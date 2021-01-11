@@ -409,7 +409,7 @@ private:
          std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
       }
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy:
    cpp_int_base(cpp_int_base&& o)
       : base_type(static_cast<base_type&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal), m_alias(o.m_alias)
    {
@@ -468,7 +468,6 @@ private:
       o.m_internal                   = true;
       return *this;
    }
-#endif
    BOOST_MP_FORCEINLINE ~cpp_int_base() BOOST_NOEXCEPT
    {
       if (!m_internal && !m_alias)
@@ -1382,7 +1381,7 @@ struct cpp_int_backend
 
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend() BOOST_NOEXCEPT {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(const cpp_int_backend& o) BOOST_MP_NOEXCEPT_IF(boost::is_void<Allocator>::value) : base_type(o) {}
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy:
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(cpp_int_backend&& o) BOOST_NOEXCEPT
        : base_type(static_cast<base_type&&>(o))
    {}
@@ -1391,7 +1390,6 @@ struct cpp_int_backend
    {
       *this = static_cast<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>&&>(o);
    }
-#endif
    //
    // Direct construction from arithmetic type:
    //
@@ -1516,7 +1514,7 @@ struct cpp_int_backend
       this->assign(o);
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy:
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_backend& operator=(cpp_int_backend&& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<base_type&>() = std::declval<base_type>()))
    {
       *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
@@ -1528,7 +1526,6 @@ struct cpp_int_backend
       *static_cast<base_type*>(this) = static_cast<typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>::base_type&&>(o);
       return *this;
    }
-#endif
  private:
    template <class A>
    BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<is_unsigned<A> >::type do_assign_arithmetic(A val, const mpl::true_&)

@@ -55,9 +55,7 @@ struct skeleton_backend
    // We must have a default constructor:
    skeleton_backend();
    skeleton_backend(const skeleton_backend& o);
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    skeleton_backend(skeleton_backend&& o);
-#endif
 
    // Optional constructors, we can make this type slightly more efficient
    // by providing constructors from any type we can handle natively.
@@ -72,9 +70,7 @@ struct skeleton_backend
    // listed in signed_types, unsigned_types, and float_types plus a string constructor.
    //
    skeleton_backend& operator=(const skeleton_backend& o);
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    skeleton_backend& operator=(skeleton_backend&& o);
-#endif
    skeleton_backend& operator=(unsigned long long i);
    skeleton_backend& operator=(long long i);
    skeleton_backend& operator=(long double i);

@@ -237,15 +237,6 @@ BOOST_CONSTEXPR typename enable_if_c<(is_unsigned<T>::value), T>::type unsigned_
    return t;
 }
 
-//
-// Move support:
-//
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-#define BOOST_MP_MOVE(x) std::move(x)
-#else
-#define BOOST_MP_MOVE(x) x
-#endif
-
 template <class T>
 struct bits_of
 {

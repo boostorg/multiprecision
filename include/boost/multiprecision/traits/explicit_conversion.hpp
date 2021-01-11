@@ -49,14 +49,9 @@ struct has_generic_interconversion
 template <typename S, typename T>
 struct is_explicitly_convertible_imp
 {
-#ifndef BOOST_NO_SFINAE_EXPR
    template <typename S1, typename T1>
    static type_traits::yes_type selector(dummy_size<sizeof(new T1(boost::declval<
-#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
                                                                   S1
-#else
-                                                                  S1 const&
-#endif
                                                                   >()))>*);
 
    template <typename S1, typename T1>
@@ -65,24 +60,12 @@ struct is_explicitly_convertible_imp
    static const bool value = sizeof(selector<S, T>(0)) == sizeof(type_traits::yes_type);
 
    typedef boost::integral_constant<bool, value> type;
-#else
-   typedef typename has_generic_interconversion<S, T>::type                                      gen_type;
-   typedef boost::integral_constant<bool, boost::is_convertible<S, T>::value || gen_type::value> type;
-#endif
 };
 
 template <typename From, typename To>
 struct is_explicitly_convertible : public is_explicitly_convertible_imp<From, To>::type
 {
 };
-
-#ifdef BOOST_NO_SFINAE_EXPR
-template <class Backend1, expression_template_option ExpressionTemplates1, class Backend2, expression_template_option ExpressionTemplates2>
-struct is_explicitly_convertible<number<Backend1, ExpressionTemplates1>, number<Backend2, ExpressionTemplates2> >
-    : public is_explicitly_convertible<Backend1, Backend2>
-{
-};
-#endif
 
 }}} // namespace boost::multiprecision::detail
 

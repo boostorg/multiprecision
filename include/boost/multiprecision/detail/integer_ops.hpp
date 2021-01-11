@@ -449,7 +449,7 @@ struct powm_func
    {
       T temp;
       eval_powm(temp, b, p, m);
-      result = BOOST_MP_MOVE(temp);
+      result = std::move(temp);
    }
 };
 

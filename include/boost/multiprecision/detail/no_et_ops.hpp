@@ -307,7 +307,6 @@ namespace boost {
          return result;
       }
 
-#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && !(defined(__GNUC__) && ((__GNUC__ == 4) && (__GNUC_MINOR__ < 5)))
       //
       // If we have rvalue references go all over again with rvalue ref overloads and move semantics.
       // Note that while it would be tempting to implement these so they return an rvalue reference
@@ -649,7 +648,6 @@ namespace boost {
          return static_cast<number<B, et_off>&&>(a);
       }
 
-#endif
 
    }
 } // namespace boost::multiprecision

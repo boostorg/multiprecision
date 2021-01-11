@@ -62,7 +62,7 @@ struct logged_adaptor
       m_value = o.m_value;
       log_postfix_event(m_value, "Copy construct");
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    logged_adaptor(logged_adaptor&& o)
    {
       log_prefix_event(m_value, o.value(), "Move construct");
@@ -76,7 +76,6 @@ struct logged_adaptor
       log_postfix_event(m_value, "Move construct");
       return *this;
    }
-#endif
    logged_adaptor& operator=(const logged_adaptor& o)
    {
       log_prefix_event(m_value, o.value(), "Assignment");

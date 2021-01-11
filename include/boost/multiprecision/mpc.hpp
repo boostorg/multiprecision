@@ -88,13 +88,12 @@ struct mpc_complex_imp
       if (o.m_data[0].re[0]._mpfr_d)
          mpc_set(m_data, o.m_data, GMP_RNDN);
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    mpc_complex_imp(mpc_complex_imp&& o) BOOST_NOEXCEPT
    {
       m_data[0]                 = o.m_data[0];
       o.m_data[0].re[0]._mpfr_d = 0;
    }
-#endif
    mpc_complex_imp& operator=(const mpc_complex_imp& o)
    {
       if ((o.m_data[0].re[0]._mpfr_d) && (this != &o))
@@ -105,13 +104,12 @@ struct mpc_complex_imp
       }
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue assign
    mpc_complex_imp& operator=(mpc_complex_imp&& o) BOOST_NOEXCEPT
    {
       mpc_swap(m_data, o.m_data);
       return *this;
    }
-#endif
 #ifdef BOOST_HAS_LONG_LONG
 #ifdef _MPFR_H_HAVE_INTMAX_T
    mpc_complex_imp& operator=(boost::ulong_long_type i)
@@ -332,10 +330,9 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
 {
    mpc_complex_backend() : detail::mpc_complex_imp<digits10>() {}
    mpc_complex_backend(const mpc_complex_backend& o) : detail::mpc_complex_imp<digits10>(o) {}
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    mpc_complex_backend(mpc_complex_backend&& o) : detail::mpc_complex_imp<digits10>(static_cast<detail::mpc_complex_imp<digits10>&&>(o))
    {}
-#endif
    template <unsigned D>
    mpc_complex_backend(const mpc_complex_backend<D>& val, typename enable_if_c<D <= digits10>::type* = 0)
        : detail::mpc_complex_imp<digits10>()
@@ -461,13 +458,12 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
       *static_cast<detail::mpc_complex_imp<digits10>*>(this) = static_cast<detail::mpc_complex_imp<digits10> const&>(o);
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue assign
    mpc_complex_backend& operator=(mpc_complex_backend&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::mpc_complex_imp<digits10>*>(this) = static_cast<detail::mpc_complex_imp<digits10>&&>(o);
       return *this;
    }
-#endif
    template <class V>
    mpc_complex_backend& operator=(const V& v)
    {
@@ -513,10 +509,9 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
       mpc_set(this->m_data, val, GMP_RNDN);
    }
    mpc_complex_backend(const mpc_complex_backend& o) : detail::mpc_complex_imp<0>(o) {}
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    mpc_complex_backend(mpc_complex_backend&& o) BOOST_NOEXCEPT : detail::mpc_complex_imp<0>(static_cast<detail::mpc_complex_imp<0>&&>(o))
    {}
-#endif
    mpc_complex_backend(const mpc_complex_backend& o, unsigned digits10)
        : detail::mpc_complex_imp<0>(multiprecision::detail::digits10_2_2(digits10))
    {
@@ -658,13 +653,12 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
       }
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue assign
    mpc_complex_backend& operator=(mpc_complex_backend&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::mpc_complex_imp<0>*>(this) = static_cast<detail::mpc_complex_imp<0>&&>(o);
       return *this;
    }
-#endif
    template <class V>
    mpc_complex_backend& operator=(const V& v)
    {

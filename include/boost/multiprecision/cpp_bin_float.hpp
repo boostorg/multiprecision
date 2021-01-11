@@ -132,7 +132,7 @@ class cpp_bin_float
    {
       *this = o;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy:
    template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
    cpp_bin_float(cpp_bin_float<D, B, A, E, MinE, MaxE>&& o, typename boost::enable_if_c<(bit_count >= cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count)>::type const* = 0)BOOST_MP_NOEXCEPT_IF(noexcept(rep_type(std::declval<rep_type&&>())))
    {
@@ -144,7 +144,6 @@ class cpp_bin_float
    {
       *this = std::move(o);
    }
-#endif
    template <class Float>
    cpp_bin_float(const Float& f,
                  typename boost::enable_if_c<detail::is_cpp_bin_float_implicitly_constructible_from_type<Float, bit_count>::value>::type const* = 0)
@@ -213,7 +212,7 @@ class cpp_bin_float
          m_exponent = o.exponent();
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy:
    template <class A, class E, E MinE, E MaxE>
    cpp_bin_float& operator=(cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>&& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<rep_type&>() = std::declval<rep_type&&>()))
    {
@@ -241,7 +240,6 @@ class cpp_bin_float
          m_exponent = o.exponent();
       return *this;
    }
-#endif
    template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
    cpp_bin_float& operator=(const cpp_bin_float<D, B, A, E, MinE, MaxE>& f)
    {

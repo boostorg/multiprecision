@@ -110,13 +110,13 @@ struct gmp_float_imp
       if (o.m_data[0]._mp_d)
          mpf_set(m_data, o.m_data);
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    gmp_float_imp(gmp_float_imp&& o) BOOST_NOEXCEPT
    {
       m_data[0]         = o.m_data[0];
       o.m_data[0]._mp_d = 0;
    }
-#endif
+
    gmp_float_imp& operator=(const gmp_float_imp& o)
    {
       if (m_data[0]._mp_d == 0)
@@ -136,13 +136,12 @@ struct gmp_float_imp
       }
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue assign
    gmp_float_imp& operator=(gmp_float_imp&& o) BOOST_NOEXCEPT
    {
       mpf_swap(m_data, o.m_data);
       return *this;
    }
-#endif
 
 #ifdef BOOST_HAS_LONG_LONG
 #if defined(ULLONG_MAX) && (ULLONG_MAX == ULONG_MAX)
@@ -466,22 +465,19 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
       mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpf_set_q(this->m_data, val);
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    gmp_float(gmp_float&& o) BOOST_NOEXCEPT : detail::gmp_float_imp<digits10>(static_cast<detail::gmp_float_imp<digits10>&&>(o))
    {}
-#endif
    gmp_float& operator=(const gmp_float& o)
    {
       *static_cast<detail::gmp_float_imp<digits10>*>(this) = static_cast<detail::gmp_float_imp<digits10> const&>(o);
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    gmp_float& operator=(gmp_float&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::gmp_float_imp<digits10>*>(this) = static_cast<detail::gmp_float_imp<digits10>&&>(o);
       return *this;
    }
-#endif
    template <unsigned D>
    gmp_float& operator=(const gmp_float<D>& o);
    gmp_float& operator=(const gmp_int& o);
@@ -559,10 +555,9 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       mpf_set(this->m_data, o.data());
       requested_precision = D;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    gmp_float(gmp_float&& o) BOOST_NOEXCEPT : detail::gmp_float_imp<0>(static_cast<detail::gmp_float_imp<0>&&>(o)), requested_precision(o.requested_precision)
    {}
-#endif
    gmp_float(const gmp_int& o);
    gmp_float(const gmp_rational& o);
    gmp_float(const gmp_float& o, unsigned digits10) : requested_precision(digits10)
@@ -595,14 +590,13 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       requested_precision                           = o.requested_precision;
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    gmp_float& operator=(gmp_float&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::gmp_float_imp<0>*>(this) = static_cast<detail::gmp_float_imp<0>&&>(o);
       requested_precision                           = o.requested_precision;
       return *this;
    }
-#endif
    template <unsigned D>
    gmp_float& operator=(const gmp_float<D>& o)
    {
@@ -1136,13 +1130,12 @@ struct gmp_int
       else
          mpz_init(this->m_data);
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue
    gmp_int(gmp_int&& o) BOOST_NOEXCEPT
    {
       m_data[0]         = o.m_data[0];
       o.m_data[0]._mp_d = 0;
    }
-#endif
    explicit gmp_int(const mpf_t val)
    {
       mpz_init(this->m_data);
@@ -1171,13 +1164,12 @@ struct gmp_int
       mpz_set(m_data, o.m_data);
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    gmp_int& operator=(gmp_int&& o) BOOST_NOEXCEPT
    {
       mpz_swap(m_data, o.m_data);
       return *this;
    }
-#endif
 #ifdef BOOST_HAS_LONG_LONG
 #if defined(ULLONG_MAX) && (ULLONG_MAX == ULONG_MAX)
    gmp_int& operator=(boost::ulong_long_type i)
@@ -2053,14 +2045,13 @@ struct gmp_rational
       mpq_init(m_data);
       mpq_set_z(m_data, o.data());
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    gmp_rational(gmp_rational&& o) BOOST_NOEXCEPT
    {
       m_data[0]                 = o.m_data[0];
       o.m_data[0]._mp_num._mp_d = 0;
       o.m_data[0]._mp_den._mp_d = 0;
    }
-#endif
    gmp_rational(const mpq_t o)
    {
       mpq_init(m_data);
@@ -2078,13 +2069,12 @@ struct gmp_rational
       mpq_set(m_data, o.m_data);
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue assign
    gmp_rational& operator=(gmp_rational&& o) BOOST_NOEXCEPT
    {
       mpq_swap(m_data, o.m_data);
       return *this;
    }
-#endif
 #ifdef BOOST_HAS_LONG_LONG
 #if defined(ULLONG_MAX) && (ULLONG_MAX == ULONG_MAX)
    gmp_rational& operator=(boost::ulong_long_type i)

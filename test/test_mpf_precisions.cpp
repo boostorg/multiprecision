@@ -40,7 +40,6 @@ int main()
       b = a;
       BOOST_CHECK_EQUAL(b.precision(), a.precision());
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    {
       // test assignment from rvalue:
       mpf_float b(2);
@@ -48,20 +47,17 @@ int main()
       b = make_rvalue_copy(a);
       BOOST_CHECK_EQUAL(b.precision(), a.precision());
    }
-#endif
    mpf_float::default_precision(20);
    {
       // test construct from lvalue:
       mpf_float b(a);
       BOOST_CHECK_EQUAL(b.precision(), a.precision());
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    {
       // test construct from rvalue:
       mpf_float b(make_rvalue_copy(a));
       BOOST_CHECK_EQUAL(b.precision(), a.precision());
    }
-#endif
    {
       mpf_float f150(2, 150);
       BOOST_CHECK_GE(f150.precision(), 150);
@@ -106,11 +102,9 @@ int main()
       BOOST_CHECK_EQUAL(y, 3);
       BOOST_CHECK_GE(x.precision(), 100);
       BOOST_CHECK_GE(y.precision(), 50);
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
       x = std::move(mpf_float(y));
       BOOST_CHECK_EQUAL(x, y);
       BOOST_CHECK_EQUAL(x.precision(), y.precision());
-#endif
    }
    {
       mpf_float c(4), d(8), e(9), f;

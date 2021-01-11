@@ -207,7 +207,7 @@ class number
       if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
       {
          number t(e);
-         return *this = BOOST_MP_MOVE(t);
+         return *this = std::move(t);
       }
       do_assign(e, tag_type());
       return *this;
@@ -231,7 +231,7 @@ class number
       {
          number t;
          t.assign(e);
-         return *this = BOOST_MP_MOVE(t);
+         return *this = std::move(t);
       }
       do_assign(e, tag_type());
       return *this;
@@ -289,7 +289,7 @@ class number
       if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
       {
          number t(v);
-         return *this = BOOST_MP_MOVE(t);
+         return *this = std::move(t);
       }
       generic_interconvert(backend(), v.backend(), number_category<Backend>(), number_category<Other>());
       return *this;
@@ -313,7 +313,7 @@ class number
       assign(e);
    }
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalues:
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(number&& r)
        BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend>())))
        : m_backend(static_cast<Backend&&>(r.m_backend))
@@ -336,7 +336,6 @@ class number
       m_backend = std::move(val).backend();
       return *this;
    }
-#endif
 
    BOOST_MP_CXX14_CONSTEXPR number& operator+=(const self_type& val)
    {
@@ -354,7 +353,7 @@ class number
       if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
       {
          number t(*this + val);
-         return *this = BOOST_MP_MOVE(t);
+         return *this = std::move(t);
       }
       do_add(detail::expression<detail::terminal, self_type>(val), detail::terminal());
       return *this;
@@ -395,7 +394,7 @@ class number
       if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
       {
          number t(*this + e);
-         return *this = BOOST_MP_MOVE(t);
+         return *this = std::move(t);
       }
       //
       // Fused multiply-add:
@@ -430,7 +429,7 @@ class number
       if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
       {
          number t(*this - val);
-         return *this = BOOST_MP_MOVE(t);
+         return *this = std::move(t);
       }
       do_subtract(detail::expression<detail::terminal, self_type>(val), detail::terminal());
       return *this;
@@ -479,7 +478,7 @@ class number
       if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
       {
          number t(*this - e);
-         return *this = BOOST_MP_MOVE(t);
+         return *this = std::move(t);
       }
       //
       // Fused multiply-subtract:
@@ -505,7 +504,7 @@ class number
       if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
       {
          number t(*this * e);
-         return *this = BOOST_MP_MOVE(t);
+         return *this = std::move(t);
       }
       do_multiplies(detail::expression<detail::terminal, self_type>(e), detail::terminal());
       return *this;
@@ -555,7 +554,7 @@ class number
       if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
       {
          number t(*this % e);
-         return *this = BOOST_MP_MOVE(t);
+         return *this = std::move(t);
       }
       do_modulus(detail::expression<detail::terminal, self_type>(e), detail::terminal());
       return *this;
@@ -659,7 +658,7 @@ class number
       if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
       {
          number t(*this / e);
-         return *this = BOOST_MP_MOVE(t);
+         return *this = std::move(t);
       }
       do_divide(detail::expression<detail::terminal, self_type>(e), detail::terminal());
       return *this;
@@ -943,7 +942,6 @@ class number
    //
    // Direct access to the underlying backend:
    //
-#if !(defined(BOOST_NO_CXX11_RVALUE_REFERENCES) || defined(BOOST_NO_CXX11_REF_QUALIFIERS) || BOOST_WORKAROUND(BOOST_GCC, < 50000))
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR Backend& backend() & BOOST_NOEXCEPT
    {
       return m_backend;
@@ -951,13 +949,6 @@ class number
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Backend& backend() const& BOOST_NOEXCEPT { return m_backend; }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR Backend&& backend() && BOOST_NOEXCEPT { return static_cast<Backend&&>(m_backend); }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR Backend const&& backend() const&& BOOST_NOEXCEPT { return static_cast<Backend const&&>(m_backend); }
-#else
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR Backend& backend() BOOST_NOEXCEPT
-   {
-      return m_backend;
-   }
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Backend& backend() const BOOST_NOEXCEPT { return m_backend; }
-#endif
    //
    // Complex number real and imag:
    //
@@ -1008,7 +999,7 @@ class number
       // create a temporary result and assign it to *this:
       typedef typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type temp_type;
       temp_type                                                                     t(e);
-      *this = BOOST_MP_MOVE(t);
+      *this = std::move(t);
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!std::is_assignable<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value>::type 
@@ -1525,20 +1516,20 @@ class number
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const detail::terminal&)
    {
       typename Exp1::result_type temp1(val1);
-      f(m_backend, BOOST_MP_MOVE(temp1.backend()), function_arg_value(val2));
+      f(m_backend, std::move(temp1.backend()), function_arg_value(val2));
    }
    template <class F, class Exp1, class Exp2, class Tag2>
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const Tag2&)
    {
       typename Exp2::result_type temp2(val2);
-      f(m_backend, function_arg_value(val1), BOOST_MP_MOVE(temp2.backend()));
+      f(m_backend, function_arg_value(val1), std::move(temp2.backend()));
    }
    template <class F, class Exp1, class Exp2, class Tag1, class Tag2>
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const Tag2&)
    {
       typename Exp1::result_type temp1(val1);
       typename Exp2::result_type temp2(val2);
-      f(m_backend, BOOST_MP_MOVE(temp1.backend()), BOOST_MP_MOVE(temp2.backend()));
+      f(m_backend, std::move(temp1.backend()), std::move(temp2.backend()));
    }
 
    template <class Exp>
@@ -1561,7 +1552,7 @@ class number
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function_3a(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag1&, const Tag2& t2, const Tag3& t3)
    {
       typename Exp1::result_type t(val1);
-      do_assign_function_3b(f, BOOST_MP_MOVE(t), val2, val3, t2, t3);
+      do_assign_function_3b(f, std::move(t), val2, val3, t2, t3);
    }
    template <class F, class Exp1, class Exp2, class Exp3, class Tag3>
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&, const Tag3& t3)
@@ -1572,7 +1563,7 @@ class number
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag2& /*t2*/, const Tag3& t3)
    {
       typename Exp2::result_type t(val2);
-      do_assign_function_3c(f, val1, BOOST_MP_MOVE(t), val3, t3);
+      do_assign_function_3c(f, val1, std::move(t), val3, t3);
    }
    template <class F, class Exp1, class Exp2, class Exp3>
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&)
@@ -1583,7 +1574,7 @@ class number
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag3& /*t3*/)
    {
       typename Exp3::result_type t(val3);
-      do_assign_function_3c(f, val1, val2, BOOST_MP_MOVE(t), detail::terminal());
+      do_assign_function_3c(f, val1, val2, std::move(t), detail::terminal());
    }
 
    template <class Exp>

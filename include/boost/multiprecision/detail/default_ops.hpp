@@ -2050,21 +2050,21 @@ template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename boost::lazy_enable_if_c<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates> > >::type
 abs(const number<T, ExpressionTemplates>& v)
 {
-   return BOOST_MP_MOVE(boost::math::hypot(real(v), imag(v)));
+   return std::move(boost::math::hypot(real(v), imag(v)));
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename boost::lazy_enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex, component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type> >::type
 abs(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-   return BOOST_MP_MOVE(abs(static_cast<number_type>(v)));
+   return std::move(abs(static_cast<number_type>(v)));
 }
 
 template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value == number_kind_complex, typename scalar_result_from_possible_complex<number<T, ExpressionTemplates> >::type>::type
 arg(const number<T, ExpressionTemplates>& v)
 {
-   return BOOST_MP_MOVE(atan2(imag(v), real(v)));
+   return std::move(atan2(imag(v), real(v)));
 }
 template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value == number_kind_floating_point, typename scalar_result_from_possible_complex<number<T, ExpressionTemplates> >::type>::type
@@ -2077,7 +2077,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename de
 arg(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-   return BOOST_MP_MOVE(arg(static_cast<number_type>(v)));
+   return std::move(arg(static_cast<number_type>(v)));
 }
 
 template <class T, expression_template_option ExpressionTemplates>
@@ -2085,7 +2085,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename boost::lazy_enable_if_c<number_category
 norm(const number<T, ExpressionTemplates>& v)
 {
    typename component_type<number<T, ExpressionTemplates> >::type a(real(v)), b(imag(v));
-   return BOOST_MP_MOVE(a * a + b * b);
+   return std::move(a * a + b * b);
 }
 template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<number_category<T>::value != number_kind_complex, typename scalar_result_from_possible_complex<number<T, ExpressionTemplates> >::type>::type
@@ -2098,7 +2098,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<typ
 norm(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-   return BOOST_MP_MOVE(norm(static_cast<number_type>(v)));
+   return std::move(norm(static_cast<number_type>(v)));
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
@@ -2487,7 +2487,7 @@ template <class tag, class A1, class A2, class A3, class A4, class Policy>
 inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<tag, A1, A2, A3, A4>::result_type trunc(const detail::expression<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-   return BOOST_MP_MOVE(trunc(number_type(v), pol));
+   return std::move(trunc(number_type(v), pol));
 }
 
 template <class Backend, expression_template_option ExpressionTemplates, class Policy>
@@ -2587,7 +2587,7 @@ template <class tag, class A1, class A2, class A3, class A4, class Policy>
 inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<tag, A1, A2, A3, A4>::result_type round(const detail::expression<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-   return BOOST_MP_MOVE(round(static_cast<number_type>(v), pol));
+   return std::move(round(static_cast<number_type>(v), pol));
 }
 template <class T, expression_template_option ExpressionTemplates, class Policy>
 inline BOOST_MP_CXX14_CONSTEXPR number<T, ExpressionTemplates> round(const number<T, ExpressionTemplates>& v, const Policy&)
@@ -2701,7 +2701,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename de
 frexp(const detail::expression<tag, A1, A2, A3, A4>& v, short* pint)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-   return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+   return std::move(frexp(static_cast<number_type>(v), pint));
 }
 template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value == number_kind_floating_point, number<T, ExpressionTemplates> >::type frexp(const number<T, ExpressionTemplates>& v, int* pint)
@@ -2717,7 +2717,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename de
 frexp(const detail::expression<tag, A1, A2, A3, A4>& v, int* pint)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-   return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+   return std::move(frexp(static_cast<number_type>(v), pint));
 }
 template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value == number_kind_floating_point, number<T, ExpressionTemplates> >::type frexp(const number<T, ExpressionTemplates>& v, long* pint)
@@ -2733,7 +2733,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename de
 frexp(const detail::expression<tag, A1, A2, A3, A4>& v, long* pint)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-   return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+   return std::move(frexp(static_cast<number_type>(v), pint));
 }
 template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value == number_kind_floating_point, number<T, ExpressionTemplates> >::type frexp(const number<T, ExpressionTemplates>& v, boost::long_long_type* pint)
@@ -2749,7 +2749,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename de
 frexp(const detail::expression<tag, A1, A2, A3, A4>& v, boost::long_long_type* pint)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-   return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+   return std::move(frexp(static_cast<number_type>(v), pint));
 }
 //
 // modf does not return an expression template since we require the
@@ -3048,7 +3048,6 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
 
 // clang-format off
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 #define UNARY_OP_FUNCTOR_CXX11_RVALUE(func, category)\
    template <class Backend>                                                                                                                                                                               \
    inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == category, number<Backend, et_on> > ::type                                                                      \
@@ -3125,10 +3124,6 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
              Arithmetic, number<Backend, et_on> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < Backend > (), arg, a);                                                                                                                          \
    }                                                                                                                                                                                                                                                       \
 
-#else
-#define UNARY_OP_FUNCTOR_CXX11_RVALUE(func, category)
-#define BINARY_OP_FUNCTOR_CXX11_RVALUE(func, category)
-#endif
 
 #define UNARY_OP_FUNCTOR(func, category)                                                                                                                                                                  \
    namespace detail {                                                                                                                                                                                     \
@@ -3148,7 +3143,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
          Backend temp;                                                                                                                                                                                    \
          BOOST_JOIN(eval_, func)                                                                                                                                                                          \
          (temp, arg);                                                                                                                                                                                     \
-         result = BOOST_MP_MOVE(temp);                                                                                                                                                                                   \
+         result = std::move(temp);                                                                                                                                                                                   \
       }                                                                                                                                                                                                   \
    };                                                                                                                                                                                                     \
    }                                                                                                                                                                                                      \
@@ -3219,7 +3214,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
          Backend r;                                                                                                                                                                                                                                        \
          BOOST_JOIN(eval_, func)                                                                                                                                                                                                                           \
          (r, arg, a);                                                                                                                                                                                                                                      \
-         result = BOOST_MP_MOVE(r);                                                                                                                                                                                                                                       \
+         result = std::move(r);                                                                                                                                                                                                                                       \
       }                                                                                                                                                                                                                                                    \
       template <class U, class Arithmetic>                                                                                                                                                                                                                 \
       BOOST_MP_CXX14_CONSTEXPR void operator()(U& result, const Backend& arg, const Arithmetic& a) const                                                                                                                                                                            \
@@ -3228,7 +3223,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
          Backend r;                                                                                                                                                                                                                                        \
          BOOST_JOIN(eval_, func)                                                                                                                                                                                                                           \
          (r, arg, number<Backend>::canonical_value(a));                                                                                                                                                                                                    \
-         result = BOOST_MP_MOVE(r);                                                                                                                                                                                                                                       \
+         result = std::move(r);                                                                                                                                                                                                                                       \
       }                                                                                                                                                                                                                                                    \
       template <class U, class Arithmetic>                                                                                                                                                                                                                 \
       BOOST_MP_CXX14_CONSTEXPR void operator()(U& result, const Arithmetic& arg, const Backend& a) const                                                                                                                                                                            \
@@ -3237,7 +3232,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
          Backend r;                                                                                                                                                                                                                                        \
          BOOST_JOIN(eval_, func)                                                                                                                                                                                                                           \
          (r, number<Backend>::canonical_value(arg), a);                                                                                                                                                                                                    \
-         result = BOOST_MP_MOVE(r);                                                                                                                                                                                                                                       \
+         result = std::move(r);                                                                                                                                                                                                                                       \
       }                                                                                                                                                                                                                                                    \
    };                                                                                                                                                                                                                                                      \
    }                                                                                                                                                                                                                                                       \
@@ -3416,7 +3411,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
          Backend temp;                                                  \
          BOOST_JOIN(eval_, func)                                        \
          (temp, arg, a);                                                \
-         result = BOOST_MP_MOVE(temp);                                  \
+         result = std::move(temp);                                  \
       }                                                                 \
    };                                                                   \
    }                                                                    \
@@ -3662,28 +3657,28 @@ template <class Backend, multiprecision::expression_template_option ExpressionTe
 inline multiprecision::number<Backend, ExpressionTemplates> sinc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x)
 {
    boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x);
-   return BOOST_MP_MOVE(detail::sinc_pi_imp(x));
+   return std::move(detail::sinc_pi_imp(x));
 }
 
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates, class Policy>
 inline multiprecision::number<Backend, ExpressionTemplates> sinc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x, const Policy&)
 {
    boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x);
-   return BOOST_MP_MOVE(detail::sinc_pi_imp(x));
+   return std::move(detail::sinc_pi_imp(x));
 }
 
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline multiprecision::number<Backend, ExpressionTemplates> sinhc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x)
 {
    boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x);
-   return BOOST_MP_MOVE(detail::sinhc_pi_imp(x));
+   return std::move(detail::sinhc_pi_imp(x));
 }
 
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates, class Policy>
 inline multiprecision::number<Backend, ExpressionTemplates> sinhc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x, const Policy&)
 {
    boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x);
-   return BOOST_MP_MOVE(boost::math::sinhc_pi(x));
+   return std::move(boost::math::sinhc_pi(x));
 }
 
 using boost::multiprecision::gcd;

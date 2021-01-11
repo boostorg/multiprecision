@@ -41,7 +41,6 @@ int main()
       b = a;
       BOOST_CHECK_EQUAL(b.precision(), a.precision());
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    {
       // test assignment from rvalue:
       mpfr_float b(2);
@@ -49,20 +48,17 @@ int main()
       b = make_rvalue_copy(a);
       BOOST_CHECK_EQUAL(b.precision(), a.precision());
    }
-#endif
    mpfr_float::default_precision(20);
    {
       // test construct from lvalue:
       mpfr_float b(a);
       BOOST_CHECK_EQUAL(b.precision(), 100);
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    {
       // test construct from rvalue:
       mpfr_float b(make_rvalue_copy(a));
       BOOST_CHECK_EQUAL(b.precision(), 100);
    }
-#endif
    mpc_complex::default_precision(100);
    mpc_complex ca("0.1");
    BOOST_CHECK_EQUAL(ca.precision(), 100);
@@ -74,7 +70,6 @@ int main()
       b = ca;
       BOOST_CHECK_EQUAL(b.precision(), ca.precision());
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    {
       // test assignment from rvalue:
       mpc_complex b(2);
@@ -82,19 +77,16 @@ int main()
       b = make_rvalue_copy(ca);
       BOOST_CHECK_EQUAL(b.precision(), ca.precision());
    }
-#endif
    {
       // test construct from lvalue:
       mpc_complex b(ca);
       BOOST_CHECK_EQUAL(b.precision(), ca.precision());
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    {
       // test construct from rvalue:
       mpc_complex b(make_rvalue_copy(ca));
       BOOST_CHECK_EQUAL(b.precision(), ca.precision());
    }
-#endif
    // real and imaginary:
    BOOST_CHECK_EQUAL(ca.real().precision(), 100);
    BOOST_CHECK_EQUAL(ca.imag().precision(), 100);
@@ -225,11 +217,9 @@ int main()
       BOOST_CHECK_EQUAL(y, 3);
       BOOST_CHECK_EQUAL(x.precision(), 100);
       BOOST_CHECK_EQUAL(y.precision(), 50);
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
       x = std::move(mpfr_float(y));
       BOOST_CHECK_EQUAL(x, y);
       BOOST_CHECK_EQUAL(x.precision(), y.precision());
-#endif
    }
    {
       mpc_complex x(2, 3, 100); // 100 digits precision.
@@ -248,11 +238,9 @@ int main()
       BOOST_CHECK_EQUAL(y.imag(), 4);
       BOOST_CHECK_EQUAL(x.precision(), 100);
       BOOST_CHECK_EQUAL(y.precision(), 50);
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
       x = std::move(mpc_complex(y));
       BOOST_CHECK_EQUAL(x, y);
       BOOST_CHECK_EQUAL(x.precision(), y.precision());
-#endif
    }
    {
       mpfr_float c(4), d(8), e(9), f;

@@ -57,7 +57,7 @@ struct rational_adaptor
       return *this;
    }
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalues:
    rational_adaptor(rational_adaptor&& o) BOOST_MP_NOEXCEPT_IF(noexcept(rational_type(std::declval<rational_type>()))) : m_value(static_cast<rational_type&&>(o.m_value))
    {}
    rational_adaptor(IntBackend&& o) BOOST_MP_NOEXCEPT_IF(noexcept(rational_type(std::declval<IntBackend>()))) : m_value(static_cast<IntBackend&&>(o)) {}
@@ -66,7 +66,6 @@ struct rational_adaptor
       m_value = static_cast<rational_type&&>(o.m_value);
       return *this;
    }
-#endif
    rational_adaptor& operator=(const rational_adaptor& o)
    {
       m_value = o.m_value;

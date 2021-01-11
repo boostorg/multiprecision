@@ -3160,7 +3160,6 @@ void test()
    //
    // Test move:
    //
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    Real m(static_cast<Real&&>(a));
    BOOST_CHECK_EQUAL(m, 20);
    // Move from already moved from object:
@@ -3175,7 +3174,6 @@ void test()
    BOOST_CHECK_EQUAL(c, 20);
    // Destructor of "a" checks destruction of moved-from-object...
    Real m3(static_cast<Real&&>(a));
-#endif
 #ifndef BOOST_MP_NOT_TESTING_NUMBER
    //
    // string and string_view:

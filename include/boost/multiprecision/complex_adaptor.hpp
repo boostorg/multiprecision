@@ -50,10 +50,9 @@ struct complex_adaptor
 
    complex_adaptor() {}
    complex_adaptor(const complex_adaptor& o) : m_real(o.real_data()), m_imag(o.imag_data()) {}
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // Rvalue construct:
    complex_adaptor(complex_adaptor&& o) : m_real(std::move(o.real_data())), m_imag(std::move(o.imag_data()))
    {}
-#endif
    complex_adaptor(const Backend& val)
        : m_real(val)
    {}
@@ -80,14 +79,13 @@ struct complex_adaptor
       m_imag = o.imag_data();
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue assign:
    complex_adaptor& operator=(complex_adaptor&& o) BOOST_NOEXCEPT
    {
       m_real = std::move(o.real_data());
       m_imag = std::move(o.imag_data());
       return *this;
    }
-#endif
    template <class V>
    complex_adaptor& operator=(const V& v)
    {
@@ -207,8 +205,8 @@ inline void eval_multiply(complex_adaptor<Backend>& result, const complex_adapto
    eval_multiply(t1, result.real_data(), o.imag_data());
    eval_multiply(t2, result.imag_data(), o.real_data());
    eval_add(t1, t2);
-   result.real_data() = BOOST_MP_MOVE(t3);
-   result.imag_data() = BOOST_MP_MOVE(t1);
+   result.real_data() = std::move(t3);
+   result.imag_data() = std::move(t1);
 }
 template <class Backend>
 inline void eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& z)

@@ -91,13 +91,12 @@ struct mpfi_float_imp
       if (o.m_data[0].left._mpfr_d)
          mpfi_set(m_data, o.m_data);
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    mpfi_float_imp(mpfi_float_imp&& o) BOOST_NOEXCEPT
    {
       m_data[0]                = o.m_data[0];
       o.m_data[0].left._mpfr_d = 0;
    }
-#endif
    mpfi_float_imp& operator=(const mpfi_float_imp& o)
    {
       if (m_data[0].left._mpfr_d == 0)
@@ -115,13 +114,12 @@ struct mpfi_float_imp
       }
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue assign
    mpfi_float_imp& operator=(mpfi_float_imp&& o) BOOST_NOEXCEPT
    {
       mpfi_swap(m_data, o.m_data);
       return *this;
    }
-#endif
 #ifdef BOOST_HAS_LONG_LONG
 #ifdef _MPFR_H_HAVE_INTMAX_T
    mpfi_float_imp& operator=(boost::ulong_long_type i)
@@ -348,10 +346,9 @@ struct mpfi_float_backend : public detail::mpfi_float_imp<digits10>
 {
    mpfi_float_backend() : detail::mpfi_float_imp<digits10>() {}
    mpfi_float_backend(const mpfi_float_backend& o) : detail::mpfi_float_imp<digits10>(o) {}
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    mpfi_float_backend(mpfi_float_backend&& o) : detail::mpfi_float_imp<digits10>(static_cast<detail::mpfi_float_imp<digits10>&&>(o))
    {}
-#endif
    template <unsigned D>
    mpfi_float_backend(const mpfi_float_backend<D>& val, typename enable_if_c<D <= digits10>::type* = 0)
        : detail::mpfi_float_imp<digits10>()
@@ -392,13 +389,12 @@ struct mpfi_float_backend : public detail::mpfi_float_imp<digits10>
    {
       mpfi_set_fr(this->m_data, val.data());
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    mpfi_float_backend& operator=(mpfi_float_backend&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::mpfi_float_imp<digits10>*>(this) = static_cast<detail::mpfi_float_imp<digits10>&&>(o);
       return *this;
    }
-#endif
    template <class V>
    mpfi_float_backend& operator=(const V& v)
    {
@@ -436,10 +432,9 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
       mpfi_set(this->m_data, val);
    }
    mpfi_float_backend(const mpfi_float_backend& o) : detail::mpfi_float_imp<0>(o) {}
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    mpfi_float_backend(mpfi_float_backend&& o) BOOST_NOEXCEPT : detail::mpfi_float_imp<0>(static_cast<detail::mpfi_float_imp<0>&&>(o))
    {}
-#endif
    mpfi_float_backend(const mpfi_float_backend& o, unsigned digits10)
        : detail::mpfi_float_imp<0>(multiprecision::detail::digits10_2_2(digits10))
    {
@@ -464,13 +459,12 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
       mpfi_set(this->m_data, o.data());
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue assign
    mpfi_float_backend& operator=(mpfi_float_backend&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::mpfi_float_imp<0>*>(this) = static_cast<detail::mpfi_float_imp<0>&&>(o);
       return *this;
    }
-#endif
    template <class V>
    mpfi_float_backend& operator=(const V& v)
    {
