@@ -444,6 +444,13 @@ struct powm_func
    {
       eval_powm(result, b, p, m);
    }
+   template <class R, class T, class U, class V>
+   BOOST_MP_CXX14_CONSTEXPR void operator()(R& result, const T& b, const U& p, const V& m) const
+   {
+      T temp;
+      eval_powm(temp, b, p, m);
+      result = BOOST_MP_MOVE(temp);
+   }
 };
 
 } // namespace default_ops

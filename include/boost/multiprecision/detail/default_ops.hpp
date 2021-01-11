@@ -798,15 +798,15 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_decrement(T& val)
    eval_subtract(val, static_cast<ui_type>(1u));
 }
 
-template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR void eval_left_shift(T& result, const T& arg, const V val)
+template <class T, class U, class V>
+inline BOOST_MP_CXX14_CONSTEXPR void eval_left_shift(T& result, const U& arg, const V val)
 {
    result = arg;
    eval_left_shift(result, val);
 }
 
-template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR void eval_right_shift(T& result, const T& arg, const V val)
+template <class T, class U, class V>
+inline BOOST_MP_CXX14_CONSTEXPR void eval_right_shift(T& result, const U& arg, const V val)
 {
    result = arg;
    eval_right_shift(result, val);
@@ -1072,20 +1072,20 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(std::complex<long double>* 
 //
 // Functions:
 //
-template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR void eval_abs(T& result, const T& arg)
+template <class T, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void eval_abs(T& result, const U& arg)
 {
-   typedef typename T::signed_types             type_list;
+   typedef typename U::signed_types             type_list;
    typedef typename mpl::front<type_list>::type front;
    result = arg;
    if (arg.compare(front(0)) < 0)
       result.negate();
 }
-template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR void eval_fabs(T& result, const T& arg)
+template <class T, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void eval_fabs(T& result, const U& arg)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The fabs function is only valid for floating point types.");
-   typedef typename T::signed_types             type_list;
+   typedef typename U::signed_types             type_list;
    typedef typename mpl::front<type_list>::type front;
    result = arg;
    if (arg.compare(front(0)) < 0)
@@ -3148,7 +3148,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
          Backend temp;                                                                                                                                                                                    \
          BOOST_JOIN(eval_, func)                                                                                                                                                                          \
          (temp, arg);                                                                                                                                                                                     \
-         result = temp;                                                                                                                                                                                   \
+         result = BOOST_MP_MOVE(temp);                                                                                                                                                                                   \
       }                                                                                                                                                                                                   \
    };                                                                                                                                                                                                     \
    }                                                                                                                                                                                                      \
@@ -3219,7 +3219,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
          Backend r;                                                                                                                                                                                                                                        \
          BOOST_JOIN(eval_, func)                                                                                                                                                                                                                           \
          (r, arg, a);                                                                                                                                                                                                                                      \
-         result = r;                                                                                                                                                                                                                                       \
+         result = BOOST_MP_MOVE(r);                                                                                                                                                                                                                                       \
       }                                                                                                                                                                                                                                                    \
       template <class U, class Arithmetic>                                                                                                                                                                                                                 \
       BOOST_MP_CXX14_CONSTEXPR void operator()(U& result, const Backend& arg, const Arithmetic& a) const                                                                                                                                                                            \
@@ -3228,7 +3228,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
          Backend r;                                                                                                                                                                                                                                        \
          BOOST_JOIN(eval_, func)                                                                                                                                                                                                                           \
          (r, arg, number<Backend>::canonical_value(a));                                                                                                                                                                                                    \
-         result = r;                                                                                                                                                                                                                                       \
+         result = BOOST_MP_MOVE(r);                                                                                                                                                                                                                                       \
       }                                                                                                                                                                                                                                                    \
       template <class U, class Arithmetic>                                                                                                                                                                                                                 \
       BOOST_MP_CXX14_CONSTEXPR void operator()(U& result, const Arithmetic& arg, const Backend& a) const                                                                                                                                                                            \
@@ -3237,7 +3237,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
          Backend r;                                                                                                                                                                                                                                        \
          BOOST_JOIN(eval_, func)                                                                                                                                                                                                                           \
          (r, number<Backend>::canonical_value(arg), a);                                                                                                                                                                                                    \
-         result = r;                                                                                                                                                                                                                                       \
+         result = BOOST_MP_MOVE(r);                                                                                                                                                                                                                                       \
       }                                                                                                                                                                                                                                                    \
    };                                                                                                                                                                                                                                                      \
    }                                                                                                                                                                                                                                                       \
@@ -3408,6 +3408,15 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
          using default_ops::BOOST_JOIN(eval_, func);                    \
          BOOST_JOIN(eval_, func)                                        \
          (result, arg, a);                                              \
+      }                                                                 \
+      template <class U, class Arg>                                              \
+      BOOST_MP_CXX14_CONSTEXPR void operator()(U& result, Backend const& arg, Arg a) const \
+      {                                                                 \
+         using default_ops::BOOST_JOIN(eval_, func);                    \
+         Backend temp;                                                  \
+         BOOST_JOIN(eval_, func)                                        \
+         (temp, arg, a);                                                \
+         result = BOOST_MP_MOVE(temp);                                  \
       }                                                                 \
    };                                                                   \
    }                                                                    \

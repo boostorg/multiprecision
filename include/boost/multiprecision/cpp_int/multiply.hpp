@@ -284,7 +284,7 @@ setup_karatsuba(
    unsigned sz = as + bs;
    unsigned storage_size = karatsuba_storage_size(s);
 
-   if (sz * sizeof(limb_type) * CHAR_BIT <= MaxBits1)
+   if (!is_fixed_precision<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value || (sz * sizeof(limb_type) * CHAR_BIT <= MaxBits1))
    {
       // Result is large enough for all the bits of the result, so we can use aliasing:
       result.resize(sz, sz);
@@ -306,6 +306,29 @@ setup_karatsuba(
       //
       result = t;
    }
+}
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
+inline typename enable_if_c<!is_fixed_precision<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_fixed_precision<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && !is_fixed_precision<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
+setup_karatsuba(
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
+   const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+   const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b)
+{
+   //
+   // Variable precision, mixed arguments, just alias and forward:
+   //
+   typedef cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > variable_precision_type;
+   variable_precision_type a_t(a.limbs(), 0, a.size()), b_t(b.limbs(), 0, b.size());
+   unsigned as = a.size();
+   unsigned bs = b.size();
+   unsigned s = as > bs ? as : bs;
+   unsigned sz = as + bs;
+   unsigned storage_size = karatsuba_storage_size(s);
+
+   result.resize(sz, sz);
+   variable_precision_type t(result.limbs(), 0, result.size());
+   typename variable_precision_type::scoped_shared_storage storage(t.allocator(), storage_size);
+   multiply_karatsuba(t, a_t, b_t, storage);
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
