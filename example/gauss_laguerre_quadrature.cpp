@@ -219,7 +219,7 @@ namespace detail
 
         const bool this_laguerre_value_is_negative = (laguerre_root_object(T(0)) < 0);
 
-        BOOST_CONSTEXPR_OR_CONST int j_max = 10000;
+        constexpr int j_max = 10000;
 
         int j = 0;
 
@@ -389,7 +389,7 @@ namespace detail
         // The determination of the maximum allowed iterations is
         // based on the number of decimal digits in the numerical
         // type T.
-        BOOST_CONSTEXPR_OR_CONST int local_math_tools_digits10 =
+        constexpr int local_math_tools_digits10 =
           static_cast<int>(static_cast<boost::float_least32_t>(boost::math::tools::digits<T>()) * BOOST_FLOAT32_C(0.301));
 
         const boost::uintmax_t number_of_iterations_allowed = (std::max)(20, local_math_tools_digits10 / 2);
@@ -467,14 +467,14 @@ namespace detail
 // A float_type is created to handle the desired number of decimal digits from `cpp_dec_float` without using __expression_templates.
 struct local
 {
-  BOOST_STATIC_CONSTEXPR unsigned int my_digits10 = 101U;
+  static constexpr unsigned int my_digits10 = 101U;
 
   typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<my_digits10>,
                                         boost::multiprecision::et_off>
   float_type;
 };
 
-BOOST_STATIC_ASSERT_MSG(local::my_digits10 > 20U,
+static_assert(local::my_digits10 > 20U,
                         "Error: This example is intended to have more than 20 decimal digits");
 
 int main()
@@ -500,11 +500,11 @@ int main()
 
   // This Gauss-Laguerre quadrature is designed for airy_ai(x) with real-valued x >= 1.
 
-  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t d = static_cast<boost::float_least32_t>(std::numeric_limits<local::float_type>::digits10);
+  constexpr boost::float_least32_t d = static_cast<boost::float_least32_t>(std::numeric_limits<local::float_type>::digits10);
 
-  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t laguerre_order_factor = -1.28301F + ((0.235487F + (0.0000178915F * d)) * d);
+  constexpr boost::float_least32_t laguerre_order_factor = -1.28301F + ((0.235487F + (0.0000178915F * d)) * d);
 
-  BOOST_CONSTEXPR_OR_CONST int laguerre_order = static_cast<int>(laguerre_order_factor * d);
+  constexpr int laguerre_order = static_cast<int>(laguerre_order_factor * d);
 
   std::cout << "std::numeric_limits<local::float_type>::digits10: " << std::numeric_limits<local::float_type>::digits10 << std::endl;
   std::cout << "laguerre_order: " << laguerre_order << std::endl;

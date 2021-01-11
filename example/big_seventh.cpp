@@ -129,8 +129,8 @@ which is different from the 'better' `cpp_bin_float_50` representation of the fr
 
    // constexpr cpp_bin_float_50 seventh_constexpr (cpp_bin_float_50(1) / 7);
    // std::cout << "seventh_constexpr = " << seventh_constexpr << std::endl; //
-   // nor use the macro BOOST_CONSTEXPR_OR_CONST unless it returns `const`
-   // BOOST_CONSTEXPR_OR_CONST cpp_bin_float_50 seventh_constexpr(seventh_const);
+   // nor use the macro constexpr unless it returns `const`
+   // constexpr cpp_bin_float_50 seventh_constexpr(seventh_const);
 
 //]  [/big_seventh_example_constexpr]
 

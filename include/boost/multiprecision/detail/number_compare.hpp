@@ -120,14 +120,14 @@ struct is_valid_mixed_compare<expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B,
 {};
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_CONSTEXPR typename boost::enable_if_c<number_category<Backend>::value != number_kind_floating_point, bool>::type is_unordered_value(const number<Backend, ExpressionTemplates>&)
+inline constexpr typename boost::enable_if_c<number_category<Backend>::value != number_kind_floating_point, bool>::type is_unordered_value(const number<Backend, ExpressionTemplates>&)
 {
    return false;
 }
 template <class Backend, expression_template_option ExpressionTemplates>
 inline
 #if !BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40700)
-    BOOST_CONSTEXPR
+    constexpr
 #endif
     typename boost::enable_if_c<number_category<Backend>::value == number_kind_floating_point, bool>::type
     is_unordered_value(const number<Backend, ExpressionTemplates>& a)
@@ -137,7 +137,7 @@ inline
 }
 
 template <class Arithmetic>
-inline BOOST_CONSTEXPR typename boost::enable_if_c<number_category<Arithmetic>::value != number_kind_floating_point, bool>::type is_unordered_value(const Arithmetic&)
+inline constexpr typename boost::enable_if_c<number_category<Arithmetic>::value != number_kind_floating_point, bool>::type is_unordered_value(const Arithmetic&)
 {
    return false;
 }
@@ -162,7 +162,7 @@ inline
 }
 
 template <class T, class U>
-inline BOOST_CONSTEXPR bool is_unordered_comparison(const T& a, const U& b)
+inline constexpr bool is_unordered_comparison(const T& a, const U& b)
 {
    return is_unordered_value(a) || is_unordered_value(b);
 }

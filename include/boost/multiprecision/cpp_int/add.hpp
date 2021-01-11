@@ -67,11 +67,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned(CppInt1& result, const Cp
 {
    // Subtract one limb.
    // Nothing fancy, just let uintmax_t take the strain:
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   BOOST_STATIC_CONSTANT(double_limb_type, borrow = static_cast<double_limb_type>(CppInt1::max_limb_value) + 1);
-#else
    constexpr double_limb_type borrow = static_cast<double_limb_type>(CppInt1::max_limb_value) + 1;
-#endif
    result.resize(a.size(), a.size());
    typename CppInt1::limb_pointer       pr = result.limbs();
    typename CppInt2::const_limb_pointer pa = a.limbs();

@@ -22,7 +22,7 @@ namespace boost {
       template <class B>
       BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator-(const number<B, et_off>& v)
       {
-         BOOST_STATIC_ASSERT_MSG(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
+         static_assert(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
          detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(v);
          number<B, et_off>                                                    result(v);
          result.backend().negate();
@@ -321,7 +321,7 @@ namespace boost {
       template <class B>
       BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator-(number<B, et_off>&& v)
       {
-         BOOST_STATIC_ASSERT_MSG(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
+         static_assert(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
          v.backend().negate();
          return static_cast<number<B, et_off>&&>(v);
       }

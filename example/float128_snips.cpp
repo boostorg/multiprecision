@@ -39,16 +39,10 @@ and have full `std::numeric_limits` support:
    std::cout << boost::math::tgamma(float128(1000)) << std::endl;
    /*` We can declare constants using GCC or Intel's native types, and literals with the Q suffix, and these can be declared `constexpr` if required:
    */
-   /*<-*/
-#ifndef BOOST_NO_CXX11_CONSTEXPR
-   /*->*/
    // std::numeric_limits<float128>::max_digits10 = 36
    constexpr float128 pi = 3.14159265358979323846264338327950288Q;
    std::cout.precision(std::numeric_limits<float128>::max_digits10);
    std::cout << "pi = " << pi << std::endl; //pi = 3.14159265358979323846264338327950280
-   /*<-*/
-#endif
-   /*->*/
 //] [/float128_eg]
    return 0;
 }

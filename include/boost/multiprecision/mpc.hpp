@@ -1027,7 +1027,7 @@ inline bool eval_is_zero(const mpc_complex_backend<digits10>& val) BOOST_NOEXCEP
 template <unsigned digits10>
 inline int eval_get_sign(const mpc_complex_backend<digits10>&)
 {
-   BOOST_STATIC_ASSERT_MSG(digits10 == UINT_MAX, "Complex numbers have no sign bit."); // designed to always fail
+   static_assert(digits10 == UINT_MAX, "Complex numbers have no sign bit."); // designed to always fail
    return 0;
 }
 

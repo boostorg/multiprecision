@@ -13,7 +13,7 @@
 namespace boost { namespace multiprecision { namespace detail {
 
 template <class B, boost::multiprecision::expression_template_option ET>
-inline BOOST_CONSTEXPR unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>&, const mpl::false_&)
+inline constexpr unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>&, const mpl::false_&)
 {
    return std::numeric_limits<boost::multiprecision::number<B, ET> >::digits10;
 }
@@ -35,7 +35,7 @@ inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_imp(const boost::m
    return n.precision();
 }
 template <class B, boost::multiprecision::expression_template_option ET>
-inline BOOST_CONSTEXPR unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& val, const mpl::false_&)
+inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& val, const mpl::false_&)
 {
    return current_precision_of_last_chance_imp(val,
                                                mpl::bool_ <
@@ -44,43 +44,43 @@ inline BOOST_CONSTEXPR unsigned current_precision_of_imp(const boost::multipreci
 }
 
 template <class Terminal>
-inline BOOST_CONSTEXPR unsigned current_precision_of(const Terminal&)
+inline constexpr unsigned current_precision_of(const Terminal&)
 {
    return std::numeric_limits<Terminal>::digits10;
 }
 
 template <class Terminal, std::size_t N>
-inline BOOST_CONSTEXPR unsigned current_precision_of(const Terminal (&)[N])
+inline constexpr unsigned current_precision_of(const Terminal (&)[N])
 { // For string literals:
    return 0;
 }
 
 template <class B, boost::multiprecision::expression_template_option ET>
-inline BOOST_CONSTEXPR unsigned current_precision_of(const boost::multiprecision::number<B, ET>& n)
+inline constexpr unsigned current_precision_of(const boost::multiprecision::number<B, ET>& n)
 {
    return current_precision_of_imp(n, boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<B, ET> >());
 }
 
 template <class tag, class Arg1>
-inline BOOST_CONSTEXPR unsigned current_precision_of(const expression<tag, Arg1, void, void, void>& expr)
+inline constexpr unsigned current_precision_of(const expression<tag, Arg1, void, void, void>& expr)
 {
    return current_precision_of(expr.left_ref());
 }
 
 template <class Arg1>
-inline BOOST_CONSTEXPR unsigned current_precision_of(const expression<terminal, Arg1, void, void, void>& expr)
+inline constexpr unsigned current_precision_of(const expression<terminal, Arg1, void, void, void>& expr)
 {
    return current_precision_of(expr.value());
 }
 
 template <class tag, class Arg1, class Arg2>
-inline BOOST_CONSTEXPR unsigned current_precision_of(const expression<tag, Arg1, Arg2, void, void>& expr)
+inline constexpr unsigned current_precision_of(const expression<tag, Arg1, Arg2, void, void>& expr)
 {
    return (std::max)(current_precision_of(expr.left_ref()), current_precision_of(expr.right_ref()));
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3>
-inline BOOST_CONSTEXPR unsigned current_precision_of(const expression<tag, Arg1, Arg2, Arg3, void>& expr)
+inline constexpr unsigned current_precision_of(const expression<tag, Arg1, Arg2, Arg3, void>& expr)
 {
    return (std::max)((std::max)(current_precision_of(expr.left_ref()), current_precision_of(expr.right_ref())), current_precision_of(expr.middle_ref()));
 }
@@ -94,11 +94,11 @@ template <class R, bool = boost::multiprecision::detail::is_variable_precision<R
 struct scoped_default_precision
 {
    template <class T>
-   BOOST_CONSTEXPR scoped_default_precision(const T&) {}
+   constexpr scoped_default_precision(const T&) {}
    template <class T, class U>
-   BOOST_CONSTEXPR scoped_default_precision(const T&, const U&) {}
+   constexpr scoped_default_precision(const T&, const U&) {}
    template <class T, class U, class V>
-   BOOST_CONSTEXPR scoped_default_precision(const T&, const U&, const V&) {}
+   constexpr scoped_default_precision(const T&, const U&, const V&) {}
 
    //
    // This function is never called: in C++17 it won't be compiled either:

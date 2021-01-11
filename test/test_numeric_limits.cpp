@@ -200,14 +200,10 @@ void test()
              << " = " << (std::numeric_limits<Number>::max)() << std::endl;
    std::cout << "min()"
              << " = " << (std::numeric_limits<Number>::min)() << std::endl;
-#ifndef BOOST_NO_CXX11_NUMERIC_LIMITS
    PRINT(lowest());
-#endif
    PRINT(digits);
    PRINT(digits10);
-#if !defined(BOOST_NO_CXX11_NUMERIC_LIMITS) || defined(PRINT_MAX_DIGITS10)
    PRINT(max_digits10);
-#endif
    PRINT(is_signed);
    PRINT(is_integer);
    PRINT(is_exact);

@@ -1539,23 +1539,19 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_CHECK_EQUAL(Real(n2).template convert_to<Num>(), n2);
    BOOST_CHECK_EQUAL(Real(n3).template convert_to<Num>(), n3);
    BOOST_CHECK_EQUAL(Real(n4).template convert_to<Num>(), n4);
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n1)), n1);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n2)), n2);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n3)), n3);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n4)), n4);
-#endif
    // Conversions when source is an expression template:
    BOOST_CHECK_EQUAL((Real(n1) + 0).template convert_to<Num>(), n1);
    BOOST_CHECK_EQUAL((Real(n2) + 0).template convert_to<Num>(), n2);
    BOOST_CHECK_EQUAL((Real(n3) + 0).template convert_to<Num>(), n3);
    BOOST_CHECK_EQUAL((Real(n4) + 0).template convert_to<Num>(), n4);
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n1) + 0)), n1);
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n2) + 0)), n2);
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n3) + 0)), n3);
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n4) + 0)), n4);
-#endif
    test_negative_mixed_numeric_limits<Real, Num>(boost::mpl::bool_<std::numeric_limits<Real>::is_specialized>());
    // Assignment:
    Real r(0);
@@ -1916,23 +1912,19 @@ void test_mixed(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(Real(n2).template convert_to<Num>(), n2);
    BOOST_CHECK_EQUAL(Real(n3).template convert_to<Num>(), n3);
    BOOST_CHECK_EQUAL(Real(n4).template convert_to<Num>(), n4);
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n1)), n1);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n2)), n2);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n3)), n3);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n4)), n4);
-#endif
    // Again with expression templates:
    BOOST_CHECK_EQUAL((Real(n1) + 0).template convert_to<Num>(), n1);
    BOOST_CHECK_EQUAL((Real(n2) + 0).template convert_to<Num>(), n2);
    BOOST_CHECK_EQUAL((Real(n3) + 0).template convert_to<Num>(), n3);
    BOOST_CHECK_EQUAL((Real(n4) + 0).template convert_to<Num>(), n4);
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n1) + 0), n1);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n2) + 0), n2);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n3) + 0), n3);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n4) + 0), n4);
-#endif
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n1), Real(n1));
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n2), Real(n2));
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n3), Real(n3));
@@ -3151,11 +3143,9 @@ void test()
    boost::hash<Real> hasher;
    std::size_t       s = hasher(a);
    BOOST_CHECK_NE(s, 0);
-#ifndef BOOST_NO_CXX11_HDR_FUNCTIONAL
    std::hash<Real> hasher2;
    s = hasher2(a);
    BOOST_CHECK_NE(s, 0);
-#endif
 
    //
    // Test move:

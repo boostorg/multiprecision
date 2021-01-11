@@ -116,8 +116,8 @@ template <class R, class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& backend)
 {
    typedef typename boost::common_type<R, Arithmetic>::type c_type;
-   BOOST_CONSTEXPR const c_type                             max = static_cast<c_type>((std::numeric_limits<R>::max)());
-   BOOST_CONSTEXPR const c_type                             min = static_cast<c_type>((std::numeric_limits<R>::min)());
+   constexpr const c_type                             max = static_cast<c_type>((std::numeric_limits<R>::max)());
+   constexpr const c_type                             min = static_cast<c_type>((std::numeric_limits<R>::min)());
    c_type                                                   ct  = static_cast<c_type>(backend.data());
    if ((backend.data() < 0) && !std::numeric_limits<R>::is_signed)
       BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative number to unsigned type."));
@@ -630,15 +630,15 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::arithm
    typedef boost::multiprecision::number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates> number_type;
 
  public:
-   BOOST_STATIC_CONSTEXPR number_type(min)() BOOST_NOEXCEPT { return (base_type::min)(); }
-   BOOST_STATIC_CONSTEXPR number_type(max)() BOOST_NOEXCEPT { return (base_type::max)(); }
-   BOOST_STATIC_CONSTEXPR number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
-   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
-   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
-   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_NOEXCEPT { return base_type::infinity(); }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_NOEXCEPT { return base_type::quiet_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_NOEXCEPT { return base_type::signaling_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
+   static constexpr number_type(min)() BOOST_NOEXCEPT { return (base_type::min)(); }
+   static constexpr number_type(max)() BOOST_NOEXCEPT { return (base_type::max)(); }
+   static constexpr number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
+   static constexpr number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
+   static constexpr number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
+   static constexpr number_type infinity() BOOST_NOEXCEPT { return base_type::infinity(); }
+   static constexpr number_type quiet_NaN() BOOST_NOEXCEPT { return base_type::quiet_NaN(); }
+   static constexpr number_type signaling_NaN() BOOST_NOEXCEPT { return base_type::signaling_NaN(); }
+   static constexpr number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
 };
 
 template <>

@@ -152,7 +152,7 @@ void reduce_n_half_pi(T& arg, const T& n, bool go_down)
 template <class T>
 void eval_sin(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The sin function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The sin function is only valid for floating point types.");
    BOOST_MATH_INSTRUMENT_CODE(x.str(0, std::ios_base::scientific));
    if (&result == &x)
    {
@@ -346,7 +346,7 @@ void eval_sin(T& result, const T& x)
 template <class T>
 void eval_cos(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The cos function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The cos function is only valid for floating point types.");
    if (&result == &x)
    {
       T temp;
@@ -482,7 +482,7 @@ void eval_cos(T& result, const T& x)
 template <class T>
 void eval_tan(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The tan function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The tan function is only valid for floating point types.");
    if (&result == &x)
    {
       T temp;
@@ -561,7 +561,7 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
 template <class T>
 void eval_asin(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The asin function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The asin function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
    typedef typename mpl::front<typename T::float_types>::type                          fp_type;
 
@@ -691,7 +691,7 @@ void eval_asin(T& result, const T& x)
 template <class T>
 inline void eval_acos(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The acos function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The acos function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
 
    switch (eval_fpclassify(x))
@@ -817,7 +817,7 @@ inline void eval_acos(T& result, const T& x)
 template <class T>
 void eval_atan(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The atan function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The atan function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
    typedef typename mpl::front<typename T::float_types>::type                          fp_type;
@@ -916,7 +916,7 @@ void eval_atan(T& result, const T& x)
 template <class T>
 void eval_atan2(T& result, const T& y, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The atan2 function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The atan2 function is only valid for floating point types.");
    if (&result == &y)
    {
       T temp(y);

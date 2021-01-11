@@ -32,9 +32,9 @@ struct numeric_limits_workaround : public std::numeric_limits<T>
 template <class R>
 struct numeric_limits_workaround<R, false>
 {
-   BOOST_STATIC_CONSTEXPR unsigned digits = ~static_cast<R>(0) < 0 ? sizeof(R) * CHAR_BIT - 1 : sizeof(R) * CHAR_BIT;
-   static BOOST_CONSTEXPR R (min)(){ return (static_cast<R>(-1) < 0) ? static_cast<R>(1) << digits : 0; }
-   static BOOST_CONSTEXPR R (max)() { return (static_cast<R>(-1) < 0) ? ~(static_cast<R>(1) << digits) : ~static_cast<R>(0); }
+   static constexpr unsigned digits = ~static_cast<R>(0) < 0 ? sizeof(R) * CHAR_BIT - 1 : sizeof(R) * CHAR_BIT;
+   static constexpr R (min)(){ return (static_cast<R>(-1) < 0) ? static_cast<R>(1) << digits : 0; }
+   static constexpr R (max)() { return (static_cast<R>(-1) < 0) ? ~(static_cast<R>(1) << digits) : ~static_cast<R>(0); }
 };
 
 template <class R, class CppInt>

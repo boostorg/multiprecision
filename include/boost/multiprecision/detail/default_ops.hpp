@@ -1084,7 +1084,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_abs(T& result, const U& arg)
 template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_fabs(T& result, const U& arg)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The fabs function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The fabs function is only valid for floating point types.");
    typedef typename U::signed_types             type_list;
    typedef typename mpl::front<type_list>::type front;
    result = arg;
@@ -1095,14 +1095,14 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_fabs(T& result, const U& arg)
 template <class Backend>
 inline BOOST_MP_CXX14_CONSTEXPR int eval_fpclassify(const Backend& arg)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The fpclassify function is only valid for floating point types.");
+   static_assert(number_category<Backend>::value == number_kind_floating_point, "The fpclassify function is only valid for floating point types.");
    return eval_is_zero(arg) ? FP_ZERO : FP_NORMAL;
 }
 
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_fmod(T& result, const T& a, const T& b)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The fmod function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The fmod function is only valid for floating point types.");
    if ((&result == &a) || (&result == &b))
    {
       T temp;
@@ -1164,7 +1164,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_round(T& result, const T& a);
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_remquo(T& result, const T& a, const T& b, int* pi)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The remquo function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The remquo function is only valid for floating point types.");
    if ((&result == &a) || (&result == &b))
    {
       T temp;
@@ -1307,7 +1307,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_arithmetic
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_trunc(T& result, const T& a)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The trunc function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The trunc function is only valid for floating point types.");
    switch (eval_fpclassify(a))
    {
    case FP_NAN:
@@ -1359,7 +1359,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_modf(T& result, T const& arg, T* pipar
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_round(T& result, const T& a)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The round function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The round function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<float, T>::type fp_type;
    int                                                                       c = eval_fpclassify(a);
    if (c == (int)FP_NAN)
@@ -1616,7 +1616,7 @@ typename enable_if_c<sizeof(T) == 0>::type eval_atanh();
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename B::exponent_type eval_ilogb(const B& val)
 {
-   BOOST_STATIC_ASSERT_MSG(!std::numeric_limits<number<B> >::is_specialized || (std::numeric_limits<number<B> >::radix == 2), "The default implementation of ilogb requires a base 2 number type");
+   static_assert(!std::numeric_limits<number<B> >::is_specialized || (std::numeric_limits<number<B> >::radix == 2), "The default implementation of ilogb requires a base 2 number type");
    typename B::exponent_type e(0);
    switch (eval_fpclassify(val))
    {
@@ -1665,7 +1665,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_logb(B& result, const B& val)
 template <class B, class A>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_scalbn(B& result, const B& val, A e)
 {
-   BOOST_STATIC_ASSERT_MSG(!std::numeric_limits<number<B> >::is_specialized || (std::numeric_limits<number<B> >::radix == 2), "The default implementation of scalbn requires a base 2 number type");
+   static_assert(!std::numeric_limits<number<B> >::is_specialized || (std::numeric_limits<number<B> >::radix == 2), "The default implementation of scalbn requires a base 2 number type");
    eval_ldexp(result, val, static_cast<typename B::exponent_type>(e));
 }
 template <class B, class A>
@@ -1865,7 +1865,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_set_real(T& to, const T& from)
 template <class T>
 void BOOST_MP_CXX14_CONSTEXPR eval_set_imag(T&, const T&)
 {
-   BOOST_STATIC_ASSERT_MSG(sizeof(T) == INT_MAX, "eval_set_imag needs to be specialised for each specific backend");
+   static_assert(sizeof(T) == INT_MAX, "eval_set_imag needs to be specialised for each specific backend");
 }
 
 //
@@ -2426,8 +2426,8 @@ inline BOOST_MP_CXX14_CONSTEXPR typename multiprecision::detail::expression<tag,
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
 inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& add(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
 {
-   BOOST_STATIC_ASSERT_MSG((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
-   BOOST_STATIC_ASSERT_MSG((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
    using default_ops::eval_add;
    eval_add(result.backend(), a.backend(), b.backend());
    return result;
@@ -2436,8 +2436,8 @@ inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& add(number<B1, ET1>& result, co
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
 inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& subtract(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
 {
-   BOOST_STATIC_ASSERT_MSG((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
-   BOOST_STATIC_ASSERT_MSG((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
    using default_ops::eval_subtract;
    eval_subtract(result.backend(), a.backend(), b.backend());
    return result;
@@ -2446,8 +2446,8 @@ inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& subtract(number<B1, ET1>& resul
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
 inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& multiply(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
 {
-   BOOST_STATIC_ASSERT_MSG((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
-   BOOST_STATIC_ASSERT_MSG((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
    using default_ops::eval_multiply;
    eval_multiply(result.backend(), a.backend(), b.backend());
    return result;

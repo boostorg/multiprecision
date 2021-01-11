@@ -18,7 +18,7 @@ void check_type_is_number(const number<B, ET>& v, T t)
 template <class T, class U>
 void check_type_is_number(const T&, U)
 {
-   BOOST_STATIC_ASSERT_MSG(sizeof(T) == 1, "Oooops we appear to have an expression template when we should not have done so!");
+   static_assert(sizeof(T) == 1, "Oooops we appear to have an expression template when we should not have done so!");
 }
 
 int main()

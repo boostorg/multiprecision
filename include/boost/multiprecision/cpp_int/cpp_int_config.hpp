@@ -155,11 +155,4 @@ enum cpp_int_check_type
 } // namespace multiprecision
 } // namespace boost
 
-//
-// Figure out whether to support user-defined-literals or not:
-//
-#if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) && !defined(BOOST_NO_CXX11_USER_DEFINED_LITERALS) && !defined(BOOST_NO_CXX11_CONSTEXPR)
-#define BOOST_MP_USER_DEFINED_LITERALS
-#endif
-
 #endif // BOOST_MP_CPP_INT_CORE_HPP

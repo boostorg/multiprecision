@@ -332,51 +332,6 @@ Microsoft VS2017 and other recent compilers, now use the
 algorithm, claimed to be both exact and fast for 32 and 64-bit floating-point numbers.
 ] [/note]
 
-[note BOOST_NO_CXX11_NUMERIC_LIMITS is a suitable feature-test macro to determine if
-`std::numeric_limits<float>::max_digits10` is implemented on any platform.
-] [/note]
-
-[note ['requires cxx11_numeric_limits] is a suitable test for use of `std::numeric_limits<float>::max_digits10`
-to control if a target in a jamfile used by a Boost B2/bjam program is built, or not.
-] [/note]
-
-
-If `max_digits10` is not available, you should use the
-[@http://www.cs.berkeley.edu/~wkahan/ieee754status/IEEE754.PDF Kahan formula for floating-point type T].
-
-In C++, the equations for what Kahan (on page 4) describes as  'at least' and  'at most' are:
-
-  static long double const log10Two = 0.30102999566398119521373889472449L; // log10(2.)
-
-  static_cast<int>(floor((significand_digits - 1) * log10Two)); // == digits10  - 'at least' .
-  static_cast<int>(ceil(1 + significand_digits * log10Two)); // == max_digits10  - 'at most'.
-
-Unfortunately, these cannot be evaluated (at least by C++03) at [*compile-time].
-So the following expression is often used instead.
-
-  max_digits10 = 2 + std::numeric_limits<T>::digits * 3010U/10000U;
-
-  // == 2 + std::numeric_limits<T>::digits for double and 64-bit long double.
-  // == 3 + std::numeric_limits<T>::digits for float,  80-bit long-double and __float128.
-
-often the actual values are computed for the C limits macros:
-
-  #define FLT_MAXDIG10 (2+FLT_MANT_DIG * 3010U/10000U)  // 9
-  #define DBL_MAXDIG10 (2+ (DBL_MANT_DIG * 3010U)/10000U) // 17
-  #define LDBL_MAXDIG10 (2+ (LDBL_MANT_DIG * 3010U)/10000U) // 17 for MSVC, 18 for others.
-
-The factor 3010U/10000U is ['log[sub 10](2) = 0.3010]
-that can be evaluated at compile-time using only `short unsigned int`s to be a desirable `const` or `constexpr` (and usually also `static`).
-
-Boost macros allow this to be done portably, see
-[@http://www.boost.org/doc/libs/1_58_0/libs/config/doc/html/boost_config/boost_macro_reference.html BOOST_CONSTEXPR_OR_CONST or BOOST_STATIC_CONSTEXPR].
-
-(See also
-[@http://www.loria.fr/~zimmerma/mca/mca-cup-0.5.9.pdf Richard P. Brent and Paul Zimmerman, Modern Computer Arithmetic]
-Equation 3.8 on page 116).
-
-[max_digits10_1] [/ example for using max_digits10]
-
 [h4 round_style]
 
 The rounding style determines how the result of floating-point operations

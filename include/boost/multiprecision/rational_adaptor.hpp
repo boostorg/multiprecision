@@ -341,27 +341,23 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::ration
    typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend> > number_type;
 
  public:
-   BOOST_STATIC_CONSTEXPR bool is_integer = false;
-   BOOST_STATIC_CONSTEXPR bool is_exact   = true;
-   BOOST_STATIC_CONSTEXPR      number_type(min)() { return (base_type::min)(); }
-   BOOST_STATIC_CONSTEXPR      number_type(max)() { return (base_type::max)(); }
-   BOOST_STATIC_CONSTEXPR number_type lowest() { return -(max)(); }
-   BOOST_STATIC_CONSTEXPR number_type epsilon() { return base_type::epsilon(); }
-   BOOST_STATIC_CONSTEXPR number_type round_error() { return epsilon() / 2; }
-   BOOST_STATIC_CONSTEXPR number_type infinity() { return base_type::infinity(); }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() { return base_type::quiet_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() { return base_type::signaling_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type denorm_min() { return base_type::denorm_min(); }
+   static constexpr bool is_integer = false;
+   static constexpr bool is_exact   = true;
+   static constexpr      number_type(min)() { return (base_type::min)(); }
+   static constexpr      number_type(max)() { return (base_type::max)(); }
+   static constexpr number_type lowest() { return -(max)(); }
+   static constexpr number_type epsilon() { return base_type::epsilon(); }
+   static constexpr number_type round_error() { return epsilon() / 2; }
+   static constexpr number_type infinity() { return base_type::infinity(); }
+   static constexpr number_type quiet_NaN() { return base_type::quiet_NaN(); }
+   static constexpr number_type signaling_NaN() { return base_type::signaling_NaN(); }
+   static constexpr number_type denorm_min() { return base_type::denorm_min(); }
 };
 
-#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
-
 template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_integer;
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_integer;
 template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_exact;
-
-#endif
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_exact;
 
 } // namespace std
 

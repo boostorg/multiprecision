@@ -329,7 +329,7 @@ inline bool eval_is_zero(const complex_adaptor<Backend>& val) BOOST_NOEXCEPT
 template <class Backend>
 inline int eval_get_sign(const complex_adaptor<Backend>&)
 {
-   BOOST_STATIC_ASSERT_MSG(sizeof(Backend) == UINT_MAX, "Complex numbers have no sign bit."); // designed to always fail
+   static_assert(sizeof(Backend) == UINT_MAX, "Complex numbers have no sign bit."); // designed to always fail
    return 0;
 }
 

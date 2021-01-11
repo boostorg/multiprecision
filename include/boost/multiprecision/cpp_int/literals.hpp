@@ -198,8 +198,8 @@ struct reverse_value_pack<value_pack<> >
 template <char l1, char l2, char... STR>
 struct make_packed_value_from_str
 {
-   BOOST_STATIC_ASSERT_MSG(l1 == '0', "Multi-precision integer literals must be in hexadecimal notation.");
-   BOOST_STATIC_ASSERT_MSG((l2 == 'X') || (l2 == 'x'), "Multi-precision integer literals must be in hexadecimal notation.");
+   static_assert(l1 == '0', "Multi-precision integer literals must be in hexadecimal notation.");
+   static_assert((l2 == 'X') || (l2 == 'x'), "Multi-precision integer literals must be in hexadecimal notation.");
    typedef typename pack_values<STR...>::type                        packed_type;
    typedef typename strip_leading_zeros_from_pack<packed_type>::type stripped_type;
    typedef typename reverse_value_pack<stripped_type>::type          type;
