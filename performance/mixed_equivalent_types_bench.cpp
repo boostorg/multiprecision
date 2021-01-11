@@ -75,7 +75,8 @@ using namespace boost::multiprecision;
 //[dot_prod_1
 cpp_int dot_product_1(const std::vector<cpp_int>& v1, const std::vector<cpp_int>& v2)
 {
-   assert(v1.size() == v2.size()); // we should really do better than an assert here!
+   if (v1.size() != v2.size())
+      throw std::domain_error("Mismatched arguments");
 
    cpp_int result;
    for (std::size_t i = 0; i < v1.size(); ++i)
@@ -89,7 +90,8 @@ cpp_int dot_product_1(const std::vector<cpp_int>& v1, const std::vector<cpp_int>
 //[dot_prod_2
 cpp_int dot_product_2(const std::vector<cpp_int>& v1, const std::vector<cpp_int>& v2)
 {
-   assert(v1.size() == v2.size()); // we should really do better than an assert here!
+   if (v1.size() != v2.size())
+      throw std::domain_error("Mismatched arguments");
    //
    // If we know that most of our data is of a certain range of values, then we can use a cpp_int type
    // with an internal cache large enough to *probably* not require an allocation:
@@ -109,7 +111,8 @@ cpp_int dot_product_2(const std::vector<cpp_int>& v1, const std::vector<cpp_int>
 //[dot_prod_3
 cpp_int dot_product_3(const std::vector<cpp_int>& v1, const std::vector<cpp_int>& v2)
 {
-   assert(v1.size() == v2.size()); // we should really do better than an assert here!
+   if (v1.size() != v2.size())
+      throw std::domain_error("Mismatched arguments");
 
    cpp_int result, term;
    for (std::size_t i = 0; i < v1.size(); ++i)
