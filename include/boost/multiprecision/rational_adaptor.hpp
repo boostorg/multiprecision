@@ -318,18 +318,6 @@ inline number<IntBackend, ET> denominator(const number<rational_adaptor<IntBacke
    return val.backend().data().denominator();
 }
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
-namespace detail {
-
-template <class U, class IntBackend>
-struct is_explicitly_convertible<U, rational_adaptor<IntBackend> > : public is_explicitly_convertible<U, IntBackend>
-{};
-
-} // namespace detail
-
-#endif
-
 }} // namespace boost::multiprecision
 
 namespace std {

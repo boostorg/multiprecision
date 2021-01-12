@@ -1604,18 +1604,6 @@ inline std::size_t hash_value(const mpfr_float_backend<Digits10, AllocateType>& 
 
 } // namespace backends
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
-namespace detail {
-
-template <unsigned D1, unsigned D2, mpfr_allocation_type A1, mpfr_allocation_type A2>
-struct is_explicitly_convertible<backends::mpfr_float_backend<D1, A1>, backends::mpfr_float_backend<D2, A2> > : public mpl::true_
-{};
-
-} // namespace detail
-
-#endif
-
 namespace detail {
 template <>
 struct is_variable_precision<backends::mpfr_float_backend<0> > : public true_type

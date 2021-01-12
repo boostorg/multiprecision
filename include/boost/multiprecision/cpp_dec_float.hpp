@@ -3054,14 +3054,6 @@ struct transcendental_reduction_type<boost::multiprecision::backends::cpp_dec_fl
    typedef boost::multiprecision::backends::cpp_dec_float<Digits10 * 3, ExponentType, Allocator> type;
 };
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
-template <unsigned D1, class E1, class A1, unsigned D2, class E2, class A2>
-struct is_explicitly_convertible<cpp_dec_float<D1, E1, A1>, cpp_dec_float<D2, E2, A2> > : public mpl::true_
-{};
-
-#endif
-
 } // namespace detail
 
 

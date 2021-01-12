@@ -2536,26 +2536,6 @@ inline number<gmp_int, ET> denominator(const number<gmp_rational, ET>& val)
 
 namespace detail {
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
-template <>
-struct is_explicitly_convertible<canonical<mpf_t, gmp_int>::type, gmp_int> : public mpl::true_
-{};
-template <>
-struct is_explicitly_convertible<canonical<mpq_t, gmp_int>::type, gmp_int> : public mpl::true_
-{};
-template <unsigned Digits10>
-struct is_explicitly_convertible<gmp_float<Digits10>, gmp_int> : public mpl::true_
-{};
-template <>
-struct is_explicitly_convertible<gmp_rational, gmp_int> : public mpl::true_
-{};
-template <unsigned D1, unsigned D2>
-struct is_explicitly_convertible<gmp_float<D1>, gmp_float<D2> > : public mpl::true_
-{};
-
-#endif
-
 template <>
 struct digits2<number<gmp_float<0>, et_on> >
 {

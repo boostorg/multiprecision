@@ -2267,17 +2267,6 @@ typedef number<cpp_int_backend<256, 256, signed_magnitude, checked, void> >   ch
 typedef number<cpp_int_backend<512, 512, signed_magnitude, checked, void> >   checked_int512_t;
 typedef number<cpp_int_backend<1024, 1024, signed_magnitude, checked, void> > checked_int1024_t;
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
-namespace detail {
-
-template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-struct is_explicitly_convertible<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> > : public mpl::true_
-{};
-
-} // namespace detail
-#endif
-
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

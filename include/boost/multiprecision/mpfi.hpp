@@ -1110,17 +1110,6 @@ void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const mpl::
 
 } // namespace backends
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
-namespace detail {
-
-template <unsigned D1, unsigned D2>
-struct is_explicitly_convertible<backends::mpfi_float_backend<D1>, backends::mpfi_float_backend<D2> > : public mpl::true_
-{};
-
-} // namespace detail
-#endif
-
 namespace detail {
 template <>
 struct is_variable_precision<backends::mpfi_float_backend<0> > : public true_type
