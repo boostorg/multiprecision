@@ -630,12 +630,10 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
        : m_wrapper(a.m_wrapper), m_limbs(a.m_limbs), m_sign((a.m_limbs == 1) && (*a.limbs() == 0) ? false : !a.m_sign) {}
    explicit constexpr cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : m_wrapper(), m_limbs(0), m_sign(false)
    {}
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    //
    // These are deprecated in C++20 unless we make them explicit:
    //
-   constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
-#endif
+   BOOST_MP_CXX14_CONSTEXPR cpp_int_base& operator=(const cpp_int_base&) = default;
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
@@ -869,12 +867,10 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
          m_limbs(o.m_limbs) {}
    // Defaulted functions:
    //~cpp_int_base() BOOST_NOEXCEPT {}
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    //
    // These are deprecated in C++20 unless we make them explicit:
    //
-   constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
-#endif
+   BOOST_MP_CXX14_CONSTEXPR cpp_int_base& operator=(const cpp_int_base&) = default;
 
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
@@ -1061,12 +1057,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    constexpr cpp_int_base(const cpp_int_base& a, const literals::detail::negate_tag&) BOOST_NOEXCEPT
        : m_data(a.m_data),
          m_sign(a.m_data ? !a.m_sign : false) {}
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    //
    // These are deprecated in C++20 unless we make them explicit:
    //
-   constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
-#endif
+   BOOST_MP_CXX14_CONSTEXPR cpp_int_base& operator=(const cpp_int_base&) = default;
+
    explicit constexpr cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : m_data(0), m_sign(false)
    {}
        //
@@ -1235,12 +1230,11 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    template <limb_type a, limb_type b>
    constexpr cpp_int_base(literals::detail::value_pack<a, b>) BOOST_NOEXCEPT
        : m_data(static_cast<local_limb_type>(a) | (static_cast<local_limb_type>(b) << bits_per_limb)) {}
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    //
    // These are deprecated in C++20 unless we make them explicit:
    //
-   constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
-#endif
+   BOOST_MP_CXX14_CONSTEXPR cpp_int_base& operator=(const cpp_int_base&) = default;
+
    explicit constexpr cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : m_data(0)
    {}
        //

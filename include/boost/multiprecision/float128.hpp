@@ -494,8 +494,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_abs(float128_backend& result, const fl
 inline void eval_abs(float128_backend& result, const float128_backend& arg)
 #endif
 {
-   float128_type v(arg.value());
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   float128_type v(arg.value());
    if (BOOST_MP_IS_CONST_EVALUATED(v))
    {
       result.value() = v < 0 ? -v : v;
@@ -512,8 +512,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_fabs(float128_backend& result, const f
 inline void eval_fabs(float128_backend& result, const float128_backend& arg)
 #endif
 {
-   float128_type v(arg.value());
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   float128_type v(arg.value());
    if (BOOST_MP_IS_CONST_EVALUATED(v))
    {
       result.value() = v < 0 ? -v : v;

@@ -245,6 +245,15 @@ eval_msb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
    return eval_msb_imp(a);
 }
 
+#ifdef BOOST_GCC
+//
+// We really shouldn't need to be disabling this warning, but it really does appear to be
+// spurious.  The warning appears only when in release mode, and asserts are on.
+//
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value, bool>::type
 eval_bit_test(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& val, unsigned index) BOOST_NOEXCEPT
@@ -256,6 +265,10 @@ eval_bit_test(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, All
       return false;
    return val.limbs()[offset] & mask ? true : false;
 }
+
+#ifdef BOOST_GCC
+#pragma GCC diagnostic pop
+#endif
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
