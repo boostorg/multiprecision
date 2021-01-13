@@ -26,12 +26,12 @@ namespace boost { namespace multiprecision {
 // which fails to compile as "long" is not a valid backend type.
 //
 template <class Backend>
-inline typename boost::enable_if_c<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on>&>::type(min)(const number<Backend, et_on>& a, const number<Backend, et_on>& b)
+inline typename std::enable_if<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on>&>::type(min)(const number<Backend, et_on>& a, const number<Backend, et_on>& b)
 {
    return a < b ? a : b;
 }
 template <class Backend, class tag, class A1, class A2, class A3, class A4>
-inline typename boost::enable_if_c<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type(min)(const number<Backend, et_on>& a, const detail::expression<tag, A1, A2, A3, A4>& b)
+inline typename std::enable_if<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type(min)(const number<Backend, et_on>& a, const detail::expression<tag, A1, A2, A3, A4>& b)
 {
    number<Backend, et_on> t(b);
    if (a < t)
@@ -39,7 +39,7 @@ inline typename boost::enable_if_c<boost::multiprecision::detail::is_backend<Bac
    return std::move(t);
 }
 template <class tag, class A1, class A2, class A3, class A4, class Backend>
-inline typename boost::enable_if_c<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type(min)(const detail::expression<tag, A1, A2, A3, A4>& a, const number<Backend, et_on>& b)
+inline typename std::enable_if<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type(min)(const detail::expression<tag, A1, A2, A3, A4>& a, const number<Backend, et_on>& b)
 {
    number<Backend, et_on> t(a);
    if (t < b)
@@ -64,12 +64,12 @@ inline typename detail::expression<tag, A1, A2, A3, A4>::result_type(min)(const 
 }
 
 template <class Backend>
-inline typename boost::enable_if_c<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on>&>::type(max)(const number<Backend, et_on>& a, const number<Backend, et_on>& b)
+inline typename std::enable_if<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on>&>::type(max)(const number<Backend, et_on>& a, const number<Backend, et_on>& b)
 {
    return a > b ? a : b;
 }
 template <class Backend, class tag, class A1, class A2, class A3, class A4>
-inline typename boost::enable_if_c<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type(max)(const number<Backend, et_on>& a, const detail::expression<tag, A1, A2, A3, A4>& b)
+inline typename std::enable_if<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type(max)(const number<Backend, et_on>& a, const detail::expression<tag, A1, A2, A3, A4>& b)
 {
    number<Backend, et_on> t(b);
    if (a > t)
@@ -77,7 +77,7 @@ inline typename boost::enable_if_c<boost::multiprecision::detail::is_backend<Bac
    return std::move(t);
 }
 template <class tag, class A1, class A2, class A3, class A4, class Backend>
-inline typename boost::enable_if_c<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type(max)(const detail::expression<tag, A1, A2, A3, A4>& a, const number<Backend, et_on>& b)
+inline typename std::enable_if<boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type(max)(const detail::expression<tag, A1, A2, A3, A4>& a, const number<Backend, et_on>& b)
 {
    number<Backend, et_on> t(a);
    if (t > b)

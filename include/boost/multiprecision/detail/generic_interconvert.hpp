@@ -178,7 +178,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 
    eval_frexp(f, from, &e);
 
-   static const int shift = std::numeric_limits<boost::intmax_t>::digits - 1;
+   static const int shift = std::numeric_limits<std::intmax_t>::digits - 1;
 
    while (!eval_is_zero(f))
    {
@@ -187,7 +187,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
       eval_floor(term, f);
       e -= shift;
       eval_ldexp(to, to, shift);
-      typename boost::multiprecision::detail::canonical<boost::intmax_t, To>::type ll;
+      typename boost::multiprecision::detail::canonical<std::intmax_t, To>::type ll;
       eval_convert_to(&ll, term);
       eval_add(to, ll);
       eval_subtract(f, term);
@@ -272,7 +272,7 @@ R safe_convert_to_float(const LargeInteger& i)
 }
 
 template <class To, class Integer>
-inline typename disable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
+inline typename std::enable_if<!(is_number<To>::value || is_floating_point<To>::value)>::type
 generic_convert_rational_to_float_imp(To& result, const Integer& n, const Integer& d, const mpl::true_&)
 {
    //
@@ -285,7 +285,7 @@ generic_convert_rational_to_float_imp(To& result, const Integer& n, const Intege
    eval_divide(result, fn.backend(), fd.backend());
 }
 template <class To, class Integer>
-inline typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
+inline typename std::enable_if<is_number<To>::value || is_floating_point<To>::value>::type
 generic_convert_rational_to_float_imp(To& result, const Integer& n, const Integer& d, const mpl::true_&)
 {
    //
@@ -299,7 +299,7 @@ generic_convert_rational_to_float_imp(To& result, const Integer& n, const Intege
 }
 
 template <class To, class Integer>
-typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
+typename std::enable_if<is_number<To>::value || is_floating_point<To>::value>::type
 generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, const mpl::false_&)
 {
    //
@@ -360,7 +360,7 @@ generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, 
       result = -result;
 }
 template <class To, class Integer>
-inline typename disable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
+inline typename std::enable_if<!(is_number<To>::value || is_floating_point<To>::value)>::type
 generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, const mpl::false_& tag)
 {
    number<To> t;

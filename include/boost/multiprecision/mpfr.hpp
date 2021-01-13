@@ -10,7 +10,7 @@
 #include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
@@ -685,25 +685,25 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10, AllocationTy
    mpfr_float_backend(mpfr_float_backend&& o) BOOST_NOEXCEPT : detail::mpfr_float_imp<digits10, AllocationType>(static_cast<detail::mpfr_float_imp<digits10, AllocationType>&&>(o))
    {}
    template <unsigned D, mpfr_allocation_type AT>
-   mpfr_float_backend(const mpfr_float_backend<D, AT>& val, typename enable_if_c<D <= digits10>::type* = 0)
+   mpfr_float_backend(const mpfr_float_backend<D, AT>& val, typename std::enable_if<D <= digits10>::type* = 0)
        : detail::mpfr_float_imp<digits10, AllocationType>()
    {
       mpfr_set(this->m_data, val.data(), GMP_RNDN);
    }
    template <unsigned D, mpfr_allocation_type AT>
-   explicit mpfr_float_backend(const mpfr_float_backend<D, AT>& val, typename disable_if_c<D <= digits10>::type* = 0)
+   explicit mpfr_float_backend(const mpfr_float_backend<D, AT>& val, typename std::enable_if<!(D <= digits10)>::type* = 0)
        : detail::mpfr_float_imp<digits10, AllocationType>()
    {
       mpfr_set(this->m_data, val.data(), GMP_RNDN);
    }
    template <unsigned D>
-   mpfr_float_backend(const gmp_float<D>& val, typename enable_if_c<D <= digits10>::type* = 0)
+   mpfr_float_backend(const gmp_float<D>& val, typename std::enable_if<D <= digits10>::type* = 0)
        : detail::mpfr_float_imp<digits10, AllocationType>()
    {
       mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
    }
    template <unsigned D>
-   mpfr_float_backend(const gmp_float<D>& val, typename disable_if_c<D <= digits10>::type* = 0)
+   mpfr_float_backend(const gmp_float<D>& val, typename std::enable_if<!(D <= digits10)>::type* = 0)
        : detail::mpfr_float_imp<digits10, AllocationType>()
    {
       mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
@@ -1008,17 +1008,17 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
 };
 
 template <unsigned digits10, mpfr_allocation_type AllocationType, class T>
-inline typename enable_if<is_arithmetic<T>, bool>::type eval_eq(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<std::is_arithmetic<T>::value, bool>::type eval_eq(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) == 0;
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType, class T>
-inline typename enable_if<is_arithmetic<T>, bool>::type eval_lt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<std::is_arithmetic<T>::value, bool>::type eval_lt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) < 0;
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType, class T>
-inline typename enable_if<is_arithmetic<T>, bool>::type eval_gt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<std::is_arithmetic<T>::value, bool>::type eval_gt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) > 0;
 }
@@ -1419,14 +1419,14 @@ inline void eval_pow(mpfr_float_backend<Digits10, AllocateType>& result, const m
 #endif
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType, class Integer>
-inline typename enable_if<mpl::and_<is_signed<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND(sizeof(Integer) <= sizeof(long))> > >::type
+inline typename std::enable_if<std::is_signed<Integer>::value && std::is_integral<Integer>::value && (BOOST_MP_ENABLE_IF_WORKAROUND(sizeof(Integer) <= sizeof(long)))>::type
 eval_pow(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& b, const Integer& e)
 {
    mpfr_pow_si(result.data(), b.data(), e, GMP_RNDN);
 }
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType, class Integer>
-inline typename enable_if<mpl::and_<is_unsigned<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND(sizeof(Integer) <= sizeof(long))> > >::type
+inline typename std::enable_if<std::is_unsigned<Integer>::value && (BOOST_MP_ENABLE_IF_WORKAROUND(sizeof(Integer) <= sizeof(long)))>::type
 eval_pow(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& b, const Integer& e)
 {
    mpfr_pow_ui(result.data(), b.data(), e, GMP_RNDN);
@@ -2287,7 +2287,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D
 }
 
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates, class Policy>
-inline typename boost::enable_if_c<boost::math::policies::is_policy<Policy>::value, boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >::type tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg, const Policy& pol)
+inline typename std::enable_if<boost::math::policies::is_policy<Policy>::value, boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >::type tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg, const Policy& pol)
 {
    boost::multiprecision::detail::scoped_default_precision<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> > precision_guard(arg);
 

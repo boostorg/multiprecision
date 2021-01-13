@@ -162,31 +162,31 @@ typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32,
 //
 // Construct from int:
 //
-static_assert(noexcept(unchecked_int32_t(std::declval<boost::int32_t>())), "noexcept test");
-static_assert(noexcept(checked_int32_t(std::declval<boost::int32_t>())), "noexcept test");
-static_assert(noexcept(unchecked_uint32_t(std::declval<boost::int32_t>())), "noexcept test");
-static_assert(!noexcept(checked_uint32_t(std::declval<boost::int32_t>())), "noexcept test");
+static_assert(noexcept(unchecked_int32_t(std::declval<std::int32_t>())), "noexcept test");
+static_assert(noexcept(checked_int32_t(std::declval<std::int32_t>())), "noexcept test");
+static_assert(noexcept(unchecked_uint32_t(std::declval<std::int32_t>())), "noexcept test");
+static_assert(!noexcept(checked_uint32_t(std::declval<std::int32_t>())), "noexcept test");
 //
 // Construct from unsigned int:
 //
-static_assert(noexcept(unchecked_int32_t(std::declval<boost::uint32_t>())), "noexcept test");
-static_assert(noexcept(checked_int32_t(std::declval<boost::uint32_t>())), "noexcept test");
-static_assert(noexcept(unchecked_uint32_t(std::declval<boost::uint32_t>())), "noexcept test");
-static_assert(noexcept(checked_uint32_t(std::declval<boost::uint32_t>())), "noexcept test");
+static_assert(noexcept(unchecked_int32_t(std::declval<std::uint32_t>())), "noexcept test");
+static_assert(noexcept(checked_int32_t(std::declval<std::uint32_t>())), "noexcept test");
+static_assert(noexcept(unchecked_uint32_t(std::declval<std::uint32_t>())), "noexcept test");
+static_assert(noexcept(checked_uint32_t(std::declval<std::uint32_t>())), "noexcept test");
 //
 // Assign from int:
 //
-static_assert(noexcept(std::declval<unchecked_int32_t>() = std::declval<boost::int32_t>()), "noexcept test");
-static_assert(noexcept(std::declval<checked_int32_t>() = std::declval<boost::int32_t>()), "noexcept test");
-static_assert(noexcept(std::declval<unchecked_uint32_t>() = std::declval<boost::int32_t>()), "noexcept test");
-static_assert(!noexcept(std::declval<checked_uint32_t>() = std::declval<boost::int32_t>()), "noexcept test");
+static_assert(noexcept(std::declval<unchecked_int32_t>() = std::declval<std::int32_t>()), "noexcept test");
+static_assert(noexcept(std::declval<checked_int32_t>() = std::declval<std::int32_t>()), "noexcept test");
+static_assert(noexcept(std::declval<unchecked_uint32_t>() = std::declval<std::int32_t>()), "noexcept test");
+static_assert(!noexcept(std::declval<checked_uint32_t>() = std::declval<std::int32_t>()), "noexcept test");
 //
 // Assign from unsigned int:
 //
-static_assert(noexcept(std::declval<unchecked_int32_t>() = std::declval<boost::uint32_t>()), "noexcept test");
-static_assert(noexcept(std::declval<checked_int32_t>() = std::declval<boost::uint32_t>()), "noexcept test");
-static_assert(noexcept(std::declval<unchecked_uint32_t>() = std::declval<boost::uint32_t>()), "noexcept test");
-static_assert(noexcept(std::declval<checked_uint32_t>() = std::declval<boost::uint32_t>()), "noexcept test");
+static_assert(noexcept(std::declval<unchecked_int32_t>() = std::declval<std::uint32_t>()), "noexcept test");
+static_assert(noexcept(std::declval<checked_int32_t>() = std::declval<std::uint32_t>()), "noexcept test");
+static_assert(noexcept(std::declval<unchecked_uint32_t>() = std::declval<std::uint32_t>()), "noexcept test");
+static_assert(noexcept(std::declval<checked_uint32_t>() = std::declval<std::uint32_t>()), "noexcept test");
 
 //
 // And finally some things which should *not* be noexcept:
@@ -199,29 +199,29 @@ typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30,
 //
 // Construct from int:
 //
-static_assert(!noexcept(checked_int30_t(std::declval<boost::int32_t>())), "noexcept test");
-static_assert(!noexcept(checked_uint30_t(std::declval<boost::int32_t>())), "noexcept test");
-static_assert(!noexcept(checked_int32_t(std::declval<boost::int64_t>())), "noexcept test");
-static_assert(!noexcept(checked_uint32_t(std::declval<boost::int64_t>())), "noexcept test");
+static_assert(!noexcept(checked_int30_t(std::declval<std::int32_t>())), "noexcept test");
+static_assert(!noexcept(checked_uint30_t(std::declval<std::int32_t>())), "noexcept test");
+static_assert(!noexcept(checked_int32_t(std::declval<std::int64_t>())), "noexcept test");
+static_assert(!noexcept(checked_uint32_t(std::declval<std::int64_t>())), "noexcept test");
 //
 // Construct from unsigned int:
 //
-static_assert(!noexcept(checked_int30_t(std::declval<boost::uint32_t>())), "noexcept test");
-static_assert(!noexcept(checked_uint30_t(std::declval<boost::uint32_t>())), "noexcept test");
-static_assert(!noexcept(checked_int32_t(std::declval<boost::uint64_t>())), "noexcept test");
-static_assert(!noexcept(checked_uint32_t(std::declval<boost::uint64_t>())), "noexcept test");
+static_assert(!noexcept(checked_int30_t(std::declval<std::uint32_t>())), "noexcept test");
+static_assert(!noexcept(checked_uint30_t(std::declval<std::uint32_t>())), "noexcept test");
+static_assert(!noexcept(checked_int32_t(std::declval<std::uint64_t>())), "noexcept test");
+static_assert(!noexcept(checked_uint32_t(std::declval<std::uint64_t>())), "noexcept test");
 //
 // Assign from int:
 //
-static_assert(!noexcept(std::declval<checked_int30_t>() = std::declval<boost::int32_t>()), "noexcept test");
-static_assert(!noexcept(std::declval<checked_uint30_t>() = std::declval<boost::int32_t>()), "noexcept test");
-static_assert(!noexcept(std::declval<checked_int32_t>() = std::declval<boost::int64_t>()), "noexcept test");
-static_assert(!noexcept(std::declval<checked_uint32_t>() = std::declval<boost::int64_t>()), "noexcept test");
+static_assert(!noexcept(std::declval<checked_int30_t>() = std::declval<std::int32_t>()), "noexcept test");
+static_assert(!noexcept(std::declval<checked_uint30_t>() = std::declval<std::int32_t>()), "noexcept test");
+static_assert(!noexcept(std::declval<checked_int32_t>() = std::declval<std::int64_t>()), "noexcept test");
+static_assert(!noexcept(std::declval<checked_uint32_t>() = std::declval<std::int64_t>()), "noexcept test");
 //
 // Assign from unsigned int:
 //
-static_assert(!noexcept(std::declval<checked_int30_t>() = std::declval<boost::uint32_t>()), "noexcept test");
-static_assert(!noexcept(std::declval<checked_uint30_t>() = std::declval<boost::uint32_t>()), "noexcept test");
-static_assert(!noexcept(std::declval<checked_int32_t>() = std::declval<boost::uint64_t>()), "noexcept test");
-static_assert(!noexcept(std::declval<checked_uint32_t>() = std::declval<boost::uint64_t>()), "noexcept test");
+static_assert(!noexcept(std::declval<checked_int30_t>() = std::declval<std::uint32_t>()), "noexcept test");
+static_assert(!noexcept(std::declval<checked_uint30_t>() = std::declval<std::uint32_t>()), "noexcept test");
+static_assert(!noexcept(std::declval<checked_int32_t>() = std::declval<std::uint64_t>()), "noexcept test");
+static_assert(!noexcept(std::declval<checked_uint32_t>() = std::declval<std::uint64_t>()), "noexcept test");
 

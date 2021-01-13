@@ -75,7 +75,7 @@ struct is_checked_cpp_int<boost::multiprecision::number<boost::multiprecision::c
 {};
 
 template <class N>
-typename boost::enable_if_c<boost::multiprecision::backends::is_fixed_precision<typename N::backend_type>::value && !is_checked_cpp_int<N>::value>::type test(const N&)
+typename std::enable_if<boost::multiprecision::backends::is_fixed_precision<typename N::backend_type>::value && !is_checked_cpp_int<N>::value>::type test(const N&)
 {
    using namespace boost::multiprecision;
 
@@ -184,7 +184,7 @@ typename boost::enable_if_c<boost::multiprecision::backends::is_fixed_precision<
    }
 }
 template <class N>
-typename boost::disable_if_c<boost::multiprecision::backends::is_fixed_precision<typename N::backend_type>::value && !is_checked_cpp_int<N>::value>::type test(const N&)
+typename std::enable_if<!(boost::multiprecision::backends::is_fixed_precision<typename N::backend_type>::value && !is_checked_cpp_int<N>::value)>::type test(const N&)
 {
    using namespace boost::multiprecision;
 

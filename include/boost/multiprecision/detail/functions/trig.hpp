@@ -20,8 +20,8 @@
 template <class T>
 void hyp0F1(T& result, const T& b, const T& x)
 {
-   typedef typename boost::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
-   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<std::int32_t, T>::type  si_type;
+   typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
 
    // Compute the series representation of Hypergeometric0F1 taken from
    // http://functions.wolfram.com/HypergeometricFunctions/Hypergeometric0F1/06/01/01/
@@ -162,8 +162,8 @@ void eval_sin(T& result, const T& x)
       return;
    }
 
-   typedef typename boost::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
-   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<std::int32_t, T>::type  si_type;
+   typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
    typedef typename mpl::front<typename T::float_types>::type                          fp_type;
 
    switch (eval_fpclassify(x))
@@ -327,7 +327,7 @@ void eval_sin(T& result, const T& x)
       eval_multiply(result, xx);
 
       // Convert back using multiple angle identity.
-      for (boost::int32_t k = static_cast<boost::int32_t>(0); k < n_scale; k++)
+      for (std::int32_t k = static_cast<std::int32_t>(0); k < n_scale; k++)
       {
          // Rescale the cosine value using the multiple angle identity.
          eval_multiply(t2, result, ui_type(3));
@@ -355,8 +355,8 @@ void eval_cos(T& result, const T& x)
       return;
    }
 
-   typedef typename boost::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
-   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<std::int32_t, T>::type  si_type;
+   typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
 
    switch (eval_fpclassify(x))
    {
@@ -503,7 +503,7 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
    // Abramowitz and Stegun 15.1.1.
    // There are no checks on input range or parameter boundaries.
 
-   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
 
    T x_pow_n_div_n_fact(x);
    T pochham_a(a);
@@ -562,7 +562,7 @@ template <class T>
 void eval_asin(T& result, const T& x)
 {
    static_assert(number_category<T>::value == number_kind_floating_point, "The asin function is only valid for floating point types.");
-   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
    typedef typename mpl::front<typename T::float_types>::type                          fp_type;
 
    if (&result == &x)
@@ -666,8 +666,8 @@ void eval_asin(T& result, const T& x)
    // have at least 2/3 of the digits correct on the assumption that the correction
    // we've just added will finish the job...
 
-   boost::intmax_t current_precision = eval_ilogb(result);
-   boost::intmax_t target_precision  = std::numeric_limits<number<T> >::is_specialized ? 
+   std::intmax_t current_precision = eval_ilogb(result);
+   std::intmax_t target_precision  = std::numeric_limits<number<T> >::is_specialized ? 
       current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
       : current_precision - 1 - (boost::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
 
@@ -692,7 +692,7 @@ template <class T>
 inline void eval_acos(T& result, const T& x)
 {
    static_assert(number_category<T>::value == number_kind_floating_point, "The acos function is only valid for floating point types.");
-   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
 
    switch (eval_fpclassify(x))
    {
@@ -793,8 +793,8 @@ inline void eval_acos(T& result, const T& x)
    // have at least 2/3 of the digits correct on the assumption that the correction
    // we've just added will finish the job...
 
-   boost::intmax_t current_precision = eval_ilogb(result);
-   boost::intmax_t target_precision = std::numeric_limits<number<T> >::is_specialized ?
+   std::intmax_t current_precision = eval_ilogb(result);
+   std::intmax_t target_precision = std::numeric_limits<number<T> >::is_specialized ?
       current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
       : current_precision - 1 - (boost::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
 
@@ -818,8 +818,8 @@ template <class T>
 void eval_atan(T& result, const T& x)
 {
    static_assert(number_category<T>::value == number_kind_floating_point, "The atan function is only valid for floating point types.");
-   typedef typename boost::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
-   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<std::int32_t, T>::type  si_type;
+   typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
    typedef typename mpl::front<typename T::float_types>::type                          fp_type;
 
    switch (eval_fpclassify(x))
@@ -891,8 +891,8 @@ void eval_atan(T& result, const T& x)
    // have at least 2/3 of the digits correct on the assumption that the correction
    // we've just added will finish the job...
 
-   boost::intmax_t current_precision = eval_ilogb(result);
-   boost::intmax_t target_precision  = std::numeric_limits<number<T> >::is_specialized ?
+   std::intmax_t current_precision = eval_ilogb(result);
+   std::intmax_t target_precision  = std::numeric_limits<number<T> >::is_specialized ?
       current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
       : current_precision - 1 - (boost::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
 
@@ -930,7 +930,7 @@ void eval_atan2(T& result, const T& y, const T& x)
       return;
    }
 
-   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
 
    switch (eval_fpclassify(y))
    {
@@ -1028,7 +1028,7 @@ void eval_atan2(T& result, const T& y, const T& x)
    }
 }
 template <class T, class A>
-inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, const T& x, const A& a)
+inline typename std::enable_if<std::is_arithmetic<A>::value, void>::type eval_atan2(T& result, const T& x, const A& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
@@ -1038,7 +1038,7 @@ inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, co
 }
 
 template <class T, class A>
-inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, const A& x, const T& a)
+inline typename std::enable_if<std::is_arithmetic<A>::value, void>::type eval_atan2(T& result, const A& x, const T& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;

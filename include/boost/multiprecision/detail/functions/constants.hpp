@@ -9,7 +9,7 @@
 template <class T>
 void calc_log2(T& num, unsigned digits)
 {
-   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
    typedef typename mpl::front<typename T::signed_types>::type                         si_type;
 
    //

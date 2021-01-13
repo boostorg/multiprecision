@@ -12,7 +12,7 @@
 #include <boost/multiprecision/detail/rebind.hpp>
 
 namespace boost { namespace multiprecision { namespace backends { namespace detail {
-template <class value_type, const boost::uint32_t elem_number, class my_allocator>
+template <class value_type, const std::uint32_t elem_number, class my_allocator>
 struct dynamic_array : public std::vector<value_type, typename rebind<value_type, my_allocator>::type>
 {
    dynamic_array() : std::vector<value_type, typename rebind<value_type, my_allocator>::type>(static_cast<typename std::vector<value_type, typename rebind<value_type, my_allocator>::type>::size_type>(elem_number), static_cast<value_type>(0))

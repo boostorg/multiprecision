@@ -10,7 +10,7 @@
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/scoped_array.hpp>
 #include <boost/functional/hash_fwd.hpp>
 #include <tommath.h>
@@ -43,8 +43,8 @@ void eval_add(tommath_int& t, const tommath_int& o);
 
 struct tommath_int
 {
-   typedef mpl::list<boost::int32_t, boost::long_long_type>   signed_types;
-   typedef mpl::list<boost::uint32_t, boost::ulong_long_type> unsigned_types;
+   typedef mpl::list<std::int32_t, boost::long_long_type>   signed_types;
+   typedef mpl::list<std::uint32_t, boost::ulong_long_type> unsigned_types;
    typedef mpl::list<long double>                             float_types;
 
    tommath_int()
@@ -115,7 +115,7 @@ struct tommath_int
       mp_zero(&m_data);
       while (i)
       {
-         detail::check_tommath_result(mp_set_i64(&t, static_cast<boost::uint64_t>(i & mask)));
+         detail::check_tommath_result(mp_set_i64(&t, static_cast<std::uint64_t>(i & mask)));
          if (shift)
             detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
          detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
@@ -149,7 +149,7 @@ struct tommath_int
    // it only sets the first 32-bits to the result, and ignores the rest.
    // So use uint32_t as the largest type to pass to this function.
    //
-   tommath_int& operator=(boost::uint32_t i)
+   tommath_int& operator=(std::uint32_t i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
@@ -160,7 +160,7 @@ struct tommath_int
 #endif
       return *this;
    }
-   tommath_int& operator=(boost::int32_t i)
+   tommath_int& operator=(std::int32_t i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
@@ -218,8 +218,8 @@ struct tommath_int
       static const int shift = std::numeric_limits<int>::digits - 1;
       typedef int      part_type;
 #else
-      static const int       shift = std::numeric_limits<boost::int64_t>::digits - 1;
-      typedef boost::int64_t part_type;
+      static const int       shift = std::numeric_limits<std::int64_t>::digits - 1;
+      typedef std::int64_t part_type;
 #endif
 
       while (f)
@@ -267,7 +267,7 @@ struct tommath_int
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
       std::size_t n  = s ? std::strlen(s) : 0;
-      *this          = static_cast<boost::uint32_t>(0u);
+      *this          = static_cast<std::uint32_t>(0u);
       unsigned radix = 10;
       bool     isneg = false;
       if (n && (*s == '-'))
@@ -339,13 +339,13 @@ struct tommath_int
          {
             // Base 10, we extract blocks of size 10^9 at a time, that way
             // the number of multiplications is kept to a minimum:
-            boost::uint32_t block_mult = 1000000000;
+            std::uint32_t block_mult = 1000000000;
             while (*s)
             {
-               boost::uint32_t block = 0;
+               std::uint32_t block = 0;
                for (unsigned i = 0; i < 9; ++i)
                {
-                  boost::uint32_t val;
+                  std::uint32_t val;
                   if (*s >= '0' && *s <= '9')
                      val = *s - '0';
                   else
@@ -354,7 +354,7 @@ struct tommath_int
                   block += val;
                   if (!*++s)
                   {
-                     static const boost::uint32_t block_multiplier[9] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+                     static const std::uint32_t block_multiplier[9] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
                      block_mult                                       = block_multiplier[i];
                      break;
                   }
@@ -740,7 +740,7 @@ inline unsigned eval_msb(const tommath_int& val)
 }
 
 template <class Integer>
-inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
+inline typename std::enable_if<std::is_unsigned<Integer>::value, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
 {
 #ifdef DIGIT_BIT
    static const mp_digit m = (static_cast<mp_digit>(1) << DIGIT_BIT) - 1;
@@ -759,7 +759,7 @@ inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modu
    }
 }
 template <class Integer>
-inline typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
+inline typename std::enable_if<std::is_signed<Integer>::value && std::is_integral<Integer>::value, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
 {
    return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }

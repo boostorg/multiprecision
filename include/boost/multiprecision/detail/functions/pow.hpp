@@ -90,7 +90,7 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
 } // namespace detail
 
 template <typename T, typename U>
-inline typename enable_if_c<is_integral<U>::value>::type eval_pow(T& result, const T& t, const U& p)
+inline typename std::enable_if<is_integral<U>::value>::type eval_pow(T& result, const T& t, const U& p)
 {
    detail::pow_imp(result, t, p, boost::is_signed<U>());
 }
@@ -273,7 +273,7 @@ void eval_exp(T& result, const T& x)
    }
 
    // Check for pure-integer arguments which can be either signed or unsigned.
-   typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type ll;
+   typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type ll;
    eval_trunc(exp_series, x);
    eval_convert_to(&ll, exp_series);
    if (x.compare(ll) == 0)
@@ -509,7 +509,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
          // Need to check for a an odd integer as a special case:
          BOOST_TRY
          {
-            typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type i;
+            typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type i;
             eval_convert_to(&i, a);
             if (a.compare(i) == 0)
             {
@@ -579,11 +579,11 @@ inline void eval_pow(T& result, const T& x, const T& a)
       return;
    }
 
-   typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type an;
-   typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type max_an =
-       std::numeric_limits<typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type>::is_specialized ? (std::numeric_limits<typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type>::max)() : static_cast<typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type>(1) << (sizeof(typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type) * CHAR_BIT - 2);
-   typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type min_an =
-       std::numeric_limits<typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type>::is_specialized ? (std::numeric_limits<typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type>::min)() : -min_an;
+   typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type an;
+   typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type max_an =
+       std::numeric_limits<typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type>::is_specialized ? (std::numeric_limits<typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type>::max)() : static_cast<typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type>(1) << (sizeof(typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type) * CHAR_BIT - 2);
+   typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type min_an =
+       std::numeric_limits<typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type>::is_specialized ? (std::numeric_limits<typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type>::min)() : -min_an;
 
    T fa;
    BOOST_TRY
@@ -598,12 +598,12 @@ inline void eval_pow(T& result, const T& x, const T& a)
    BOOST_CATCH(const std::exception&)
    {
       // conversion failed, just fall through, value is not an integer.
-      an = (std::numeric_limits<boost::intmax_t>::max)();
+      an = (std::numeric_limits<std::intmax_t>::max)();
    }
    BOOST_CATCH_END
    if ((eval_get_sign(x) < 0))
    {
-      typename boost::multiprecision::detail::canonical<boost::uintmax_t, T>::type aun;
+      typename boost::multiprecision::detail::canonical<std::uintmax_t, T>::type aun;
       BOOST_TRY
       {
          eval_convert_to(&aun, a);
@@ -717,9 +717,9 @@ inline void eval_pow(T& result, const T& x, const T& a)
 
 template <class T, class A>
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
-inline typename enable_if_c<!is_integral<A>::value, void>::type
+inline typename std::enable_if<!is_integral<A>::value, void>::type
 #else
-inline typename enable_if_c<is_compatible_arithmetic_type<A, number<T> >::value && !is_integral<A>::value, void>::type
+inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::value && !is_integral<A>::value, void>::type
 #endif
 eval_pow(T& result, const T& x, const A& a)
 {
@@ -736,7 +736,7 @@ template <class T, class A>
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
 inline void
 #else
-inline typename enable_if_c<is_compatible_arithmetic_type<A, number<T> >::value, void>::type
+inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::value, void>::type
 #endif
 eval_pow(T& result, const A& x, const T& a)
 {

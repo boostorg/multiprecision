@@ -7,7 +7,6 @@
 #define BOOST_MATH_BIG_NUM_BASE_HPP
 
 #include <limits>
-#include <boost/utility/enable_if.hpp>
 #include <boost/core/nvp.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/is_constructible.hpp>
@@ -208,7 +207,7 @@ namespace detail {
 // Workaround for missing abs(boost::long_long_type) and abs(__int128) on some compilers:
 //
 template <class T>
-constexpr typename enable_if_c<(is_signed<T>::value || is_floating_point<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<(is_signed<T>::value || is_floating_point<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
 {
    // This strange expression avoids a hardware trap in the corner case
    // that val is the most negative value permitted in boost::long_long_type.
@@ -216,7 +215,7 @@ constexpr typename enable_if_c<(is_signed<T>::value || is_floating_point<T>::val
    return t < 0 ? T(1u) + T(-(t + 1)) : t;
 }
 template <class T>
-constexpr typename enable_if_c<(is_unsigned<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<(is_unsigned<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
 {
    return t;
 }
@@ -224,7 +223,7 @@ constexpr typename enable_if_c<(is_unsigned<T>::value), T>::type abs(T t) BOOST_
 #define BOOST_MP_USING_ABS using boost::multiprecision::detail::abs;
 
 template <class T>
-constexpr typename enable_if_c<(is_signed<T>::value || is_floating_point<T>::value), typename make_unsigned<T>::type>::type unsigned_abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<(is_signed<T>::value || is_floating_point<T>::value), typename make_unsigned<T>::type>::type unsigned_abs(T t) BOOST_NOEXCEPT
 {
    // This strange expression avoids a hardware trap in the corner case
    // that val is the most negative value permitted in boost::long_long_type.
@@ -232,7 +231,7 @@ constexpr typename enable_if_c<(is_signed<T>::value || is_floating_point<T>::val
    return t < 0 ? static_cast<typename make_unsigned<T>::type>(1u) + static_cast<typename make_unsigned<T>::type>(-(t + 1)) : static_cast<typename make_unsigned<T>::type>(t);
 }
 template <class T>
-constexpr typename enable_if_c<(is_unsigned<T>::value), T>::type unsigned_abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<(is_unsigned<T>::value), T>::type unsigned_abs(T t) BOOST_NOEXCEPT
 {
    return t;
 }
@@ -240,7 +239,7 @@ constexpr typename enable_if_c<(is_unsigned<T>::value), T>::type unsigned_abs(T 
 template <class T>
 struct bits_of
 {
-   BOOST_STATIC_ASSERT(is_integral<T>::value || is_enum<T>::value || std::numeric_limits<T>::is_specialized);
+   static_assert(std::is_integral<T>::value || std::is_enum<T>::value || std::numeric_limits<T>::is_specialized, "Failed integer size check");
    static const unsigned value =
        std::numeric_limits<T>::is_specialized ? std::numeric_limits<T>::digits
                                               : sizeof(T) * CHAR_BIT - (is_signed<T>::value ? 1 : 0);
@@ -629,7 +628,7 @@ struct expression<tag, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
+             typename std::enable_if<!(is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value), int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -780,7 +779,7 @@ struct expression<terminal, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
+             typename std::enable_if<!(is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value), int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -936,7 +935,7 @@ struct expression<tag, Arg1, Arg2, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
+             typename std::enable_if<!(is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value), int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1102,7 +1101,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
+             typename std::enable_if<!(is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value), int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1276,7 +1275,7 @@ struct expression
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
+             typename std::enable_if<!(is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value), int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1316,10 +1315,10 @@ struct expression
 template <class T>
 struct digits2
 {
-   BOOST_STATIC_ASSERT(std::numeric_limits<T>::is_specialized);
-   BOOST_STATIC_ASSERT((std::numeric_limits<T>::radix == 2) || (std::numeric_limits<T>::radix == 10));
+   static_assert(std::numeric_limits<T>::is_specialized, "numeric_limits must be specialized here");
+   static_assert((std::numeric_limits<T>::radix == 2) || (std::numeric_limits<T>::radix == 10), "Failed radix check");
    // If we really have so many digits that this fails, then we're probably going to hit other problems anyway:
-   BOOST_STATIC_ASSERT(LONG_MAX / 1000 > (std::numeric_limits<T>::digits + 1));
+   static_assert(LONG_MAX / 1000 > (std::numeric_limits<T>::digits + 1), "Too many digits to cope with here");
    static const long                  m_value = std::numeric_limits<T>::radix == 10 ? (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) : std::numeric_limits<T>::digits;
    static inline constexpr long value() BOOST_NOEXCEPT { return m_value; }
 };
@@ -1333,7 +1332,7 @@ struct digits2
 #endif
 
 template <class S>
-void format_float_string(S& str, boost::intmax_t my_exp, boost::intmax_t digits, std::ios_base::fmtflags f, bool iszero)
+void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std::ios_base::fmtflags f, bool iszero)
 {
    typedef typename S::size_type size_type;
    bool                          scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
@@ -1399,7 +1398,7 @@ void format_float_string(S& str, boost::intmax_t my_exp, boost::intmax_t digits,
       //
       // Pad out the end with zero's if we need to:
       //
-      boost::intmax_t chars = str.size();
+      std::intmax_t chars = str.size();
       chars                 = digits - chars;
       if (scientific)
          ++chars;
@@ -1411,14 +1410,14 @@ void format_float_string(S& str, boost::intmax_t my_exp, boost::intmax_t digits,
 
    if (fixed || (!scientific && (my_exp >= -4) && (my_exp < digits)))
    {
-      if (1 + my_exp > static_cast<boost::intmax_t>(str.size()))
+      if (1 + my_exp > static_cast<std::intmax_t>(str.size()))
       {
          // Just pad out the end with zeros:
          str.append(static_cast<std::string::size_type>(1 + my_exp - str.size()), '0');
          if (showpoint || fixed)
             str.append(".");
       }
-      else if (my_exp + 1 < static_cast<boost::intmax_t>(str.size()))
+      else if (my_exp + 1 < static_cast<std::intmax_t>(str.size()))
       {
          if (my_exp < 0)
          {
@@ -1437,7 +1436,7 @@ void format_float_string(S& str, boost::intmax_t my_exp, boost::intmax_t digits,
       if (fixed)
       {
          // We may need to add trailing zeros:
-         boost::intmax_t l = str.find('.') + 1;
+         std::intmax_t l = str.find('.') + 1;
          l                 = digits - (str.size() - l);
          if (l > 0)
             str.append(size_type(l), '0');

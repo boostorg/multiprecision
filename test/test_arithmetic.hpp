@@ -82,7 +82,7 @@ int normalize_compare_result(int r)
 }
 
 template <class Real, class Val>
-typename boost::disable_if_c<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type
+typename std::enable_if<boost::multiprecision::number_category<Real>::value != boost::multiprecision::number_kind_complex>::type
 test_comparisons(Val a, Val b, const boost::mpl::true_)
 {
    Real r1(a);
@@ -154,7 +154,7 @@ test_comparisons(Val a, Val b, const boost::mpl::true_)
 }
 
 template <class Real, class Val>
-typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type
+typename std::enable_if<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type
 test_comparisons(Val a, Val b, const boost::mpl::true_)
 {
    Real r1(a);
@@ -1431,10 +1431,10 @@ struct lexical_cast_target_type
 {
    typedef typename boost::mpl::if_<
        boost::is_signed<T>,
-       boost::intmax_t,
+       std::intmax_t,
        typename boost::mpl::if_<
            boost::is_unsigned<T>,
-           boost::uintmax_t,
+           std::uintmax_t,
            T>::type>::type type;
 };
 
@@ -2057,7 +2057,7 @@ void test_mixed(const boost::mpl::true_&)
 }
 
 template <class Real>
-typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type test_members(Real)
+typename std::enable_if<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type test_members(Real)
 {
    //
    // Test sign and zero functions:
@@ -2486,7 +2486,7 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
 }
 
 template <class Real>
-typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value != boost::multiprecision::number_kind_complex>::type test_members(Real)
+typename std::enable_if<boost::multiprecision::number_category<Real>::value != boost::multiprecision::number_kind_complex>::type test_members(Real)
 {
    //
    // Test sign and zero functions:
@@ -2691,7 +2691,7 @@ void test_basic_conditionals(Real a, Real b)
 }
 
 template <class T>
-typename boost::enable_if_c<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_complex>::type
+typename std::enable_if<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_complex>::type
 test_relationals(T a, T b)
 {
    BOOST_CHECK_EQUAL((a == b), false);
@@ -2722,7 +2722,7 @@ test_relationals(T a, T b)
 }
 
 template <class T>
-typename boost::disable_if_c<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_complex>::type
+typename std::enable_if<boost::multiprecision::number_category<T>::value != boost::multiprecision::number_kind_complex>::type
 test_relationals(T a, T b)
 {
    BOOST_CHECK_EQUAL((a == b), false);

@@ -10,7 +10,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cmath>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/multiprecision/number.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/mpl/list.hpp>
@@ -96,8 +96,8 @@ struct number_backend_float_architype
          ss.precision(digits);
       else
          ss.precision(std::numeric_limits<long double>::digits10 + 3);
-      boost::intmax_t  i = m_value;
-      boost::uintmax_t u = m_value;
+      std::intmax_t  i = m_value;
+      std::uintmax_t u = m_value;
       if (!(f & std::ios_base::scientific) && m_value == i)
          ss << i;
       else if (!(f & std::ios_base::scientific) && m_value == u)

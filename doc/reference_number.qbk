@@ -70,7 +70,7 @@
       // Comparison:
       int compare(const number<Backend>& o)const;
       template <class V>
-      typename enable_if<is_convertible<V, number<Backend, ExpressionTemplates> >, int>::type
+      typename std::enable_if<std::is_convertible<V, number<Backend, ExpressionTemplates>::value >, int>::type
          compare(const V& o)const;
       // real and imaginary parts:
       value_type real()const;
@@ -433,7 +433,7 @@ the default precision and the precision of `*this` respectively.
 
       int compare(const number<Backend, ExpressionTemplates>& o)const;
       template <class V>
-      typename enable_if<is_convertible<V, number<Backend, ExpressionTemplates> >, int>::type
+      typename std::enable_if<std::is_convertible<V, number<Backend, ExpressionTemplates>::value >, int>::type
          compare(const V& other)const;
 
 Returns:

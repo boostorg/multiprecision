@@ -126,7 +126,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_lcm(B& result, const B& a, const B& b)
 } // namespace default_ops
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer>::type
 divide_qr(const number<Backend, ExpressionTemplates>& x, const number<Backend, ExpressionTemplates>& y,
           number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r)
 {
@@ -135,7 +135,7 @@ divide_qr(const number<Backend, ExpressionTemplates>& x, const number<Backend, E
 }
 
 template <class Backend, expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer>::type
 divide_qr(const number<Backend, ExpressionTemplates>& x, const multiprecision::detail::expression<tag, A1, A2, A3, A4>& y,
           number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r)
 {
@@ -143,7 +143,7 @@ divide_qr(const number<Backend, ExpressionTemplates>& x, const multiprecision::d
 }
 
 template <class tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer>::type
 divide_qr(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, const number<Backend, ExpressionTemplates>& y,
           number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r)
 {
@@ -151,7 +151,7 @@ divide_qr(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, cons
 }
 
 template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b, class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer>::type
 divide_qr(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, const multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& y,
           number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r)
 {
@@ -159,7 +159,7 @@ divide_qr(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, cons
 }
 
 template <class Backend, expression_template_option ExpressionTemplates, class Integer>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<mpl::and_<is_integral<Integer>, mpl::bool_<number_category<Backend>::value == number_kind_integer> >, Integer>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<Integer>::value && (number_category<Backend>::value == number_kind_integer), Integer>::type
 integer_modulus(const number<Backend, ExpressionTemplates>& x, Integer val)
 {
    using default_ops::eval_integer_modulus;
@@ -167,7 +167,7 @@ integer_modulus(const number<Backend, ExpressionTemplates>& x, Integer val)
 }
 
 template <class tag, class A1, class A2, class A3, class A4, class Integer>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<mpl::and_<is_integral<Integer>, mpl::bool_<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer> >, Integer>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<Integer>::value && (number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer), Integer>::type
 integer_modulus(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, Integer val)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type result_type;
@@ -175,7 +175,7 @@ integer_modulus(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, unsigned>::type
 lsb(const number<Backend, ExpressionTemplates>& x)
 {
    using default_ops::eval_lsb;
@@ -183,7 +183,7 @@ lsb(const number<Backend, ExpressionTemplates>& x)
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, unsigned>::type
 lsb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
@@ -193,7 +193,7 @@ lsb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, unsigned>::type
 msb(const number<Backend, ExpressionTemplates>& x)
 {
    using default_ops::eval_msb;
@@ -201,7 +201,7 @@ msb(const number<Backend, ExpressionTemplates>& x)
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, unsigned>::type
 msb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
@@ -211,7 +211,7 @@ msb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, bool>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, bool>::type
 bit_test(const number<Backend, ExpressionTemplates>& x, unsigned index)
 {
    using default_ops::eval_bit_test;
@@ -219,7 +219,7 @@ bit_test(const number<Backend, ExpressionTemplates>& x, unsigned index)
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, bool>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, bool>::type
 bit_test(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, unsigned index)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
@@ -229,7 +229,7 @@ bit_test(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, unsig
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
 bit_set(number<Backend, ExpressionTemplates>& x, unsigned index)
 {
    using default_ops::eval_bit_set;
@@ -238,7 +238,7 @@ bit_set(number<Backend, ExpressionTemplates>& x, unsigned index)
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
 bit_unset(number<Backend, ExpressionTemplates>& x, unsigned index)
 {
    using default_ops::eval_bit_unset;
@@ -247,7 +247,7 @@ bit_unset(number<Backend, ExpressionTemplates>& x, unsigned index)
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
 bit_flip(number<Backend, ExpressionTemplates>& x, unsigned index)
 {
    using default_ops::eval_bit_flip;
@@ -356,7 +356,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_powm(Backend& result, const Backend& a, const
 }
 
 template <class Backend, class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_unsigned<Integer> >::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_unsigned<Integer>::value >::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
 {
    typedef typename double_precision_type<Backend>::type                                       double_type;
    typedef typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
@@ -386,7 +386,7 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_unsigned<Integer> >::type eval_po
 }
 
 template <class Backend, class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_signed<Integer> >::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_signed<Integer>::value && std::is_integral<Integer>::value>::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
 {
    if (b < 0)
    {
@@ -396,7 +396,7 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_signed<Integer> >::type eval_powm
 }
 
 template <class Backend, class Integer1, class Integer2>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_unsigned<Integer1> >::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_unsigned<Integer1>::value >::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
 {
    typedef typename double_precision_type<Backend>::type                                       double_type;
    typedef typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
@@ -428,7 +428,7 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_unsigned<Integer1> >::type eval_p
 }
 
 template <class Backend, class Integer1, class Integer2>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_signed<Integer1> >::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_signed<Integer1>::value && std::is_integral<Integer1>::value>::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
 {
    if (b < 0)
    {
@@ -456,20 +456,11 @@ struct powm_func
 } // namespace default_ops
 
 template <class T, class U, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<
-    mpl::and_<
-        mpl::bool_<number_category<T>::value == number_kind_integer>,
-        mpl::or_<
-            is_number<T>,
-            is_number_expression<T> >,
-        mpl::or_<
-            is_number<U>,
-            is_number_expression<U>,
-            is_integral<U> >,
-        mpl::or_<
-            is_number<V>,
-            is_number_expression<V>,
-            is_integral<V> > >,
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+        (number_category<T>::value == number_kind_integer) &&
+        (is_number<T>::value || is_number_expression<T>::value) &&
+        (is_number<U>::value || is_number_expression<U>::value || is_integral<U>::value) &&
+        (is_number<V>::value || is_number_expression<V>::value || is_integral<V>::value),
     typename mpl::if_<
         is_no_et_number<T>,
         T,

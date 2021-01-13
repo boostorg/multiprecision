@@ -261,12 +261,12 @@ int main()
 {
    using namespace boost::multiprecision;
 #if defined(TEST1) && !defined(BOOST_MSVC)
-   test_round_trip<number<cpp_bin_float<113, digit_base_2, void, boost::int16_t> >, cpp_rational>();
+   test_round_trip<number<cpp_bin_float<113, digit_base_2, void, std::int16_t> >, cpp_rational>();
 #elif defined(TEST2)
    double_spot_tests();
    test_round_trip<double, cpp_rational>();
 #elif defined(TEST3) && !defined(BOOST_MSVC)
-   test_random_rationals<number<cpp_bin_float<113, digit_base_2, void, boost::int16_t> >, cpp_rational>();
+   test_random_rationals<number<cpp_bin_float<113, digit_base_2, void, std::int16_t> >, cpp_rational>();
 #elif defined(TEST4)
    test_random_rationals<double, cpp_rational>();
 #elif defined(TEST5)

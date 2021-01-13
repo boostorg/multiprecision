@@ -9,7 +9,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/functional/hash_fwd.hpp>
 #include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MSVC
@@ -43,15 +43,15 @@ struct rational_adaptor
    rational_adaptor(const IntBackend& o) BOOST_MP_NOEXCEPT_IF(noexcept(rational_type(std::declval<const IntBackend&>()))) : m_value(o) {}
 
    template <class U>
-   rational_adaptor(const U& u, typename enable_if_c<is_convertible<U, IntBackend>::value>::type* = 0)
+   rational_adaptor(const U& u, typename std::enable_if<is_convertible<U, IntBackend>::value>::type* = 0)
        : m_value(static_cast<integer_type>(u)) {}
    template <class U>
    explicit rational_adaptor(const U& u,
-                             typename enable_if_c<
+                             typename std::enable_if<
                                  boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_convertible<U, IntBackend>::value>::type* = 0)
        : m_value(IntBackend(u)) {}
    template <class U>
-   typename enable_if_c<(boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_arithmetic<U>::value), rational_adaptor&>::type operator=(const U& u)
+   typename std::enable_if<(boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_arithmetic<U>::value), rational_adaptor&>::type operator=(const U& u)
    {
       m_value = IntBackend(u);
       return *this;
@@ -77,13 +77,13 @@ struct rational_adaptor
       return *this;
    }
    template <class Int>
-   typename enable_if<is_integral<Int>, rational_adaptor&>::type operator=(Int i)
+   typename std::enable_if<std::is_integral<Int>::value, rational_adaptor&>::type operator=(Int i)
    {
       m_value = i;
       return *this;
    }
    template <class Float>
-   typename enable_if<is_floating_point<Float>, rational_adaptor&>::type operator=(Float i)
+   typename std::enable_if<std::is_floating_point<Float>::value, rational_adaptor&>::type operator=(Float i)
    {
       int   e;
       Float f = std::frexp(i, &e);
@@ -166,12 +166,12 @@ struct rational_adaptor
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
    template <class Arithmatic>
-   typename enable_if_c<is_arithmetic<Arithmatic>::value && !is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
+   typename std::enable_if<is_arithmetic<Arithmatic>::value && !is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
    {
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
    }
    template <class Arithmatic>
-   typename enable_if_c<is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
+   typename std::enable_if<is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
    {
       rational_adaptor r;
       r = i;
@@ -235,7 +235,7 @@ inline void eval_divide(rational_adaptor<IntBackend>& result, const rational_ada
 }
 
 template <class R, class IntBackend>
-inline typename enable_if_c<number_category<R>::value == number_kind_floating_point>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+inline typename std::enable_if<number_category<R>::value == number_kind_floating_point>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
    //
    // The generic conversion is as good as anything we can write here:
@@ -244,7 +244,7 @@ inline typename enable_if_c<number_category<R>::value == number_kind_floating_po
 }
 
 template <class R, class IntBackend>
-inline typename enable_if_c<(number_category<R>::value != number_kind_integer) && (number_category<R>::value != number_kind_floating_point)>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+inline typename std::enable_if<(number_category<R>::value != number_kind_integer) && (number_category<R>::value != number_kind_floating_point)>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
    typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
    comp_t                                                                        num(backend.data().numerator());
@@ -254,7 +254,7 @@ inline typename enable_if_c<(number_category<R>::value != number_kind_integer) &
 }
 
 template <class R, class IntBackend>
-inline typename enable_if_c<number_category<R>::value == number_kind_integer>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+inline typename std::enable_if<number_category<R>::value == number_kind_integer>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
    typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
    comp_t                                                                        t = backend.data().numerator();

@@ -14,7 +14,7 @@
 
    namespace boost{ namespace multiprecision{
 
-   template <unsigned Digits10, class ExponentType = boost::int32_t, class Allocator = void>
+   template <unsigned Digits10, class ExponentType = std::int32_t, class Allocator = void>
    class cpp_dec_float;
 
    typedef number<cpp_dec_float<50> > cpp_dec_float_50;

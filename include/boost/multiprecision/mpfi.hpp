@@ -8,7 +8,7 @@
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
@@ -350,13 +350,13 @@ struct mpfi_float_backend : public detail::mpfi_float_imp<digits10>
    mpfi_float_backend(mpfi_float_backend&& o) : detail::mpfi_float_imp<digits10>(static_cast<detail::mpfi_float_imp<digits10>&&>(o))
    {}
    template <unsigned D>
-   mpfi_float_backend(const mpfi_float_backend<D>& val, typename enable_if_c<D <= digits10>::type* = 0)
+   mpfi_float_backend(const mpfi_float_backend<D>& val, typename std::enable_if<D <= digits10>::type* = 0)
        : detail::mpfi_float_imp<digits10>()
    {
       mpfi_set(this->m_data, val.data());
    }
    template <unsigned D>
-   explicit mpfi_float_backend(const mpfi_float_backend<D>& val, typename disable_if_c<D <= digits10>::type* = 0)
+   explicit mpfi_float_backend(const mpfi_float_backend<D>& val, typename std::enable_if<!(D <= digits10)>::type* = 0)
        : detail::mpfi_float_imp<digits10>()
    {
       mpfi_set(this->m_data, val.data());
@@ -372,7 +372,7 @@ struct mpfi_float_backend : public detail::mpfi_float_imp<digits10>
       return *this;
    }
    template <unsigned D>
-   mpfi_float_backend(const mpfr_float_backend<D>& val, typename enable_if_c<D <= digits10>::type* = 0)
+   mpfi_float_backend(const mpfr_float_backend<D>& val, typename std::enable_if<D <= digits10>::type* = 0)
        : detail::mpfi_float_imp<digits10>()
    {
       mpfi_set_fr(this->m_data, val.data());
@@ -384,7 +384,7 @@ struct mpfi_float_backend : public detail::mpfi_float_imp<digits10>
       return *this;
    }
    template <unsigned D>
-   explicit mpfi_float_backend(const mpfr_float_backend<D>& val, typename disable_if_c<D <= digits10>::type* = 0)
+   explicit mpfi_float_backend(const mpfr_float_backend<D>& val, typename std::enable_if<!(D <= digits10)>::type* = 0)
        : detail::mpfi_float_imp<digits10>()
    {
       mpfi_set_fr(this->m_data, val.data());
@@ -419,7 +419,7 @@ template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
 void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_backend<D2, AllocationType>& a, const mpfr_float_backend<D2, AllocationType>& b);
 
 template <unsigned Digits10, class V>
-typename enable_if_c<boost::is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value || boost::is_convertible<V, const char*>::value>::type
+typename std::enable_if<boost::is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value || boost::is_convertible<V, const char*>::value>::type
 assign_components(mpfi_float_backend<Digits10>& result, const V& a, const V& b);
 
 template <>
@@ -504,17 +504,17 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
 };
 
 template <unsigned digits10, class T>
-inline typename enable_if<is_arithmetic<T>, bool>::type eval_eq(const mpfi_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<std::is_arithmetic<T>::value, bool>::type eval_eq(const mpfi_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) == 0;
 }
 template <unsigned digits10, class T>
-inline typename enable_if<is_arithmetic<T>, bool>::type eval_lt(const mpfi_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<std::is_arithmetic<T>::value, bool>::type eval_lt(const mpfi_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) < 0;
 }
 template <unsigned digits10, class T>
-inline typename enable_if<is_arithmetic<T>, bool>::type eval_gt(const mpfi_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<std::is_arithmetic<T>::value, bool>::type eval_gt(const mpfi_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) > 0;
 }
@@ -820,7 +820,7 @@ inline void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_b
 }
 
 template <unsigned Digits10, class V>
-inline typename enable_if_c<boost::is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value || boost::is_convertible<V, const char*>::value>::type
+inline typename std::enable_if<boost::is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value || boost::is_convertible<V, const char*>::value>::type
 assign_components(mpfi_float_backend<Digits10>& result, const V& a, const V& b)
 {
    number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> x(a), y(b);
@@ -938,7 +938,7 @@ inline void eval_pow(mpfi_float_backend<Digits10>& result, const mpfi_float_back
          eval_divide(result, t1, t2);
          return;
       }
-      typename boost::multiprecision::detail::canonical<boost::uintmax_t, mpfi_float_backend<Digits10> >::type an;
+      typename boost::multiprecision::detail::canonical<std::uintmax_t, mpfi_float_backend<Digits10> >::type an;
 #ifndef BOOST_NO_EXCEPTIONS
       try
       {

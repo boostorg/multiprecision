@@ -7,7 +7,7 @@
 #define BOOST_MULTIPRECISION_COMPLEX_ADAPTOR_HPP
 
 #include <boost/multiprecision/number.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/functional/hash_fwd.hpp>
 #include <boost/type_traits/is_complex.hpp>
@@ -178,7 +178,7 @@ struct complex_adaptor
 };
 
 template <class Backend, class T>
-inline typename enable_if<is_arithmetic<T>, bool>::type eval_eq(const complex_adaptor<Backend>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<std::is_arithmetic<T>::value, bool>::type eval_eq(const complex_adaptor<Backend>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) == 0;
 }
@@ -265,26 +265,26 @@ inline void eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<
    }
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_add(complex_adaptor<Backend>& result, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_add(complex_adaptor<Backend>& result, const T& scalar)
 {
    using default_ops::eval_add;
    eval_add(result.real_data(), scalar);
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_subtract(complex_adaptor<Backend>& result, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_subtract(complex_adaptor<Backend>& result, const T& scalar)
 {
    using default_ops::eval_subtract;
    eval_subtract(result.real_data(), scalar);
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_multiply(complex_adaptor<Backend>& result, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_multiply(complex_adaptor<Backend>& result, const T& scalar)
 {
    using default_ops::eval_multiply;
    eval_multiply(result.real_data(), scalar);
    eval_multiply(result.imag_data(), scalar);
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_divide(complex_adaptor<Backend>& result, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_divide(complex_adaptor<Backend>& result, const T& scalar)
 {
    using default_ops::eval_divide;
    eval_divide(result.real_data(), scalar);
@@ -292,28 +292,28 @@ inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>:
 }
 // Optimised 3 arg versions:
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_add(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_add(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
 {
    using default_ops::eval_add;
    eval_add(result.real_data(), a.real_data(), scalar);
    result.imag_data() = a.imag_data();
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_subtract(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_subtract(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
 {
    using default_ops::eval_subtract;
    eval_subtract(result.real_data(), a.real_data(), scalar);
    result.imag_data() = a.imag_data();
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_multiply(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_multiply(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
 {
    using default_ops::eval_multiply;
    eval_multiply(result.real_data(), a.real_data(), scalar);
    eval_multiply(result.imag_data(), a.imag_data(), scalar);
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
 {
    using default_ops::eval_divide;
    eval_divide(result.real_data(), a.real_data(), scalar);
@@ -334,7 +334,7 @@ inline int eval_get_sign(const complex_adaptor<Backend>&)
 }
 
 template <class Result, class Backend>
-inline typename disable_if_c<boost::is_complex<Result>::value>::type eval_convert_to(Result* result, const complex_adaptor<Backend>& val)
+inline typename std::enable_if< !boost::is_complex<Result>::value>::type eval_convert_to(Result* result, const complex_adaptor<Backend>& val)
 {
    using default_ops::eval_convert_to;
    using default_ops::eval_is_zero;

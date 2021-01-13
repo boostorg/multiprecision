@@ -309,7 +309,7 @@ namespace detail
 
           // Before storing the approximate root, perform a couple of
           // bisection steps in order to tighten up the root bracket.
-          boost::uintmax_t a_couple_of_iterations = 4U;
+          std::uintmax_t a_couple_of_iterations = 4U;
 
           const std::pair<T, T>
             root_estimate_bracket = boost::math::tools::bisect(laguerre_root_object,
@@ -392,9 +392,9 @@ namespace detail
         constexpr int local_math_tools_digits10 =
           static_cast<int>(static_cast<boost::float_least32_t>(boost::math::tools::digits<T>()) * BOOST_FLOAT32_C(0.301));
 
-        const boost::uintmax_t number_of_iterations_allowed = (std::max)(20, local_math_tools_digits10 / 2);
+        const std::uintmax_t number_of_iterations_allowed = (std::max)(20, local_math_tools_digits10 / 2);
 
-        boost::uintmax_t number_of_iterations_used = number_of_iterations_allowed;
+        std::uintmax_t number_of_iterations_used = number_of_iterations_allowed;
 
         // Perform the root-finding using ACM TOMS 748 from Boost.Math.
         const std::pair<T, T>
