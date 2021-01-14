@@ -161,14 +161,14 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   double test_str(const boost::mpl::false_&)
+   double test_str(const std::integral_constant<bool, false>&)
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < b.size(); ++i)
          a[i] = boost::lexical_cast<T>(boost::lexical_cast<std::string>(b[i]));
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   double test_str(const boost::mpl::true_&)
+   double test_str(const std::integral_constant<bool, true>&)
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < b.size(); ++i)
@@ -177,7 +177,7 @@ struct tester
    }
    double test_str()
    {
-      return test_str(boost::is_class<T>());
+      return test_str(std::is_class<T>());
    }
    //
    // The following tests only work for integer types:
@@ -370,19 +370,19 @@ struct tester
    // Hetero operations:
    //
    template <class U>
-   static U get_hetero_test_value(boost::mpl::false_ const&)
+   static U get_hetero_test_value(std::integral_constant<bool, false> const&)
    {
       return U(2) / 3;
    }
    template <class U>
-   static U get_hetero_test_value(boost::mpl::true_ const&)
+   static U get_hetero_test_value(std::integral_constant<bool, true> const&)
    {
       return (std::numeric_limits<U>::max)() >> 4;
    }
    template <class U>
    static U get_hetero_test_value()
    {
-      return get_hetero_test_value<U>(boost::is_integral<U>());
+      return get_hetero_test_value<U>(boost::multiprecision::detail::is_integral<U>());
    }
    template <class U>
    double test_multiply_hetero()

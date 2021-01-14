@@ -272,7 +272,7 @@ R safe_convert_to_float(const LargeInteger& i)
 }
 
 template <class To, class Integer>
-inline typename std::enable_if<!(is_number<To>::value || is_floating_point<To>::value)>::type
+inline typename std::enable_if<!(is_number<To>::value || std::is_floating_point<To>::value)>::type
 generic_convert_rational_to_float_imp(To& result, const Integer& n, const Integer& d, const mpl::true_&)
 {
    //
@@ -285,7 +285,7 @@ generic_convert_rational_to_float_imp(To& result, const Integer& n, const Intege
    eval_divide(result, fn.backend(), fd.backend());
 }
 template <class To, class Integer>
-inline typename std::enable_if<is_number<To>::value || is_floating_point<To>::value>::type
+inline typename std::enable_if<is_number<To>::value || std::is_floating_point<To>::value>::type
 generic_convert_rational_to_float_imp(To& result, const Integer& n, const Integer& d, const mpl::true_&)
 {
    //
@@ -299,7 +299,7 @@ generic_convert_rational_to_float_imp(To& result, const Integer& n, const Intege
 }
 
 template <class To, class Integer>
-typename std::enable_if<is_number<To>::value || is_floating_point<To>::value>::type
+typename std::enable_if<is_number<To>::value || std::is_floating_point<To>::value>::type
 generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, const mpl::false_&)
 {
    //
@@ -360,7 +360,7 @@ generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, 
       result = -result;
 }
 template <class To, class Integer>
-inline typename std::enable_if<!(is_number<To>::value || is_floating_point<To>::value)>::type
+inline typename std::enable_if<!(is_number<To>::value || std::is_floating_point<To>::value)>::type
 generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, const mpl::false_& tag)
 {
    number<To> t;
@@ -379,7 +379,7 @@ inline void generic_convert_rational_to_float(To& result, const From& f)
    // from specific conversions to built in types.
    //
    typedef typename mpl::if_c<is_number<From>::value, From, number<From> >::type                                                                                                                                                                                                            actual_from_type;
-   typedef typename mpl::if_c<is_number<To>::value || is_floating_point<To>::value, To, number<To> >::type                                                                                                                                                                                  actual_to_type;
+   typedef typename mpl::if_c<is_number<To>::value || std::is_floating_point<To>::value, To, number<To> >::type                                                                                                                                                                             actual_to_type;
    typedef typename component_type<actual_from_type>::type                                                                                                                                                                                                                                  integer_type;
    typedef mpl::bool_<!std::numeric_limits<integer_type>::is_specialized || std::numeric_limits<integer_type>::is_bounded || !std::numeric_limits<actual_to_type>::is_specialized || !std::numeric_limits<actual_to_type>::is_bounded || (std::numeric_limits<actual_to_type>::radix != 2)> dispatch_tag;
 
@@ -577,7 +577,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
    typedef typename component_type<number<From> >::type component_number;
    typedef typename component_number::backend_type      component_backend;
 
-   generic_interconvert_complex_to_scalar(to, from, mpl::bool_<boost::is_same<component_backend, To>::value>(), mpl::bool_<boost::is_constructible<To, const component_backend&>::value>());
+   generic_interconvert_complex_to_scalar(to, from, mpl::bool_<std::is_same<component_backend, To>::value>(), mpl::bool_<std::is_constructible<To, const component_backend&>::value>());
 }
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_complex>& /*from_type*/)
@@ -585,7 +585,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
    typedef typename component_type<number<From> >::type component_number;
    typedef typename component_number::backend_type      component_backend;
 
-   generic_interconvert_complex_to_scalar(to, from, mpl::bool_<boost::is_same<component_backend, To>::value>(), mpl::bool_<boost::is_constructible<To, const component_backend&>::value>());
+   generic_interconvert_complex_to_scalar(to, from, mpl::bool_<std::is_same<component_backend, To>::value>(), mpl::bool_<std::is_constructible<To, const component_backend&>::value>());
 }
 
 }

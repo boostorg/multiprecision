@@ -159,7 +159,7 @@ divide_qr(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, cons
 }
 
 template <class Backend, expression_template_option ExpressionTemplates, class Integer>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<Integer>::value && (number_category<Backend>::value == number_kind_integer), Integer>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value && (number_category<Backend>::value == number_kind_integer), Integer>::type
 integer_modulus(const number<Backend, ExpressionTemplates>& x, Integer val)
 {
    using default_ops::eval_integer_modulus;
@@ -167,7 +167,7 @@ integer_modulus(const number<Backend, ExpressionTemplates>& x, Integer val)
 }
 
 template <class tag, class A1, class A2, class A3, class A4, class Integer>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<Integer>::value && (number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer), Integer>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value && (number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer), Integer>::type
 integer_modulus(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, Integer val)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type result_type;
@@ -356,7 +356,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_powm(Backend& result, const Backend& a, const
 }
 
 template <class Backend, class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_unsigned<Integer>::value >::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_unsigned<Integer>::value >::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
 {
    typedef typename double_precision_type<Backend>::type                                       double_type;
    typedef typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
@@ -386,17 +386,17 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_unsigned<Integer>::valu
 }
 
 template <class Backend, class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_signed<Integer>::value && std::is_integral<Integer>::value>::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_signed<Integer>::value && boost::multiprecision::detail::is_integral<Integer>::value>::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
 {
    if (b < 0)
    {
       BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
-   eval_powm(result, a, static_cast<typename make_unsigned<Integer>::type>(b), c);
+   eval_powm(result, a, static_cast<typename boost::multiprecision::detail::make_unsigned<Integer>::type>(b), c);
 }
 
 template <class Backend, class Integer1, class Integer2>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_unsigned<Integer1>::value >::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_unsigned<Integer1>::value >::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
 {
    typedef typename double_precision_type<Backend>::type                                       double_type;
    typedef typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
@@ -428,13 +428,13 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_unsigned<Integer1>::val
 }
 
 template <class Backend, class Integer1, class Integer2>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_signed<Integer1>::value && std::is_integral<Integer1>::value>::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_signed<Integer1>::value && boost::multiprecision::detail::is_integral<Integer1>::value>::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
 {
    if (b < 0)
    {
       BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
-   eval_powm(result, a, static_cast<typename make_unsigned<Integer1>::type>(b), c);
+   eval_powm(result, a, static_cast<typename boost::multiprecision::detail::make_unsigned<Integer1>::type>(b), c);
 }
 
 struct powm_func
@@ -459,8 +459,8 @@ template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
         (number_category<T>::value == number_kind_integer) &&
         (is_number<T>::value || is_number_expression<T>::value) &&
-        (is_number<U>::value || is_number_expression<U>::value || is_integral<U>::value) &&
-        (is_number<V>::value || is_number_expression<V>::value || is_integral<V>::value),
+        (is_number<U>::value || is_number_expression<U>::value || boost::multiprecision::detail::is_integral<U>::value) &&
+        (is_number<V>::value || is_number_expression<V>::value || boost::multiprecision::detail::is_integral<V>::value),
     typename mpl::if_<
         is_no_et_number<T>,
         T,

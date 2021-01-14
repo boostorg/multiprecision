@@ -43,15 +43,15 @@ struct rational_adaptor
    rational_adaptor(const IntBackend& o) BOOST_MP_NOEXCEPT_IF(noexcept(rational_type(std::declval<const IntBackend&>()))) : m_value(o) {}
 
    template <class U>
-   rational_adaptor(const U& u, typename std::enable_if<is_convertible<U, IntBackend>::value>::type* = 0)
+   rational_adaptor(const U& u, typename std::enable_if<std::is_convertible<U, IntBackend>::value>::type* = 0)
        : m_value(static_cast<integer_type>(u)) {}
    template <class U>
    explicit rational_adaptor(const U& u,
                              typename std::enable_if<
-                                 boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_convertible<U, IntBackend>::value>::type* = 0)
+                                 boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !std::is_convertible<U, IntBackend>::value>::type* = 0)
        : m_value(IntBackend(u)) {}
    template <class U>
-   typename std::enable_if<(boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_arithmetic<U>::value), rational_adaptor&>::type operator=(const U& u)
+   typename std::enable_if<(boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !boost::multiprecision::detail::is_arithmetic<U>::value), rational_adaptor&>::type operator=(const U& u)
    {
       m_value = IntBackend(u);
       return *this;
@@ -77,7 +77,7 @@ struct rational_adaptor
       return *this;
    }
    template <class Int>
-   typename std::enable_if<std::is_integral<Int>::value, rational_adaptor&>::type operator=(Int i)
+   typename std::enable_if<boost::multiprecision::detail::is_integral<Int>::value, rational_adaptor&>::type operator=(Int i)
    {
       m_value = i;
       return *this;
@@ -166,12 +166,12 @@ struct rational_adaptor
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
    template <class Arithmatic>
-   typename std::enable_if<is_arithmetic<Arithmatic>::value && !is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
+   typename std::enable_if<boost::multiprecision::detail::is_arithmetic<Arithmatic>::value && !std::is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
    {
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
    }
    template <class Arithmatic>
-   typename std::enable_if<is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
+   typename std::enable_if<std::is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
    {
       rational_adaptor r;
       r = i;

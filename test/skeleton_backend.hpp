@@ -84,7 +84,7 @@ struct skeleton_backend
    // Comparison with arithmetic types, default just constructs a temporary:
    //
    template <class A>
-   typename std::enable_if<std::is_arithmetic<A>::value, int>::type compare(A i) const
+   typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, int>::type compare(A i) const
    {
       skeleton_backend t;
       t = i;  //  Note: construct directly from i if supported.

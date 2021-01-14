@@ -178,7 +178,7 @@ struct complex_adaptor
 };
 
 template <class Backend, class T>
-inline typename std::enable_if<std::is_arithmetic<T>::value, bool>::type eval_eq(const complex_adaptor<Backend>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const complex_adaptor<Backend>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) == 0;
 }

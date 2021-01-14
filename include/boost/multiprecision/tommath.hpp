@@ -740,7 +740,7 @@ inline unsigned eval_msb(const tommath_int& val)
 }
 
 template <class Integer>
-inline typename std::enable_if<std::is_unsigned<Integer>::value, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
+inline typename std::enable_if<boost::multiprecision::detail::is_unsigned<Integer>::value, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
 {
 #ifdef DIGIT_BIT
    static const mp_digit m = (static_cast<mp_digit>(1) << DIGIT_BIT) - 1;
@@ -759,7 +759,7 @@ inline typename std::enable_if<std::is_unsigned<Integer>::value, Integer>::type 
    }
 }
 template <class Integer>
-inline typename std::enable_if<std::is_signed<Integer>::value && std::is_integral<Integer>::value, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
+inline typename std::enable_if<boost::multiprecision::detail::is_signed<Integer>::value && boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
 {
    return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }

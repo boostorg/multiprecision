@@ -15,7 +15,6 @@
 #include <boost/mpl/front.hpp>
 #include <boost/mpl/fold.hpp>
 #include <cstdint>
-#include <boost/type_traits/make_unsigned.hpp>
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
 #include <string_view>
 #endif
@@ -78,7 +77,7 @@ eval_add(T& result, V const& v)
    eval_add(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, T>::value>::type
 eval_add(T& result, V const& v)
 {
    T t(v);
@@ -93,7 +92,7 @@ eval_subtract(T& result, V const& v)
    eval_subtract(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, T>::value>::type
 eval_subtract(T& result, V const& v)
 {
    T t(v);
@@ -108,7 +107,7 @@ eval_multiply(T& result, V const& v)
    eval_multiply(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, T>::value>::type
 eval_multiply(T& result, V const& v)
 {
    T t(v);
@@ -119,31 +118,31 @@ template <class T, class U, class V>
 BOOST_MP_CXX14_CONSTEXPR void eval_multiply(T& t, const U& u, const V& v);
 
 template <class T, class U, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!is_same<T, U>::value && is_same<T, V>::value)>::type eval_multiply_add(T& t, const U& u, const V& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!std::is_same<T, U>::value && std::is_same<T, V>::value)>::type eval_multiply_add(T& t, const U& u, const V& v)
 {
    T z;
    eval_multiply(z, u, v);
    eval_add(t, z);
 }
 template <class T, class U, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::is_same<T, U>::value && std::is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v)
 {
    eval_multiply_add(t, v, u);
 }
 template <class T, class U, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!is_same<T, U>::value && is_same<T, V>::value)>::type eval_multiply_subtract(T& t, const U& u, const V& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!std::is_same<T, U>::value && std::is_same<T, V>::value)>::type eval_multiply_subtract(T& t, const U& u, const V& v)
 {
    T z;
    eval_multiply(z, u, v);
    eval_subtract(t, z);
 }
 template <class T, class U, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::is_same<T, U>::value && std::is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v)
 {
    eval_multiply_subtract(t, v, u);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && !std::is_convertible<V, T>::value>::type
 eval_divide(T& result, V const& v)
 {
    T t;
@@ -151,14 +150,14 @@ eval_divide(T& result, V const& v)
    eval_divide(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && std::is_convertible<V, T>::value>::type
 eval_divide(T& result, V const& v)
 {
    T t(v);
    eval_divide(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && !std::is_convertible<V, T>::value>::type
 eval_modulus(T& result, V const& v)
 {
    T t;
@@ -166,14 +165,14 @@ eval_modulus(T& result, V const& v)
    eval_modulus(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && std::is_convertible<V, T>::value>::type
 eval_modulus(T& result, V const& v)
 {
    T t(v);
    eval_modulus(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && !std::is_convertible<V, T>::value>::type
 eval_bitwise_and(T& result, V const& v)
 {
    T t;
@@ -181,14 +180,14 @@ eval_bitwise_and(T& result, V const& v)
    eval_bitwise_and(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && std::is_convertible<V, T>::value>::type
 eval_bitwise_and(T& result, V const& v)
 {
    T t(v);
    eval_bitwise_and(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && !std::is_convertible<V, T>::value>::type
 eval_bitwise_or(T& result, V const& v)
 {
    T t;
@@ -196,14 +195,14 @@ eval_bitwise_or(T& result, V const& v)
    eval_bitwise_or(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && std::is_convertible<V, T>::value>::type
 eval_bitwise_or(T& result, V const& v)
 {
    T t(v);
    eval_bitwise_or(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && !std::is_convertible<V, T>::value>::type
 eval_bitwise_xor(T& result, V const& v)
 {
    T t;
@@ -211,7 +210,7 @@ eval_bitwise_xor(T& result, V const& v)
    eval_bitwise_xor(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && std::is_convertible<V, T>::value>::type
 eval_bitwise_xor(T& result, V const& v)
 {
    T t(v);
@@ -219,7 +218,7 @@ eval_bitwise_xor(T& result, V const& v)
 }
 
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && !std::is_convertible<V, T>::value>::type
 eval_complement(T& result, V const& v)
 {
    T t;
@@ -227,7 +226,7 @@ eval_complement(T& result, V const& v)
    eval_complement(result, t);
 }
 template <class T, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, number<T, et_on> >::value && std::is_convertible<V, T>::value>::type
 eval_complement(T& result, V const& v)
 {
    T t(v);
@@ -258,27 +257,27 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_add_default(T& t, const T& u, const T&
    }
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_add_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_add_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_add(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_add_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && std::is_convertible<U, T>::value>::type eval_add_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_add(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value>::type eval_add_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value>::type eval_add_default(T& t, const U& u, const T& v)
 {
    eval_add(t, v, u);
 }
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_add_default(T& t, const U& u, const V& v)
 {
-   if (is_same<T, V>::value && ((void*)&t == (void*)&v))
+   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
       eval_add(t, u);
    }
@@ -316,33 +315,33 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_subtract_default(T& t, const T& u, con
    }
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_subtract_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_subtract_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_subtract(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_subtract_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && std::is_convertible<U, T>::value>::type eval_subtract_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_subtract(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && is_signed_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && is_signed_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    eval_subtract(t, v, u);
    t.negate();
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    T temp;
    temp = u;
    eval_subtract(t, temp, v);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && std::is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    T temp(u);
    eval_subtract(t, temp, v);
@@ -350,7 +349,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_subtract_default(T& t, const U& u, const V& v)
 {
-   if (is_same<T, V>::value && ((void*)&t == (void*)&v))
+   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
       eval_subtract(t, u);
       t.negate();
@@ -386,20 +385,20 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_multiply_default(T& t, const T& u, con
 }
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_multiply(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && std::is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_multiply(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value>::type eval_multiply_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value>::type eval_multiply_default(T& t, const U& u, const T& v)
 {
    eval_multiply(t, v, u);
 }
@@ -407,7 +406,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_multiply_default(T& t, const U& u, const V& v)
 {
-   if (is_same<T, V>::value && ((void*)&t == (void*)&v))
+   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
       eval_multiply(t, u);
    }
@@ -453,17 +452,17 @@ inline BOOST_MP_CXX14_CONSTEXPR const T& make_T(const T& t)
 }
 
 template <class T, class U, class V, class X>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!is_same<T, U>::value && is_same<T, V>::value)>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!std::is_same<T, U>::value && std::is_same<T, V>::value)>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
 {
    eval_multiply_add(t, make_T<T>(u), make_T<T>(v), make_T<T>(x));
 }
 template <class T, class U, class V, class X>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::is_same<T, U>::value && std::is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
 {
    eval_multiply_add(t, v, u, x);
 }
 template <class T, class U, class V, class X>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!is_same<T, U>::value && is_same<T, V>::value)>::type eval_multiply_subtract(T& t, const U& u, const V& v, const X& x)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!std::is_same<T, U>::value && std::is_same<T, V>::value)>::type eval_multiply_subtract(T& t, const U& u, const V& v, const X& x)
 {
    if ((void*)&x == (void*)&t)
    {
@@ -478,7 +477,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!is_same<T, U>::value 
    }
 }
 template <class T, class U, class V, class X>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v, const X& x)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::is_same<T, U>::value && std::is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v, const X& x)
 {
    eval_multiply_subtract(t, v, u, x);
 }
@@ -505,27 +504,27 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_divide_default(T& t, const T& u, const
 }
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_divide(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && std::is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_divide(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_divide_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_divide_default(T& t, const U& u, const T& v)
 {
    T uu;
    uu = u;
    eval_divide(t, uu, v);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_divide_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && std::is_convertible<U, T>::value>::type eval_divide_default(T& t, const U& u, const T& v)
 {
    T uu(u);
    eval_divide(t, uu, v);
@@ -534,7 +533,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_divide_default(T& t, const U& u, const V& v)
 {
-   if (is_same<T, V>::value && ((void*)&t == (void*)&v))
+   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
       T temp;
       temp = u;
@@ -574,27 +573,27 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_modulus_default(T& t, const T& u, cons
    }
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_modulus_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_modulus_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_modulus(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_modulus_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && std::is_convertible<U, T>::value>::type eval_modulus_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_modulus(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_modulus_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_modulus_default(T& t, const U& u, const T& v)
 {
    T uu;
    uu = u;
    eval_modulus(t, uu, v);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_modulus_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && std::is_convertible<U, T>::value>::type eval_modulus_default(T& t, const U& u, const T& v)
 {
    T uu(u);
    eval_modulus(t, uu, v);
@@ -602,7 +601,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_modulus_default(T& t, const U& u, const V& v)
 {
-   if (is_same<T, V>::value && ((void*)&t == (void*)&v))
+   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
       T temp(u);
       eval_modulus(temp, v);
@@ -648,18 +647,18 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !std::is_convertible<U,
    eval_bitwise_and(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_bitwise_and(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_and_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_and_default(T& t, const U& u, const T& v)
 {
    eval_bitwise_and(t, v, u);
 }
 template <class T, class U, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !std::is_same<T, U>::value || is_same<T, V>::value>::type eval_bitwise_and_default(T& t, const U& u, const V& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::is_same<T, U>::value || std::is_same<T, V>::value>::type eval_bitwise_and_default(T& t, const U& u, const V& v)
 {
    t = u;
    eval_bitwise_and(t, v);
@@ -691,27 +690,27 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_or_default(T& t, const T& u, c
    }
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_bitwise_or_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_bitwise_or_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_bitwise_or(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_bitwise_or_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && std::is_convertible<U, T>::value>::type eval_bitwise_or_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_bitwise_or(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_or_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_or_default(T& t, const U& u, const T& v)
 {
    eval_bitwise_or(t, v, u);
 }
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_or_default(T& t, const U& u, const V& v)
 {
-   if (is_same<T, V>::value && ((void*)&t == (void*)&v))
+   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
       eval_bitwise_or(t, u);
    }
@@ -748,27 +747,27 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_xor_default(T& t, const T& u, 
    }
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_bitwise_xor_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_bitwise_xor_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_bitwise_xor(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_bitwise_xor_default(T& t, const T& u, const U& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && std::is_convertible<U, T>::value>::type eval_bitwise_xor_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_bitwise_xor(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_xor_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_xor_default(T& t, const U& u, const T& v)
 {
    eval_bitwise_xor(t, v, u);
 }
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_xor_default(T& t, const U& u, const V& v)
 {
-   if (is_same<T, V>::value && ((void*)&t == (void*)&v))
+   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
       eval_bitwise_xor(t, u);
    }
@@ -869,7 +868,7 @@ template <class R, int b>
 struct has_enough_bits
 {
    template <class T>
-   struct type : public mpl::and_<mpl::not_<is_same<R, T> >, mpl::bool_<std::numeric_limits<T>::digits >= b> >
+   struct type : public mpl::bool_<!std::is_same<R, T>::value && (std::numeric_limits<T>::digits >= b)>
    {};
 };
 
@@ -891,11 +890,11 @@ template <class R, class B>
 struct calculate_next_larger_type
 {
    // Find which list we're looking through:
-   typedef typename mpl::if_<
-       is_signed<R>,
+   typedef typename mpl::if_c<
+       boost::multiprecision::detail::is_signed<R>::value && boost::multiprecision::detail::is_integral<R>::value,
        typename B::signed_types,
-       typename mpl::if_<
-           is_unsigned<R>,
+       typename mpl::if_c<
+           boost::multiprecision::detail::is_unsigned<R>::value,
            typename B::unsigned_types,
            typename B::float_types>::type>::type list_type;
    // A predicate to find a type with enough bits:
@@ -903,9 +902,9 @@ struct calculate_next_larger_type
    // See if the last type is in the list, if so we have to start after this:
    typedef typename mpl::find_if<
        list_type,
-       is_same<R, mpl::_> >::type start_last;
+       std::is_same<R, mpl::_> >::type start_last;
    // Where we're starting from, either the start of the sequence or the last type found:
-   typedef typename mpl::if_<is_same<start_last, typename mpl::end<list_type>::type>, typename mpl::begin<list_type>::type, start_last>::type start_seq;
+   typedef typename mpl::if_c<std::is_same<start_last, typename mpl::end<list_type>::type>::value, typename mpl::begin<list_type>::type, start_last>::type start_seq;
    // The range we're searching:
    typedef mpl::iterator_range<start_seq, typename mpl::end<list_type>::type> range;
    // Find the next type:
@@ -913,14 +912,14 @@ struct calculate_next_larger_type
        range,
        pred_type>::type iter_type;
    // Either the next type, or a "terminal" to indicate we've run out of types to search:
-   typedef typename mpl::eval_if<
-       is_same<typename mpl::end<list_type>::type, iter_type>,
+   typedef typename mpl::eval_if_c<
+       std::is_same<typename mpl::end<list_type>::type, iter_type>::value,
        mpl::identity<terminal<R> >,
        mpl::deref<iter_type> >::type type;
 };
 
 template <class R, class T>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_integral<R>::value, bool>::type check_in_range(const T& t)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<R>::value, bool>::type check_in_range(const T& t)
 {
    // Can t fit in an R?
    if ((t > 0) && std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && (t > (std::numeric_limits<R>::max)()))
@@ -930,12 +929,12 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_integral<R>::v
 }
 
 template <class R, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
    typedef typename calculate_next_larger_type<R, B>::type next_type;
    next_type                                               n = next_type();
    eval_convert_to(&n, backend);
-   if (!boost::is_unsigned<R>::value && std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && (n > (next_type)(std::numeric_limits<R>::max)()))
+   if (!boost::multiprecision::detail::is_unsigned<R>::value && std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && (n > (next_type)(std::numeric_limits<R>::max)()))
    {
       *result = (std::numeric_limits<R>::max)();
    }
@@ -948,7 +947,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_integral<R>::v
 }
 
 template <class R, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !std::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !boost::multiprecision::detail::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
    typedef typename calculate_next_larger_type<R, B>::type next_type;
    next_type                                               n = next_type();
@@ -1015,7 +1014,7 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
 template <class R, class B>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(terminal<R>* result, const B& backend)
 {
-   typedef mpl::bool_<boost::is_unsigned<R>::value && number_category<B>::value == number_kind_integer> tag_type;
+   typedef mpl::bool_<boost::multiprecision::detail::is_unsigned<R>::value && number_category<B>::value == number_kind_integer> tag_type;
    last_chance_eval_convert_to(result, backend, tag_type());
 }
 
@@ -1138,20 +1137,20 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_fmod(T& result, const T& a, const T& b
    eval_subtract(result, a, n);
 }
 template <class T, class A>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_arithmetic<A>::value, void>::type eval_fmod(T& result, const T& x, const A& a)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_fmod(T& result, const T& x, const A& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c;
    c = a;
    eval_fmod(result, x, c);
 }
 
 template <class T, class A>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_arithmetic<A>::value, void>::type eval_fmod(T& result, const A& x, const T& a)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_fmod(T& result, const A& x, const T& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c;
    c = x;
    eval_fmod(result, c, a);
@@ -1179,19 +1178,19 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_remquo(T& result, const T& a, const T&
    eval_subtract(result, a, n);
 }
 template <class T, class A>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_arithmetic<A>::value, void>::type eval_remquo(T& result, const T& x, const A& a, int* pi)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_remquo(T& result, const T& x, const A& a, int* pi)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c = cast_type();
    c = a;
    eval_remquo(result, x, c, pi);
 }
 template <class T, class A>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_arithmetic<A>::value, void>::type eval_remquo(T& result, const A& x, const T& a, int* pi)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_remquo(T& result, const A& x, const T& a, int* pi)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c = cast_type();
    c = x;
    eval_remquo(result, c, a, pi);
@@ -1242,7 +1241,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_fdim(T& result, const T& a, const T& b
 }
 
 template <class T, class A>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_arithmetic<A>::value>::type eval_fdim(T& result, const T& a, const A& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value>::type eval_fdim(T& result, const T& a, const A& b)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    typedef typename boost::multiprecision::detail::canonical<A, T>::type        arithmetic_type;
@@ -1273,7 +1272,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_arithmetic<A>:
 }
 
 template <class T, class A>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_arithmetic<A>::value>::type eval_fdim(T& result, const A& a, const T& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value>::type eval_fdim(T& result, const A& a, const T& b)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    typedef typename boost::multiprecision::detail::canonical<A, T>::type        arithmetic_type;
@@ -1389,7 +1388,7 @@ template <class B>
 BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b);
 
 template <class T, class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<Arithmetic>::value >::type eval_gcd(T& result, const T& a, const Arithmetic& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Arithmetic>::value >::type eval_gcd(T& result, const T& a, const Arithmetic& b)
 {
    typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
    using default_ops::eval_gcd;
@@ -1398,12 +1397,12 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<Arithme
    eval_gcd(result, a, t);
 }
 template <class T, class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<Arithmetic>::value >::type eval_gcd(T& result, const Arithmetic& a, const T& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Arithmetic>::value >::type eval_gcd(T& result, const Arithmetic& a, const T& b)
 {
    eval_gcd(result, b, a);
 }
 template <class T, class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<Arithmetic>::value >::type eval_lcm(T& result, const T& a, const Arithmetic& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Arithmetic>::value >::type eval_lcm(T& result, const T& a, const Arithmetic& b)
 {
    typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
    using default_ops::eval_lcm;
@@ -1412,7 +1411,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<Arithme
    eval_lcm(result, a, t);
 }
 template <class T, class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<Arithmetic>::value >::type eval_lcm(T& result, const Arithmetic& a, const T& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Arithmetic>::value >::type eval_lcm(T& result, const Arithmetic& a, const T& b)
 {
    eval_lcm(result, b, a);
 }
@@ -1658,7 +1657,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_logb(B& result, const B& val)
          result.negate();
       return;
    }
-   typedef typename boost::mpl::if_c<boost::is_same<std::intmax_t, long>::value, boost::long_long_type, std::intmax_t>::type max_t;
+   typedef typename boost::mpl::if_c<std::is_same<std::intmax_t, long>::value, boost::long_long_type, std::intmax_t>::type max_t;
    result = static_cast<max_t>(eval_ilogb(val));
 }
 template <class B, class A>
@@ -1674,17 +1673,17 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_scalbln(B& result, const B& val, A e)
 }
 
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val, mpl::true_ const&, const mpl::false_&)
+inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val, std::integral_constant<bool, true> const&, const std::integral_constant<bool, false>&)
 {
    return eval_fpclassify(val) == FP_NAN;
 }
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val, mpl::false_ const&, const mpl::true_&)
+inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val, std::integral_constant<bool, false> const&, const std::integral_constant<bool, true>&)
 {
    return (boost::math::isnan)(val);
 }
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T&, mpl::false_ const&, const mpl::false_&)
+inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T&, std::integral_constant<bool, false> const&, const std::integral_constant<bool, false>&)
 {
    return false;
 }
@@ -1692,7 +1691,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T&, mpl::false_ const&, co
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val)
 {
-   return is_arg_nan(val, mpl::bool_<boost::multiprecision::detail::is_backend<T>::value>(), is_floating_point<T>());
+   return is_arg_nan(val, std::integral_constant<bool, boost::multiprecision::detail::is_backend<T>::value>(), std::is_floating_point<T>());
 }
 
 template <class T, class U, class V>
@@ -2107,7 +2106,7 @@ BOOST_MP_CXX14_CONSTEXPR typename complex_result_from_scalar<number<Backend, Exp
 }
 
 template <class tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, ExpressionTemplates> >::value,
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, ExpressionTemplates> >::value,
                      typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type>::type
 polar(detail::expression<tag, A1, A2, A3, A4> const& r, number<Backend, ExpressionTemplates> const& theta)
 {
@@ -2115,7 +2114,7 @@ polar(detail::expression<tag, A1, A2, A3, A4> const& r, number<Backend, Expressi
 }
 
 template <class Backend, expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, ExpressionTemplates> >::value,
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, ExpressionTemplates> >::value,
                      typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type>::type
 polar(number<Backend, ExpressionTemplates> const& r, detail::expression<tag, A1, A2, A3, A4> const& theta)
 {
@@ -2123,7 +2122,7 @@ polar(number<Backend, ExpressionTemplates> const& r, detail::expression<tag, A1,
 }
 
 template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type, typename detail::expression<tagb, A1b, A2b, A3b, A4b>::result_type>::value,
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type, typename detail::expression<tagb, A1b, A2b, A3b, A4b>::result_type>::value,
                      typename complex_result_from_scalar<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
 polar(detail::expression<tag, A1, A2, A3, A4> const& r, detail::expression<tagb, A1b, A2b, A3b, A4b> const& theta)
 {
@@ -2134,14 +2133,14 @@ polar(detail::expression<tag, A1, A2, A3, A4> const& r, detail::expression<tagb,
 // We also allow the first argument to polar to be an arithmetic type (probably a literal):
 //
 template <class Scalar, class Backend, expression_template_option ExpressionTemplates>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_arithmetic<Scalar>::value, typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type>::type
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<Scalar>::value, typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type>::type
 polar(Scalar const& r, number<Backend, ExpressionTemplates> const& theta)
 {
    return typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type(number<Backend, ExpressionTemplates>(r * cos(theta)), number<Backend, ExpressionTemplates>(r * sin(theta)));
 }
 
 template <class tag, class A1, class A2, class A3, class A4, class Scalar>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::is_arithmetic<Scalar>::value,
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<Scalar>::value,
                      typename complex_result_from_scalar<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
 polar(Scalar const& r, detail::expression<tag, A1, A2, A3, A4> const& theta)
 {
@@ -2425,8 +2424,8 @@ inline BOOST_MP_CXX14_CONSTEXPR typename multiprecision::detail::expression<tag,
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
 inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& add(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
 {
-   static_assert((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
-   static_assert((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((std::is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((std::is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
    using default_ops::eval_add;
    eval_add(result.backend(), a.backend(), b.backend());
    return result;
@@ -2435,8 +2434,8 @@ inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& add(number<B1, ET1>& result, co
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
 inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& subtract(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
 {
-   static_assert((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
-   static_assert((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((std::is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((std::is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
    using default_ops::eval_subtract;
    eval_subtract(result.backend(), a.backend(), b.backend());
    return result;
@@ -2445,15 +2444,15 @@ inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& subtract(number<B1, ET1>& resul
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
 inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& multiply(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
 {
-   static_assert((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
-   static_assert((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((std::is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   static_assert((std::is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
    using default_ops::eval_multiply;
    eval_multiply(result.backend(), a.backend(), b.backend());
    return result;
 }
 
 template <class B, expression_template_option ET, class I>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value, number<B, ET>&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value, number<B, ET>&>::type
 add(number<B, ET>& result, const I& a, const I& b)
 {
    using default_ops::eval_add;
@@ -2463,7 +2462,7 @@ add(number<B, ET>& result, const I& a, const I& b)
 }
 
 template <class B, expression_template_option ET, class I>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value, number<B, ET>&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value, number<B, ET>&>::type
 subtract(number<B, ET>& result, const I& a, const I& b)
 {
    using default_ops::eval_subtract;
@@ -2473,7 +2472,7 @@ subtract(number<B, ET>& result, const I& a, const I& b)
 }
 
 template <class B, expression_template_option ET, class I>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value, number<B, ET>&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value, number<B, ET>&>::type
 multiply(number<B, ET>& result, const I& a, const I& b)
 {
    using default_ops::eval_multiply;
@@ -2806,8 +2805,8 @@ struct fma_func
 template <class Backend, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
         (number_category<number<Backend, et_on> >::value == number_kind_floating_point) &&
-        (is_number<U>::value || is_number_expression<U>::value || std::is_arithmetic<U>::value) &&
-        (is_number<V>::value || is_number_expression<V>::value || std::is_arithmetic<V>::value),
+        (is_number<U>::value || is_number_expression<U>::value || boost::multiprecision::detail::is_arithmetic<U>::value) &&
+        (is_number<V>::value || is_number_expression<V>::value || boost::multiprecision::detail::is_arithmetic<V>::value),
     detail::expression<detail::function, default_ops::fma_func, number<Backend, et_on>, U, V> >::type
 fma(const number<Backend, et_on>& a, const U& b, const V& c)
 {
@@ -2818,8 +2817,8 @@ fma(const number<Backend, et_on>& a, const U& b, const V& c)
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
         (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_floating_point) &&
-        (is_number<U>::value || is_number_expression<U>::value || std::is_arithmetic<U>::value) &&
-        (is_number<V>::value || is_number_expression<V>::value || std::is_arithmetic<V>::value),
+        (is_number<U>::value || is_number_expression<U>::value || boost::multiprecision::detail::is_arithmetic<U>::value) &&
+        (is_number<V>::value || is_number_expression<V>::value || boost::multiprecision::detail::is_arithmetic<V>::value),
     detail::expression<detail::function, default_ops::fma_func, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, U, V> >::type
 fma(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const U& b, const V& c)
 {
@@ -2830,8 +2829,8 @@ fma(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const U& b, const 
 template <class Backend, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
         (number_category<number<Backend, et_off> >::value == number_kind_floating_point) &&
-        (is_number<U>::value || is_number_expression<U>::value || std::is_arithmetic<U>::value) &&
-        (is_number<V>::value || is_number_expression<V>::value || std::is_arithmetic<V>::value),
+        (is_number<U>::value || is_number_expression<U>::value || boost::multiprecision::detail::is_arithmetic<U>::value) &&
+        (is_number<V>::value || is_number_expression<V>::value || boost::multiprecision::detail::is_arithmetic<V>::value),
     number<Backend, et_off> >::type
 fma(const number<Backend, et_off>& a, const U& b, const V& c)
 {
@@ -2845,8 +2844,8 @@ fma(const number<Backend, et_off>& a, const U& b, const V& c)
 template <class U, class Backend, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
         (number_category<number<Backend, et_on> >::value == number_kind_floating_point) &&
-        is_arithmetic<U>::value &&
-        (is_number<V>::value || is_number_expression<V>::value || std::is_arithmetic<V>::value),
+        boost::multiprecision::detail::is_arithmetic<U>::value &&
+        (is_number<V>::value || is_number_expression<V>::value || boost::multiprecision::detail::is_arithmetic<V>::value),
     detail::expression<detail::function, default_ops::fma_func, U, number<Backend, et_on>, V> >::type
 fma(const U& a, const number<Backend, et_on>& b, const V& c)
 {
@@ -2857,8 +2856,8 @@ fma(const U& a, const number<Backend, et_on>& b, const V& c)
 template <class U, class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
         (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_floating_point) &&
-        is_arithmetic<U>::value &&
-        (is_number<V>::value || is_number_expression<V>::value || std::is_arithmetic<V>::value),
+        boost::multiprecision::detail::is_arithmetic<U>::value &&
+        (is_number<V>::value || is_number_expression<V>::value || boost::multiprecision::detail::is_arithmetic<V>::value),
     detail::expression<detail::function, default_ops::fma_func, U, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, V> >::type
 fma(const U& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b, const V& c)
 {
@@ -2869,8 +2868,8 @@ fma(const U& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b, const 
 template <class U, class Backend, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
         (number_category<number<Backend, et_off> >::value == number_kind_floating_point) &&
-        is_arithmetic<U>::value &&
-        (is_number<V>::value || is_number_expression<V>::value || std::is_arithmetic<V>::value),
+        boost::multiprecision::detail::is_arithmetic<U>::value &&
+        (is_number<V>::value || is_number_expression<V>::value || boost::multiprecision::detail::is_arithmetic<V>::value),
     number<Backend, et_off> >::type
 fma(const U& a, const number<Backend, et_off>& b, const V& c)
 {
@@ -2884,8 +2883,8 @@ fma(const U& a, const number<Backend, et_off>& b, const V& c)
 template <class U, class V, class Backend>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
         (number_category<number<Backend, et_on> >::value == number_kind_floating_point) &&
-        std::is_arithmetic<U>::value &&
-        std::is_arithmetic<V>::value,
+        boost::multiprecision::detail::is_arithmetic<U>::value &&
+        boost::multiprecision::detail::is_arithmetic<V>::value,
     detail::expression<detail::function, default_ops::fma_func, U, V, number<Backend, et_on> > >::type
 fma(const U& a, const V& b, const number<Backend, et_on>& c)
 {
@@ -2896,8 +2895,8 @@ fma(const U& a, const V& b, const number<Backend, et_on>& c)
 template <class U, class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
         (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_floating_point) &&
-        std::is_arithmetic<U>::value &&
-        std::is_arithmetic<V>::value,
+        boost::multiprecision::detail::is_arithmetic<U>::value &&
+        boost::multiprecision::detail::is_arithmetic<V>::value,
     detail::expression<detail::function, default_ops::fma_func, U, V, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > >::type
 fma(const U& a, const V& b, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& c)
 {
@@ -2908,8 +2907,8 @@ fma(const U& a, const V& b, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4
 template <class U, class V, class Backend>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
         (number_category<number<Backend, et_off> >::value == number_kind_floating_point) &&
-        std::is_arithmetic<U>::value &&
-        std::is_arithmetic<V>::value,
+        boost::multiprecision::detail::is_arithmetic<U>::value &&
+        boost::multiprecision::detail::is_arithmetic<V>::value,
         number<Backend, et_off> >::type
 fma(const U& a, const V& b, const number<Backend, et_off>& c)
 {
@@ -3052,7 +3051,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
       return result;                                                                                                                                                                                                                        \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class tag, class A1, class A2, class A3, class A4>                                                                                                                                                                             \
-   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (std::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
            number<Backend, et_on> > ::type                                                                                                                                                                       \
    func(number<Backend, et_on>&& arg, const detail::expression<tag, A1, A2, A3, A4>& a)                                                                                    \
    {                                                                                                                                                                                                                                                       \
@@ -3060,7 +3059,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
              number<Backend, et_on>, detail::expression<tag, A1, A2, A3, A4> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>(), arg, a);                                                                                             \
    }                                                                                                                                                                                                                                                       \
    template <class tag, class A1, class A2, class A3, class A4, class Backend>                                                                                                                                                                             \
-   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (std::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
            number<Backend, et_on> > ::type                                                                                                                                                                       \
    func(const detail::expression<tag, A1, A2, A3, A4>& arg, number<Backend, et_on>&& a)                                                                                    \
    {                                                                                                                                                                                                                                                       \
@@ -3208,7 +3207,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
              number<Backend, et_on>, number<Backend, et_on> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>(), arg, a);                                                                                                              \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class tag, class A1, class A2, class A3, class A4>                                                                                                                                                                             \
-   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (std::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
            detail::expression<detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>, number<Backend, et_on>, detail::expression<tag, A1, A2, A3, A4> > > ::type                                                                                                                                                                       \
    func(const number<Backend, et_on>& arg, const detail::expression<tag, A1, A2, A3, A4>& a)                                                                                    \
    {                                                                                                                                                                                                                                                       \
@@ -3216,7 +3215,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
              number<Backend, et_on>, detail::expression<tag, A1, A2, A3, A4> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>(), arg, a);                                                                                             \
    }                                                                                                                                                                                                                                                       \
    template <class tag, class A1, class A2, class A3, class A4, class Backend>                                                                                                                                                                             \
-   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (std::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
            detail::expression<detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>, detail::expression<tag, A1, A2, A3, A4>, number<Backend, et_on> > > ::type                                                                                                                                                                       \
    func(const detail::expression<tag, A1, A2, A3, A4>& arg, const number<Backend, et_on>& a)                                                                                    \
    {                                                                                                                                                                                                                                                       \

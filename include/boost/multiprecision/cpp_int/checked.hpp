@@ -59,7 +59,7 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const mpl::false_&)
 template <class A>
 inline BOOST_MP_CXX14_CONSTEXPR A checked_add(A a, A b, const mpl::int_<checked>&)
 {
-   return checked_add_imp(a, b, mpl::bool_<boost::is_signed<A>::value>());
+   return checked_add_imp(a, b, mpl::bool_<boost::multiprecision::detail::is_signed<A>::value && boost::multiprecision::detail::is_integral<A>::value > ());
 }
 template <class A>
 inline BOOST_MP_CXX14_CONSTEXPR A checked_add(A a, A b, const mpl::int_<unchecked>&)
@@ -92,7 +92,7 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_subtract_imp(A a, A b, const mpl::fals
 template <class A>
 inline BOOST_MP_CXX14_CONSTEXPR A checked_subtract(A a, A b, const mpl::int_<checked>&)
 {
-   return checked_subtract_imp(a, b, mpl::bool_<boost::is_signed<A>::value>());
+   return checked_subtract_imp(a, b, mpl::bool_<boost::multiprecision::detail::is_signed<A>::value && boost::multiprecision::detail::is_integral<A>::value>());
 }
 template <class A>
 inline BOOST_MP_CXX14_CONSTEXPR A checked_subtract(A a, A b, const mpl::int_<unchecked>&)

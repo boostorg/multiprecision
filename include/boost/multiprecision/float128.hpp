@@ -181,10 +181,10 @@ struct float128_backend
       return *this;
    }
    template <class T>
-   constexpr float128_backend(const T& i, const typename std::enable_if<is_convertible<T, float128_type>::value>::type* = 0) BOOST_NOEXCEPT_IF(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
+   constexpr float128_backend(const T& i, const typename std::enable_if<std::is_convertible<T, float128_type>::value>::type* = 0) BOOST_NOEXCEPT_IF(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
        : m_value(i) {}
    template <class T>
-   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_arithmetic<T>::value || is_convertible<T, float128_type>::value, float128_backend&>::type operator=(const T& i) BOOST_NOEXCEPT_IF(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value || std::is_convertible<T, float128_type>::value, float128_backend&>::type operator=(const T& i) BOOST_NOEXCEPT_IF(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
    {
       m_value = i;
       return *this;
@@ -779,7 +779,7 @@ template <class Archive>
 void serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, unsigned int /*version*/)
 {
    typedef typename Archive::is_loading                                                                                                                            load_tag;
-   typedef typename mpl::bool_<boost::is_same<Archive, boost::archive::binary_oarchive>::value || boost::is_same<Archive, boost::archive::binary_iarchive>::value> binary_tag;
+   typedef typename mpl::bool_<std::is_same<Archive, boost::archive::binary_oarchive>::value || std::is_same<Archive, boost::archive::binary_iarchive>::value> binary_tag;
 
    float128_detail::do_serialize(ar, val, load_tag(), binary_tag());
 }

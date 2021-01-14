@@ -92,7 +92,7 @@ BOOST_FORCEINLINE unsigned find_msb(Unsigned mask, const mpl::int_<2>&)
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
-   typedef typename make_unsigned<Unsigned>::type ui_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<
        sizeof(Unsigned) <= sizeof(unsigned long),
        mpl::int_<1>,
@@ -118,7 +118,7 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
-   typedef typename make_unsigned<Unsigned>::type ui_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<
        sizeof(Unsigned) <= sizeof(unsigned long),
        mpl::int_<1>,
@@ -212,7 +212,7 @@ BOOST_FORCEINLINE unsigned find_lsb(uint128_type mask, mpl::int_<0> const&)
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
-   typedef typename make_unsigned<Unsigned>::type ui_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<
        sizeof(Unsigned) <= sizeof(unsigned),
        mpl::int_<1>,
@@ -235,7 +235,7 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
-   typedef typename make_unsigned<Unsigned>::type ui_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<
        sizeof(Unsigned) <= sizeof(unsigned),
        mpl::int_<1>,
@@ -267,7 +267,7 @@ BOOST_FORCEINLINE unsigned find_msb(unsigned mask, mpl::int_<1> const&)
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
-   typedef typename make_unsigned<Unsigned>::type ui_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<
        sizeof(Unsigned) <= sizeof(unsigned),
        mpl::int_<1>,
@@ -284,7 +284,7 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
-   typedef typename make_unsigned<Unsigned>::type ui_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<
        sizeof(Unsigned) <= sizeof(unsigned),
        mpl::int_<1>,

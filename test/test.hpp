@@ -19,14 +19,14 @@
 namespace detail {
 
 template <class T>
-inline typename std::enable_if<!(boost::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value), T>::type
+inline typename std::enable_if<!(boost::multiprecision::detail::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value), T>::type
 abs(const T& a)
 {
    return a < 0 ? -a : a;
 }
 
 template <class T>
-inline typename std::enable_if<boost::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value, T>::type
+inline typename std::enable_if<boost::multiprecision::detail::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value, T>::type
 abs(const T& a)
 {
    return a;
@@ -85,10 +85,10 @@ typename std::enable_if<!((boost::multiprecision::number_category<T>::value == b
 }
 
 template <class T, class U>
-typename boost::mpl::if_c<boost::is_convertible<T, U>::value, U, T>::type
+typename boost::mpl::if_c<std::is_convertible<T, U>::value, U, T>::type
 relative_error(T a, U b)
 {
-   typedef typename boost::mpl::if_c<boost::is_convertible<T, U>::value, U, T>::type cast_type;
+   typedef typename boost::mpl::if_c<std::is_convertible<T, U>::value, U, T>::type cast_type;
    return relative_error<cast_type>(static_cast<cast_type>(a), static_cast<cast_type>(b));
 }
 

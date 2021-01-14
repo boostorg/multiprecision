@@ -7,12 +7,11 @@
 #define BOOST_MATH_BIG_NUM_BASE_HPP
 
 #include <limits>
+#include <type_traits>
 #include <boost/core/nvp.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-#include <boost/type_traits/is_constructible.hpp>
-#include <boost/type_traits/decay.hpp>
 #include <boost/math/tools/complex.hpp>
 #include <boost/multiprecision/traits/transcendental_reduction_type.hpp>
+#include <boost/multiprecision/traits/std_integer_traits.hpp>
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4307)
@@ -199,7 +198,7 @@ struct is_number_expression<detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > : 
 template <class T, class Num>
 struct is_compatible_arithmetic_type
     : public mpl::bool_<
-          is_convertible<T, Num>::value && !is_same<T, Num>::value && !is_number_expression<T>::value>
+          std::is_convertible<T, Num>::value && !std::is_same<T, Num>::value && !is_number_expression<T>::value>
 {};
 
 namespace detail {
@@ -207,7 +206,7 @@ namespace detail {
 // Workaround for missing abs(boost::long_long_type) and abs(__int128) on some compilers:
 //
 template <class T>
-constexpr typename std::enable_if<(is_signed<T>::value || is_floating_point<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
 {
    // This strange expression avoids a hardware trap in the corner case
    // that val is the most negative value permitted in boost::long_long_type.
@@ -215,7 +214,7 @@ constexpr typename std::enable_if<(is_signed<T>::value || is_floating_point<T>::
    return t < 0 ? T(1u) + T(-(t + 1)) : t;
 }
 template <class T>
-constexpr typename std::enable_if<(is_unsigned<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<boost::multiprecision::detail::is_unsigned<T>::value, T>::type abs(T t) BOOST_NOEXCEPT
 {
    return t;
 }
@@ -223,15 +222,15 @@ constexpr typename std::enable_if<(is_unsigned<T>::value), T>::type abs(T t) BOO
 #define BOOST_MP_USING_ABS using boost::multiprecision::detail::abs;
 
 template <class T>
-constexpr typename std::enable_if<(is_signed<T>::value || is_floating_point<T>::value), typename make_unsigned<T>::type>::type unsigned_abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), typename boost::multiprecision::detail::make_unsigned<T>::type>::type unsigned_abs(T t) BOOST_NOEXCEPT
 {
    // This strange expression avoids a hardware trap in the corner case
    // that val is the most negative value permitted in boost::long_long_type.
    // See https://svn.boost.org/trac/boost/ticket/9740.
-   return t < 0 ? static_cast<typename make_unsigned<T>::type>(1u) + static_cast<typename make_unsigned<T>::type>(-(t + 1)) : static_cast<typename make_unsigned<T>::type>(t);
+   return t < 0 ? static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(1u) + static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(-(t + 1)) : static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(t);
 }
 template <class T>
-constexpr typename std::enable_if<(is_unsigned<T>::value), T>::type unsigned_abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<boost::multiprecision::detail::is_unsigned<T>::value, T>::type unsigned_abs(T t) BOOST_NOEXCEPT
 {
    return t;
 }
@@ -239,10 +238,10 @@ constexpr typename std::enable_if<(is_unsigned<T>::value), T>::type unsigned_abs
 template <class T>
 struct bits_of
 {
-   static_assert(std::is_integral<T>::value || std::is_enum<T>::value || std::numeric_limits<T>::is_specialized, "Failed integer size check");
+   static_assert(boost::multiprecision::detail::is_integral<T>::value || std::is_enum<T>::value || std::numeric_limits<T>::is_specialized, "Failed integer size check");
    static const unsigned value =
        std::numeric_limits<T>::is_specialized ? std::numeric_limits<T>::digits
-                                              : sizeof(T) * CHAR_BIT - (is_signed<T>::value ? 1 : 0);
+                                              : sizeof(T) * CHAR_BIT - (boost::multiprecision::detail::is_signed<T>::value ? 1 : 0);
 };
 
 #if defined(_GLIBCXX_USE_FLOAT128) && defined(BOOST_GCC) && !defined(__STRICT_ANSI__)
@@ -265,7 +264,7 @@ struct has_enough_bits
 template <class Val, class Backend, class Tag>
 struct canonical_imp
 {
-   typedef typename remove_cv<typename decay<const Val>::type>::type type;
+   typedef typename std::remove_cv<typename std::decay<const Val>::type>::type type;
 };
 template <class B, class Backend, class Tag>
 struct canonical_imp<number<B, et_on>, Backend, Tag>
@@ -297,7 +296,7 @@ struct canonical_imp<Val, Backend, mpl::int_<0> >
        typename Backend::signed_types,
        pred_type>::type                                                                                                 iter_type;
    typedef typename mpl::end<typename Backend::signed_types>::type                                                      end_type;
-   typedef typename mpl::eval_if<boost::is_same<iter_type, end_type>, mpl::identity<Val>, mpl::deref<iter_type> >::type type;
+   typedef typename mpl::eval_if_c<std::is_same<iter_type, end_type>::value, mpl::identity<Val>, mpl::deref<iter_type> >::type   type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<1> >
@@ -307,7 +306,7 @@ struct canonical_imp<Val, Backend, mpl::int_<1> >
        typename Backend::unsigned_types,
        pred_type>::type                                                                                                 iter_type;
    typedef typename mpl::end<typename Backend::unsigned_types>::type                                                    end_type;
-   typedef typename mpl::eval_if<boost::is_same<iter_type, end_type>, mpl::identity<Val>, mpl::deref<iter_type> >::type type;
+   typedef typename mpl::eval_if_c<std::is_same<iter_type, end_type>::value, mpl::identity<Val>, mpl::deref<iter_type> >::type   type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<2> >
@@ -317,7 +316,7 @@ struct canonical_imp<Val, Backend, mpl::int_<2> >
        typename Backend::float_types,
        pred_type>::type                                                                                                 iter_type;
    typedef typename mpl::end<typename Backend::float_types>::type                                                       end_type;
-   typedef typename mpl::eval_if<boost::is_same<iter_type, end_type>, mpl::identity<Val>, mpl::deref<iter_type> >::type type;
+   typedef typename mpl::eval_if_c<std::is_same<iter_type, end_type>::value, mpl::identity<Val>, mpl::deref<iter_type> >::type   type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<3> >
@@ -328,19 +327,17 @@ struct canonical_imp<Val, Backend, mpl::int_<3> >
 template <class Val, class Backend>
 struct canonical
 {
-   typedef typename mpl::if_<
-       is_signed<Val>,
+   typedef typename mpl::if_c<
+       boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value,
        mpl::int_<0>,
-       typename mpl::if_<
-           is_unsigned<Val>,
+       typename mpl::if_c<
+           boost::multiprecision::detail::is_unsigned<Val>::value,
            mpl::int_<1>,
-           typename mpl::if_<
-               is_floating_point<Val>,
+           typename mpl::if_c<
+               std::is_floating_point<Val>::value,
                mpl::int_<2>,
-               typename mpl::if_<
-                   mpl::or_<
-                       is_convertible<Val, const char*>,
-                       is_same<Val, std::string> >,
+               typename mpl::if_c<
+                   (std::is_convertible<Val, const char*>::value || std::is_same<Val, std::string>::value),
                    mpl::int_<3>,
                    mpl::int_<4> >::type>::type>::type>::type tag_type;
 
@@ -441,7 +438,7 @@ template <class T1, expression_template_option ExpressionTemplates1, class T2, e
 struct combine_expression<number<T1, ExpressionTemplates1>, number<T2, ExpressionTemplates2> >
 {
    typedef typename mpl::if_c<
-       is_convertible<number<T2, ExpressionTemplates2>, number<T1, ExpressionTemplates2> >::value,
+       std::is_convertible<number<T2, ExpressionTemplates2>, number<T1, ExpressionTemplates2> >::value,
        number<T1, ExpressionTemplates1>,
        number<T2, ExpressionTemplates2> >::type type;
 };
@@ -478,7 +475,7 @@ struct expression_storage_base<T, true>
 };
 
 template <class T>
-struct expression_storage : public expression_storage_base<T, boost::is_arithmetic<T>::value>
+struct expression_storage : public expression_storage_base<T, boost::multiprecision::detail::is_arithmetic<T>::value>
 {};
 
 template <class T>
@@ -628,7 +625,7 @@ struct expression<tag, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!(is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value), int>::type = 0
+             typename std::enable_if<!(is_number<T>::value || std::is_constructible<T const&, result_type>::value || !std::is_constructible<T, result_type>::value), int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -779,7 +776,7 @@ struct expression<terminal, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!(is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value), int>::type = 0
+             typename std::enable_if<!(is_number<T>::value || std::is_constructible<T const&, result_type>::value || !std::is_constructible<T, result_type>::value), int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -935,7 +932,7 @@ struct expression<tag, Arg1, Arg2, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!(is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value), int>::type = 0
+             typename std::enable_if<!(is_number<T>::value || std::is_constructible<T const&, result_type>::value || !std::is_constructible<T, result_type>::value), int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1101,7 +1098,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!(is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value), int>::type = 0
+             typename std::enable_if<!(is_number<T>::value || std::is_constructible<T const&, result_type>::value || !std::is_constructible<T, result_type>::value), int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1275,7 +1272,7 @@ struct expression
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!(is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value), int>::type = 0
+             typename std::enable_if<!(is_number<T>::value || std::is_constructible<T const&, result_type>::value || !std::is_constructible<T, result_type>::value), int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1514,7 +1511,7 @@ template <class Num>
 struct number_category_base<Num, true, false> : public mpl::int_<std::numeric_limits<Num>::is_integer ? number_kind_integer : (std::numeric_limits<Num>::max_exponent ? number_kind_floating_point : number_kind_unknown)>
 {};
 template <class Num>
-struct number_category : public number_category_base<Num, boost::is_class<Num>::value || boost::is_arithmetic<Num>::value, boost::is_abstract<Num>::value>
+struct number_category : public number_category_base<Num, std::is_class<Num>::value || boost::multiprecision::detail::is_arithmetic<Num>::value, std::is_abstract<Num>::value>
 {};
 template <class Backend, expression_template_option ExpressionTemplates>
 struct number_category<number<Backend, ExpressionTemplates> > : public number_category<Backend>
@@ -1575,7 +1572,8 @@ struct is_interval_number<number<Backend, ExpressionTemplates> > : public is_int
 {};
 
 template <class T, class U>
-struct is_equivalent_number_type : public boost::is_same<T, U> {};
+struct is_equivalent_number_type : public std::is_same<T, U>
+{};
 
 template <class Backend, expression_template_option ExpressionTemplates, class T2>
 struct is_equivalent_number_type<number<Backend, ExpressionTemplates>, T2> : public is_equivalent_number_type<Backend, T2>

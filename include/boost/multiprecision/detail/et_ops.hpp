@@ -1078,19 +1078,19 @@ operator%(const V& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 // Left shift:
 //
 template <class B, class I>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value && (number_category<B>::value == number_kind_integer), detail::expression<detail::shift_left, number<B, et_on>, I> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<B>::value == number_kind_integer), detail::expression<detail::shift_left, number<B, et_on>, I> >::type
 operator<<(const number<B, et_on>& a, const I& b)
 {
    return detail::expression<detail::shift_left, number<B, et_on>, I>(a, b);
 }
 template <class B, class I>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_on> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_on> >::type
 operator<<(number<B, et_on>&& a, const I& b)
 {
    return detail::expression<detail::shift_left, number<B, et_on>, I>(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class I>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
                             detail::expression<detail::shift_left, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, I> >::type
 operator<<(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const I& b)
 {
@@ -1100,21 +1100,21 @@ operator<<(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const I& b)
 // Right shift:
 //
 template <class B, class I>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value && (number_category<B>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<B>::value == number_kind_integer),
                             detail::expression<detail::shift_right, number<B, et_on>, I> >::type
 operator>>(const number<B, et_on>& a, const I& b)
 {
    return detail::expression<detail::shift_right, number<B, et_on>, I>(a, b);
 }
 template <class B, class I>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value && (number_category<B>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<B>::value == number_kind_integer),
    number<B, et_on> >::type
 operator>>(number<B, et_on>&& a, const I& b)
 {
    return detail::expression<detail::shift_right, number<B, et_on>, I>(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class I>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
                             detail::expression<detail::shift_right, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, I> >::type
 operator>>(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const I& b)
 {

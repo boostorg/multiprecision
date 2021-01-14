@@ -22,7 +22,7 @@
 namespace detail {
 
 template <typename T, typename U>
-inline void pow_imp(T& result, const T& t, const U& p, const mpl::false_&)
+inline void pow_imp(T& result, const T& t, const U& p, const std::integral_constant<bool, false>&)
 {
    // Compute the pure power of typename T t^p.
    // Use the S-and-X binary method, as described in
@@ -35,7 +35,7 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::false_&)
    if (&result == &t)
    {
       T temp;
-      pow_imp(temp, t, p, mpl::false_());
+      pow_imp(temp, t, p, std::integral_constant<bool, false>());
       result = temp;
       return;
    }
@@ -69,30 +69,30 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::false_&)
 }
 
 template <typename T, typename U>
-inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
+inline void pow_imp(T& result, const T& t, const U& p, const std::integral_constant<bool, true>&)
 {
    // Signed integer power, just take care of the sign then call the unsigned version:
    typedef typename boost::multiprecision::detail::canonical<U, T>::type int_type;
-   typedef typename make_unsigned<U>::type                               ui_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<U>::type                          ui_type;
 
    if (p < 0)
    {
       T temp;
       temp = static_cast<int_type>(1);
       T denom;
-      pow_imp(denom, t, static_cast<ui_type>(-p), mpl::false_());
+      pow_imp(denom, t, static_cast<ui_type>(-p), std::integral_constant<bool, false>());
       eval_divide(result, temp, denom);
       return;
    }
-   pow_imp(result, t, static_cast<ui_type>(p), mpl::false_());
+   pow_imp(result, t, static_cast<ui_type>(p), std::integral_constant<bool, false>());
 }
 
 } // namespace detail
 
 template <typename T, typename U>
-inline typename std::enable_if<is_integral<U>::value>::type eval_pow(T& result, const T& t, const U& p)
+inline typename std::enable_if<boost::multiprecision::detail::is_integral<U>::value>::type eval_pow(T& result, const T& t, const U& p)
 {
-   detail::pow_imp(result, t, p, boost::is_signed<U>());
+   detail::pow_imp(result, t, p, boost::multiprecision::detail::is_signed<U>());
 }
 
 template <class T>
@@ -278,7 +278,7 @@ void eval_exp(T& result, const T& x)
    eval_convert_to(&ll, exp_series);
    if (x.compare(ll) == 0)
    {
-      detail::pow_imp(result, get_constant_e<T>(), ll, mpl::true_());
+      detail::pow_imp(result, get_constant_e<T>(), ll, std::integral_constant<bool, true>());
       return;
    }
    else if (exp_series.compare(x) == 0)
@@ -326,7 +326,7 @@ void eval_exp(T& result, const T& x)
    exp_series.negate();
    hyp0F0(result, exp_series);
 
-   detail::pow_imp(exp_series, result, p2, mpl::true_());
+   detail::pow_imp(exp_series, result, p2, std::integral_constant<bool, true>());
    result = ui_type(1);
    eval_ldexp(result, result, n);
    eval_multiply(exp_series, result);
@@ -591,7 +591,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
       eval_convert_to(&an, a);
       if (a.compare(an) == 0)
       {
-         detail::pow_imp(result, x, an, mpl::true_());
+         detail::pow_imp(result, x, an, std::integral_constant<bool, true>());
          return;
       }
    }
@@ -681,7 +681,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
             t = si_type(1);
             eval_subtract(t, x);
             hyp1F0(result, da, t);
-            detail::pow_imp(t, x, an, mpl::true_());
+            detail::pow_imp(t, x, an, std::integral_constant<bool, true>());
             eval_multiply(result, t);
          }
          else
@@ -703,7 +703,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
          eval_log(t, x);
          eval_multiply(t, da);
          eval_exp(result, t);
-         detail::pow_imp(t, x, an, mpl::true_());
+         detail::pow_imp(t, x, an, std::integral_constant<bool, true>());
          eval_multiply(result, t);
       }
       else
@@ -717,16 +717,16 @@ inline void eval_pow(T& result, const T& x, const T& a)
 
 template <class T, class A>
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
-inline typename std::enable_if<!is_integral<A>::value, void>::type
+inline typename std::enable_if<!boost::multiprecision::detail::is_integral<A>::value, void>::type
 #else
-inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::value && !is_integral<A>::value, void>::type
+inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::value && !boost::multiprecision::detail::is_integral<A>::value, void>::type
 #endif
 eval_pow(T& result, const T& x, const A& a)
 {
    // Note this one is restricted to float arguments since pow.hpp already has a version for
    // integer powers....
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c;
    c = a;
    eval_pow(result, x, c);
@@ -741,7 +741,7 @@ inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::val
 eval_pow(T& result, const A& x, const T& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c;
    c = x;
    eval_pow(result, c, a);

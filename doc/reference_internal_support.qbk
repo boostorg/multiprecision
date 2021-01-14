@@ -21,10 +21,6 @@ There are some traits classes which authors of new backends should be aware of:
 
 Inherits from `boost::integral_constant<bool,true>` if type `From` has an explicit conversion from `To`.
 
-For compilers that support C++11 SFINAE-expressions this trait should "just work".  Otherwise it inherits
-from `boost::is_convertible<From, To>::type`, and will need to be specialised for Backends that have
-constructors marked as `explicit`.
-
    template <class From, class To>
    struct is_lossy_conversion
    {

@@ -405,7 +405,7 @@ struct gmp_float_imp
       return mpf_cmp_ui(m_data, i);
    }
    template <class V>
-   typename std::enable_if<std::is_arithmetic<V>::value, int>::type compare(V v) const
+   typename std::enable_if<boost::multiprecision::detail::is_arithmetic<V>::value, int>::type compare(V v) const
    {
       gmp_float<digits10> d;
       d = v;
@@ -675,17 +675,17 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
 };
 
 template <unsigned digits10, class T>
-inline typename std::enable_if<is_arithmetic<T>::value, bool>::type eval_eq(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) == 0;
 }
 template <unsigned digits10, class T>
-inline typename std::enable_if<is_arithmetic<T>::value, bool>::type eval_lt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) < 0;
 }
 template <unsigned digits10, class T>
-inline typename std::enable_if<is_arithmetic<T>::value, bool>::type eval_gt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) > 0;
 }
@@ -1462,17 +1462,17 @@ struct gmp_int
 };
 
 template <class T>
-inline typename std::enable_if<std::is_arithmetic<T>::value, bool>::type eval_eq(const gmp_int& a, const T& b)
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const gmp_int& a, const T& b)
 {
    return a.compare(b) == 0;
 }
 template <class T>
-inline typename std::enable_if<std::is_arithmetic<T>::value, bool>::type eval_lt(const gmp_int& a, const T& b)
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const gmp_int& a, const T& b)
 {
    return a.compare(b) < 0;
 }
 template <class T>
-inline typename std::enable_if<std::is_arithmetic<T>::value, bool>::type eval_gt(const gmp_int& a, const T& b)
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const gmp_int& a, const T& b)
 {
    return a.compare(b) > 0;
 }
@@ -1874,22 +1874,22 @@ inline void eval_lcm(gmp_int& result, const gmp_int& a, const gmp_int& b)
    mpz_lcm(result.data(), a.data(), b.data());
 }
 template <class I>
-inline typename std::enable_if<(is_unsigned<I>::value && (sizeof(I) <= sizeof(unsigned long)))>::type eval_gcd(gmp_int& result, const gmp_int& a, const I b)
+inline typename std::enable_if<(boost::multiprecision::detail::is_unsigned<I>::value && (sizeof(I) <= sizeof(unsigned long)))>::type eval_gcd(gmp_int& result, const gmp_int& a, const I b)
 {
    mpz_gcd_ui(result.data(), a.data(), b);
 }
 template <class I>
-inline typename std::enable_if<(is_unsigned<I>::value && (sizeof(I) <= sizeof(unsigned long)))>::type eval_lcm(gmp_int& result, const gmp_int& a, const I b)
+inline typename std::enable_if<(boost::multiprecision::detail::is_unsigned<I>::value && (sizeof(I) <= sizeof(unsigned long)))>::type eval_lcm(gmp_int& result, const gmp_int& a, const I b)
 {
    mpz_lcm_ui(result.data(), a.data(), b);
 }
 template <class I>
-inline typename std::enable_if<(is_signed<I>::value && (sizeof(I) <= sizeof(long)))>::type eval_gcd(gmp_int& result, const gmp_int& a, const I b)
+inline typename std::enable_if<(boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value && (sizeof(I) <= sizeof(long)))>::type eval_gcd(gmp_int& result, const gmp_int& a, const I b)
 {
    mpz_gcd_ui(result.data(), a.data(), boost::multiprecision::detail::unsigned_abs(b));
 }
 template <class I>
-inline typename std::enable_if<is_signed<I>::value && ((sizeof(I) <= sizeof(long)))>::type eval_lcm(gmp_int& result, const gmp_int& a, const I b)
+inline typename std::enable_if<boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value && ((sizeof(I) <= sizeof(long)))>::type eval_lcm(gmp_int& result, const gmp_int& a, const I b)
 {
    mpz_lcm_ui(result.data(), a.data(), boost::multiprecision::detail::unsigned_abs(b));
 }
@@ -1954,7 +1954,7 @@ inline void eval_qr(const gmp_int& x, const gmp_int& y,
 }
 
 template <class Integer>
-inline typename std::enable_if<std::is_unsigned<Integer>::value, Integer>::type eval_integer_modulus(const gmp_int& x, Integer val)
+inline typename std::enable_if<boost::multiprecision::detail::is_unsigned<Integer>::value, Integer>::type eval_integer_modulus(const gmp_int& x, Integer val)
 {
 #if defined(__MPIR_VERSION) && (__MPIR_VERSION >= 3)
    if ((sizeof(Integer) <= sizeof(mpir_ui)) || (val <= (std::numeric_limits<mpir_ui>::max)()))
@@ -1970,7 +1970,7 @@ inline typename std::enable_if<std::is_unsigned<Integer>::value, Integer>::type 
    }
 }
 template <class Integer>
-inline typename std::enable_if<std::is_signed<Integer>::value && std::is_integral<Integer>::value, Integer>::type eval_integer_modulus(const gmp_int& x, Integer val)
+inline typename std::enable_if<boost::multiprecision::detail::is_signed<Integer>::value && boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type eval_integer_modulus(const gmp_int& x, Integer val)
 {
    return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
@@ -1985,13 +1985,13 @@ inline void eval_powm(gmp_int& result, const gmp_int& base, const gmp_int& p, co
 
 template <class Integer>
 inline typename std::enable_if<
-    std::is_unsigned<Integer>::value && (sizeof(Integer) <= sizeof(unsigned long))>::type
+    boost::multiprecision::detail::is_unsigned<Integer>::value && (sizeof(Integer) <= sizeof(unsigned long))>::type
 eval_powm(gmp_int& result, const gmp_int& base, Integer p, const gmp_int& m)
 {
    mpz_powm_ui(result.data(), base.data(), p, m.data());
 }
 template <class Integer>
-inline typename std::enable_if<std::is_signed<Integer>::value && std::is_integral<Integer>::value && (sizeof(Integer) <= sizeof(unsigned long))>::type
+inline typename std::enable_if<boost::multiprecision::detail::is_signed<Integer>::value && boost::multiprecision::detail::is_integral<Integer>::value && (sizeof(Integer) <= sizeof(unsigned long))>::type
 eval_powm(gmp_int& result, const gmp_int& base, Integer p, const gmp_int& m)
 {
    if (p < 0)

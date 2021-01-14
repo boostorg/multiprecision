@@ -8,7 +8,6 @@
 #ifndef BOOST_MP_CPP_INT_COMPARISON_HPP
 #define BOOST_MP_CPP_INT_COMPARISON_HPP
 
-#include <boost/type_traits/make_unsigned.hpp>
 #include <boost/multiprecision/detail/constexpr.hpp>
 
 namespace boost { namespace multiprecision { namespace backends {
@@ -198,7 +197,7 @@ eval_eq(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, voi
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class U>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
     bool>::type
 eval_eq(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>& a, U b) BOOST_NOEXCEPT
 {
@@ -206,7 +205,7 @@ eval_eq(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class S>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_signed<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_signed<S>::value && boost::multiprecision::detail::is_integral<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
     bool>::type
 eval_eq(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>& a, S b) BOOST_NOEXCEPT
 {
@@ -214,7 +213,7 @@ eval_eq(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class U>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>::type
 eval_eq(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>& a, U b) BOOST_NOEXCEPT
 {
@@ -222,11 +221,11 @@ eval_eq(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, voi
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class S>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_signed<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_signed<S>::value && boost::multiprecision::detail::is_integral<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>::type
 eval_eq(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>& a, S b) BOOST_NOEXCEPT
 {
-   typedef typename make_unsigned<S>::type ui_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<S>::type ui_type;
    if (b < 0)
    {
       cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> t(b);
@@ -258,7 +257,7 @@ eval_lt(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, voi
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class U>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
     bool>::type
 eval_lt(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>& a, U b) BOOST_NOEXCEPT
 {
@@ -268,7 +267,7 @@ eval_lt(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class S>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_signed<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_signed<S>::value && boost::multiprecision::detail::is_integral<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
     bool>::type
 eval_lt(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>& a, S b) BOOST_NOEXCEPT
 {
@@ -278,7 +277,7 @@ eval_lt(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class U>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>::type
 eval_lt(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>& a, U b) BOOST_NOEXCEPT
 {
@@ -286,11 +285,11 @@ eval_lt(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, voi
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class S>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_signed<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_signed<S>::value && boost::multiprecision::detail::is_integral<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>::type
 eval_lt(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>& a, S b) BOOST_NOEXCEPT
 {
-   typedef typename make_unsigned<S>::type ui_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<S>::type ui_type;
    if (b < 0)
    {
       cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> t(b);
@@ -322,7 +321,7 @@ eval_gt(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, voi
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class U>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
     bool>::type
 eval_gt(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>& a, U b) BOOST_NOEXCEPT
 {
@@ -332,7 +331,7 @@ eval_gt(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class S>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_signed<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_signed<S>::value && boost::multiprecision::detail::is_integral<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
     bool>::type
 eval_gt(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>& a, S b) BOOST_NOEXCEPT
 {
@@ -342,7 +341,7 @@ eval_gt(const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, void>
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class U>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_unsigned<U>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>::type
 eval_gt(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>& a, U b) BOOST_NOEXCEPT
 {
@@ -350,11 +349,11 @@ eval_gt(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, voi
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class S>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-    is_signed<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
+    boost::multiprecision::detail::is_signed<S>::value && boost::multiprecision::detail::is_integral<S>::value && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>::type
 eval_gt(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>& a, S b) BOOST_NOEXCEPT
 {
-   typedef typename make_unsigned<S>::type ui_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<S>::type ui_type;
    if (b < 0)
    {
       cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> t(b);

@@ -287,22 +287,22 @@ namespace boost {
       // shifts:
       //
       template <class B, class I>
-      BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+      BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
          operator<<(const number<B, et_off>& a, const I& b)
       {
          number<B, et_off> result(a);
          using default_ops::eval_left_shift;
-         detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), mpl::bool_<is_signed<I>::value>());
+         detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), mpl::bool_<boost::multiprecision::detail::is_signed<I>::value>());
          eval_left_shift(result.backend(), b);
          return result;
       }
       template <class B, class I>
-      BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+      BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
          operator>>(const number<B, et_off>& a, const I& b)
       {
          number<B, et_off> result(a);
          using default_ops::eval_right_shift;
-         detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), mpl::bool_<is_signed<I>::value>());
+         detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), mpl::bool_<boost::multiprecision::detail::is_signed<I>::value>());
          eval_right_shift(result.backend(), b);
          return result;
       }
@@ -632,7 +632,7 @@ namespace boost {
       // shifts:
       //
       template <class B, class I>
-      BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+      BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
          operator<<(number<B, et_off>&& a, const I& b)
       {
          using default_ops::eval_left_shift;
@@ -640,7 +640,7 @@ namespace boost {
          return static_cast<number<B, et_off>&&>(a);
       }
       template <class B, class I>
-      BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+      BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
          operator>>(number<B, et_off>&& a, const I& b)
       {
          using default_ops::eval_right_shift;

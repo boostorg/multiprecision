@@ -91,9 +91,9 @@ import_bits_generic(
    typename number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>::backend_type newval;
 
    typedef typename std::iterator_traits<Iterator>::value_type                                   value_type;
-   typedef typename boost::make_unsigned<value_type>::type                                       unsigned_value_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<value_type>::type                                         unsigned_value_type;
    typedef typename std::iterator_traits<Iterator>::difference_type                              difference_type;
-   typedef typename boost::make_unsigned<difference_type>::type                                  size_type;
+   typedef typename boost::multiprecision::detail::make_unsigned<difference_type>::type                                    size_type;
    typedef typename cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>::trivial_tag tag_type;
 
    if (!chunk_size)

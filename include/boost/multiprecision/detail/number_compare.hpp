@@ -102,7 +102,7 @@ struct is_valid_mixed_compare : public mpl::false_
 {};
 
 template <class B, expression_template_option ET, class Val>
-struct is_valid_mixed_compare<number<B, ET>, Val> : public is_convertible<Val, number<B, ET> >
+struct is_valid_mixed_compare<number<B, ET>, Val> : public std::is_convertible<Val, number<B, ET> >
 {};
 
 template <class B, expression_template_option ET>
@@ -111,12 +111,12 @@ struct is_valid_mixed_compare<number<B, ET>, number<B, ET> > : public mpl::false
 
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 struct is_valid_mixed_compare<number<B, ET>, expression<tag, Arg1, Arg2, Arg3, Arg4> >
-    : public is_convertible<expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >
+    : public std::is_convertible<expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >
 {};
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 struct is_valid_mixed_compare<expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >
-    : public is_convertible<expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >
+    : public std::is_convertible<expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >
 {};
 
 template <class Backend, expression_template_option ExpressionTemplates>

@@ -117,7 +117,7 @@ inline bool is_small_prime(unsigned n)
 }
 
 template <class I>
-typename std::enable_if<is_convertible<I, unsigned>::value, unsigned>::type
+typename std::enable_if<std::is_convertible<I, unsigned>::value, unsigned>::type
 cast_to_unsigned(const I& val)
 {
    return static_cast<unsigned>(val);

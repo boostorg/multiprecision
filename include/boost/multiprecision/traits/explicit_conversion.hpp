@@ -10,7 +10,6 @@
 #include <boost/config.hpp>
 #include <boost/type_traits/conditional.hpp>
 #include <boost/type_traits/integral_constant.hpp>
-#include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/declval.hpp>
 #include <boost/multiprecision/detail/number_base.hpp> // number_category
 

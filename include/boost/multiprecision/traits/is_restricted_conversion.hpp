@@ -29,7 +29,7 @@ template <typename From, typename To>
 struct is_restricted_conversion
 {
    typedef typename mpl::if_c<
-       ((is_explicitly_convertible<From, To>::value && !is_convertible<From, To>::value) || is_lossy_conversion<From, To>::value),
+       ((is_explicitly_convertible<From, To>::value && !std::is_convertible<From, To>::value) || is_lossy_conversion<From, To>::value),
        mpl::true_,
        mpl::false_>::type type;
    static const bool      value = type::value;

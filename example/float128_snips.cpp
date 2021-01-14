@@ -55,10 +55,10 @@ GCC 8.1.0
 Type name is float128_t:
 Type is g
 std::is_fundamental<> = true
-std::is_signed<> = true
-std::is_unsigned<> = false
-std::is_integral<> = false
-std::is_arithmetic<> = true
+boost::multiprecision::detail::is_signed<> = true
+boost::multiprecision::detail::is_unsigned<> = false
+boost::multiprecision::detail::is_integral<> = false
+boost::multiprecision::detail::is_arithmetic<> = true
 std::is_const<> = false
 std::is_trivial<> = true
 std::is_standard_layout<> = true

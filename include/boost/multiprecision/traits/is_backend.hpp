@@ -8,7 +8,6 @@
 
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/type_traits/conditional.hpp>
-#include <boost/type_traits/is_convertible.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 
 namespace boost { namespace multiprecision { namespace detail {
@@ -27,7 +26,7 @@ template <class Backend>
 struct other_backend
 {
    typedef typename boost::conditional<
-       boost::is_same<number<Backend>, number<Backend, et_on> >::value,
+       std::is_same<number<Backend>, number<Backend, et_on> >::value,
        number<Backend, et_off>, number<Backend, et_on> >::type type;
 };
 
@@ -35,7 +34,7 @@ template <class B, class V>
 struct number_from_backend
 {
    typedef typename boost::conditional<
-       boost::is_convertible<V, number<B> >::value,
+       std::is_convertible<V, number<B> >::value,
        number<B>,
        typename other_backend<B>::type>::type type;
 };
@@ -48,7 +47,7 @@ struct is_first_backend_imp
 template <class T, class U>
 struct is_first_backend_imp<true, T, U>
 {
-   static const bool value = is_convertible<U, number<T, et_on> >::value || is_convertible<U, number<T, et_off> >::value;
+   static const bool value = std::is_convertible<U, number<T, et_on> >::value || std::is_convertible<U, number<T, et_off> >::value;
 };
 
 template <class T, class U>
@@ -63,7 +62,7 @@ struct is_second_backend_imp
 template <class T, class U>
 struct is_second_backend_imp<true, T, U>
 {
-   static const bool value = (is_convertible<T, number<U, et_on> >::value || is_convertible<T, number<U, et_off> >::value) && !is_first_backend<T, U>::value;
+   static const bool value = (std::is_convertible<T, number<U, et_on> >::value || std::is_convertible<T, number<U, et_off> >::value) && !is_first_backend<T, U>::value;
 };
 
 template <class T, class U>

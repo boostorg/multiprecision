@@ -68,7 +68,7 @@ class cpp_dec_float
    static const std::int32_t cpp_dec_float_digits10_setting = Digits10;
 
    // We need at least 16-bits in the exponent type to do anything sensible:
-   static_assert(boost::is_signed<ExponentType>::value, "ExponentType must be a signed built in integer type.");
+   static_assert(boost::multiprecision::detail::is_signed<ExponentType>::value, "ExponentType must be a signed built in integer type.");
    static_assert(sizeof(ExponentType) > 1, "ExponentType is too small.");
 
  public:
@@ -116,7 +116,7 @@ class cpp_dec_float
       cpp_dec_float_NaN
    } fpclass_type;
 
-   typedef typename mpl::if_<is_void<Allocator>,
+   typedef typename mpl::if_c<std::is_void<Allocator>::value,
                              std::array<std::uint32_t, cpp_dec_float_elem_number>,
                              detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number, Allocator> >::type array_type;
 
@@ -195,7 +195,7 @@ class cpp_dec_float
    }
 
    template <class I>
-   cpp_dec_float(I i, typename std::enable_if<std::is_unsigned<I>::value >::type* = 0) : data(),
+   cpp_dec_float(I i, typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value >::type* = 0) : data(),
                                                                         exp(static_cast<ExponentType>(0)),
                                                                         neg(false),
                                                                         fpclass(cpp_dec_float_finite),
@@ -205,7 +205,7 @@ class cpp_dec_float
    }
 
    template <class I>
-   cpp_dec_float(I i, typename std::enable_if<std::is_signed<I>::value && std::is_integral<I>::value>::type* = 0) : data(),
+   cpp_dec_float(I i, typename std::enable_if<boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value>::type* = 0) : data(),
                                                                       exp(static_cast<ExponentType>(0)),
                                                                       neg(false),
                                                                       fpclass(cpp_dec_float_finite),
@@ -247,7 +247,7 @@ class cpp_dec_float
    }
 
    template <class F>
-   cpp_dec_float(const F val, typename std::enable_if<is_floating_point<F>::value
+   cpp_dec_float(const F val, typename std::enable_if<std::is_floating_point<F>::value
 #ifdef BOOST_HAS_FLOAT128
                                                    && !std::is_same<F, __float128>::value
 #endif
@@ -437,7 +437,7 @@ class cpp_dec_float
    }
 
    template <class Float>
-   typename std::enable_if<boost::is_floating_point<Float>::value, cpp_dec_float&>::type operator=(Float v);
+   typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float&>::type operator=(Float v);
 
    cpp_dec_float& operator=(const char* v)
    {
@@ -2257,7 +2257,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 template <class Float>
-typename std::enable_if<boost::is_floating_point<Float>::value, cpp_dec_float<Digits10, ExponentType, Allocator>&>::type cpp_dec_float<Digits10, ExponentType, Allocator>::operator=(Float a)
+typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digits10, ExponentType, Allocator>&>::type cpp_dec_float<Digits10, ExponentType, Allocator>::operator=(Float a)
 {
    // Christopher Kormanyos's original code used a cast to boost::long_long_type here, but that fails
    // when long double has more digits than a boost::long_long_type.
@@ -2688,7 +2688,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
       else
       {
          cpp_dec_float<Digits10, ExponentType, Allocator> t;
-         default_ops::detail::pow_imp(t, two(), p, mpl::true_());
+         default_ops::detail::pow_imp(t, two(), p, std::integral_constant<bool, true>());
          return t;
       }
    }

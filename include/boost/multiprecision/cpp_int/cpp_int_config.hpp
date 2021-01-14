@@ -10,7 +10,6 @@
 #include <boost/integer_traits.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/int.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/assert.hpp>
 
 namespace boost {
