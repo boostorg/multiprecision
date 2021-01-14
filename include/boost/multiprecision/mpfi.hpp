@@ -1112,7 +1112,7 @@ void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const mpl::
 
 namespace detail {
 template <>
-struct is_variable_precision<backends::mpfi_float_backend<0> > : public true_type
+struct is_variable_precision<backends::mpfi_float_backend<0> > : public std::integral_constant<bool, true>
 {};
 } // namespace detail
 

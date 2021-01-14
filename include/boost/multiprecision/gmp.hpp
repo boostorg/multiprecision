@@ -2597,7 +2597,7 @@ struct number_category<detail::canonical<mpf_t, gmp_float<0> >::type> : public m
 
 namespace detail {
 template <>
-struct is_variable_precision<backends::gmp_float<0> > : public true_type
+struct is_variable_precision<backends::gmp_float<0> > : public std::integral_constant<bool, true>
 {};
 } // namespace detail
 

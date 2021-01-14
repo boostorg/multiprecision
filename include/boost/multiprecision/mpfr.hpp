@@ -1606,7 +1606,7 @@ inline std::size_t hash_value(const mpfr_float_backend<Digits10, AllocateType>& 
 
 namespace detail {
 template <>
-struct is_variable_precision<backends::mpfr_float_backend<0> > : public true_type
+struct is_variable_precision<backends::mpfr_float_backend<0> > : public std::integral_constant<bool, true>
 {};
 } // namespace detail
 

@@ -1470,7 +1470,7 @@ inline std::size_t hash_value(const mpc_complex_backend<Digits10>& val)
 
 namespace detail {
 template <>
-struct is_variable_precision<backends::mpc_complex_backend<0> > : public true_type
+struct is_variable_precision<backends::mpc_complex_backend<0> > : public std::integral_constant<bool, true>
 {};
 } // namespace detail
 
