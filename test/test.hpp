@@ -13,7 +13,6 @@
 
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/current_function.hpp>
-#include <boost/type_traits/is_unsigned.hpp>
 #include <boost/multiprecision/number.hpp>
 
 namespace detail {
@@ -85,10 +84,10 @@ typename std::enable_if<!((boost::multiprecision::number_category<T>::value == b
 }
 
 template <class T, class U>
-typename boost::mpl::if_c<std::is_convertible<T, U>::value, U, T>::type
+typename std::conditional<std::is_convertible<T, U>::value, U, T>::type
 relative_error(T a, U b)
 {
-   typedef typename boost::mpl::if_c<std::is_convertible<T, U>::value, U, T>::type cast_type;
+   typedef typename std::conditional<std::is_convertible<T, U>::value, U, T>::type cast_type;
    return relative_error<cast_type>(static_cast<cast_type>(a), static_cast<cast_type>(b));
 }
 

@@ -30,12 +30,12 @@ inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_last_chance_imp(co
 }
 
 template <class B, boost::multiprecision::expression_template_option ET>
-inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& n, const mpl::true_&)
+inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& n, const std::integral_constant<bool, true>&)
 {
    return n.precision();
 }
 template <class B, boost::multiprecision::expression_template_option ET>
-inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& val, const mpl::false_&)
+inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& val, const std::integral_constant<bool, false>&)
 {
    return current_precision_of_last_chance_imp(val,
                                                mpl::bool_ <

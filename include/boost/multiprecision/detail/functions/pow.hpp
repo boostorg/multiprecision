@@ -726,7 +726,7 @@ eval_pow(T& result, const T& x, const A& a)
    // Note this one is restricted to float arguments since pow.hpp already has a version for
    // integer powers....
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
+   typedef typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c;
    c = a;
    eval_pow(result, x, c);
@@ -741,7 +741,7 @@ inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::val
 eval_pow(T& result, const A& x, const T& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
+   typedef typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c;
    c = x;
    eval_pow(result, c, a);

@@ -19,7 +19,6 @@
 #include <boost/multiprecision/traits/is_byte_container.hpp>
 #include <boost/predef/other/endian.h>
 #include <boost/integer/static_min_max.hpp>
-#include <boost/type_traits/common_type.hpp>
 #include <boost/multiprecision/cpp_int/checked.hpp>
 #include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/cpp_int/value_pack.hpp>
@@ -37,7 +36,7 @@ using boost::enable_if;
 #pragma warning(disable : 4702) // Unreachable code (reachability depends on template params)
 #endif
 
-template <unsigned MinBits = 0, unsigned MaxBits = 0, boost::multiprecision::cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = typename mpl::if_c<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type>
+template <unsigned MinBits = 0, unsigned MaxBits = 0, boost::multiprecision::cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = typename std::conditional<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type>
 struct cpp_int_backend;
 
 } // namespace backends
@@ -988,7 +987,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!boost::multiprecision::detail::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)))>::type
    check_in_range(T val, const mpl::int_<checked>&)
    {
-      typedef typename common_type<typename boost::multiprecision::detail::make_unsigned<T>::type, local_limb_type>::type common_type;
+      typedef typename std::common_type<typename boost::multiprecision::detail::make_unsigned<T>::type, local_limb_type>::type common_type;
 
       if (static_cast<common_type>(boost::multiprecision::detail::unsigned_abs(val)) > static_cast<common_type>(limb_mask))
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
@@ -998,7 +997,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    check_in_range(T val, const mpl::int_<checked>&)
    {
       using std::abs;
-      typedef typename common_type<T, local_limb_type>::type common_type;
+      typedef typename std::common_type<T, local_limb_type>::type common_type;
 
       if (static_cast<common_type>(abs(val)) > static_cast<common_type>(limb_mask))
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
@@ -1153,7 +1152,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !(std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits))>::type
    check_in_range(T val, const mpl::int_<checked>&, const std::integral_constant<bool, false>&)
    {
-      typedef typename common_type<T, local_limb_type>::type common_type;
+      typedef typename std::common_type<T, local_limb_type>::type common_type;
 
       if (static_cast<common_type>(val) > limb_mask)
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
@@ -1161,7 +1160,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    template <class T>
    BOOST_MP_CXX14_CONSTEXPR void check_in_range(T val, const mpl::int_<checked>&, const std::integral_constant<bool, true>&)
    {
-      typedef typename common_type<T, local_limb_type>::type common_type;
+      typedef typename std::common_type<T, local_limb_type>::type common_type;
 
       if (static_cast<common_type>(val) > limb_mask)
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
@@ -1287,7 +1286,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
 // used to enable/disable constructors etc:
 //
 template <class Arg, class Base>
-struct is_allowed_cpp_int_base_conversion : public mpl::if_c<
+struct is_allowed_cpp_int_base_conversion : public std::conditional<
                                                 std::is_same<Arg, limb_type>::value || std::is_same<Arg, signed_limb_type>::value
 #if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
                                                     || std::is_same<Arg, double_limb_type>::value || std::is_same<Arg, signed_double_limb_type>::value
@@ -1841,7 +1840,7 @@ struct cpp_int_backend
  private:
    std::string do_get_trivial_string(std::ios_base::fmtflags f, const mpl::false_&) const
    {
-      typedef typename mpl::if_c<sizeof(typename base_type::local_limb_type) == 1, unsigned, typename base_type::local_limb_type>::type io_type;
+      typedef typename std::conditional<sizeof(typename base_type::local_limb_type) == 1, unsigned, typename base_type::local_limb_type>::type io_type;
       if (this->sign() && (((f & std::ios_base::hex) == std::ios_base::hex) || ((f & std::ios_base::oct) == std::ios_base::oct)))
          BOOST_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
       std::stringstream ss;
@@ -2195,7 +2194,7 @@ struct double_precision_type;
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct double_precision_type<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        backends::is_fixed_precision<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value,
        backends::cpp_int_backend<
            (std::is_void<Allocator>::value ? 2 * backends::max_precision<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value

@@ -28,13 +28,13 @@ namespace detail {
 template <unsigned N>
 struct largest_signed_type
 {
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        1 + std::numeric_limits<boost::long_long_type>::digits == N,
        boost::long_long_type,
-       typename mpl::if_c<
+       typename std::conditional<
            1 + std::numeric_limits<long>::digits == N,
            long,
-           typename mpl::if_c<
+           typename std::conditional<
                1 + std::numeric_limits<int>::digits == N,
                int,
                typename boost::int_t<N>::exact>::type>::type>::type type;
@@ -43,13 +43,13 @@ struct largest_signed_type
 template <unsigned N>
 struct largest_unsigned_type
 {
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        std::numeric_limits<boost::ulong_long_type>::digits == N,
        boost::ulong_long_type,
-       typename mpl::if_c<
+       typename std::conditional<
            std::numeric_limits<unsigned long>::digits == N,
            unsigned long,
-           typename mpl::if_c<
+           typename std::conditional<
                std::numeric_limits<unsigned int>::digits == N,
                unsigned int,
                typename boost::uint_t<N>::exact>::type>::type>::type type;

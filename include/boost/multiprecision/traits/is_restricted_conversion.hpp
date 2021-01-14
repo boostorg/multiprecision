@@ -16,7 +16,7 @@ namespace boost { namespace multiprecision { namespace detail {
 template <class From, class To>
 struct is_lossy_conversion
 {
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        ((number_category<From>::value == number_kind_floating_point) && (number_category<To>::value == number_kind_integer))
            /* || ((number_category<From>::value == number_kind_floating_point) && (number_category<To>::value == number_kind_rational))*/
            || ((number_category<From>::value == number_kind_rational) && (number_category<To>::value == number_kind_integer)) || ((number_category<From>::value == number_kind_fixed_point) && (number_category<To>::value == number_kind_integer)) || (number_category<From>::value == number_kind_unknown) || (number_category<To>::value == number_kind_unknown),
@@ -28,7 +28,7 @@ struct is_lossy_conversion
 template <typename From, typename To>
 struct is_restricted_conversion
 {
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        ((is_explicitly_convertible<From, To>::value && !std::is_convertible<From, To>::value) || is_lossy_conversion<From, To>::value),
        mpl::true_,
        mpl::false_>::type type;

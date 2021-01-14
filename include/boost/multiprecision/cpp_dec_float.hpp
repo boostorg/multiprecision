@@ -116,7 +116,7 @@ class cpp_dec_float
       cpp_dec_float_NaN
    } fpclass_type;
 
-   typedef typename mpl::if_c<std::is_void<Allocator>::value,
+   typedef typename std::conditional<std::is_void<Allocator>::value,
                              std::array<std::uint32_t, cpp_dec_float_elem_number>,
                              detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number, Allocator> >::type array_type;
 
@@ -3160,7 +3160,7 @@ struct precision<boost::multiprecision::number<boost::multiprecision::cpp_dec_fl
 
    typedef typename Policy::precision_type                            precision_type;
    typedef digits2<((cpp_dec_float_digits10 + 1LL) * 1000LL) / 301LL> digits_2;
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        ((digits_2::value <= precision_type::value) || (Policy::precision_type::value <= 0)),
        // Default case, full precision for RealType:
        digits_2,

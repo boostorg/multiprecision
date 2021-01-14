@@ -93,11 +93,11 @@ template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
    typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned long),
        mpl::int_<1>,
 #ifdef _M_X64
-       typename mpl::if_c<
+       typename std::conditional<
            sizeof(Unsigned) <= sizeof(__int64),
            mpl::int_<2>,
            mpl::int_<0> >::type
@@ -119,11 +119,11 @@ template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
    typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned long),
        mpl::int_<1>,
 #ifdef _M_X64
-       typename mpl::if_c<
+       typename std::conditional<
            sizeof(Unsigned) <= sizeof(__int64),
            mpl::int_<2>,
            mpl::int_<0> >::type
@@ -213,13 +213,13 @@ template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
    typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned),
        mpl::int_<1>,
-       typename mpl::if_c<
+       typename std::conditional<
            sizeof(Unsigned) <= sizeof(unsigned long),
            mpl::int_<2>,
-           typename mpl::if_c<
+           typename std::conditional<
                sizeof(Unsigned) <= sizeof(boost::ulong_long_type),
                mpl::int_<3>,
                mpl::int_<0> >::type>::type>::type tag_type;
@@ -236,13 +236,13 @@ template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
    typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned),
        mpl::int_<1>,
-       typename mpl::if_c<
+       typename std::conditional<
            sizeof(Unsigned) <= sizeof(unsigned long),
            mpl::int_<2>,
-           typename mpl::if_c<
+           typename std::conditional<
                sizeof(Unsigned) <= sizeof(boost::ulong_long_type),
                mpl::int_<3>,
                mpl::int_<0> >::type>::type>::type tag_type;
@@ -268,7 +268,7 @@ template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
    typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned),
        mpl::int_<1>,
        mpl::int_<0> >::type tag_type;
@@ -285,7 +285,7 @@ template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
    typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned),
        mpl::int_<1>,
        mpl::int_<0> >::type tag_type;

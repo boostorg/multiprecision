@@ -10,7 +10,6 @@
 #include <cstdint>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/functional/hash_fwd.hpp>
-#include <boost/type_traits/is_complex.hpp>
 #include <cmath>
 #include <algorithm>
 #include <complex>
@@ -334,7 +333,7 @@ inline int eval_get_sign(const complex_adaptor<Backend>&)
 }
 
 template <class Result, class Backend>
-inline typename std::enable_if< !boost::is_complex<Result>::value>::type eval_convert_to(Result* result, const complex_adaptor<Backend>& val)
+inline typename std::enable_if< !boost::multiprecision::detail::is_complex<Result>::value>::type eval_convert_to(Result* result, const complex_adaptor<Backend>& val)
 {
    using default_ops::eval_convert_to;
    using default_ops::eval_is_zero;

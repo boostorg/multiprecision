@@ -890,10 +890,10 @@ template <class R, class B>
 struct calculate_next_larger_type
 {
    // Find which list we're looking through:
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        boost::multiprecision::detail::is_signed<R>::value && boost::multiprecision::detail::is_integral<R>::value,
        typename B::signed_types,
-       typename mpl::if_c<
+       typename std::conditional<
            boost::multiprecision::detail::is_unsigned<R>::value,
            typename B::unsigned_types,
            typename B::float_types>::type>::type list_type;
@@ -904,7 +904,7 @@ struct calculate_next_larger_type
        list_type,
        std::is_same<R, mpl::_> >::type start_last;
    // Where we're starting from, either the start of the sequence or the last type found:
-   typedef typename mpl::if_c<std::is_same<start_last, typename mpl::end<list_type>::type>::value, typename mpl::begin<list_type>::type, start_last>::type start_seq;
+   typedef typename std::conditional<std::is_same<start_last, typename mpl::end<list_type>::type>::value, typename mpl::begin<list_type>::type, start_last>::type start_seq;
    // The range we're searching:
    typedef mpl::iterator_range<start_seq, typename mpl::end<list_type>::type> range;
    // Find the next type:
@@ -1140,7 +1140,7 @@ template <class T, class A>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_fmod(T& result, const T& x, const A& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
+   typedef typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c;
    c = a;
    eval_fmod(result, x, c);
@@ -1150,7 +1150,7 @@ template <class T, class A>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_fmod(T& result, const A& x, const T& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
+   typedef typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c;
    c = x;
    eval_fmod(result, c, a);
@@ -1181,7 +1181,7 @@ template <class T, class A>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_remquo(T& result, const T& x, const A& a, int* pi)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
+   typedef typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c = cast_type();
    c = a;
    eval_remquo(result, x, c, pi);
@@ -1190,7 +1190,7 @@ template <class T, class A>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_remquo(T& result, const A& x, const T& a, int* pi)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
+   typedef typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c = cast_type();
    c = x;
    eval_remquo(result, c, a, pi);
@@ -1657,7 +1657,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_logb(B& result, const B& val)
          result.negate();
       return;
    }
-   typedef typename boost::mpl::if_c<std::is_same<std::intmax_t, long>::value, boost::long_long_type, std::intmax_t>::type max_t;
+   typedef typename std::conditional<std::is_same<std::intmax_t, long>::value, boost::long_long_type, std::intmax_t>::type max_t;
    result = static_cast<max_t>(eval_ilogb(val));
 }
 template <class B, class A>

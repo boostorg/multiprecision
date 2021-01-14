@@ -461,14 +461,14 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
         (is_number<T>::value || is_number_expression<T>::value) &&
         (is_number<U>::value || is_number_expression<U>::value || boost::multiprecision::detail::is_integral<U>::value) &&
         (is_number<V>::value || is_number_expression<V>::value || boost::multiprecision::detail::is_integral<V>::value),
-    typename mpl::if_<
-        is_no_et_number<T>,
+    typename std::conditional<
+        is_no_et_number<T>::value,
         T,
-        typename mpl::if_<
-            is_no_et_number<U>,
+        typename std::conditional<
+            is_no_et_number<U>::value,
             U,
-            typename mpl::if_<
-                is_no_et_number<V>,
+            typename std::conditional<
+                is_no_et_number<V>::value,
                 V,
                 detail::expression<detail::function, default_ops::powm_func, T, U, V> >::type>::type>::type>::type
 powm(const T& b, const U& p, const V& mod)

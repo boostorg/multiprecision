@@ -7,7 +7,6 @@
 #define BOOST_MP_IS_BACKEND_HPP
 
 #include <boost/mpl/has_xxx.hpp>
-#include <boost/type_traits/conditional.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 
 namespace boost { namespace multiprecision { namespace detail {
@@ -25,7 +24,7 @@ struct is_backend
 template <class Backend>
 struct other_backend
 {
-   typedef typename boost::conditional<
+   typedef typename std::conditional<
        std::is_same<number<Backend>, number<Backend, et_on> >::value,
        number<Backend, et_off>, number<Backend, et_on> >::type type;
 };
@@ -33,7 +32,7 @@ struct other_backend
 template <class B, class V>
 struct number_from_backend
 {
-   typedef typename boost::conditional<
+   typedef typename std::conditional<
        std::is_convertible<V, number<B> >::value,
        number<B>,
        typename other_backend<B>::type>::type type;

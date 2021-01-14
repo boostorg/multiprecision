@@ -8,9 +8,6 @@
 #define BOOST_MP_EXPLICIT_CONVERTIBLE_HPP
 
 #include <boost/config.hpp>
-#include <boost/type_traits/conditional.hpp>
-#include <boost/type_traits/integral_constant.hpp>
-#include <boost/type_traits/declval.hpp>
 #include <boost/multiprecision/detail/number_base.hpp> // number_category
 
 namespace boost {
@@ -24,39 +21,39 @@ struct dummy_size
 template <typename S, typename T>
 struct has_generic_interconversion
 {
-   typedef typename boost::conditional<
+   typedef typename std::conditional<
        is_number<S>::value && is_number<T>::value,
-       typename boost::conditional<
+       typename std::conditional<
            number_category<S>::value == number_kind_integer,
-           typename boost::conditional<
+           typename std::conditional<
                number_category<T>::value == number_kind_integer || number_category<T>::value == number_kind_floating_point || number_category<T>::value == number_kind_rational || number_category<T>::value == number_kind_fixed_point,
-               boost::true_type,
-               boost::false_type>::type,
-           typename boost::conditional<
+               std::integral_constant<bool, true>,
+               std::integral_constant<bool, false> >::type,
+           typename std::conditional<
                number_category<S>::value == number_kind_rational,
-               typename boost::conditional<
+               typename std::conditional<
                    number_category<T>::value == number_kind_rational || number_category<T>::value == number_kind_rational,
-                   boost::true_type,
-                   boost::false_type>::type,
-               typename boost::conditional<
+                   std::integral_constant<bool, true>,
+                   std::integral_constant<bool, false> >::type,
+               typename std::conditional<
                    number_category<T>::value == number_kind_floating_point,
-                   boost::true_type,
-                   boost::false_type>::type>::type>::type,
-       boost::false_type>::type type;
+                   std::integral_constant<bool, true>,
+                   std::integral_constant<bool, false> >::type>::type>::type,
+       std::integral_constant<bool, false> >::type type;
 };
 
 template <typename S, typename T>
 struct is_explicitly_convertible_imp
 {
    template <typename S1, typename T1>
-   static type_traits::yes_type selector(dummy_size<sizeof(new T1(boost::declval<
+   static int selector(dummy_size<sizeof(new T1(std::declval<
                                                                   S1
                                                                   >()))>*);
 
    template <typename S1, typename T1>
-   static type_traits::no_type selector(...);
+   static char selector(...);
 
-   static const bool value = sizeof(selector<S, T>(0)) == sizeof(type_traits::yes_type);
+   static const bool value = sizeof(selector<S, T>(0)) == sizeof(int);
 
    typedef boost::integral_constant<bool, value> type;
 };

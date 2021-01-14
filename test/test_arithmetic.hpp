@@ -1429,10 +1429,10 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
 template <class T>
 struct lexical_cast_target_type
 {
-   typedef typename boost::mpl::if_c<
+   typedef typename std::conditional<
        boost::multiprecision::detail::is_signed<T>::value && boost::multiprecision::detail::is_integral<T>::value,
        std::intmax_t,
-       typename boost::mpl::if_c<
+       typename std::conditional<
            boost::multiprecision::detail::is_unsigned<T>::value,
            std::uintmax_t,
            T>::type>::type type;
@@ -1503,11 +1503,11 @@ void test_negative_mixed_numeric_limits(boost::mpl::false_ const&) {}
 template <class Real, class Num>
 void test_negative_mixed(boost::mpl::true_ const&)
 {
-   typedef typename boost::mpl::if_c<
+   typedef typename std::conditional<
        std::is_convertible<Num, Real>::value,
-       typename boost::mpl::if_c<boost::multiprecision::detail::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
+       typename std::conditional<boost::multiprecision::detail::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
        Real>::type cast_type;
-   typedef typename boost::mpl::if_c<
+   typedef typename std::conditional<
        std::is_convertible<Num, Real>::value,
        Num,
        Real>::type simple_cast_type;
@@ -1876,11 +1876,11 @@ void test_mixed_numeric_limits(const boost::mpl::false_&)
 template <class Real, class Num>
 void test_mixed(const boost::mpl::true_&)
 {
-   typedef typename boost::mpl::if_c<
+   typedef typename std::conditional<
        std::is_convertible<Num, Real>::value,
-       typename boost::mpl::if_c<boost::multiprecision::detail::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
+       typename std::conditional<boost::multiprecision::detail::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
        Real>::type cast_type;
-   typedef typename boost::mpl::if_c<
+   typedef typename std::conditional<
        std::is_convertible<Num, Real>::value,
        Num,
        Real>::type simple_cast_type;

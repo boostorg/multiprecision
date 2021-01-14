@@ -142,7 +142,7 @@ struct pack_values
    static constexpr limb_type value_to_add  = shift ? hex_value<NextChar>::value << shift : hex_value<NextChar>::value;
 
    typedef typename pack_values<CHARS...>::type                          recursive_packed_type;
-   typedef typename boost::mpl::if_c<shift == 0,
+   typedef typename std::conditional<shift == 0,
                                      typename recursive_packed_type::next_type,
                                      recursive_packed_type>::type        pack_type;
    typedef typename combine_value_to_pack<pack_type, value_to_add>::type type;

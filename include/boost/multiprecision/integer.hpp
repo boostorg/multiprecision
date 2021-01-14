@@ -57,15 +57,15 @@ struct double_integer
    static const unsigned int_t_digits =
        2 * sizeof(I) <= sizeof(boost::long_long_type) ? std::numeric_limits<I>::digits * 2 : 1;
 
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        2 * sizeof(I) <= sizeof(boost::long_long_type),
-       typename mpl::if_c<
+       typename std::conditional<
            boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value,
            typename boost::int_t<int_t_digits>::least,
            typename boost::uint_t<int_t_digits>::least>::type,
-       typename mpl::if_c<
+       typename std::conditional<
            2 * sizeof(I) <= sizeof(double_limb_type),
-           typename mpl::if_c<
+           typename std::conditional<
                boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value,
                signed_double_limb_type,
                double_limb_type>::type,

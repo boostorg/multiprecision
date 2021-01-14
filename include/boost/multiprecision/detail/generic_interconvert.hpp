@@ -378,8 +378,8 @@ inline void generic_convert_rational_to_float(To& result, const From& f)
    // that way we can call this from generic conversions, and
    // from specific conversions to built in types.
    //
-   typedef typename mpl::if_c<is_number<From>::value, From, number<From> >::type                                                                                                                                                                                                            actual_from_type;
-   typedef typename mpl::if_c<is_number<To>::value || std::is_floating_point<To>::value, To, number<To> >::type                                                                                                                                                                             actual_to_type;
+   typedef typename std::conditional<is_number<From>::value, From, number<From> >::type                                                                                                                                                                                                            actual_from_type;
+   typedef typename std::conditional<is_number<To>::value || std::is_floating_point<To>::value, To, number<To> >::type                                                                                                                                                                             actual_to_type;
    typedef typename component_type<actual_from_type>::type                                                                                                                                                                                                                                  integer_type;
    typedef mpl::bool_<!std::numeric_limits<integer_type>::is_specialized || std::numeric_limits<integer_type>::is_bounded || !std::numeric_limits<actual_to_type>::is_specialized || !std::numeric_limits<actual_to_type>::is_bounded || (std::numeric_limits<actual_to_type>::radix != 2)> dispatch_tag;
 

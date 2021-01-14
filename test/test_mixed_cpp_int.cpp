@@ -53,7 +53,7 @@ void test()
    };
    typedef typename boost::uint_t<require_digits>::least                                                     uint_least;
    typedef typename boost::int_t<require_digits>::least                                                      int_least;
-   typedef typename boost::mpl::if_c<std::numeric_limits<test_type>::is_signed, int_least, uint_least>::type i_type;
+   typedef typename std::conditional<std::numeric_limits<test_type>::is_signed, int_least, uint_least>::type i_type;
 
    i_type ih = (std::numeric_limits<i_type>::max)();
    i_type il = (std::numeric_limits<i_type>::max)();

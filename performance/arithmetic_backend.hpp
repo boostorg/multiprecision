@@ -14,7 +14,6 @@
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/integer/common_factor_rt.hpp>
-#include <boost/type_traits/common_type.hpp>
 #include <boost/container_hash/hash.hpp>
 
 namespace boost {
@@ -115,7 +114,7 @@ struct arithmetic_backend
 template <class R, class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<R>::value>::type eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& backend)
 {
-   typedef typename boost::common_type<R, Arithmetic>::type c_type;
+   typedef typename std::common_type<R, Arithmetic>::type c_type;
    constexpr const c_type                             max = static_cast<c_type>((std::numeric_limits<R>::max)());
    constexpr const c_type                             min = static_cast<c_type>((std::numeric_limits<R>::min)());
    c_type                                                   ct  = static_cast<c_type>(backend.data());

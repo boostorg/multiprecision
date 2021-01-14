@@ -327,16 +327,16 @@ struct canonical_imp<Val, Backend, mpl::int_<3> >
 template <class Val, class Backend>
 struct canonical
 {
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value,
        mpl::int_<0>,
-       typename mpl::if_c<
+       typename std::conditional<
            boost::multiprecision::detail::is_unsigned<Val>::value,
            mpl::int_<1>,
-           typename mpl::if_c<
+           typename std::conditional<
                std::is_floating_point<Val>::value,
                mpl::int_<2>,
-               typename mpl::if_c<
+               typename std::conditional<
                    (std::is_convertible<Val, const char*>::value || std::is_same<Val, std::string>::value),
                    mpl::int_<3>,
                    mpl::int_<4> >::type>::type>::type>::type tag_type;
@@ -437,7 +437,7 @@ struct combine_expression<number<T, ExpressionTemplates>, number<T, ExpressionTe
 template <class T1, expression_template_option ExpressionTemplates1, class T2, expression_template_option ExpressionTemplates2>
 struct combine_expression<number<T1, ExpressionTemplates1>, number<T2, ExpressionTemplates2> >
 {
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        std::is_convertible<number<T2, ExpressionTemplates2>, number<T1, ExpressionTemplates2> >::value,
        number<T1, ExpressionTemplates1>,
        number<T2, ExpressionTemplates2> >::type type;
@@ -1548,7 +1548,7 @@ struct component_type<detail::expression<tag, A1, A2, A3, A4> > : public compone
 template <class T>
 struct scalar_result_from_possible_complex
 {
-   typedef typename mpl::if_c<number_category<T>::value == number_kind_complex,
+   typedef typename std::conditional<number_category<T>::value == number_kind_complex,
                               typename component_type<T>::type, T>::type type;
 };
 

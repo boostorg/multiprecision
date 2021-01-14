@@ -172,7 +172,7 @@ void test_specific(const T&)
 template <class Number>
 void test()
 {
-   typedef typename boost::mpl::if_c<
+   typedef typename std::conditional<
        std::numeric_limits<Number>::is_specialized,
        typename boost::multiprecision::number_category<Number>::type,
        boost::mpl::int_<500> // not a number type

@@ -1031,7 +1031,7 @@ template <class T, class A>
 inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_atan2(T& result, const T& x, const A& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
+   typedef typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c;
    c = a;
    eval_atan2(result, x, c);
@@ -1041,7 +1041,7 @@ template <class T, class A>
 inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_atan2(T& result, const A& x, const T& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename mpl::if_c<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
+   typedef typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
    cast_type                                                                      c;
    c = x;
    eval_atan2(result, c, a);
