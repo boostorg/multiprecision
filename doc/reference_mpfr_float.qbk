@@ -33,7 +33,7 @@ and `number::precision`.  Note that this type does not in any way change the GMP
 it does not change the default precision of the mpfr_t data type), therefore you can safely mix this type with existing
 code that uses GMP or MPFR, and also mix `mpfr_float_backend`s of differing precision.
 
-The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_floating_point>`.
+The type of `number_category<cpp_int<Args...> >::type` is `std::integral_constant<int, number_kind_floating_point>`.
 
 More information on this type can be found in the [link boost_multiprecision.tut.floats.mpfr_float tutorial].
 

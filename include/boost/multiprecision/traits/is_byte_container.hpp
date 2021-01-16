@@ -8,11 +8,19 @@
 
 #include <iterator>
 #include <type_traits>
-#include <boost/mpl/has_xxx.hpp>
 
 namespace boost { namespace multiprecision { namespace detail {
 
-BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(has_member_const_iterator, const_iterator, false)
+template <class T>
+struct has_member_const_iterator
+{
+   template <class U>
+   static double         check(U*, typename U::const_iterator* = 0);
+   static char           check(...);
+   static T*             get();
+   static constexpr bool value = sizeof(check(get())) == sizeof(double);
+};
+
 
 template <class C, bool b>
 struct is_byte_container_imp

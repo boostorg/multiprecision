@@ -106,7 +106,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b)
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_lcm(B& result, const B& a, const B& b)
 {
-   typedef typename mpl::front<typename B::unsigned_types>::type ui_type;
+   typedef typename std::tuple_element<0, typename B::unsigned_types>::type ui_type;
    B                                                             t;
    eval_gcd(t, a, b);
 
@@ -272,7 +272,7 @@ struct double_precision_type
 // check the value is positive:
 //
 template <class Backend>
-inline BOOST_MP_CXX14_CONSTEXPR void check_sign_of_backend(const Backend& v, const mpl::true_)
+inline BOOST_MP_CXX14_CONSTEXPR void check_sign_of_backend(const Backend& v, const std::integral_constant<bool, true>)
 {
    if (eval_get_sign(v) < 0)
    {
@@ -280,7 +280,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void check_sign_of_backend(const Backend& v, con
    }
 }
 template <class Backend>
-inline BOOST_MP_CXX14_CONSTEXPR void check_sign_of_backend(const Backend&, const mpl::false_) {}
+inline BOOST_MP_CXX14_CONSTEXPR void check_sign_of_backend(const Backend&, const std::integral_constant<bool, false>) {}
 //
 // Calculate (a^p)%c:
 //
@@ -296,7 +296,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_powm(Backend& result, const Backend& a, const
    typedef typename double_precision_type<Backend>::type                                       double_type;
    typedef typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
 
-   check_sign_of_backend(p, mpl::bool_<std::numeric_limits<number<Backend> >::is_signed>());
+   check_sign_of_backend(p, std::integral_constant<bool, std::numeric_limits<number<Backend> >::is_signed>());
 
    double_type x, y(a), b(p), t;
    x = ui_type(1u);
@@ -330,7 +330,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_powm(Backend& result, const Backend& a, const
    using default_ops::eval_multiply;
    using default_ops::eval_right_shift;
 
-   check_sign_of_backend(p, mpl::bool_<std::numeric_limits<number<Backend> >::is_signed>());
+   check_sign_of_backend(p, std::integral_constant<bool, std::numeric_limits<number<Backend> >::is_signed>());
 
    if (eval_get_sign(p) < 0)
    {

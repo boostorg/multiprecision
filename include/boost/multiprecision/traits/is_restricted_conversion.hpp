@@ -8,7 +8,6 @@
 #define BOOST_MP_RESTRICTED_CONVERSION_HPP
 
 #include <boost/multiprecision/traits/explicit_conversion.hpp>
-#include <boost/mpl/if.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 
 namespace boost { namespace multiprecision { namespace detail {
@@ -20,8 +19,8 @@ struct is_lossy_conversion
        ((number_category<From>::value == number_kind_floating_point) && (number_category<To>::value == number_kind_integer))
            /* || ((number_category<From>::value == number_kind_floating_point) && (number_category<To>::value == number_kind_rational))*/
            || ((number_category<From>::value == number_kind_rational) && (number_category<To>::value == number_kind_integer)) || ((number_category<From>::value == number_kind_fixed_point) && (number_category<To>::value == number_kind_integer)) || (number_category<From>::value == number_kind_unknown) || (number_category<To>::value == number_kind_unknown),
-       mpl::true_,
-       mpl::false_>::type type;
+       std::integral_constant<bool, true>,
+       std::integral_constant<bool, false>>::type type;
    static const bool      value = type::value;
 };
 
@@ -30,8 +29,8 @@ struct is_restricted_conversion
 {
    typedef typename std::conditional<
        ((is_explicitly_convertible<From, To>::value && !std::is_convertible<From, To>::value) || is_lossy_conversion<From, To>::value),
-       mpl::true_,
-       mpl::false_>::type type;
+       std::integral_constant<bool, true>,
+       std::integral_constant<bool, false>>::type type;
    static const bool      value = type::value;
 };
 

@@ -8,8 +8,6 @@
 
 #include <boost/integer.hpp>
 #include <boost/integer_traits.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/int.hpp>
 #include <boost/assert.hpp>
 
 namespace boost {

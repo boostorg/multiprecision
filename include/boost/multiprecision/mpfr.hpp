@@ -43,7 +43,7 @@ struct mpfr_float_backend<0, allocate_stack>;
 } // namespace backends
 
 template <unsigned digits10, mpfr_allocation_type AllocationType>
-struct number_category<backends::mpfr_float_backend<digits10, AllocationType> > : public mpl::int_<number_kind_floating_point>
+struct number_category<backends::mpfr_float_backend<digits10, AllocationType> > : public std::integral_constant<int, number_kind_floating_point>
 {};
 
 namespace backends {
@@ -91,13 +91,13 @@ template <unsigned digits10>
 struct mpfr_float_imp<digits10, allocate_dynamic>
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef mpl::list<long, boost::long_long_type>           signed_types;
-   typedef mpl::list<unsigned long, boost::ulong_long_type> unsigned_types;
+   typedef std::tuple<long, boost::long_long_type>           signed_types;
+   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
 #else
-   typedef mpl::list<long>          signed_types;
-   typedef mpl::list<unsigned long> unsigned_types;
+   typedef std::tuple<long>          signed_types;
+   typedef std::tuple<unsigned long> unsigned_types;
 #endif
-   typedef mpl::list<double, long double> float_types;
+   typedef std::tuple<double, long double> float_types;
    typedef long                           exponent_type;
 
    mpfr_float_imp()
@@ -413,13 +413,13 @@ template <unsigned digits10>
 struct mpfr_float_imp<digits10, allocate_stack>
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef mpl::list<long, boost::long_long_type>           signed_types;
-   typedef mpl::list<unsigned long, boost::ulong_long_type> unsigned_types;
+   typedef std::tuple<long, boost::long_long_type>           signed_types;
+   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
 #else
-   typedef mpl::list<long>          signed_types;
-   typedef mpl::list<unsigned long> unsigned_types;
+   typedef std::tuple<long>          signed_types;
+   typedef std::tuple<unsigned long> unsigned_types;
 #endif
-   typedef mpl::list<double, long double> float_types;
+   typedef std::tuple<double, long double> float_types;
    typedef long                           exponent_type;
 
    static const unsigned digits2    = (digits10 * 1000uL) / 301uL + ((digits10 * 1000uL) % 301 ? 2u : 1u);
@@ -1611,11 +1611,11 @@ struct is_variable_precision<backends::mpfr_float_backend<0> > : public std::int
 } // namespace detail
 
 template <>
-struct number_category<detail::canonical<mpfr_t, backends::mpfr_float_backend<0> >::type> : public mpl::int_<number_kind_floating_point>
+struct number_category<detail::canonical<mpfr_t, backends::mpfr_float_backend<0> >::type> : public std::integral_constant<int, number_kind_floating_point>
 {};
 
 template <unsigned D, boost::multiprecision::mpfr_allocation_type A1, boost::multiprecision::mpfr_allocation_type A2>
-struct is_equivalent_number_type<backends::mpfr_float_backend<D, A1>, backends::mpfr_float_backend<D, A2> > : public mpl::true_ {};
+struct is_equivalent_number_type<backends::mpfr_float_backend<D, A1>, backends::mpfr_float_backend<D, A2> > : public std::integral_constant<bool, true> {};
 
 using boost::multiprecision::backends::mpfr_float_backend;
 

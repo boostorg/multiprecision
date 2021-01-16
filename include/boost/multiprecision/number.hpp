@@ -8,10 +8,6 @@
 
 #include <boost/config.hpp>
 #include <cstdint>
-#include <boost/mpl/max.hpp>
-#include <boost/mpl/plus.hpp>
-#include <boost/mpl/or.hpp>
-#include <boost/mpl/find_if.hpp>
 #include <boost/assert.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/multiprecision/detail/precision.hpp>
@@ -186,7 +182,7 @@ class number
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value, number&>::type operator=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      typedef mpl::bool_<is_equivalent_number_type<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value> tag_type;
+      typedef std::integral_constant<bool, is_equivalent_number_type<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value> tag_type;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                       precision_guard(e);
       //
       // If the current precision of *this differs from that of expression e, then we
@@ -209,7 +205,7 @@ class number
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    BOOST_MP_CXX14_CONSTEXPR number& assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      typedef mpl::bool_<is_equivalent_number_type<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value> tag_type;
+      typedef std::integral_constant<bool, is_equivalent_number_type<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value> tag_type;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                       precision_guard(e);
       //
       // If the current precision of *this differs from that of expression e, then we
@@ -622,7 +618,7 @@ class number
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<V>::value, number&>::type operator<<=(V val)
    {
       static_assert(number_category<Backend>::value == number_kind_integer, "The left-shift operation is only valid for integer types");
-      detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), mpl::bool_<boost::multiprecision::detail::is_signed<V>::value && boost::multiprecision::detail::is_integral<V>::value > ());
+      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(V) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<V>::value && boost::multiprecision::detail::is_integral<V>::value > ());
       eval_left_shift(m_backend, static_cast<std::size_t>(canonical_value(val)));
       return *this;
    }
@@ -631,7 +627,7 @@ class number
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<V>::value, number&>::type operator>>=(V val)
    {
       static_assert(number_category<Backend>::value == number_kind_integer, "The right-shift operation is only valid for integer types");
-      detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), mpl::bool_<boost::multiprecision::detail::is_signed<V>::value && boost::multiprecision::detail::is_integral<V>::value>());
+      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(V) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<V>::value && boost::multiprecision::detail::is_integral<V>::value>());
       eval_right_shift(m_backend, static_cast<std::size_t>(canonical_value(val)));
       return *this;
    }
@@ -949,13 +945,13 @@ class number
 
  private:
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   BOOST_MP_CXX14_CONSTEXPR void do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::true_&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const std::integral_constant<bool, true>&)
    {
       do_assign(e, tag());
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_assignable<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value>::type 
-      do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::false_&)
+      do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const std::integral_constant<bool, false>&)
    {
       // The result of the expression isn't the same type as this -
       // create a temporary result and assign it to *this:
@@ -965,7 +961,7 @@ class number
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::is_assignable<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value>::type 
-      do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::false_&)
+      do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const std::integral_constant<bool, false>&)
    {
       // The result of the expression isn't the same type as this -
       // create a temporary result and assign it to *this:
@@ -1404,7 +1400,7 @@ class number
    {
       static_assert(number_category<Backend>::value == number_kind_integer, "The right shift operation is only valid for integer types");
       using default_ops::eval_right_shift;
-      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), mpl::bool_<boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
+      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
       eval_right_shift(m_backend, canonical_value(e.value()), static_cast<std::size_t>(val));
    }
 
@@ -1413,7 +1409,7 @@ class number
    {
       static_assert(number_category<Backend>::value == number_kind_integer, "The left shift operation is only valid for integer types");
       using default_ops::eval_left_shift;
-      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), mpl::bool_<boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
+      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
       eval_left_shift(m_backend, canonical_value(e.value()), static_cast<std::size_t>(val));
    }
 
@@ -1423,7 +1419,7 @@ class number
       static_assert(number_category<Backend>::value == number_kind_integer, "The right shift operation is only valid for integer types");
       using default_ops::eval_right_shift;
       self_type temp(e);
-      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), mpl::bool_<boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
+      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
       eval_right_shift(m_backend, temp.backend(), static_cast<std::size_t>(val));
    }
 
@@ -1433,17 +1429,17 @@ class number
       static_assert(number_category<Backend>::value == number_kind_integer, "The left shift operation is only valid for integer types");
       using default_ops::eval_left_shift;
       self_type temp(e);
-      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), mpl::bool_<boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
+      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
       eval_left_shift(m_backend, temp.backend(), static_cast<std::size_t>(val));
    }
 
    template <class Exp>
-   BOOST_MP_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const mpl::int_<1>&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const std::integral_constant<int, 1>&)
    {
       e.left().value()(&m_backend);
    }
    template <class Exp>
-   BOOST_MP_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const mpl::int_<2>&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const std::integral_constant<int, 2>&)
    {
       typedef typename Exp::right_type      right_type;
       typedef typename right_type::tag_type tag_type;
@@ -1461,7 +1457,7 @@ class number
       f(m_backend, t.backend());
    }
    template <class Exp>
-   BOOST_MP_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const mpl::int_<3>&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const std::integral_constant<int, 3>&)
    {
       typedef typename Exp::middle_type      middle_type;
       typedef typename middle_type::tag_type tag_type;
@@ -1495,7 +1491,7 @@ class number
    }
 
    template <class Exp>
-   BOOST_MP_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const mpl::int_<4>&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const std::integral_constant<int, 4>&)
    {
       typedef typename Exp::left_middle_type  left_type;
       typedef typename left_type::tag_type    left_tag_type;
@@ -1900,25 +1896,25 @@ class number
       return contains_self(e, typename Exp::arity());
    }
    template <class Exp>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<0> const&) const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool contains_self(const Exp& e, std::integral_constant<int, 0> const&) const BOOST_NOEXCEPT
    {
       return is_realy_self(e.value());
    }
    template <class Exp>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<1> const&) const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool contains_self(const Exp& e, std::integral_constant<int, 1> const&) const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type child_type;
       return contains_self(e.left(), typename child_type::arity());
    }
    template <class Exp>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<2> const&) const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool contains_self(const Exp& e, std::integral_constant<int, 2> const&) const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type  child0_type;
       typedef typename Exp::right_type child1_type;
       return contains_self(e.left(), typename child0_type::arity()) || contains_self(e.right(), typename child1_type::arity());
    }
    template <class Exp>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<3> const&) const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool contains_self(const Exp& e, std::integral_constant<int, 3> const&) const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type   child0_type;
       typedef typename Exp::middle_type child1_type;
@@ -1933,12 +1929,12 @@ class number
       return is_self(e, typename Exp::arity());
    }
    template <class Exp>
-   BOOST_MP_FORCEINLINE constexpr bool is_self(const Exp& e, mpl::int_<0> const&) const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE constexpr bool is_self(const Exp& e, std::integral_constant<int, 0> const&) const BOOST_NOEXCEPT
    {
       return is_realy_self(e.value());
    }
    template <class Exp, int v>
-   BOOST_MP_FORCEINLINE constexpr bool is_self(const Exp&, mpl::int_<v> const&) const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE constexpr bool is_self(const Exp&, std::integral_constant<int, v> const&) const BOOST_NOEXCEPT
    {
       return false;
    }

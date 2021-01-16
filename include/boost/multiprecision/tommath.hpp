@@ -11,7 +11,6 @@
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
-#include <boost/scoped_array.hpp>
 #include <boost/functional/hash_fwd.hpp>
 #include <tommath.h>
 #include <cctype>
@@ -43,9 +42,9 @@ void eval_add(tommath_int& t, const tommath_int& o);
 
 struct tommath_int
 {
-   typedef mpl::list<std::int32_t, boost::long_long_type>   signed_types;
-   typedef mpl::list<std::uint32_t, boost::ulong_long_type> unsigned_types;
-   typedef mpl::list<long double>                             float_types;
+   typedef std::tuple<std::int32_t, boost::long_long_type>   signed_types;
+   typedef std::tuple<std::uint32_t, boost::ulong_long_type> unsigned_types;
+   typedef std::tuple<long double>                             float_types;
 
    tommath_int()
    {
@@ -391,7 +390,7 @@ struct tommath_int
       std::size_t s;
       detail::check_tommath_result(mp_radix_size(const_cast< ::mp_int*>(&m_data), base, &s));
 #endif
-      boost::scoped_array<char> a(new char[s + 1]);
+      std::unique_ptr<char[]> a(new char[s + 1]);
 #ifdef DIGIT_BIT
       detail::check_tommath_result(mp_toradix_n(const_cast< ::mp_int*>(&m_data), a.get(), base, s + 1));
 #else
@@ -779,7 +778,7 @@ inline std::size_t hash_value(const tommath_int& val)
 using boost::multiprecision::backends::tommath_int;
 
 template <>
-struct number_category<tommath_int> : public mpl::int_<number_kind_integer>
+struct number_category<tommath_int> : public std::integral_constant<int, number_kind_integer>
 {};
 
 typedef number<tommath_int>           tom_int;

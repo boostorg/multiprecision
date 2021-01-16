@@ -12,8 +12,6 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/special_functions/next.hpp>
 #include <boost/math/special_functions/hypot.hpp>
-#include <boost/mpl/front.hpp>
-#include <boost/mpl/fold.hpp>
 #include <cstdint>
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
 #include <string_view>
@@ -37,15 +35,15 @@ template <class T>
 struct is_backend;
 
 template <class To, class From>
-void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_floating_point>& /*to_type*/, const mpl::int_<number_kind_integer>& /*from_type*/);
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_floating_point>& /*to_type*/, const std::integral_constant<int, number_kind_integer>& /*from_type*/);
 template <class To, class From>
-void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_integer>& /*from_type*/);
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_integer>& /*to_type*/, const std::integral_constant<int, number_kind_integer>& /*from_type*/);
 template <class To, class From>
-void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_floating_point>& /*to_type*/, const mpl::int_<number_kind_floating_point>& /*from_type*/);
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_floating_point>& /*to_type*/, const std::integral_constant<int, number_kind_floating_point>& /*from_type*/);
 template <class To, class From>
-void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_rational>& /*to_type*/, const mpl::int_<number_kind_rational>& /*from_type*/);
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_rational>& /*to_type*/, const std::integral_constant<int, number_kind_rational>& /*from_type*/);
 template <class To, class From>
-void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_rational>& /*to_type*/, const mpl::int_<number_kind_integer>& /*from_type*/);
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_rational>& /*to_type*/, const std::integral_constant<int, number_kind_integer>& /*from_type*/);
 
 } // namespace detail
 
@@ -786,13 +784,13 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_xor(T& t, const U& u, const V&
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_increment(T& val)
 {
-   typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+   typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
    eval_add(val, static_cast<ui_type>(1u));
 }
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_decrement(T& val)
 {
-   typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+   typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
    eval_subtract(val, static_cast<ui_type>(1u));
 }
 
@@ -813,18 +811,18 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_right_shift(T& result, const U& arg, c
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR bool eval_is_zero(const T& val)
 {
-   typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+   typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
    return val.compare(static_cast<ui_type>(0)) == 0;
 }
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR int eval_get_sign(const T& val)
 {
-   typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+   typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
    return val.compare(static_cast<ui_type>(0));
 }
 
 template <class T, class V, class U>
-inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<number_kind_rational>&)
+inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v1, const U& v2, const std::integral_constant<int, number_kind_rational>&)
 {
    result = v1;
    T t;
@@ -833,7 +831,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v
 }
 
 template <class T, class V, class U, int N>
-inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<N>&)
+inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v1, const U& v2, const std::integral_constant<int, N>&)
 {
    typedef typename component_type<number<T> >::type component_number_type;
 
@@ -868,7 +866,7 @@ template <class R, int b>
 struct has_enough_bits
 {
    template <class T>
-   struct type : public mpl::bool_<!std::is_same<R, T>::value && (std::numeric_limits<T>::digits >= b)>
+   struct type : public std::integral_constant<bool, !std::is_same<R, T>::value && (std::numeric_limits<T>::digits >= b)>
    {};
 };
 
@@ -886,6 +884,18 @@ struct terminal
    BOOST_MP_CXX14_CONSTEXPR operator R() const { return value; }
 };
 
+template <class Tuple, int i, class T, bool = (i == std::tuple_size<Tuple>::value)>
+struct find_index_of_type
+{
+   static constexpr int value = std::is_same<T, typename std::tuple_element<i, Tuple>::type>::value ? i : find_index_of_type<Tuple, i + 1, T>::value;
+};
+template <class Tuple, int i, class T>
+struct find_index_of_type<Tuple, i, T, true>
+{
+   static constexpr int value = -1;
+};
+
+
 template <class R, class B>
 struct calculate_next_larger_type
 {
@@ -897,25 +907,9 @@ struct calculate_next_larger_type
            boost::multiprecision::detail::is_unsigned<R>::value,
            typename B::unsigned_types,
            typename B::float_types>::type>::type list_type;
-   // A predicate to find a type with enough bits:
-   typedef typename has_enough_bits<R, std::numeric_limits<R>::digits>::template type<mpl::_> pred_type;
-   // See if the last type is in the list, if so we have to start after this:
-   typedef typename mpl::find_if<
-       list_type,
-       std::is_same<R, mpl::_> >::type start_last;
-   // Where we're starting from, either the start of the sequence or the last type found:
-   typedef typename std::conditional<std::is_same<start_last, typename mpl::end<list_type>::type>::value, typename mpl::begin<list_type>::type, start_last>::type start_seq;
-   // The range we're searching:
-   typedef mpl::iterator_range<start_seq, typename mpl::end<list_type>::type> range;
-   // Find the next type:
-   typedef typename mpl::find_if<
-       range,
-       pred_type>::type iter_type;
-   // Either the next type, or a "terminal" to indicate we've run out of types to search:
-   typedef typename mpl::eval_if_c<
-       std::is_same<typename mpl::end<list_type>::type, iter_type>::value,
-       mpl::identity<terminal<R> >,
-       mpl::deref<iter_type> >::type type;
+   static constexpr int start = find_index_of_type<list_type, 0, R>::value;
+   static constexpr int index_of_type = boost::multiprecision::detail::find_index_of_large_enough_type<list_type, start + 1, std::numeric_limits<R>::digits>::value;
+   typedef typename boost::multiprecision::detail::dereference_tuple<index_of_type, list_type, terminal<R> >::type type;
 };
 
 template <class R, class T>
@@ -961,7 +955,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !boost::multiprecision:
 }
 
 template <class R, class B>
-inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const mpl::false_&)
+inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const std::integral_constant<bool, false>&)
 {
    //
    // We ran out of types to try for the conversion, try
@@ -985,7 +979,7 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
 }
 
 template <class R, class B>
-inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const mpl::true_&)
+inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const std::integral_constant<bool, true>&)
 {
    //
    // We ran out of types to try for the conversion, try
@@ -1014,7 +1008,7 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
 template <class R, class B>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(terminal<R>* result, const B& backend)
 {
-   typedef mpl::bool_<boost::multiprecision::detail::is_unsigned<R>::value && number_category<B>::value == number_kind_integer> tag_type;
+   typedef std::integral_constant<bool, boost::multiprecision::detail::is_unsigned<R>::value && number_category<B>::value == number_kind_integer> tag_type;
    last_chance_eval_convert_to(result, backend, tag_type());
 }
 
@@ -1074,7 +1068,7 @@ template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_abs(T& result, const U& arg)
 {
    typedef typename U::signed_types             type_list;
-   typedef typename mpl::front<type_list>::type front;
+   typedef typename std::tuple_element<0, type_list>::type front;
    result = arg;
    if (arg.compare(front(0)) < 0)
       result.negate();
@@ -1084,7 +1078,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_fabs(T& result, const U& arg)
 {
    static_assert(number_category<T>::value == number_kind_floating_point, "The fabs function is only valid for floating point types.");
    typedef typename U::signed_types             type_list;
-   typedef typename mpl::front<type_list>::type front;
+   typedef typename std::tuple_element<0, type_list>::type front;
    result = arg;
    if (arg.compare(front(0)) < 0)
       result.negate();
@@ -1811,7 +1805,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_real(To& to, const From& from)
 template <class To, class From>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_imag(To& to, const From&)
 {
-   typedef typename mpl::front<typename To::unsigned_types>::type ui_type;
+   typedef typename std::tuple_element<0, typename To::unsigned_types>::type ui_type;
    to = ui_type(0);
 }
 

@@ -65,7 +65,7 @@ T generate_random()
 }
 
 template <class T>
-void do_round_trip(const T& val, std::ios_base::fmtflags f, const boost::mpl::true_&)
+void do_round_trip(const T& val, std::ios_base::fmtflags f, const std::integral_constant<bool, true>&)
 {
    std::stringstream ss;
    ss << std::setprecision(std::numeric_limits<T>::max_digits10);
@@ -78,7 +78,7 @@ void do_round_trip(const T& val, std::ios_base::fmtflags f, const boost::mpl::tr
 }
 
 template <class T>
-void do_round_trip(const T& val, std::ios_base::fmtflags f, const boost::mpl::false_&)
+void do_round_trip(const T& val, std::ios_base::fmtflags f, const std::integral_constant<bool, false>&)
 {
    std::stringstream ss;
    ss << std::setprecision(std::numeric_limits<T>::digits10 + 4);
@@ -90,10 +90,10 @@ void do_round_trip(const T& val, std::ios_base::fmtflags f, const boost::mpl::fa
 }
 
 template <class T>
-struct is_number : public boost::mpl::false_
+struct is_number : public std::integral_constant<bool, false>
 {};
 template <class T>
-struct is_number<boost::multiprecision::number<T> > : public boost::mpl::true_
+struct is_number<boost::multiprecision::number<T> > : public std::integral_constant<bool, true>
 {};
 
 template <class T>

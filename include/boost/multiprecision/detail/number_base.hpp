@@ -156,27 +156,27 @@ template <class Backend, expression_template_option ExpressionTemplates = expres
 class number;
 
 template <class T>
-struct is_number : public mpl::false_
+struct is_number : public std::integral_constant<bool, false>
 {};
 
 template <class Backend, expression_template_option ExpressionTemplates>
-struct is_number<number<Backend, ExpressionTemplates> > : public mpl::true_
+struct is_number<number<Backend, ExpressionTemplates> > : public std::integral_constant<bool, true>
 {};
 
 template <class T>
-struct is_et_number : public mpl::false_
+struct is_et_number : public std::integral_constant<bool, false>
 {};
 
 template <class Backend>
-struct is_et_number<number<Backend, et_on> > : public mpl::true_
+struct is_et_number<number<Backend, et_on> > : public std::integral_constant<bool, true>
 {};
 
 template <class T>
-struct is_no_et_number : public mpl::false_
+struct is_no_et_number : public std::integral_constant<bool, false>
 {};
 
 template <class Backend>
-struct is_no_et_number<number<Backend, et_off> > : public mpl::true_
+struct is_no_et_number<number<Backend, et_off> > : public std::integral_constant<bool, true>
 {};
 
 namespace detail {
@@ -188,16 +188,16 @@ struct expression;
 } // namespace detail
 
 template <class T>
-struct is_number_expression : public mpl::false_
+struct is_number_expression : public std::integral_constant<bool, false>
 {};
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-struct is_number_expression<detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > : public mpl::true_
+struct is_number_expression<detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > : public std::integral_constant<bool, true>
 {};
 
 template <class T, class Num>
 struct is_compatible_arithmetic_type
-    : public mpl::bool_<
+    : public std::integral_constant<bool, 
           std::is_convertible<T, Num>::value && !std::is_same<T, Num>::value && !is_number_expression<T>::value>
 {};
 
@@ -257,8 +257,30 @@ template <int b>
 struct has_enough_bits
 {
    template <class T>
-   struct type : public mpl::bool_<bits_of<T>::value >= b>
+   struct type : public std::integral_constant<bool, bits_of<T>::value >= b>
    {};
+};
+
+template <class Tuple, int i, int digits, bool = (i == std::tuple_size<Tuple>::value)>
+struct find_index_of_large_enough_type
+{
+   static constexpr int value = bits_of<typename std::tuple_element<i, Tuple>::type>::value >= digits ? i : find_index_of_large_enough_type<Tuple, i + 1, digits>::value;
+};
+template <class Tuple, int i, int digits>
+struct find_index_of_large_enough_type<Tuple, i, digits, true>
+{
+   static constexpr int value = INT_MAX;
+};
+
+template <int index, class Tuple, class Fallback, bool = (std::tuple_size<Tuple>::value <= index)>
+struct dereference_tuple
+{
+   typedef typename std::tuple_element<index, Tuple>::type type;
+};
+template <int index, class Tuple, class Fallback>
+struct dereference_tuple<index, Tuple, Fallback, true>
+{
+   typedef Fallback type;
 };
 
 template <class Val, class Backend, class Tag>
@@ -278,48 +300,36 @@ struct canonical_imp<number<B, et_off>, Backend, Tag>
 };
 #ifdef __SUNPRO_CC
 template <class B, class Backend>
-struct canonical_imp<number<B, et_on>, Backend, mpl::int_<3> >
+struct canonical_imp<number<B, et_on>, Backend, std::integral_constant<int, 3> >
 {
    typedef B type;
 };
 template <class B, class Backend>
-struct canonical_imp<number<B, et_off>, Backend, mpl::int_<3> >
+struct canonical_imp<number<B, et_off>, Backend, std::integral_constant<int, 3> >
 {
    typedef B type;
 };
 #endif
 template <class Val, class Backend>
-struct canonical_imp<Val, Backend, mpl::int_<0> >
+struct canonical_imp<Val, Backend, std::integral_constant<int, 0> >
 {
-   typedef typename has_enough_bits<bits_of<Val>::value>::template type<mpl::_> pred_type;
-   typedef typename mpl::find_if<
-       typename Backend::signed_types,
-       pred_type>::type                                                                                                 iter_type;
-   typedef typename mpl::end<typename Backend::signed_types>::type                                                      end_type;
-   typedef typename mpl::eval_if_c<std::is_same<iter_type, end_type>::value, mpl::identity<Val>, mpl::deref<iter_type> >::type   type;
+   static constexpr int index = find_index_of_large_enough_type<typename Backend::signed_types, 0, bits_of<Val>::value>::value;
+   typedef typename dereference_tuple<index, typename Backend::signed_types, Val>::type type;
 };
 template <class Val, class Backend>
-struct canonical_imp<Val, Backend, mpl::int_<1> >
+struct canonical_imp<Val, Backend, std::integral_constant<int, 1> >
 {
-   typedef typename has_enough_bits<bits_of<Val>::value>::template type<mpl::_> pred_type;
-   typedef typename mpl::find_if<
-       typename Backend::unsigned_types,
-       pred_type>::type                                                                                                 iter_type;
-   typedef typename mpl::end<typename Backend::unsigned_types>::type                                                    end_type;
-   typedef typename mpl::eval_if_c<std::is_same<iter_type, end_type>::value, mpl::identity<Val>, mpl::deref<iter_type> >::type   type;
+   static constexpr int index = find_index_of_large_enough_type<typename Backend::unsigned_types, 0, bits_of<Val>::value>::value;
+   typedef typename dereference_tuple<index, typename Backend::unsigned_types, Val>::type type;
 };
 template <class Val, class Backend>
-struct canonical_imp<Val, Backend, mpl::int_<2> >
+struct canonical_imp<Val, Backend, std::integral_constant<int, 2> >
 {
-   typedef typename has_enough_bits<bits_of<Val>::value>::template type<mpl::_> pred_type;
-   typedef typename mpl::find_if<
-       typename Backend::float_types,
-       pred_type>::type                                                                                                 iter_type;
-   typedef typename mpl::end<typename Backend::float_types>::type                                                       end_type;
-   typedef typename mpl::eval_if_c<std::is_same<iter_type, end_type>::value, mpl::identity<Val>, mpl::deref<iter_type> >::type   type;
+   static constexpr int index = find_index_of_large_enough_type<typename Backend::float_types, 0, bits_of<Val>::value>::value;
+   typedef typename dereference_tuple<index, typename Backend::float_types, Val>::type type;
 };
 template <class Val, class Backend>
-struct canonical_imp<Val, Backend, mpl::int_<3> >
+struct canonical_imp<Val, Backend, std::integral_constant<int, 3> >
 {
    typedef const char* type;
 };
@@ -329,17 +339,17 @@ struct canonical
 {
    typedef typename std::conditional<
        boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value,
-       mpl::int_<0>,
+       std::integral_constant<int, 0>,
        typename std::conditional<
            boost::multiprecision::detail::is_unsigned<Val>::value,
-           mpl::int_<1>,
+           std::integral_constant<int, 1>,
            typename std::conditional<
                std::is_floating_point<Val>::value,
-               mpl::int_<2>,
+               std::integral_constant<int, 2>,
                typename std::conditional<
                    (std::is_convertible<Val, const char*>::value || std::is_same<Val, std::string>::value),
-                   mpl::int_<3>,
-                   mpl::int_<4> >::type>::type>::type>::type tag_type;
+                   std::integral_constant<int, 3>,
+                   std::integral_constant<int, 4> >::type>::type>::type>::type tag_type;
 
    typedef typename canonical_imp<Val, Backend, tag_type>::type type;
 };
@@ -499,7 +509,7 @@ struct expression_storage<expression<tag, A1, A2, A3, A4> >
 template <class tag, class Arg1>
 struct expression<tag, Arg1, void, void, void>
 {
-   typedef mpl::int_<1>                    arity;
+   typedef std::integral_constant<int, 1>                    arity;
    typedef typename arg_type<Arg1>::type   left_type;
    typedef typename left_type::result_type left_result_type;
    typedef typename left_type::result_type result_type;
@@ -653,7 +663,7 @@ struct expression<tag, Arg1, void, void, void>
 template <class Arg1>
 struct expression<terminal, Arg1, void, void, void>
 {
-   typedef mpl::int_<0> arity;
+   typedef std::integral_constant<int, 0> arity;
    typedef Arg1         result_type;
    typedef terminal     tag_type;
 
@@ -804,7 +814,7 @@ struct expression<terminal, Arg1, void, void, void>
 template <class tag, class Arg1, class Arg2>
 struct expression<tag, Arg1, Arg2, void, void>
 {
-   typedef mpl::int_<2>                                                           arity;
+   typedef std::integral_constant<int, 2>                                                           arity;
    typedef typename arg_type<Arg1>::type                                          left_type;
    typedef typename arg_type<Arg2>::type                                          right_type;
    typedef typename left_type::result_type                                        left_result_type;
@@ -964,7 +974,7 @@ struct expression<tag, Arg1, Arg2, void, void>
 template <class tag, class Arg1, class Arg2, class Arg3>
 struct expression<tag, Arg1, Arg2, Arg3, void>
 {
-   typedef mpl::int_<3>                      arity;
+   typedef std::integral_constant<int, 3>                      arity;
    typedef typename arg_type<Arg1>::type     left_type;
    typedef typename arg_type<Arg2>::type     middle_type;
    typedef typename arg_type<Arg3>::type     right_type;
@@ -1132,7 +1142,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 struct expression
 {
-   typedef mpl::int_<4>                            arity;
+   typedef std::integral_constant<int, 4>                            arity;
    typedef typename arg_type<Arg1>::type           left_type;
    typedef typename arg_type<Arg2>::type           left_middle_type;
    typedef typename arg_type<Arg3>::type           right_middle_type;
@@ -1462,7 +1472,7 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
 }
 
 template <class V>
-BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const mpl::true_&, const mpl::true_&)
+BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, true>&)
 {
    if (val > (std::numeric_limits<std::size_t>::max)())
       BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
@@ -1470,19 +1480,19 @@ BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const mpl::true_&, const 
       BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
 }
 template <class V>
-BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const mpl::false_&, const mpl::true_&)
+BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, false>&, const std::integral_constant<bool, true>&)
 {
    if (val < 0)
       BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
 }
 template <class V>
-BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const mpl::true_&, const mpl::false_&)
+BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, false>&)
 {
    if (val > (std::numeric_limits<std::size_t>::max)())
       BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
 }
 template <class V>
-BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V, const mpl::false_&, const mpl::false_&) BOOST_NOEXCEPT {}
+BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V, const std::integral_constant<bool, false>&, const std::integral_constant<bool, false>&) BOOST_NOEXCEPT {}
 
 template <class T>
 BOOST_MP_CXX14_CONSTEXPR const T& evaluate_if_expression(const T& val) { return val; }
@@ -1505,10 +1515,10 @@ enum number_category_type
 };
 
 template <class Num, bool, bool>
-struct number_category_base : public mpl::int_<number_kind_unknown>
+struct number_category_base : public std::integral_constant<int, number_kind_unknown>
 {};
 template <class Num>
-struct number_category_base<Num, true, false> : public mpl::int_<std::numeric_limits<Num>::is_integer ? number_kind_integer : (std::numeric_limits<Num>::max_exponent ? number_kind_floating_point : number_kind_unknown)>
+struct number_category_base<Num, true, false> : public std::integral_constant<int, std::numeric_limits<Num>::is_integer ? number_kind_integer : (std::numeric_limits<Num>::max_exponent ? number_kind_floating_point : number_kind_unknown)>
 {};
 template <class Num>
 struct number_category : public number_category_base<Num, std::is_class<Num>::value || boost::multiprecision::detail::is_arithmetic<Num>::value, std::is_abstract<Num>::value>
@@ -1524,15 +1534,15 @@ struct number_category<detail::expression<tag, A1, A2, A3, A4> > : public number
 //
 #ifdef BOOST_HAS_INT128
 template <>
-struct number_category<boost::int128_type> : public mpl::int_<number_kind_integer>
+struct number_category<boost::int128_type> : public std::integral_constant<int, number_kind_integer>
 {};
 template <>
-struct number_category<boost::uint128_type> : public mpl::int_<number_kind_integer>
+struct number_category<boost::uint128_type> : public std::integral_constant<int, number_kind_integer>
 {};
 #endif
 #ifdef BOOST_HAS_FLOAT128
 template <>
-struct number_category<__float128> : public mpl::int_<number_kind_floating_point>
+struct number_category<__float128> : public std::integral_constant<int, number_kind_floating_point>
 {};
 #endif
 
@@ -1556,16 +1566,16 @@ template <class T>
 struct complex_result_from_scalar; // individual backends must specialize this trait.
 
 template <class T>
-struct is_unsigned_number : public mpl::false_
+struct is_unsigned_number : public std::integral_constant<bool, false>
 {};
 template <class Backend, expression_template_option ExpressionTemplates>
 struct is_unsigned_number<number<Backend, ExpressionTemplates> > : public is_unsigned_number<Backend>
 {};
 template <class T>
-struct is_signed_number : public mpl::bool_<!is_unsigned_number<T>::value>
+struct is_signed_number : public std::integral_constant<bool, !is_unsigned_number<T>::value>
 {};
 template <class T>
-struct is_interval_number : public mpl::false_
+struct is_interval_number : public std::integral_constant<bool, false>
 {};
 template <class Backend, expression_template_option ExpressionTemplates>
 struct is_interval_number<number<Backend, ExpressionTemplates> > : public is_interval_number<Backend>
@@ -1614,7 +1624,7 @@ namespace boost { namespace math {
       }
 
       template <class B, boost::multiprecision::expression_template_option ET>
-      struct is_complex_type<boost::multiprecision::number<B, ET> > : public boost::mpl::bool_<boost::multiprecision::number_category<B>::value == boost::multiprecision::number_kind_complex> {};
+      struct is_complex_type<boost::multiprecision::number<B, ET> > : public std::integral_constant<bool, boost::multiprecision::number_category<B>::value == boost::multiprecision::number_kind_complex> {};
 
 } // namespace tools
 

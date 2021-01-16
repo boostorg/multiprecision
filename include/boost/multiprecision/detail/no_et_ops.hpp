@@ -292,7 +292,7 @@ namespace boost {
       {
          number<B, et_off> result(a);
          using default_ops::eval_left_shift;
-         detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), mpl::bool_<boost::multiprecision::detail::is_signed<I>::value>());
+         detail::check_shift_range(b, std::integral_constant<bool, (sizeof(I) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<I>::value>());
          eval_left_shift(result.backend(), b);
          return result;
       }
@@ -302,7 +302,7 @@ namespace boost {
       {
          number<B, et_off> result(a);
          using default_ops::eval_right_shift;
-         detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), mpl::bool_<boost::multiprecision::detail::is_signed<I>::value>());
+         detail::check_shift_range(b, std::integral_constant<bool, (sizeof(I) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<I>::value>());
          eval_right_shift(result.backend(), b);
          return result;
       }

@@ -7,7 +7,6 @@
 #define BOOST_MP_FLOAT128_HPP
 
 #include <boost/config.hpp>
-#include <boost/scoped_array.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/multiprecision/number.hpp>
 
@@ -133,11 +132,11 @@ struct float128_backend;
 using backends::float128_backend;
 
 template <>
-struct number_category<backends::float128_backend> : public mpl::int_<number_kind_floating_point>
+struct number_category<backends::float128_backend> : public std::integral_constant<int, number_kind_floating_point>
 {};
 #if defined(BOOST_MP_USE_QUAD)
 template <>
-struct number_category<float128_type> : public mpl::int_<number_kind_floating_point>
+struct number_category<float128_type> : public std::integral_constant<int, number_kind_floating_point>
 {};
 #endif
 
@@ -162,11 +161,11 @@ namespace backends {
 
 struct float128_backend
 {
-   typedef mpl::list<signed char, short, int, long, boost::long_long_type> signed_types;
-   typedef mpl::list<unsigned char, unsigned short,
+   typedef std::tuple<signed char, short, int, long, boost::long_long_type> signed_types;
+   typedef std::tuple<unsigned char, unsigned short,
                      unsigned int, unsigned long, boost::ulong_long_type>
        unsigned_types;
-   typedef mpl::list<float, double, long double> float_types;
+   typedef std::tuple<float, double, long double> float_types;
    typedef int                                   exponent_type;
 
  private:
@@ -259,7 +258,7 @@ struct float128_backend
       if ((v < 0) || (v >= 127))
       {
          int                       v_max = v;
-         boost::scoped_array<char> buf2;
+         std::unique_ptr<char[]>   buf2;
          buf2.reset(new char[v + 3]);
          v = quadmath_snprintf(&buf2[0], v_max + 3, format.c_str(), digits, m_value);
          if (v >= v_max + 3)
@@ -741,7 +740,7 @@ namespace serialization {
 namespace float128_detail {
 
 template <class Archive>
-void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const mpl::false_&, const mpl::false_&)
+void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const std::integral_constant<bool, false>&, const std::integral_constant<bool, false>&)
 {
    // saving
    // non-binary
@@ -749,7 +748,7 @@ void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend
    ar&         boost::make_nvp("value", s);
 }
 template <class Archive>
-void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const mpl::true_&, const mpl::false_&)
+void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, false>&)
 {
    // loading
    // non-binary
@@ -759,14 +758,14 @@ void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend
 }
 
 template <class Archive>
-void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const mpl::false_&, const mpl::true_&)
+void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const std::integral_constant<bool, false>&, const std::integral_constant<bool, true>&)
 {
    // saving
    // binary
    ar.save_binary(&val, sizeof(val));
 }
 template <class Archive>
-void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const mpl::true_&, const mpl::true_&)
+void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, true>&)
 {
    // loading
    // binary
@@ -779,7 +778,7 @@ template <class Archive>
 void serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, unsigned int /*version*/)
 {
    typedef typename Archive::is_loading                                                                                                                            load_tag;
-   typedef typename mpl::bool_<std::is_same<Archive, boost::archive::binary_oarchive>::value || std::is_same<Archive, boost::archive::binary_iarchive>::value> binary_tag;
+   typedef typename std::integral_constant<bool, std::is_same<Archive, boost::archive::binary_oarchive>::value || std::is_same<Archive, boost::archive::binary_iarchive>::value> binary_tag;
 
    float128_detail::do_serialize(ar, val, load_tag(), binary_tag());
 }

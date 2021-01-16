@@ -102,7 +102,7 @@ void hyp0F0(T& H0F0, const T& x)
    // http://functions.wolfram.com/HypergeometricFunctions/Hypergeometric0F0/06/01/
    // There are no checks on input range or parameter boundaries.
 
-   typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+   typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
 
    BOOST_ASSERT(&H0F0 != &x);
    long tol = boost::multiprecision::detail::digits2<number<T, et_on> >::value();
@@ -350,7 +350,7 @@ void eval_log(T& result, const T& arg)
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    typedef typename T::exponent_type                                            exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::float_types>::type                   fp_type;
+   typedef typename std::tuple_element<0, typename T::float_types>::type                   fp_type;
    int                                                                          s = eval_signbit(arg);
    switch (eval_fpclassify(arg))
    {
@@ -471,7 +471,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
 {
    static_assert(number_category<T>::value == number_kind_floating_point, "The pow function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
-   typedef typename mpl::front<typename T::float_types>::type              fp_type;
+   typedef typename std::tuple_element<0, typename T::float_types>::type              fp_type;
 
    if ((&result == &x) || (&result == &a))
    {
@@ -761,7 +761,7 @@ void eval_exp2(T& result, const T& arg)
       eval_convert_to(&i, temp);
       if (arg.compare(i) == 0)
       {
-         temp = static_cast<typename mpl::front<typename T::unsigned_types>::type>(1u);
+         temp = static_cast<typename std::tuple_element<0, typename T::unsigned_types>::type>(1u);
          eval_ldexp(result, temp, i);
          return;
       }
@@ -774,7 +774,7 @@ void eval_exp2(T& result, const T& arg)
    }
    BOOST_CATCH_END
 
-   temp = static_cast<typename mpl::front<typename T::unsigned_types>::type>(2u);
+   temp = static_cast<typename std::tuple_element<0, typename T::unsigned_types>::type>(2u);
    eval_pow(result, temp, arg);
 }
 
@@ -811,7 +811,7 @@ template <class T>
 void sinhcosh(const T& x, T* p_sinh, T* p_cosh)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-   typedef typename mpl::front<typename T::float_types>::type                   fp_type;
+   typedef typename std::tuple_element<0, typename T::float_types>::type                   fp_type;
 
    switch (eval_fpclassify(x))
    {
@@ -896,7 +896,7 @@ inline void eval_tanh(T& result, const T& x)
    if ((eval_fpclassify(result) == FP_INFINITE) && (eval_fpclassify(c) == FP_INFINITE))
    {
       bool s = eval_signbit(result) != eval_signbit(c);
-      result = static_cast<typename mpl::front<typename T::unsigned_types>::type>(1u);
+      result = static_cast<typename std::tuple_element<0, typename T::unsigned_types>::type>(1u);
       if (s)
          result.negate();
       return;

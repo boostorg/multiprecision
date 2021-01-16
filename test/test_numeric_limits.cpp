@@ -71,7 +71,7 @@
    std::cout << BOOST_STRINGIZE(x) << " = " << std::numeric_limits<Number>::x << std::endl;
 
 template <class Number>
-void test_specific(const boost::mpl::int_<boost::multiprecision::number_kind_floating_point>&)
+void test_specific(const std::integral_constant<int, boost::multiprecision::number_kind_floating_point>&)
 {
    Number minv, maxv;
    minv = (std::numeric_limits<Number>::min)();
@@ -152,7 +152,7 @@ void test_specific(const boost::mpl::int_<boost::multiprecision::number_kind_flo
 }
 
 template <class Number>
-void test_specific(const boost::mpl::int_<boost::multiprecision::number_kind_integer>&)
+void test_specific(const std::integral_constant<int, boost::multiprecision::number_kind_integer>&)
 {
    if (std::numeric_limits<Number>::is_modulo)
    {
@@ -175,7 +175,7 @@ void test()
    typedef typename std::conditional<
        std::numeric_limits<Number>::is_specialized,
        typename boost::multiprecision::number_category<Number>::type,
-       boost::mpl::int_<500> // not a number type
+       std::integral_constant<int, 500> // not a number type
        >::type fp_test_type;
 
    test_specific<Number>(fp_test_type());

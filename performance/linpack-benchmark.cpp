@@ -47,7 +47,7 @@ std::ostream& operator<<(std::ostream& os, const __float128& f)
 namespace boost {
 
 template <>
-struct has_left_shift<std::basic_ostream<char>, __float128> : public mpl::true_
+struct has_left_shift<std::basic_ostream<char>, __float128> : public std::integral_constant<bool, true>
 {};
 
 template <>

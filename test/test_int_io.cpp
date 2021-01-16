@@ -104,17 +104,17 @@ void do_round_trip(const T& val)
 }
 
 template <class T>
-void negative_round_trip(T val, const boost::mpl::true_&)
+void negative_round_trip(T val, const std::integral_constant<bool, true>&)
 {
    do_round_trip(T(-val));
 }
 template <class T>
-void negative_round_trip(T, const boost::mpl::false_&)
+void negative_round_trip(T, const std::integral_constant<bool, false>&)
 {
 }
 
 template <class T>
-void negative_spots(const boost::mpl::true_&)
+void negative_spots(const std::integral_constant<bool, true>&)
 {
    BOOST_CHECK_EQUAL(T(-1002).str(), "-1002");
    if (!std::numeric_limits<T>::is_modulo)
@@ -126,7 +126,7 @@ void negative_spots(const boost::mpl::true_&)
    }
 }
 template <class T>
-void negative_spots(const boost::mpl::false_&)
+void negative_spots(const std::integral_constant<bool, false>&)
 {
 }
 
@@ -137,7 +137,7 @@ void test_round_trip()
    {
       T val = generate_random<T>();
       do_round_trip(val);
-      negative_round_trip(val, boost::mpl::bool_<std::numeric_limits<T>::is_signed>());
+      negative_round_trip(val, std::integral_constant<bool, std::numeric_limits<T>::is_signed>());
    }
 
    BOOST_CHECK_EQUAL(T(1002).str(), "1002");
@@ -151,7 +151,7 @@ void test_round_trip()
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::dec), "1002");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::dec | std::ios_base::showbase), "1002");
 
-   negative_spots<T>(boost::mpl::bool_<std::numeric_limits<T>::is_signed>());
+   negative_spots<T>(std::integral_constant<bool, std::numeric_limits<T>::is_signed>());
 }
 
 int main()

@@ -51,7 +51,7 @@ given the limitations of the type and our internal requirements".]]
 given the limitations of the type and our internal requirements".]]
 ]
 
-The type of `number_category<cpp_bin_float<Args...> >::type` is `mpl::int_<number_kind_floating_point>`.
+The type of `number_category<cpp_bin_float<Args...> >::type` is `std::integral_constant<int, number_kind_floating_point>`.
 
 More information on this type can be found in the [link boost_multiprecision.tut.floats.cpp_bin_float tutorial].
 

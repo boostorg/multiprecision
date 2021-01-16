@@ -6,14 +6,37 @@
 #ifndef BOOST_MP_IS_BACKEND_HPP
 #define BOOST_MP_IS_BACKEND_HPP
 
-#include <boost/mpl/has_xxx.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 
 namespace boost { namespace multiprecision { namespace detail {
 
-BOOST_MPL_HAS_XXX_TRAIT_DEF(signed_types)
-BOOST_MPL_HAS_XXX_TRAIT_DEF(unsigned_types)
-BOOST_MPL_HAS_XXX_TRAIT_DEF(float_types)
+template <class T>
+struct has_signed_types
+{
+   template <class U>
+   static double check(U*, typename U::signed_types* = 0);
+   static char   check(...);
+   static T* get();
+   static constexpr bool value = sizeof(check(get())) == sizeof(double);
+};
+template <class T>
+struct has_unsigned_types
+{
+   template <class U>
+   static double check(U*, typename U::unsigned_types* = 0);
+   static char   check(...);
+   static T* get();
+   static constexpr bool value = sizeof(check(get())) == sizeof(double);
+};
+template <class T>
+struct has_float_types
+{
+   template <class U>
+   static double check(U*, typename U::float_types* = 0);
+   static char   check(...);
+   static T* get();
+   static constexpr bool value = sizeof(check(get())) == sizeof(double);
+};
 
 template <class T>
 struct is_backend

@@ -47,18 +47,18 @@ struct NumTraits<boost::multiprecision::number<Backend, ExpressionTemplates> >
    {
       return (std::numeric_limits<Real>::min)();
    }
-   static int digits10_imp(const boost::mpl::true_&)
+   static int digits10_imp(const std::integral_constant<bool, true>&)
    {
       return std::numeric_limits<Real>::digits10;
    }
    template <bool B>
-   static int digits10_imp(const boost::mpl::bool_<B>&)
+   static int digits10_imp(const std::integral_constant<bool, B>&)
    {
       return Real::default_precision();
    }
    static int digits10()
    {
-      return digits10_imp(boost::mpl::bool_ < std::numeric_limits<Real>::digits10 && (std::numeric_limits<Real>::digits10 != INT_MAX) ? true : false > ());
+      return digits10_imp(std::integral_constant<bool, std::numeric_limits<Real>::digits10 && (std::numeric_limits<Real>::digits10 != INT_MAX) ? true : false > ());
    }
 };
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>

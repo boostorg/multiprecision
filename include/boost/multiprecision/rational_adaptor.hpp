@@ -181,7 +181,7 @@ struct rational_adaptor
    const rational_type& data() const { return m_value; }
 
    template <class Archive>
-   void serialize(Archive& ar, const mpl::true_&)
+   void serialize(Archive& ar, const std::integral_constant<bool, true>&)
    {
       // Saving
       integer_type n(m_value.numerator()), d(m_value.denominator());
@@ -189,7 +189,7 @@ struct rational_adaptor
       ar&          boost::make_nvp("denominator", d);
    }
    template <class Archive>
-   void serialize(Archive& ar, const mpl::false_&)
+   void serialize(Archive& ar, const std::integral_constant<bool, false>&)
    {
       // Loading
       integer_type n, d;
@@ -201,7 +201,8 @@ struct rational_adaptor
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
       typedef typename Archive::is_saving tag;
-      serialize(ar, tag());
+      typedef std::integral_constant<bool, tag::value> saving_tag;
+      serialize(ar, saving_tag());
    }
 
  private:
@@ -296,7 +297,7 @@ struct expression_template_default<backends::rational_adaptor<IntBackend> > : pu
 {};
 
 template <class IntBackend>
-struct number_category<backends::rational_adaptor<IntBackend> > : public mpl::int_<number_kind_rational>
+struct number_category<backends::rational_adaptor<IntBackend> > : public std::integral_constant<int, number_kind_rational>
 {};
 
 using boost::multiprecision::backends::rational_adaptor;

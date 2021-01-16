@@ -30,11 +30,11 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
 
 [table Compulsory Requirements on the Backend type.
 [[Expression][Return Type][Comments][Throws]]
-[[`B::signed_types`][`mpl::list<type-list>`][A list of signed integral types that can be assigned to type B.  The types shall be
+[[`B::signed_types`][`std::tuple<type-list>`][A list of signed integral types that can be assigned to type B.  The types shall be
                    listed in order of size, smallest first, and shall terminate in the type that is `std::intmax_t`.][[space]]]
-[[`B::unsigned_types`][`mpl::list<type-list>`][A list of unsigned integral types that can be assigned to type B.  The types shall be
+[[`B::unsigned_types`][`std::tuple<type-list>`][A list of unsigned integral types that can be assigned to type B.  The types shall be
                    listed in order of size, smallest first, and shall terminate in the type that is `std::uintmax_t`.][[space]]]
-[[`B::float_types`][`mpl::list<type-list>`][A list of floating-point types that can be assigned to type B.The types shall be
+[[`B::float_types`][`std::tuple<type-list>`][A list of floating-point types that can be assigned to type B.The types shall be
                    listed in order of size, smallest first, and shall terminate in type `long double`.][[space]]]
 [[`B::exponent_type`][A signed integral type.][The type of the exponent of type B.  This type is required only for floating-point types.][[space]]]
 [[`B()`][ ][Default constructor.][[space]]]
@@ -77,7 +77,7 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
 [[`eval_floor(b, cb)`][`void`][Stores the floor of `cb` in `b`, only required when `B` is a floating-point type.][[space]]]
 [[`eval_ceil(b, cb)`][`void`][Stores the ceiling of `cb` in `b`, only required when `B` is a floating-point type.][[space]]]
 [[`eval_sqrt(b, cb)`][`void`][Stores the square root of `cb` in `b`, only required when `B` is a floating-point type.][[space]]]
-[[`boost::multiprecision::number_category<B>::type`][`mpl::int_<N>`][`N` is one of the values `number_kind_integer`, `number_kind_floating_point`, `number_kind_complex`, `number_kind_rational` or `number_kind_fixed_point`.
+[[`boost::multiprecision::number_category<B>::type`][`std::integral_constant<int, N>`][`N` is one of the values `number_kind_integer`, `number_kind_floating_point`, `number_kind_complex`, `number_kind_rational` or `number_kind_fixed_point`.
                                                 Defaults to `number_kind_floating_point`.][[space]]]
 [[`eval_conj(b, cb)`][`void`][Sets `b` to the complex conjugate of `cb`.  Required for complex types only - other types have a sensible default.][[space]]]
 [[`eval_proj(b, cb)`][`void`][Sets `b` to the Riemann projection of `cb`.  Required for complex types only - other types have a sensible default.][[space]]]
@@ -141,11 +141,11 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
             When not provided, the default implementation returns `eval_lt(cb, a)`.][[space]]]
 [[`eval_is_zero(cb)`][`bool`][Returns `true` if `cb` is zero, otherwise `false`.  The default version of this function
             returns `cb.compare(ui_type(0)) == 0`, where `ui_type` is `ui_type` is
-            `typename mpl::front<typename B::unsigned_types>::type`.][[space]]]
+            `typename std::tuple_element<0, typename B::unsigned_types>::type`.][[space]]]
 [[`eval_get_sign(cb)`][`int`][Returns a value < zero if `cb` is negative, a value > zero if `cb` is positive, and zero if `cb` is zero.
             The default version of this function
             returns `cb.compare(ui_type(0))`, where `ui_type` is `ui_type` is
-            `typename mpl::front<typename B::unsigned_types>::type`.][[space]]]
+            `typename std::tuple_element<0, typename B::unsigned_types>::type`.][[space]]]
 
 [[['Basic arithmetic:]]]
 [[`eval_add(b, a)`][`void`][Adds `a` to `b`.  The type of `a` shall be listed in one of the type lists
@@ -234,10 +234,10 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
             [`std::overflow_error` if cb has the value zero, and `std::numeric_limits<number<B> >::has_infinity == false`]]
 [[`eval_increment(b)`][void][Increments the value of `b` by one.
             When not provided, does the equivalent of `eval_add(b, static_cast<ui_type>(1u))`.
-            Where `ui_type` is `typename mpl::front<typename B::unsigned_types>::type`.][[space]]]
+            Where `ui_type` is `typename std::tuple_element<0, typename B::unsigned_types>::type`.][[space]]]
 [[`eval_decrement(b)`][void][Decrements the value of `b` by one.
             When not provided, does the equivalent of `eval_subtract(b, static_cast<ui_type>(1u))`.
-            Where `ui_type` is `typename mpl::front<typename B::unsigned_types>::type`.][[space]]]
+            Where `ui_type` is `typename std::tuple_element<0, typename B::unsigned_types>::type`.][[space]]]
 
 [[['Integer specific operations:]]]
 [[`eval_modulus(b, a)`][`void`][Computes `b %= cb`, only required when `B` is an integer type.  The type of `a` shall be listed in one of the type lists

@@ -56,7 +56,7 @@ class cpp_dec_float;
 } // namespace backends
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-struct number_category<backends::cpp_dec_float<Digits10, ExponentType, Allocator> > : public mpl::int_<number_kind_floating_point>
+struct number_category<backends::cpp_dec_float<Digits10, ExponentType, Allocator> > : public std::integral_constant<int, number_kind_floating_point>
 {};
 
 namespace backends {
@@ -72,9 +72,9 @@ class cpp_dec_float
    static_assert(sizeof(ExponentType) > 1, "ExponentType is too small.");
 
  public:
-   typedef mpl::list<boost::long_long_type>  signed_types;
-   typedef mpl::list<boost::ulong_long_type> unsigned_types;
-   typedef mpl::list<double, long double>    float_types;
+   typedef std::tuple<boost::long_long_type>  signed_types;
+   typedef std::tuple<boost::ulong_long_type> unsigned_types;
+   typedef std::tuple<double, long double>    float_types;
    typedef ExponentType                      exponent_type;
 
    static const std::int32_t cpp_dec_float_radix             = 10L;

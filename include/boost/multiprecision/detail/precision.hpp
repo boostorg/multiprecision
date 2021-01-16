@@ -13,12 +13,12 @@
 namespace boost { namespace multiprecision { namespace detail {
 
 template <class B, boost::multiprecision::expression_template_option ET>
-inline constexpr unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>&, const mpl::false_&)
+inline constexpr unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>&, const std::integral_constant<bool, false>&)
 {
    return std::numeric_limits<boost::multiprecision::number<B, ET> >::digits10;
 }
 template <class B, boost::multiprecision::expression_template_option ET>
-inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>& val, const mpl::true_&)
+inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>& val, const std::integral_constant<bool, true>&)
 {
    //
    // We have an arbitrary precision integer, take it's "precision" as the
@@ -38,7 +38,7 @@ template <class B, boost::multiprecision::expression_template_option ET>
 inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& val, const std::integral_constant<bool, false>&)
 {
    return current_precision_of_last_chance_imp(val,
-                                               mpl::bool_ <
+                                               std::integral_constant<bool, 
                                                        std::numeric_limits<boost::multiprecision::number<B, ET> >::is_specialized &&
                                                    std::numeric_limits<boost::multiprecision::number<B, ET> >::is_integer && std::numeric_limits<boost::multiprecision::number<B, ET> >::is_exact && !std::numeric_limits<boost::multiprecision::number<B, ET> >::is_modulo > ());
 }
@@ -158,10 +158,10 @@ struct scoped_default_precision<R, true>
 };
 
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T*, const mpl::false_&) {}
+inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T*, const std::integral_constant<bool, false>&) {}
 
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T* obj, const mpl::true_&)
+inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T* obj, const std::integral_constant<bool, true>&)
 {
    if (obj->precision() != T::default_precision())
    {
@@ -172,7 +172,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T* obj, const mpl::
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T* obj)
 {
-   maybe_promote_precision(obj, mpl::bool_<boost::multiprecision::detail::is_variable_precision<T>::value>());
+   maybe_promote_precision(obj, std::integral_constant<bool, boost::multiprecision::detail::is_variable_precision<T>::value>());
 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR

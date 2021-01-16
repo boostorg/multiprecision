@@ -28,9 +28,9 @@ namespace backends {
 template <class Arithmetic>
 struct arithmetic_backend
 {
-   typedef mpl::list<short, int, long, long long>                                 signed_types;
-   typedef mpl::list<unsigned short, unsigned, unsigned long, unsigned long long> unsigned_types;
-   typedef mpl::list<float, double, long double>                                  float_types;
+   typedef std::tuple<short, int, long, long long>                                 signed_types;
+   typedef std::tuple<unsigned short, unsigned, unsigned long, unsigned long long> unsigned_types;
+   typedef std::tuple<float, double, long double>                                  float_types;
    typedef int                                                                    exponent_type;
 
    BOOST_MP_CXX14_CONSTEXPR arithmetic_backend() : m_value(0) {}
@@ -83,17 +83,17 @@ struct arithmetic_backend
       ss << std::setprecision(digits ? digits : std::numeric_limits<Arithmetic>::digits10 + 4) << m_value;
       return ss.str();
    }
-   BOOST_MP_CXX14_CONSTEXPR void do_negate(const mpl::true_&)
+   BOOST_MP_CXX14_CONSTEXPR void do_negate(const std::integral_constant<bool, true>&)
    {
       m_value = 1 + ~m_value;
    }
-   BOOST_MP_CXX14_CONSTEXPR void do_negate(const mpl::false_&)
+   BOOST_MP_CXX14_CONSTEXPR void do_negate(const std::integral_constant<bool, false>&)
    {
       m_value = -m_value;
    }
    BOOST_MP_CXX14_CONSTEXPR void negate()
    {
-      do_negate(mpl::bool_<boost::multiprecision::detail::is_unsigned<Arithmetic>::value>());
+      do_negate(std::integral_constant<bool, boost::multiprecision::detail::is_unsigned<Arithmetic>::value>());
    }
    BOOST_MP_CXX14_CONSTEXPR int compare(const arithmetic_backend& o) const
    {
@@ -549,7 +549,7 @@ inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const arithmetic_backend<
 using boost::multiprecision::backends::arithmetic_backend;
 
 template <class Arithmetic>
-struct number_category<arithmetic_backend<Arithmetic> > : public mpl::int_<boost::multiprecision::detail::is_integral<Arithmetic>::value ? number_kind_integer : number_kind_floating_point>
+struct number_category<arithmetic_backend<Arithmetic> > : public std::integral_constant<int, boost::multiprecision::detail::is_integral<Arithmetic>::value ? number_kind_integer : number_kind_floating_point>
 {};
 
 namespace detail {

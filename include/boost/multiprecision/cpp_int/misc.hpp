@@ -38,7 +38,7 @@ struct numeric_limits_workaround<R, false>
 };
 
 template <class R, class CppInt>
-BOOST_MP_CXX14_CONSTEXPR void check_in_range(const CppInt& val, const mpl::int_<checked>&)
+BOOST_MP_CXX14_CONSTEXPR void check_in_range(const CppInt& val, const std::integral_constant<int, checked>&)
 {
    typedef typename boost::multiprecision::detail::canonical<R, CppInt>::type cast_type;
 
@@ -56,7 +56,7 @@ BOOST_MP_CXX14_CONSTEXPR void check_in_range(const CppInt& val, const mpl::int_<
    }
 }
 template <class R, class CppInt>
-inline BOOST_MP_CXX14_CONSTEXPR void check_in_range(const CppInt& /*val*/, const mpl::int_<unchecked>&) BOOST_NOEXCEPT {}
+inline BOOST_MP_CXX14_CONSTEXPR void check_in_range(const CppInt& /*val*/, const std::integral_constant<int, unchecked>&) BOOST_NOEXCEPT {}
 
 inline BOOST_MP_CXX14_CONSTEXPR void check_is_negative(const std::integral_constant<bool, true>&) BOOST_NOEXCEPT {}
 inline void                          check_is_negative(const std::integral_constant<bool, false>&)
@@ -79,7 +79,7 @@ template <class R, unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignTy
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<R>::value && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value, void>::type
 eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& backend)
 {
-   typedef mpl::int_<Checked1> checked_type;
+   typedef std::integral_constant<int, Checked1> checked_type;
    check_in_range<R>(backend, checked_type());
 
    BOOST_IF_CONSTEXPR(numeric_limits_workaround<R>::digits < cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
@@ -1111,11 +1111,11 @@ eval_lcm(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& r
    result.normalize(); // result may overflow the specified number of bits
 }
 
-inline void conversion_overflow(const mpl::int_<checked>&)
+inline void conversion_overflow(const std::integral_constant<int, checked>&)
 {
    BOOST_THROW_EXCEPTION(std::overflow_error("Overflow in conversion to narrower type"));
 }
-inline BOOST_MP_CXX14_CONSTEXPR void conversion_overflow(const mpl::int_<unchecked>&) {}
+inline BOOST_MP_CXX14_CONSTEXPR void conversion_overflow(const std::integral_constant<int, unchecked>&) {}
 
 template <class R, unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<

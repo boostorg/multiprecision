@@ -33,7 +33,7 @@ struct mpc_complex_backend;
 } // namespace backends
 
 template <unsigned digits10>
-struct number_category<backends::mpc_complex_backend<digits10> > : public mpl::int_<number_kind_complex>
+struct number_category<backends::mpc_complex_backend<digits10> > : public std::integral_constant<int, number_kind_complex>
 {};
 
 namespace backends {
@@ -62,13 +62,13 @@ template <unsigned digits10>
 struct mpc_complex_imp
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef mpl::list<long, boost::long_long_type>           signed_types;
-   typedef mpl::list<unsigned long, boost::ulong_long_type> unsigned_types;
+   typedef std::tuple<long, boost::long_long_type>           signed_types;
+   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
 #else
-   typedef mpl::list<long>          signed_types;
-   typedef mpl::list<unsigned long> unsigned_types;
+   typedef std::tuple<long>          signed_types;
+   typedef std::tuple<unsigned long> unsigned_types;
 #endif
-   typedef mpl::list<double, long double> float_types;
+   typedef std::tuple<double, long double> float_types;
    typedef long                           exponent_type;
 
    mpc_complex_imp()
@@ -1475,7 +1475,7 @@ struct is_variable_precision<backends::mpc_complex_backend<0> > : public std::in
 } // namespace detail
 
 template <>
-struct number_category<detail::canonical<mpc_t, backends::mpc_complex_backend<0> >::type> : public mpl::int_<number_kind_floating_point>
+struct number_category<detail::canonical<mpc_t, backends::mpc_complex_backend<0> >::type> : public std::integral_constant<int, number_kind_floating_point>
 {};
 
 using boost::multiprecision::backends::mpc_complex_backend;

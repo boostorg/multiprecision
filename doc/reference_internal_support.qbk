@@ -50,7 +50,7 @@ authors of backend types should generally specialise one of the traits above, ra
    template <class T>
    is_unsigned_number;
 
-These two traits inherit from either `mpl::true_` or `mpl::false_`, by default types are assumed to be signed unless
+These two traits inherit from either `std::integral_constant<bool, true>` or `std::integral_constant<bool, false>`, by default types are assumed to be signed unless
 `is_unsigned_number` is specialized for that type.
 
 [endsect]

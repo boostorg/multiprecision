@@ -63,13 +63,13 @@ struct gmp_rational;
 } // namespace backends
 
 template <>
-struct number_category<backends::gmp_int> : public mpl::int_<number_kind_integer>
+struct number_category<backends::gmp_int> : public std::integral_constant<int, number_kind_integer>
 {};
 template <>
-struct number_category<backends::gmp_rational> : public mpl::int_<number_kind_rational>
+struct number_category<backends::gmp_rational> : public std::integral_constant<int, number_kind_rational>
 {};
 template <unsigned digits10>
-struct number_category<backends::gmp_float<digits10> > : public mpl::int_<number_kind_floating_point>
+struct number_category<backends::gmp_float<digits10> > : public std::integral_constant<int, number_kind_floating_point>
 {};
 
 namespace backends {
@@ -84,13 +84,13 @@ template <unsigned digits10>
 struct gmp_float_imp
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef mpl::list<long, boost::long_long_type>           signed_types;
-   typedef mpl::list<unsigned long, boost::ulong_long_type> unsigned_types;
+   typedef std::tuple<long, boost::long_long_type>           signed_types;
+   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
 #else
-   typedef mpl::list<long>          signed_types;
-   typedef mpl::list<unsigned long> unsigned_types;
+   typedef std::tuple<long>          signed_types;
+   typedef std::tuple<unsigned long> unsigned_types;
 #endif
-   typedef mpl::list<double, long double> float_types;
+   typedef std::tuple<double, long double> float_types;
    typedef long                           exponent_type;
 
    gmp_float_imp() BOOST_NOEXCEPT
@@ -1111,13 +1111,13 @@ inline std::size_t hash_value(const gmp_float<Digits10>& val)
 struct gmp_int
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef mpl::list<long, boost::long_long_type>           signed_types;
-   typedef mpl::list<unsigned long, boost::ulong_long_type> unsigned_types;
+   typedef std::tuple<long, boost::long_long_type>           signed_types;
+   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
 #else
-   typedef mpl::list<long>          signed_types;
-   typedef mpl::list<unsigned long> unsigned_types;
+   typedef std::tuple<long>          signed_types;
+   typedef std::tuple<unsigned long> unsigned_types;
 #endif
-   typedef mpl::list<double, long double> float_types;
+   typedef std::tuple<double, long double> float_types;
 
    gmp_int()
    {
@@ -2017,13 +2017,13 @@ void eval_add(gmp_rational& t, const gmp_rational& o);
 struct gmp_rational
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef mpl::list<long, boost::long_long_type>           signed_types;
-   typedef mpl::list<unsigned long, boost::ulong_long_type> unsigned_types;
+   typedef std::tuple<long, boost::long_long_type>           signed_types;
+   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
 #else
-   typedef mpl::list<long>          signed_types;
-   typedef mpl::list<unsigned long> unsigned_types;
+   typedef std::tuple<long>          signed_types;
+   typedef std::tuple<unsigned long> unsigned_types;
 #endif
-   typedef mpl::list<double, long double> float_types;
+   typedef std::tuple<double, long double> float_types;
 
    gmp_rational()
    {
@@ -2586,13 +2586,13 @@ struct transcendental_reduction_type<boost::multiprecision::backends::gmp_float<
 } // namespace detail
 
 template <>
-struct number_category<detail::canonical<mpz_t, gmp_int>::type> : public mpl::int_<number_kind_integer>
+struct number_category<detail::canonical<mpz_t, gmp_int>::type> : public std::integral_constant<int, number_kind_integer>
 {};
 template <>
-struct number_category<detail::canonical<mpq_t, gmp_rational>::type> : public mpl::int_<number_kind_rational>
+struct number_category<detail::canonical<mpq_t, gmp_rational>::type> : public std::integral_constant<int, number_kind_rational>
 {};
 template <>
-struct number_category<detail::canonical<mpf_t, gmp_float<0> >::type> : public mpl::int_<number_kind_floating_point>
+struct number_category<detail::canonical<mpf_t, gmp_float<0> >::type> : public std::integral_constant<int, number_kind_floating_point>
 {};
 
 namespace detail {

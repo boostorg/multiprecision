@@ -164,7 +164,7 @@ void eval_sin(T& result, const T& x)
 
    typedef typename boost::multiprecision::detail::canonical<std::int32_t, T>::type  si_type;
    typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
-   typedef typename mpl::front<typename T::float_types>::type                          fp_type;
+   typedef typename std::tuple_element<0, typename T::float_types>::type                          fp_type;
 
    switch (eval_fpclassify(x))
    {
@@ -563,7 +563,7 @@ void eval_asin(T& result, const T& x)
 {
    static_assert(number_category<T>::value == number_kind_floating_point, "The asin function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
-   typedef typename mpl::front<typename T::float_types>::type                          fp_type;
+   typedef typename std::tuple_element<0, typename T::float_types>::type                          fp_type;
 
    if (&result == &x)
    {
@@ -736,7 +736,7 @@ inline void eval_acos(T& result, const T& x)
       return;
    }
 
-   typedef typename mpl::front<typename T::float_types>::type fp_type;
+   typedef typename std::tuple_element<0, typename T::float_types>::type fp_type;
 
    if (xx.compare(fp_type(1e-3)) < 0)
    {
@@ -820,7 +820,7 @@ void eval_atan(T& result, const T& x)
    static_assert(number_category<T>::value == number_kind_floating_point, "The atan function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<std::int32_t, T>::type  si_type;
    typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
-   typedef typename mpl::front<typename T::float_types>::type                          fp_type;
+   typedef typename std::tuple_element<0, typename T::float_types>::type                          fp_type;
 
    switch (eval_fpclassify(x))
    {

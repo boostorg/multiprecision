@@ -43,9 +43,9 @@ struct skeleton_backend
    // present in the list will get promoted to the next wider type that is
    // in the list whenever mixed arithmetic involving that type is encountered.
    //
-   typedef mpl::list</*signed char, short, int, long,*/ long long>                                     signed_types;
-   typedef mpl::list</* unsigned char, unsigned short, unsigned, unsigned long,*/ unsigned long long>  unsigned_types;
-   typedef mpl::list</*float, double,*/ long double>                                                   float_types;
+   typedef std::tuple</*signed char, short, int, long,*/ long long>                                     signed_types;
+   typedef std::tuple</* unsigned char, unsigned short, unsigned, unsigned long,*/ unsigned long long>  unsigned_types;
+   typedef std::tuple</*float, double,*/ long double>                                                   float_types;
    //
    // This typedef is only required if this is a floating point type, it is the type
    // which holds the exponent:
@@ -1088,7 +1088,7 @@ typedef number<skeleton_backend, et_off> skeleton_number;
 //    number_kind_complex
 //
 template<>
-struct number_category<skeleton_backend > : public mpl::int_<number_kind_floating_point>
+struct number_category<skeleton_backend > : public std::integral_constant<int, number_kind_floating_point>
 {};
 
 //

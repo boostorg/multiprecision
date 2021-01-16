@@ -12,7 +12,7 @@ namespace multiprecision {
 namespace detail {
 
 template <class Backend, class Unsigned>
-void assign_bits(Backend& val, Unsigned bits, unsigned bit_location, unsigned chunk_bits, const mpl::false_& tag)
+void assign_bits(Backend& val, Unsigned bits, unsigned bit_location, unsigned chunk_bits, const std::integral_constant<bool, false>& tag)
 {
    unsigned limb  = bit_location / (sizeof(limb_type) * CHAR_BIT);
    unsigned shift = bit_location % (sizeof(limb_type) * CHAR_BIT);
@@ -42,7 +42,7 @@ void assign_bits(Backend& val, Unsigned bits, unsigned bit_location, unsigned ch
    }
 }
 template <class Backend, class Unsigned>
-void assign_bits(Backend& val, Unsigned bits, unsigned bit_location, unsigned chunk_bits, const mpl::true_&)
+void assign_bits(Backend& val, Unsigned bits, unsigned bit_location, unsigned chunk_bits, const std::integral_constant<bool, true>&)
 {
    typedef typename Backend::local_limb_type local_limb_type;
    //
@@ -66,7 +66,7 @@ void assign_bits(Backend& val, Unsigned bits, unsigned bit_location, unsigned ch
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
-inline void resize_to_bit_size(cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& newval, unsigned bits, const mpl::false_&)
+inline void resize_to_bit_size(cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& newval, unsigned bits, const std::integral_constant<bool, false>&)
 {
    unsigned limb_count = static_cast<unsigned>(bits / (sizeof(limb_type) * CHAR_BIT));
    if (bits % (sizeof(limb_type) * CHAR_BIT))
@@ -78,7 +78,7 @@ inline void resize_to_bit_size(cpp_int_backend<MinBits, MaxBits, SignType, Check
    std::memset(newval.limbs(), 0, newval.size() * sizeof(limb_type));
 }
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
-inline void resize_to_bit_size(cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& newval, unsigned, const mpl::true_&)
+inline void resize_to_bit_size(cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& newval, unsigned, const std::integral_constant<bool, true>&)
 {
    *newval.limbs() = 0;
 }
@@ -177,7 +177,7 @@ import_bits(
 namespace detail {
 
 template <class Backend>
-std::uintmax_t extract_bits(const Backend& val, unsigned location, unsigned count, const mpl::false_& tag)
+std::uintmax_t extract_bits(const Backend& val, unsigned location, unsigned count, const std::integral_constant<bool, false>& tag)
 {
    unsigned         limb   = location / (sizeof(limb_type) * CHAR_BIT);
    unsigned         shift  = location % (sizeof(limb_type) * CHAR_BIT);
@@ -194,7 +194,7 @@ std::uintmax_t extract_bits(const Backend& val, unsigned location, unsigned coun
 }
 
 template <class Backend>
-inline std::uintmax_t extract_bits(const Backend& val, unsigned location, unsigned count, const mpl::true_&)
+inline std::uintmax_t extract_bits(const Backend& val, unsigned location, unsigned count, const std::integral_constant<bool, true>&)
 {
    typename Backend::local_limb_type result = *val.limbs();
    typename Backend::local_limb_type mask   = count >= std::numeric_limits<typename Backend::local_limb_type>::digits ? ~static_cast<typename Backend::local_limb_type>(0) : (static_cast<typename Backend::local_limb_type>(1u) << count) - 1;

@@ -27,13 +27,13 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq(const B& a, const B& b)
    return a.compare(b) == 0;
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq_imp(const T& a, const U& b, const mpl::true_&)
+inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq_imp(const T& a, const U& b, const std::integral_constant<bool, true>&)
 {
    typename boost::multiprecision::detail::number_from_backend<T, U>::type t(b);
    return eval_eq(a, t.backend());
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq_imp(const T& a, const U& b, const mpl::false_&)
+inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq_imp(const T& a, const U& b, const std::integral_constant<bool, false>&)
 {
    typename boost::multiprecision::detail::number_from_backend<U, T>::type t(a);
    return eval_eq(t.backend(), b);
@@ -41,7 +41,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq_imp(const T& a, const U& b, const m
 template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq(const T& a, const U& b)
 {
-   typedef mpl::bool_<boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
+   typedef std::integral_constant<bool, boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
    return eval_eq_imp(a, b, tag_type());
 }
 
@@ -51,13 +51,13 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_lt(const B& a, const B& b)
    return a.compare(b) < 0;
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR bool eval_lt_imp(const T& a, const U& b, const mpl::true_&)
+inline BOOST_MP_CXX14_CONSTEXPR bool eval_lt_imp(const T& a, const U& b, const std::integral_constant<bool, true>&)
 {
    typename boost::multiprecision::detail::number_from_backend<T, U>::type t(b);
    return eval_lt(a, t.backend());
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR bool eval_lt_imp(const T& a, const U& b, const mpl::false_&)
+inline BOOST_MP_CXX14_CONSTEXPR bool eval_lt_imp(const T& a, const U& b, const std::integral_constant<bool, false>&)
 {
    typename boost::multiprecision::detail::number_from_backend<U, T>::type t(a);
    return eval_lt(t.backend(), b);
@@ -65,7 +65,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_lt_imp(const T& a, const U& b, const m
 template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR bool eval_lt(const T& a, const U& b)
 {
-   typedef mpl::bool_<boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
+   typedef std::integral_constant<bool, boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
    return eval_lt_imp(a, b, tag_type());
 }
 
@@ -75,13 +75,13 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_gt(const B& a, const B& b)
    return a.compare(b) > 0;
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR bool eval_gt_imp(const T& a, const U& b, const mpl::true_&)
+inline BOOST_MP_CXX14_CONSTEXPR bool eval_gt_imp(const T& a, const U& b, const std::integral_constant<bool, true>&)
 {
    typename boost::multiprecision::detail::number_from_backend<T, U>::type t(b);
    return eval_gt(a, t.backend());
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR bool eval_gt_imp(const T& a, const U& b, const mpl::false_&)
+inline BOOST_MP_CXX14_CONSTEXPR bool eval_gt_imp(const T& a, const U& b, const std::integral_constant<bool, false>&)
 {
    typename boost::multiprecision::detail::number_from_backend<U, T>::type t(a);
    return eval_gt(t.backend(), b);
@@ -89,7 +89,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_gt_imp(const T& a, const U& b, const m
 template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR bool eval_gt(const T& a, const U& b)
 {
-   typedef mpl::bool_<boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
+   typedef std::integral_constant<bool, boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
    return eval_gt_imp(a, b, tag_type());
 }
 
@@ -98,7 +98,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_gt(const T& a, const U& b)
 namespace detail {
 
 template <class Num, class Val>
-struct is_valid_mixed_compare : public mpl::false_
+struct is_valid_mixed_compare : public std::integral_constant<bool, false>
 {};
 
 template <class B, expression_template_option ET, class Val>
@@ -106,7 +106,7 @@ struct is_valid_mixed_compare<number<B, ET>, Val> : public std::is_convertible<V
 {};
 
 template <class B, expression_template_option ET>
-struct is_valid_mixed_compare<number<B, ET>, number<B, ET> > : public mpl::false_
+struct is_valid_mixed_compare<number<B, ET>, number<B, ET> > : public std::integral_constant<bool, false>
 {};
 
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>

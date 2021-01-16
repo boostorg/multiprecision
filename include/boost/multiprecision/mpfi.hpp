@@ -35,7 +35,7 @@ struct mpfi_float_backend;
 } // namespace backends
 
 template <unsigned digits10>
-struct number_category<backends::mpfi_float_backend<digits10> > : public mpl::int_<number_kind_floating_point>
+struct number_category<backends::mpfi_float_backend<digits10> > : public std::integral_constant<int, number_kind_floating_point>
 {};
 
 struct interval_error : public std::runtime_error
@@ -65,13 +65,13 @@ template <unsigned digits10>
 struct mpfi_float_imp
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef mpl::list<long, boost::long_long_type>           signed_types;
-   typedef mpl::list<unsigned long, boost::ulong_long_type> unsigned_types;
+   typedef std::tuple<long, boost::long_long_type>           signed_types;
+   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
 #else
-   typedef mpl::list<long>          signed_types;
-   typedef mpl::list<unsigned long> unsigned_types;
+   typedef std::tuple<long>          signed_types;
+   typedef std::tuple<unsigned long> unsigned_types;
 #endif
-   typedef mpl::list<double, long double> float_types;
+   typedef std::tuple<double, long double> float_types;
    typedef long                           exponent_type;
 
    mpfi_float_imp()
@@ -1082,7 +1082,7 @@ inline std::size_t hash_value(const mpfi_float_backend<Digits10>& val)
 }
 
 template <class To, unsigned D>
-void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const mpl::int_<number_kind_integer>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
+void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const std::integral_constant<int, number_kind_integer>& to_type, const std::integral_constant<int, number_kind_floating_point>& from_type)
 {
    using boost::multiprecision::detail::generic_interconvert;
    mpfr_float_backend<D> t;
@@ -1091,7 +1091,7 @@ void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const mpl::
 }
 
 template <class To, unsigned D>
-void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const mpl::int_<number_kind_rational>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
+void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const std::integral_constant<int, number_kind_rational>& to_type, const std::integral_constant<int, number_kind_floating_point>& from_type)
 {
    using boost::multiprecision::detail::generic_interconvert;
    mpfr_float_backend<D> t;
@@ -1100,7 +1100,7 @@ void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const mpl::
 }
 
 template <class To, unsigned D>
-void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const mpl::int_<number_kind_floating_point>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
+void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const std::integral_constant<int, number_kind_floating_point>& to_type, const std::integral_constant<int, number_kind_floating_point>& from_type)
 {
    using boost::multiprecision::detail::generic_interconvert;
    mpfr_float_backend<D> t;
@@ -1117,10 +1117,10 @@ struct is_variable_precision<backends::mpfi_float_backend<0> > : public std::int
 } // namespace detail
 
 template <>
-struct number_category<detail::canonical<mpfi_t, backends::mpfi_float_backend<0> >::type> : public mpl::int_<number_kind_floating_point>
+struct number_category<detail::canonical<mpfi_t, backends::mpfi_float_backend<0> >::type> : public std::integral_constant<int, number_kind_floating_point>
 {};
 template <unsigned Digits10>
-struct is_interval_number<backends::mpfi_float_backend<Digits10> > : public mpl::true_
+struct is_interval_number<backends::mpfi_float_backend<Digits10> > : public std::integral_constant<bool, true>
 {};
 
 using boost::multiprecision::backends::mpfi_float_backend;
