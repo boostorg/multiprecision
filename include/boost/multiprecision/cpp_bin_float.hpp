@@ -1987,6 +1987,10 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
       }
       return value.second;
    }
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4127) // conditional expression is constant
+#endif
    static number_type(max)()
    {
       initializer.do_nothing();
@@ -1994,7 +1998,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
       if (!value.first)
       {
          value.first = true;
-         if (std::is_void<Allocator>::value)
+         BOOST_IF_CONSTEXPR(std::is_void<Allocator>::value)
             eval_complement(value.second.backend().bits(), value.second.backend().bits());
          else
          {
@@ -2017,6 +2021,9 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
       }
       return value.second;
    }
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
    static constexpr number_type lowest()
    {
       return -(max)();

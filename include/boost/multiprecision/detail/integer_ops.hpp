@@ -33,11 +33,6 @@ inline BOOST_MP_CXX14_CONSTEXPR Integer eval_integer_modulus(const Backend& x, I
    return abs(result);
 }
 
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable : 4127)
-#endif
-
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b)
 {
@@ -98,10 +93,6 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b)
    result = u;
    eval_left_shift(result, shift);
 }
-
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
 
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_lcm(B& result, const B& a, const B& b)

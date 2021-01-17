@@ -127,87 +127,89 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
 {
 #ifdef BOOST_MSVC
 #pragma warning(push)
-#pragma warning(disable : 4127)
+//#pragma warning(disable : 4127)
 #endif
    //
    // The code here only works when the radix of "From" is 2, we could try shifting by other
    // radixes but it would complicate things.... use a string conversion when the radix is other
    // than 2:
    //
-   if (std::numeric_limits<number<From> >::radix != 2)
+   BOOST_IF_CONSTEXPR(std::numeric_limits<number<From> >::radix != 2)
    {
       to = from.str(0, std::ios_base::fmtflags()).c_str();
       return;
    }
-
-   typedef typename canonical<unsigned char, To>::type ui_type;
-
-   using default_ops::eval_add;
-   using default_ops::eval_convert_to;
-   using default_ops::eval_fpclassify;
-   using default_ops::eval_get_sign;
-   using default_ops::eval_is_zero;
-   using default_ops::eval_subtract;
-
-   //
-   // First classify the input, then handle the special cases:
-   //
-   int c = eval_fpclassify(from);
-
-   if (c == (int)FP_ZERO)
+   else
    {
+      typedef typename canonical<unsigned char, To>::type ui_type;
+
+      using default_ops::eval_add;
+      using default_ops::eval_convert_to;
+      using default_ops::eval_fpclassify;
+      using default_ops::eval_get_sign;
+      using default_ops::eval_is_zero;
+      using default_ops::eval_subtract;
+
+      //
+      // First classify the input, then handle the special cases:
+      //
+      int c = eval_fpclassify(from);
+
+      if (c == (int)FP_ZERO)
+      {
+         to = ui_type(0);
+         return;
+      }
+      else if (c == (int)FP_NAN)
+      {
+         to = static_cast<const char*>("nan");
+         return;
+      }
+      else if (c == (int)FP_INFINITE)
+      {
+         to = static_cast<const char*>("inf");
+         if (eval_get_sign(from) < 0)
+            to.negate();
+         return;
+      }
+
+      typename From::exponent_type e;
+      From                         f, term;
       to = ui_type(0);
-      return;
-   }
-   else if (c == (int)FP_NAN)
-   {
-      to = static_cast<const char*>("nan");
-      return;
-   }
-   else if (c == (int)FP_INFINITE)
-   {
-      to = static_cast<const char*>("inf");
-      if (eval_get_sign(from) < 0)
-         to.negate();
-      return;
-   }
 
-   typename From::exponent_type e;
-   From                         f, term;
-   to = ui_type(0);
+      eval_frexp(f, from, &e);
 
-   eval_frexp(f, from, &e);
+      static const int shift = std::numeric_limits<std::intmax_t>::digits - 1;
 
-   static const int shift = std::numeric_limits<std::intmax_t>::digits - 1;
-
-   while (!eval_is_zero(f))
-   {
-      // extract int sized bits from f:
-      eval_ldexp(f, f, shift);
-      eval_floor(term, f);
-      e -= shift;
-      eval_ldexp(to, to, shift);
-      typename boost::multiprecision::detail::canonical<std::intmax_t, To>::type ll;
-      eval_convert_to(&ll, term);
-      eval_add(to, ll);
-      eval_subtract(f, term);
+      while (!eval_is_zero(f))
+      {
+         // extract int sized bits from f:
+         eval_ldexp(f, f, shift);
+         eval_floor(term, f);
+         e -= shift;
+         eval_ldexp(to, to, shift);
+         typename boost::multiprecision::detail::canonical<std::intmax_t, To>::type ll;
+         eval_convert_to(&ll, term);
+         eval_add(to, ll);
+         eval_subtract(f, term);
+      }
+      typedef typename To::exponent_type to_exponent;
+      if (e > (std::numeric_limits<to_exponent>::max)())
+      {
+         to = static_cast<const char*>("inf");
+         if (eval_get_sign(from) < 0)
+            to.negate();
+         return;
+      }
+      if (e < (std::numeric_limits<to_exponent>::min)())
+      {
+         to = ui_type(0);
+         if (eval_get_sign(from) < 0)
+            to.negate();
+         return;
+      }
+      eval_ldexp(to, to, static_cast<to_exponent>(e));
    }
-   typedef typename To::exponent_type to_exponent;
-   if (e > (std::numeric_limits<to_exponent>::max)())
-   {
-      to = static_cast<const char*>("inf");
-      if (eval_get_sign(from) < 0)
-         to.negate();
-      return;
-   }
-   if (e < (std::numeric_limits<to_exponent>::min)())
-   {
-      to = ui_type(0);
-      if (eval_get_sign(from) < 0)
-         to.negate();
-      return;
-   }
-   eval_ldexp(to, to, static_cast<to_exponent>(e));
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
@@ -241,7 +243,7 @@ R safe_convert_to_float(const LargeInteger& i)
    using std::ldexp;
    if (!i)
       return R(0);
-   if (std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::max_exponent)
+   BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::max_exponent)
    {
       LargeInteger val(i);
       if (val.sign() < 0)
@@ -253,7 +255,7 @@ R safe_convert_to_float(const LargeInteger& i)
          BOOST_ASSERT(scale_factor >= 1);
          val >>= scale_factor;
          R result = val.template convert_to<R>();
-         if (std::numeric_limits<R>::digits == 0 || std::numeric_limits<R>::digits >= std::numeric_limits<R>::max_exponent)
+         BOOST_IF_CONSTEXPR(std::numeric_limits<R>::digits == 0 || std::numeric_limits<R>::digits >= std::numeric_limits<R>::max_exponent)
          {
             //
             // Calculate and add on the remainder, only if there are more

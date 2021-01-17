@@ -52,7 +52,7 @@ namespace backends {
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
 #pragma warning(push)
-#pragma warning(disable : 4127)
+//#pragma warning(disable : 4127)
 #endif
 
 template <unsigned digits10>
@@ -1402,7 +1402,7 @@ struct gmp_int
       (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
       if (f & std::ios_base::uppercase)
          for (size_t i = 0; i < s.length(); ++i)
-            s[i] = std::toupper(s[i]);
+            s[i] = static_cast<char>(std::toupper(s[i]));
       if ((base != 10) && (f & std::ios_base::showbase))
       {
          int         pos = s[0] == '-' ? 1 : 0;

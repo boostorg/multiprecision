@@ -15,6 +15,7 @@
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 6326) // comparison of two constants
+#pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
 #include <boost/core/no_exceptions_support.hpp> // BOOST_TRY
@@ -242,7 +243,7 @@ void eval_exp(T& result, const T& x)
       // Use series for exp(x) - 1:
       //
       T lim;
-      if (std::numeric_limits<number<T, et_on> >::is_specialized)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::is_specialized)
          lim = std::numeric_limits<number<T, et_on> >::epsilon().backend();
       else
       {
@@ -402,7 +403,7 @@ void eval_log(T& result, const T& arg)
    else
       eval_subtract(result, t);
 
-   if (std::numeric_limits<number<T, et_on> >::is_specialized)
+   BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::is_specialized)
       eval_multiply(lim, result, std::numeric_limits<number<T, et_on> >::epsilon().backend());
    else
       eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value());
@@ -645,7 +646,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
       {
          result = std::numeric_limits<number<T, et_on> >::infinity().backend();
       }
-      else if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      else BOOST_IF_CONSTEXPR (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;

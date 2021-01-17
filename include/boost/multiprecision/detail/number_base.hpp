@@ -261,7 +261,7 @@ struct has_enough_bits
    {};
 };
 
-template <class Tuple, int i, int digits, bool = (i == std::tuple_size<Tuple>::value)>
+template <class Tuple, int i, int digits, bool = (i >= std::tuple_size<Tuple>::value)>
 struct find_index_of_large_enough_type
 {
    static constexpr int value = bits_of<typename std::tuple_element<i, Tuple>::type>::value >= digits ? i : find_index_of_large_enough_type<Tuple, i + 1, digits>::value;

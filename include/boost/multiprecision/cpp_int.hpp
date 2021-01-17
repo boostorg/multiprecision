@@ -1265,7 +1265,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void negate() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
-      if (Checked == checked)
+      BOOST_IF_CONSTEXPR(Checked == checked)
       {
          BOOST_THROW_EXCEPTION(std::range_error("Attempt to negate an unsigned type."));
       }
@@ -1383,9 +1383,12 @@ struct cpp_int_backend
       if (other.size() > 1)
       {
          v |= static_cast<double_limb_type>(other.limbs()[1]) << bits_per_limb;
-         if ((Checked == checked) && (other.size() > 2))
+         BOOST_IF_CONSTEXPR(Checked == checked)
          {
-            BOOST_THROW_EXCEPTION(std::range_error("Assignment of a cpp_int that is out of range for the target type."));
+            if (other.size() > 2)
+            {
+               BOOST_THROW_EXCEPTION(std::range_error("Assignment of a cpp_int that is out of range for the target type."));
+            }
          }
       }
       *this = v;

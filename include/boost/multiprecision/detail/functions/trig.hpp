@@ -15,6 +15,7 @@
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 6326) // comparison of two constants
+#pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
 template <class T>
@@ -170,7 +171,7 @@ void eval_sin(T& result, const T& x)
    {
    case FP_INFINITE:
    case FP_NAN:
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;
@@ -362,7 +363,7 @@ void eval_cos(T& result, const T& x)
    {
    case FP_INFINITE:
    case FP_NAN:
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;
@@ -576,7 +577,7 @@ void eval_asin(T& result, const T& x)
    {
    case FP_NAN:
    case FP_INFINITE:
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;
@@ -599,7 +600,7 @@ void eval_asin(T& result, const T& x)
    int c = xx.compare(ui_type(1));
    if (c > 0)
    {
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;
@@ -698,7 +699,7 @@ inline void eval_acos(T& result, const T& x)
    {
    case FP_NAN:
    case FP_INFINITE:
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;
@@ -718,7 +719,7 @@ inline void eval_acos(T& result, const T& x)
 
    if (c > 0)
    {
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;

@@ -47,7 +47,7 @@ struct arithmetic_backend
    template <class A>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, arithmetic_backend&>::type operator=(A i)
    {
-      m_value = i;
+      m_value = static_cast<Arithmetic>(i);
       return *this;
    }
    template <class A>

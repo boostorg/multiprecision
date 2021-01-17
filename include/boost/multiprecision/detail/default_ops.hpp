@@ -275,9 +275,17 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, n
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_add_default(T& t, const U& u, const V& v)
 {
-   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
+   BOOST_IF_CONSTEXPR(std::is_same<T, V>::value)
    {
-      eval_add(t, u);
+      if ((void*)&t == (void*)&v)
+      {
+         eval_add(t, u);
+      }
+      else
+      {
+         t = u;
+         eval_add(t, v);
+      }
    }
    else
    {
@@ -347,10 +355,18 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, n
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_subtract_default(T& t, const U& u, const V& v)
 {
-   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
+   BOOST_IF_CONSTEXPR(std::is_same<T, V>::value)
    {
-      eval_subtract(t, u);
-      t.negate();
+      if ((void*)&t == (void*)&v)
+      {
+         eval_subtract(t, u);
+         t.negate();
+      }
+      else
+      {
+         t = u;
+         eval_subtract(t, v);
+      }
    }
    else
    {
@@ -404,9 +420,17 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, n
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_multiply_default(T& t, const U& u, const V& v)
 {
-   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
+   BOOST_IF_CONSTEXPR(std::is_same<T, V>::value)
    {
-      eval_multiply(t, u);
+      if ((void*)&t == (void*)&v)
+      {
+         eval_multiply(t, u);
+      }
+      else
+      {
+         t = number<T>::canonical_value(u);
+         eval_multiply(t, v);
+      }
    }
    else
    {
@@ -531,12 +555,20 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, n
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_divide_default(T& t, const U& u, const V& v)
 {
-   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
+   BOOST_IF_CONSTEXPR(std::is_same<T, V>::value)
    {
-      T temp;
-      temp = u;
-      eval_divide(temp, v);
-      t = temp;
+      if ((void*)&t == (void*)&v)
+      {
+         T temp;
+         temp = u;
+         eval_divide(temp, v);
+         t = temp;
+      }
+      else
+      {
+         t = u;
+         eval_divide(t, v);
+      }
    }
    else
    {
@@ -599,11 +631,19 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, n
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_modulus_default(T& t, const U& u, const V& v)
 {
-   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
+   BOOST_IF_CONSTEXPR(std::is_same<T, V>::value)
    {
-      T temp(u);
-      eval_modulus(temp, v);
-      t = temp;
+      if ((void*)&t == (void*)&v)
+      {
+         T temp(u);
+         eval_modulus(temp, v);
+         t = temp;
+      }
+      else
+      {
+         t = u;
+         eval_modulus(t, v);
+      }
    }
    else
    {
@@ -708,9 +748,17 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, n
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_or_default(T& t, const U& u, const V& v)
 {
-   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
+   BOOST_IF_CONSTEXPR(std::is_same<T, V>::value)
    {
-      eval_bitwise_or(t, u);
+      if ((void*)&t == (void*)&v)
+      {
+         eval_bitwise_or(t, u);
+      }
+      else
+      {
+         t = u;
+         eval_bitwise_or(t, v);
+      }
    }
    else
    {
@@ -765,9 +813,17 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, n
 template <class T, class U, class V>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_xor_default(T& t, const U& u, const V& v)
 {
-   if (std::is_same<T, V>::value && ((void*)&t == (void*)&v))
+   BOOST_IF_CONSTEXPR(std::is_same<T, V>::value)
    {
-      eval_bitwise_xor(t, u);
+      if ((void*)&t == (void*)&v)
+      {
+         eval_bitwise_xor(t, u);
+      }
+      else
+      {
+         t = u;
+         eval_bitwise_xor(t, v);
+      }
    }
    else
    {
@@ -908,7 +964,7 @@ struct calculate_next_larger_type
            typename B::unsigned_types,
            typename B::float_types>::type>::type list_type;
    static constexpr int start = find_index_of_type<list_type, 0, R>::value;
-   static constexpr int index_of_type = boost::multiprecision::detail::find_index_of_large_enough_type<list_type, start + 1, std::numeric_limits<R>::digits>::value;
+   static constexpr int index_of_type = boost::multiprecision::detail::find_index_of_large_enough_type<list_type, start == INT_MAX ? 0 : start + 1, std::numeric_limits<R>::digits>::value;
    typedef typename boost::multiprecision::detail::dereference_tuple<index_of_type, list_type, terminal<R> >::type type;
 };
 
@@ -928,16 +984,23 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::d
    typedef typename calculate_next_larger_type<R, B>::type next_type;
    next_type                                               n = next_type();
    eval_convert_to(&n, backend);
-   if (!boost::multiprecision::detail::is_unsigned<R>::value && std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && (n > (next_type)(std::numeric_limits<R>::max)()))
+   BOOST_IF_CONSTEXPR(!boost::multiprecision::detail::is_unsigned<R>::value && std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded)
    {
-      *result = (std::numeric_limits<R>::max)();
+      if(n > (next_type)(std::numeric_limits<R>::max)())
+      {
+         *result = (std::numeric_limits<R>::max)();
+         return;
+      }
    }
-   else if (std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && (n < (next_type)(std::numeric_limits<R>::min)()))
+   BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized&& std::numeric_limits<R>::is_bounded)
    {
-      *result = (std::numeric_limits<R>::min)();
+      if (n < (next_type)(std::numeric_limits<R>::min)())
+      {
+         *result = (std::numeric_limits<R>::min)();
+         return;
+      }
    }
-   else
-      *result = static_cast<R>(n);
+   *result = static_cast<R>(n);
 }
 
 template <class R, class B>
@@ -946,9 +1009,14 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !boost::multiprecision:
    typedef typename calculate_next_larger_type<R, B>::type next_type;
    next_type                                               n = next_type();
    eval_convert_to(&n, backend);
-   if (std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && ((n > (next_type)(std::numeric_limits<R>::max)() || (n < (next_type) - (std::numeric_limits<R>::max)()))))
+   BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded)
    {
-      *result = n > 0 ? (std::numeric_limits<R>::max)() : -(std::numeric_limits<R>::max)();
+      if ((n > (next_type)(std::numeric_limits<R>::max)() || (n < (next_type) - (std::numeric_limits<R>::max)())))
+      {
+         *result = n > 0 ? (std::numeric_limits<R>::max)() : -(std::numeric_limits<R>::max)();
+      }
+      else
+         *result = static_cast<R>(n);
    }
    else
       *result = static_cast<R>(n);
@@ -961,8 +1029,9 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    // We ran out of types to try for the conversion, try
    // a lexical_cast and hope for the best:
    //
-   if (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed && (eval_get_sign(backend) < 0))
-      BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
+   BOOST_IF_CONSTEXPR (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
+      if (eval_get_sign(backend) < 0)
+         BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
    BOOST_TRY {
       result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
    }
@@ -970,7 +1039,12 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    {
       if (eval_get_sign(backend) < 0)
       {
-         *result = std::numeric_limits<R>::is_integer && std::numeric_limits<R>::is_signed ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
+         BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
+            *result = (std::numeric_limits<R>::min)();
+         else BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer)
+            *result = (std::numeric_limits<R>::max)(); // we should never get here, exception above will be raised.
+         else
+            *result = -(std::numeric_limits<R>::max)();
       }
       else
          *result = (std::numeric_limits<R>::max)();
@@ -985,8 +1059,11 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    // We ran out of types to try for the conversion, try
    // a lexical_cast and hope for the best:
    //
-   if (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed && (eval_get_sign(backend) < 0))
-      BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
+   BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
+   {
+      if (eval_get_sign(backend) < 0)
+         BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
+   }
    BOOST_TRY {
       B t(backend);
       R mask = ~static_cast<R>(0u);
@@ -997,7 +1074,12 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    {
       if (eval_get_sign(backend) < 0)
       {
-         *result = std::numeric_limits<R>::is_integer && std::numeric_limits<R>::is_signed ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
+         BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && std::numeric_limits<R>::is_signed)
+            *result = (std::numeric_limits<R>::min)();
+         else BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
+            *result = 0; // we never get here, exception is thrown above.
+         else
+            *result = (std::numeric_limits<R>::max)();
       }
       else
          *result = (std::numeric_limits<R>::max)();

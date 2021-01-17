@@ -13,11 +13,6 @@ namespace boost {
 namespace multiprecision {
 namespace backends {
 
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable : 4127) // conditional expression is constant
-#endif
-
 template <class Backend>
 struct debug_adaptor
 {
@@ -491,9 +486,6 @@ template <class Backend>
 struct number_category<backends::debug_adaptor<Backend> > : public number_category<Backend>
 {};
 
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
 }} // namespace boost::multiprecision
 
 namespace std {

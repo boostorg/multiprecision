@@ -135,10 +135,6 @@ template <class I, class Engine>
 typename std::enable_if<number_category<I>::value == number_kind_integer, bool>::type
 miller_rabin_test(const I& n, unsigned trials, Engine& gen)
 {
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable : 4127)
-#endif
    typedef I number_type;
 
    if (n == 2)
@@ -190,9 +186,6 @@ miller_rabin_test(const I& n, unsigned trials, Engine& gen)
       }
    }
    return true; // Yeheh! probably prime.
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
 }
 
 template <class I>

@@ -310,7 +310,10 @@ const T& get_constant_pi()
 
    return result;
 }
-
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4127) // conditional expression is constant
+#endif
 template <class T>
 const T& get_constant_one_over_epsilon()
 {
@@ -330,7 +333,7 @@ const T& get_constant_one_over_epsilon()
       typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
       boost::multiprecision::detail::maybe_promote_precision(&result);
       result = static_cast<ui_type>(1u);
-      if(std::numeric_limits<number<T> >::is_specialized)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T> >::is_specialized)
          eval_divide(result, std::numeric_limits<number<T> >::epsilon().backend());
       else
          eval_ldexp(result, result, boost::multiprecision::detail::digits2<number<T> >::value() - 1);
@@ -339,3 +342,6 @@ const T& get_constant_one_over_epsilon()
 
    return result;
 }
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif

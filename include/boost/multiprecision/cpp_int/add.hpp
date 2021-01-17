@@ -13,11 +13,6 @@
 
 namespace boost { namespace multiprecision { namespace backends {
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4127) // conditional expression is constant
-#endif
-
 //
 // As above, but for adding a single limb to a non-trivial cpp_int:
 //
@@ -373,10 +368,6 @@ eval_subtract(
    *result.limbs() = detail::checked_subtract(*result.limbs(), *o.limbs(), typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
    result.normalize();
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 }}} // namespace boost::multiprecision::backends
 
