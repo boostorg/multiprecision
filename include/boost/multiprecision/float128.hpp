@@ -777,10 +777,11 @@ void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend
 template <class Archive>
 void serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, unsigned int /*version*/)
 {
-   typedef typename Archive::is_loading                                                                                                                            load_tag;
+   typedef typename Archive::is_loading                                                                                                                                          load_tag;
+   typedef std::integral_constant<bool, load_tag::value>                                                                                                                         loading;
    typedef typename std::integral_constant<bool, std::is_same<Archive, boost::archive::binary_oarchive>::value || std::is_same<Archive, boost::archive::binary_iarchive>::value> binary_tag;
 
-   float128_detail::do_serialize(ar, val, load_tag(), binary_tag());
+   float128_detail::do_serialize(ar, val, loading(), binary_tag());
 }
 
 } // namespace serialization
