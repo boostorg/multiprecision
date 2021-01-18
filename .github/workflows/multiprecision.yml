@@ -1,0 +1,11 @@
+name: wide_decimal
+on: [push,pull_request]
+jobs:
+  all-tests:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: hello-world
+        run: |
+          echo "hello world"
+          exit 0
+        shell: bash
