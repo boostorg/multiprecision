@@ -25,7 +25,7 @@ git submodule update --init libs/headers
 git submodule update --init tools/boostdep
 cp -r $TRAVIS_BUILD_DIR/* libs/multiprecision
 python tools/boostdep/depinst/depinst.py multiprecision
-./bootstrap.sh
+CXX= ./bootstrap.sh
 ./b2 headers
 
 echo '==================================> BEFORE_SCRIPT'
