@@ -1,4 +1,4 @@
-name: wide_decimal
+name: multiprecision
 on: [push,pull_request]
 jobs:
   all-tests:
