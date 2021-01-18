@@ -20,27 +20,56 @@
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
-
-#if defined(BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS) || BOOST_WORKAROUND(__SUNPRO_CC, < 0x5140)
-#define BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#endif
-
-#if defined(BOOST_NO_CXX11_RVALUE_REFERENCES) || defined(BOOST_NO_CXX11_TEMPLATE_ALIASES) || defined(BOOST_NO_CXX11_HDR_ARRAY)\
-      || defined(BOOST_NO_CXX11_ALLOCATOR) || defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) || defined(BOOST_NO_CXX11_CONSTEXPR)\
-      || defined(BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS) || defined(BOOST_NO_CXX11_REF_QUALIFIERS) || defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)\
-      || defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || defined(BOOST_NO_CXX11_USER_DEFINED_LITERALS) || defined(BOOST_NO_CXX11_THREAD_LOCAL)\
-      || defined(BOOST_NO_CXX11_DECLTYPE) || defined(BOOST_NO_CXX11_STATIC_ASSERT) || defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS)\
-      || defined(BOOST_NO_CXX11_NOEXCEPT) || defined(BOOST_NO_CXX11_REF_QUALIFIERS)
 //
-// The above list includes everything we use, plus a few we're likely to use soon.
-// As from March 2020, C++03 support is deprecated, and as from March 2021 will be removed,
-// so mark up as such:
+// We now require C++11, if something we use is not supported, then error and say why:
 //
-#if (defined(_MSC_VER) || defined(__GNUC__)) && !defined(BOOST_MP_DISABLE_DEPRECATE_03_WARNING)
-#pragma message("CAUTION: One or more C++11 features were found to be unavailable")
-#pragma message("CAUTION: Compiling Boost.Multiprecision in non-C++11 or later conformance modes is now deprecated and will be removed from March 2021.")
-#pragma message("CAUTION: Define BOOST_MP_DISABLE_DEPRECATE_03_WARNING to suppress this message.")
+#ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_RVALUE_REFERENCES being set"
 #endif
+#ifdef BOOST_NO_CXX11_TEMPLATE_ALIASES
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_TEMPLATE_ALIASES being set"
+#endif
+#ifdef BOOST_NO_CXX11_HDR_ARRAY
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_ARRAY being set"
+#endif
+#ifdef BOOST_NO_CXX11_ALLOCATOR
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_ALLOCATOR being set"
+#endif
+#ifdef BOOST_NO_CXX11_CONSTEXPR
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_CONSTEXPR being set"
+#endif
+#ifdef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS being set"
+#endif
+#ifdef BOOST_NO_CXX11_REF_QUALIFIERS
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_REF_QUALIFIERS being set"
+#endif
+#ifdef BOOST_NO_CXX11_HDR_FUNCTIONAL
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_FUNCTIONAL being set"
+#endif
+#ifdef BOOST_NO_CXX11_VARIADIC_TEMPLATES
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_VARIADIC_TEMPLATES being set"
+#endif
+#ifdef BOOST_NO_CXX11_USER_DEFINED_LITERALS
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_USER_DEFINED_LITERALS being set"
+#endif
+#ifdef BOOST_NO_CXX11_DECLTYPE
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_DECLTYPE being set"
+#endif
+#ifdef BOOST_NO_CXX11_STATIC_ASSERT
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_STATIC_ASSERT being set"
+#endif
+#ifdef BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_DEFAULTED_FUNCTIONS being set"
+#endif
+#ifdef BOOST_NO_CXX11_NOEXCEPT
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_NOEXCEPT being set"
+#endif
+#ifdef BOOST_NO_CXX11_REF_QUALIFIERS
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_REF_QUALIFIERS being set"
+#endif
+#ifdef BOOST_NO_CXX11_USER_DEFINED_LITERALS
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_USER_DEFINED_LITERALS being set"
 #endif
 
 #if defined(NDEBUG) && !defined(_DEBUG)
