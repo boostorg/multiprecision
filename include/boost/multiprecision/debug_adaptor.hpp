@@ -13,11 +13,6 @@ namespace boost {
 namespace multiprecision {
 namespace backends {
 
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable : 4127) // conditional expression is constant
-#endif
-
 template <class Backend>
 struct debug_adaptor
 {
@@ -63,7 +58,7 @@ struct debug_adaptor
       return *this;
    }
    template <class T>
-   debug_adaptor(const T& i, const typename enable_if_c<is_convertible<T, Backend>::value>::type* = 0)
+   debug_adaptor(const T& i, const typename std::enable_if<std::is_convertible<T, Backend>::value>::type* = 0)
        : m_value(i)
    {
       update_view();
@@ -75,7 +70,7 @@ struct debug_adaptor
       update_view();
    }
    template <class T>
-   typename enable_if_c<is_arithmetic<T>::value || is_convertible<T, Backend>::value, debug_adaptor&>::type operator=(const T& i)
+   typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value || std::is_convertible<T, Backend>::value, debug_adaptor&>::type operator=(const T& i)
    {
       m_value = i;
       update_view();
@@ -491,9 +486,6 @@ template <class Backend>
 struct number_category<backends::debug_adaptor<Backend> > : public number_category<Backend>
 {};
 
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
 }} // namespace boost::multiprecision
 
 namespace std {

@@ -161,14 +161,14 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   double test_str(const boost::mpl::false_&)
+   double test_str(const std::integral_constant<bool, false>&)
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < b.size(); ++i)
          a[i] = boost::lexical_cast<T>(boost::lexical_cast<std::string>(b[i]));
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   double test_str(const boost::mpl::true_&)
+   double test_str(const std::integral_constant<bool, true>&)
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < b.size(); ++i)
@@ -177,7 +177,7 @@ struct tester
    }
    double test_str()
    {
-      return test_str(boost::is_class<T>());
+      return test_str(std::is_class<T>());
    }
    //
    // The following tests only work for integer types:
@@ -370,19 +370,19 @@ struct tester
    // Hetero operations:
    //
    template <class U>
-   static U get_hetero_test_value(boost::mpl::false_ const&)
+   static U get_hetero_test_value(std::integral_constant<bool, false> const&)
    {
       return U(2) / 3;
    }
    template <class U>
-   static U get_hetero_test_value(boost::mpl::true_ const&)
+   static U get_hetero_test_value(std::integral_constant<bool, true> const&)
    {
       return (std::numeric_limits<U>::max)() >> 4;
    }
    template <class U>
    static U get_hetero_test_value()
    {
-      return get_hetero_test_value<U>(boost::is_integral<U>());
+      return get_hetero_test_value<U>(boost::multiprecision::detail::is_integral<U>());
    }
    template <class U>
    double test_multiply_hetero()
@@ -484,9 +484,9 @@ struct tester
  private:
    T generate_random()
    {
-      return generate_random(boost::mpl::int_<Type>());
+      return generate_random(std::integral_constant<int, Type>());
    }
-   T generate_random(const boost::mpl::int_<boost::multiprecision::number_kind_floating_point>&)
+   T generate_random(const std::integral_constant<int, boost::multiprecision::number_kind_floating_point>&)
    {
       T val      = gen();
       T prev_val = -1;
@@ -503,7 +503,7 @@ struct tester
       static boost::random::uniform_int_distribution<e_type> ui(-30, 30);
       return ldexp(val, static_cast<int>(ui(gen)));
    }
-   T generate_random(const boost::mpl::int_<boost::multiprecision::number_kind_integer>&)
+   T generate_random(const std::integral_constant<int, boost::multiprecision::number_kind_integer>&)
    {
       typedef boost::random::mt19937::result_type random_type;
 
@@ -535,7 +535,7 @@ struct tester
       val %= max_val;
       return val;
    }
-   T generate_random(const boost::mpl::int_<boost::multiprecision::number_kind_rational>&)
+   T generate_random(const std::integral_constant<int, boost::multiprecision::number_kind_rational>&)
    {
       typedef boost::random::mt19937::result_type                     random_type;
       typedef typename boost::multiprecision::component_type<T>::type IntType;
@@ -584,15 +584,15 @@ struct tester
 template <class N, int V>
 boost::random::mt19937 tester<N, V>::gen;
 
-inline const char* category_name(const boost::mpl::int_<boost::multiprecision::number_kind_integer>&)
+inline const char* category_name(const std::integral_constant<int, boost::multiprecision::number_kind_integer>&)
 {
    return "integer";
 }
-inline const char* category_name(const boost::mpl::int_<boost::multiprecision::number_kind_floating_point>&)
+inline const char* category_name(const std::integral_constant<int, boost::multiprecision::number_kind_floating_point>&)
 {
    return "float";
 }
-inline const char* category_name(const boost::mpl::int_<boost::multiprecision::number_kind_rational>&)
+inline const char* category_name(const std::integral_constant<int, boost::multiprecision::number_kind_rational>&)
 {
    return "rational";
 }
@@ -614,7 +614,7 @@ inline void report_result(const char* cat, const char* type, const char* op, uns
 }
 
 template <class Number, int N>
-void test_int_ops(tester<Number, N>& t, const char* type, unsigned precision, const boost::mpl::int_<boost::multiprecision::number_kind_integer>&)
+void test_int_ops(tester<Number, N>& t, const char* type, unsigned precision, const std::integral_constant<int, boost::multiprecision::number_kind_integer>&)
 {
    const char* cat = "integer";
    report_result(cat, type, "%", precision, t.test_mod());

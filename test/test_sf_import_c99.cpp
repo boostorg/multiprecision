@@ -613,7 +613,7 @@ bool type_sets_errno(const boost::multiprecision::float128&)
 #endif
 
 template <class T>
-typename boost::enable_if_c<std::numeric_limits<T>::is_specialized>::type check_invalid(const T& val)
+typename std::enable_if<std::numeric_limits<T>::is_specialized>::type check_invalid(const T& val)
 {
    if (std::numeric_limits<T>::has_quiet_NaN)
    {
@@ -629,7 +629,7 @@ typename boost::enable_if_c<std::numeric_limits<T>::is_specialized>::type check_
 }
 
 template <class T>
-typename boost::disable_if_c<std::numeric_limits<T>::is_specialized>::type check_invalid(const T& val)
+typename std::enable_if<!std::numeric_limits<T>::is_specialized>::type check_invalid(const T& val)
 {
    check_invalid(static_cast<typename T::result_type>(val));
 }

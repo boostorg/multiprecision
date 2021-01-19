@@ -18,8 +18,8 @@ int main()
 {
    using namespace boost::multiprecision;
 
-   boost::uint64_t i = (std::numeric_limits<boost::uint64_t>::max)();
-   boost::uint64_t j = 1;
+   std::uint64_t i = (std::numeric_limits<std::uint64_t>::max)();
+   std::uint64_t j = 1;
 
    uint128_t ui128;
    uint256_t ui256;

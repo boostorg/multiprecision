@@ -21,10 +21,6 @@ There are some traits classes which authors of new backends should be aware of:
 
 Inherits from `boost::integral_constant<bool,true>` if type `From` has an explicit conversion from `To`.
 
-For compilers that support C++11 SFINAE-expressions this trait should "just work".  Otherwise it inherits
-from `boost::is_convertible<From, To>::type`, and will need to be specialised for Backends that have
-constructors marked as `explicit`.
-
    template <class From, class To>
    struct is_lossy_conversion
    {
@@ -54,7 +50,7 @@ authors of backend types should generally specialise one of the traits above, ra
    template <class T>
    is_unsigned_number;
 
-These two traits inherit from either `mpl::true_` or `mpl::false_`, by default types are assumed to be signed unless
+These two traits inherit from either `std::integral_constant<bool, true>` or `std::integral_constant<bool, false>`, by default types are assumed to be signed unless
 `is_unsigned_number` is specialized for that type.
 
 [endsect]

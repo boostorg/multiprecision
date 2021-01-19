@@ -8,9 +8,6 @@
 
 #include <boost/integer.hpp>
 #include <boost/integer_traits.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/assert.hpp>
 
 namespace boost {
@@ -29,13 +26,13 @@ namespace detail {
 template <unsigned N>
 struct largest_signed_type
 {
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        1 + std::numeric_limits<boost::long_long_type>::digits == N,
        boost::long_long_type,
-       typename mpl::if_c<
+       typename std::conditional<
            1 + std::numeric_limits<long>::digits == N,
            long,
-           typename mpl::if_c<
+           typename std::conditional<
                1 + std::numeric_limits<int>::digits == N,
                int,
                typename boost::int_t<N>::exact>::type>::type>::type type;
@@ -44,13 +41,13 @@ struct largest_signed_type
 template <unsigned N>
 struct largest_unsigned_type
 {
-   typedef typename mpl::if_c<
+   typedef typename std::conditional<
        std::numeric_limits<boost::ulong_long_type>::digits == N,
        boost::ulong_long_type,
-       typename mpl::if_c<
+       typename std::conditional<
            std::numeric_limits<unsigned long>::digits == N,
            unsigned long,
-           typename mpl::if_c<
+           typename std::conditional<
                std::numeric_limits<unsigned int>::digits == N,
                unsigned int,
                typename boost::uint_t<N>::exact>::type>::type>::type type;
@@ -154,12 +151,5 @@ enum cpp_int_check_type
 
 } // namespace multiprecision
 } // namespace boost
-
-//
-// Figure out whether to support user-defined-literals or not:
-//
-#if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) && !defined(BOOST_NO_CXX11_USER_DEFINED_LITERALS) && !defined(BOOST_NO_CXX11_CONSTEXPR)
-#define BOOST_MP_USER_DEFINED_LITERALS
-#endif
 
 #endif // BOOST_MP_CPP_INT_CORE_HPP

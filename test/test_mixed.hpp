@@ -9,7 +9,7 @@
 #include "test.hpp"
 
 template <class Big, class Small>
-void test_floats(const boost::mpl::true_)
+void test_floats(const std::integral_constant<bool, true>)
 {
    Big big_val = boost::math::constants::pi<Big>();
    Small small   = boost::math::constants::pi<Small>();
@@ -47,7 +47,7 @@ void test_floats(const boost::mpl::true_)
 }
 
 template <class Big, class Small>
-void test_floats(const boost::mpl::false_){}
+void test_floats(const std::integral_constant<bool, false>){}
 
 template <class Big, class Small>
 void test()
@@ -227,7 +227,7 @@ void test()
    BOOST_CHECK_EQUAL((big_val * 1) * (small_val * 1), (big_val * 1) * Big((small_val * 1)));
    BOOST_CHECK_EQUAL((big_val * 1) / (small_val * 1), (big_val * 1) / Big((small_val * 1)));
 
-   test_floats<Big, Small>(boost::mpl::bool_<boost::multiprecision::number_category<Big>::value == boost::multiprecision::number_kind_floating_point>());
+   test_floats<Big, Small>(std::integral_constant<bool, boost::multiprecision::number_category<Big>::value == boost::multiprecision::number_kind_floating_point>());
 }
 
 #endif // BOOST_MATH_TEST_MIXED_HPP

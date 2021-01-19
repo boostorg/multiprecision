@@ -53,7 +53,7 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
    using default_ops::eval_pow;
    using default_ops::eval_subtract;
 
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
    typedef typename Backend::exponent_type                             exponent_type;
 
    std::string     result;
@@ -196,7 +196,7 @@ void convert_from_string(Backend& b, const char* p)
    using default_ops::eval_multiply;
    using default_ops::eval_pow;
 
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
    b = ui_type(0);
    if (!p || (*p == 0))
       return;

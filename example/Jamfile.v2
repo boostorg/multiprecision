@@ -47,9 +47,8 @@ project
       <toolset>msvc:<cxxflags>/wd4512
       <toolset>msvc:<cxxflags>/wd4610
       <toolset>msvc:<cxxflags>/wd4510
-      <toolset>msvc:<cxxflags>/wd4127
+      #<toolset>msvc:<cxxflags>/wd4127
       <toolset>msvc:<cxxflags>/wd4701
-      <toolset>msvc:<cxxflags>/wd4127
       <toolset>msvc:<cxxflags>/wd4305
       <toolset>clang:<link>static
      

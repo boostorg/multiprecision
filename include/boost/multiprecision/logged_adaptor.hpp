@@ -62,7 +62,7 @@ struct logged_adaptor
       m_value = o.m_value;
       log_postfix_event(m_value, "Copy construct");
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // rvalue copy
    logged_adaptor(logged_adaptor&& o)
    {
       log_prefix_event(m_value, o.value(), "Move construct");
@@ -76,7 +76,6 @@ struct logged_adaptor
       log_postfix_event(m_value, "Move construct");
       return *this;
    }
-#endif
    logged_adaptor& operator=(const logged_adaptor& o)
    {
       log_prefix_event(m_value, o.value(), "Assignment");
@@ -85,19 +84,19 @@ struct logged_adaptor
       return *this;
    }
    template <class T>
-   logged_adaptor(const T& i, const typename enable_if_c<is_convertible<T, Backend>::value>::type* = 0)
+   logged_adaptor(const T& i, const typename std::enable_if<std::is_convertible<T, Backend>::value>::type* = 0)
        : m_value(i)
    {
       log_postfix_event(m_value, "construct from arithmetic type");
    }
    template <class T>
-   logged_adaptor(const logged_adaptor<T>& i, const typename enable_if_c<is_convertible<T, Backend>::value>::type* = 0)
+   logged_adaptor(const logged_adaptor<T>& i, const typename std::enable_if<std::is_convertible<T, Backend>::value>::type* = 0)
        : m_value(i.value())
    {
       log_postfix_event(m_value, "construct from arithmetic type");
    }
    template <class T>
-   typename enable_if_c<is_arithmetic<T>::value || is_convertible<T, Backend>::value, logged_adaptor&>::type operator=(const T& i)
+   typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value || std::is_convertible<T, Backend>::value, logged_adaptor&>::type operator=(const T& i)
    {
       log_prefix_event(m_value, i, "Assignment from arithmetic type");
       m_value = i;

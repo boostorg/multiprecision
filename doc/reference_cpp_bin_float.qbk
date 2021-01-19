@@ -24,11 +24,11 @@
    typedef number<cpp_bin_float<50> > cpp_bin_float_50;
    typedef number<cpp_bin_float<100> > cpp_bin_float_100;
 
-   typedef number<backends::cpp_bin_float<24, backends::digit_base_2, void, boost::int16_t, -126, 127>, et_off>         cpp_bin_float_single;
-   typedef number<backends::cpp_bin_float<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023>, et_off>       cpp_bin_float_double;
-   typedef number<backends::cpp_bin_float<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>     cpp_bin_float_double_extended;
-   typedef number<backends::cpp_bin_float<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>    cpp_bin_float_quad;
-   typedef number<backends::cpp_bin_float<237, backends::digit_base_2, void, boost::int32_t, -262142, 262143>, et_off>  cpp_bin_float_oct;
+   typedef number<backends::cpp_bin_float<24, backends::digit_base_2, void, std::int16_t, -126, 127>, et_off>         cpp_bin_float_single;
+   typedef number<backends::cpp_bin_float<53, backends::digit_base_2, void, std::int16_t, -1022, 1023>, et_off>       cpp_bin_float_double;
+   typedef number<backends::cpp_bin_float<64, backends::digit_base_2, void, std::int16_t, -16382, 16383>, et_off>     cpp_bin_float_double_extended;
+   typedef number<backends::cpp_bin_float<113, backends::digit_base_2, void, std::int16_t, -16382, 16383>, et_off>    cpp_bin_float_quad;
+   typedef number<backends::cpp_bin_float<237, backends::digit_base_2, void, std::int32_t, -262142, 262143>, et_off>  cpp_bin_float_oct;
 
    }} // namespaces
 
@@ -51,7 +51,7 @@ given the limitations of the type and our internal requirements".]]
 given the limitations of the type and our internal requirements".]]
 ]
 
-The type of `number_category<cpp_bin_float<Args...> >::type` is `mpl::int_<number_kind_floating_point>`.
+The type of `number_category<cpp_bin_float<Args...> >::type` is `std::integral_constant<int, number_kind_floating_point>`.
 
 More information on this type can be found in the [link boost_multiprecision.tut.floats.cpp_bin_float tutorial].
 

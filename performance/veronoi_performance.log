@@ -22,4 +22,4 @@ Time for tom_int                        = 1.12504
 [[tom_int][41.6378(1.12504s)]]
 ]
 Time for int64_t                        = 0.0128646
-Time for number<arithmetic_backend<boost::int64_t>, et_off> = 0.0129255
+Time for number<arithmetic_backend<std::int64_t>, et_off> = 0.0129255

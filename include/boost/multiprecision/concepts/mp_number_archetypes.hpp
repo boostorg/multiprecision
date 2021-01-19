@@ -10,10 +10,9 @@
 #include <sstream>
 #include <iomanip>
 #include <cmath>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/multiprecision/number.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/mpl/list.hpp>
 #include <boost/container_hash/hash.hpp>
 
 namespace boost {
@@ -27,9 +26,9 @@ namespace concepts {
 
 struct number_backend_float_architype
 {
-   typedef mpl::list<boost::long_long_type>  signed_types;
-   typedef mpl::list<boost::ulong_long_type> unsigned_types;
-   typedef mpl::list<long double>            float_types;
+   typedef std::tuple<boost::long_long_type>  signed_types;
+   typedef std::tuple<boost::ulong_long_type> unsigned_types;
+   typedef std::tuple<long double>            float_types;
    typedef int                               exponent_type;
 
    number_backend_float_architype()
@@ -96,8 +95,8 @@ struct number_backend_float_architype
          ss.precision(digits);
       else
          ss.precision(std::numeric_limits<long double>::digits10 + 3);
-      boost::intmax_t  i = m_value;
-      boost::uintmax_t u = m_value;
+      std::intmax_t  i = m_value;
+      std::uintmax_t u = m_value;
       if (!(f & std::ios_base::scientific) && m_value == i)
          ss << i;
       else if (!(f & std::ios_base::scientific) && m_value == u)
@@ -211,7 +210,7 @@ typedef boost::multiprecision::number<number_backend_float_architype> mp_number_
 } // namespace concepts
 
 template <>
-struct number_category<concepts::number_backend_float_architype> : public mpl::int_<number_kind_floating_point>
+struct number_category<concepts::number_backend_float_architype> : public std::integral_constant<int, number_kind_floating_point>
 {};
 
 }} // namespace boost::multiprecision

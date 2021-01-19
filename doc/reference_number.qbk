@@ -70,7 +70,7 @@
       // Comparison:
       int compare(const number<Backend>& o)const;
       template <class V>
-      typename enable_if<is_convertible<V, number<Backend, ExpressionTemplates> >, int>::type
+      typename std::enable_if<std::is_convertible<V, number<Backend, ExpressionTemplates>::value >, int>::type
          compare(const V& o)const;
       // real and imaginary parts:
       value_type real()const;
@@ -433,7 +433,7 @@ the default precision and the precision of `*this` respectively.
 
       int compare(const number<Backend, ExpressionTemplates>& o)const;
       template <class V>
-      typename enable_if<is_convertible<V, number<Backend, ExpressionTemplates> >, int>::type
+      typename std::enable_if<std::is_convertible<V, number<Backend, ExpressionTemplates>::value >, int>::type
          compare(const V& other)const;
 
 Returns:
@@ -694,7 +694,7 @@ If this is a type with multiple components (for example rational or complex type
    template <class T>
    struct number_category;
 
-A traits class that inherits from `mpl::int_<N>` where `N` is one of the enumerated values `number_kind_integer`, `number_kind_floating_point`,
+A traits class that inherits from `std::integral_constant<int, N>` where `N` is one of the enumerated values `number_kind_integer`, `number_kind_floating_point`,
 `number_kind_rational`, `number_kind_fixed_point`, or `number_kind_unknown`.  This traits class is specialized for any type that has
 `std::numeric_limits` support as well as for classes in this library: which means it can be used for generic code that must work
 with __fundamental arithmetic types as well as multiprecision ones.
@@ -702,12 +702,12 @@ with __fundamental arithmetic types as well as multiprecision ones.
    template <class T>
    struct is_number;
 
-A traits class that inherits from `mpl::true_` if T is an instance of `number<>`, otherwise from `mpl::false_`.
+A traits class that inherits from `std::integral_constant<bool, true>` if T is an instance of `number<>`, otherwise from `std::integral_constant<bool, false>`.
 
    template <class T>
    struct is_number_expression;
 
-A traits class that inherits from `mpl::true_` if T is an expression template type derived from `number<>`, otherwise from `mpl::false_`.
+A traits class that inherits from `std::integral_constant<bool, true>` if T is an expression template type derived from `number<>`, otherwise from `std::integral_constant<bool, false>`.
 
 
 [h4 Integer functions]

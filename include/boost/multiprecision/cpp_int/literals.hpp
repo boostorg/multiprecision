@@ -142,7 +142,7 @@ struct pack_values
    static constexpr limb_type value_to_add  = shift ? hex_value<NextChar>::value << shift : hex_value<NextChar>::value;
 
    typedef typename pack_values<CHARS...>::type                          recursive_packed_type;
-   typedef typename boost::mpl::if_c<shift == 0,
+   typedef typename std::conditional<shift == 0,
                                      typename recursive_packed_type::next_type,
                                      recursive_packed_type>::type        pack_type;
    typedef typename combine_value_to_pack<pack_type, value_to_add>::type type;
@@ -198,8 +198,8 @@ struct reverse_value_pack<value_pack<> >
 template <char l1, char l2, char... STR>
 struct make_packed_value_from_str
 {
-   BOOST_STATIC_ASSERT_MSG(l1 == '0', "Multi-precision integer literals must be in hexadecimal notation.");
-   BOOST_STATIC_ASSERT_MSG((l2 == 'X') || (l2 == 'x'), "Multi-precision integer literals must be in hexadecimal notation.");
+   static_assert(l1 == '0', "Multi-precision integer literals must be in hexadecimal notation.");
+   static_assert((l2 == 'X') || (l2 == 'x'), "Multi-precision integer literals must be in hexadecimal notation.");
    typedef typename pack_values<STR...>::type                        packed_type;
    typedef typename strip_leading_zeros_from_pack<packed_type>::type stripped_type;
    typedef typename reverse_value_pack<stripped_type>::type          type;

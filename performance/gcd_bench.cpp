@@ -19,7 +19,7 @@ namespace boost {
       namespace backends {
 
       template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
-      inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+      inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
       eval_gcd_old(
           cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
           const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,

@@ -26,8 +26,8 @@ struct promote_traits<boost::multiprecision::number<Backend1, ExpressionTemplate
 {
    typedef boost::multiprecision::number<Backend1, ExpressionTemplates1> number1_t;
    typedef boost::multiprecision::number<Backend2, ExpressionTemplates2> number2_t;
-   typedef typename mpl::if_c<
-       is_convertible<number1_t, number2_t>::value && !is_convertible<number2_t, number1_t>::value,
+   typedef typename std::conditional<
+       std::is_convertible<number1_t, number2_t>::value && !std::is_convertible<number2_t, number1_t>::value,
        number2_t, number1_t>::type promote_type;
 };
 
