@@ -78,12 +78,6 @@
 #define BOOST_MP_FORCEINLINE inline
 #endif
 
-#if (defined(BOOST_GCC) && (BOOST_GCC <= 40700)) || BOOST_WORKAROUND(__SUNPRO_CC, < 0x5140) || (defined(__clang_major__) && (__clang_major__ == 3) && (__clang_minor__ < 5))
-#define noexcept(x)
-#else
-#define noexcept(x) noexcept_IF(x)
-#endif
-
 //
 // Thread local storage:
 // Note fails on Mingw, see https://sourceforge.net/p/mingw-w64/bugs/527/

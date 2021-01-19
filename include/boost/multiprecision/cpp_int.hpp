@@ -557,21 +557,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
       double_limb_type m_double_first_limb;
 
       constexpr data_type()
-#if defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) || defined(BOOST_NO_CXX14_CONSTEXPR)
-          : m_first_limb(0)
-      {}
-#else
           : m_data{0}
       {}
-#endif
       constexpr data_type(limb_type i)
-#if defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) || defined(BOOST_NO_CXX14_CONSTEXPR)
-          : m_first_limb(i)
-      {}
-#else
           : m_data{i}
       {}
-#endif
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
       constexpr data_type(limb_type i, limb_type j) : m_data{i, j}
       {}
@@ -760,21 +750,11 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
       double_limb_type m_double_first_limb;
 
       constexpr data_type()
-#if defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) || defined(BOOST_NO_CXX14_CONSTEXPR)
-          : m_first_limb(0)
-      {}
-#else
           : m_data{0}
       {}
-#endif
       constexpr data_type(limb_type i)
-#if defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) || defined(BOOST_NO_CXX14_CONSTEXPR)
-          : m_first_limb(i)
-      {}
-#else
           : m_data{i}
       {}
-#endif
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
       constexpr data_type(limb_type i, limb_type j) : m_data{i, j}
       {}

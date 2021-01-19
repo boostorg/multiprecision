@@ -244,11 +244,8 @@ template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_increment(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const limb_type one = 1;
-#else
    constexpr const limb_type one = 1;
-#endif
+
    if (!result.sign() && (result.limbs()[0] < cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::max_limb_value))
       ++result.limbs()[0];
    else if (result.sign() && result.limbs()[0])
@@ -264,11 +261,8 @@ template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_decrement(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const limb_type one = 1;
-#else
    constexpr const limb_type one = 1;
-#endif
+
    if (!result.sign() && result.limbs()[0])
       --result.limbs()[0];
    else if (result.sign() && (result.limbs()[0] < cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::max_limb_value))

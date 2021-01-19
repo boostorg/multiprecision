@@ -445,13 +445,9 @@ eval_left_shift(
       return;
 
 #if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - 1;
-   static const limb_type byte_shift_mask = CHAR_BIT - 1;
-#else
    constexpr const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - 1;
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
-#endif
+
    if ((s & limb_shift_mask) == 0)
    {
       left_shift_limb(result, s);
@@ -465,11 +461,8 @@ eval_left_shift(
       left_shift_byte(result, s);
    }
 #elif BOOST_ENDIAN_LITTLE_BYTE
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const limb_type byte_shift_mask = CHAR_BIT - 1;
-#else
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
-#endif
+
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
    if ((s & byte_shift_mask) == 0)
 #else
@@ -482,11 +475,8 @@ eval_left_shift(
       left_shift_byte(result, s);
    }
 #else
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - 1;
-#else
    constexpr const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - 1;
-#endif
+
    if ((s & limb_shift_mask) == 0)
    {
       left_shift_limb(result, s);
@@ -595,13 +585,9 @@ eval_right_shift(
       return;
 
 #if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
-   static const limb_type byte_shift_mask = CHAR_BIT - 1;
-#else
    constexpr const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
-#endif
+
    if ((s & limb_shift_mask) == 0)
       right_shift_limb(result, s);
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -611,11 +597,8 @@ eval_right_shift(
 #endif
       right_shift_byte(result, s);
 #elif BOOST_ENDIAN_LITTLE_BYTE
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const limb_type byte_shift_mask = CHAR_BIT - 1;
-#else
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
-#endif
+
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
    if ((s & byte_shift_mask) == 0)
 #else
@@ -626,11 +609,8 @@ eval_right_shift(
 #endif
       right_shift_byte(result, s);
 #else
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
-#else
    constexpr const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
-#endif
+
    if ((s & limb_shift_mask) == 0)
       right_shift_limb(result, s);
 #endif
@@ -652,31 +632,21 @@ eval_right_shift(
       eval_increment(result);
 
 #if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
-   static const limb_type byte_shift_mask = CHAR_BIT - 1;
-#else
    constexpr const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
-#endif
+
    if ((s & limb_shift_mask) == 0)
       right_shift_limb(result, s);
    else if ((s & byte_shift_mask) == 0)
       right_shift_byte(result, s);
 #elif BOOST_ENDIAN_LITTLE_BYTE
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const limb_type byte_shift_mask = CHAR_BIT - 1;
-#else
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
-#endif
+
    if ((s & byte_shift_mask) == 0)
       right_shift_byte(result, s);
 #else
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
-#else
    constexpr const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
-#endif
+
    if ((s & limb_shift_mask) == 0)
       right_shift_limb(result, s);
 #endif
@@ -768,12 +738,7 @@ eval_bitwise_and(
 
    if (result.sign() || o.sign())
    {
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-      static
-#else
-      constexpr
-#endif
-      const unsigned                                              m = static_unsigned_max<static_unsigned_max<MinBits1, MinBits2>::value, static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
+      constexpr const unsigned m = static_unsigned_max<static_unsigned_max<MinBits1, MinBits2>::value, static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t1(result);
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t2(o);
       eval_bitwise_and(t1, t2);
@@ -816,12 +781,7 @@ eval_bitwise_or(
 
    if (result.sign() || o.sign())
    {
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-      static
-#else
-      constexpr
-#endif
-      const unsigned                                              m = static_unsigned_max<static_unsigned_max<MinBits1, MinBits2>::value, static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
+      constexpr const unsigned m = static_unsigned_max<static_unsigned_max<MinBits1, MinBits2>::value, static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t1(result);
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t2(o);
       eval_bitwise_or(t1, t2);
@@ -865,12 +825,7 @@ eval_bitwise_xor(
 
    if (result.sign() || o.sign())
    {
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-      static
-#else
-      constexpr
-#endif
-      const unsigned                                              m = static_unsigned_max<static_unsigned_max<MinBits1, MinBits2>::value, static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
+      constexpr const unsigned m = static_unsigned_max<static_unsigned_max<MinBits1, MinBits2>::value, static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t1(result);
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t2(o);
       eval_bitwise_xor(t1, t2);
