@@ -116,9 +116,9 @@ class cpp_bin_float
    bool          m_sign;
 
  public:
-   cpp_bin_float() BOOST_MP_NOEXCEPT_IF(noexcept(rep_type())) : m_data(), m_exponent(exponent_zero), m_sign(false) {}
+   cpp_bin_float() noexcept(noexcept(rep_type())) : m_data(), m_exponent(exponent_zero), m_sign(false) {}
 
-   cpp_bin_float(const cpp_bin_float& o) BOOST_MP_NOEXCEPT_IF(noexcept(rep_type(std::declval<const rep_type&>())))
+   cpp_bin_float(const cpp_bin_float& o) noexcept(noexcept(rep_type(std::declval<const rep_type&>())))
        : m_data(o.m_data), m_exponent(o.m_exponent), m_sign(o.m_sign) {}
 
    template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
@@ -134,12 +134,12 @@ class cpp_bin_float
    }
    // rvalue copy:
    template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
-   cpp_bin_float(cpp_bin_float<D, B, A, E, MinE, MaxE>&& o, typename std::enable_if<(bit_count >= cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count)>::type const* = 0)BOOST_MP_NOEXCEPT_IF(noexcept(rep_type(std::declval<rep_type&&>())))
+   cpp_bin_float(cpp_bin_float<D, B, A, E, MinE, MaxE>&& o, typename std::enable_if<(bit_count >= cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count)>::type const* = 0)noexcept(noexcept(rep_type(std::declval<rep_type&&>())))
    {
       *this = std::move(o);
    }
    template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
-   explicit cpp_bin_float(cpp_bin_float<D, B, A, E, MinE, MaxE>&& o, typename std::enable_if< !(bit_count >= cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(rep_type(std::declval<rep_type&&>())))
+   explicit cpp_bin_float(cpp_bin_float<D, B, A, E, MinE, MaxE>&& o, typename std::enable_if< !(bit_count >= cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count)>::type const* = 0) noexcept(noexcept(rep_type(std::declval<rep_type&&>())))
        : m_exponent(o.exponent()), m_sign(o.sign())
    {
       *this = std::move(o);
@@ -177,7 +177,7 @@ class cpp_bin_float
       this->assign_float(f);
    }
 #endif
-   cpp_bin_float& operator=(const cpp_bin_float& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<rep_type&>() = std::declval<const rep_type&>()))
+   cpp_bin_float& operator=(const cpp_bin_float& o) noexcept(noexcept(std::declval<rep_type&>() = std::declval<const rep_type&>()))
    {
       m_data     = o.m_data;
       m_exponent = o.m_exponent;
@@ -186,7 +186,7 @@ class cpp_bin_float
    }
 
    template <class A, class E, E MinE, E MaxE>
-   cpp_bin_float& operator=(const cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<rep_type&>() = std::declval<const rep_type&>()))
+   cpp_bin_float& operator=(const cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>& o) noexcept(noexcept(std::declval<rep_type&>() = std::declval<const rep_type&>()))
    {
       m_data     = o.bits();
       m_sign     = o.sign();
@@ -214,7 +214,7 @@ class cpp_bin_float
    }
    // rvalue copy:
    template <class A, class E, E MinE, E MaxE>
-   cpp_bin_float& operator=(cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>&& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<rep_type&>() = std::declval<rep_type&&>()))
+   cpp_bin_float& operator=(cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>&& o) noexcept(noexcept(std::declval<rep_type&>() = std::declval<rep_type&&>()))
    {
       m_data     = std::move(o.bits());
       m_sign     = o.sign();
@@ -527,7 +527,7 @@ class cpp_bin_float
 
    cpp_bin_float& operator=(const char* s);
 
-   void swap(cpp_bin_float& o) BOOST_NOEXCEPT
+   void swap(cpp_bin_float& o) noexcept
    {
       m_data.swap(o.m_data);
       std::swap(m_exponent, o.m_exponent);
@@ -542,7 +542,7 @@ class cpp_bin_float
          m_sign = !m_sign;
    }
 
-   int compare(const cpp_bin_float& o) const BOOST_NOEXCEPT
+   int compare(const cpp_bin_float& o) const noexcept
    {
       if (m_sign != o.m_sign)
          return (m_exponent == exponent_zero) && (m_exponent == o.m_exponent) ? 0 : m_sign ? -1 : 1;
@@ -565,7 +565,7 @@ class cpp_bin_float
       return result;
    }
    template <class A>
-   int compare(const A& o) const BOOST_NOEXCEPT
+   int compare(const A& o) const noexcept
    {
       cpp_bin_float b;
       b = o;

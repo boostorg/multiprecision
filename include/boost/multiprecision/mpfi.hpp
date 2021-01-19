@@ -92,7 +92,7 @@ struct mpfi_float_imp
          mpfi_set(m_data, o.m_data);
    }
    // rvalue copy
-   mpfi_float_imp(mpfi_float_imp&& o) BOOST_NOEXCEPT
+   mpfi_float_imp(mpfi_float_imp&& o) noexcept
    {
       m_data[0]                = o.m_data[0];
       o.m_data[0].left._mpfr_d = 0;
@@ -115,7 +115,7 @@ struct mpfi_float_imp
       return *this;
    }
    // rvalue assign
-   mpfi_float_imp& operator=(mpfi_float_imp&& o) BOOST_NOEXCEPT
+   mpfi_float_imp& operator=(mpfi_float_imp&& o) noexcept
    {
       mpfi_swap(m_data, o.m_data);
       return *this;
@@ -252,7 +252,7 @@ struct mpfi_float_imp
       }
       return *this;
    }
-   void swap(mpfi_float_imp& o) BOOST_NOEXCEPT
+   void swap(mpfi_float_imp& o) noexcept
    {
       mpfi_swap(m_data, o.m_data);
    }
@@ -270,17 +270,17 @@ struct mpfi_float_imp
 
       return "{" + a.str(digits, f) + "," + b.str(digits, f) + "}";
    }
-   ~mpfi_float_imp() BOOST_NOEXCEPT
+   ~mpfi_float_imp() noexcept
    {
       if (m_data[0].left._mpfr_d)
          mpfi_clear(m_data);
    }
-   void negate() BOOST_NOEXCEPT
+   void negate() noexcept
    {
       BOOST_ASSERT(m_data[0].left._mpfr_d);
       mpfi_neg(m_data, m_data);
    }
-   int compare(const mpfi_float_imp& o) const BOOST_NOEXCEPT
+   int compare(const mpfi_float_imp& o) const noexcept
    {
       BOOST_ASSERT(m_data[0].left._mpfr_d && o.m_data[0].left._mpfr_d);
       if (mpfr_cmp(right_data(), o.left_data()) < 0)
@@ -293,38 +293,38 @@ struct mpfi_float_imp
       return 0;
    }
    template <class V>
-   int compare(V v) const BOOST_NOEXCEPT
+   int compare(V v) const noexcept
    {
       mpfi_float_imp d;
       d = v;
       return compare(d);
    }
-   mpfi_t& data() BOOST_NOEXCEPT
+   mpfi_t& data() noexcept
    {
       BOOST_ASSERT(m_data[0].left._mpfr_d);
       return m_data;
    }
-   const mpfi_t& data() const BOOST_NOEXCEPT
+   const mpfi_t& data() const noexcept
    {
       BOOST_ASSERT(m_data[0].left._mpfr_d);
       return m_data;
    }
-   mpfr_ptr left_data() BOOST_NOEXCEPT
+   mpfr_ptr left_data() noexcept
    {
       BOOST_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].left);
    }
-   mpfr_srcptr left_data() const BOOST_NOEXCEPT
+   mpfr_srcptr left_data() const noexcept
    {
       BOOST_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].left);
    }
-   mpfr_ptr right_data() BOOST_NOEXCEPT
+   mpfr_ptr right_data() noexcept
    {
       BOOST_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].right);
    }
-   mpfr_srcptr right_data() const BOOST_NOEXCEPT
+   mpfr_srcptr right_data() const noexcept
    {
       BOOST_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].right);
@@ -332,7 +332,7 @@ struct mpfi_float_imp
 
  protected:
    mpfi_t           m_data;
-   static boost::multiprecision::detail::precision_type& get_default_precision() BOOST_NOEXCEPT
+   static boost::multiprecision::detail::precision_type& get_default_precision() noexcept
    {
       static boost::multiprecision::detail::precision_type val(BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION);
       return val;
@@ -390,7 +390,7 @@ struct mpfi_float_backend : public detail::mpfi_float_imp<digits10>
       mpfi_set_fr(this->m_data, val.data());
    }
    // rvalue copy
-   mpfi_float_backend& operator=(mpfi_float_backend&& o) BOOST_NOEXCEPT
+   mpfi_float_backend& operator=(mpfi_float_backend&& o) noexcept
    {
       *static_cast<detail::mpfi_float_imp<digits10>*>(this) = static_cast<detail::mpfi_float_imp<digits10>&&>(o);
       return *this;
@@ -433,7 +433,7 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
    }
    mpfi_float_backend(const mpfi_float_backend& o) : detail::mpfi_float_imp<0>(o) {}
    // rvalue copy
-   mpfi_float_backend(mpfi_float_backend&& o) BOOST_NOEXCEPT : detail::mpfi_float_imp<0>(static_cast<detail::mpfi_float_imp<0>&&>(o))
+   mpfi_float_backend(mpfi_float_backend&& o) noexcept : detail::mpfi_float_imp<0>(static_cast<detail::mpfi_float_imp<0>&&>(o))
    {}
    mpfi_float_backend(const mpfi_float_backend& o, unsigned digits10)
        : detail::mpfi_float_imp<0>(multiprecision::detail::digits10_2_2(digits10))
@@ -460,7 +460,7 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
       return *this;
    }
    // rvalue assign
-   mpfi_float_backend& operator=(mpfi_float_backend&& o) BOOST_NOEXCEPT
+   mpfi_float_backend& operator=(mpfi_float_backend&& o) noexcept
    {
       *static_cast<detail::mpfi_float_imp<0>*>(this) = static_cast<detail::mpfi_float_imp<0>&&>(o);
       return *this;
@@ -484,19 +484,19 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
       mpfi_set(this->m_data, val.data());
       return *this;
    }
-   static unsigned default_precision() BOOST_NOEXCEPT
+   static unsigned default_precision() noexcept
    {
       return get_default_precision();
    }
-   static void default_precision(unsigned v) BOOST_NOEXCEPT
+   static void default_precision(unsigned v) noexcept
    {
       get_default_precision() = v;
    }
-   unsigned precision() const BOOST_NOEXCEPT
+   unsigned precision() const noexcept
    {
       return multiprecision::detail::digits2_2_10(mpfi_get_prec(this->m_data));
    }
-   void precision(unsigned digits10) BOOST_NOEXCEPT
+   void precision(unsigned digits10) noexcept
    {
       mpfi_float_backend t(*this, digits10);
       this->swap(t);
@@ -504,17 +504,17 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
 };
 
 template <unsigned digits10, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const mpfi_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const mpfi_float_backend<digits10>& a, const T& b) noexcept
 {
    return a.compare(b) == 0;
 }
 template <unsigned digits10, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const mpfi_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const mpfi_float_backend<digits10>& a, const T& b) noexcept
 {
    return a.compare(b) < 0;
 }
 template <unsigned digits10, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const mpfi_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const mpfi_float_backend<digits10>& a, const T& b) noexcept
 {
    return a.compare(b) > 0;
 }
@@ -744,7 +744,7 @@ inline void eval_divide(mpfi_float_backend<D1>& a, long x, const mpfi_float_back
 }
 
 template <unsigned digits10>
-inline bool eval_is_zero(const mpfi_float_backend<digits10>& val) BOOST_NOEXCEPT
+inline bool eval_is_zero(const mpfi_float_backend<digits10>& val) noexcept
 {
    return 0 != mpfi_is_zero(val.data());
 }
@@ -785,12 +785,12 @@ inline void eval_convert_to(boost::long_long_type* result, const mpfi_float_back
 }
 #endif
 template <unsigned digits10>
-inline void eval_convert_to(double* result, const mpfi_float_backend<digits10>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(double* result, const mpfi_float_backend<digits10>& val) noexcept
 {
    *result = mpfi_get_d(val.data());
 }
 template <unsigned digits10>
-inline void eval_convert_to(long double* result, const mpfi_float_backend<digits10>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(long double* result, const mpfi_float_backend<digits10>& val) noexcept
 {
    mpfr_float_backend<digits10> t;
    mpfi_mid(t.data(), val.data());
@@ -903,7 +903,7 @@ inline void eval_frexp(mpfi_float_backend<Digits10>& result, const mpfi_float_ba
 }
 
 template <unsigned Digits10>
-inline int eval_fpclassify(const mpfi_float_backend<Digits10>& val) BOOST_NOEXCEPT
+inline int eval_fpclassify(const mpfi_float_backend<Digits10>& val) noexcept
 {
    return mpfi_inf_p(val.data()) ? FP_INFINITE : mpfi_nan_p(val.data()) ? FP_NAN : mpfi_is_zero(val.data()) ? FP_ZERO : FP_NORMAL;
 }
@@ -1309,7 +1309,7 @@ inline void set_output_precision(const boost::multiprecision::mpfi_float& val, s
 template <>
 inline int digits<boost::multiprecision::mpfi_float>()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(boost::multiprecision::mpfi_float::default_precision());
@@ -1317,7 +1317,7 @@ inline int digits<boost::multiprecision::mpfi_float>()
 template <>
 inline int digits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<0>, boost::multiprecision::et_off> >()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(boost::multiprecision::mpfi_float::default_precision());
@@ -1370,7 +1370,7 @@ typedef boost::multiprecision::number<boost::multiprecision::backends::logged_ad
 template <>
 inline int digits<logged_type1>()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(logged_type1::default_precision());
@@ -1378,7 +1378,7 @@ inline int digits<logged_type1>()
 template <>
 inline int digits<logged_type2>()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(logged_type1::default_precision());

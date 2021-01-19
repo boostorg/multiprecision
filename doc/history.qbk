@@ -345,7 +345,7 @@ conversions. (Done 2012/09/15).
 and what the backend needs to do to profit from this optimization. (Done 2012/09/15).
 * The documentation should contain Throws specification on the mp_number
 and backend requirements operations. (Done 2012/09/15).
-* The library interface should use the noexcept (BOOST_NOEXCEPT, ...)
+* The library interface should use the noexcept (noexcept, ...)
 facilities (Done 2012/09/15).
 * It is unfortunate that the generic mp_number front end can not make use
 constexpr as not all the backends can ensure this (done - we can go quite a way).

@@ -172,18 +172,18 @@ struct float128_backend
    float128_type m_value;
 
  public:
-   constexpr   float128_backend() BOOST_NOEXCEPT : m_value(0) {}
-   constexpr   float128_backend(const float128_backend& o) BOOST_NOEXCEPT : m_value(o.m_value) {}
-   BOOST_MP_CXX14_CONSTEXPR float128_backend& operator=(const float128_backend& o) BOOST_NOEXCEPT
+   constexpr   float128_backend() noexcept : m_value(0) {}
+   constexpr   float128_backend(const float128_backend& o) noexcept : m_value(o.m_value) {}
+   BOOST_MP_CXX14_CONSTEXPR float128_backend& operator=(const float128_backend& o) noexcept
    {
       m_value = o.m_value;
       return *this;
    }
    template <class T>
-   constexpr float128_backend(const T& i, const typename std::enable_if<std::is_convertible<T, float128_type>::value>::type* = 0) BOOST_NOEXCEPT_IF(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
+   constexpr float128_backend(const T& i, const typename std::enable_if<std::is_convertible<T, float128_type>::value>::type* = 0) noexcept_IF(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
        : m_value(i) {}
    template <class T>
-   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value || std::is_convertible<T, float128_type>::value, float128_backend&>::type operator=(const T& i) BOOST_NOEXCEPT_IF(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value || std::is_convertible<T, float128_type>::value, float128_backend&>::type operator=(const T& i) noexcept_IF(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
    {
       m_value = i;
       return *this;
@@ -217,7 +217,7 @@ struct float128_backend
 #endif
       return *this;
    }
-   BOOST_MP_CXX14_CONSTEXPR void swap(float128_backend& o) BOOST_NOEXCEPT
+   BOOST_MP_CXX14_CONSTEXPR void swap(float128_backend& o) noexcept
    {
       // We don't call std::swap here because it's no constexpr (yet):
       float128_type t(o.value());
@@ -272,7 +272,7 @@ struct float128_backend
       return boost::multiprecision::detail::convert_to_string(*this, digits ? digits : 37, f);
 #endif
    }
-   BOOST_MP_CXX14_CONSTEXPR void negate() BOOST_NOEXCEPT
+   BOOST_MP_CXX14_CONSTEXPR void negate() noexcept
    {
       m_value = -m_value;
    }
@@ -797,9 +797,9 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
 
  public:
    static constexpr bool is_specialized = true;
-   static BOOST_MP_CXX14_CONSTEXPR number_type(min)() BOOST_NOEXCEPT { return BOOST_MP_QUAD_MIN; }
-   static BOOST_MP_CXX14_CONSTEXPR number_type(max)() BOOST_NOEXCEPT { return BOOST_MP_QUAD_MAX; }
-   static BOOST_MP_CXX14_CONSTEXPR number_type          lowest() BOOST_NOEXCEPT { return -(max)(); }
+   static BOOST_MP_CXX14_CONSTEXPR number_type(min)() noexcept { return BOOST_MP_QUAD_MIN; }
+   static BOOST_MP_CXX14_CONSTEXPR number_type(max)() noexcept { return BOOST_MP_QUAD_MAX; }
+   static BOOST_MP_CXX14_CONSTEXPR number_type          lowest() noexcept { return -(max)(); }
    static constexpr int  digits       = 113;
    static constexpr int  digits10     = 33;
    static constexpr int  max_digits10 = 36;

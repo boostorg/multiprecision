@@ -89,7 +89,7 @@ struct mpc_complex_imp
          mpc_set(m_data, o.m_data, GMP_RNDN);
    }
    // rvalue copy
-   mpc_complex_imp(mpc_complex_imp&& o) BOOST_NOEXCEPT
+   mpc_complex_imp(mpc_complex_imp&& o) noexcept
    {
       m_data[0]                 = o.m_data[0];
       o.m_data[0].re[0]._mpfr_d = 0;
@@ -105,7 +105,7 @@ struct mpc_complex_imp
       return *this;
    }
    // rvalue assign
-   mpc_complex_imp& operator=(mpc_complex_imp&& o) BOOST_NOEXCEPT
+   mpc_complex_imp& operator=(mpc_complex_imp&& o) noexcept
    {
       mpc_swap(m_data, o.m_data);
       return *this;
@@ -241,7 +241,7 @@ struct mpc_complex_imp
       }
       return *this;
    }
-   void swap(mpc_complex_imp& o) BOOST_NOEXCEPT
+   void swap(mpc_complex_imp& o) noexcept
    {
       mpc_swap(m_data, o.m_data);
    }
@@ -259,32 +259,32 @@ struct mpc_complex_imp
 
       return "(" + a.str(digits, f) + "," + b.str(digits, f) + ")";
    }
-   ~mpc_complex_imp() BOOST_NOEXCEPT
+   ~mpc_complex_imp() noexcept
    {
       if (m_data[0].re[0]._mpfr_d)
          mpc_clear(m_data);
    }
-   void negate() BOOST_NOEXCEPT
+   void negate() noexcept
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
       mpc_neg(m_data, m_data, GMP_RNDD);
    }
-   int compare(const mpc_complex_imp& o) const BOOST_NOEXCEPT
+   int compare(const mpc_complex_imp& o) const noexcept
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d && o.m_data[0].re[0]._mpfr_d);
       return mpc_cmp(m_data, o.m_data);
    }
-   int compare(const mpc_complex_backend<digits10>& o) const BOOST_NOEXCEPT
+   int compare(const mpc_complex_backend<digits10>& o) const noexcept
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d && o.m_data[0].re[0]._mpfr_d);
       return mpc_cmp(m_data, o.data());
    }
-   int compare(long int i) const BOOST_NOEXCEPT
+   int compare(long int i) const noexcept
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
       return mpc_cmp_si(m_data, i);
    }
-   int compare(unsigned long int i) const BOOST_NOEXCEPT
+   int compare(unsigned long int i) const noexcept
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
       static const unsigned long int max_val = (std::numeric_limits<long>::max)();
@@ -297,18 +297,18 @@ struct mpc_complex_imp
       return mpc_cmp_si(m_data, (long)i);
    }
    template <class V>
-   int compare(const V& v) const BOOST_NOEXCEPT
+   int compare(const V& v) const noexcept
    {
       mpc_complex_imp d(mpc_get_prec(m_data));
       d = v;
       return compare(d);
    }
-   mpc_t& data() BOOST_NOEXCEPT
+   mpc_t& data() noexcept
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
       return m_data;
    }
-   const mpc_t& data() const BOOST_NOEXCEPT
+   const mpc_t& data() const noexcept
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
       return m_data;
@@ -316,7 +316,7 @@ struct mpc_complex_imp
 
  protected:
    mpc_t            m_data;
-   static boost::multiprecision::detail::precision_type& get_default_precision() BOOST_NOEXCEPT
+   static boost::multiprecision::detail::precision_type& get_default_precision() noexcept
    {
       static boost::multiprecision::detail::precision_type val(BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION);
       return val;
@@ -459,7 +459,7 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
       return *this;
    }
    // rvalue assign
-   mpc_complex_backend& operator=(mpc_complex_backend&& o) BOOST_NOEXCEPT
+   mpc_complex_backend& operator=(mpc_complex_backend&& o) noexcept
    {
       *static_cast<detail::mpc_complex_imp<digits10>*>(this) = static_cast<detail::mpc_complex_imp<digits10>&&>(o);
       return *this;
@@ -510,7 +510,7 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    }
    mpc_complex_backend(const mpc_complex_backend& o) : detail::mpc_complex_imp<0>(o) {}
    // rvalue copy
-   mpc_complex_backend(mpc_complex_backend&& o) BOOST_NOEXCEPT : detail::mpc_complex_imp<0>(static_cast<detail::mpc_complex_imp<0>&&>(o))
+   mpc_complex_backend(mpc_complex_backend&& o) noexcept : detail::mpc_complex_imp<0>(static_cast<detail::mpc_complex_imp<0>&&>(o))
    {}
    mpc_complex_backend(const mpc_complex_backend& o, unsigned digits10)
        : detail::mpc_complex_imp<0>(multiprecision::detail::digits10_2_2(digits10))
@@ -654,7 +654,7 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
       return *this;
    }
    // rvalue assign
-   mpc_complex_backend& operator=(mpc_complex_backend&& o) BOOST_NOEXCEPT
+   mpc_complex_backend& operator=(mpc_complex_backend&& o) noexcept
    {
       *static_cast<detail::mpc_complex_imp<0>*>(this) = static_cast<detail::mpc_complex_imp<0>&&>(o);
       return *this;
@@ -700,19 +700,19 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
       mpc_set_ld_ld(this->m_data, val.real(), val.imag(), GMP_RNDN);
       return *this;
    }
-   static unsigned default_precision() BOOST_NOEXCEPT
+   static unsigned default_precision() noexcept
    {
       return get_default_precision();
    }
-   static void default_precision(unsigned v) BOOST_NOEXCEPT
+   static void default_precision(unsigned v) noexcept
    {
       get_default_precision() = v;
    }
-   unsigned precision() const BOOST_NOEXCEPT
+   unsigned precision() const noexcept
    {
       return multiprecision::detail::digits2_2_10(mpc_get_prec(this->m_data));
    }
-   void precision(unsigned digits10) BOOST_NOEXCEPT
+   void precision(unsigned digits10) noexcept
    {
       mpfr_prec_round(mpc_realref(this->m_data), multiprecision::detail::digits10_2_2((digits10)), GMP_RNDN);
       mpfr_prec_round(mpc_imagref(this->m_data), multiprecision::detail::digits10_2_2((digits10)), GMP_RNDN);
@@ -720,17 +720,17 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
 };
 
 template <unsigned digits10, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const mpc_complex_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const mpc_complex_backend<digits10>& a, const T& b) noexcept
 {
    return a.compare(b) == 0;
 }
 template <unsigned digits10, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const mpc_complex_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const mpc_complex_backend<digits10>& a, const T& b) noexcept
 {
    return a.compare(b) < 0;
 }
 template <unsigned digits10, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const mpc_complex_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const mpc_complex_backend<digits10>& a, const T& b) noexcept
 {
    return a.compare(b) > 0;
 }
@@ -1020,7 +1020,7 @@ inline void eval_divide(mpc_complex_backend<D1>& a, long x, const mpc_complex_ba
 }
 
 template <unsigned digits10>
-inline bool eval_is_zero(const mpc_complex_backend<digits10>& val) BOOST_NOEXCEPT
+inline bool eval_is_zero(const mpc_complex_backend<digits10>& val) noexcept
 {
    return (0 != mpfr_zero_p(mpc_realref(val.data()))) && (0 != mpfr_zero_p(mpc_imagref(val.data())));
 }
@@ -1078,7 +1078,7 @@ inline void eval_convert_to(boost::long_long_type* result, const mpc_complex_bac
 }
 #endif
 template <unsigned digits10>
-inline void eval_convert_to(double* result, const mpc_complex_backend<digits10>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(double* result, const mpc_complex_backend<digits10>& val) noexcept
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
@@ -1089,7 +1089,7 @@ inline void eval_convert_to(double* result, const mpc_complex_backend<digits10>&
    eval_convert_to(result, t);
 }
 template <unsigned digits10>
-inline void eval_convert_to(long double* result, const mpc_complex_backend<digits10>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(long double* result, const mpc_complex_backend<digits10>& val) noexcept
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {

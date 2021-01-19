@@ -55,7 +55,7 @@ struct tommath_int
       detail::check_tommath_result(mp_init_copy(&m_data, const_cast< ::mp_int*>(&o.m_data)));
    }
    // rvalues:
-   tommath_int(tommath_int&& o) BOOST_NOEXCEPT
+   tommath_int(tommath_int&& o) noexcept
    {
       m_data      = o.m_data;
       o.m_data.dp = 0;
@@ -450,7 +450,7 @@ struct tommath_int
       BOOST_ASSERT(m_data.dp);
       return m_data;
    }
-   void swap(tommath_int& o) BOOST_NOEXCEPT
+   void swap(tommath_int& o) noexcept
    {
       mp_exch(&m_data, &o.data());
    }

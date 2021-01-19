@@ -629,15 +629,15 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::arithm
    typedef boost::multiprecision::number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates> number_type;
 
  public:
-   static constexpr number_type(min)() BOOST_NOEXCEPT { return (base_type::min)(); }
-   static constexpr number_type(max)() BOOST_NOEXCEPT { return (base_type::max)(); }
-   static constexpr number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
-   static constexpr number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
-   static constexpr number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
-   static constexpr number_type infinity() BOOST_NOEXCEPT { return base_type::infinity(); }
-   static constexpr number_type quiet_NaN() BOOST_NOEXCEPT { return base_type::quiet_NaN(); }
-   static constexpr number_type signaling_NaN() BOOST_NOEXCEPT { return base_type::signaling_NaN(); }
-   static constexpr number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
+   static constexpr number_type(min)() noexcept { return (base_type::min)(); }
+   static constexpr number_type(max)() noexcept { return (base_type::max)(); }
+   static constexpr number_type lowest() noexcept { return -(max)(); }
+   static constexpr number_type epsilon() noexcept { return base_type::epsilon(); }
+   static constexpr number_type round_error() noexcept { return epsilon() / 2; }
+   static constexpr number_type infinity() noexcept { return base_type::infinity(); }
+   static constexpr number_type quiet_NaN() noexcept { return base_type::quiet_NaN(); }
+   static constexpr number_type signaling_NaN() noexcept { return base_type::signaling_NaN(); }
+   static constexpr number_type denorm_min() noexcept { return base_type::denorm_min(); }
 };
 
 template <>
@@ -647,15 +647,15 @@ class numeric_limits<boost::math::concepts::real_concept> : public std::numeric_
    typedef boost::math::concepts::real_concept number_type;
 
  public:
-   static const number_type(min)() BOOST_NOEXCEPT { return (base_type::min)(); }
-   static const number_type(max)() BOOST_NOEXCEPT { return (base_type::max)(); }
-   static const number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
-   static const number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
-   static const number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
-   static const number_type infinity() BOOST_NOEXCEPT { return base_type::infinity(); }
-   static const number_type quiet_NaN() BOOST_NOEXCEPT { return base_type::quiet_NaN(); }
-   static const number_type signaling_NaN() BOOST_NOEXCEPT { return base_type::signaling_NaN(); }
-   static const number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
+   static const number_type(min)() noexcept { return (base_type::min)(); }
+   static const number_type(max)() noexcept { return (base_type::max)(); }
+   static const number_type lowest() noexcept { return -(max)(); }
+   static const number_type epsilon() noexcept { return base_type::epsilon(); }
+   static const number_type round_error() noexcept { return epsilon() / 2; }
+   static const number_type infinity() noexcept { return base_type::infinity(); }
+   static const number_type quiet_NaN() noexcept { return base_type::quiet_NaN(); }
+   static const number_type signaling_NaN() noexcept { return base_type::signaling_NaN(); }
+   static const number_type denorm_min() noexcept { return base_type::denorm_min(); }
 };
 
 } // namespace std
