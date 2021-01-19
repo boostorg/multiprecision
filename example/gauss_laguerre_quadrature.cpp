@@ -76,7 +76,7 @@ namespace detail
   class laguerre_l_object BOOST_FINAL
   {
   public:
-    laguerre_l_object(const int n, const T a) BOOST_NOEXCEPT
+    laguerre_l_object(const int n, const T a) noexcept
       : order(n),
         alpha(a),
         p1   (0),
@@ -95,7 +95,7 @@ namespace detail
       return *this;
     }
 
-    T operator()(const T& x) const BOOST_NOEXCEPT
+    T operator()(const T& x) const noexcept
     {
       // Calculate (via forward recursion):
       // * the value of the Laguerre function L(n, alpha, x), called (p2),
@@ -138,10 +138,10 @@ namespace detail
       return p2;
     }
 
-    const T previous  () const BOOST_NOEXCEPT { return p1; }
-    const T derivative() const BOOST_NOEXCEPT { return d2; }
+    const T previous  () const noexcept { return p1; }
+    const T derivative() const noexcept { return d2; }
 
-    static bool root_tolerance(const T& a, const T& b) BOOST_NOEXCEPT
+    static bool root_tolerance(const T& a, const T& b) noexcept
     {
       using std::fabs;
 
@@ -177,8 +177,8 @@ namespace detail
       }
     }
 
-    const std::vector<T>& abscissa_n() const BOOST_NOEXCEPT { return xi; }
-    const std::vector<T>& weight_n  () const BOOST_NOEXCEPT { return wi; }
+    const std::vector<T>& abscissa_n() const noexcept { return xi; }
+    const std::vector<T>& weight_n  () const noexcept { return wi; }
 
   private:
     const int order;

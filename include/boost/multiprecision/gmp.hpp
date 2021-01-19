@@ -93,7 +93,7 @@ struct gmp_float_imp
    typedef std::tuple<double, long double> float_types;
    typedef long                           exponent_type;
 
-   gmp_float_imp() BOOST_NOEXCEPT
+   gmp_float_imp() noexcept
    {
       m_data[0]._mp_d = 0; // uninitialized m_data
    }
@@ -111,7 +111,7 @@ struct gmp_float_imp
          mpf_set(m_data, o.m_data);
    }
    // rvalue copy
-   gmp_float_imp(gmp_float_imp&& o) BOOST_NOEXCEPT
+   gmp_float_imp(gmp_float_imp&& o) noexcept
    {
       m_data[0]         = o.m_data[0];
       o.m_data[0]._mp_d = 0;
@@ -137,7 +137,7 @@ struct gmp_float_imp
       return *this;
    }
    // rvalue assign
-   gmp_float_imp& operator=(gmp_float_imp&& o) BOOST_NOEXCEPT
+   gmp_float_imp& operator=(gmp_float_imp&& o) noexcept
    {
       mpf_swap(m_data, o.m_data);
       return *this;
@@ -266,7 +266,7 @@ struct gmp_float_imp
          BOOST_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid floating point number.")));
       return *this;
    }
-   void swap(gmp_float_imp& o) BOOST_NOEXCEPT
+   void swap(gmp_float_imp& o) noexcept
    {
       mpf_swap(m_data, o.m_data);
    }
@@ -379,27 +379,27 @@ struct gmp_float_imp
       boost::multiprecision::detail::format_float_string(result, e, org_digits, f, mpf_sgn(m_data) == 0);
       return result;
    }
-   ~gmp_float_imp() BOOST_NOEXCEPT
+   ~gmp_float_imp() noexcept
    {
       if (m_data[0]._mp_d)
          mpf_clear(m_data);
    }
-   void negate() BOOST_NOEXCEPT
+   void negate() noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       mpf_neg(m_data, m_data);
    }
-   int compare(const gmp_float<digits10>& o) const BOOST_NOEXCEPT
+   int compare(const gmp_float<digits10>& o) const noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d && o.m_data[0]._mp_d);
       return mpf_cmp(m_data, o.m_data);
    }
-   int compare(long i) const BOOST_NOEXCEPT
+   int compare(long i) const noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return mpf_cmp_si(m_data, i);
    }
-   int compare(unsigned long i) const BOOST_NOEXCEPT
+   int compare(unsigned long i) const noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return mpf_cmp_ui(m_data, i);
@@ -411,12 +411,12 @@ struct gmp_float_imp
       d = v;
       return compare(d);
    }
-   mpf_t& data() BOOST_NOEXCEPT
+   mpf_t& data() noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return m_data;
    }
-   const mpf_t& data() const BOOST_NOEXCEPT
+   const mpf_t& data() const noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return m_data;
@@ -424,7 +424,7 @@ struct gmp_float_imp
 
  protected:
    mpf_t            m_data;
-   static boost::multiprecision::detail::precision_type& get_default_precision() BOOST_NOEXCEPT
+   static boost::multiprecision::detail::precision_type& get_default_precision() noexcept
    {
       static boost::multiprecision::detail::precision_type val(50);
       return val;
@@ -466,14 +466,14 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
       mpf_set_q(this->m_data, val);
    }
    // rvalue copy
-   gmp_float(gmp_float&& o) BOOST_NOEXCEPT : detail::gmp_float_imp<digits10>(static_cast<detail::gmp_float_imp<digits10>&&>(o))
+   gmp_float(gmp_float&& o) noexcept : detail::gmp_float_imp<digits10>(static_cast<detail::gmp_float_imp<digits10>&&>(o))
    {}
    gmp_float& operator=(const gmp_float& o)
    {
       *static_cast<detail::gmp_float_imp<digits10>*>(this) = static_cast<detail::gmp_float_imp<digits10> const&>(o);
       return *this;
    }
-   gmp_float& operator=(gmp_float&& o) BOOST_NOEXCEPT
+   gmp_float& operator=(gmp_float&& o) noexcept
    {
       *static_cast<detail::gmp_float_imp<digits10>*>(this) = static_cast<detail::gmp_float_imp<digits10>&&>(o);
       return *this;
@@ -556,7 +556,7 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       requested_precision = D;
    }
    // rvalue copy
-   gmp_float(gmp_float&& o) BOOST_NOEXCEPT : detail::gmp_float_imp<0>(static_cast<detail::gmp_float_imp<0>&&>(o)), requested_precision(o.requested_precision)
+   gmp_float(gmp_float&& o) noexcept : detail::gmp_float_imp<0>(static_cast<detail::gmp_float_imp<0>&&>(o)), requested_precision(o.requested_precision)
    {}
    gmp_float(const gmp_int& o);
    gmp_float(const gmp_rational& o);
@@ -591,7 +591,7 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       return *this;
    }
    // rvalue copy
-   gmp_float& operator=(gmp_float&& o) BOOST_NOEXCEPT
+   gmp_float& operator=(gmp_float&& o) noexcept
    {
       *static_cast<detail::gmp_float_imp<0>*>(this) = static_cast<detail::gmp_float_imp<0>&&>(o);
       requested_precision                           = o.requested_precision;
@@ -650,19 +650,19 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       *static_cast<detail::gmp_float_imp<0>*>(this) = v;
       return *this;
    }
-   static unsigned default_precision() BOOST_NOEXCEPT
+   static unsigned default_precision() noexcept
    {
       return get_default_precision();
    }
-   static void default_precision(unsigned v) BOOST_NOEXCEPT
+   static void default_precision(unsigned v) noexcept
    {
       get_default_precision() = v;
    }
-   unsigned precision() const BOOST_NOEXCEPT
+   unsigned precision() const noexcept
    {
       return requested_precision;
    }
-   void precision(unsigned digits10) BOOST_NOEXCEPT
+   void precision(unsigned digits10) noexcept
    {
       requested_precision = digits10;
       mpf_set_prec(this->m_data, multiprecision::detail::digits10_2_2(requested_precision));
@@ -675,17 +675,17 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
 };
 
 template <unsigned digits10, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const gmp_float<digits10>& a, const T& b) noexcept
 {
    return a.compare(b) == 0;
 }
 template <unsigned digits10, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const gmp_float<digits10>& a, const T& b) noexcept
 {
    return a.compare(b) < 0;
 }
 template <unsigned digits10, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const gmp_float<digits10>& a, const T& b) noexcept
 {
    return a.compare(b) > 0;
 }
@@ -706,7 +706,7 @@ inline void eval_multiply(gmp_float<D1>& result, const gmp_float<D2>& o)
    mpf_mul(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline bool eval_is_zero(const gmp_float<digits10>& val) BOOST_NOEXCEPT
+inline bool eval_is_zero(const gmp_float<digits10>& val) noexcept
 {
    return mpf_sgn(val.data()) == 0;
 }
@@ -930,13 +930,13 @@ inline void eval_divide(gmp_float<D1>& a, long x, const gmp_float<D2>& y)
 }
 
 template <unsigned digits10>
-inline int eval_get_sign(const gmp_float<digits10>& val) BOOST_NOEXCEPT
+inline int eval_get_sign(const gmp_float<digits10>& val) noexcept
 {
    return mpf_sgn(val.data());
 }
 
 template <unsigned digits10>
-inline void eval_convert_to(unsigned long* result, const gmp_float<digits10>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(unsigned long* result, const gmp_float<digits10>& val) noexcept
 {
    if (0 == mpf_fits_ulong_p(val.data()))
       *result = (std::numeric_limits<unsigned long>::max)();
@@ -944,7 +944,7 @@ inline void eval_convert_to(unsigned long* result, const gmp_float<digits10>& va
       *result = (unsigned long)mpf_get_ui(val.data());
 }
 template <unsigned digits10>
-inline void eval_convert_to(long* result, const gmp_float<digits10>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(long* result, const gmp_float<digits10>& val) noexcept
 {
    if (0 == mpf_fits_slong_p(val.data()))
    {
@@ -955,7 +955,7 @@ inline void eval_convert_to(long* result, const gmp_float<digits10>& val) BOOST_
       *result = (long)mpf_get_si(val.data());
 }
 template <unsigned digits10>
-inline void eval_convert_to(double* result, const gmp_float<digits10>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(double* result, const gmp_float<digits10>& val) noexcept
 {
    *result = mpf_get_d(val.data());
 }
@@ -1131,7 +1131,7 @@ struct gmp_int
          mpz_init(this->m_data);
    }
    // rvalue
-   gmp_int(gmp_int&& o) BOOST_NOEXCEPT
+   gmp_int(gmp_int&& o) noexcept
    {
       m_data[0]         = o.m_data[0];
       o.m_data[0]._mp_d = 0;
@@ -1165,7 +1165,7 @@ struct gmp_int
       return *this;
    }
    // rvalue copy
-   gmp_int& operator=(gmp_int&& o) BOOST_NOEXCEPT
+   gmp_int& operator=(gmp_int&& o) noexcept
    {
       mpz_swap(m_data, o.m_data);
       return *this;
@@ -1414,27 +1414,27 @@ struct gmp_int
 
       return s;
    }
-   ~gmp_int() BOOST_NOEXCEPT
+   ~gmp_int() noexcept
    {
       if (m_data[0]._mp_d)
          mpz_clear(m_data);
    }
-   void negate() BOOST_NOEXCEPT
+   void negate() noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       mpz_neg(m_data, m_data);
    }
-   int compare(const gmp_int& o) const BOOST_NOEXCEPT
+   int compare(const gmp_int& o) const noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d && o.m_data[0]._mp_d);
       return mpz_cmp(m_data, o.m_data);
    }
-   int compare(long i) const BOOST_NOEXCEPT
+   int compare(long i) const noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return mpz_cmp_si(m_data, i);
    }
-   int compare(unsigned long i) const BOOST_NOEXCEPT
+   int compare(unsigned long i) const noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return mpz_cmp_ui(m_data, i);
@@ -1446,12 +1446,12 @@ struct gmp_int
       d = v;
       return compare(d);
    }
-   mpz_t& data() BOOST_NOEXCEPT
+   mpz_t& data() noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return m_data;
    }
-   const mpz_t& data() const BOOST_NOEXCEPT
+   const mpz_t& data() const noexcept
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return m_data;
@@ -2041,7 +2041,7 @@ struct gmp_rational
       mpq_set_z(m_data, o.data());
    }
    // rvalue copy
-   gmp_rational(gmp_rational&& o) BOOST_NOEXCEPT
+   gmp_rational(gmp_rational&& o) noexcept
    {
       m_data[0]                 = o.m_data[0];
       o.m_data[0]._mp_num._mp_d = 0;
@@ -2065,7 +2065,7 @@ struct gmp_rational
       return *this;
    }
    // rvalue assign
-   gmp_rational& operator=(gmp_rational&& o) BOOST_NOEXCEPT
+   gmp_rational& operator=(gmp_rational&& o) noexcept
    {
       mpq_swap(m_data, o.m_data);
       return *this;
@@ -2621,7 +2621,7 @@ inline void set_output_precision(const boost::multiprecision::mpf_float& val, st
 template <>
 inline int digits<boost::multiprecision::mpf_float>()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(boost::multiprecision::mpf_float::default_precision());
@@ -2629,7 +2629,7 @@ inline int digits<boost::multiprecision::mpf_float>()
 template <>
 inline int digits<boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boost::multiprecision::et_off> >()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(boost::multiprecision::mpf_float::default_precision());
@@ -2674,7 +2674,7 @@ min_value<boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boo
 template <>
 inline int digits<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> > >()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >::default_precision());
@@ -2682,7 +2682,7 @@ inline int digits<boost::multiprecision::number<boost::multiprecision::debug_ada
 template <>
 inline int digits<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::gmp_float<0> >, boost::multiprecision::et_off> >()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >::default_precision());

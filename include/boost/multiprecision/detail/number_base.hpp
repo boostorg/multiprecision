@@ -78,12 +78,6 @@
 #define BOOST_MP_FORCEINLINE inline
 #endif
 
-#if (defined(BOOST_GCC) && (BOOST_GCC <= 40700)) || BOOST_WORKAROUND(__SUNPRO_CC, < 0x5140) || (defined(__clang_major__) && (__clang_major__ == 3) && (__clang_minor__ < 5))
-#define BOOST_MP_NOEXCEPT_IF(x)
-#else
-#define BOOST_MP_NOEXCEPT_IF(x) BOOST_NOEXCEPT_IF(x)
-#endif
-
 //
 // Thread local storage:
 // Note fails on Mingw, see https://sourceforge.net/p/mingw-w64/bugs/527/
@@ -235,7 +229,7 @@ namespace detail {
 // Workaround for missing abs(boost::long_long_type) and abs(__int128) on some compilers:
 //
 template <class T>
-constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), T>::type abs(T t) noexcept
 {
    // This strange expression avoids a hardware trap in the corner case
    // that val is the most negative value permitted in boost::long_long_type.
@@ -243,7 +237,7 @@ constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::
    return t < 0 ? T(1u) + T(-(t + 1)) : t;
 }
 template <class T>
-constexpr typename std::enable_if<boost::multiprecision::detail::is_unsigned<T>::value, T>::type abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<boost::multiprecision::detail::is_unsigned<T>::value, T>::type abs(T t) noexcept
 {
    return t;
 }
@@ -251,7 +245,7 @@ constexpr typename std::enable_if<boost::multiprecision::detail::is_unsigned<T>:
 #define BOOST_MP_USING_ABS using boost::multiprecision::detail::abs;
 
 template <class T>
-constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), typename boost::multiprecision::detail::make_unsigned<T>::type>::type unsigned_abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), typename boost::multiprecision::detail::make_unsigned<T>::type>::type unsigned_abs(T t) noexcept
 {
    // This strange expression avoids a hardware trap in the corner case
    // that val is the most negative value permitted in boost::long_long_type.
@@ -259,7 +253,7 @@ constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::
    return t < 0 ? static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(1u) + static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(-(t + 1)) : static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(t);
 }
 template <class T>
-constexpr typename std::enable_if<boost::multiprecision::detail::is_unsigned<T>::value, T>::type unsigned_abs(T t) BOOST_NOEXCEPT
+constexpr typename std::enable_if<boost::multiprecision::detail::is_unsigned<T>::value, T>::type unsigned_abs(T t) noexcept
 {
    return t;
 }
@@ -658,7 +652,7 @@ struct expression<tag, Arg1, void, void, void>
       return left_type(arg);
    }
 
-   BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const BOOST_NOEXCEPT { return arg; }
+   BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const noexcept { return arg; }
 
    static const unsigned depth = left_type::depth + 1;
    template <class T
@@ -805,7 +799,7 @@ struct expression<terminal, Arg1, void, void, void>
       return *this;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR const Arg1& value() const BOOST_NOEXCEPT
+   BOOST_MP_CXX14_CONSTEXPR const Arg1& value() const noexcept
    {
       return arg;
    }
@@ -965,8 +959,8 @@ struct expression<tag, Arg1, Arg2, void, void>
       return left_type(arg1);
    }
    BOOST_MP_CXX14_CONSTEXPR right_type  right() const { return right_type(arg2); }
-   BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const BOOST_NOEXCEPT { return arg1; }
-   BOOST_MP_CXX14_CONSTEXPR const Arg2& right_ref() const BOOST_NOEXCEPT { return arg2; }
+   BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const noexcept { return arg1; }
+   BOOST_MP_CXX14_CONSTEXPR const Arg2& right_ref() const noexcept { return arg2; }
 
    template <class T
 #ifndef __SUNPRO_CC
@@ -1130,9 +1124,9 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    }
    BOOST_MP_CXX14_CONSTEXPR middle_type middle() const { return middle_type(arg2); }
    BOOST_MP_CXX14_CONSTEXPR right_type  right() const { return right_type(arg3); }
-   BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const BOOST_NOEXCEPT { return arg1; }
-   BOOST_MP_CXX14_CONSTEXPR const Arg2& middle_ref() const BOOST_NOEXCEPT { return arg2; }
-   BOOST_MP_CXX14_CONSTEXPR const Arg3& right_ref() const BOOST_NOEXCEPT { return arg3; }
+   BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const noexcept { return arg1; }
+   BOOST_MP_CXX14_CONSTEXPR const Arg2& middle_ref() const noexcept { return arg2; }
+   BOOST_MP_CXX14_CONSTEXPR const Arg3& right_ref() const noexcept { return arg3; }
 
    template <class T
 #ifndef __SUNPRO_CC
@@ -1303,10 +1297,10 @@ struct expression
    BOOST_MP_CXX14_CONSTEXPR left_middle_type  left_middle() const { return left_middle_type(arg2); }
    BOOST_MP_CXX14_CONSTEXPR right_middle_type right_middle() const { return right_middle_type(arg3); }
    BOOST_MP_CXX14_CONSTEXPR right_type        right() const { return right_type(arg4); }
-   BOOST_MP_CXX14_CONSTEXPR const Arg1&       left_ref() const BOOST_NOEXCEPT { return arg1; }
-   BOOST_MP_CXX14_CONSTEXPR const Arg2&       left_middle_ref() const BOOST_NOEXCEPT { return arg2; }
-   BOOST_MP_CXX14_CONSTEXPR const Arg3&       right_middle_ref() const BOOST_NOEXCEPT { return arg3; }
-   BOOST_MP_CXX14_CONSTEXPR const Arg4&       right_ref() const BOOST_NOEXCEPT { return arg4; }
+   BOOST_MP_CXX14_CONSTEXPR const Arg1&       left_ref() const noexcept { return arg1; }
+   BOOST_MP_CXX14_CONSTEXPR const Arg2&       left_middle_ref() const noexcept { return arg2; }
+   BOOST_MP_CXX14_CONSTEXPR const Arg3&       right_middle_ref() const noexcept { return arg3; }
+   BOOST_MP_CXX14_CONSTEXPR const Arg4&       right_ref() const noexcept { return arg4; }
 
    template <class T
 #ifndef __SUNPRO_CC
@@ -1356,7 +1350,7 @@ struct digits2
    // If we really have so many digits that this fails, then we're probably going to hit other problems anyway:
    static_assert(LONG_MAX / 1000 > (std::numeric_limits<T>::digits + 1), "Too many digits to cope with here");
    static const long                  m_value = std::numeric_limits<T>::radix == 10 ? (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) : std::numeric_limits<T>::digits;
-   static inline constexpr long value() BOOST_NOEXCEPT { return m_value; }
+   static inline constexpr long value() noexcept { return m_value; }
 };
 
 #ifndef BOOST_MP_MIN_EXPONENT_DIGITS
@@ -1521,7 +1515,7 @@ BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_const
       BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
 }
 template <class V>
-BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V, const std::integral_constant<bool, false>&, const std::integral_constant<bool, false>&) BOOST_NOEXCEPT {}
+BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V, const std::integral_constant<bool, false>&, const std::integral_constant<bool, false>&) noexcept {}
 
 template <class T>
 BOOST_MP_CXX14_CONSTEXPR const T& evaluate_if_expression(const T& val) { return val; }

@@ -79,7 +79,7 @@ struct complex_adaptor
       return *this;
    }
    // rvalue assign:
-   complex_adaptor& operator=(complex_adaptor&& o) BOOST_NOEXCEPT
+   complex_adaptor& operator=(complex_adaptor&& o) noexcept
    {
       m_real = std::move(o.real_data());
       m_imag = std::move(o.imag_data());
@@ -177,7 +177,7 @@ struct complex_adaptor
 };
 
 template <class Backend, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const complex_adaptor<Backend>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const complex_adaptor<Backend>& a, const T& b) noexcept
 {
    return a.compare(b) == 0;
 }
@@ -320,7 +320,7 @@ inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::valu
 }
 
 template <class Backend>
-inline bool eval_is_zero(const complex_adaptor<Backend>& val) BOOST_NOEXCEPT
+inline bool eval_is_zero(const complex_adaptor<Backend>& val) noexcept
 {
    using default_ops::eval_is_zero;
    return eval_is_zero(val.real_data()) && eval_is_zero(val.imag_data());

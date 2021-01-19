@@ -118,7 +118,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
          mpfr_set(m_data, o.m_data, GMP_RNDN);
    }
    // rvalue copy
-   mpfr_float_imp(mpfr_float_imp&& o) BOOST_NOEXCEPT
+   mpfr_float_imp(mpfr_float_imp&& o) noexcept
    {
       m_data[0]           = o.m_data[0];
       o.m_data[0]._mpfr_d = 0;
@@ -134,7 +134,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       return *this;
    }
    // rvalue assign
-   mpfr_float_imp& operator=(mpfr_float_imp&& o) BOOST_NOEXCEPT
+   mpfr_float_imp& operator=(mpfr_float_imp&& o) noexcept
    {
       mpfr_swap(m_data, o.m_data);
       return *this;
@@ -227,7 +227,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       }
       return *this;
    }
-   void swap(mpfr_float_imp& o) BOOST_NOEXCEPT
+   void swap(mpfr_float_imp& o) noexcept
    {
       mpfr_swap(m_data, o.m_data);
    }
@@ -350,46 +350,46 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       boost::multiprecision::detail::format_float_string(result, e, org_digits, f, 0 != mpfr_zero_p(m_data));
       return result;
    }
-   ~mpfr_float_imp() BOOST_NOEXCEPT
+   ~mpfr_float_imp() noexcept
    {
       if (m_data[0]._mpfr_d)
          mpfr_clear(m_data);
       detail::mpfr_cleanup<true>::force_instantiate();
    }
-   void negate() BOOST_NOEXCEPT
+   void negate() noexcept
    {
       BOOST_ASSERT(m_data[0]._mpfr_d);
       mpfr_neg(m_data, m_data, GMP_RNDN);
    }
    template <mpfr_allocation_type AllocationType>
-   int compare(const mpfr_float_backend<digits10, AllocationType>& o) const BOOST_NOEXCEPT
+   int compare(const mpfr_float_backend<digits10, AllocationType>& o) const noexcept
    {
       BOOST_ASSERT(m_data[0]._mpfr_d && o.m_data[0]._mpfr_d);
       return mpfr_cmp(m_data, o.m_data);
    }
-   int compare(long i) const BOOST_NOEXCEPT
+   int compare(long i) const noexcept
    {
       BOOST_ASSERT(m_data[0]._mpfr_d);
       return mpfr_cmp_si(m_data, i);
    }
-   int compare(unsigned long i) const BOOST_NOEXCEPT
+   int compare(unsigned long i) const noexcept
    {
       BOOST_ASSERT(m_data[0]._mpfr_d);
       return mpfr_cmp_ui(m_data, i);
    }
    template <class V>
-   int compare(V v) const BOOST_NOEXCEPT
+   int compare(V v) const noexcept
    {
       mpfr_float_backend<digits10, allocate_dynamic> d(0uL, mpfr_get_prec(m_data));
       d = v;
       return compare(d);
    }
-   mpfr_t& data() BOOST_NOEXCEPT
+   mpfr_t& data() noexcept
    {
       BOOST_ASSERT(m_data[0]._mpfr_d);
       return m_data;
    }
-   const mpfr_t& data() const BOOST_NOEXCEPT
+   const mpfr_t& data() const noexcept
    {
       BOOST_ASSERT(m_data[0]._mpfr_d);
       return m_data;
@@ -397,7 +397,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
 
  protected:
    mpfr_t           m_data;
-   static boost::multiprecision::detail::precision_type& get_default_precision() BOOST_NOEXCEPT
+   static boost::multiprecision::detail::precision_type& get_default_precision() noexcept
    {
       static boost::multiprecision::detail::precision_type val(BOOST_MULTIPRECISION_MPFR_DEFAULT_PRECISION);
       return val;
@@ -425,7 +425,7 @@ struct mpfr_float_imp<digits10, allocate_stack>
    static const unsigned digits2    = (digits10 * 1000uL) / 301uL + ((digits10 * 1000uL) % 301 ? 2u : 1u);
    static const unsigned limb_count = mpfr_custom_get_size(digits2) / sizeof(mp_limb_t);
 
-   ~mpfr_float_imp() BOOST_NOEXCEPT
+   ~mpfr_float_imp() noexcept
    {
       detail::mpfr_cleanup<true>::force_instantiate();
    }
@@ -518,7 +518,7 @@ struct mpfr_float_imp<digits10, allocate_stack>
       }
       return *this;
    }
-   void swap(mpfr_float_imp& o) BOOST_NOEXCEPT
+   void swap(mpfr_float_imp& o) noexcept
    {
       // We have to swap by copying:
       mpfr_float_imp t(*this);
@@ -632,35 +632,35 @@ struct mpfr_float_imp<digits10, allocate_stack>
       boost::multiprecision::detail::format_float_string(result, e, org_digits, f, 0 != mpfr_zero_p(m_data));
       return result;
    }
-   void negate() BOOST_NOEXCEPT
+   void negate() noexcept
    {
       mpfr_neg(m_data, m_data, GMP_RNDN);
    }
    template <mpfr_allocation_type AllocationType>
-   int compare(const mpfr_float_backend<digits10, AllocationType>& o) const BOOST_NOEXCEPT
+   int compare(const mpfr_float_backend<digits10, AllocationType>& o) const noexcept
    {
       return mpfr_cmp(m_data, o.m_data);
    }
-   int compare(long i) const BOOST_NOEXCEPT
+   int compare(long i) const noexcept
    {
       return mpfr_cmp_si(m_data, i);
    }
-   int compare(unsigned long i) const BOOST_NOEXCEPT
+   int compare(unsigned long i) const noexcept
    {
       return mpfr_cmp_ui(m_data, i);
    }
    template <class V>
-   int compare(V v) const BOOST_NOEXCEPT
+   int compare(V v) const noexcept
    {
       mpfr_float_backend<digits10, allocate_stack> d;
       d = v;
       return compare(d);
    }
-   mpfr_t& data() BOOST_NOEXCEPT
+   mpfr_t& data() noexcept
    {
       return m_data;
    }
-   const mpfr_t& data() const BOOST_NOEXCEPT
+   const mpfr_t& data() const noexcept
    {
       return m_data;
    }
@@ -682,7 +682,7 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10, AllocationTy
    mpfr_float_backend() : detail::mpfr_float_imp<digits10, AllocationType>() {}
    mpfr_float_backend(const mpfr_float_backend& o) : detail::mpfr_float_imp<digits10, AllocationType>(o) {}
    // rvalue copy
-   mpfr_float_backend(mpfr_float_backend&& o) BOOST_NOEXCEPT : detail::mpfr_float_imp<digits10, AllocationType>(static_cast<detail::mpfr_float_imp<digits10, AllocationType>&&>(o))
+   mpfr_float_backend(mpfr_float_backend&& o) noexcept : detail::mpfr_float_imp<digits10, AllocationType>(static_cast<detail::mpfr_float_imp<digits10, AllocationType>&&>(o))
    {}
    template <unsigned D, mpfr_allocation_type AT>
    mpfr_float_backend(const mpfr_float_backend<D, AT>& val, typename std::enable_if<D <= digits10>::type* = 0)
@@ -750,7 +750,7 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10, AllocationTy
       return *this;
    }
    // rvalue assign
-   mpfr_float_backend& operator=(mpfr_float_backend&& o) BOOST_NOEXCEPT
+   mpfr_float_backend& operator=(mpfr_float_backend&& o) noexcept
    {
       *static_cast<detail::mpfr_float_imp<digits10, AllocationType>*>(this) = static_cast<detail::mpfr_float_imp<digits10, AllocationType>&&>(o);
       return *this;
@@ -848,7 +848,7 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    }
    mpfr_float_backend(const mpfr_float_backend& o) : detail::mpfr_float_imp<0, allocate_dynamic>(o) {}
    // rvalue copy
-   mpfr_float_backend(mpfr_float_backend&& o) BOOST_NOEXCEPT : detail::mpfr_float_imp<0, allocate_dynamic>(static_cast<detail::mpfr_float_imp<0, allocate_dynamic>&&>(o))
+   mpfr_float_backend(mpfr_float_backend&& o) noexcept : detail::mpfr_float_imp<0, allocate_dynamic>(static_cast<detail::mpfr_float_imp<0, allocate_dynamic>&&>(o))
    {}
    template <class V>
    mpfr_float_backend(const V& o, unsigned digits10)
@@ -912,7 +912,7 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
       return *this;
    }
    // rvalue assign
-   mpfr_float_backend& operator=(mpfr_float_backend&& o) BOOST_NOEXCEPT
+   mpfr_float_backend& operator=(mpfr_float_backend&& o) noexcept
    {
       *static_cast<detail::mpfr_float_imp<0, allocate_dynamic>*>(this) = static_cast<detail::mpfr_float_imp<0, allocate_dynamic>&&>(o);
       return *this;
@@ -989,36 +989,36 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
       mpfr_set_q(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
-   static unsigned default_precision() BOOST_NOEXCEPT
+   static unsigned default_precision() noexcept
    {
       return get_default_precision();
    }
-   static void default_precision(unsigned v) BOOST_NOEXCEPT
+   static void default_precision(unsigned v) noexcept
    {
       get_default_precision() = v;
    }
-   unsigned precision() const BOOST_NOEXCEPT
+   unsigned precision() const noexcept
    {
       return multiprecision::detail::digits2_2_10(mpfr_get_prec(this->m_data));
    }
-   void precision(unsigned digits10) BOOST_NOEXCEPT
+   void precision(unsigned digits10) noexcept
    {
       mpfr_prec_round(this->m_data, multiprecision::detail::digits10_2_2((digits10)), GMP_RNDN);
    }
 };
 
 template <unsigned digits10, mpfr_allocation_type AllocationType, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) noexcept
 {
    return a.compare(b) == 0;
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) noexcept
 {
    return a.compare(b) < 0;
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) noexcept
 {
    return a.compare(b) > 0;
 }
@@ -1248,12 +1248,12 @@ inline void eval_divide(mpfr_float_backend<D1, A1>& a, long x, const mpfr_float_
 }
 
 template <unsigned digits10, mpfr_allocation_type AllocationType>
-inline bool eval_is_zero(const mpfr_float_backend<digits10, AllocationType>& val) BOOST_NOEXCEPT
+inline bool eval_is_zero(const mpfr_float_backend<digits10, AllocationType>& val) noexcept
 {
    return 0 != mpfr_zero_p(val.data());
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType>
-inline int eval_get_sign(const mpfr_float_backend<digits10, AllocationType>& val) BOOST_NOEXCEPT
+inline int eval_get_sign(const mpfr_float_backend<digits10, AllocationType>& val) noexcept
 {
    return mpfr_sgn(val.data());
 }
@@ -1297,17 +1297,17 @@ inline void eval_convert_to(boost::long_long_type* result, const mpfr_float_back
 }
 #endif
 template <unsigned digits10, mpfr_allocation_type AllocationType>
-inline void eval_convert_to(float* result, const mpfr_float_backend<digits10, AllocationType>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(float* result, const mpfr_float_backend<digits10, AllocationType>& val) noexcept
 {
    *result = mpfr_get_flt(val.data(), GMP_RNDN);
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType>
-inline void eval_convert_to(double* result, const mpfr_float_backend<digits10, AllocationType>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(double* result, const mpfr_float_backend<digits10, AllocationType>& val) noexcept
 {
    *result = mpfr_get_d(val.data(), GMP_RNDN);
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType>
-inline void eval_convert_to(long double* result, const mpfr_float_backend<digits10, AllocationType>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(long double* result, const mpfr_float_backend<digits10, AllocationType>& val) noexcept
 {
    *result = mpfr_get_ld(val.data(), GMP_RNDN);
 }
@@ -1391,7 +1391,7 @@ inline void eval_frexp(mpfr_float_backend<Digits10, AllocateType>& result, const
 }
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
-inline int eval_fpclassify(const mpfr_float_backend<Digits10, AllocateType>& val) BOOST_NOEXCEPT
+inline int eval_fpclassify(const mpfr_float_backend<Digits10, AllocateType>& val) noexcept
 {
    return mpfr_inf_p(val.data()) ? FP_INFINITE : mpfr_nan_p(val.data()) ? FP_NAN : mpfr_zero_p(val.data()) ? FP_ZERO : FP_NORMAL;
 }
@@ -1657,7 +1657,7 @@ inline void set_output_precision(const boost::multiprecision::mpfr_float& val, s
 template <>
 inline int digits<boost::multiprecision::mpfr_float>()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(boost::multiprecision::mpfr_float::default_precision());
@@ -1665,7 +1665,7 @@ inline int digits<boost::multiprecision::mpfr_float>()
 template <>
 inline int digits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> >()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(boost::multiprecision::mpfr_float::default_precision());
@@ -1714,7 +1714,7 @@ min_value<boost::multiprecision::number<boost::multiprecision::mpfr_float_backen
 template <>
 inline int digits<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float::backend_type> > >()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float::backend_type> >::default_precision());
@@ -1722,7 +1722,7 @@ inline int digits<boost::multiprecision::number<boost::multiprecision::debug_ada
 template <>
 inline int digits<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<0> >, boost::multiprecision::et_off> >()
 #ifdef BOOST_MATH_NOEXCEPT
-    BOOST_NOEXCEPT
+    noexcept
 #endif
 {
    return multiprecision::detail::digits10_2_2(boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float::backend_type> >::default_precision());
