@@ -9,6 +9,9 @@ on: [push]
 jobs:
   ubuntu-focal:
     runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
@@ -24,7 +27,7 @@ jobs:
       - name: Add repository
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: sudo apt install g++-9 libgmp-dev libmpfr-dev libtommath-dev
+        run: sudo apt install g++-9 libgmp-dev libmpfr-dev
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
@@ -52,7 +55,7 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j3 toolset=$TOOLSET ${{ matrix.suite }}
+        run: ../../../b2 -j3 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
   windows:
     runs-on: windows-latest
@@ -65,7 +68,7 @@ jobs:
       fail-fast: false
       matrix:
         toolset: [ gcc, msvc-14.0, msvc-14.2 ]
-        standard: [ 11, 17 ]
+        standard: [ 11 ]
         suite: [ arithmetic_tests, cpp_int_tests, functions_and_limits, conversions, misc, compile_fail, examples, concepts ]
     steps:
       - uses: actions/checkout@v2
@@ -95,5 +98,5 @@ jobs:
         run: config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ..\..\..\b2 -j3 --hash %ARGS% ${{ matrix.suite }}
+        run: ..\..\..\b2 -j3 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/multiprecision/test
