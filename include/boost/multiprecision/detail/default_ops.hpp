@@ -1040,9 +1040,9 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
       if (eval_get_sign(backend) < 0)
       {
          BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
-            *result = (std::numeric_limits<R>::min)();
-         else BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer)
             *result = (std::numeric_limits<R>::max)(); // we should never get here, exception above will be raised.
+         else BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer)
+            *result = (std::numeric_limits<R>::min)();
          else
             *result = -(std::numeric_limits<R>::max)();
       }
@@ -1056,14 +1056,12 @@ template <class R, class B>
 inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const std::integral_constant<bool, true>&)
 {
    //
+   // Last chance conversion to an unsigned integer.
    // We ran out of types to try for the conversion, try
    // a lexical_cast and hope for the best:
    //
-   BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
-   {
-      if (eval_get_sign(backend) < 0)
-         BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
-   }
+   if (eval_get_sign(backend) < 0)
+      BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
    BOOST_TRY {
       B t(backend);
       R mask = ~static_cast<R>(0u);
@@ -1072,17 +1070,8 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    }
    BOOST_CATCH (const bad_lexical_cast&)
    {
-      if (eval_get_sign(backend) < 0)
-      {
-         BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && std::numeric_limits<R>::is_signed)
-            *result = (std::numeric_limits<R>::min)();
-         else BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
-            *result = 0; // we never get here, exception is thrown above.
-         else
-            *result = (std::numeric_limits<R>::max)();
-      }
-      else
-         *result = (std::numeric_limits<R>::max)();
+      // We should never really get here...
+      *result = (std::numeric_limits<R>::max)();
    }
    BOOST_CATCH_END
 }
