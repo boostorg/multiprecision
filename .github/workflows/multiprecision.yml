@@ -67,7 +67,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolset: [ gcc, msvc-14.0, msvc-14.2 ]
+        toolset: [ gcc-9, msvc-14.0, msvc-14.2 ]
         standard: [ 11 ]
         suite: [ arithmetic_tests, cpp_int_tests, functions_and_limits, conversions, misc, compile_fail, examples, concepts ]
     steps:
