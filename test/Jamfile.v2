@@ -356,8 +356,8 @@ test-suite functions_and_limits :
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_2 : test_sf_import_c99_cpp_dec_float_2 ]
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_3 : test_sf_import_c99_cpp_dec_float_3 ]
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_4 : test_sf_import_c99_cpp_dec_float_4 ]
-      [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_5 : test_sf_import_c99_cpp_dec_float_5 ]
-      [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_6 : test_sf_import_c99_cpp_dec_float_6 ]
+      [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_5 <toolset>gcc-mingw:<cxxflags>-Wl,--stack,8388608 : test_sf_import_c99_cpp_dec_float_5 ]
+      [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_6 <toolset>gcc-mingw:<cxxflags>-Wl,--stack,8388608 : test_sf_import_c99_cpp_dec_float_6 ]
 
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_BIN_FLOAT_2 : test_sf_import_c99_cpp_bin_float_2 ]
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_BIN_FLOAT_2 : test_sf_import_c99_cpp_bin_float_3 ]
