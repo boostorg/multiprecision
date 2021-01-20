@@ -945,11 +945,6 @@ class number
 
  private:
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   BOOST_MP_CXX14_CONSTEXPR void do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const std::integral_constant<bool, true>&)
-   {
-      do_assign(e, tag());
-   }
-   template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_assignable<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value>::type 
       do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const std::integral_constant<bool, false>&)
    {
@@ -968,6 +963,12 @@ class number
       typedef typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type temp_type;
       temp_type                                                                     t(e);
       this->assign(t);
+   }
+#ifdef BOOST_NO_CXX17_IF_CONSTEXPR
+   template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+   BOOST_MP_CXX14_CONSTEXPR void do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const std::integral_constant<bool, true>&)
+   {
+      do_assign(e, tag());
    }
 
    template <class Exp>
@@ -1400,7 +1401,7 @@ class number
    {
       static_assert(number_category<Backend>::value == number_kind_integer, "The right shift operation is only valid for integer types");
       using default_ops::eval_right_shift;
-      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
+      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value&& boost::multiprecision::detail::is_integral<Val>::value>());
       eval_right_shift(m_backend, canonical_value(e.value()), static_cast<std::size_t>(val));
    }
 
@@ -1409,7 +1410,7 @@ class number
    {
       static_assert(number_category<Backend>::value == number_kind_integer, "The left shift operation is only valid for integer types");
       using default_ops::eval_left_shift;
-      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
+      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value&& boost::multiprecision::detail::is_integral<Val>::value>());
       eval_left_shift(m_backend, canonical_value(e.value()), static_cast<std::size_t>(val));
    }
 
@@ -1419,7 +1420,7 @@ class number
       static_assert(number_category<Backend>::value == number_kind_integer, "The right shift operation is only valid for integer types");
       using default_ops::eval_right_shift;
       self_type temp(e);
-      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
+      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value&& boost::multiprecision::detail::is_integral<Val>::value>());
       eval_right_shift(m_backend, temp.backend(), static_cast<std::size_t>(val));
    }
 
@@ -1429,7 +1430,7 @@ class number
       static_assert(number_category<Backend>::value == number_kind_integer, "The left shift operation is only valid for integer types");
       using default_ops::eval_left_shift;
       self_type temp(e);
-      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value>());
+      detail::check_shift_range(val, std::integral_constant<bool, (sizeof(Val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<Val>::value&& boost::multiprecision::detail::is_integral<Val>::value>());
       eval_left_shift(m_backend, temp.backend(), static_cast<std::size_t>(val));
    }
 
@@ -1501,6 +1502,485 @@ class number
       typedef typename right_type::tag_type   right_tag_type;
       do_assign_function_3a(e.left().value(), e.left_middle_ref(), e.right_middle_ref(), e.right_ref(), left_tag_type(), middle_tag_type(), right_tag_type());
    }
+#else
+   template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+   BOOST_MP_CXX14_CONSTEXPR void do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const std::integral_constant<bool, true>& true_tag)
+   {
+      typedef detail::expression<tag, Arg1, Arg2, Arg3, Arg4> Exp;
+      if constexpr (std::is_same<tag, detail::add_immediates>::value)
+      {
+         using default_ops::eval_add;
+         boost::multiprecision::detail::maybe_promote_precision(this);
+         eval_add(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
+      }
+      else if constexpr (std::is_same<tag, detail::subtract_immediates>::value)
+      {
+         using default_ops::eval_subtract;
+         boost::multiprecision::detail::maybe_promote_precision(this);
+         eval_subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
+      }
+      else if constexpr (std::is_same<tag, detail::multiply_immediates>::value)
+      {
+         using default_ops::eval_multiply;
+         boost::multiprecision::detail::maybe_promote_precision(this);
+         eval_multiply(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
+      }
+      else if constexpr (std::is_same<tag, detail::multiply_add>::value)
+      {
+         using default_ops::eval_multiply_add;
+         boost::multiprecision::detail::maybe_promote_precision(this);
+         eval_multiply_add(m_backend, canonical_value(e.left().value()), canonical_value(e.middle().value()), canonical_value(e.right().value()));
+      }
+      else if constexpr (std::is_same<tag, detail::multiply_subtract>::value)
+      {
+         using default_ops::eval_multiply_subtract;
+         boost::multiprecision::detail::maybe_promote_precision(this);
+         eval_multiply_subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.middle().value()), canonical_value(e.right().value()));
+      }
+      else if constexpr (std::is_same<tag, detail::divide_immediates>::value)
+      {
+         using default_ops::eval_divide;
+         boost::multiprecision::detail::maybe_promote_precision(this);
+         eval_divide(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
+      }
+      else if constexpr (std::is_same<tag, detail::negate>::value)
+      {
+         do_assign(e.left(), true_tag);
+         m_backend.negate();
+      }
+      else if constexpr (std::is_same<tag, detail::plus>::value)
+      {
+         typedef typename Exp::left_type  left_type;
+         typedef typename Exp::right_type right_type;
+
+         constexpr int const left_depth  = left_type::depth;
+         constexpr int const right_depth = right_type::depth;
+
+         bool bl = contains_self(e.left());
+         bool br = contains_self(e.right());
+
+         if (bl && br)
+         {
+            self_type temp(e);
+            temp.m_backend.swap(this->m_backend);
+         }
+         else if (bl && is_self(e.left()))
+         {
+            // Ignore the left node, it's *this, just add the right:
+            do_add(e.right(), typename right_type::tag_type());
+         }
+         else if (br && is_self(e.right()))
+         {
+            // Ignore the right node, it's *this, just add the left:
+            do_add(e.left(), typename left_type::tag_type());
+         }
+         else if (!br && (bl || (left_depth >= right_depth)))
+         { // br is always false, but if bl is true we must take the this branch:
+            do_assign(e.left(), true_tag);
+            do_add(e.right(), typename right_type::tag_type());
+         }
+         else
+         {
+            do_assign(e.right(), true_tag);
+            do_add(e.left(), typename left_type::tag_type());
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::minus>::value)
+      {
+         typedef typename Exp::left_type  left_type;
+         typedef typename Exp::right_type right_type;
+
+         constexpr int const left_depth  = left_type::depth;
+         constexpr int const right_depth = right_type::depth;
+
+         bool bl = contains_self(e.left());
+         bool br = contains_self(e.right());
+
+         if (bl && br)
+         {
+            self_type temp(e);
+            temp.m_backend.swap(this->m_backend);
+         }
+         else if (bl && is_self(e.left()))
+         {
+            // Ignore the left node, it's *this, just subtract the right:
+            do_subtract(e.right(), typename right_type::tag_type());
+         }
+         else if (br && is_self(e.right()))
+         {
+            // Ignore the right node, it's *this, just subtract the left and negate the result:
+            do_subtract(e.left(), typename left_type::tag_type());
+            m_backend.negate();
+         }
+         else if (!br && (bl || (left_depth >= right_depth)))
+         { // br is always false, but if bl is true we must take the this branch:
+            do_assign(e.left(), true_tag);
+            do_subtract(e.right(), typename right_type::tag_type());
+         }
+         else
+         {
+            do_assign(e.right(), true_tag);
+            do_subtract(e.left(), typename left_type::tag_type());
+            m_backend.negate();
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::multiplies>::value)
+      {
+         typedef typename Exp::left_type  left_type;
+         typedef typename Exp::right_type right_type;
+
+         constexpr int const left_depth  = left_type::depth;
+         constexpr int const right_depth = right_type::depth;
+
+         bool bl = contains_self(e.left());
+         bool br = contains_self(e.right());
+
+         if (bl && br)
+         {
+            self_type temp(e);
+            temp.m_backend.swap(this->m_backend);
+         }
+         else if (bl && is_self(e.left()))
+         {
+            // Ignore the left node, it's *this, just add the right:
+            do_multiplies(e.right(), typename right_type::tag_type());
+         }
+         else if (br && is_self(e.right()))
+         {
+            // Ignore the right node, it's *this, just add the left:
+            do_multiplies(e.left(), typename left_type::tag_type());
+         }
+         else if (!br && (bl || (left_depth >= right_depth)))
+         { // br is always false, but if bl is true we must take the this branch:
+            do_assign(e.left(), true_tag);
+            do_multiplies(e.right(), typename right_type::tag_type());
+         }
+         else
+         {
+            do_assign(e.right(), true_tag);
+            do_multiplies(e.left(), typename left_type::tag_type());
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::divides>::value)
+      {
+         typedef typename Exp::right_type right_type;
+
+         bool bl = contains_self(e.left());
+         bool br = contains_self(e.right());
+
+         if (bl && is_self(e.left()))
+         {
+            // Ignore the left node, it's *this, just add the right:
+            do_divide(e.right(), typename right_type::tag_type());
+         }
+         else if (br)
+         {
+            self_type temp(e);
+            temp.m_backend.swap(this->m_backend);
+         }
+         else
+         {
+            do_assign(e.left(), true_tag);
+            do_divide(e.right(), typename right_type::tag_type());
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::modulus>::value)
+      {
+         //
+         // This operation is only valid for integer backends:
+         //
+         static_assert(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
+         typedef typename Exp::right_type right_type;
+
+         bool bl = contains_self(e.left());
+         bool br = contains_self(e.right());
+
+         if (bl && is_self(e.left()))
+         {
+            // Ignore the left node, it's *this, just add the right:
+            do_modulus(e.right(), typename right_type::tag_type());
+         }
+         else if (br)
+         {
+            self_type temp(e);
+            temp.m_backend.swap(this->m_backend);
+         }
+         else
+         {
+            do_assign(e.left(), true_tag);
+            do_modulus(e.right(), typename right_type::tag_type());
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::modulus_immediates>::value)
+      {
+         static_assert(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
+         using default_ops::eval_modulus;
+         boost::multiprecision::detail::maybe_promote_precision(this);
+         eval_modulus(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
+      }
+      else if constexpr (std::is_same<tag, detail::bitwise_and>::value)
+      {
+         //
+         // This operation is only valid for integer backends:
+         //
+         static_assert(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
+
+         typedef typename Exp::left_type  left_type;
+         typedef typename Exp::right_type right_type;
+
+         constexpr int const left_depth  = left_type::depth;
+         constexpr int const right_depth = right_type::depth;
+
+         bool bl = contains_self(e.left());
+         bool br = contains_self(e.right());
+
+         if (bl && is_self(e.left()))
+         {
+            // Ignore the left node, it's *this, just add the right:
+            do_bitwise_and(e.right(), typename right_type::tag_type());
+         }
+         else if (br && is_self(e.right()))
+         {
+            do_bitwise_and(e.left(), typename left_type::tag_type());
+         }
+         else if (!br && (bl || (left_depth >= right_depth)))
+         {
+            do_assign(e.left(), true_tag);
+            do_bitwise_and(e.right(), typename right_type::tag_type());
+         }
+         else
+         {
+            do_assign(e.right(), true_tag);
+            do_bitwise_and(e.left(), typename left_type::tag_type());
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::bitwise_and_immediates>::value)
+      {
+         static_assert(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
+         using default_ops::eval_bitwise_and;
+         eval_bitwise_and(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
+      }
+      else if constexpr (std::is_same<tag, detail::bitwise_or>::value)
+      {
+         //
+         // This operation is only valid for integer backends:
+         //
+         static_assert(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
+
+         typedef typename Exp::left_type  left_type;
+         typedef typename Exp::right_type right_type;
+
+         constexpr int const left_depth  = left_type::depth;
+         constexpr int const right_depth = right_type::depth;
+
+         bool bl = contains_self(e.left());
+         bool br = contains_self(e.right());
+
+         if (bl && is_self(e.left()))
+         {
+            // Ignore the left node, it's *this, just add the right:
+            do_bitwise_or(e.right(), typename right_type::tag_type());
+         }
+         else if (br && is_self(e.right()))
+         {
+            do_bitwise_or(e.left(), typename left_type::tag_type());
+         }
+         else if (!br && (bl || (left_depth >= right_depth)))
+         {
+            do_assign(e.left(), true_tag);
+            do_bitwise_or(e.right(), typename right_type::tag_type());
+         }
+         else
+         {
+            do_assign(e.right(), true_tag);
+            do_bitwise_or(e.left(), typename left_type::tag_type());
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::bitwise_or_immediates>::value)
+      {
+         static_assert(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
+         using default_ops::eval_bitwise_or;
+         eval_bitwise_or(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
+      }
+      else if constexpr (std::is_same<tag, detail::bitwise_xor>::value)
+      {
+         //
+         // This operation is only valid for integer backends:
+         //
+         static_assert(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
+
+         typedef typename Exp::left_type  left_type;
+         typedef typename Exp::right_type right_type;
+
+         constexpr int const left_depth  = left_type::depth;
+         constexpr int const right_depth = right_type::depth;
+
+         bool bl = contains_self(e.left());
+         bool br = contains_self(e.right());
+
+         if (bl && is_self(e.left()))
+         {
+            // Ignore the left node, it's *this, just add the right:
+            do_bitwise_xor(e.right(), typename right_type::tag_type());
+         }
+         else if (br && is_self(e.right()))
+         {
+            do_bitwise_xor(e.left(), typename left_type::tag_type());
+         }
+         else if (!br && (bl || (left_depth >= right_depth)))
+         {
+            do_assign(e.left(), true_tag);
+            do_bitwise_xor(e.right(), typename right_type::tag_type());
+         }
+         else
+         {
+            do_assign(e.right(), true_tag);
+            do_bitwise_xor(e.left(), typename left_type::tag_type());
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::bitwise_xor_immediates>::value)
+      {
+         static_assert(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
+         using default_ops::eval_bitwise_xor;
+         eval_bitwise_xor(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
+      }
+      else if constexpr (std::is_same<tag, detail::terminal>::value)
+      {
+         if (!is_self(e))
+         {
+            m_backend = canonical_value(e.value());
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::function>::value)
+      {
+         typedef typename Exp::arity tag_type;
+         boost::multiprecision::detail::maybe_promote_precision(this);
+         static_assert(tag_type::value <= 4);
+
+         if constexpr (tag_type::value == 1)
+         {
+            e.left().value()(&m_backend);
+         }
+         else if constexpr (tag_type::value == 2)
+         {
+            typedef typename Exp::right_type      right_type;
+            typedef typename right_type::tag_type right_tag;
+            if constexpr (std::is_same<right_tag, detail::terminal>::value)
+            {
+               (e.left().value())(m_backend, function_arg_value(e.right_ref()));
+            }
+            else
+            {
+               typename right_type::result_type t(e.right_ref());
+               (e.left().value())(m_backend, t.backend());
+            }
+         }
+         else if constexpr (tag_type::value == 3)
+         {
+            typedef typename Exp::middle_type      middle_type;
+            typedef typename middle_type::tag_type middle_tag;
+            typedef typename Exp::right_type       end_type;
+            typedef typename end_type::tag_type    end_tag;
+            if constexpr (std::is_same<middle_tag, detail::terminal>::value && std::is_same<end_tag, detail::terminal>::value)
+            {
+               (e.left().value())(m_backend, function_arg_value(e.middle_ref()), function_arg_value(e.right_ref()));
+            }
+            else if constexpr (std::is_same<end_tag, detail::terminal>::value)
+            {
+               typename middle_type::result_type temp1(e.middle_ref());
+               (e.left().value())(m_backend, std::move(temp1.backend()), function_arg_value(e.right_ref()));
+            }
+            else if constexpr (std::is_same<middle_tag, detail::terminal>::value)
+            {
+               typename end_type::result_type temp2(e.right_ref());
+               (e.left().value())(m_backend, function_arg_value(e.middle_ref()), std::move(temp2.backend()));
+            }
+            else
+            {
+               typename middle_type::result_type temp1(e.middle_ref());
+               typename end_type::result_type temp2(e.right_ref());
+               (e.left().value())(m_backend, std::move(temp1.backend()), std::move(temp2.backend()));
+            }
+         }
+         else if constexpr (tag_type::value == 4)
+         {
+            typedef typename Exp::left_middle_type  left_type;
+            typedef typename left_type::tag_type    left_tag_type;
+            typedef typename Exp::right_middle_type middle_type;
+            typedef typename middle_type::tag_type  middle_tag_type;
+            typedef typename Exp::right_type        right_type;
+            typedef typename right_type::tag_type   right_tag_type;
+            do_assign_function_3a(e.left().value(), e.left_middle_ref(), e.right_middle_ref(), e.right_ref(), left_tag_type(), middle_tag_type(), right_tag_type());
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::shift_left>::value)
+      {
+         // We can only shift by an integer value, not an arbitrary expression:
+         typedef typename Exp::left_type    left_type;
+         typedef typename Exp::right_type   right_type;
+         typedef typename right_type::arity right_arity;
+         static_assert(right_arity::value == 0, "The left shift operator requires an integer value for the shift operand.");
+         typedef typename right_type::result_type right_value_type;
+         static_assert(boost::multiprecision::detail::is_integral<right_value_type>::value, "The left shift operator requires an integer value for the shift operand.");
+         typedef typename left_type::tag_type tag_type;
+         if constexpr (std::is_same<tag_type, detail::terminal>::value)
+         {
+            using default_ops::eval_left_shift;
+            auto val = canonical_value(e.right().value());
+            detail::check_shift_range(val, std::integral_constant<bool, (sizeof(val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<decltype(val)>::value && boost::multiprecision::detail::is_integral<decltype(val)>::value>());
+            eval_left_shift(m_backend, canonical_value(e.left().value()), static_cast<std::size_t>(val));
+         }
+         else
+         {
+            using default_ops::eval_left_shift;
+            auto val = canonical_value(e.right().value());
+            self_type temp(e.left());
+            detail::check_shift_range(val, std::integral_constant<bool, (sizeof(val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<decltype(val)>::value && boost::multiprecision::detail::is_integral<decltype(val)>::value>());
+            eval_left_shift(m_backend, temp.backend(), static_cast<std::size_t>(val));
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::shift_right>::value)
+      {
+         // We can only shift by an integer value, not an arbitrary expression:
+         typedef typename Exp::left_type    left_type;
+         typedef typename Exp::right_type   right_type;
+         typedef typename right_type::arity right_arity;
+         static_assert(right_arity::value == 0, "The left shift operator requires an integer value for the shift operand.");
+         typedef typename right_type::result_type right_value_type;
+         static_assert(boost::multiprecision::detail::is_integral<right_value_type>::value, "The left shift operator requires an integer value for the shift operand.");
+         typedef typename left_type::tag_type tag_type;
+         if constexpr (std::is_same<tag_type, detail::terminal>::value)
+         {
+            using default_ops::eval_right_shift;
+            auto val = canonical_value(e.right().value());
+            detail::check_shift_range(val, std::integral_constant<bool, (sizeof(val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<decltype(val)>::value && boost::multiprecision::detail::is_integral<decltype(val)>::value>());
+            eval_right_shift(m_backend, canonical_value(e.left().value()), static_cast<std::size_t>(val));
+         }
+         else
+         {
+            using default_ops::eval_right_shift;
+            self_type temp(e.left());
+            auto val = canonical_value(e.right().value());
+            detail::check_shift_range(val, std::integral_constant<bool, (sizeof(val) > sizeof(std::size_t))>(), std::integral_constant<bool, boost::multiprecision::detail::is_signed<decltype(val)>::value && boost::multiprecision::detail::is_integral<decltype(val)>::value>());
+            eval_right_shift(m_backend, temp.backend(), static_cast<std::size_t>(val));
+         }
+      }
+      else if constexpr (std::is_same<tag, detail::bitwise_complement>::value)
+      {
+         static_assert(number_category<Backend>::value == number_kind_integer, "The bitwise ~ operation is only valid for integer types");
+         using default_ops::eval_complement;
+         self_type temp(e.left());
+         eval_complement(m_backend, temp.backend());
+      }
+      else if constexpr (std::is_same<tag, detail::complement_immediates>::value)
+      {
+         static_assert(number_category<Backend>::value == number_kind_integer, "The bitwise ~ operation is only valid for integer types");
+         using default_ops::eval_complement;
+         eval_complement(m_backend, canonical_value(e.left().value()));
+      }
+   }
+#endif
+
    template <class F, class Exp1, class Exp2, class Exp3, class Tag2, class Tag3>
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function_3a(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&, const Tag2& t2, const Tag3& t3)
    {
