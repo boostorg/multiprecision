@@ -16,8 +16,8 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [ g++-9 ]
-        standard: [ c++11 ]
-        suite: [ arithmetic_tests, cpp_int_tests, functions_and_limits, conversions, misc, compile_fail, examples, concepts ]
+        standard: [ c++11, c++17 ]
+        suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -27,7 +27,7 @@ jobs:
       - name: Add repository
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: sudo apt install g++-9 libgmp-dev libmpfr-dev
+        run: sudo apt install g++-9 libgmp-dev libmpfr-dev libtommath-dev
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
@@ -69,7 +69,7 @@ jobs:
       matrix:
         toolset: [ gcc, msvc-14.0, msvc-14.2 ]
         standard: [ 11 ]
-        suite: [ arithmetic_tests, cpp_int_tests, functions_and_limits, conversions, misc, compile_fail, examples, concepts ]
+        suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
     steps:
       - uses: actions/checkout@v2
         with:
