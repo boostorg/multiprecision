@@ -1976,7 +1976,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
    static constexpr bool is_specialized = true;
    static number_type(min)()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -1993,7 +1992,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
 #endif
    static number_type(max)()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2038,7 +2036,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
    static constexpr int  radix        = 2;
    static number_type          epsilon()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2054,7 +2051,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
    static number_type round_error()
    {
       // returns 0.5
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2077,7 +2073,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
    static constexpr bool               has_denorm_loss                                                                                                 = false;
    static number_type                        infinity()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2088,7 +2083,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
    }
    static number_type quiet_NaN()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2108,26 +2102,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
    static constexpr bool        traps             = true;
    static constexpr bool        tinyness_before   = false;
    static constexpr float_round_style round_style = round_to_nearest;
-
- private:
-   struct data_initializer
-   {
-      data_initializer()
-      {
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::epsilon();
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::round_error();
-         (std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::min)();
-         (std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::max)();
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::infinity();
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN();
-      }
-      void do_nothing() const {}
-   };
-   static const data_initializer initializer;
 };
-
-template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
-const typename numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::data_initializer numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::initializer;
 
 template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::digits;

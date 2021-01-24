@@ -135,48 +135,6 @@ class cpp_dec_float
                                    fpclass(c),
                                    prec_elem(cpp_dec_float_elem_number) {}
 
-   //
-   // Static data initializer:
-   //
-   struct initializer
-   {
-      initializer()
-      {
-         cpp_dec_float<Digits10, ExponentType, Allocator>::nan();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::inf();
-         (cpp_dec_float<Digits10, ExponentType, Allocator>::min)();
-         (cpp_dec_float<Digits10, ExponentType, Allocator>::max)();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::zero();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::one();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::two();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::half();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::double_min();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::double_max();
-         //cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_max();
-         //cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_min();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::long_long_max();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::long_long_min();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::ulong_long_max();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::eps();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(0);
-      }
-      void do_nothing() {}
-   };
-
-   static initializer init;
-
-   struct long_double_initializer
-   {
-      long_double_initializer()
-      {
-         cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_max();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_min();
-      }
-      void do_nothing() {}
-   };
-
-   static long_double_initializer linit;
-
  public:
    // Constructors
    cpp_dec_float() noexcept(noexcept(array_type())) : data(),
@@ -277,76 +235,65 @@ class cpp_dec_float
    static const cpp_dec_float& nan()
    {
       static const cpp_dec_float val(cpp_dec_float_NaN);
-      init.do_nothing();
       return val;
    }
 
    static const cpp_dec_float& inf()
    {
       static const cpp_dec_float val(cpp_dec_float_inf);
-      init.do_nothing();
       return val;
    }
 
    static const cpp_dec_float&(max)()
    {
-      init.do_nothing();
       static cpp_dec_float val_max = std::string("1.0e" + boost::multiprecision::detail::itos(cpp_dec_float_max_exp10)).c_str();
       return val_max;
    }
 
    static const cpp_dec_float&(min)()
    {
-      init.do_nothing();
       static cpp_dec_float val_min = std::string("1.0e" + boost::multiprecision::detail::itos(cpp_dec_float_min_exp10)).c_str();
       return val_min;
    }
 
    static const cpp_dec_float& zero()
    {
-      init.do_nothing();
       static cpp_dec_float val(static_cast<boost::ulong_long_type>(0u));
       return val;
    }
 
    static const cpp_dec_float& one()
    {
-      init.do_nothing();
       static cpp_dec_float val(static_cast<boost::ulong_long_type>(1u));
       return val;
    }
 
    static const cpp_dec_float& two()
    {
-      init.do_nothing();
       static cpp_dec_float val(static_cast<boost::ulong_long_type>(2u));
       return val;
    }
 
    static const cpp_dec_float& half()
    {
-      init.do_nothing();
       static cpp_dec_float val(0.5L);
       return val;
    }
 
    static const cpp_dec_float& double_min()
    {
-      init.do_nothing();
       static cpp_dec_float val((std::numeric_limits<double>::min)());
       return val;
    }
 
    static const cpp_dec_float& double_max()
    {
-      init.do_nothing();
       static cpp_dec_float val((std::numeric_limits<double>::max)());
       return val;
    }
 
    static const cpp_dec_float& long_double_min()
    {
-      linit.do_nothing();
 #ifdef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
       static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::min)()));
 #else
@@ -357,7 +304,6 @@ class cpp_dec_float
 
    static const cpp_dec_float& long_double_max()
    {
-       linit.do_nothing();
 #ifdef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
       static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::max)()));
 #else
@@ -368,28 +314,24 @@ class cpp_dec_float
 
    static const cpp_dec_float& long_long_max()
    {
-      init.do_nothing();
       static cpp_dec_float val((std::numeric_limits<boost::long_long_type>::max)());
       return val;
    }
 
    static const cpp_dec_float& long_long_min()
    {
-      init.do_nothing();
       static cpp_dec_float val((std::numeric_limits<boost::long_long_type>::min)());
       return val;
    }
 
    static const cpp_dec_float& ulong_long_max()
    {
-      init.do_nothing();
       static cpp_dec_float val((std::numeric_limits<boost::ulong_long_type>::max)());
       return val;
    }
 
    static const cpp_dec_float& eps()
    {
-      init.do_nothing();
       static cpp_dec_float val(1.0, 1 - static_cast<int>(cpp_dec_float_digits10));
       return val;
    }
@@ -624,11 +566,6 @@ class cpp_dec_float
    template <unsigned D, class ET, class A>
    friend class cpp_dec_float;
 };
-
-template <unsigned Digits10, class ExponentType, class Allocator>
-typename cpp_dec_float<Digits10, ExponentType, Allocator>::initializer cpp_dec_float<Digits10, ExponentType, Allocator>::init;
-template <unsigned Digits10, class ExponentType, class Allocator>
-typename cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_initializer cpp_dec_float<Digits10, ExponentType, Allocator>::linit;
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
@@ -2416,7 +2353,6 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
    // Create a static const table of p^2 for -128 < p < +128.
    // Note: The size of this table must be odd-numbered and
    // symmetric about 0.
-   init.do_nothing();
    static const std::array<cpp_dec_float<Digits10, ExponentType, Allocator>, 255u> p2_data =
        {{cpp_dec_float("5.877471754111437539843682686111228389093327783860437607543758531392086297273635864257812500000000000e-39"),
          cpp_dec_float("1.175494350822287507968736537222245677818665556772087521508751706278417259454727172851562500000000000e-38"),
