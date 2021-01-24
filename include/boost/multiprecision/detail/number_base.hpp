@@ -82,10 +82,11 @@
 // Thread local storage:
 // Note fails on Mingw, see https://sourceforge.net/p/mingw-w64/bugs/527/
 //
-#if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !defined(BOOST_INTEL) && !defined(__MINGW32__)
+#if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !(defined(__MINGW32__) && (__GNUC__ < 9))
 #define BOOST_MP_THREAD_LOCAL thread_local
 #define BOOST_MP_USING_THREAD_LOCAL
 #else
+#pragma GCC warning "BOOST_MP_THREAD_LOCAL on mingw is broken, please use MSys mingw gcc-9 or later, see https://sourceforge.net/p/mingw-w64/bugs/527/"
 #define BOOST_MP_THREAD_LOCAL
 #endif
 
