@@ -429,8 +429,8 @@ void eval_log(T& result, const T& arg)
 template <class T>
 const T& get_constant_log10()
 {
-   static thread_local T             result;
-   static thread_local long digits = 0;
+   static BOOST_MP_THREAD_LOCAL T             result;
+   static BOOST_MP_THREAD_LOCAL long digits = 0;
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
       typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;

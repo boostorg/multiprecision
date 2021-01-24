@@ -219,8 +219,8 @@ void calc_pi(T& result, unsigned digits)
 template <class T>
 const T& get_constant_ln2()
 {
-   static thread_local T    result;
-   static thread_local long digits = 0;
+   static BOOST_MP_THREAD_LOCAL T    result;
+   static BOOST_MP_THREAD_LOCAL long digits = 0;
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
       boost::multiprecision::detail::maybe_promote_precision(&result);
@@ -234,8 +234,8 @@ const T& get_constant_ln2()
 template <class T>
 const T& get_constant_e()
 {
-   static thread_local T    result;
-   static thread_local long digits = 0;
+   static BOOST_MP_THREAD_LOCAL T    result;
+   static BOOST_MP_THREAD_LOCAL long digits = 0;
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
       boost::multiprecision::detail::maybe_promote_precision(&result);
@@ -249,8 +249,8 @@ const T& get_constant_e()
 template <class T>
 const T& get_constant_pi()
 {
-   static thread_local T             result;
-   static thread_local long digits = 0;
+   static BOOST_MP_THREAD_LOCAL T             result;
+   static BOOST_MP_THREAD_LOCAL long digits = 0;
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
       boost::multiprecision::detail::maybe_promote_precision(&result);
@@ -267,8 +267,8 @@ const T& get_constant_pi()
 template <class T>
 const T& get_constant_one_over_epsilon()
 {
-   static thread_local T             result;
-   static thread_local long digits = 0;
+   static BOOST_MP_THREAD_LOCAL T             result;
+   static BOOST_MP_THREAD_LOCAL long digits = 0;
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
       typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
