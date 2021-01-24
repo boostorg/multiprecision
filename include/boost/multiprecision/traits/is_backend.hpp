@@ -41,7 +41,7 @@ struct has_float_types
 template <class T>
 struct is_backend
 {
-   static const bool value = has_signed_types<T>::value && has_unsigned_types<T>::value && has_float_types<T>::value;
+   static constexpr const bool value = has_signed_types<T>::value && has_unsigned_types<T>::value && has_float_types<T>::value;
 };
 
 template <class Backend>
@@ -64,12 +64,12 @@ struct number_from_backend
 template <bool b, class T, class U>
 struct is_first_backend_imp
 {
-   static const bool value = false;
+   static constexpr const bool value = false;
 };
 template <class T, class U>
 struct is_first_backend_imp<true, T, U>
 {
-   static const bool value = std::is_convertible<U, number<T, et_on> >::value || std::is_convertible<U, number<T, et_off> >::value;
+   static constexpr const bool value = std::is_convertible<U, number<T, et_on> >::value || std::is_convertible<U, number<T, et_off> >::value;
 };
 
 template <class T, class U>
@@ -79,12 +79,12 @@ struct is_first_backend : is_first_backend_imp<is_backend<T>::value, T, U>
 template <bool b, class T, class U>
 struct is_second_backend_imp
 {
-   static const bool value = false;
+   static constexpr const bool value = false;
 };
 template <class T, class U>
 struct is_second_backend_imp<true, T, U>
 {
-   static const bool value = (std::is_convertible<T, number<U, et_on> >::value || std::is_convertible<T, number<U, et_off> >::value) && !is_first_backend<T, U>::value;
+   static constexpr const bool value = (std::is_convertible<T, number<U, et_on> >::value || std::is_convertible<T, number<U, et_off> >::value) && !is_first_backend<T, U>::value;
 };
 
 template <class T, class U>

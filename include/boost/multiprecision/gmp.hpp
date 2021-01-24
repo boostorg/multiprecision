@@ -235,7 +235,7 @@ struct gmp_float_imp
 
       f = frexp(a, &e);
 
-      static const int shift = std::numeric_limits<int>::digits - 1;
+      constexpr const int shift = std::numeric_limits<int>::digits - 1;
 
       while (f)
       {
@@ -1295,7 +1295,7 @@ struct gmp_int
 
       f = frexp(a, &e);
 
-      static const int shift = std::numeric_limits<int>::digits - 1;
+      constexpr const int shift = std::numeric_limits<int>::digits - 1;
 
       while (f)
       {
@@ -1843,8 +1843,8 @@ inline void eval_convert_to(__int128* result, const gmp_int& val)
    //
    // Overflow check:
    //
-   static const __int128 int128_max = static_cast<__int128>((static_cast<unsigned __int128>(1u) << 127) - 1);
-   static const __int128 int128_min = (static_cast<unsigned __int128>(1u) << 127);
+   constexpr const __int128 int128_max = static_cast<__int128>((static_cast<unsigned __int128>(1u) << 127) - 1);
+   constexpr const __int128 int128_min = (static_cast<unsigned __int128>(1u) << 127);
    bool overflow = false;
    if (mpz_sgn(t.data()))
    {
@@ -2154,7 +2154,7 @@ struct gmp_rational
 
       f = frexp(a, &e);
 
-      static const int shift = std::numeric_limits<int>::digits - 1;
+      constexpr const int shift = std::numeric_limits<int>::digits - 1;
 
       while (f)
       {

@@ -24,7 +24,7 @@ struct calc_max_digits10
       //
       return static_cast<unsigned>(0.301029995663981195213738894724493026768189881462108541310 * d) + 2;
    }
-   static const unsigned value = max_digits_10(digits);
+   static constexpr const unsigned value = max_digits_10(digits);
 };
 
 template <unsigned digits>
@@ -39,7 +39,7 @@ struct calc_digits10
       //
       return static_cast<unsigned>(0.301029995663981195213738894724493026768189881462108541310 * (d - 1));
    }
-   static const unsigned value = digits_10(digits);
+   static constexpr const unsigned value = digits_10(digits);
 };
 
 }}} // namespace boost::multiprecision::detail

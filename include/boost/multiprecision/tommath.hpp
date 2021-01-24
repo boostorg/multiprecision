@@ -214,10 +214,10 @@ struct tommath_int
       f = frexp(a, &e);
 
 #ifdef DIGIT_BIT
-      static const int shift = std::numeric_limits<int>::digits - 1;
+      constexpr const int shift = std::numeric_limits<int>::digits - 1;
       typedef int      part_type;
 #else
-      static const int       shift = std::numeric_limits<std::int64_t>::digits - 1;
+      constexpr const int  shift = std::numeric_limits<std::int64_t>::digits - 1;
       typedef std::int64_t part_type;
 #endif
 
@@ -353,7 +353,7 @@ struct tommath_int
                   block += val;
                   if (!*++s)
                   {
-                     static const std::uint32_t block_multiplier[9] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+                     constexpr const std::uint32_t block_multiplier[9] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
                      block_mult                                       = block_multiplier[i];
                      break;
                   }
@@ -742,9 +742,9 @@ template <class Integer>
 inline typename std::enable_if<boost::multiprecision::detail::is_unsigned<Integer>::value, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
 {
 #ifdef DIGIT_BIT
-   static const mp_digit m = (static_cast<mp_digit>(1) << DIGIT_BIT) - 1;
+   constexpr const mp_digit m = (static_cast<mp_digit>(1) << DIGIT_BIT) - 1;
 #else
-   static const mp_digit m = (static_cast<mp_digit>(1) << MP_DIGIT_BIT) - 1;
+   constexpr const mp_digit m = (static_cast<mp_digit>(1) << MP_DIGIT_BIT) - 1;
 #endif
    if (val <= m)
    {

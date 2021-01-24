@@ -16,9 +16,9 @@ namespace detail {
 template <class I>
 bool check_small_factors(const I& n)
 {
-   static const std::uint32_t small_factors1[] = {
+   constexpr const std::uint32_t small_factors1[] = {
        3u, 5u, 7u, 11u, 13u, 17u, 19u, 23u};
-   static const std::uint32_t pp1 = 223092870u;
+   constexpr const std::uint32_t pp1 = 223092870u;
 
    std::uint32_t m1 = integer_modulus(n, pp1);
 
@@ -29,9 +29,9 @@ bool check_small_factors(const I& n)
          return false;
    }
 
-   static const std::uint32_t small_factors2[] = {
+   constexpr const std::uint32_t small_factors2[] = {
        29u, 31u, 37u, 41u, 43u, 47u};
-   static const std::uint32_t pp2 = 2756205443u;
+   constexpr const std::uint32_t pp2 = 2756205443u;
 
    m1 = integer_modulus(n, pp2);
 
@@ -42,9 +42,9 @@ bool check_small_factors(const I& n)
          return false;
    }
 
-   static const std::uint32_t small_factors3[] = {
+   constexpr const std::uint32_t small_factors3[] = {
        53u, 59u, 61u, 67u, 71u};
-   static const std::uint32_t pp3 = 907383479u;
+   constexpr const std::uint32_t pp3 = 907383479u;
 
    m1 = integer_modulus(n, pp3);
 
@@ -55,9 +55,9 @@ bool check_small_factors(const I& n)
          return false;
    }
 
-   static const std::uint32_t small_factors4[] = {
+   constexpr const std::uint32_t small_factors4[] = {
        73u, 79u, 83u, 89u, 97u};
-   static const std::uint32_t pp4 = 4132280413u;
+   constexpr const std::uint32_t pp4 = 4132280413u;
 
    m1 = integer_modulus(n, pp4);
 
@@ -68,14 +68,14 @@ bool check_small_factors(const I& n)
          return false;
    }
 
-   static const std::uint32_t small_factors5[6][4] = {
+   constexpr const std::uint32_t small_factors5[6][4] = {
        {101u, 103u, 107u, 109u},
        {113u, 127u, 131u, 137u},
        {139u, 149u, 151u, 157u},
        {163u, 167u, 173u, 179u},
        {181u, 191u, 193u, 197u},
        {199u, 211u, 223u, 227u}};
-   static const std::uint32_t pp5[6] =
+   constexpr const std::uint32_t pp5[6] =
        {
            121330189u,
            113u * 127u * 131u * 137u,
@@ -100,7 +100,7 @@ bool check_small_factors(const I& n)
 
 inline bool is_small_prime(unsigned n)
 {
-   static const unsigned char p[] =
+   constexpr const unsigned char p[] =
        {
            3u, 5u, 7u, 11u, 13u, 17u, 19u, 23u, 29u, 31u,
            37u, 41u, 43u, 47u, 53u, 59u, 61u, 67u, 71u, 73u,

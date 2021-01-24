@@ -62,7 +62,7 @@ struct max_precision;
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct max_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
-   static const unsigned value = std::is_void<Allocator>::value ? static_unsigned_max<MinBits, MaxBits>::value
+   static constexpr const unsigned value = std::is_void<Allocator>::value ? static_unsigned_max<MinBits, MaxBits>::value
                                                            : (((MaxBits >= MinBits) && MaxBits) ? MaxBits : UINT_MAX);
 };
 
@@ -72,7 +72,7 @@ struct min_precision;
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct min_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
-   static const unsigned value = (std::is_void<Allocator>::value ? static_unsigned_max<MinBits, MaxBits>::value : MinBits);
+   static constexpr const unsigned value = (std::is_void<Allocator>::value ? static_unsigned_max<MinBits, MaxBits>::value : MinBits);
 };
 //
 // Traits class determines whether the number of bits precision requested could fit in a native type,
@@ -81,20 +81,20 @@ struct min_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Alloca
 template <class T>
 struct is_trivial_cpp_int
 {
-   static const bool value = false;
+   static constexpr const bool value = false;
 };
 
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
    typedef cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> self;
-   static const bool                                                       value = std::is_void<Allocator>::value && (max_precision<self>::value <= (sizeof(double_limb_type) * CHAR_BIT) - (SignType == signed_packed ? 1 : 0));
+   static constexpr const bool                                             value = std::is_void<Allocator>::value && (max_precision<self>::value <= (sizeof(double_limb_type) * CHAR_BIT) - (SignType == signed_packed ? 1 : 0));
 };
 
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct is_trivial_cpp_int<cpp_int_base<MinBits, MaxBits, SignType, Checked, Allocator, true> >
 {
-   static const bool value = true;
+   static constexpr const bool value = true;
 };
 
 } // namespace backends
@@ -120,7 +120,7 @@ struct is_implicit_cpp_int_conversion<cpp_int_backend<MinBits, MaxBits, SignType
 {
    typedef cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>      t1;
    typedef cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> t2;
-   static const bool                                                            value =
+   static constexpr const bool                                                  value =
        (is_signed_number<t2>::value || !is_signed_number<t1>::value) && (max_precision<t1>::value <= max_precision<t2>::value);
 };
 
@@ -351,7 +351,7 @@ private:
    }
    void resize(unsigned new_size, unsigned min_size)
    {
-      static const unsigned max_limbs = MaxBits / (CHAR_BIT * sizeof(limb_type)) + ((MaxBits % (CHAR_BIT * sizeof(limb_type))) ? 1 : 0);
+      constexpr const unsigned max_limbs = MaxBits / (CHAR_BIT * sizeof(limb_type)) + ((MaxBits % (CHAR_BIT * sizeof(limb_type))) ? 1 : 0);
       // We never resize beyond MaxSize:
       if (new_size > max_limbs)
          new_size = max_limbs;
@@ -2198,7 +2198,7 @@ struct is_equivalent_number_type<backends::cpp_int_backend<MinBits, MaxBits, Sig
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
 struct expression_template_default<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> >
 {
-   static const expression_template_option value = et_off;
+   static constexpr const expression_template_option value = et_off;
 };
 
 using boost::multiprecision::backends::cpp_int_backend;

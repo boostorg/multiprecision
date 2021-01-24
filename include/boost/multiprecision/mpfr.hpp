@@ -422,8 +422,8 @@ struct mpfr_float_imp<digits10, allocate_stack>
    typedef std::tuple<double, long double> float_types;
    typedef long                           exponent_type;
 
-   static const unsigned digits2    = (digits10 * 1000uL) / 301uL + ((digits10 * 1000uL) % 301 ? 2u : 1u);
-   static const unsigned limb_count = mpfr_custom_get_size(digits2) / sizeof(mp_limb_t);
+   static constexpr const unsigned digits2    = (digits10 * 1000uL) / 301uL + ((digits10 * 1000uL) % 301 ? 2u : 1u);
+   static constexpr const unsigned limb_count = mpfr_custom_get_size(digits2) / sizeof(mp_limb_t);
 
    ~mpfr_float_imp() noexcept
    {

@@ -71,7 +71,7 @@ inline void resize_to_bit_size(cpp_int_backend<MinBits, MaxBits, SignType, Check
    unsigned limb_count = static_cast<unsigned>(bits / (sizeof(limb_type) * CHAR_BIT));
    if (bits % (sizeof(limb_type) * CHAR_BIT))
       ++limb_count;
-   static const unsigned max_limbs = MaxBits ? MaxBits / (CHAR_BIT * sizeof(limb_type)) + ((MaxBits % (CHAR_BIT * sizeof(limb_type))) ? 1 : 0) : (std::numeric_limits<unsigned>::max)();
+   constexpr const unsigned max_limbs = MaxBits ? MaxBits / (CHAR_BIT * sizeof(limb_type)) + ((MaxBits % (CHAR_BIT * sizeof(limb_type))) ? 1 : 0) : (std::numeric_limits<unsigned>::max)();
    if (limb_count > max_limbs)
       limb_count = max_limbs;
    newval.resize(limb_count, limb_count);
