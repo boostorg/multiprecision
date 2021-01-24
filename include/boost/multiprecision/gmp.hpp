@@ -235,7 +235,7 @@ struct gmp_float_imp
 
       f = frexp(a, &e);
 
-      static const int shift = std::numeric_limits<int>::digits - 1;
+      constexpr const int shift = std::numeric_limits<int>::digits - 1;
 
       while (f)
       {
@@ -1295,7 +1295,7 @@ struct gmp_int
 
       f = frexp(a, &e);
 
-      static const int shift = std::numeric_limits<int>::digits - 1;
+      constexpr const int shift = std::numeric_limits<int>::digits - 1;
 
       while (f)
       {
@@ -1843,8 +1843,8 @@ inline void eval_convert_to(__int128* result, const gmp_int& val)
    //
    // Overflow check:
    //
-   static const __int128 int128_max = static_cast<__int128>((static_cast<unsigned __int128>(1u) << 127) - 1);
-   static const __int128 int128_min = (static_cast<unsigned __int128>(1u) << 127);
+   constexpr const __int128 int128_max = static_cast<__int128>((static_cast<unsigned __int128>(1u) << 127) - 1);
+   constexpr const __int128 int128_min = (static_cast<unsigned __int128>(1u) << 127);
    bool overflow = false;
    if (mpz_sgn(t.data()))
    {
@@ -2154,7 +2154,7 @@ struct gmp_rational
 
       f = frexp(a, &e);
 
-      static const int shift = std::numeric_limits<int>::digits - 1;
+      constexpr const int shift = std::numeric_limits<int>::digits - 1;
 
       while (f)
       {
@@ -2739,7 +2739,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_fl
    //
    static number_type(min)()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2751,7 +2750,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_fl
    }
    static number_type(max)()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2775,7 +2773,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_fl
    static constexpr int  radix        = 2;
    static number_type          epsilon()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2789,7 +2786,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_fl
    static number_type round_error()
    {
       // returns epsilon/2
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2817,24 +2813,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_fl
    static constexpr bool               traps           = true;
    static constexpr bool               tinyness_before = false;
    static constexpr float_round_style  round_style     = round_indeterminate;
-
- private:
-   struct data_initializer
-   {
-      data_initializer()
-      {
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<digits10> > >::epsilon();
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<digits10> > >::round_error();
-         (std::numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<digits10> > >::min)();
-         (std::numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<digits10> > >::max)();
-      }
-      void do_nothing() const {}
-   };
-   static const data_initializer initializer;
 };
-
-template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
-const typename numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> >::data_initializer numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> >::initializer;
 
 template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr int numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> >::digits;

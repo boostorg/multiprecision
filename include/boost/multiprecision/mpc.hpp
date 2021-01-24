@@ -287,7 +287,7 @@ struct mpc_complex_imp
    int compare(unsigned long int i) const noexcept
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
-      static const unsigned long int max_val = (std::numeric_limits<long>::max)();
+      constexpr const unsigned long int max_val = (std::numeric_limits<long>::max)();
       if (i > max_val)
       {
          mpc_complex_imp d(mpc_get_prec(m_data));

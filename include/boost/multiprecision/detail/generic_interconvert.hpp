@@ -179,7 +179,7 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
 
       eval_frexp(f, from, &e);
 
-      static const int shift = std::numeric_limits<std::intmax_t>::digits - 1;
+      constexpr const int shift = std::numeric_limits<std::intmax_t>::digits - 1;
 
       while (!eval_is_zero(f))
       {
@@ -399,7 +399,7 @@ template <class To, class From>
 void generic_interconvert_float2rational(To& to, const From& from, const std::integral_constant<int, 2>& /*radix*/)
 {
    typedef typename std::tuple_element<0, typename To::unsigned_types>::type ui_type;
-   static const int                                               shift = std::numeric_limits<boost::long_long_type>::digits;
+   constexpr const int                                                       shift = std::numeric_limits<boost::long_long_type>::digits;
    typename From::exponent_type                                   e;
    typename component_type<number<To> >::type                     num, denom;
    number<From>                                                   val(from);
@@ -480,7 +480,7 @@ template <class To, class From>
 void generic_interconvert_float2int(To& to, const From& from, const std::integral_constant<int, 2>& /*radix*/)
 {
    typedef typename From::exponent_type exponent_type;
-   static const exponent_type           shift = std::numeric_limits<boost::long_long_type>::digits;
+   constexpr const exponent_type        shift = std::numeric_limits<boost::long_long_type>::digits;
    exponent_type                        e;
    number<To>                           num(0u);
    number<From>                         val(from);

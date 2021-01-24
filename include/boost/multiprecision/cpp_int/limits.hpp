@@ -169,18 +169,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_in
    typedef boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> backend_type;
    typedef boost::multiprecision::number<backend_type, ExpressionTemplates>                       number_type;
 
-   struct inititializer
-   {
-      BOOST_CXX14_CONSTEXPR_IF_DETECTION inititializer()
-      {
-         (std::numeric_limits<number_type>::max)();
-         (std::numeric_limits<number_type>::min)();
-      }
-      BOOST_CXX14_CONSTEXPR_IF_DETECTION void do_nothing() const {}
-   };
-
-   static const inititializer init;
-
  public:
    static constexpr bool is_specialized = true;
    //
@@ -189,12 +177,10 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_in
    //
    static BOOST_CXX14_CONSTEXPR_IF_DETECTION number_type(min)()
    {
-      init.do_nothing();
       return detail::get_min<MinBits, MaxBits, SignType, Checked, Allocator, ExpressionTemplates>(boost::multiprecision::backends::is_fixed_precision<backend_type>(), boost::multiprecision::is_signed_number<backend_type>(), std::integral_constant<bool, std::is_void<Allocator>::value>());
    }
    static BOOST_CXX14_CONSTEXPR_IF_DETECTION number_type(max)()
    {
-      init.do_nothing();
       return detail::get_max<MinBits, MaxBits, SignType, Checked, Allocator, ExpressionTemplates>(boost::multiprecision::backends::is_fixed_precision<backend_type>(), boost::multiprecision::is_signed_number<backend_type>(), std::integral_constant<bool, std::is_void<Allocator>::value>());
    }
    static BOOST_CXX14_CONSTEXPR_IF_DETECTION number_type          lowest() { return (min)(); }
@@ -227,9 +213,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_in
    static constexpr bool               tinyness_before = false;
    static constexpr float_round_style round_style      = round_toward_zero;
 };
-
-template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-const typename numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> >::inititializer numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> >::init;
 
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> >::digits;

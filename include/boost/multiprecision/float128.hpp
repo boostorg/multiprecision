@@ -116,7 +116,7 @@ namespace detail {
 template <>
 struct bits_of<float128_type>
 {
-   static const unsigned value = 113;
+   static constexpr const unsigned value = 113;
 };
 
 }

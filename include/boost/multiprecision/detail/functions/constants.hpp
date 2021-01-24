@@ -216,45 +216,13 @@ void calc_pi(T& result, unsigned digits)
    eval_divide(result, B, D);
 }
 
-template <class T, const T& (*F)(void)>
-struct constant_initializer
-{
-   static void do_nothing()
-   {
-      init.do_nothing();
-   }
-
- private:
-   struct initializer
-   {
-      initializer()
-      {
-         F();
-      }
-      void do_nothing() const {}
-   };
-   static const initializer init;
-};
-
-template <class T, const T& (*F)(void)>
-typename constant_initializer<T, F>::initializer const constant_initializer<T, F>::init;
-
 template <class T>
 const T& get_constant_ln2()
 {
-   static BOOST_MP_THREAD_LOCAL T    result;
-   static BOOST_MP_THREAD_LOCAL long digits = 0;
-#ifndef BOOST_MP_USING_THREAD_LOCAL
-   static BOOST_MP_THREAD_LOCAL bool b = false;
-   constant_initializer<T, &get_constant_ln2<T> >::do_nothing();
-
-   if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
-   {
-      b = true;
-#else
+   static thread_local T    result;
+   static thread_local long digits = 0;
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
-#endif
       boost::multiprecision::detail::maybe_promote_precision(&result);
       calc_log2(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       digits = boost::multiprecision::detail::digits2<number<T> >::value();
@@ -266,19 +234,10 @@ const T& get_constant_ln2()
 template <class T>
 const T& get_constant_e()
 {
-   static BOOST_MP_THREAD_LOCAL T    result;
-   static BOOST_MP_THREAD_LOCAL long digits = 0;
-#ifndef BOOST_MP_USING_THREAD_LOCAL
-   static BOOST_MP_THREAD_LOCAL bool b = false;
-   constant_initializer<T, &get_constant_e<T> >::do_nothing();
-
-   if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
-   {
-      b = true;
-#else
+   static thread_local T    result;
+   static thread_local long digits = 0;
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
-#endif
       boost::multiprecision::detail::maybe_promote_precision(&result);
       calc_e(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       digits = boost::multiprecision::detail::digits2<number<T> >::value();
@@ -290,19 +249,10 @@ const T& get_constant_e()
 template <class T>
 const T& get_constant_pi()
 {
-   static BOOST_MP_THREAD_LOCAL T    result;
-   static BOOST_MP_THREAD_LOCAL long digits = 0;
-#ifndef BOOST_MP_USING_THREAD_LOCAL
-   static BOOST_MP_THREAD_LOCAL bool b = false;
-   constant_initializer<T, &get_constant_pi<T> >::do_nothing();
-
-   if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
-   {
-      b = true;
-#else
+   static thread_local T             result;
+   static thread_local long digits = 0;
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
-#endif
       boost::multiprecision::detail::maybe_promote_precision(&result);
       calc_pi(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       digits = boost::multiprecision::detail::digits2<number<T> >::value();
@@ -317,19 +267,10 @@ const T& get_constant_pi()
 template <class T>
 const T& get_constant_one_over_epsilon()
 {
-   static BOOST_MP_THREAD_LOCAL T    result;
-   static BOOST_MP_THREAD_LOCAL long digits = 0;
-#ifndef BOOST_MP_USING_THREAD_LOCAL
-   static BOOST_MP_THREAD_LOCAL bool b = false;
-   constant_initializer<T, &get_constant_one_over_epsilon<T> >::do_nothing();
-
-   if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
-   {
-      b = true;
-#else
+   static thread_local T             result;
+   static thread_local long digits = 0;
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
-#endif
       typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
       boost::multiprecision::detail::maybe_promote_precision(&result);
       result = static_cast<ui_type>(1u);

@@ -1436,33 +1436,6 @@ struct constant_euler;
 template <class T>
 struct constant_catalan;
 
-//
-// Initializer: ensure all our constants are initialized prior to the first call of main:
-//
-template <class T>
-struct mpfi_initializer
-{
-   struct init
-   {
-      init()
-      {
-         boost::math::constants::pi<T>();
-         boost::math::constants::ln_two<T>();
-         boost::math::constants::euler<T>();
-         boost::math::constants::catalan<T>();
-      }
-      void force_instantiate() const {}
-   };
-   static const init initializer;
-   static void       force_instantiate()
-   {
-      initializer.force_instantiate();
-   }
-};
-
-template <class T>
-const typename mpfi_initializer<T>::init mpfi_initializer<T>::initializer;
-
 template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> >
 {
@@ -1470,7 +1443,6 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfi_flo
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
-      mpfi_initializer<result_type>::force_instantiate();
       static result_type result;
       static bool        has_init = false;
       if (!has_init)
@@ -1494,7 +1466,6 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfi
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
-      mpfi_initializer<result_type>::force_instantiate();
       static result_type result;
       static bool        has_init = false;
       if (!has_init)
@@ -1518,7 +1489,6 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfi_
    template <int N>
    static inline result_type const& get(const boost::integral_constant<int, N>&)
    {
-      mpfi_initializer<result_type>::force_instantiate();
       static result_type result;
       static bool        has_init = false;
       if (!has_init)
@@ -1542,7 +1512,6 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
    template <int N>
    static inline result_type const& get(const boost::integral_constant<int, N>&)
    {
-      mpfi_initializer<result_type>::force_instantiate();
       static result_type result;
       static bool        has_init = false;
       if (!has_init)
@@ -1579,7 +1548,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
    static constexpr bool is_specialized = true;
    static number_type(min)()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -1591,7 +1559,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
    }
    static number_type(max)()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -1615,7 +1582,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
    static constexpr int  radix        = 2;
    static number_type          epsilon()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -1629,7 +1595,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
    static number_type round_error()
    {
       // returns epsilon/2
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -1650,7 +1615,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
    static constexpr bool               has_denorm_loss = false;
    static number_type                        infinity()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -1663,7 +1627,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
    }
    static number_type quiet_NaN()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -1685,26 +1648,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
    static constexpr bool        traps             = true;
    static constexpr bool        tinyness_before   = false;
    static constexpr float_round_style round_style = round_to_nearest;
-
- private:
-   struct data_initializer
-   {
-      data_initializer()
-      {
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<digits10> > >::epsilon();
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<digits10> > >::round_error();
-         (std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<digits10> > >::min)();
-         (std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<digits10> > >::max)();
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<digits10> > >::infinity();
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<digits10> > >::quiet_NaN();
-      }
-      void do_nothing() const {}
-   };
-   static const data_initializer initializer;
 };
-
-template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
-const typename numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> >::data_initializer numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> >::initializer;
 
 template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr int numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> >::digits;

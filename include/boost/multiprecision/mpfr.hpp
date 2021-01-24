@@ -422,8 +422,8 @@ struct mpfr_float_imp<digits10, allocate_stack>
    typedef std::tuple<double, long double> float_types;
    typedef long                           exponent_type;
 
-   static const unsigned digits2    = (digits10 * 1000uL) / 301uL + ((digits10 * 1000uL) % 301 ? 2u : 1u);
-   static const unsigned limb_count = mpfr_custom_get_size(digits2) / sizeof(mp_limb_t);
+   static constexpr const unsigned digits2    = (digits10 * 1000uL) / 301uL + ((digits10 * 1000uL) % 301 ? 2u : 1u);
+   static constexpr const unsigned limb_count = mpfr_custom_get_size(digits2) / sizeof(mp_limb_t);
 
    ~mpfr_float_imp() noexcept
    {
@@ -1769,33 +1769,6 @@ struct constant_euler;
 template <class T>
 struct constant_catalan;
 
-namespace detail {
-
-template <class T, int N>
-struct mpfr_constant_initializer
-{
-   static void force_instantiate()
-   {
-      init.force_instantiate();
-   }
-
- private:
-   struct initializer
-   {
-      initializer()
-      {
-         T::get(boost::integral_constant<int, N>());
-      }
-      void force_instantiate() const {}
-   };
-   static const initializer init;
-};
-
-template <class T, int N>
-typename mpfr_constant_initializer<T, N>::initializer const mpfr_constant_initializer<T, N>::init;
-
-} // namespace detail
-
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >
 {
@@ -1803,7 +1776,6 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfr_flo
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
-      detail::mpfr_constant_initializer<constant_pi<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >, N>::force_instantiate();
       static result_type result;
       static bool        has_init = false;
       if (!has_init)
@@ -1827,7 +1799,6 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfr
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
-      detail::mpfr_constant_initializer<constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >, N>::force_instantiate();
       static result_type result;
       static bool        init = false;
       if (!init)
@@ -1851,7 +1822,6 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfr_
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
-      detail::mpfr_constant_initializer<constant_euler<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >, N>::force_instantiate();
       static result_type result;
       static bool        init = false;
       if (!init)
@@ -1875,7 +1845,6 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
-      detail::mpfr_constant_initializer<constant_catalan<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >, N>::force_instantiate();
       static result_type result;
       static bool        init = false;
       if (!init)
@@ -1900,7 +1869,6 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::debug_ad
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
-      detail::mpfr_constant_initializer<constant_pi<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> >, N>::force_instantiate();
       static result_type result;
       static bool        has_init = false;
       if (!has_init)
@@ -1924,7 +1892,6 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::debu
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
-      detail::mpfr_constant_initializer<constant_ln_two<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> >, N>::force_instantiate();
       static result_type result;
       static bool        init = false;
       if (!init)
@@ -1948,7 +1915,6 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::debug
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
-      detail::mpfr_constant_initializer<constant_euler<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> >, N>::force_instantiate();
       static result_type result;
       static bool        init = false;
       if (!init)
@@ -1972,7 +1938,6 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::deb
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
-      detail::mpfr_constant_initializer<constant_catalan<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> >, N>::force_instantiate();
       static result_type result;
       static bool        init = false;
       if (!init)
@@ -2361,7 +2326,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    static constexpr bool is_specialized = true;
    static number_type(min)()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2373,7 +2337,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    }
    static number_type(max)()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2397,7 +2360,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    static constexpr int  radix        = 2;
    static number_type          epsilon()
    {
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2411,7 +2373,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    static number_type round_error()
    {
       // returns epsilon/2
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2433,7 +2394,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    static number_type                        infinity()
    {
       // returns epsilon/2
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2446,7 +2406,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    static number_type quiet_NaN()
    {
       // returns epsilon/2
-      initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
@@ -2467,26 +2426,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    static constexpr bool        traps             = true;
    static constexpr bool        tinyness_before   = false;
    static constexpr float_round_style round_style = round_to_nearest;
-
- private:
-   struct data_initializer
-   {
-      data_initializer()
-      {
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<digits10, AllocateType> > >::epsilon();
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<digits10, AllocateType> > >::round_error();
-         (std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<digits10, AllocateType> > >::min)();
-         (std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<digits10, AllocateType> > >::max)();
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<digits10, AllocateType> > >::infinity();
-         std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<digits10, AllocateType> > >::quiet_NaN();
-      }
-      void do_nothing() const {}
-   };
-   static const data_initializer initializer;
 };
-
-template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
-const typename numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >::data_initializer numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >::initializer;
 
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr int numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >::digits;

@@ -54,7 +54,7 @@ namespace detail {
 template <class I>
 struct double_integer
 {
-   static const unsigned int_t_digits =
+   static constexpr const unsigned int_t_digits =
        2 * sizeof(I) <= sizeof(boost::long_long_type) ? std::numeric_limits<I>::digits * 2 : 1;
 
    typedef typename std::conditional<

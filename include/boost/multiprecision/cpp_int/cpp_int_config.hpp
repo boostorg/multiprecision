@@ -61,8 +61,8 @@ typedef detail::largest_unsigned_type<64>::type limb_type;
 typedef detail::largest_signed_type<64>::type   signed_limb_type;
 typedef boost::uint128_type                     double_limb_type;
 typedef boost::int128_type                      signed_double_limb_type;
-static const limb_type                          max_block_10        = 1000000000000000000uLL;
-static const limb_type                          digits_per_block_10 = 18;
+constexpr const limb_type                       max_block_10        = 1000000000000000000uLL;
+constexpr const limb_type                       digits_per_block_10 = 18;
 
 inline BOOST_MP_CXX14_CONSTEXPR limb_type block_multiplier(unsigned count)
 {
@@ -96,8 +96,8 @@ typedef detail::largest_unsigned_type<32>::type limb_type;
 typedef detail::largest_signed_type<32>::type   signed_limb_type;
 typedef detail::largest_unsigned_type<64>::type double_limb_type;
 typedef detail::largest_signed_type<64>::type   signed_double_limb_type;
-static const limb_type                          max_block_10        = 1000000000;
-static const limb_type                          digits_per_block_10 = 9;
+constexpr const limb_type                       max_block_10        = 1000000000;
+constexpr const limb_type                       digits_per_block_10 = 9;
 
 inline limb_type block_multiplier(unsigned count)
 {
@@ -108,7 +108,7 @@ inline limb_type block_multiplier(unsigned count)
 
 #endif
 
-static const unsigned bits_per_limb = sizeof(limb_type) * CHAR_BIT;
+constexpr const unsigned bits_per_limb = sizeof(limb_type) * CHAR_BIT;
 
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR void minmax(const T& a, const T& b, T& aa, T& bb)
