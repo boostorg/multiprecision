@@ -135,7 +135,7 @@ template <class I, class Engine>
 typename std::enable_if<number_category<I>::value == number_kind_integer, bool>::type
 miller_rabin_test(const I& n, unsigned trials, Engine& gen)
 {
-   typedef I number_type;
+   using number_type = I;
 
    if (n == 2)
       return true; // Trivial special case.
@@ -199,14 +199,14 @@ miller_rabin_test(const I& x, unsigned trials)
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class Engine>
 bool miller_rabin_test(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& n, unsigned trials, Engine& gen)
 {
-   typedef typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type number_type;
+   using number_type = typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type;
    return miller_rabin_test(number_type(n), trials, gen);
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 bool miller_rabin_test(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& n, unsigned trials)
 {
-   typedef typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type number_type;
+   using number_type = typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type;
    return miller_rabin_test(number_type(n), trials);
 }
 

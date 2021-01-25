@@ -37,11 +37,11 @@ namespace multiprecision {
 template <class Backend, expression_template_option ExpressionTemplates>
 class number
 {
-   typedef number<Backend, ExpressionTemplates> self_type;
+   using self_type = number<Backend, ExpressionTemplates>;
 
  public:
-   typedef Backend                                  backend_type;
-   typedef typename component_type<self_type>::type value_type;
+   using backend_type = Backend                                 ;
+   using value_type = typename component_type<self_type>::type;
    BOOST_MP_FORCEINLINE constexpr number() noexcept(noexcept(Backend())) {}
    BOOST_MP_FORCEINLINE constexpr number(const number& e) noexcept(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(e.m_backend) {}
    template <class V>
@@ -182,7 +182,7 @@ class number
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value, number&>::type operator=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      typedef std::integral_constant<bool, is_equivalent_number_type<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value> tag_type;
+      using tag_type = std::integral_constant<bool, is_equivalent_number_type<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value>;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                       precision_guard(e);
       //
       // If the current precision of *this differs from that of expression e, then we
@@ -205,7 +205,7 @@ class number
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    BOOST_MP_CXX14_CONSTEXPR number& assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      typedef std::integral_constant<bool, is_equivalent_number_type<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value> tag_type;
+      using tag_type = std::integral_constant<bool, is_equivalent_number_type<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value>;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                       precision_guard(e);
       //
       // If the current precision of *this differs from that of expression e, then we
@@ -950,7 +950,7 @@ class number
    {
       // The result of the expression isn't the same type as this -
       // create a temporary result and assign it to *this:
-      typedef typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type temp_type;
+      using temp_type = typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type;
       temp_type                                                                     t(e);
       *this = std::move(t);
    }
@@ -960,7 +960,7 @@ class number
    {
       // The result of the expression isn't the same type as this -
       // create a temporary result and assign it to *this:
-      typedef typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type temp_type;
+      using temp_type = typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type;
       temp_type                                                                     t(e);
       this->assign(t);
    }
@@ -1018,15 +1018,15 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::negate&)
    {
-      typedef typename Exp::left_type left_type;
+      using left_type = typename Exp::left_type;
       do_assign(e.left(), typename left_type::tag_type());
       m_backend.negate();
    }
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::plus&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
 
       constexpr int const left_depth  = left_type::depth;
       constexpr int const right_depth = right_type::depth;
@@ -1063,8 +1063,8 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::minus&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
 
       constexpr int const left_depth  = left_type::depth;
       constexpr int const right_depth = right_type::depth;
@@ -1103,8 +1103,8 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::multiplies&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
 
       constexpr int const left_depth  = left_type::depth;
       constexpr int const right_depth = right_type::depth;
@@ -1141,8 +1141,8 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::divides&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
 
       bool bl = contains_self(e.left());
       bool br = contains_self(e.right());
@@ -1171,8 +1171,8 @@ class number
       //
       static_assert(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
 
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
 
       bool bl = contains_self(e.left());
       bool br = contains_self(e.right());
@@ -1210,8 +1210,8 @@ class number
       //
       static_assert(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
 
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
 
       constexpr int const left_depth  = left_type::depth;
       constexpr int const right_depth = right_type::depth;
@@ -1255,8 +1255,8 @@ class number
       //
       static_assert(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
 
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
 
       constexpr int const left_depth  = left_type::depth;
       constexpr int const right_depth = right_type::depth;
@@ -1300,8 +1300,8 @@ class number
       //
       static_assert(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
 
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
 
       constexpr int const left_depth  = left_type::depth;
       constexpr int const right_depth = right_type::depth;
@@ -1347,7 +1347,7 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::function&)
    {
-      typedef typename Exp::arity tag_type;
+      using tag_type = typename Exp::arity;
       boost::multiprecision::detail::maybe_promote_precision(this);
       do_assign_function(e, tag_type());
    }
@@ -1355,13 +1355,13 @@ class number
    BOOST_MP_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::shift_left&)
    {
       // We can only shift by an integer value, not an arbitrary expression:
-      typedef typename Exp::left_type    left_type;
-      typedef typename Exp::right_type   right_type;
-      typedef typename right_type::arity right_arity;
+      using left_type = typename Exp::left_type   ;
+      using right_type = typename Exp::right_type  ;
+      using right_arity = typename right_type::arity;
       static_assert(right_arity::value == 0, "The left shift operator requires an integer value for the shift operand.");
-      typedef typename right_type::result_type right_value_type;
+      using right_value_type = typename right_type::result_type;
       static_assert(boost::multiprecision::detail::is_integral<right_value_type>::value, "The left shift operator requires an integer value for the shift operand.");
-      typedef typename left_type::tag_type tag_type;
+      using tag_type = typename left_type::tag_type;
       do_assign_left_shift(e.left(), canonical_value(e.right().value()), tag_type());
    }
 
@@ -1369,13 +1369,13 @@ class number
    BOOST_MP_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::shift_right&)
    {
       // We can only shift by an integer value, not an arbitrary expression:
-      typedef typename Exp::left_type    left_type;
-      typedef typename Exp::right_type   right_type;
-      typedef typename right_type::arity right_arity;
+      using left_type = typename Exp::left_type   ;
+      using right_type = typename Exp::right_type  ;
+      using right_arity = typename right_type::arity;
       static_assert(right_arity::value == 0, "The left shift operator requires an integer value for the shift operand.");
-      typedef typename right_type::result_type right_value_type;
+      using right_value_type = typename right_type::result_type;
       static_assert(boost::multiprecision::detail::is_integral<right_value_type>::value, "The left shift operator requires an integer value for the shift operand.");
-      typedef typename left_type::tag_type tag_type;
+      using tag_type = typename left_type::tag_type;
       do_assign_right_shift(e.left(), canonical_value(e.right().value()), tag_type());
    }
 
@@ -1442,8 +1442,8 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const std::integral_constant<int, 2>&)
    {
-      typedef typename Exp::right_type      right_type;
-      typedef typename right_type::tag_type tag_type;
+      using right_type = typename Exp::right_type     ;
+      using tag_type = typename right_type::tag_type;
       do_assign_function_1(e.left().value(), e.right_ref(), tag_type());
    }
    template <class F, class Exp>
@@ -1460,10 +1460,10 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const std::integral_constant<int, 3>&)
    {
-      typedef typename Exp::middle_type      middle_type;
-      typedef typename middle_type::tag_type tag_type;
-      typedef typename Exp::right_type       end_type;
-      typedef typename end_type::tag_type    end_tag;
+      using middle_type = typename Exp::middle_type     ;
+      using tag_type = typename middle_type::tag_type;
+      using end_type = typename Exp::right_type      ;
+      using end_tag = typename end_type::tag_type   ;
       do_assign_function_2(e.left().value(), e.middle_ref(), e.right_ref(), tag_type(), end_tag());
    }
    template <class F, class Exp1, class Exp2>
@@ -1494,12 +1494,12 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const std::integral_constant<int, 4>&)
    {
-      typedef typename Exp::left_middle_type  left_type;
-      typedef typename left_type::tag_type    left_tag_type;
-      typedef typename Exp::right_middle_type middle_type;
-      typedef typename middle_type::tag_type  middle_tag_type;
-      typedef typename Exp::right_type        right_type;
-      typedef typename right_type::tag_type   right_tag_type;
+      using left_type = typename Exp::left_middle_type ;
+      using left_tag_type = typename left_type::tag_type   ;
+      using middle_type = typename Exp::right_middle_type;
+      using middle_tag_type = typename middle_type::tag_type ;
+      using right_type = typename Exp::right_type       ;
+      using right_tag_type = typename right_type::tag_type  ;
       do_assign_function_3a(e.left().value(), e.left_middle_ref(), e.right_middle_ref(), e.right_ref(), left_tag_type(), middle_tag_type(), right_tag_type());
    }
 
@@ -1548,7 +1548,7 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_add(const Exp& e, const detail::negate&)
    {
-      typedef typename Exp::left_type left_type;
+      using left_type = typename Exp::left_type;
       boost::multiprecision::detail::maybe_promote_precision(this);
       do_subtract(e.left(), typename left_type::tag_type());
    }
@@ -1556,8 +1556,8 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_add(const Exp& e, const detail::plus&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
       do_add(e.left(), typename left_type::tag_type());
       do_add(e.right(), typename right_type::tag_type());
    }
@@ -1565,8 +1565,8 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_add(const Exp& e, const detail::minus&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
       do_add(e.left(), typename left_type::tag_type());
       do_subtract(e.right(), typename right_type::tag_type());
    }
@@ -1606,15 +1606,15 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_subtract(const Exp& e, const detail::negate&)
    {
-      typedef typename Exp::left_type left_type;
+      using left_type = typename Exp::left_type;
       do_add(e.left(), typename left_type::tag_type());
    }
 
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_subtract(const Exp& e, const detail::plus&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
       do_subtract(e.left(), typename left_type::tag_type());
       do_subtract(e.right(), typename right_type::tag_type());
    }
@@ -1622,8 +1622,8 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_subtract(const Exp& e, const detail::minus&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
       do_subtract(e.left(), typename left_type::tag_type());
       do_add(e.right(), typename right_type::tag_type());
    }
@@ -1661,7 +1661,7 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_multiplies(const Exp& e, const detail::negate&)
    {
-      typedef typename Exp::left_type left_type;
+      using left_type = typename Exp::left_type;
       do_multiplies(e.left(), typename left_type::tag_type());
       m_backend.negate();
    }
@@ -1669,8 +1669,8 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_multiplies(const Exp& e, const detail::multiplies&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
       do_multiplies(e.left(), typename left_type::tag_type());
       do_multiplies(e.right(), typename right_type::tag_type());
    }
@@ -1682,8 +1682,8 @@ class number
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1)>::type
    do_multiplies(const Exp& e, const detail::divides&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
       do_multiplies(e.left(), typename left_type::tag_type());
       do_divide(e.right(), typename right_type::tag_type());
    }
@@ -1730,7 +1730,7 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_divide(const Exp& e, const detail::negate&)
    {
-      typedef typename Exp::left_type left_type;
+      using left_type = typename Exp::left_type;
       do_divide(e.left(), typename left_type::tag_type());
       m_backend.negate();
    }
@@ -1742,8 +1742,8 @@ class number
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1)>::type
    do_divide(const Exp& e, const detail::multiplies&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
       do_divide(e.left(), typename left_type::tag_type());
       do_divide(e.right(), typename right_type::tag_type());
    }
@@ -1755,8 +1755,8 @@ class number
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1)>::type
    do_divide(const Exp& e, const detail::divides&)
    {
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
       do_divide(e.left(), typename left_type::tag_type());
       do_multiplies(e.right(), typename right_type::tag_type());
    }
@@ -1827,8 +1827,8 @@ class number
    BOOST_MP_CXX14_CONSTEXPR void do_bitwise_and(const Exp& e, const detail::bitwise_and&)
    {
       static_assert(number_category<Backend>::value == number_kind_integer, "The bitwise & operation is only valid for integer types");
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
       do_bitwise_and(e.left(), typename left_type::tag_type());
       do_bitwise_and(e.right(), typename right_type::tag_type());
    }
@@ -1852,8 +1852,8 @@ class number
    BOOST_MP_CXX14_CONSTEXPR void do_bitwise_or(const Exp& e, const detail::bitwise_or&)
    {
       static_assert(number_category<Backend>::value == number_kind_integer, "The bitwise | operation is only valid for integer types");
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
       do_bitwise_or(e.left(), typename left_type::tag_type());
       do_bitwise_or(e.right(), typename right_type::tag_type());
    }
@@ -1877,8 +1877,8 @@ class number
    BOOST_MP_CXX14_CONSTEXPR void do_bitwise_xor(const Exp& e, const detail::bitwise_xor&)
    {
       static_assert(number_category<Backend>::value == number_kind_integer, "The bitwise ^ operation is only valid for integer types");
-      typedef typename Exp::left_type  left_type;
-      typedef typename Exp::right_type right_type;
+      using left_type = typename Exp::left_type ;
+      using right_type = typename Exp::right_type;
       do_bitwise_xor(e.left(), typename left_type::tag_type());
       do_bitwise_xor(e.right(), typename right_type::tag_type());
    }
@@ -1905,22 +1905,22 @@ class number
    template <class Exp>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool contains_self(const Exp& e, std::integral_constant<int, 1> const&) const noexcept
    {
-      typedef typename Exp::left_type child_type;
+      using child_type = typename Exp::left_type;
       return contains_self(e.left(), typename child_type::arity());
    }
    template <class Exp>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool contains_self(const Exp& e, std::integral_constant<int, 2> const&) const noexcept
    {
-      typedef typename Exp::left_type  child0_type;
-      typedef typename Exp::right_type child1_type;
+      using child0_type = typename Exp::left_type ;
+      using child1_type = typename Exp::right_type;
       return contains_self(e.left(), typename child0_type::arity()) || contains_self(e.right(), typename child1_type::arity());
    }
    template <class Exp>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool contains_self(const Exp& e, std::integral_constant<int, 3> const&) const noexcept
    {
-      typedef typename Exp::left_type   child0_type;
-      typedef typename Exp::middle_type child1_type;
-      typedef typename Exp::right_type  child2_type;
+      using child0_type = typename Exp::left_type  ;
+      using child1_type = typename Exp::middle_type;
+      using child2_type = typename Exp::right_type ;
       return contains_self(e.left(), typename child0_type::arity()) || contains_self(e.middle(), typename child1_type::arity()) || contains_self(e.right(), typename child2_type::arity());
    }
 
@@ -1997,7 +1997,7 @@ namespace detail {
 template <class tag, class A1, class A2, class A3, class A4>
 inline std::ostream& operator<<(std::ostream& os, const expression<tag, A1, A2, A3, A4>& r)
 {
-   typedef typename expression<tag, A1, A2, A3, A4>::result_type value_type;
+   using value_type = typename expression<tag, A1, A2, A3, A4>::result_type;
    value_type                                                    temp(r);
    return os << temp;
 }
@@ -2171,7 +2171,7 @@ namespace multiprecision {
 template <class I>
 struct component_type<boost::rational<I> >
 {
-   typedef I type;
+   using type = I;
 };
 
 } // namespace multiprecision

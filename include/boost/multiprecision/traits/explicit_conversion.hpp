@@ -21,7 +21,7 @@ struct dummy_size
 template <typename S, typename T>
 struct has_generic_interconversion
 {
-   typedef typename std::conditional<
+   using type = typename std::conditional<
        is_number<S>::value && is_number<T>::value,
        typename std::conditional<
            number_category<S>::value == number_kind_integer,
@@ -39,7 +39,7 @@ struct has_generic_interconversion
                    number_category<T>::value == number_kind_floating_point,
                    std::integral_constant<bool, true>,
                    std::integral_constant<bool, false> >::type>::type>::type,
-       std::integral_constant<bool, false> >::type type;
+       std::integral_constant<bool, false> >::type;
 };
 
 template <typename S, typename T>
@@ -55,7 +55,7 @@ struct is_explicitly_convertible_imp
 
    static constexpr const bool value = sizeof(selector<S, T>(0)) == sizeof(int);
 
-   typedef boost::integral_constant<bool, value> type;
+   using type = boost::integral_constant<bool, value>;
 };
 
 template <typename From, typename To>

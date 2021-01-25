@@ -31,7 +31,7 @@ inline void pow_imp(T& result, const T& t, const U& p, const std::integral_const
    // Section 4.6.3 . The resulting computational complexity
    // is order log2[abs(p)].
 
-   typedef typename boost::multiprecision::detail::canonical<U, T>::type int_type;
+   using int_type = typename boost::multiprecision::detail::canonical<U, T>::type;
 
    if (&result == &t)
    {
@@ -73,8 +73,8 @@ template <typename T, typename U>
 inline void pow_imp(T& result, const T& t, const U& p, const std::integral_constant<bool, true>&)
 {
    // Signed integer power, just take care of the sign then call the unsigned version:
-   typedef typename boost::multiprecision::detail::canonical<U, T>::type int_type;
-   typedef typename boost::multiprecision::detail::make_unsigned<U>::type                          ui_type;
+   using int_type = typename boost::multiprecision::detail::canonical<U, T>::type;
+   using ui_type = typename boost::multiprecision::detail::make_unsigned<U>::type                         ;
 
    if (p < 0)
    {
@@ -103,7 +103,7 @@ void hyp0F0(T& H0F0, const T& x)
    // http://functions.wolfram.com/HypergeometricFunctions/Hypergeometric0F0/06/01/
    // There are no checks on input range or parameter boundaries.
 
-   typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename T::unsigned_types>::type;
 
    BOOST_ASSERT(&H0F0 != &x);
    long tol = boost::multiprecision::detail::digits2<number<T, et_on> >::value();
@@ -150,7 +150,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    // and also see the corresponding section for the power function (i.e. x^a).
    // There are no checks on input range or parameter boundaries.
 
-   typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
+   using si_type = typename boost::multiprecision::detail::canonical<int, T>::type;
 
    BOOST_ASSERT(&H1F0 != &x);
    BOOST_ASSERT(&H1F0 != &a);
@@ -202,10 +202,10 @@ void eval_exp(T& result, const T& x)
       result = temp;
       return;
    }
-   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-   typedef typename boost::multiprecision::detail::canonical<int, T>::type      si_type;
-   typedef typename T::exponent_type                                            exp_type;
-   typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
+   using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
+   using si_type = typename boost::multiprecision::detail::canonical<int, T>::type     ;
+   using exp_type = typename T::exponent_type                                           ;
+   using canonical_exp_type = typename boost::multiprecision::detail::canonical<exp_type, T>::type;
 
    // Handle special arguments.
    int  type  = eval_fpclassify(x);
@@ -348,10 +348,10 @@ void eval_log(T& result, const T& arg)
    // then let y = x - 1 and compute:
    // log(x) = log(2) * n + log1p(1 + y)
    //
-   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-   typedef typename T::exponent_type                                            exp_type;
-   typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename std::tuple_element<0, typename T::float_types>::type                   fp_type;
+   using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
+   using exp_type = typename T::exponent_type                                           ;
+   using canonical_exp_type = typename boost::multiprecision::detail::canonical<exp_type, T>::type;
+   using fp_type = typename std::tuple_element<0, typename T::float_types>::type                  ;
    int                                                                          s = eval_signbit(arg);
    switch (eval_fpclassify(arg))
    {
@@ -433,7 +433,7 @@ const T& get_constant_log10()
    static BOOST_MP_THREAD_LOCAL long digits = 0;
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
-      typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+      using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
       T                                                                            ten;
       ten = ui_type(10u);
       eval_log(result, ten);
@@ -462,8 +462,8 @@ template <typename T>
 inline void eval_pow(T& result, const T& x, const T& a)
 {
    static_assert(number_category<T>::value == number_kind_floating_point, "The pow function is only valid for floating point types.");
-   typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
-   typedef typename std::tuple_element<0, typename T::float_types>::type              fp_type;
+   using si_type = typename boost::multiprecision::detail::canonical<int, T>::type;
+   using fp_type = typename std::tuple_element<0, typename T::float_types>::type             ;
 
    if ((&result == &x) || (&result == &a))
    {
@@ -717,8 +717,8 @@ eval_pow(T& result, const T& x, const A& a)
 {
    // Note this one is restricted to float arguments since pow.hpp already has a version for
    // integer powers....
-   typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
+   using canonical_type = typename boost::multiprecision::detail::canonical<A, T>::type         ;
+   using cast_type = typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type;
    cast_type                                                                      c;
    c = a;
    eval_pow(result, x, c);
@@ -732,8 +732,8 @@ inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::val
 #endif
 eval_pow(T& result, const A& x, const T& a)
 {
-   typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type cast_type;
+   using canonical_type = typename boost::multiprecision::detail::canonical<A, T>::type         ;
+   using cast_type = typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type;
    cast_type                                                                      c;
    c = x;
    eval_pow(result, c, a);
@@ -775,7 +775,7 @@ namespace detail {
 template <class T>
 void small_sinh_series(T x, T& result)
 {
-   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
    bool                                                                         neg = eval_get_sign(x) < 0;
    if (neg)
       x.negate();
@@ -802,8 +802,8 @@ void small_sinh_series(T x, T& result)
 template <class T>
 void sinhcosh(const T& x, T* p_sinh, T* p_cosh)
 {
-   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-   typedef typename std::tuple_element<0, typename T::float_types>::type                   fp_type;
+   using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
+   using fp_type = typename std::tuple_element<0, typename T::float_types>::type                  ;
 
    switch (eval_fpclassify(x))
    {

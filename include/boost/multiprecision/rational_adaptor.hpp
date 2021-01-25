@@ -28,12 +28,12 @@ namespace backends {
 template <class IntBackend>
 struct rational_adaptor
 {
-   typedef number<IntBackend>            integer_type;
-   typedef boost::rational<integer_type> rational_type;
+   using integer_type = number<IntBackend>           ;
+   using rational_type = boost::rational<integer_type>;
 
-   typedef typename IntBackend::signed_types   signed_types;
-   typedef typename IntBackend::unsigned_types unsigned_types;
-   typedef typename IntBackend::float_types    float_types;
+   using signed_types = typename IntBackend::signed_types  ;
+   using unsigned_types = typename IntBackend::unsigned_types;
+   using float_types = typename IntBackend::float_types   ;
 
    rational_adaptor() noexcept(noexcept(rational_type())) {}
    rational_adaptor(const rational_adaptor& o) noexcept(noexcept(std::declval<rational_type&>() = std::declval<const rational_type&>()))
@@ -200,8 +200,8 @@ struct rational_adaptor
    template <class Archive>
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
-      typedef typename Archive::is_saving tag;
-      typedef std::integral_constant<bool, tag::value> saving_tag;
+      using tag = typename Archive::is_saving;
+      using saving_tag = std::integral_constant<bool, tag::value>;
       serialize(ar, saving_tag());
    }
 
@@ -247,7 +247,7 @@ inline typename std::enable_if<number_category<R>::value == number_kind_floating
 template <class R, class IntBackend>
 inline typename std::enable_if<(number_category<R>::value != number_kind_integer) && (number_category<R>::value != number_kind_floating_point)>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
-   typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
+   using comp_t = typename component_type<number<rational_adaptor<IntBackend> > >::type;
    comp_t                                                                        num(backend.data().numerator());
    comp_t                                                                        denom(backend.data().denominator());
    *result = num.template convert_to<R>();
@@ -257,7 +257,7 @@ inline typename std::enable_if<(number_category<R>::value != number_kind_integer
 template <class R, class IntBackend>
 inline typename std::enable_if<number_category<R>::value == number_kind_integer>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
-   typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
+   using comp_t = typename component_type<number<rational_adaptor<IntBackend> > >::type;
    comp_t                                                                        t = backend.data().numerator();
    t /= backend.data().denominator();
    *result = t.template convert_to<R>();
@@ -305,7 +305,7 @@ using boost::multiprecision::backends::rational_adaptor;
 template <class Backend, expression_template_option ExpressionTemplates>
 struct component_type<number<backends::rational_adaptor<Backend>, ExpressionTemplates> >
 {
-   typedef number<Backend, ExpressionTemplates> type;
+   using type = number<Backend, ExpressionTemplates>;
 };
 
 template <class IntBackend, expression_template_option ET>
@@ -326,8 +326,8 @@ namespace std {
 template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> > : public std::numeric_limits<boost::multiprecision::number<IntBackend, ExpressionTemplates> >
 {
-   typedef std::numeric_limits<boost::multiprecision::number<IntBackend> >                     base_type;
-   typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend> > number_type;
+   using base_type = std::numeric_limits<boost::multiprecision::number<IntBackend> >                    ;
+   using number_type = boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend> >;
 
  public:
    static constexpr bool is_integer = false;

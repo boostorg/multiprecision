@@ -57,7 +57,7 @@ struct double_integer
    static constexpr const unsigned int_t_digits =
        2 * sizeof(I) <= sizeof(boost::long_long_type) ? std::numeric_limits<I>::digits * 2 : 1;
 
-   typedef typename std::conditional<
+   using type = typename std::conditional<
        2 * sizeof(I) <= sizeof(boost::long_long_type),
        typename std::conditional<
            boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value,
@@ -69,7 +69,7 @@ struct double_integer
                boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value,
                signed_double_limb_type,
                double_limb_type>::type,
-           number<cpp_int_backend<sizeof(I) * CHAR_BIT * 2, sizeof(I) * CHAR_BIT * 2, (boost::multiprecision::detail::is_signed<I>::value ? signed_magnitude : unsigned_magnitude), unchecked, void> > >::type>::type type;
+           number<cpp_int_backend<sizeof(I) * CHAR_BIT * 2, sizeof(I) * CHAR_BIT * 2, (boost::multiprecision::detail::is_signed<I>::value ? signed_magnitude : unsigned_magnitude), unchecked, void> > >::type>::type;
 };
 
 } // namespace detail
@@ -78,7 +78,7 @@ template <class I1, class I2, class I3>
 BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I1>::value && boost::multiprecision::detail::is_unsigned<I2>::value && is_integral<I3>::value, I1>::type
 powm(const I1& a, I2 b, I3 c)
 {
-   typedef typename detail::double_integer<I1>::type double_type;
+   using double_type = typename detail::double_integer<I1>::type;
 
    I1          x(1), y(a);
    double_type result(0);

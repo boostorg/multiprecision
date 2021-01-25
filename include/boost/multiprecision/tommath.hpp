@@ -42,9 +42,9 @@ void eval_add(tommath_int& t, const tommath_int& o);
 
 struct tommath_int
 {
-   typedef std::tuple<std::int32_t, boost::long_long_type>   signed_types;
-   typedef std::tuple<std::uint32_t, boost::ulong_long_type> unsigned_types;
-   typedef std::tuple<long double>                             float_types;
+   using signed_types = std::tuple<std::int32_t, boost::long_long_type>  ;
+   using unsigned_types = std::tuple<std::uint32_t, boost::ulong_long_type>;
+   using float_types = std::tuple<long double>                            ;
 
    tommath_int()
    {
@@ -215,10 +215,10 @@ struct tommath_int
 
 #ifdef DIGIT_BIT
       constexpr const int shift = std::numeric_limits<int>::digits - 1;
-      typedef int      part_type;
+      using part_type = int     ;
 #else
       constexpr const int  shift = std::numeric_limits<std::int64_t>::digits - 1;
-      typedef std::int64_t part_type;
+      using part_type = std::int64_t;
 #endif
 
       while (f)
@@ -781,9 +781,9 @@ template <>
 struct number_category<tommath_int> : public std::integral_constant<int, number_kind_integer>
 {};
 
-typedef number<tommath_int>           tom_int;
-typedef rational_adaptor<tommath_int> tommath_rational;
-typedef number<tommath_rational>      tom_rational;
+using tom_int = number<tommath_int>          ;
+using tommath_rational = rational_adaptor<tommath_int>;
+using tom_rational = number<tommath_rational>     ;
 }
 } // namespace boost::multiprecision
 
@@ -792,7 +792,7 @@ namespace std {
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> number_type;
+   using number_type = boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates>;
 
  public:
    static constexpr bool is_specialized = true;

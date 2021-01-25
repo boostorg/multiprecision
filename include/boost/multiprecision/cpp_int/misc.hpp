@@ -40,7 +40,7 @@ struct numeric_limits_workaround<R, false>
 template <class R, class CppInt>
 BOOST_MP_CXX14_CONSTEXPR void check_in_range(const CppInt& val, const std::integral_constant<int, checked>&)
 {
-   typedef typename boost::multiprecision::detail::canonical<R, CppInt>::type cast_type;
+   using cast_type = typename boost::multiprecision::detail::canonical<R, CppInt>::type;
 
    if (val.sign())
    {
@@ -79,7 +79,7 @@ template <class R, unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignTy
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<R>::value && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value, void>::type
 eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& backend)
 {
-   typedef std::integral_constant<int, Checked1> checked_type;
+   using checked_type = std::integral_constant<int, Checked1>;
    check_in_range<R>(backend, checked_type());
 
    BOOST_IF_CONSTEXPR(numeric_limits_workaround<R>::digits < cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
@@ -1127,7 +1127,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && std::is_convertible<typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type, R>::value>::type
 eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& val)
 {
-   typedef typename std::common_type<R, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type>::type common_type;
+   using common_type = typename std::common_type<R, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type>::type;
    BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized)
    {
       if (static_cast<common_type>(*val.limbs()) > static_cast<common_type>((std::numeric_limits<R>::max)()))
@@ -1171,7 +1171,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && std::is_convertible<typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type, R>::value>::type
 eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& val)
 {
-   typedef typename std::common_type<R, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type>::type common_type;
+   using common_type = typename std::common_type<R, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type>::type;
    BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized)
    {
       if(static_cast<common_type>(*val.limbs()) > static_cast<common_type>((std::numeric_limits<R>::max)()))

@@ -26,7 +26,7 @@ template <class C, bool b>
 struct is_byte_container_imp
 {
    // Note: Don't use C::value_type as this is a rather widespread typedef, even for non-range types
-   typedef typename std::remove_cv<typename std::iterator_traits<typename C::const_iterator>::value_type>::type container_value_type;
+   using container_value_type = typename std::remove_cv<typename std::iterator_traits<typename C::const_iterator>::value_type>::type;
    static constexpr const bool                                                                                  value = boost::multiprecision::detail::is_integral<container_value_type>::value && (sizeof(container_value_type) == 1);
 };
 

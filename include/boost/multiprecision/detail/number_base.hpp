@@ -86,7 +86,7 @@
 #define BOOST_MP_THREAD_LOCAL thread_local
 #define BOOST_MP_USING_THREAD_LOCAL
 #else
-#pragma GCC warning "BOOST_MP_THREAD_LOCAL on mingw is broken, please use MSys mingw gcc-9 or later, see https://sourceforge.net/p/mingw-w64/bugs/527/"
+#pragma GCC warning "thread_local on mingw is broken, please use MSys mingw gcc-9 or later, see https://sourceforge.net/p/mingw-w64/bugs/527/"
 #define BOOST_MP_THREAD_LOCAL
 #endif
 
@@ -299,69 +299,69 @@ struct find_index_of_large_enough_type<Tuple, i, digits, true>
 template <int index, class Tuple, class Fallback, bool = (std::tuple_size<Tuple>::value <= index)>
 struct dereference_tuple
 {
-   typedef typename std::tuple_element<index, Tuple>::type type;
+   using type = typename std::tuple_element<index, Tuple>::type;
 };
 template <int index, class Tuple, class Fallback>
 struct dereference_tuple<index, Tuple, Fallback, true>
 {
-   typedef Fallback type;
+   using type = Fallback;
 };
 
 template <class Val, class Backend, class Tag>
 struct canonical_imp
 {
-   typedef typename std::remove_cv<typename std::decay<const Val>::type>::type type;
+   using type = typename std::remove_cv<typename std::decay<const Val>::type>::type;
 };
 template <class B, class Backend, class Tag>
 struct canonical_imp<number<B, et_on>, Backend, Tag>
 {
-   typedef B type;
+   using type = B;
 };
 template <class B, class Backend, class Tag>
 struct canonical_imp<number<B, et_off>, Backend, Tag>
 {
-   typedef B type;
+   using type = B;
 };
 #ifdef __SUNPRO_CC
 template <class B, class Backend>
 struct canonical_imp<number<B, et_on>, Backend, std::integral_constant<int, 3> >
 {
-   typedef B type;
+   using type = B;
 };
 template <class B, class Backend>
 struct canonical_imp<number<B, et_off>, Backend, std::integral_constant<int, 3> >
 {
-   typedef B type;
+   using type = B;
 };
 #endif
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, std::integral_constant<int, 0> >
 {
    static constexpr int index = find_index_of_large_enough_type<typename Backend::signed_types, 0, bits_of<Val>::value>::value;
-   typedef typename dereference_tuple<index, typename Backend::signed_types, Val>::type type;
+   using type = typename dereference_tuple<index, typename Backend::signed_types, Val>::type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, std::integral_constant<int, 1> >
 {
    static constexpr int index = find_index_of_large_enough_type<typename Backend::unsigned_types, 0, bits_of<Val>::value>::value;
-   typedef typename dereference_tuple<index, typename Backend::unsigned_types, Val>::type type;
+   using type = typename dereference_tuple<index, typename Backend::unsigned_types, Val>::type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, std::integral_constant<int, 2> >
 {
    static constexpr int index = find_index_of_large_enough_type<typename Backend::float_types, 0, bits_of<Val>::value>::value;
-   typedef typename dereference_tuple<index, typename Backend::float_types, Val>::type type;
+   using type = typename dereference_tuple<index, typename Backend::float_types, Val>::type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, std::integral_constant<int, 3> >
 {
-   typedef const char* type;
+   using type = const char*;
 };
 
 template <class Val, class Backend>
 struct canonical
 {
-   typedef typename std::conditional<
+   using tag_type = typename std::conditional<
        boost::multiprecision::detail::is_signed<Val>::value && boost::multiprecision::detail::is_integral<Val>::value,
        std::integral_constant<int, 0>,
        typename std::conditional<
@@ -373,9 +373,9 @@ struct canonical
                typename std::conditional<
                    (std::is_convertible<Val, const char*>::value || std::is_same<Val, std::string>::value),
                    std::integral_constant<int, 3>,
-                   std::integral_constant<int, 4> >::type>::type>::type>::type tag_type;
+                   std::integral_constant<int, 4> >::type>::type>::type>::type;
 
-   typedef typename canonical_imp<Val, Backend, tag_type>::type type;
+   using type = typename canonical_imp<Val, Backend, tag_type>::type;
 };
 
 struct terminal
@@ -435,58 +435,58 @@ struct backend_type;
 template <class T, expression_template_option ExpressionTemplates>
 struct backend_type<number<T, ExpressionTemplates> >
 {
-   typedef T type;
+   using type = T;
 };
 
 template <class tag, class A1, class A2, class A3, class A4>
 struct backend_type<expression<tag, A1, A2, A3, A4> >
 {
-   typedef typename backend_type<typename expression<tag, A1, A2, A3, A4>::result_type>::type type;
+   using type = typename backend_type<typename expression<tag, A1, A2, A3, A4>::result_type>::type;
 };
 
 template <class T1, class T2>
 struct combine_expression
 {
-   typedef decltype(T1() + T2()) type;
+   using type = decltype(T1() + T2());
 };
 
 template <class T1, expression_template_option ExpressionTemplates, class T2>
 struct combine_expression<number<T1, ExpressionTemplates>, T2>
 {
-   typedef number<T1, ExpressionTemplates> type;
+   using type = number<T1, ExpressionTemplates>;
 };
 
 template <class T1, class T2, expression_template_option ExpressionTemplates>
 struct combine_expression<T1, number<T2, ExpressionTemplates> >
 {
-   typedef number<T2, ExpressionTemplates> type;
+   using type = number<T2, ExpressionTemplates>;
 };
 
 template <class T, expression_template_option ExpressionTemplates>
 struct combine_expression<number<T, ExpressionTemplates>, number<T, ExpressionTemplates> >
 {
-   typedef number<T, ExpressionTemplates> type;
+   using type = number<T, ExpressionTemplates>;
 };
 
 template <class T1, expression_template_option ExpressionTemplates1, class T2, expression_template_option ExpressionTemplates2>
 struct combine_expression<number<T1, ExpressionTemplates1>, number<T2, ExpressionTemplates2> >
 {
-   typedef typename std::conditional<
+   using type = typename std::conditional<
        std::is_convertible<number<T2, ExpressionTemplates2>, number<T1, ExpressionTemplates2> >::value,
        number<T1, ExpressionTemplates1>,
-       number<T2, ExpressionTemplates2> >::type type;
+       number<T2, ExpressionTemplates2> >::type;
 };
 
 template <class T>
 struct arg_type
 {
-   typedef expression<terminal, T> type;
+   using type = expression<terminal, T>;
 };
 
 template <class Tag, class Arg1, class Arg2, class Arg3, class Arg4>
 struct arg_type<expression<Tag, Arg1, Arg2, Arg3, Arg4> >
 {
-   typedef expression<Tag, Arg1, Arg2, Arg3, Arg4> type;
+   using type = expression<Tag, Arg1, Arg2, Arg3, Arg4>;
 };
 
 struct unmentionable
@@ -499,13 +499,13 @@ typedef unmentionable* (unmentionable::*unmentionable_type)();
 template <class T, bool b>
 struct expression_storage_base
 {
-   typedef const T& type;
+   using type = const T&;
 };
 
 template <class T>
 struct expression_storage_base<T, true>
 {
-   typedef T type;
+   using type = T;
 };
 
 template <class T>
@@ -515,29 +515,29 @@ struct expression_storage : public expression_storage_base<T, boost::multiprecis
 template <class T>
 struct expression_storage<T*>
 {
-   typedef T* type;
+   using type = T*;
 };
 
 template <class T>
 struct expression_storage<const T*>
 {
-   typedef const T* type;
+   using type = const T*;
 };
 
 template <class tag, class A1, class A2, class A3, class A4>
 struct expression_storage<expression<tag, A1, A2, A3, A4> >
 {
-   typedef expression<tag, A1, A2, A3, A4> type;
+   using type = expression<tag, A1, A2, A3, A4>;
 };
 
 template <class tag, class Arg1>
 struct expression<tag, Arg1, void, void, void>
 {
-   typedef std::integral_constant<int, 1>                    arity;
-   typedef typename arg_type<Arg1>::type   left_type;
-   typedef typename left_type::result_type left_result_type;
-   typedef typename left_type::result_type result_type;
-   typedef tag                             tag_type;
+   using arity = std::integral_constant<int, 1>                   ;
+   using left_type = typename arg_type<Arg1>::type  ;
+   using left_result_type = typename left_type::result_type;
+   using result_type = typename left_type::result_type;
+   using tag_type = tag                            ;
 
    explicit BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a) : arg(a) {}
    BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg(e.arg) {}
@@ -687,9 +687,9 @@ struct expression<tag, Arg1, void, void, void>
 template <class Arg1>
 struct expression<terminal, Arg1, void, void, void>
 {
-   typedef std::integral_constant<int, 0> arity;
-   typedef Arg1         result_type;
-   typedef terminal     tag_type;
+   using arity = std::integral_constant<int, 0>;
+   using result_type = Arg1        ;
+   using tag_type = terminal    ;
 
    explicit BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a) : arg(a) {}
    BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg(e.arg) {}
@@ -838,13 +838,13 @@ struct expression<terminal, Arg1, void, void, void>
 template <class tag, class Arg1, class Arg2>
 struct expression<tag, Arg1, Arg2, void, void>
 {
-   typedef std::integral_constant<int, 2>                                                           arity;
-   typedef typename arg_type<Arg1>::type                                          left_type;
-   typedef typename arg_type<Arg2>::type                                          right_type;
-   typedef typename left_type::result_type                                        left_result_type;
-   typedef typename right_type::result_type                                       right_result_type;
-   typedef typename combine_expression<left_result_type, right_result_type>::type result_type;
-   typedef tag                                                                    tag_type;
+   using arity = std::integral_constant<int, 2>                                                          ;
+   using left_type = typename arg_type<Arg1>::type                                         ;
+   using right_type = typename arg_type<Arg2>::type                                         ;
+   using left_result_type = typename left_type::result_type                                       ;
+   using right_result_type = typename right_type::result_type                                      ;
+   using result_type = typename combine_expression<left_result_type, right_result_type>::type;
+   using tag_type = tag                                                                   ;
 
    BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2) : arg1(a1), arg2(a2) {}
    BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg1(e.arg1), arg2(e.arg2) {}
@@ -998,17 +998,17 @@ struct expression<tag, Arg1, Arg2, void, void>
 template <class tag, class Arg1, class Arg2, class Arg3>
 struct expression<tag, Arg1, Arg2, Arg3, void>
 {
-   typedef std::integral_constant<int, 3>                      arity;
-   typedef typename arg_type<Arg1>::type     left_type;
-   typedef typename arg_type<Arg2>::type     middle_type;
-   typedef typename arg_type<Arg3>::type     right_type;
-   typedef typename left_type::result_type   left_result_type;
-   typedef typename middle_type::result_type middle_result_type;
-   typedef typename right_type::result_type  right_result_type;
-   typedef typename combine_expression<
+   using arity = std::integral_constant<int, 3>                     ;
+   using left_type = typename arg_type<Arg1>::type    ;
+   using middle_type = typename arg_type<Arg2>::type    ;
+   using right_type = typename arg_type<Arg3>::type    ;
+   using left_result_type = typename left_type::result_type  ;
+   using middle_result_type = typename middle_type::result_type;
+   using right_result_type = typename right_type::result_type ;
+   using result_type = typename combine_expression<
        left_result_type,
-       typename combine_expression<right_result_type, middle_result_type>::type>::type result_type;
-   typedef tag                                                                         tag_type;
+       typename combine_expression<right_result_type, middle_result_type>::type>::type;
+   using tag_type = tag                                                                        ;
 
    BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2, const Arg3& a3) : arg1(a1), arg2(a2), arg3(a3) {}
    BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg1(e.arg1), arg2(e.arg2), arg3(e.arg3) {}
@@ -1166,21 +1166,21 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 struct expression
 {
-   typedef std::integral_constant<int, 4>                            arity;
-   typedef typename arg_type<Arg1>::type           left_type;
-   typedef typename arg_type<Arg2>::type           left_middle_type;
-   typedef typename arg_type<Arg3>::type           right_middle_type;
-   typedef typename arg_type<Arg4>::type           right_type;
-   typedef typename left_type::result_type         left_result_type;
-   typedef typename left_middle_type::result_type  left_middle_result_type;
-   typedef typename right_middle_type::result_type right_middle_result_type;
-   typedef typename right_type::result_type        right_result_type;
-   typedef typename combine_expression<
+   using arity = std::integral_constant<int, 4>                           ;
+   using left_type = typename arg_type<Arg1>::type          ;
+   using left_middle_type = typename arg_type<Arg2>::type          ;
+   using right_middle_type = typename arg_type<Arg3>::type          ;
+   using right_type = typename arg_type<Arg4>::type          ;
+   using left_result_type = typename left_type::result_type        ;
+   using left_middle_result_type = typename left_middle_type::result_type ;
+   using right_middle_result_type = typename right_middle_type::result_type;
+   using right_result_type = typename right_type::result_type       ;
+   using result_type = typename combine_expression<
        left_result_type,
        typename combine_expression<
            left_middle_result_type,
-           typename combine_expression<right_middle_result_type, right_result_type>::type>::type>::type result_type;
-   typedef tag                                                                                          tag_type;
+           typename combine_expression<right_middle_result_type, right_result_type>::type>::type>::type;
+   using tag_type = tag                                                                                         ;
 
    BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2, const Arg3& a3, const Arg4& a4) : arg1(a1), arg2(a2), arg3(a3), arg4(a4) {}
    BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg1(e.arg1), arg2(e.arg2), arg3(e.arg3), arg4(e.arg4) {}
@@ -1365,7 +1365,7 @@ struct digits2
 template <class S>
 void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std::ios_base::fmtflags f, bool iszero)
 {
-   typedef typename S::size_type size_type;
+   using size_type = typename S::size_type;
    bool                          scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
    bool                          fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
    bool                          showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
@@ -1573,7 +1573,7 @@ struct number_category<__float128> : public std::integral_constant<int, number_k
 template <class T>
 struct component_type
 {
-   typedef T type;
+   using type = T;
 };
 template <class tag, class A1, class A2, class A3, class A4>
 struct component_type<detail::expression<tag, A1, A2, A3, A4> > : public component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type>
@@ -1582,8 +1582,7 @@ struct component_type<detail::expression<tag, A1, A2, A3, A4> > : public compone
 template <class T>
 struct scalar_result_from_possible_complex
 {
-   typedef typename std::conditional<number_category<T>::value == number_kind_complex,
-                              typename component_type<T>::type, T>::type type;
+   using type = typename std::conditional<number_category<T>::value == number_kind_complex, typename component_type<T>::type, T>::type;
 };
 
 template <class T>
@@ -1631,7 +1630,7 @@ namespace boost { namespace math {
       template <class tag, class A1, class A2, class A3, class A4>
       struct promote_arg<boost::multiprecision::detail::expression<tag, A1, A2, A3, A4> >
       {
-         typedef typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type type;
+         using type = typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
       };
 
       template <class R, class B, boost::multiprecision::expression_template_option ET>
@@ -1643,7 +1642,7 @@ namespace boost { namespace math {
       template <class R, class tag, class A1, class A2, class A3, class A4>
       inline R real_cast(const boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>& val)
       {
-         typedef typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type val_type;
+         using val_type = typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
          return val_type(val).template convert_to<R>();
       }
 

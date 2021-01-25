@@ -44,7 +44,7 @@ void assign_bits(Backend& val, Unsigned bits, unsigned bit_location, unsigned ch
 template <class Backend, class Unsigned>
 void assign_bits(Backend& val, Unsigned bits, unsigned bit_location, unsigned chunk_bits, const std::integral_constant<bool, true>&)
 {
-   typedef typename Backend::local_limb_type local_limb_type;
+   using local_limb_type = typename Backend::local_limb_type;
    //
    // Check for possible overflow, this may trigger an exception, or have no effect
    // depending on whether this is a checked integer or not:
@@ -90,11 +90,11 @@ import_bits_generic(
 {
    typename number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>::backend_type newval;
 
-   typedef typename std::iterator_traits<Iterator>::value_type                                   value_type;
-   typedef typename boost::multiprecision::detail::make_unsigned<value_type>::type                                         unsigned_value_type;
-   typedef typename std::iterator_traits<Iterator>::difference_type                              difference_type;
-   typedef typename boost::multiprecision::detail::make_unsigned<difference_type>::type                                    size_type;
-   typedef typename cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>::trivial_tag tag_type;
+   using value_type = typename std::iterator_traits<Iterator>::value_type                                  ;
+   using unsigned_value_type = typename boost::multiprecision::detail::make_unsigned<value_type>::type                                        ;
+   using difference_type = typename std::iterator_traits<Iterator>::difference_type                             ;
+   using size_type = typename boost::multiprecision::detail::make_unsigned<difference_type>::type                                   ;
+   using tag_type = typename cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>::trivial_tag;
 
    if (!chunk_size)
       chunk_size = std::numeric_limits<value_type>::digits;
@@ -211,7 +211,7 @@ OutputIterator export_bits(
 #pragma warning(push)
 #pragma warning(disable : 4244)
 #endif
-   typedef typename cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>::trivial_tag tag_type;
+   using tag_type = typename cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>::trivial_tag;
    if (!val)
    {
       *out = 0;

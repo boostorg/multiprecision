@@ -42,11 +42,10 @@ namespace backends {
 template <class Backend>
 struct logged_adaptor
 {
-   typedef typename Backend::signed_types   signed_types;
-   typedef typename Backend::unsigned_types unsigned_types;
-   typedef typename Backend::float_types    float_types;
-   typedef typename extract_exponent_type<
-       Backend, number_category<Backend>::value>::type exponent_type;
+   using signed_types = typename Backend::signed_types  ;
+   using unsigned_types = typename Backend::unsigned_types;
+   using float_types = typename Backend::float_types   ;
+   using exponent_type = typename extract_exponent_type<Backend, number_category<Backend>::value>::type;
 
  private:
    Backend m_value;
@@ -597,8 +596,8 @@ template <class Backend, boost::multiprecision::expression_template_option Expre
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<Backend>, ExpressionTemplates> >
     : public std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
-   typedef std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> >                            base_type;
-   typedef boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<Backend>, ExpressionTemplates> number_type;
+   using base_type = std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> >                           ;
+   using number_type = boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<Backend>, ExpressionTemplates>;
 
  public:
    static number_type(min)() noexcept { return (base_type::min)(); }

@@ -37,9 +37,9 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
    using default_ops::eval_ldexp;
    using default_ops::eval_right_shift;
    // smallest unsigned type handled natively by "From" is likely to be it's limb_type:
-   typedef typename canonical<unsigned char, From>::type l_limb_type;
+   using l_limb_type = typename canonical<unsigned char, From>::type;
    // get the corresponding type that we can assign to "To":
-   typedef typename canonical<l_limb_type, To>::type to_type;
+   using to_type = typename canonical<l_limb_type, To>::type;
    From                                              t(from);
    bool                                              is_neg = eval_get_sign(t) < 0;
    if (is_neg)
@@ -85,9 +85,9 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
    using default_ops::eval_left_shift;
    using default_ops::eval_right_shift;
    // smallest unsigned type handled natively by "From" is likely to be it's limb_type:
-   typedef typename canonical<unsigned char, From>::type limb_type;
+   using limb_type = typename canonical<unsigned char, From>::type;
    // get the corresponding type that we can assign to "To":
-   typedef typename canonical<limb_type, To>::type to_type;
+   using to_type = typename canonical<limb_type, To>::type;
    From                                            t(from);
    bool                                            is_neg = eval_get_sign(t) < 0;
    if (is_neg)
@@ -141,7 +141,7 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
    }
    else
    {
-      typedef typename canonical<unsigned char, To>::type ui_type;
+      using ui_type = typename canonical<unsigned char, To>::type;
 
       using default_ops::eval_add;
       using default_ops::eval_convert_to;
@@ -193,7 +193,7 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
          eval_add(to, ll);
          eval_subtract(f, term);
       }
-      typedef typename To::exponent_type to_exponent;
+      using to_exponent = typename To::exponent_type;
       if (e > (std::numeric_limits<to_exponent>::max)())
       {
          to = static_cast<const char*>("inf");
@@ -218,7 +218,7 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_rational>& /*to_type*/, const std::integral_constant<int, number_kind_rational>& /*from_type*/)
 {
-   typedef typename component_type<number<To> >::type to_component_type;
+   using to_component_type = typename component_type<number<To> >::type;
 
    number<From>      t(from);
    to_component_type n(numerator(t)), d(denominator(t));
@@ -229,7 +229,7 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_rational>& /*to_type*/, const std::integral_constant<int, number_kind_integer>& /*from_type*/)
 {
-   typedef typename component_type<number<To> >::type to_component_type;
+   using to_component_type = typename component_type<number<To> >::type;
 
    number<From>      t(from);
    to_component_type n(t), d(1);
@@ -380,10 +380,10 @@ inline void generic_convert_rational_to_float(To& result, const From& f)
    // that way we can call this from generic conversions, and
    // from specific conversions to built in types.
    //
-   typedef typename std::conditional<is_number<From>::value, From, number<From> >::type                                                                                                                                                                                                            actual_from_type;
-   typedef typename std::conditional<is_number<To>::value || std::is_floating_point<To>::value, To, number<To> >::type                                                                                                                                                                             actual_to_type;
-   typedef typename component_type<actual_from_type>::type                                                                                                                                                                                                                                  integer_type;
-   typedef std::integral_constant<bool, !std::numeric_limits<integer_type>::is_specialized || std::numeric_limits<integer_type>::is_bounded || !std::numeric_limits<actual_to_type>::is_specialized || !std::numeric_limits<actual_to_type>::is_bounded || (std::numeric_limits<actual_to_type>::radix != 2)> dispatch_tag;
+   using actual_from_type = typename std::conditional<is_number<From>::value, From, number<From> >::type                                                                                                                                                                                                           ;
+   using actual_to_type = typename std::conditional<is_number<To>::value || std::is_floating_point<To>::value, To, number<To> >::type                                                                                                                                                                            ;
+   using integer_type = typename component_type<actual_from_type>::type                                                                                                                                                                                                                                 ;
+   using dispatch_tag = std::integral_constant<bool, !std::numeric_limits<integer_type>::is_specialized || std::numeric_limits<integer_type>::is_bounded || !std::numeric_limits<actual_to_type>::is_specialized || !std::numeric_limits<actual_to_type>::is_bounded || (std::numeric_limits<actual_to_type>::radix != 2)>;
 
    integer_type n(numerator(static_cast<actual_from_type>(f))), d(denominator(static_cast<actual_from_type>(f)));
    generic_convert_rational_to_float_imp(result, n, d, dispatch_tag());
@@ -398,7 +398,7 @@ inline void generic_interconvert(To& to, const From& from, const std::integral_c
 template <class To, class From>
 void generic_interconvert_float2rational(To& to, const From& from, const std::integral_constant<int, 2>& /*radix*/)
 {
-   typedef typename std::tuple_element<0, typename To::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename To::unsigned_types>::type;
    constexpr const int                                                       shift = std::numeric_limits<boost::long_long_type>::digits;
    typename From::exponent_type                                   e;
    typename component_type<number<To> >::type                     num, denom;
@@ -429,7 +429,7 @@ void generic_interconvert_float2rational(To& to, const From& from, const std::in
    // scalbn and ilogb rather than ldexp and frexp, we also only extract
    // one Radix digit at a time which is terribly inefficient!
    //
-   typedef typename std::tuple_element<0, typename To::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename To::unsigned_types>::type;
    typename From::exponent_type                                   e;
    typename component_type<number<To> >::type                     num, denom;
    number<From>                                                   val(from);
@@ -479,7 +479,7 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
 template <class To, class From>
 void generic_interconvert_float2int(To& to, const From& from, const std::integral_constant<int, 2>& /*radix*/)
 {
-   typedef typename From::exponent_type exponent_type;
+   using exponent_type = typename From::exponent_type;
    constexpr const exponent_type        shift = std::numeric_limits<boost::long_long_type>::digits;
    exponent_type                        e;
    number<To>                           num(0u);
@@ -551,8 +551,8 @@ void generic_interconvert_complex_to_scalar(To& to, const From& from, const std:
 template <class To, class From>
 void generic_interconvert_complex_to_scalar(To& to, const From& from, const std::integral_constant<bool, false>&, const std::integral_constant<bool, true>&)
 {
-   typedef typename component_type<number<From> >::type component_number;
-   typedef typename component_number::backend_type      component_backend;
+   using component_number = typename component_type<number<From> >::type;
+   using component_backend = typename component_number::backend_type     ;
    //
    // Get the real part and copy-construct the result from it:
    //
@@ -563,8 +563,8 @@ void generic_interconvert_complex_to_scalar(To& to, const From& from, const std:
 template <class To, class From>
 void generic_interconvert_complex_to_scalar(To& to, const From& from, const std::integral_constant<bool, false>&, const std::integral_constant<bool, false>&)
 {
-   typedef typename component_type<number<From> >::type component_number;
-   typedef typename component_number::backend_type      component_backend;
+   using component_number = typename component_type<number<From> >::type;
+   using component_backend = typename component_number::backend_type     ;
    //
    // Get the real part and use a generic_interconvert to type To:
    //
@@ -576,16 +576,16 @@ void generic_interconvert_complex_to_scalar(To& to, const From& from, const std:
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_floating_point>& /*to_type*/, const std::integral_constant<int, number_kind_complex>& /*from_type*/)
 {
-   typedef typename component_type<number<From> >::type component_number;
-   typedef typename component_number::backend_type      component_backend;
+   using component_number = typename component_type<number<From> >::type;
+   using component_backend = typename component_number::backend_type     ;
 
    generic_interconvert_complex_to_scalar(to, from, std::integral_constant<bool, std::is_same<component_backend, To>::value>(), std::integral_constant<bool, std::is_constructible<To, const component_backend&>::value>());
 }
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_integer>& /*to_type*/, const std::integral_constant<int, number_kind_complex>& /*from_type*/)
 {
-   typedef typename component_type<number<From> >::type component_number;
-   typedef typename component_number::backend_type      component_backend;
+   using component_number = typename component_type<number<From> >::type;
+   using component_backend = typename component_number::backend_type     ;
 
    generic_interconvert_complex_to_scalar(to, from, std::integral_constant<bool, std::is_same<component_backend, To>::value>(), std::integral_constant<bool, std::is_constructible<To, const component_backend&>::value>());
 }
