@@ -97,7 +97,7 @@ inline void multiply_karatsuba(
     const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, Allocator>& b,
     typename cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, Allocator>::scoped_shared_storage& storage)
 {
-   typedef cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, Allocator> cpp_int_type;
+   using cpp_int_type = cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, Allocator>;
 
    unsigned as = a.size();
    unsigned bs = b.size();
@@ -276,7 +276,7 @@ setup_karatsuba(
    // to variable precision types by aliasing them, this also
    // reduce the number of template instantations:
    //
-   typedef cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > variable_precision_type;
+   using variable_precision_type = cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> >;
    variable_precision_type a_t(a.limbs(), 0, a.size()), b_t(b.limbs(), 0, b.size());
    unsigned as = a.size();
    unsigned bs = b.size();
@@ -317,7 +317,7 @@ setup_karatsuba(
    //
    // Variable precision, mixed arguments, just alias and forward:
    //
-   typedef cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > variable_precision_type;
+   using variable_precision_type = cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> >;
    variable_precision_type a_t(a.limbs(), 0, a.size()), b_t(b.limbs(), 0, b.size());
    unsigned as = a.size();
    unsigned bs = b.size();
@@ -811,7 +811,7 @@ eval_multiply(
     cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> const& a,
     cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> const& b)
 {
-   typedef typename boost::multiprecision::detail::canonical<typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::local_limb_type, cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::type canonical_type;
+   using canonical_type = typename boost::multiprecision::detail::canonical<typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::local_limb_type, cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::type;
    eval_multiply(result, static_cast<canonical_type>(*a.limbs()), static_cast<canonical_type>(*b.limbs()));
    result.sign(a.sign() != b.sign());
 }

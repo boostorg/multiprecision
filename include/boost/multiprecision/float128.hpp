@@ -39,13 +39,13 @@ extern "C" {
 #include <quadmath.h>
 }
 
-typedef __float128 float128_type;
+using float128_type = __float128;
 
 #elif defined(BOOST_MP_USE_QUAD)
 
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 
-typedef _Quad float128_type;
+using float128_type = _Quad;
 
 extern "C" {
 _Quad __ldexpq(_Quad, int);
@@ -140,7 +140,7 @@ struct number_category<float128_type> : public std::integral_constant<int, numbe
 {};
 #endif
 
-typedef number<float128_backend, et_off> float128;
+using float128 = number<float128_backend, et_off>;
 
 namespace quad_constants {
 constexpr __float128 quad_min = static_cast<__float128>(1) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) / 1073741824;
@@ -161,12 +161,10 @@ namespace backends {
 
 struct float128_backend
 {
-   typedef std::tuple<signed char, short, int, long, boost::long_long_type> signed_types;
-   typedef std::tuple<unsigned char, unsigned short,
-                     unsigned int, unsigned long, boost::ulong_long_type>
-       unsigned_types;
-   typedef std::tuple<float, double, long double> float_types;
-   typedef int                                   exponent_type;
+   using signed_types = std::tuple<signed char, short, int, long, boost::long_long_type>;
+   using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, boost::ulong_long_type>;
+   using float_types = std::tuple<float, double, long double>;
+   using exponent_type = int                                  ;
 
  private:
    float128_type m_value;
@@ -777,9 +775,9 @@ void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend
 template <class Archive>
 void serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, unsigned int /*version*/)
 {
-   typedef typename Archive::is_loading                                                                                                                                          load_tag;
-   typedef std::integral_constant<bool, load_tag::value>                                                                                                                         loading;
-   typedef typename std::integral_constant<bool, std::is_same<Archive, boost::archive::binary_oarchive>::value || std::is_same<Archive, boost::archive::binary_iarchive>::value> binary_tag;
+   using load_tag = typename Archive::is_loading                                                                                                                                         ;
+   using loading = std::integral_constant<bool, load_tag::value>                                                                                                                        ;
+   using binary_tag = typename std::integral_constant<bool, std::is_same<Archive, boost::archive::binary_oarchive>::value || std::is_same<Archive, boost::archive::binary_iarchive>::value>;
 
    float128_detail::do_serialize(ar, val, loading(), binary_tag());
 }
@@ -793,7 +791,7 @@ namespace std {
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates> number_type;
+   using number_type = boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>;
 
  public:
    static constexpr bool is_specialized = true;

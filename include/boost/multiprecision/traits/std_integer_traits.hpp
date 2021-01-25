@@ -46,22 +46,22 @@ struct is_arithmetic<unsigned __int128> : public std::integral_constant<bool, tr
 template <>
 struct make_unsigned<__int128>
 {
-   typedef unsigned __int128 type;
+   using type = unsigned __int128;
 };
 template <>
 struct make_unsigned<unsigned __int128>
 {
-   typedef unsigned __int128 type;
+   using type = unsigned __int128;
 };
 template <>
 struct make_signed<__int128>
 {
-   typedef __int128 type;
+   using type = __int128;
 };
 template <>
 struct make_signed<unsigned __int128>
 {
-   typedef __int128 type;
+   using type = __int128;
 };
 
 #endif

@@ -62,14 +62,14 @@ template <unsigned digits10>
 struct mpc_complex_imp
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef std::tuple<long, boost::long_long_type>           signed_types;
-   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
+   using signed_types = std::tuple<long, boost::long_long_type>          ;
+   using unsigned_types = std::tuple<unsigned long, boost::ulong_long_type>;
 #else
-   typedef std::tuple<long>          signed_types;
-   typedef std::tuple<unsigned long> unsigned_types;
+   using signed_types = std::tuple<long>         ;
+   using unsigned_types = std::tuple<unsigned long>;
 #endif
-   typedef std::tuple<double, long double> float_types;
-   typedef long                           exponent_type;
+   using float_types = std::tuple<double, long double>;
+   using exponent_type = long                          ;
 
    mpc_complex_imp()
    {
@@ -1480,28 +1480,28 @@ struct number_category<detail::canonical<mpc_t, backends::mpc_complex_backend<0>
 
 using boost::multiprecision::backends::mpc_complex_backend;
 
-typedef number<mpc_complex_backend<50> >   mpc_complex_50;
-typedef number<mpc_complex_backend<100> >  mpc_complex_100;
-typedef number<mpc_complex_backend<500> >  mpc_complex_500;
-typedef number<mpc_complex_backend<1000> > mpc_complex_1000;
-typedef number<mpc_complex_backend<0> >    mpc_complex;
+using mpc_complex_50 = number<mpc_complex_backend<50> >  ;
+using mpc_complex_100 = number<mpc_complex_backend<100> > ;
+using mpc_complex_500 = number<mpc_complex_backend<500> > ;
+using mpc_complex_1000 = number<mpc_complex_backend<1000> >;
+using mpc_complex = number<mpc_complex_backend<0> >   ;
 
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 struct component_type<number<mpc_complex_backend<Digits10>, ExpressionTemplates> >
 {
-   typedef number<mpfr_float_backend<Digits10>, ExpressionTemplates> type;
+   using type = number<mpfr_float_backend<Digits10>, ExpressionTemplates>;
 };
 
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 struct component_type<number<logged_adaptor<mpc_complex_backend<Digits10> >, ExpressionTemplates> >
 {
-   typedef number<mpfr_float_backend<Digits10>, ExpressionTemplates> type;
+   using type = number<mpfr_float_backend<Digits10>, ExpressionTemplates>;
 };
 
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 struct complex_result_from_scalar<number<mpfr_float_backend<Digits10>, ExpressionTemplates> >
 {
-   typedef number<mpc_complex_backend<Digits10>, ExpressionTemplates> type;
+   using type = number<mpc_complex_backend<Digits10>, ExpressionTemplates>;
 };
 
 }

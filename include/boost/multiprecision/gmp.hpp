@@ -84,14 +84,14 @@ template <unsigned digits10>
 struct gmp_float_imp
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef std::tuple<long, boost::long_long_type>           signed_types;
-   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
+   using signed_types = std::tuple<long, boost::long_long_type>          ;
+   using unsigned_types = std::tuple<unsigned long, boost::ulong_long_type>;
 #else
-   typedef std::tuple<long>          signed_types;
-   typedef std::tuple<unsigned long> unsigned_types;
+   using signed_types = std::tuple<long>         ;
+   using unsigned_types = std::tuple<unsigned long>;
 #endif
-   typedef std::tuple<double, long double> float_types;
-   typedef long                           exponent_type;
+   using float_types = std::tuple<double, long double>;
+   using exponent_type = long                          ;
 
    gmp_float_imp() noexcept
    {
@@ -1111,13 +1111,13 @@ inline std::size_t hash_value(const gmp_float<Digits10>& val)
 struct gmp_int
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef std::tuple<long, boost::long_long_type>           signed_types;
-   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
+   using signed_types = std::tuple<long, boost::long_long_type>          ;
+   using unsigned_types = std::tuple<unsigned long, boost::ulong_long_type>;
 #else
-   typedef std::tuple<long>          signed_types;
-   typedef std::tuple<unsigned long> unsigned_types;
+   using signed_types = std::tuple<long>         ;
+   using unsigned_types = std::tuple<unsigned long>;
 #endif
-   typedef std::tuple<double, long double> float_types;
+   using float_types = std::tuple<double, long double>;
 
    gmp_int()
    {
@@ -2017,13 +2017,13 @@ void eval_add(gmp_rational& t, const gmp_rational& o);
 struct gmp_rational
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef std::tuple<long, boost::long_long_type>           signed_types;
-   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
+   using signed_types = std::tuple<long, boost::long_long_type>          ;
+   using unsigned_types = std::tuple<unsigned long, boost::ulong_long_type>;
 #else
-   typedef std::tuple<long>          signed_types;
-   typedef std::tuple<unsigned long> unsigned_types;
+   using signed_types = std::tuple<long>         ;
+   using unsigned_types = std::tuple<unsigned long>;
 #endif
-   typedef std::tuple<double, long double> float_types;
+   using float_types = std::tuple<double, long double>;
 
    gmp_rational()
    {
@@ -2511,7 +2511,7 @@ using boost::multiprecision::backends::gmp_rational;
 template <expression_template_option ExpressionTemplates>
 struct component_type<number<gmp_rational, ExpressionTemplates> >
 {
-   typedef number<gmp_int, ExpressionTemplates> type;
+   using type = number<gmp_int, ExpressionTemplates>;
 };
 
 template <expression_template_option ET>
@@ -2579,7 +2579,7 @@ struct transcendental_reduction_type<boost::multiprecision::backends::gmp_float<
    // 
    // See ARGUMENT REDUCTION FOR HUGE ARGUMENTS. K C Ng.
    //
-   typedef boost::multiprecision::backends::gmp_float<Digits10 * 3> type;
+   using type = boost::multiprecision::backends::gmp_float<Digits10 * 3>;
 };
 
 
@@ -2601,13 +2601,13 @@ struct is_variable_precision<backends::gmp_float<0> > : public std::integral_con
 {};
 } // namespace detail
 
-typedef number<gmp_float<50> >   mpf_float_50;
-typedef number<gmp_float<100> >  mpf_float_100;
-typedef number<gmp_float<500> >  mpf_float_500;
-typedef number<gmp_float<1000> > mpf_float_1000;
-typedef number<gmp_float<0> >    mpf_float;
-typedef number<gmp_int>          mpz_int;
-typedef number<gmp_rational>     mpq_rational;
+using mpf_float_50 = number<gmp_float<50> >  ;
+using mpf_float_100 = number<gmp_float<100> > ;
+using mpf_float_500 = number<gmp_float<500> > ;
+using mpf_float_1000 = number<gmp_float<1000> >;
+using mpf_float = number<gmp_float<0> >   ;
+using mpz_int = number<gmp_int>         ;
+using mpq_rational = number<gmp_rational>    ;
 
 } // namespace multiprecision
 
@@ -2728,7 +2728,7 @@ namespace std {
 template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> number_type;
+   using number_type = boost::multiprecision::number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates>;
 
  public:
    static constexpr bool is_specialized = true;
@@ -2863,7 +2863,7 @@ constexpr float_round_style numeric_limits<boost::multiprecision::number<boost::
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> number_type;
+   using number_type = boost::multiprecision::number<boost::multiprecision::gmp_float<0>, ExpressionTemplates>;
 
  public:
    static constexpr bool is_specialized = false;
@@ -2948,7 +2948,7 @@ constexpr float_round_style numeric_limits<boost::multiprecision::number<boost::
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_int, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::gmp_int, ExpressionTemplates> number_type;
+   using number_type = boost::multiprecision::number<boost::multiprecision::gmp_int, ExpressionTemplates>;
 
  public:
    static constexpr bool is_specialized = true;
@@ -3043,7 +3043,7 @@ constexpr float_round_style numeric_limits<boost::multiprecision::number<boost::
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_rational, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::gmp_rational, ExpressionTemplates> number_type;
+   using number_type = boost::multiprecision::number<boost::multiprecision::gmp_rational, ExpressionTemplates>;
 
  public:
    static constexpr bool is_specialized = true;

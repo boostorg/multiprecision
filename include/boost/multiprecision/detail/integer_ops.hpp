@@ -25,7 +25,7 @@ inline BOOST_MP_CXX14_CONSTEXPR Integer eval_integer_modulus(const Backend& x, I
    BOOST_MP_USING_ABS
    using default_ops::eval_convert_to;
    using default_ops::eval_modulus;
-   typedef typename boost::multiprecision::detail::canonical<Integer, Backend>::type int_type;
+   using int_type = typename boost::multiprecision::detail::canonical<Integer, Backend>::type;
    Backend                                                                           t;
    eval_modulus(t, x, static_cast<int_type>(val));
    Integer result(0);
@@ -97,7 +97,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b)
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_lcm(B& result, const B& a, const B& b)
 {
-   typedef typename std::tuple_element<0, typename B::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename B::unsigned_types>::type;
    B                                                             t;
    eval_gcd(t, a, b);
 
@@ -161,7 +161,7 @@ template <class tag, class A1, class A2, class A3, class A4, class Integer>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value && (number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer), Integer>::type
 integer_modulus(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, Integer val)
 {
-   typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
    return integer_modulus(result_type(x), val);
 }
 
@@ -177,7 +177,7 @@ template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, unsigned>::type
 lsb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 {
-   typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   using number_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
    number_type                                                                           n(x);
    using default_ops::eval_lsb;
    return eval_lsb(n.backend());
@@ -195,7 +195,7 @@ template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, unsigned>::type
 msb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 {
-   typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   using number_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
    number_type                                                                           n(x);
    using default_ops::eval_msb;
    return eval_msb(n.backend());
@@ -213,7 +213,7 @@ template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, bool>::type
 bit_test(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, unsigned index)
 {
-   typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   using number_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
    number_type                                                                           n(x);
    using default_ops::eval_bit_test;
    return eval_bit_test(n.backend(), index);
@@ -255,7 +255,7 @@ namespace default_ops {
 template <class Backend>
 struct double_precision_type
 {
-   typedef Backend type;
+   using type = Backend;
 };
 
 //
@@ -284,8 +284,8 @@ BOOST_MP_CXX14_CONSTEXPR void eval_powm(Backend& result, const Backend& a, const
    using default_ops::eval_multiply;
    using default_ops::eval_right_shift;
 
-   typedef typename double_precision_type<Backend>::type                                       double_type;
-   typedef typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
+   using double_type = typename double_precision_type<Backend>::type                                      ;
+   using ui_type = typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type;
 
    check_sign_of_backend(p, std::integral_constant<bool, std::numeric_limits<number<Backend> >::is_signed>());
 
@@ -310,10 +310,10 @@ BOOST_MP_CXX14_CONSTEXPR void eval_powm(Backend& result, const Backend& a, const
 template <class Backend, class Integer>
 BOOST_MP_CXX14_CONSTEXPR void eval_powm(Backend& result, const Backend& a, const Backend& p, Integer c)
 {
-   typedef typename double_precision_type<Backend>::type                                       double_type;
-   typedef typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
-   typedef typename boost::multiprecision::detail::canonical<Integer, double_type>::type       i1_type;
-   typedef typename boost::multiprecision::detail::canonical<Integer, Backend>::type           i2_type;
+   using double_type = typename double_precision_type<Backend>::type                                      ;
+   using ui_type = typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type;
+   using i1_type = typename boost::multiprecision::detail::canonical<Integer, double_type>::type      ;
+   using i2_type = typename boost::multiprecision::detail::canonical<Integer, Backend>::type          ;
 
    using default_ops::eval_bit_test;
    using default_ops::eval_get_sign;
@@ -349,8 +349,8 @@ BOOST_MP_CXX14_CONSTEXPR void eval_powm(Backend& result, const Backend& a, const
 template <class Backend, class Integer>
 BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_unsigned<Integer>::value >::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
 {
-   typedef typename double_precision_type<Backend>::type                                       double_type;
-   typedef typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
+   using double_type = typename double_precision_type<Backend>::type                                      ;
+   using ui_type = typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type;
 
    using default_ops::eval_bit_test;
    using default_ops::eval_get_sign;
@@ -389,10 +389,10 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
 template <class Backend, class Integer1, class Integer2>
 BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_unsigned<Integer1>::value >::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
 {
-   typedef typename double_precision_type<Backend>::type                                       double_type;
-   typedef typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
-   typedef typename boost::multiprecision::detail::canonical<Integer1, double_type>::type      i1_type;
-   typedef typename boost::multiprecision::detail::canonical<Integer2, Backend>::type          i2_type;
+   using double_type = typename double_precision_type<Backend>::type                                      ;
+   using ui_type = typename boost::multiprecision::detail::canonical<unsigned char, double_type>::type;
+   using i1_type = typename boost::multiprecision::detail::canonical<Integer1, double_type>::type     ;
+   using i2_type = typename boost::multiprecision::detail::canonical<Integer2, Backend>::type         ;
 
    using default_ops::eval_bit_test;
    using default_ops::eval_get_sign;

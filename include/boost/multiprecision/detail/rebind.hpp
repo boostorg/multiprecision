@@ -12,7 +12,7 @@ namespace boost { namespace multiprecision { namespace backends { namespace deta
 template <class value_type, class my_allocator>
 struct rebind
 {
-   typedef typename std::allocator_traits<my_allocator>::template rebind_alloc<value_type> type;
+   using type = typename std::allocator_traits<my_allocator>::template rebind_alloc<value_type>;
 };
 }}}} // namespace boost::multiprecision::backends::detail
 

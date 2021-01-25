@@ -9,8 +9,8 @@
 template <class T>
 void calc_log2(T& num, unsigned digits)
 {
-   typedef typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type ui_type;
-   typedef typename std::tuple_element<0, typename T::signed_types>::type                         si_type;
+   using ui_type = typename boost::multiprecision::detail::canonical<std::uint32_t, T>::type;
+   using si_type = typename std::tuple_element<0, typename T::signed_types>::type                        ;
 
    //
    // String value with 1100 digits:
@@ -80,7 +80,7 @@ void calc_log2(T& num, unsigned digits)
 template <class T>
 void calc_e(T& result, unsigned digits)
 {
-   typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename T::unsigned_types>::type;
    //
    // 1100 digits in string form:
    //
@@ -129,8 +129,8 @@ void calc_e(T& result, unsigned digits)
 template <class T>
 void calc_pi(T& result, unsigned digits)
 {
-   typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
-   typedef typename std::tuple_element<0, typename T::float_types>::type    real_type;
+   using ui_type = typename std::tuple_element<0, typename T::unsigned_types>::type;
+   using real_type = typename std::tuple_element<0, typename T::float_types>::type   ;
    //
    // 1100 digits in string form:
    //
@@ -271,7 +271,7 @@ const T& get_constant_one_over_epsilon()
    static BOOST_MP_THREAD_LOCAL long digits = 0;
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
-      typedef typename std::tuple_element<0, typename T::unsigned_types>::type ui_type;
+      using ui_type = typename std::tuple_element<0, typename T::unsigned_types>::type;
       boost::multiprecision::detail::maybe_promote_precision(&result);
       result = static_cast<ui_type>(1u);
       BOOST_IF_CONSTEXPR(std::numeric_limits<number<T> >::is_specialized)

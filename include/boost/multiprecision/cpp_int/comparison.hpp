@@ -225,7 +225,7 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     bool>::type
 eval_eq(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>& a, S b) noexcept
 {
-   typedef typename boost::multiprecision::detail::make_unsigned<S>::type ui_type;
+   using ui_type = typename boost::multiprecision::detail::make_unsigned<S>::type;
    if (b < 0)
    {
       cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> t(b);
@@ -289,7 +289,7 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     bool>::type
 eval_lt(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>& a, S b) noexcept
 {
-   typedef typename boost::multiprecision::detail::make_unsigned<S>::type ui_type;
+   using ui_type = typename boost::multiprecision::detail::make_unsigned<S>::type;
    if (b < 0)
    {
       cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> t(b);
@@ -353,7 +353,7 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     bool>::type
 eval_gt(const cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>& a, S b) noexcept
 {
-   typedef typename boost::multiprecision::detail::make_unsigned<S>::type ui_type;
+   using ui_type = typename boost::multiprecision::detail::make_unsigned<S>::type;
    if (b < 0)
    {
       cpp_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void> t(b);

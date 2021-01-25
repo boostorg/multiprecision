@@ -16,11 +16,10 @@ namespace backends {
 template <class Backend>
 struct debug_adaptor
 {
-   typedef typename Backend::signed_types   signed_types;
-   typedef typename Backend::unsigned_types unsigned_types;
-   typedef typename Backend::float_types    float_types;
-   typedef typename extract_exponent_type<
-       Backend, number_category<Backend>::value>::type exponent_type;
+   using signed_types = typename Backend::signed_types  ;
+   using unsigned_types = typename Backend::unsigned_types;
+   using float_types = typename Backend::float_types   ;
+   using exponent_type = typename extract_exponent_type<Backend, number_category<Backend>::value>::type;
 
  private:
    std::string debug_value;
@@ -117,7 +116,7 @@ struct debug_adaptor
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
       ar & boost::make_nvp("value", m_value);
-      typedef typename Archive::is_loading tag;
+      using tag = typename Archive::is_loading;
       if (tag::value)
          update_view();
    }
@@ -494,8 +493,8 @@ template <class Backend, boost::multiprecision::expression_template_option Expre
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<Backend>, ExpressionTemplates> >
     : public std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
-   typedef std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> >                           base_type;
-   typedef boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<Backend>, ExpressionTemplates> number_type;
+   using base_type = std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> >                          ;
+   using number_type = boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<Backend>, ExpressionTemplates>;
 
  public:
    static number_type(min)() noexcept { return (base_type::min)(); }

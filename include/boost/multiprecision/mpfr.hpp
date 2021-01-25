@@ -91,14 +91,14 @@ template <unsigned digits10>
 struct mpfr_float_imp<digits10, allocate_dynamic>
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef std::tuple<long, boost::long_long_type>           signed_types;
-   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
+   using signed_types = std::tuple<long, boost::long_long_type>          ;
+   using unsigned_types = std::tuple<unsigned long, boost::ulong_long_type>;
 #else
-   typedef std::tuple<long>          signed_types;
-   typedef std::tuple<unsigned long> unsigned_types;
+   using signed_types = std::tuple<long>         ;
+   using unsigned_types = std::tuple<unsigned long>;
 #endif
-   typedef std::tuple<double, long double> float_types;
-   typedef long                           exponent_type;
+   using float_types = std::tuple<double, long double>;
+   using exponent_type = long                          ;
 
    mpfr_float_imp()
    {
@@ -413,14 +413,14 @@ template <unsigned digits10>
 struct mpfr_float_imp<digits10, allocate_stack>
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef std::tuple<long, boost::long_long_type>           signed_types;
-   typedef std::tuple<unsigned long, boost::ulong_long_type> unsigned_types;
+   using signed_types = std::tuple<long, boost::long_long_type>          ;
+   using unsigned_types = std::tuple<unsigned long, boost::ulong_long_type>;
 #else
-   typedef std::tuple<long>          signed_types;
-   typedef std::tuple<unsigned long> unsigned_types;
+   using signed_types = std::tuple<long>         ;
+   using unsigned_types = std::tuple<unsigned long>;
 #endif
-   typedef std::tuple<double, long double> float_types;
-   typedef long                           exponent_type;
+   using float_types = std::tuple<double, long double>;
+   using exponent_type = long                          ;
 
    static constexpr const unsigned digits2    = (digits10 * 1000uL) / 301uL + ((digits10 * 1000uL) % 301 ? 2u : 1u);
    static constexpr const unsigned limb_count = mpfr_custom_get_size(digits2) / sizeof(mp_limb_t);
@@ -1619,14 +1619,14 @@ struct is_equivalent_number_type<backends::mpfr_float_backend<D, A1>, backends::
 
 using boost::multiprecision::backends::mpfr_float_backend;
 
-typedef number<mpfr_float_backend<50> >   mpfr_float_50;
-typedef number<mpfr_float_backend<100> >  mpfr_float_100;
-typedef number<mpfr_float_backend<500> >  mpfr_float_500;
-typedef number<mpfr_float_backend<1000> > mpfr_float_1000;
-typedef number<mpfr_float_backend<0> >    mpfr_float;
+using mpfr_float_50 = number<mpfr_float_backend<50> >  ;
+using mpfr_float_100 = number<mpfr_float_backend<100> > ;
+using mpfr_float_500 = number<mpfr_float_backend<500> > ;
+using mpfr_float_1000 = number<mpfr_float_backend<1000> >;
+using mpfr_float = number<mpfr_float_backend<0> >   ;
 
-typedef number<mpfr_float_backend<50, allocate_stack> >  static_mpfr_float_50;
-typedef number<mpfr_float_backend<100, allocate_stack> > static_mpfr_float_100;
+using static_mpfr_float_50 = number<mpfr_float_backend<50, allocate_stack> > ;
+using static_mpfr_float_100 = number<mpfr_float_backend<100, allocate_stack> >;
 
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& a, const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& b)
@@ -1772,7 +1772,7 @@ struct constant_catalan;
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
+   using result_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>;
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
@@ -1795,7 +1795,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfr_flo
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
+   using result_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>;
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
@@ -1818,7 +1818,7 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfr
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
+   using result_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>;
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
@@ -1841,7 +1841,7 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfr_
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
+   using result_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>;
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
@@ -1865,7 +1865,7 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_pi<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> result_type;
+   using result_type = boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>;
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
@@ -1888,7 +1888,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::debug_ad
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> result_type;
+   using result_type = boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>;
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
@@ -1911,7 +1911,7 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::debu
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_euler<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> result_type;
+   using result_type = boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>;
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
@@ -1934,7 +1934,7 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::debug
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_catalan<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates> result_type;
+   using result_type = boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>;
    template <int N>
    static inline const result_type& get(const boost::integral_constant<int, N>&)
    {
@@ -2320,7 +2320,7 @@ namespace std {
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> number_type;
+   using number_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>;
 
  public:
    static constexpr bool is_specialized = true;
@@ -2476,7 +2476,7 @@ constexpr float_round_style numeric_limits<boost::multiprecision::number<boost::
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> number_type;
+   using number_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates>;
 
  public:
    static constexpr bool is_specialized = false;

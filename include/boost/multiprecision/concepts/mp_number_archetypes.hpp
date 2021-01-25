@@ -26,10 +26,10 @@ namespace concepts {
 
 struct number_backend_float_architype
 {
-   typedef std::tuple<boost::long_long_type>  signed_types;
-   typedef std::tuple<boost::ulong_long_type> unsigned_types;
-   typedef std::tuple<long double>            float_types;
-   typedef int                               exponent_type;
+   using signed_types = std::tuple<boost::long_long_type> ;
+   using unsigned_types = std::tuple<boost::ulong_long_type>;
+   using float_types = std::tuple<long double>           ;
+   using exponent_type = int                              ;
 
    number_backend_float_architype()
    {
@@ -205,7 +205,7 @@ inline std::size_t hash_value(const number_backend_float_architype& v)
    return hasher(v.m_value);
 }
 
-typedef boost::multiprecision::number<number_backend_float_architype> mp_number_float_architype;
+using mp_number_float_architype = boost::multiprecision::number<number_backend_float_architype>;
 
 } // namespace concepts
 
@@ -220,8 +220,8 @@ namespace std {
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype, ExpressionTemplates> > : public std::numeric_limits<long double>
 {
-   typedef std::numeric_limits<long double>                                                                                    base_type;
-   typedef boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype, ExpressionTemplates> number_type;
+   using base_type = std::numeric_limits<long double>                                                                                   ;
+   using number_type = boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype, ExpressionTemplates>;
 
  public:
    static number_type(min)() noexcept { return (base_type::min)(); }

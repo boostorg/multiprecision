@@ -47,18 +47,18 @@ struct is_backend
 template <class Backend>
 struct other_backend
 {
-   typedef typename std::conditional<
+   using type = typename std::conditional<
        std::is_same<number<Backend>, number<Backend, et_on> >::value,
-       number<Backend, et_off>, number<Backend, et_on> >::type type;
+       number<Backend, et_off>, number<Backend, et_on> >::type;
 };
 
 template <class B, class V>
 struct number_from_backend
 {
-   typedef typename std::conditional<
+   using type = typename std::conditional<
        std::is_convertible<V, number<B> >::value,
        number<B>,
-       typename other_backend<B>::type>::type type;
+       typename other_backend<B>::type>::type;
 };
 
 template <bool b, class T, class U>

@@ -92,8 +92,8 @@ BOOST_FORCEINLINE unsigned find_msb(Unsigned mask, const std::integral_constant<
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
-   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename std::conditional<
+   using ui_type = typename boost::multiprecision::detail::make_unsigned<Unsigned>::type;
+   using tag_type = typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned long),
        std::integral_constant<int, 1>,
 #ifdef _M_X64
@@ -104,7 +104,7 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 #else
        std::integral_constant<int, 0>
 #endif
-       >::type tag_type;
+       >::type;
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    if (BOOST_MP_IS_CONST_EVALUATED(mask))
    {
@@ -118,8 +118,8 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
-   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename std::conditional<
+   using ui_type = typename boost::multiprecision::detail::make_unsigned<Unsigned>::type;
+   using tag_type = typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned long),
        std::integral_constant<int, 1>,
 #ifdef _M_X64
@@ -130,7 +130,7 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 #else
        std::integral_constant<int, 0>
 #endif
-       >::type tag_type;
+       >::type;
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    if (BOOST_MP_IS_CONST_EVALUATED(mask))
    {
@@ -169,7 +169,7 @@ BOOST_FORCEINLINE unsigned find_msb(boost::ulong_long_type mask, std::integral_c
 }
 #ifdef BOOST_HAS_INT128
 
-__extension__ typedef unsigned __int128 uint128_type;
+__extension__ using uint128_type = unsigned __int128;
 
 BOOST_FORCEINLINE unsigned find_msb(uint128_type mask, std::integral_constant<int, 0> const&)
 {
@@ -212,8 +212,8 @@ BOOST_FORCEINLINE unsigned find_lsb(uint128_type mask, std::integral_constant<in
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
-   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename std::conditional<
+   using ui_type = typename boost::multiprecision::detail::make_unsigned<Unsigned>::type;
+   using tag_type = typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned),
        std::integral_constant<int, 1>,
        typename std::conditional<
@@ -222,7 +222,7 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
            typename std::conditional<
                sizeof(Unsigned) <= sizeof(boost::ulong_long_type),
                std::integral_constant<int, 3>,
-               std::integral_constant<int, 0> >::type>::type>::type tag_type;
+               std::integral_constant<int, 0> >::type>::type>::type;
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    if (BOOST_MP_IS_CONST_EVALUATED(mask))
    {
@@ -235,8 +235,8 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
-   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename std::conditional<
+   using ui_type = typename boost::multiprecision::detail::make_unsigned<Unsigned>::type;
+   using tag_type = typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned),
        std::integral_constant<int, 1>,
        typename std::conditional<
@@ -245,7 +245,7 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
            typename std::conditional<
                sizeof(Unsigned) <= sizeof(boost::ulong_long_type),
                std::integral_constant<int, 3>,
-               std::integral_constant<int, 0> >::type>::type>::type tag_type;
+               std::integral_constant<int, 0> >::type>::type>::type;
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    if (BOOST_MP_IS_CONST_EVALUATED(mask))
    {
@@ -267,11 +267,11 @@ BOOST_FORCEINLINE unsigned find_msb(unsigned mask, std::integral_constant<int, 1
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
-   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename std::conditional<
+   using ui_type = typename boost::multiprecision::detail::make_unsigned<Unsigned>::type;
+   using tag_type = typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned),
        std::integral_constant<int, 1>,
-       std::integral_constant<int, 0> >::type tag_type;
+       std::integral_constant<int, 0> >::type;
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    if (BOOST_MP_IS_CONST_EVALUATED(mask))
    {
@@ -284,11 +284,11 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 template <class Unsigned>
 BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
-   typedef typename boost::multiprecision::detail::make_unsigned<Unsigned>::type ui_type;
-   typedef typename std::conditional<
+   using ui_type = typename boost::multiprecision::detail::make_unsigned<Unsigned>::type;
+   using tag_type = typename std::conditional<
        sizeof(Unsigned) <= sizeof(unsigned),
        std::integral_constant<int, 1>,
-       std::integral_constant<int, 0> >::type tag_type;
+       std::integral_constant<int, 0> >::type;
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    if (BOOST_MP_IS_CONST_EVALUATED(mask))
    {

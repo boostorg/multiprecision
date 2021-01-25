@@ -87,7 +87,7 @@ struct is_trivial_cpp_int
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
-   typedef cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> self;
+   using self = cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>;
    static constexpr const bool                                             value = std::is_void<Allocator>::value && (max_precision<self>::value <= (sizeof(double_limb_type) * CHAR_BIT) - (SignType == signed_packed ? 1 : 0));
 };
 
@@ -118,8 +118,8 @@ struct is_implicit_cpp_int_conversion;
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 struct is_implicit_cpp_int_conversion<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >
 {
-   typedef cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>      t1;
-   typedef cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> t2;
+   using t1 = cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>     ;
+   using t2 = cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>;
    static constexpr const bool                                                  value =
        (is_signed_number<t2>::value || !is_signed_number<t1>::value) && (max_precision<t1>::value <= max_precision<t2>::value);
 };
@@ -176,17 +176,17 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, bool trivial2>
    friend struct cpp_int_base;
 
-   typedef typename detail::rebind<limb_type, Allocator>::type allocator_type;
-   typedef typename std::allocator_traits<allocator_type>::pointer       limb_pointer;
-   typedef typename std::allocator_traits<allocator_type>::const_pointer const_limb_pointer;
-   typedef std::integral_constant<int, Checked> checked_type;
+   using allocator_type = typename detail::rebind<limb_type, Allocator>::type;
+   using limb_pointer = typename std::allocator_traits<allocator_type>::pointer      ;
+   using const_limb_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
+   using checked_type = std::integral_constant<int, Checked>;
 
    //
    // Interface invariants:
    //
    static_assert(!std::is_void<Allocator>::value, "Allocator must not be void here");
 
-   typedef boost::empty_value<allocator_type> base_type;
+   using base_type = boost::empty_value<allocator_type>;
 
 private:
    struct limb_data
@@ -526,9 +526,9 @@ struct cpp_int_base<MinBits, MaxBits, unsigned_magnitude, Checked, Allocator, fa
 template <unsigned MinBits, cpp_int_check_type Checked>
 struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
 {
-   typedef limb_type*         limb_pointer;
-   typedef const limb_type*   const_limb_pointer;
-   typedef std::integral_constant<int, Checked> checked_type;
+   using limb_pointer = limb_type*        ;
+   using const_limb_pointer = const limb_type*  ;
+   using checked_type = std::integral_constant<int, Checked>;
 
    struct scoped_shared_storage 
    {
@@ -720,9 +720,9 @@ const unsigned cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, f
 template <unsigned MinBits, cpp_int_check_type Checked>
 struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
 {
-   typedef limb_type*         limb_pointer;
-   typedef const limb_type*   const_limb_pointer;
-   typedef std::integral_constant<int, Checked> checked_type;
+   using limb_pointer = limb_type*        ;
+   using const_limb_pointer = const limb_type*  ;
+   using checked_type = std::integral_constant<int, Checked>;
 
    struct scoped_shared_storage 
    {
@@ -920,13 +920,13 @@ const unsigned cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
 template <unsigned N, bool s>
 struct trivial_limb_type_imp
 {
-   typedef double_limb_type type;
+   using type = double_limb_type;
 };
 
 template <unsigned N>
 struct trivial_limb_type_imp<N, true>
 {
-   typedef typename boost::uint_t<N>::least type;
+   using type = typename boost::uint_t<N>::least;
 };
 
 template <unsigned N>
@@ -938,10 +938,10 @@ struct trivial_limb_type : public trivial_limb_type_imp<N, N <= sizeof(boost::lo
 template <unsigned MinBits, cpp_int_check_type Checked>
 struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 {
-   typedef typename trivial_limb_type<MinBits>::type local_limb_type;
-   typedef local_limb_type*                          limb_pointer;
-   typedef const local_limb_type*                    const_limb_pointer;
-   typedef std::integral_constant<int, Checked>                        checked_type;
+   using local_limb_type = typename trivial_limb_type<MinBits>::type;
+   using limb_pointer = local_limb_type*                         ;
+   using const_limb_pointer = const local_limb_type*                   ;
+   using checked_type = std::integral_constant<int, Checked>                       ;
 
    struct scoped_shared_storage 
    {
@@ -967,7 +967,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!boost::multiprecision::detail::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)))>::type
    check_in_range(T val, const std::integral_constant<int, checked>&)
    {
-      typedef typename std::common_type<typename boost::multiprecision::detail::make_unsigned<T>::type, local_limb_type>::type common_type;
+      using common_type = typename std::common_type<typename boost::multiprecision::detail::make_unsigned<T>::type, local_limb_type>::type;
 
       if (static_cast<common_type>(boost::multiprecision::detail::unsigned_abs(val)) > static_cast<common_type>(limb_mask))
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
@@ -977,7 +977,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    check_in_range(T val, const std::integral_constant<int, checked>&)
    {
       using std::abs;
-      typedef typename std::common_type<T, local_limb_type>::type common_type;
+      using common_type = typename std::common_type<T, local_limb_type>::type;
 
       if (static_cast<common_type>(abs(val)) > static_cast<common_type>(limb_mask))
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
@@ -1103,9 +1103,9 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 template <unsigned MinBits, cpp_int_check_type Checked>
 struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
 {
-   typedef typename trivial_limb_type<MinBits>::type local_limb_type;
-   typedef local_limb_type*                          limb_pointer;
-   typedef const local_limb_type*                    const_limb_pointer;
+   using local_limb_type = typename trivial_limb_type<MinBits>::type;
+   using limb_pointer = local_limb_type*                         ;
+   using const_limb_pointer = const local_limb_type*                   ;
 
    struct scoped_shared_storage 
    {
@@ -1120,7 +1120,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
 
    local_limb_type m_data;
 
-   typedef std::integral_constant<int, Checked> checked_type;
+   using checked_type = std::integral_constant<int, Checked>;
 
    //
    // Interface invariants:
@@ -1132,7 +1132,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !(std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits))>::type
    check_in_range(T val, const std::integral_constant<int, checked>&, const std::integral_constant<bool, false>&)
    {
-      typedef typename std::common_type<T, local_limb_type>::type common_type;
+      using common_type = typename std::common_type<T, local_limb_type>::type;
 
       if (static_cast<common_type>(val) > limb_mask)
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
@@ -1140,7 +1140,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    template <class T>
    BOOST_MP_CXX14_CONSTEXPR void check_in_range(T val, const std::integral_constant<int, checked>&, const std::integral_constant<bool, true>&)
    {
-      typedef typename std::common_type<T, local_limb_type>::type common_type;
+      using common_type = typename std::common_type<T, local_limb_type>::type;
 
       if (static_cast<common_type>(val) > limb_mask)
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
@@ -1288,34 +1288,33 @@ struct cpp_int_backend
           Allocator,
           is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value>
 {
-   typedef cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> self_type;
-   typedef cpp_int_base<
+   using self_type = cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>;
+   using base_type = cpp_int_base<
        min_precision<self_type>::value,
        max_precision<self_type>::value,
        SignType,
        Checked,
        Allocator,
-       is_trivial_cpp_int<self_type>::value>
-       base_type;
-   typedef std::integral_constant<bool, is_trivial_cpp_int<self_type>::value> trivial_tag;
+       is_trivial_cpp_int<self_type>::value>;
+   using trivial_tag = std::integral_constant<bool, is_trivial_cpp_int<self_type>::value>;
 
  public:
-   typedef typename std::conditional<
+   using signed_types = typename std::conditional<
        is_trivial_cpp_int<self_type>::value,
        std::tuple<
            signed char, short, int, long,
            boost::long_long_type, signed_double_limb_type>,
-       std::tuple<signed_limb_type, signed_double_limb_type> >::type signed_types;
-   typedef typename std::conditional<
+       std::tuple<signed_limb_type, signed_double_limb_type> >::type;
+   using unsigned_types = typename std::conditional<
        is_trivial_cpp_int<self_type>::value,
        std::tuple<unsigned char, unsigned short, unsigned,
                  unsigned long, boost::ulong_long_type, double_limb_type>,
-       std::tuple<limb_type, double_limb_type> >::type unsigned_types;
-   typedef typename std::conditional<
+       std::tuple<limb_type, double_limb_type> >::type;
+   using float_types = typename std::conditional<
        is_trivial_cpp_int<self_type>::value,
        std::tuple<float, double, long double>,
-       std::tuple<long double> >::type float_types;
-   typedef std::integral_constant<int, Checked>         checked_type;
+       std::tuple<long double> >::type;
+   using checked_type = std::integral_constant<int, Checked>        ;
 
    BOOST_MP_FORCEINLINE constexpr cpp_int_backend() noexcept {}
    BOOST_MP_FORCEINLINE constexpr cpp_int_backend(const cpp_int_backend& o) noexcept(std::is_void<Allocator>::value) : base_type(o) {}
@@ -1823,7 +1822,7 @@ struct cpp_int_backend
  private:
    std::string do_get_trivial_string(std::ios_base::fmtflags f, const std::integral_constant<bool, false>&) const
    {
-      typedef typename std::conditional<sizeof(typename base_type::local_limb_type) == 1, unsigned, typename base_type::local_limb_type>::type io_type;
+      using io_type = typename std::conditional<sizeof(typename base_type::local_limb_type) == 1, unsigned, typename base_type::local_limb_type>::type;
       if (this->sign() && (((f & std::ios_base::hex) == std::ios_base::hex) || ((f & std::ios_base::oct) == std::ios_base::oct)))
          BOOST_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
       std::stringstream ss;
@@ -2063,7 +2062,7 @@ struct cpp_int_backend
       //
       // We assume that c is a sequence of (unsigned) bytes with the most significant byte first:
       //
-      typedef typename base_type::local_limb_type local_limb_type;
+      using local_limb_type = typename base_type::local_limb_type;
       *this->limbs() = 0;
       if (c.size())
       {
@@ -2137,8 +2136,8 @@ struct cpp_int_backend
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
    BOOST_MP_CXX14_CONSTEXPR int compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o) const noexcept
    {
-      typedef std::integral_constant<bool, is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value>      t1;
-      typedef std::integral_constant<bool, is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value> t2;
+      using t1 = std::integral_constant<bool, is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value>     ;
+      using t2 = std::integral_constant<bool, is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>;
       return compare_imp(o, t1(), t2());
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
@@ -2177,7 +2176,7 @@ struct double_precision_type;
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct double_precision_type<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
-   typedef typename std::conditional<
+   using type = typename std::conditional<
        backends::is_fixed_precision<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value,
        backends::cpp_int_backend<
            (std::is_void<Allocator>::value ? 2 * backends::max_precision<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value
@@ -2186,7 +2185,7 @@ struct double_precision_type<backends::cpp_int_backend<MinBits, MaxBits, SignTyp
            SignType,
            Checked,
            Allocator>,
-       backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::type type;
+       backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::type;
 };
 
 } // namespace default_ops
@@ -2207,37 +2206,37 @@ template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int
 struct number_category<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> > : public std::integral_constant<int, number_kind_integer>
 {};
 
-typedef number<cpp_int_backend<> >           cpp_int;
-typedef rational_adaptor<cpp_int_backend<> > cpp_rational_backend;
-typedef number<cpp_rational_backend>         cpp_rational;
+using cpp_int = number<cpp_int_backend<> >          ;
+using cpp_rational_backend = rational_adaptor<cpp_int_backend<> >;
+using cpp_rational = number<cpp_rational_backend>        ;
 
 // Fixed precision unsigned types:
-typedef number<cpp_int_backend<128, 128, unsigned_magnitude, unchecked, void> >   uint128_t;
-typedef number<cpp_int_backend<256, 256, unsigned_magnitude, unchecked, void> >   uint256_t;
-typedef number<cpp_int_backend<512, 512, unsigned_magnitude, unchecked, void> >   uint512_t;
-typedef number<cpp_int_backend<1024, 1024, unsigned_magnitude, unchecked, void> > uint1024_t;
+using uint128_t = number<cpp_int_backend<128, 128, unsigned_magnitude, unchecked, void> >  ;
+using uint256_t = number<cpp_int_backend<256, 256, unsigned_magnitude, unchecked, void> >  ;
+using uint512_t = number<cpp_int_backend<512, 512, unsigned_magnitude, unchecked, void> >  ;
+using uint1024_t = number<cpp_int_backend<1024, 1024, unsigned_magnitude, unchecked, void> >;
 
 // Fixed precision signed types:
-typedef number<cpp_int_backend<128, 128, signed_magnitude, unchecked, void> >   int128_t;
-typedef number<cpp_int_backend<256, 256, signed_magnitude, unchecked, void> >   int256_t;
-typedef number<cpp_int_backend<512, 512, signed_magnitude, unchecked, void> >   int512_t;
-typedef number<cpp_int_backend<1024, 1024, signed_magnitude, unchecked, void> > int1024_t;
+using int128_t = number<cpp_int_backend<128, 128, signed_magnitude, unchecked, void> >  ;
+using int256_t = number<cpp_int_backend<256, 256, signed_magnitude, unchecked, void> >  ;
+using int512_t = number<cpp_int_backend<512, 512, signed_magnitude, unchecked, void> >  ;
+using int1024_t = number<cpp_int_backend<1024, 1024, signed_magnitude, unchecked, void> >;
 
 // Over again, but with checking enabled this time:
-typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >           checked_cpp_int;
-typedef rational_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked> > checked_cpp_rational_backend;
-typedef number<checked_cpp_rational_backend>                                checked_cpp_rational;
+using checked_cpp_int = number<cpp_int_backend<0, 0, signed_magnitude, checked> >          ;
+using checked_cpp_rational_backend = rational_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked> >;
+using checked_cpp_rational = number<checked_cpp_rational_backend>                               ;
 // Fixed precision unsigned types:
-typedef number<cpp_int_backend<128, 128, unsigned_magnitude, checked, void> >   checked_uint128_t;
-typedef number<cpp_int_backend<256, 256, unsigned_magnitude, checked, void> >   checked_uint256_t;
-typedef number<cpp_int_backend<512, 512, unsigned_magnitude, checked, void> >   checked_uint512_t;
-typedef number<cpp_int_backend<1024, 1024, unsigned_magnitude, checked, void> > checked_uint1024_t;
+using checked_uint128_t = number<cpp_int_backend<128, 128, unsigned_magnitude, checked, void> >  ;
+using checked_uint256_t = number<cpp_int_backend<256, 256, unsigned_magnitude, checked, void> >  ;
+using checked_uint512_t = number<cpp_int_backend<512, 512, unsigned_magnitude, checked, void> >  ;
+using checked_uint1024_t = number<cpp_int_backend<1024, 1024, unsigned_magnitude, checked, void> >;
 
 // Fixed precision signed types:
-typedef number<cpp_int_backend<128, 128, signed_magnitude, checked, void> >   checked_int128_t;
-typedef number<cpp_int_backend<256, 256, signed_magnitude, checked, void> >   checked_int256_t;
-typedef number<cpp_int_backend<512, 512, signed_magnitude, checked, void> >   checked_int512_t;
-typedef number<cpp_int_backend<1024, 1024, signed_magnitude, checked, void> > checked_int1024_t;
+using checked_int128_t = number<cpp_int_backend<128, 128, signed_magnitude, checked, void> >  ;
+using checked_int256_t = number<cpp_int_backend<256, 256, signed_magnitude, checked, void> >  ;
+using checked_int512_t = number<cpp_int_backend<512, 512, signed_magnitude, checked, void> >  ;
+using checked_int1024_t = number<cpp_int_backend<1024, 1024, signed_magnitude, checked, void> >;
 
 #ifdef _MSC_VER
 #pragma warning(pop)

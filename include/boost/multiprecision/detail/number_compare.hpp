@@ -41,7 +41,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq_imp(const T& a, const U& b, const s
 template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq(const T& a, const U& b)
 {
-   typedef std::integral_constant<bool, boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
+   using tag_type = std::integral_constant<bool, boost::multiprecision::detail::is_first_backend<T, U>::value>;
    return eval_eq_imp(a, b, tag_type());
 }
 
@@ -65,7 +65,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_lt_imp(const T& a, const U& b, const s
 template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR bool eval_lt(const T& a, const U& b)
 {
-   typedef std::integral_constant<bool, boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
+   using tag_type = std::integral_constant<bool, boost::multiprecision::detail::is_first_backend<T, U>::value>;
    return eval_lt_imp(a, b, tag_type());
 }
 
@@ -89,7 +89,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_gt_imp(const T& a, const U& b, const s
 template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR bool eval_gt(const T& a, const U& b)
 {
-   typedef std::integral_constant<bool, boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
+   using tag_type = std::integral_constant<bool, boost::multiprecision::detail::is_first_backend<T, U>::value>;
    return eval_gt_imp(a, b, tag_type());
 }
 
@@ -199,7 +199,7 @@ template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value, bool>::type
 operator==(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_eq;
    result_type t(b);
    if (detail::is_unordered_comparison(a, t))
@@ -209,7 +209,7 @@ operator==(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b
 template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator==(const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_eq;
    result_type t(b);
    if (detail::is_unordered_comparison(a, t))
@@ -220,7 +220,7 @@ template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value, bool>::type
 operator==(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_eq;
    result_type t(a);
    if (detail::is_unordered_comparison(t, b))
@@ -230,7 +230,7 @@ operator==(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b
 template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator==(const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_eq;
    result_type t(a);
    if (detail::is_unordered_comparison(t, b))
@@ -279,7 +279,7 @@ template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value, bool>::type
 operator!=(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_eq;
    result_type t(b);
    if (detail::is_unordered_comparison(a, t))
@@ -289,7 +289,7 @@ operator!=(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b
 template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator!=(const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_eq;
    result_type t(b);
    if (detail::is_unordered_comparison(a, t))
@@ -300,7 +300,7 @@ template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value, bool>::type
 operator!=(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_eq;
    result_type t(a);
    if (detail::is_unordered_comparison(t, b))
@@ -310,7 +310,7 @@ operator!=(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b
 template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator!=(const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_eq;
    result_type t(a);
    if (detail::is_unordered_comparison(t, b))
@@ -360,7 +360,7 @@ template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value && (number_category<typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex), bool>::type
 operator<(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_gt;
    result_type t(b);
    if (detail::is_unordered_comparison(a, t))
@@ -370,7 +370,7 @@ operator<(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator<(const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_gt;
    result_type t(b);
    return a < t;
@@ -379,7 +379,7 @@ template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value && (number_category<typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex), bool>::type
 operator<(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_lt;
    result_type t(a);
    if (detail::is_unordered_comparison(t, b))
@@ -389,7 +389,7 @@ operator<(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator<(const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_lt;
    result_type t(a);
    return t < b;
@@ -437,7 +437,7 @@ template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value && (number_category<typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex), bool>::type
 operator>(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_lt;
    result_type t(b);
    return a > t;
@@ -445,7 +445,7 @@ operator>(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator>(const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_lt;
    result_type t(b);
    return a > t;
@@ -454,7 +454,7 @@ template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value && (number_category<typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex), bool>::type
 operator>(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_gt;
    result_type t(a);
    return t > b;
@@ -462,7 +462,7 @@ operator>(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator>(const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_gt;
    result_type t(a);
    return t > b;
@@ -508,7 +508,7 @@ template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value && (number_category<typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex), bool>::type
 operator<=(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_lt;
    if (detail::is_unordered_value(a) || detail::is_unordered_value(b))
       return false;
@@ -520,7 +520,7 @@ operator<=(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b
 template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator<=(const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_lt;
    if (detail::is_unordered_value(a) || detail::is_unordered_value(b))
       return false;
@@ -531,7 +531,7 @@ template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value && (number_category<typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex), bool>::type
 operator<=(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_gt;
    result_type t(a);
    if (detail::is_unordered_comparison(t, b))
@@ -541,7 +541,7 @@ operator<=(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b
 template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator<=(const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_gt;
    result_type t(a);
    return t <= b;
@@ -589,7 +589,7 @@ template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value && (number_category<typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex), bool>::type
 operator>=(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_gt;
    result_type t(b);
    if (detail::is_unordered_comparison(a, t))
@@ -599,7 +599,7 @@ operator>=(const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b
 template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator>=(const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_gt;
    result_type t(b);
    return a >= t;
@@ -608,7 +608,7 @@ template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value && (number_category<typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex), bool>::type
 operator>=(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_lt;
    result_type t(a);
    if (detail::is_unordered_comparison(t, b))
@@ -618,7 +618,7 @@ operator>=(const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b
 template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool operator>=(const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
 {
-   typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
+   using result_type = typename detail::expression<Tag, A1, A2, A3, A4>::result_type;
    using default_ops::eval_lt;
    result_type t(a);
    return t >= b;

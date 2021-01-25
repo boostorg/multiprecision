@@ -53,8 +53,8 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
    using default_ops::eval_pow;
    using default_ops::eval_subtract;
 
-   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
-   typedef typename Backend::exponent_type                             exponent_type;
+   using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
+   using exponent_type = typename Backend::exponent_type                            ;
 
    std::string     result;
    bool            iszero     = false;
@@ -196,7 +196,7 @@ void convert_from_string(Backend& b, const char* p)
    using default_ops::eval_multiply;
    using default_ops::eval_pow;
 
-   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
    b = ui_type(0);
    if (!p || (*p == 0))
       return;
@@ -206,7 +206,7 @@ void convert_from_string(Backend& b, const char* p)
    constexpr const ui_type                               ten          = ui_type(10);
    typename Backend::exponent_type                       expon        = 0;
    int                                                   digits_seen  = 0;
-   typedef std::numeric_limits<number<Backend, et_off> > limits;
+   using limits = std::numeric_limits<number<Backend, et_off> >;
    constexpr const int                                   max_digits = limits::is_specialized ? limits::max_digits10 + 1 : INT_MAX;
 
    if (*p == '+')

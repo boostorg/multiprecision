@@ -72,10 +72,10 @@ class cpp_dec_float
    static_assert(sizeof(ExponentType) > 1, "ExponentType is too small.");
 
  public:
-   typedef std::tuple<boost::long_long_type>  signed_types;
-   typedef std::tuple<boost::ulong_long_type> unsigned_types;
-   typedef std::tuple<double, long double>    float_types;
-   typedef ExponentType                      exponent_type;
+   using signed_types = std::tuple<boost::long_long_type> ;
+   using unsigned_types = std::tuple<boost::ulong_long_type>;
+   using float_types = std::tuple<double, long double>   ;
+   using exponent_type = ExponentType                     ;
 
    static constexpr const std::int32_t cpp_dec_float_radix             = 10L;
    static constexpr const std::int32_t cpp_dec_float_digits10_limit_lo = 9L;
@@ -116,9 +116,9 @@ class cpp_dec_float
       cpp_dec_float_NaN
    } fpclass_type;
 
-   typedef typename std::conditional<std::is_void<Allocator>::value,
+   using array_type = typename std::conditional<std::is_void<Allocator>::value,
                              std::array<std::uint32_t, cpp_dec_float_elem_number>,
-                             detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number, Allocator> >::type array_type;
+                             detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number, Allocator> >::type;
 
    array_type     data;
    ExponentType   exp;
@@ -2970,8 +2970,8 @@ inline std::size_t hash_value(const cpp_dec_float<Digits10, ExponentType, Alloca
 
 using boost::multiprecision::backends::cpp_dec_float;
 
-typedef number<cpp_dec_float<50> >  cpp_dec_float_50;
-typedef number<cpp_dec_float<100> > cpp_dec_float_100;
+using cpp_dec_float_50 = number<cpp_dec_float<50> > ;
+using cpp_dec_float_100 = number<cpp_dec_float<100> >;
 
 namespace detail {
 
@@ -2987,7 +2987,7 @@ struct transcendental_reduction_type<boost::multiprecision::backends::cpp_dec_fl
    // 
    // See ARGUMENT REDUCTION FOR HUGE ARGUMENTS. K C Ng.
    //
-   typedef boost::multiprecision::backends::cpp_dec_float<Digits10 * 3, ExponentType, Allocator> type;
+   using type = boost::multiprecision::backends::cpp_dec_float<Digits10 * 3, ExponentType, Allocator>;
 };
 
 } // namespace detail
@@ -3094,14 +3094,14 @@ struct precision<boost::multiprecision::number<boost::multiprecision::cpp_dec_fl
    // from the template parameter Digits10 for small or large digit counts.
    static constexpr const std::int32_t cpp_dec_float_digits10 = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
 
-   typedef typename Policy::precision_type                            precision_type;
-   typedef digits2<((cpp_dec_float_digits10 + 1LL) * 1000LL) / 301LL> digits_2;
-   typedef typename std::conditional<
+   using precision_type = typename Policy::precision_type                           ;
+   using digits_2 = digits2<((cpp_dec_float_digits10 + 1LL) * 1000LL) / 301LL>;
+   using type = typename std::conditional<
        ((digits_2::value <= precision_type::value) || (Policy::precision_type::value <= 0)),
        // Default case, full precision for RealType:
        digits_2,
        // User customized precision:
-       precision_type>::type type;
+       precision_type>::type;
 };
 
 }

@@ -26,7 +26,7 @@ namespace detail {
 template <unsigned N>
 struct largest_signed_type
 {
-   typedef typename std::conditional<
+   using type = typename std::conditional<
        1 + std::numeric_limits<boost::long_long_type>::digits == N,
        boost::long_long_type,
        typename std::conditional<
@@ -35,13 +35,13 @@ struct largest_signed_type
            typename std::conditional<
                1 + std::numeric_limits<int>::digits == N,
                int,
-               typename boost::int_t<N>::exact>::type>::type>::type type;
+               typename boost::int_t<N>::exact>::type>::type>::type;
 };
 
 template <unsigned N>
 struct largest_unsigned_type
 {
-   typedef typename std::conditional<
+   using type = typename std::conditional<
        std::numeric_limits<boost::ulong_long_type>::digits == N,
        boost::ulong_long_type,
        typename std::conditional<
@@ -50,17 +50,17 @@ struct largest_unsigned_type
            typename std::conditional<
                std::numeric_limits<unsigned int>::digits == N,
                unsigned int,
-               typename boost::uint_t<N>::exact>::type>::type>::type type;
+               typename boost::uint_t<N>::exact>::type>::type>::type;
 };
 
 } // namespace detail
 
 #if defined(BOOST_HAS_INT128)
 
-typedef detail::largest_unsigned_type<64>::type limb_type;
-typedef detail::largest_signed_type<64>::type   signed_limb_type;
-typedef boost::uint128_type                     double_limb_type;
-typedef boost::int128_type                      signed_double_limb_type;
+using limb_type = detail::largest_unsigned_type<64>::type;
+using signed_limb_type = detail::largest_signed_type<64>::type  ;
+using double_limb_type = boost::uint128_type                    ;
+using signed_double_limb_type = boost::int128_type                     ;
 constexpr const limb_type                       max_block_10        = 1000000000000000000uLL;
 constexpr const limb_type                       digits_per_block_10 = 18;
 
@@ -92,10 +92,10 @@ namespace multiprecision {
 
 #else
 
-typedef detail::largest_unsigned_type<32>::type limb_type;
-typedef detail::largest_signed_type<32>::type   signed_limb_type;
-typedef detail::largest_unsigned_type<64>::type double_limb_type;
-typedef detail::largest_signed_type<64>::type   signed_double_limb_type;
+using limb_type = detail::largest_unsigned_type<32>::type;
+using signed_limb_type = detail::largest_signed_type<32>::type  ;
+using double_limb_type = detail::largest_unsigned_type<64>::type;
+using signed_double_limb_type = detail::largest_signed_type<64>::type  ;
 constexpr const limb_type                       max_block_10        = 1000000000;
 constexpr const limb_type                       digits_per_block_10 = 9;
 
