@@ -263,12 +263,18 @@ int main()
 #if defined(TEST1) && !defined(BOOST_MSVC)
    test_round_trip<number<cpp_bin_float<113, digit_base_2, void, std::int16_t> >, cpp_rational>();
 #elif defined(TEST2)
+   #if defined(__clang__) && (__clang__ < 8)
+   #else
    double_spot_tests();
    test_round_trip<double, cpp_rational>();
+   #endif
 #elif defined(TEST3) && !defined(BOOST_MSVC)
    test_random_rationals<number<cpp_bin_float<113, digit_base_2, void, std::int16_t> >, cpp_rational>();
 #elif defined(TEST4)
+   #if defined(__clang__) && (__clang__ < 8)
+   #else
    test_random_rationals<double, cpp_rational>();
+   #endif
 #elif defined(TEST5)
    // This does not work: gmp does not correctly round integer to float or
    // rational to float conversions:
