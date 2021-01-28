@@ -1572,7 +1572,15 @@ struct cpp_int_backend
 
       f = frexp(a, &e);
 
+#if !(defined(__clang__) && (__clang_major__ <= 7))
       constexpr limb_type shift = std::numeric_limits<limb_type>::digits;
+#else
+      // clang 7 has an issue converting long double to unsigned long long in
+      // release mode (bits get dropped, conversion appears to go via float)
+      // Never extract more than double bits at a time:
+      constexpr limb_type shift = std::numeric_limits<limb_type>::digits > std::numeric_limits<double>::digits
+            ? std::numeric_limits<double>::digits : std::numeric_limits<limb_type>::digits;
+#endif
 
       while (f)
       {
@@ -1581,10 +1589,18 @@ struct cpp_int_backend
          term = floor(f);
          e -= shift;
          eval_left_shift(*this, shift);
+#if !(defined(__clang__) && (__clang_major__ <= 7))
          if (term > 0)
             eval_add(*this, static_cast<limb_type>(term));
          else
             eval_subtract(*this, static_cast<limb_type>(-term));
+#else
+         // clang 7 requires extra cast to double to avoid buggy code generation:
+         if (term > 0)
+            eval_add(*this, static_cast<limb_type>(static_cast<double>(term)));
+         else
+            eval_subtract(*this, static_cast<limb_type>(static_cast<double>(-term)));
+#endif
          f -= term;
       }
       if (e > 0)
