@@ -1011,6 +1011,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    template <class UI>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(UI i, typename std::enable_if<boost::multiprecision::detail::is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) noexcept(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<UI>())))
        : m_data(static_cast<local_limb_type>(i) & limb_mask), m_sign(false) { check_in_range(i); }
+#if !(defined(__clang__) && defined(__MINGW32__))
    template <class F>
    BOOST_MP_FORCEINLINE constexpr cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == unchecked)>::type const* = 0) noexcept
        : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask),
@@ -1018,6 +1019,23 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    template <class F>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == checked)>::type const* = 0)
        : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask), m_sign(i < 0) { check_in_range(i); }
+#else
+   //
+   // conversion from float to __int128 is broken on clang/mingw, 
+   // see: https://bugs.llvm.org/show_bug.cgi?id=48940
+   // Since no floating point type has more than 64 bits of
+   // precision, we can simply cast to an intermediate type to
+   // solve the issue:
+   //
+   template <class F>
+   BOOST_MP_FORCEINLINE constexpr cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == unchecked)>::type const* = 0) noexcept
+       : m_data(static_cast<local_limb_type>(static_cast<std::uint64_t>(std::fabs(i))) & limb_mask),
+         m_sign(i < 0) {}
+   template <class F>
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == checked)>::type const* = 0)
+       : m_data(static_cast<local_limb_type>(static_cast<std::uint64_t>(std::fabs(i))) & limb_mask), m_sign(i < 0) { check_in_range(i); }
+#endif
+
    constexpr cpp_int_base(literals::detail::value_pack<>) noexcept
        : m_data(static_cast<local_limb_type>(0u)),
          m_sign(false)

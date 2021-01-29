@@ -1122,6 +1122,47 @@ inline void conversion_overflow(const std::integral_constant<int, checked>&)
 }
 inline BOOST_MP_CXX14_CONSTEXPR void conversion_overflow(const std::integral_constant<int, unchecked>&) {}
 
+#if defined(__clang__) && defined(__MINGW32__)
+//
+// clang-11 on Mingw segfaults on conversion of __int128 -> float.
+// See: https://bugs.llvm.org/show_bug.cgi?id=48941
+// These workarounds pass everything through an intermediate uint64_t.
+//
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+    is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && std::is_same<typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type, double_limb_type>::value>::type
+eval_convert_to(float* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& val)
+{
+   float f = static_cast<std::uint64_t>((*val.limbs()) >> 64);
+   *result = std::ldexp(f, 64);
+   *result += static_cast<std::uint64_t>((*val.limbs()));
+   if(val.sign())
+      *result = -*result;
+}
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+    is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && std::is_same<typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type, double_limb_type>::value>::type
+eval_convert_to(double* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& val)
+{
+   float f = static_cast<std::uint64_t>((*val.limbs()) >> 64);
+   *result = std::ldexp(f, 64);
+   *result += static_cast<std::uint64_t>((*val.limbs()));
+   if(val.sign())
+      *result = -*result;
+}
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+    is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && std::is_same<typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type, double_limb_type>::value>::type
+eval_convert_to(long double* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& val)
+{
+   float f = static_cast<std::uint64_t>((*val.limbs()) >> 64);
+   *result = std::ldexp(f, 64);
+   *result += static_cast<std::uint64_t>((*val.limbs()));
+   if(val.sign())
+      *result = -*result;
+}
+#endif
+
 template <class R, unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && std::is_convertible<typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type, R>::value>::type
