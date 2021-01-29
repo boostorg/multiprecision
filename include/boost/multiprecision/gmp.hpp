@@ -360,6 +360,7 @@ struct gmp_float_imp
                   // happens, account for it here.
                   // example: cout << fixed << setprecision(3) << mpf_float_50("99.9809")
                   digits -= old_e - e;
+                  (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
                   ps = mpf_get_str(0, &e, 10, static_cast<std::size_t>(digits), m_data);
                   --e; // To match with what our formatter expects.
                }
