@@ -329,6 +329,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
                   // change the number of digits to the left of the decimal, if that
                   // happens, account for it here.
                   // example: cout << fixed << setprecision(3) << mpf_float_50("99.9809")
+                  mpfr_free_str(ps);
                   digits -= old_e - e;
                   ps = mpfr_get_str(0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
                   --e; // To match with what our formatter expects.
