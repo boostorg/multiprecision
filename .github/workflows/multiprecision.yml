@@ -107,7 +107,7 @@ jobs:
       - name: Test
         run: ../../../b2 -j3 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
-  windows:
+  windows_gcc:
     runs-on: windows-latest
     defaults:
       run:
@@ -117,8 +117,94 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolset: [ gcc, msvc-14.0, msvc-14.2 ]
+        toolset: [ gcc ]
         standard: [ 11, 14, 17 ]
+        suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: xcopy /s /e /q %GITHUB_WORKSPACE% libs\multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: bootstrap
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: b2 headers
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ..\..\..\b2 config_info_travis_install %ARGS%
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ..\..\..\b2 -j3 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
+        working-directory: ../boost-root/libs/multiprecision/test
+  windows_msvc_14_0:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: cmd
+    env:
+      ARGS: toolset=${{ matrix.toolset }} address-model=64 cxxstd=${{ matrix.standard }}
+    strategy:
+      fail-fast: false
+      matrix:
+        toolset: [ msvc-14.0 ]
+        standard: [ 14, 17 ]
+        suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: xcopy /s /e /q %GITHUB_WORKSPACE% libs\multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: bootstrap
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: b2 headers
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ..\..\..\b2 config_info_travis_install %ARGS%
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ..\..\..\b2 -j3 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
+        working-directory: ../boost-root/libs/multiprecision/test
+  windows_msvc_14_2:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: cmd
+    env:
+      ARGS: toolset=${{ matrix.toolset }} address-model=64 cxxstd=${{ matrix.standard }}
+    strategy:
+      fail-fast: false
+      matrix:
+        toolset: [ msvc-14.2 ]
+        standard: [ 14, 17, 20 ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
     steps:
       - uses: actions/checkout@v2
