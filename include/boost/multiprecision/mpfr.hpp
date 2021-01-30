@@ -53,14 +53,31 @@ namespace detail {
 template <bool b>
 struct mpfr_cleanup
 {
+   //
+   // There are 2 seperate cleanup objects here, one calls
+   // mpfr_free_cache on destruction to perform global cleanup
+   // the other is declared thread_local and calls
+   // mpfr_free_cache2(MPFR_FREE_LOCAL_CACHE) to free thread local data.
+   //
    struct initializer
    {
       initializer() {}
       ~initializer() { mpfr_free_cache(); }
       void force_instantiate() const {}
    };
+   struct thread_initializer
+   {
+      thread_initializer() {}
+      ~thread_initializer() { mpfr_free_cache2(MPFR_FREE_LOCAL_CACHE); }
+      void force_instantiate() const {}
+   };
    static const initializer init;
-   static void              force_instantiate() { init.force_instantiate(); }
+   static void              force_instantiate()
+   {
+      static const BOOST_MP_THREAD_LOCAL thread_initializer thread_init;
+      thread_init.force_instantiate();
+      init.force_instantiate();
+   }
 };
 
 template <bool b>
