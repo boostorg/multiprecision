@@ -65,17 +65,21 @@ struct mpfr_cleanup
       ~initializer() { mpfr_free_cache(); }
       void force_instantiate() const {}
    };
+#if MPFR_VERSION_MAJOR >= 4
    struct thread_initializer
    {
       thread_initializer() {}
       ~thread_initializer() { mpfr_free_cache2(MPFR_FREE_LOCAL_CACHE); }
       void force_instantiate() const {}
    };
+#endif
    static const initializer init;
    static void              force_instantiate()
    {
+#if MPFR_VERSION_MAJOR >= 4
       static const BOOST_MP_THREAD_LOCAL thread_initializer thread_init;
       thread_init.force_instantiate();
+#endif
       init.force_instantiate();
    }
 };
