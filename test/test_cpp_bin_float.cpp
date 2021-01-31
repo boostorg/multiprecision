@@ -793,7 +793,10 @@ void test_special_cases()
 
 int main()
 {
+   // compile times are too long for CI when ASAN is enabled, prune things down a bit:
+#if !defined(BOOST_CI_ASAN_BUILD) && !defined(BOOST_CI_USAN_BUID)
    test_special_cases();
+#endif
    unsigned error_count = 0;
    for (unsigned i = 0; i < 100000; ++i)
    {

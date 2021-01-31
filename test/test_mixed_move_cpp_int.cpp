@@ -20,6 +20,9 @@
 # define DISABLE_THIS_TEST
 #endif
 #endif
+#ifdef BOOST_CI_ASAN_BUILD
+#define DISABLE_THIS_TEST
+#endif
 
 #ifndef DISABLE_THIS_TEST
 
