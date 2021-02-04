@@ -17,14 +17,10 @@
 #define BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 
 #include <boost/config.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <limits>
-#ifndef BOOST_NO_CXX11_HDR_ARRAY
 #include <array>
-#else
-#include <boost/array.hpp>
-#endif
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/functional/hash_fwd.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
@@ -54,13 +50,13 @@ namespace boost {
 namespace multiprecision {
 namespace backends {
 
-template <unsigned Digits10, class ExponentType = boost::int32_t, class Allocator = void>
+template <unsigned Digits10, class ExponentType = std::int32_t, class Allocator = void>
 class cpp_dec_float;
 
 } // namespace backends
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-struct number_category<backends::cpp_dec_float<Digits10, ExponentType, Allocator> > : public mpl::int_<number_kind_floating_point>
+struct number_category<backends::cpp_dec_float<Digits10, ExponentType, Allocator> > : public std::integral_constant<int, number_kind_floating_point>
 {};
 
 namespace backends {
@@ -69,34 +65,34 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 class cpp_dec_float
 {
  private:
-   static const boost::int32_t cpp_dec_float_digits10_setting = Digits10;
+   static constexpr const std::int32_t cpp_dec_float_digits10_setting = Digits10;
 
    // We need at least 16-bits in the exponent type to do anything sensible:
-   BOOST_STATIC_ASSERT_MSG(boost::is_signed<ExponentType>::value, "ExponentType must be a signed built in integer type.");
-   BOOST_STATIC_ASSERT_MSG(sizeof(ExponentType) > 1, "ExponentType is too small.");
+   static_assert(boost::multiprecision::detail::is_signed<ExponentType>::value, "ExponentType must be a signed built in integer type.");
+   static_assert(sizeof(ExponentType) > 1, "ExponentType is too small.");
 
  public:
-   typedef mpl::list<boost::long_long_type>  signed_types;
-   typedef mpl::list<boost::ulong_long_type> unsigned_types;
-   typedef mpl::list<double, long double>    float_types;
-   typedef ExponentType                      exponent_type;
+   using signed_types = std::tuple<boost::long_long_type> ;
+   using unsigned_types = std::tuple<boost::ulong_long_type>;
+   using float_types = std::tuple<double, long double>   ;
+   using exponent_type = ExponentType                     ;
 
-   static const boost::int32_t cpp_dec_float_radix             = 10L;
-   static const boost::int32_t cpp_dec_float_digits10_limit_lo = 9L;
-   static const boost::int32_t cpp_dec_float_digits10_limit_hi = boost::integer_traits<boost::int32_t>::const_max - 100;
-   static const boost::int32_t cpp_dec_float_digits10          = ((cpp_dec_float_digits10_setting < cpp_dec_float_digits10_limit_lo) ? cpp_dec_float_digits10_limit_lo : ((cpp_dec_float_digits10_setting > cpp_dec_float_digits10_limit_hi) ? cpp_dec_float_digits10_limit_hi : cpp_dec_float_digits10_setting));
-   static const ExponentType   cpp_dec_float_max_exp10         = (static_cast<ExponentType>(1) << (std::numeric_limits<ExponentType>::digits - 5));
-   static const ExponentType   cpp_dec_float_min_exp10         = -cpp_dec_float_max_exp10;
-   static const ExponentType   cpp_dec_float_max_exp           = cpp_dec_float_max_exp10;
-   static const ExponentType   cpp_dec_float_min_exp           = cpp_dec_float_min_exp10;
+   static constexpr const std::int32_t cpp_dec_float_radix             = 10L;
+   static constexpr const std::int32_t cpp_dec_float_digits10_limit_lo = 9L;
+   static constexpr const std::int32_t cpp_dec_float_digits10_limit_hi = boost::integer_traits<std::int32_t>::const_max - 100;
+   static constexpr const std::int32_t cpp_dec_float_digits10          = ((cpp_dec_float_digits10_setting < cpp_dec_float_digits10_limit_lo) ? cpp_dec_float_digits10_limit_lo : ((cpp_dec_float_digits10_setting > cpp_dec_float_digits10_limit_hi) ? cpp_dec_float_digits10_limit_hi : cpp_dec_float_digits10_setting));
+   static constexpr const ExponentType cpp_dec_float_max_exp10         = (static_cast<ExponentType>(1) << (std::numeric_limits<ExponentType>::digits - 5));
+   static constexpr const ExponentType cpp_dec_float_min_exp10         = -cpp_dec_float_max_exp10;
+   static constexpr const ExponentType cpp_dec_float_max_exp           = cpp_dec_float_max_exp10;
+   static constexpr const ExponentType cpp_dec_float_min_exp           = cpp_dec_float_min_exp10;
 
-   BOOST_STATIC_ASSERT((cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10 == -cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10));
+   static_assert(cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10 == -cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10, "Failed exponent range check");
 
  private:
-   static const boost::int32_t cpp_dec_float_elem_digits10 = 8L;
-   static const boost::int32_t cpp_dec_float_elem_mask     = 100000000L;
+   static constexpr const std::int32_t cpp_dec_float_elem_digits10 = 8L;
+   static constexpr const std::int32_t cpp_dec_float_elem_mask     = 100000000L;
 
-   BOOST_STATIC_ASSERT(0 == cpp_dec_float_max_exp10 % cpp_dec_float_elem_digits10);
+   static_assert(0 == cpp_dec_float_max_exp10 % cpp_dec_float_elem_digits10, "Failed digit sanity check");
 
    // There are three guard limbs.
    // 1) The first limb has 'play' from 1...8 decimal digits.
@@ -104,13 +100,13 @@ class cpp_dec_float
    // 3) One limb can get lost when justifying after multiply,
    // as only half of the triangle is multiplied and a carry
    // from below is missing.
-   static const boost::int32_t cpp_dec_float_elem_number_request = static_cast<boost::int32_t>((cpp_dec_float_digits10 / cpp_dec_float_elem_digits10) + (((cpp_dec_float_digits10 % cpp_dec_float_elem_digits10) != 0) ? 1 : 0));
+   static constexpr const std::int32_t cpp_dec_float_elem_number_request = static_cast<std::int32_t>((cpp_dec_float_digits10 / cpp_dec_float_elem_digits10) + (((cpp_dec_float_digits10 % cpp_dec_float_elem_digits10) != 0) ? 1 : 0));
 
    // The number of elements needed (with a minimum of two) plus three added guard limbs.
-   static const boost::int32_t cpp_dec_float_elem_number = static_cast<boost::int32_t>(((cpp_dec_float_elem_number_request < 2L) ? 2L : cpp_dec_float_elem_number_request) + 3L);
+   static constexpr const std::int32_t cpp_dec_float_elem_number = static_cast<std::int32_t>(((cpp_dec_float_elem_number_request < 2L) ? 2L : cpp_dec_float_elem_number_request) + 3L);
 
  public:
-   static const boost::int32_t cpp_dec_float_total_digits10 = static_cast<boost::int32_t>(cpp_dec_float_elem_number * cpp_dec_float_elem_digits10);
+   static constexpr const std::int32_t cpp_dec_float_total_digits10 = static_cast<std::int32_t>(cpp_dec_float_elem_number * cpp_dec_float_elem_digits10);
 
  private:
    typedef enum enum_fpclass_type
@@ -120,21 +116,15 @@ class cpp_dec_float
       cpp_dec_float_NaN
    } fpclass_type;
 
-#ifndef BOOST_NO_CXX11_HDR_ARRAY
-   typedef typename mpl::if_<is_void<Allocator>,
-                             std::array<boost::uint32_t, cpp_dec_float_elem_number>,
-                             detail::dynamic_array<boost::uint32_t, cpp_dec_float_elem_number, Allocator> >::type array_type;
-#else
-   typedef typename mpl::if_<is_void<Allocator>,
-                             boost::array<boost::uint32_t, cpp_dec_float_elem_number>,
-                             detail::dynamic_array<boost::uint32_t, cpp_dec_float_elem_number, Allocator> >::type array_type;
-#endif
+   using array_type = typename std::conditional<std::is_void<Allocator>::value,
+                             std::array<std::uint32_t, cpp_dec_float_elem_number>,
+                             detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number, Allocator> >::type;
 
    array_type     data;
    ExponentType   exp;
    bool           neg;
    fpclass_type   fpclass;
-   boost::int32_t prec_elem;
+   std::int32_t prec_elem;
 
    //
    // Special values constructor:
@@ -145,51 +135,9 @@ class cpp_dec_float
                                    fpclass(c),
                                    prec_elem(cpp_dec_float_elem_number) {}
 
-   //
-   // Static data initializer:
-   //
-   struct initializer
-   {
-      initializer()
-      {
-         cpp_dec_float<Digits10, ExponentType, Allocator>::nan();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::inf();
-         (cpp_dec_float<Digits10, ExponentType, Allocator>::min)();
-         (cpp_dec_float<Digits10, ExponentType, Allocator>::max)();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::zero();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::one();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::two();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::half();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::double_min();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::double_max();
-         //cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_max();
-         //cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_min();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::long_long_max();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::long_long_min();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::ulong_long_max();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::eps();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(0);
-      }
-      void do_nothing() {}
-   };
-
-   static initializer init;
-
-   struct long_double_initializer
-   {
-      long_double_initializer()
-      {
-         cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_max();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_min();
-      }
-      void do_nothing() {}
-   };
-
-   static long_double_initializer linit;
-
  public:
    // Constructors
-   cpp_dec_float() BOOST_MP_NOEXCEPT_IF(noexcept(array_type())) : data(),
+   cpp_dec_float() noexcept(noexcept(array_type())) : data(),
                                                                   exp(static_cast<ExponentType>(0)),
                                                                   neg(false),
                                                                   fpclass(cpp_dec_float_finite),
@@ -205,7 +153,7 @@ class cpp_dec_float
    }
 
    template <class I>
-   cpp_dec_float(I i, typename enable_if<is_unsigned<I> >::type* = 0) : data(),
+   cpp_dec_float(I i, typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value >::type* = 0) : data(),
                                                                         exp(static_cast<ExponentType>(0)),
                                                                         neg(false),
                                                                         fpclass(cpp_dec_float_finite),
@@ -215,7 +163,7 @@ class cpp_dec_float
    }
 
    template <class I>
-   cpp_dec_float(I i, typename enable_if<is_signed<I> >::type* = 0) : data(),
+   cpp_dec_float(I i, typename std::enable_if<boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value>::type* = 0) : data(),
                                                                       exp(static_cast<ExponentType>(0)),
                                                                       neg(false),
                                                                       fpclass(cpp_dec_float_finite),
@@ -230,14 +178,14 @@ class cpp_dec_float
          from_unsigned_long_long(i);
    }
 
-   cpp_dec_float(const cpp_dec_float& f) BOOST_MP_NOEXCEPT_IF(noexcept(array_type(std::declval<const array_type&>()))) : data(f.data),
+   cpp_dec_float(const cpp_dec_float& f) noexcept(noexcept(array_type(std::declval<const array_type&>()))) : data(f.data),
                                                                                                                          exp(f.exp),
                                                                                                                          neg(f.neg),
                                                                                                                          fpclass(f.fpclass),
                                                                                                                          prec_elem(f.prec_elem) {}
 
    template <unsigned D, class ET, class A>
-   cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename enable_if_c<D <= Digits10>::type* = 0) : data(),
+   cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if<D <= Digits10>::type* = 0) : data(),
                                                                                                      exp(f.exp),
                                                                                                      neg(f.neg),
                                                                                                      fpclass(static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
@@ -246,7 +194,7 @@ class cpp_dec_float
       std::copy(f.data.begin(), f.data.begin() + f.prec_elem, data.begin());
    }
    template <unsigned D, class ET, class A>
-   explicit cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename disable_if_c<D <= Digits10>::type* = 0) : data(),
+   explicit cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if< !(D <= Digits10)>::type* = 0) : data(),
                                                                                                                exp(f.exp),
                                                                                                                neg(f.neg),
                                                                                                                fpclass(static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
@@ -257,9 +205,9 @@ class cpp_dec_float
    }
 
    template <class F>
-   cpp_dec_float(const F val, typename enable_if_c<is_floating_point<F>::value
+   cpp_dec_float(const F val, typename std::enable_if<std::is_floating_point<F>::value
 #ifdef BOOST_HAS_FLOAT128
-                                                   && !boost::is_same<F, __float128>::value
+                                                   && !std::is_same<F, __float128>::value
 #endif
                                                    >::type* = 0) : data(),
                                                                    exp(static_cast<ExponentType>(0)),
@@ -287,76 +235,65 @@ class cpp_dec_float
    static const cpp_dec_float& nan()
    {
       static const cpp_dec_float val(cpp_dec_float_NaN);
-      init.do_nothing();
       return val;
    }
 
    static const cpp_dec_float& inf()
    {
       static const cpp_dec_float val(cpp_dec_float_inf);
-      init.do_nothing();
       return val;
    }
 
    static const cpp_dec_float&(max)()
    {
-      init.do_nothing();
       static cpp_dec_float val_max = std::string("1.0e" + boost::multiprecision::detail::itos(cpp_dec_float_max_exp10)).c_str();
       return val_max;
    }
 
    static const cpp_dec_float&(min)()
    {
-      init.do_nothing();
       static cpp_dec_float val_min = std::string("1.0e" + boost::multiprecision::detail::itos(cpp_dec_float_min_exp10)).c_str();
       return val_min;
    }
 
    static const cpp_dec_float& zero()
    {
-      init.do_nothing();
       static cpp_dec_float val(static_cast<boost::ulong_long_type>(0u));
       return val;
    }
 
    static const cpp_dec_float& one()
    {
-      init.do_nothing();
       static cpp_dec_float val(static_cast<boost::ulong_long_type>(1u));
       return val;
    }
 
    static const cpp_dec_float& two()
    {
-      init.do_nothing();
       static cpp_dec_float val(static_cast<boost::ulong_long_type>(2u));
       return val;
    }
 
    static const cpp_dec_float& half()
    {
-      init.do_nothing();
       static cpp_dec_float val(0.5L);
       return val;
    }
 
    static const cpp_dec_float& double_min()
    {
-      init.do_nothing();
       static cpp_dec_float val((std::numeric_limits<double>::min)());
       return val;
    }
 
    static const cpp_dec_float& double_max()
    {
-      init.do_nothing();
       static cpp_dec_float val((std::numeric_limits<double>::max)());
       return val;
    }
 
    static const cpp_dec_float& long_double_min()
    {
-      linit.do_nothing();
 #ifdef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
       static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::min)()));
 #else
@@ -367,7 +304,6 @@ class cpp_dec_float
 
    static const cpp_dec_float& long_double_max()
    {
-       linit.do_nothing();
 #ifdef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
       static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::max)()));
 #else
@@ -378,34 +314,30 @@ class cpp_dec_float
 
    static const cpp_dec_float& long_long_max()
    {
-      init.do_nothing();
       static cpp_dec_float val((std::numeric_limits<boost::long_long_type>::max)());
       return val;
    }
 
    static const cpp_dec_float& long_long_min()
    {
-      init.do_nothing();
       static cpp_dec_float val((std::numeric_limits<boost::long_long_type>::min)());
       return val;
    }
 
    static const cpp_dec_float& ulong_long_max()
    {
-      init.do_nothing();
       static cpp_dec_float val((std::numeric_limits<boost::ulong_long_type>::max)());
       return val;
    }
 
    static const cpp_dec_float& eps()
    {
-      init.do_nothing();
       static cpp_dec_float val(1.0, 1 - static_cast<int>(cpp_dec_float_digits10));
       return val;
    }
 
    // Basic operations.
-   cpp_dec_float& operator=(const cpp_dec_float& v) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<array_type&>() = std::declval<const array_type&>()))
+   cpp_dec_float& operator=(const cpp_dec_float& v) noexcept(noexcept(std::declval<array_type&>() = std::declval<const array_type&>()))
    {
       data      = v.data;
       exp       = v.exp;
@@ -447,7 +379,7 @@ class cpp_dec_float
    }
 
    template <class Float>
-   typename boost::enable_if_c<boost::is_floating_point<Float>::value, cpp_dec_float&>::type operator=(Float v);
+   typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float&>::type operator=(Float v);
 
    cpp_dec_float& operator=(const char* v)
    {
@@ -512,7 +444,7 @@ class cpp_dec_float
       return *this -= one();
    }
 
-   std::string str(boost::intmax_t digits, std::ios_base::fmtflags f) const;
+   std::string str(std::intmax_t digits, std::ios_base::fmtflags f) const;
 
    int compare(const cpp_dec_float& v) const;
 
@@ -540,7 +472,7 @@ class cpp_dec_float
    void                   extract_parts(double& mantissa, ExponentType& exponent) const;
    cpp_dec_float          extract_integer_part() const;
 
-   void precision(const boost::int32_t prec_digits)
+   void precision(const std::int32_t prec_digits)
    {
       if (prec_digits >= cpp_dec_float_total_digits10)
       {
@@ -548,15 +480,15 @@ class cpp_dec_float
       }
       else
       {
-         const boost::int32_t elems = static_cast<boost::int32_t>(static_cast<boost::int32_t>((prec_digits + (cpp_dec_float_elem_digits10 / 2)) / cpp_dec_float_elem_digits10) + static_cast<boost::int32_t>(((prec_digits % cpp_dec_float_elem_digits10) != 0) ? 1 : 0));
+         const std::int32_t elems = static_cast<std::int32_t>(static_cast<std::int32_t>((prec_digits + (cpp_dec_float_elem_digits10 / 2)) / cpp_dec_float_elem_digits10) + static_cast<std::int32_t>(((prec_digits % cpp_dec_float_elem_digits10) != 0) ? 1 : 0));
 
-         prec_elem = (std::min)(cpp_dec_float_elem_number, (std::max)(elems, static_cast<boost::int32_t>(2)));
+         prec_elem = (std::min)(cpp_dec_float_elem_number, (std::max)(elems, static_cast<std::int32_t>(2)));
       }
    }
    static cpp_dec_float pow2(boost::long_long_type i);
    ExponentType         order() const
    {
-      const bool bo_order_is_zero = ((!(isfinite)()) || (data[0] == static_cast<boost::uint32_t>(0u)));
+      const bool bo_order_is_zero = ((!(isfinite)()) || (data[0] == static_cast<std::uint32_t>(0u)));
       //
       // Binary search to find the order of the leading term:
       //
@@ -617,17 +549,17 @@ class cpp_dec_float
    }
 
  private:
-   static bool data_elem_is_non_zero_predicate(const boost::uint32_t& d) { return (d != static_cast<boost::uint32_t>(0u)); }
-   static bool data_elem_is_non_nine_predicate(const boost::uint32_t& d) { return (d != static_cast<boost::uint32_t>(cpp_dec_float::cpp_dec_float_elem_mask - 1)); }
+   static bool data_elem_is_non_zero_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(0u)); }
+   static bool data_elem_is_non_nine_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(cpp_dec_float::cpp_dec_float_elem_mask - 1)); }
    static bool char_is_nonzero_predicate(const char& c) { return (c != static_cast<char>('0')); }
 
    void from_unsigned_long_long(const boost::ulong_long_type u);
 
    int cmp_data(const array_type& vd) const;
 
-   static boost::uint32_t mul_loop_uv(boost::uint32_t* const u, const boost::uint32_t* const v, const boost::int32_t p);
-   static boost::uint32_t mul_loop_n(boost::uint32_t* const u, boost::uint32_t n, const boost::int32_t p);
-   static boost::uint32_t div_loop_n(boost::uint32_t* const u, boost::uint32_t n, const boost::int32_t p);
+   static std::uint32_t mul_loop_uv(std::uint32_t* const u, const std::uint32_t* const v, const std::int32_t p);
+   static std::uint32_t mul_loop_n(std::uint32_t* const u, std::uint32_t n, const std::int32_t p);
+   static std::uint32_t div_loop_n(std::uint32_t* const u, std::uint32_t n, const std::int32_t p);
 
    bool rd_string(const char* const s);
 
@@ -636,20 +568,15 @@ class cpp_dec_float
 };
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-typename cpp_dec_float<Digits10, ExponentType, Allocator>::initializer cpp_dec_float<Digits10, ExponentType, Allocator>::init;
+const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
 template <unsigned Digits10, class ExponentType, class Allocator>
-typename cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_initializer cpp_dec_float<Digits10, ExponentType, Allocator>::linit;
-
+const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_setting;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const boost::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
+const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_limit_lo;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const boost::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_setting;
+const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_limit_hi;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const boost::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_limit_lo;
-template <unsigned Digits10, class ExponentType, class Allocator>
-const boost::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_limit_hi;
-template <unsigned Digits10, class ExponentType, class Allocator>
-const boost::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
+const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
 template <unsigned Digits10, class ExponentType, class Allocator>
 const ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp;
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -659,13 +586,13 @@ const ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_flo
 template <unsigned Digits10, class ExponentType, class Allocator>
 const ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const boost::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_digits10;
+const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_digits10;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const boost::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_number_request;
+const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_number_request;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const boost::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_number;
+const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_number;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const boost::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_mask;
+const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_mask;
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, ExponentType, Allocator>::operator+=(const cpp_dec_float<Digits10, ExponentType, Allocator>& v)
@@ -696,7 +623,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    }
 
    // Get the offset for the add/sub operation.
-   static const ExponentType max_delta_exp = static_cast<ExponentType>((cpp_dec_float_elem_number - 1) * cpp_dec_float_elem_digits10);
+   constexpr const ExponentType max_delta_exp = static_cast<ExponentType>((cpp_dec_float_elem_number - 1) * cpp_dec_float_elem_digits10);
 
    const ExponentType ofs_exp = static_cast<ExponentType>(exp - v.exp);
 
@@ -717,7 +644,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    typename array_type::iterator       p_u    = data.begin();
    typename array_type::const_iterator p_v    = v.data.begin();
    bool                                b_copy = false;
-   const boost::int32_t                ofs    = static_cast<boost::int32_t>(static_cast<boost::int32_t>(ofs_exp) / cpp_dec_float_elem_digits10);
+   const std::int32_t                ofs    = static_cast<std::int32_t>(static_cast<std::int32_t>(ofs_exp) / cpp_dec_float_elem_digits10);
    array_type                          n_data;
 
    if (neg == v.neg)
@@ -726,28 +653,28 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       // might have to be treated with a positive, negative or zero offset.
       // The result is stored in *this. The data are added one element
       // at a time, each element with carry.
-      if (ofs >= static_cast<boost::int32_t>(0))
+      if (ofs >= static_cast<std::int32_t>(0))
       {
          std::copy(v.data.begin(), v.data.end() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
-         std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(ofs), static_cast<boost::uint32_t>(0u));
+         std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(ofs), static_cast<std::uint32_t>(0u));
          p_v = n_data.begin();
       }
       else
       {
          std::copy(data.begin(), data.end() - static_cast<size_t>(-ofs), n_data.begin() + static_cast<size_t>(-ofs));
-         std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(-ofs), static_cast<boost::uint32_t>(0u));
+         std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(-ofs), static_cast<std::uint32_t>(0u));
          p_u    = n_data.begin();
          b_copy = true;
       }
 
       // Addition algorithm
-      boost::uint32_t carry = static_cast<boost::uint32_t>(0u);
+      std::uint32_t carry = static_cast<std::uint32_t>(0u);
 
-      for (boost::int32_t j = static_cast<boost::int32_t>(cpp_dec_float_elem_number - static_cast<boost::int32_t>(1)); j >= static_cast<boost::int32_t>(0); j--)
+      for (std::int32_t j = static_cast<std::int32_t>(cpp_dec_float_elem_number - static_cast<std::int32_t>(1)); j >= static_cast<std::int32_t>(0); j--)
       {
-         boost::uint32_t t = static_cast<boost::uint32_t>(static_cast<boost::uint32_t>(p_u[j] + p_v[j]) + carry);
-         carry             = t / static_cast<boost::uint32_t>(cpp_dec_float_elem_mask);
-         p_u[j]            = static_cast<boost::uint32_t>(t - static_cast<boost::uint32_t>(carry * static_cast<boost::uint32_t>(cpp_dec_float_elem_mask)));
+         std::uint32_t t = static_cast<std::uint32_t>(static_cast<std::uint32_t>(p_u[j] + p_v[j]) + carry);
+         carry             = t / static_cast<std::uint32_t>(cpp_dec_float_elem_mask);
+         p_u[j]            = static_cast<std::uint32_t>(t - static_cast<std::uint32_t>(carry * static_cast<std::uint32_t>(cpp_dec_float_elem_mask)));
       }
 
       if (b_copy)
@@ -757,7 +684,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       }
 
       // There needs to be a carry into the element -1 of the array data
-      if (carry != static_cast<boost::uint32_t>(0u))
+      if (carry != static_cast<std::uint32_t>(0u))
       {
          std::copy_backward(data.begin(), data.end() - static_cast<std::size_t>(1u), data.end());
          data[0] = carry;
@@ -768,24 +695,24 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    {
       // Subtract v from *this, where the data array of either *this or v
       // might have to be treated with a positive, negative or zero offset.
-      if ((ofs > static_cast<boost::int32_t>(0)) || ((ofs == static_cast<boost::int32_t>(0)) && (cmp_data(v.data) > static_cast<boost::int32_t>(0))))
+      if ((ofs > static_cast<std::int32_t>(0)) || ((ofs == static_cast<std::int32_t>(0)) && (cmp_data(v.data) > static_cast<std::int32_t>(0))))
       {
          // In this case, |u| > |v| and ofs is positive.
          // Copy the data of v, shifted down to a lower value
          // into the data array m_n. Set the operand pointer p_v
          // to point to the copied, shifted data m_n.
          std::copy(v.data.begin(), v.data.end() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
-         std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(ofs), static_cast<boost::uint32_t>(0u));
+         std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(ofs), static_cast<std::uint32_t>(0u));
          p_v = n_data.begin();
       }
       else
       {
-         if (ofs != static_cast<boost::int32_t>(0))
+         if (ofs != static_cast<std::int32_t>(0))
          {
             // In this case, |u| < |v| and ofs is negative.
             // Shift the data of u down to a lower value.
             std::copy_backward(data.begin(), data.end() - static_cast<size_t>(-ofs), data.end());
-            std::fill(data.begin(), data.begin() + static_cast<size_t>(-ofs), static_cast<boost::uint32_t>(0u));
+            std::fill(data.begin(), data.begin() + static_cast<size_t>(-ofs), static_cast<std::uint32_t>(0u));
          }
 
          // Copy the data of v into the data array n_data.
@@ -798,28 +725,28 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
          b_copy = true;
       }
 
-      boost::int32_t j;
+      std::int32_t j;
 
       // Subtraction algorithm
-      boost::int32_t borrow = static_cast<boost::int32_t>(0);
+      std::int32_t borrow = static_cast<std::int32_t>(0);
 
-      for (j = static_cast<boost::int32_t>(cpp_dec_float_elem_number - static_cast<boost::int32_t>(1)); j >= static_cast<boost::int32_t>(0); j--)
+      for (j = static_cast<std::int32_t>(cpp_dec_float_elem_number - static_cast<std::int32_t>(1)); j >= static_cast<std::int32_t>(0); j--)
       {
-         boost::int32_t t = static_cast<boost::int32_t>(static_cast<boost::int32_t>(static_cast<boost::int32_t>(p_u[j]) - static_cast<boost::int32_t>(p_v[j])) - borrow);
+         std::int32_t t = static_cast<std::int32_t>(static_cast<std::int32_t>(static_cast<std::int32_t>(p_u[j]) - static_cast<std::int32_t>(p_v[j])) - borrow);
 
          // Underflow? Borrow?
-         if (t < static_cast<boost::int32_t>(0))
+         if (t < static_cast<std::int32_t>(0))
          {
             // Yes, underflow and borrow
-            t += static_cast<boost::int32_t>(cpp_dec_float_elem_mask);
-            borrow = static_cast<boost::int32_t>(1);
+            t += static_cast<std::int32_t>(cpp_dec_float_elem_mask);
+            borrow = static_cast<std::int32_t>(1);
          }
          else
          {
-            borrow = static_cast<boost::int32_t>(0);
+            borrow = static_cast<std::int32_t>(0);
          }
 
-         p_u[j] = static_cast<boost::uint32_t>(static_cast<boost::uint32_t>(t) % static_cast<boost::uint32_t>(cpp_dec_float_elem_mask));
+         p_u[j] = static_cast<std::uint32_t>(static_cast<std::uint32_t>(t) % static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
       }
 
       if (b_copy)
@@ -847,7 +774,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
             const std::size_t sj = static_cast<std::size_t>(std::distance<typename array_type::const_iterator>(data.begin(), first_nonzero_elem));
 
             std::copy(data.begin() + static_cast<std::size_t>(sj), data.end(), data.begin());
-            std::fill(data.end() - sj, data.end(), static_cast<boost::uint32_t>(0u));
+            std::fill(data.end() - sj, data.end(), static_cast<std::uint32_t>(0u));
 
             exp -= static_cast<ExponentType>(sj * static_cast<std::size_t>(cpp_dec_float_elem_digits10));
          }
@@ -927,18 +854,18 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    // Set the exponent of the result.
    exp += v.exp;
 
-   const boost::int32_t prec_mul = (std::min)(prec_elem, v.prec_elem);
+   const std::int32_t prec_mul = (std::min)(prec_elem, v.prec_elem);
 
-   const boost::uint32_t carry = mul_loop_uv(data.data(), v.data.data(), prec_mul);
+   const std::uint32_t carry = mul_loop_uv(data.data(), v.data.data(), prec_mul);
 
    // Handle a potential carry.
-   if (carry != static_cast<boost::uint32_t>(0u))
+   if (carry != static_cast<std::uint32_t>(0u))
    {
       exp += cpp_dec_float_elem_digits10;
 
       // Shift the result of the multiplication one element to the right...
       std::copy_backward(data.begin(),
-                         data.begin() + static_cast<std::size_t>(prec_elem - static_cast<boost::int32_t>(1)),
+                         data.begin() + static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1)),
                          data.begin() + static_cast<std::size_t>(prec_elem));
 
       // ... And insert the carry.
@@ -980,7 +907,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       }
    }
 
-   const bool u_and_v_are_finite_and_identical = ((isfinite)() && (fpclass == v.fpclass) && (exp == v.exp) && (cmp_data(v.data) == static_cast<boost::int32_t>(0)));
+   const bool u_and_v_are_finite_and_identical = ((isfinite)() && (fpclass == v.fpclass) && (exp == v.exp) && (cmp_data(v.data) == static_cast<std::int32_t>(0)));
 
    if (u_and_v_are_finite_and_identical)
    {
@@ -1014,7 +941,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 
    // Handle special cases like zero, inf and NaN.
    const bool b_u_is_inf  = (isinf)();
-   const bool b_n_is_zero = (n == static_cast<boost::int32_t>(0));
+   const bool b_n_is_zero = (n == static_cast<std::int32_t>(0));
 
    if ((isnan)() || (b_u_is_inf && b_n_is_zero))
    {
@@ -1050,20 +977,20 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    }
 
    // Set up the multiplication loop.
-   const boost::uint32_t nn    = static_cast<boost::uint32_t>(n);
-   const boost::uint32_t carry = mul_loop_n(data.data(), nn, prec_elem);
+   const std::uint32_t nn    = static_cast<std::uint32_t>(n);
+   const std::uint32_t carry = mul_loop_n(data.data(), nn, prec_elem);
 
    // Handle the carry and adjust the exponent.
-   if (carry != static_cast<boost::uint32_t>(0u))
+   if (carry != static_cast<std::uint32_t>(0u))
    {
       exp += static_cast<ExponentType>(cpp_dec_float_elem_digits10);
 
       // Shift the result of the multiplication one element to the right.
       std::copy_backward(data.begin(),
-                         data.begin() + static_cast<std::size_t>(prec_elem - static_cast<boost::int32_t>(1)),
+                         data.begin() + static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1)),
                          data.begin() + static_cast<std::size_t>(prec_elem));
 
-      data.front() = static_cast<boost::uint32_t>(carry);
+      data.front() = static_cast<std::uint32_t>(carry);
    }
 
    // Check for potential overflow.
@@ -1136,25 +1063,25 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       return operator/=(t);
    }
 
-   const boost::uint32_t nn = static_cast<boost::uint32_t>(n);
+   const std::uint32_t nn = static_cast<std::uint32_t>(n);
 
-   if (nn > static_cast<boost::uint32_t>(1u))
+   if (nn > static_cast<std::uint32_t>(1u))
    {
       // Do the division loop.
-      const boost::uint32_t prev = div_loop_n(data.data(), nn, prec_elem);
+      const std::uint32_t prev = div_loop_n(data.data(), nn, prec_elem);
 
       // Determine if one leading zero is in the result data.
-      if (data[0] == static_cast<boost::uint32_t>(0u))
+      if (data[0] == static_cast<std::uint32_t>(0u))
       {
          // Adjust the exponent
          exp -= static_cast<ExponentType>(cpp_dec_float_elem_digits10);
 
          // Shift result of the division one element to the left.
          std::copy(data.begin() + static_cast<std::size_t>(1u),
-                   data.begin() + static_cast<std::size_t>(prec_elem - static_cast<boost::int32_t>(1)),
+                   data.begin() + static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1)),
                    data.begin());
 
-         data[prec_elem - static_cast<boost::int32_t>(1)] = static_cast<boost::uint32_t>(static_cast<boost::uint64_t>(prev * static_cast<boost::uint64_t>(cpp_dec_float_elem_mask)) / nn);
+         data[prec_elem - static_cast<std::int32_t>(1)] = static_cast<std::uint32_t>(static_cast<std::uint64_t>(prev * static_cast<std::uint64_t>(cpp_dec_float_elem_mask)) / nn);
       }
    }
 
@@ -1222,13 +1149,13 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    // is used. During the iterative steps, the precision of the calculation is limited
    // to the minimum required in order to minimize the run-time.
 
-   static const boost::int32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
+   constexpr const std::int32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
 
-   for (boost::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_total_digits10; digits *= static_cast<boost::int32_t>(2))
+   for (std::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_total_digits10; digits *= static_cast<std::int32_t>(2))
    {
       // Adjust precision of the terms.
-      precision(static_cast<boost::int32_t>((digits + 10) * static_cast<boost::int32_t>(2)));
-      x.precision(static_cast<boost::int32_t>((digits + 10) * static_cast<boost::int32_t>(2)));
+      precision(static_cast<std::int32_t>((digits + 10) * static_cast<std::int32_t>(2)));
+      x.precision(static_cast<std::int32_t>((digits + 10) * static_cast<std::int32_t>(2)));
 
       // Next iteration.
       cpp_dec_float t(*this);
@@ -1303,9 +1230,9 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    // https://doi.org/10.1007/978-3-642-56735-3
    // http://www.amazon.com/exec/obidos/tg/detail/-/3540665722/qid=1035535482/sr=8-7/ref=sr_8_7/104-3357872-6059916?v=glance&n=507846
 
-   static const boost::uint32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
+   constexpr const std::uint32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
 
-   for (boost::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_total_digits10; digits *= 2u)
+   for (std::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_total_digits10; digits *= 2u)
    {
       // Adjust precision of the terms.
       precision((digits + 10) * 2);
@@ -1446,12 +1373,12 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::isone() const
 
    if (not_negative_and_is_finite)
    {
-      if ((data[0u] == static_cast<boost::uint32_t>(1u)) && (exp == static_cast<ExponentType>(0)))
+      if ((data[0u] == static_cast<std::uint32_t>(1u)) && (exp == static_cast<ExponentType>(0)))
       {
          const typename array_type::const_iterator it_non_zero = std::find_if(data.begin(), data.end(), data_elem_is_non_zero_predicate);
          return (it_non_zero == data.end());
       }
-      else if ((data[0u] == static_cast<boost::uint32_t>(cpp_dec_float_elem_mask - 1)) && (exp == static_cast<ExponentType>(-cpp_dec_float_elem_digits10)))
+      else if ((data[0u] == static_cast<std::uint32_t>(cpp_dec_float_elem_mask - 1)) && (exp == static_cast<ExponentType>(-cpp_dec_float_elem_digits10)))
       {
          const typename array_type::const_iterator it_non_nine = std::find_if(data.begin(), data.end(), data_elem_is_non_nine_predicate);
          return (it_non_nine == data.end());
@@ -1501,27 +1428,27 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::extract_parts(double& man
    // Extracts the mantissa and exponent.
    exponent = exp;
 
-   boost::uint32_t p10  = static_cast<boost::uint32_t>(1u);
-   boost::uint32_t test = data[0u];
+   std::uint32_t p10  = static_cast<std::uint32_t>(1u);
+   std::uint32_t test = data[0u];
 
    for (;;)
    {
-      test /= static_cast<boost::uint32_t>(10u);
+      test /= static_cast<std::uint32_t>(10u);
 
-      if (test == static_cast<boost::uint32_t>(0u))
+      if (test == static_cast<std::uint32_t>(0u))
       {
          break;
       }
 
-      p10 *= static_cast<boost::uint32_t>(10u);
+      p10 *= static_cast<std::uint32_t>(10u);
       ++exponent;
    }
 
    // Establish the upper bound of limbs for extracting the double.
-   const int max_elem_in_double_count = static_cast<int>(static_cast<boost::int32_t>(std::numeric_limits<double>::digits10) / cpp_dec_float_elem_digits10) + (static_cast<int>(static_cast<boost::int32_t>(std::numeric_limits<double>::digits10) % cpp_dec_float_elem_digits10) != 0 ? 1 : 0) + 1;
+   const int max_elem_in_double_count = static_cast<int>(static_cast<std::int32_t>(std::numeric_limits<double>::digits10) / cpp_dec_float_elem_digits10) + (static_cast<int>(static_cast<std::int32_t>(std::numeric_limits<double>::digits10) % cpp_dec_float_elem_digits10) != 0 ? 1 : 0) + 1;
 
    // And make sure this upper bound stays within bounds of the elems.
-   const std::size_t max_elem_extract_count = static_cast<std::size_t>((std::min)(static_cast<boost::int32_t>(max_elem_in_double_count), cpp_dec_float_elem_number));
+   const std::size_t max_elem_extract_count = static_cast<std::size_t>((std::min)(static_cast<std::int32_t>(max_elem_in_double_count), cpp_dec_float_elem_number));
 
    // Extract into the mantissa the first limb, extracted as a double.
    mantissa     = static_cast<double>(data[0]);
@@ -1669,9 +1596,9 @@ boost::long_long_type cpp_dec_float<Digits10, ExponentType, Allocator>::extract_
 
       val = static_cast<boost::ulong_long_type>(xn.data[0]);
 
-      const boost::int32_t imax = (std::min)(static_cast<boost::int32_t>(static_cast<boost::int32_t>(xn.exp) / cpp_dec_float_elem_digits10), static_cast<boost::int32_t>(cpp_dec_float_elem_number - static_cast<boost::int32_t>(1)));
+      const std::int32_t imax = (std::min)(static_cast<std::int32_t>(static_cast<std::int32_t>(xn.exp) / cpp_dec_float_elem_digits10), static_cast<std::int32_t>(cpp_dec_float_elem_number - static_cast<std::int32_t>(1)));
 
-      for (boost::int32_t i = static_cast<boost::int32_t>(1); i <= imax; i++)
+      for (std::int32_t i = static_cast<std::int32_t>(1); i <= imax; i++)
       {
          val *= static_cast<boost::ulong_long_type>(cpp_dec_float_elem_mask);
          val += static_cast<boost::ulong_long_type>(xn.data[i]);
@@ -1727,9 +1654,9 @@ boost::ulong_long_type cpp_dec_float<Digits10, ExponentType, Allocator>::extract
       // Extract the data into an boost::ulong_long_type value.
       val = static_cast<boost::ulong_long_type>(xn.data[0]);
 
-      const boost::int32_t imax = (std::min)(static_cast<boost::int32_t>(static_cast<boost::int32_t>(xn.exp) / cpp_dec_float_elem_digits10), static_cast<boost::int32_t>(cpp_dec_float_elem_number - static_cast<boost::int32_t>(1)));
+      const std::int32_t imax = (std::min)(static_cast<std::int32_t>(static_cast<std::int32_t>(xn.exp) / cpp_dec_float_elem_digits10), static_cast<std::int32_t>(cpp_dec_float_elem_number - static_cast<std::int32_t>(1)));
 
-      for (boost::int32_t i = static_cast<boost::int32_t>(1); i <= imax; i++)
+      for (std::int32_t i = static_cast<std::int32_t>(1); i <= imax; i++)
       {
          val *= static_cast<boost::ulong_long_type>(cpp_dec_float_elem_mask);
          val += static_cast<boost::ulong_long_type>(xn.data[i]);
@@ -1767,13 +1694,13 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
    const size_t last_clear  = static_cast<size_t>(cpp_dec_float_elem_number);
 
    if (first_clear < last_clear)
-      std::fill(x.data.begin() + first_clear, x.data.begin() + last_clear, static_cast<boost::uint32_t>(0u));
+      std::fill(x.data.begin() + first_clear, x.data.begin() + last_clear, static_cast<std::uint32_t>(0u));
 
    return x;
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_t number_of_digits, std::ios_base::fmtflags f) const
+std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t number_of_digits, std::ios_base::fmtflags f) const
 {
    if ((this->isinf)())
    {
@@ -1790,7 +1717,7 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
    }
 
    std::string     str;
-   boost::intmax_t org_digits(number_of_digits);
+   std::intmax_t org_digits(number_of_digits);
    ExponentType    my_exp = order();
 
    if (number_of_digits == 0)
@@ -1844,13 +1771,13 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
       if (str.length() > static_cast<std::string::size_type>(number_of_digits))
       {
          // Get the digit after the last needed digit for rounding
-         const boost::uint32_t round = static_cast<boost::uint32_t>(static_cast<boost::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits)]) - static_cast<boost::uint32_t>('0'));
+         const std::uint32_t round = static_cast<std::uint32_t>(static_cast<std::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits)]) - static_cast<std::uint32_t>('0'));
 
          bool need_round_up = round >= 5u;
 
          if (round == 5u)
          {
-            const boost::uint32_t ix = static_cast<boost::uint32_t>(static_cast<boost::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits - 1)]) - static_cast<boost::uint32_t>('0'));
+            const std::uint32_t ix = static_cast<std::uint32_t>(static_cast<std::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits - 1)]) - static_cast<std::uint32_t>('0'));
             if ((ix & 1u) == 0)
             {
                // We have an even digit followed by a 5, so we might not actually need to round up
@@ -1881,7 +1808,7 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
             std::size_t ix = static_cast<std::size_t>(str.length() - 1u);
 
             // Every trailing 9 must be rounded up
-            while (ix && (static_cast<boost::int32_t>(str.at(ix)) - static_cast<boost::int32_t>('0') == static_cast<boost::int32_t>(9)))
+            while (ix && (static_cast<std::int32_t>(str.at(ix)) - static_cast<std::int32_t>('0') == static_cast<std::int32_t>(9)))
             {
                str.at(ix) = static_cast<char>('0');
                --ix;
@@ -1890,7 +1817,7 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
             if (!ix)
             {
                // There were nothing but trailing nines.
-               if (static_cast<boost::int32_t>(static_cast<boost::int32_t>(str.at(ix)) - static_cast<boost::int32_t>(0x30)) == static_cast<boost::int32_t>(9))
+               if (static_cast<std::int32_t>(static_cast<std::int32_t>(str.at(ix)) - static_cast<std::int32_t>(0x30)) == static_cast<std::int32_t>(9))
                {
                   // Increment up to the next order and adjust exponent.
                   str.at(ix) = static_cast<char>('1');
@@ -2102,11 +2029,11 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
       if (pos > static_cast<std::size_t>(cpp_dec_float_elem_digits10))
       {
-         const boost::int32_t n_pos         = static_cast<boost::int32_t>(pos);
-         const boost::int32_t n_rem_is_zero = ((static_cast<boost::int32_t>(n_pos % cpp_dec_float_elem_digits10) == static_cast<boost::int32_t>(0)) ? static_cast<boost::int32_t>(1) : static_cast<boost::int32_t>(0));
-         const boost::int32_t n             = static_cast<boost::int32_t>(static_cast<boost::int32_t>(n_pos / cpp_dec_float_elem_digits10) - n_rem_is_zero);
+         const std::int32_t n_pos         = static_cast<std::int32_t>(pos);
+         const std::int32_t n_rem_is_zero = ((static_cast<std::int32_t>(n_pos % cpp_dec_float_elem_digits10) == static_cast<std::int32_t>(0)) ? static_cast<std::int32_t>(1) : static_cast<std::int32_t>(0));
+         const std::int32_t n             = static_cast<std::int32_t>(static_cast<std::int32_t>(n_pos / cpp_dec_float_elem_digits10) - n_rem_is_zero);
 
-         str.insert(static_cast<std::size_t>(static_cast<boost::int32_t>(n_pos - static_cast<boost::int32_t>(n * cpp_dec_float_elem_digits10))), ".");
+         str.insert(static_cast<std::size_t>(static_cast<std::int32_t>(n_pos - static_cast<std::int32_t>(n * cpp_dec_float_elem_digits10))), ".");
 
          str.erase(pos_plus_one, static_cast<std::size_t>(1u));
 
@@ -2118,14 +2045,14 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       pos          = str.find(static_cast<char>('.'));
       pos_plus_one = static_cast<std::size_t>(pos + 1u);
 
-      const boost::int32_t n_dec = static_cast<boost::int32_t>(static_cast<boost::int32_t>(str.length() - 1u) - static_cast<boost::int32_t>(pos));
-      const boost::int32_t n_rem = static_cast<boost::int32_t>(n_dec % cpp_dec_float_elem_digits10);
+      const std::int32_t n_dec = static_cast<std::int32_t>(static_cast<std::int32_t>(str.length() - 1u) - static_cast<std::int32_t>(pos));
+      const std::int32_t n_rem = static_cast<std::int32_t>(n_dec % cpp_dec_float_elem_digits10);
 
-      boost::int32_t n_cnt = ((n_rem != static_cast<boost::int32_t>(0))
-                                  ? static_cast<boost::int32_t>(cpp_dec_float_elem_digits10 - n_rem)
-                                  : static_cast<boost::int32_t>(0));
+      std::int32_t n_cnt = ((n_rem != static_cast<std::int32_t>(0))
+                                  ? static_cast<std::int32_t>(cpp_dec_float_elem_digits10 - n_rem)
+                                  : static_cast<std::int32_t>(0));
 
-      if (n_cnt != static_cast<boost::int32_t>(0))
+      if (n_cnt != static_cast<std::int32_t>(0))
       {
          str.append(static_cast<std::size_t>(n_cnt), static_cast<char>('0'));
       }
@@ -2143,12 +2070,12 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // (See the comment above.)
 
       // Set all the data elements to 0.
-      std::fill(data.begin(), data.end(), static_cast<boost::uint32_t>(0u));
+      std::fill(data.begin(), data.end(), static_cast<std::uint32_t>(0u));
 
       // Extract the data.
 
       // First get the digits to the left of the decimal point...
-      data[0u] = boost::lexical_cast<boost::uint32_t>(str.substr(static_cast<std::size_t>(0u), pos));
+      data[0u] = boost::lexical_cast<std::uint32_t>(str.substr(static_cast<std::size_t>(0u), pos));
 
       // ...then get the remaining digits to the right of the decimal point.
       const std::string::size_type i_end = ((str.length() - pos_plus_one) / static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
@@ -2157,7 +2084,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       {
          const std::string::const_iterator it = str.begin() + pos_plus_one + (i * static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
 
-         data[i + 1u] = boost::lexical_cast<boost::uint32_t>(std::string(it, it + static_cast<std::string::size_type>(cpp_dec_float_elem_digits10)));
+         data[i + 1u] = boost::lexical_cast<std::uint32_t>(std::string(it, it + static_cast<std::string::size_type>(cpp_dec_float_elem_digits10)));
       }
 
       // Check for overflow...
@@ -2220,7 +2147,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
 
    if (mantissa_is_iszero)
    {
-      std::fill(data.begin(), data.end(), static_cast<boost::uint32_t>(0u));
+      std::fill(data.begin(), data.end(), static_cast<std::uint32_t>(0u));
       return;
    }
 
@@ -2240,9 +2167,9 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
       --e;
    }
 
-   boost::int32_t shift = static_cast<boost::int32_t>(e % static_cast<boost::int32_t>(cpp_dec_float_elem_digits10));
+   std::int32_t shift = static_cast<std::int32_t>(e % static_cast<std::int32_t>(cpp_dec_float_elem_digits10));
 
-   while (static_cast<boost::int32_t>(shift-- % cpp_dec_float_elem_digits10) != static_cast<boost::int32_t>(0))
+   while (static_cast<std::int32_t>(shift-- % cpp_dec_float_elem_digits10) != static_cast<std::int32_t>(0))
    {
       d *= 10.0;
       --e;
@@ -2251,15 +2178,15 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
    exp = e;
    neg = b_neg;
 
-   std::fill(data.begin(), data.end(), static_cast<boost::uint32_t>(0u));
+   std::fill(data.begin(), data.end(), static_cast<std::uint32_t>(0u));
 
-   static const boost::int32_t digit_ratio = static_cast<boost::int32_t>(static_cast<boost::int32_t>(std::numeric_limits<double>::digits10) / static_cast<boost::int32_t>(cpp_dec_float_elem_digits10));
-   static const boost::int32_t digit_loops = static_cast<boost::int32_t>(digit_ratio + static_cast<boost::int32_t>(2));
+   constexpr const std::int32_t digit_ratio = static_cast<std::int32_t>(static_cast<std::int32_t>(std::numeric_limits<double>::digits10) / static_cast<std::int32_t>(cpp_dec_float_elem_digits10));
+   constexpr const std::int32_t digit_loops = static_cast<std::int32_t>(digit_ratio + static_cast<std::int32_t>(2));
 
-   for (boost::int32_t i = static_cast<boost::int32_t>(0); i < digit_loops; i++)
+   for (std::int32_t i = static_cast<std::int32_t>(0); i < digit_loops; i++)
    {
-      boost::uint32_t n = static_cast<boost::uint32_t>(static_cast<boost::uint64_t>(d));
-      data[i]           = static_cast<boost::uint32_t>(n);
+      std::uint32_t n = static_cast<std::uint32_t>(static_cast<std::uint64_t>(d));
+      data[i]           = static_cast<std::uint32_t>(n);
       d -= static_cast<double>(n);
       d *= static_cast<double>(cpp_dec_float_elem_mask);
    }
@@ -2267,7 +2194,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 template <class Float>
-typename boost::enable_if_c<boost::is_floating_point<Float>::value, cpp_dec_float<Digits10, ExponentType, Allocator>&>::type cpp_dec_float<Digits10, ExponentType, Allocator>::operator=(Float a)
+typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digits10, ExponentType, Allocator>&>::type cpp_dec_float<Digits10, ExponentType, Allocator>::operator=(Float a)
 {
    // Christopher Kormanyos's original code used a cast to boost::long_long_type here, but that fails
    // when long double has more digits than a boost::long_long_type.
@@ -2300,7 +2227,7 @@ typename boost::enable_if_c<boost::is_floating_point<Float>::value, cpp_dec_floa
    // See https://svn.boost.org/trac/boost/ticket/10924 for an example of why this may go wrong:
    BOOST_ASSERT((boost::math::isfinite)(f));
 
-   static const int shift = std::numeric_limits<int>::digits - 1;
+   constexpr const int shift = std::numeric_limits<int>::digits - 1;
 
    while (f)
    {
@@ -2326,7 +2253,7 @@ typename boost::enable_if_c<boost::is_floating_point<Float>::value, cpp_dec_floa
 template <unsigned Digits10, class ExponentType, class Allocator>
 void cpp_dec_float<Digits10, ExponentType, Allocator>::from_unsigned_long_long(const boost::ulong_long_type u)
 {
-   std::fill(data.begin(), data.end(), static_cast<boost::uint32_t>(0u));
+   std::fill(data.begin(), data.end(), static_cast<std::uint32_t>(0u));
 
    exp       = static_cast<ExponentType>(0);
    neg       = false;
@@ -2342,11 +2269,11 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::from_unsigned_long_long(c
 
    boost::ulong_long_type uu = u;
 
-   boost::uint32_t temp[(std::numeric_limits<boost::ulong_long_type>::digits10 / static_cast<int>(cpp_dec_float_elem_digits10)) + 3] = {static_cast<boost::uint32_t>(0u)};
+   std::uint32_t temp[(std::numeric_limits<boost::ulong_long_type>::digits10 / static_cast<int>(cpp_dec_float_elem_digits10)) + 3] = {static_cast<std::uint32_t>(0u)};
 
    while (uu != static_cast<boost::ulong_long_type>(0u))
    {
-      temp[i] = static_cast<boost::uint32_t>(uu % static_cast<boost::ulong_long_type>(cpp_dec_float_elem_mask));
+      temp[i] = static_cast<std::uint32_t>(uu % static_cast<boost::ulong_long_type>(cpp_dec_float_elem_mask));
       uu      = static_cast<boost::ulong_long_type>(uu / static_cast<boost::ulong_long_type>(cpp_dec_float_elem_mask));
       ++i;
    }
@@ -2361,7 +2288,7 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::from_unsigned_long_long(c
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-boost::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_uv(boost::uint32_t* const u, const boost::uint32_t* const v, const boost::int32_t p)
+std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_uv(std::uint32_t* const u, const std::uint32_t* const v, const std::int32_t p)
 {
    //
    // There is a limit on how many limbs this algorithm can handle without dropping digits
@@ -2369,55 +2296,55 @@ boost::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_uv(bo
    //
    // FLOOR( (2^64 - 1) / (10^8 * 10^8) ) == 1844
    //
-   BOOST_STATIC_ASSERT_MSG(cpp_dec_float_elem_number < 1800, "Too many limbs in the data type for the multiplication algorithm - unsupported precision in cpp_dec_float.");
+   static_assert(cpp_dec_float_elem_number < 1800, "Too many limbs in the data type for the multiplication algorithm - unsupported precision in cpp_dec_float.");
 
-   boost::uint64_t carry = static_cast<boost::uint64_t>(0u);
+   std::uint64_t carry = static_cast<std::uint64_t>(0u);
 
-   for (boost::int32_t j = static_cast<boost::int32_t>(p - 1u); j >= static_cast<boost::int32_t>(0); j--)
+   for (std::int32_t j = static_cast<std::int32_t>(p - 1u); j >= static_cast<std::int32_t>(0); j--)
    {
-      boost::uint64_t sum = carry;
+      std::uint64_t sum = carry;
 
-      for (boost::int32_t i = j; i >= static_cast<boost::int32_t>(0); i--)
+      for (std::int32_t i = j; i >= static_cast<std::int32_t>(0); i--)
       {
-         sum += static_cast<boost::uint64_t>(u[j - i] * static_cast<boost::uint64_t>(v[i]));
+         sum += static_cast<std::uint64_t>(u[j - i] * static_cast<std::uint64_t>(v[i]));
       }
 
-      u[j]  = static_cast<boost::uint32_t>(sum % static_cast<boost::uint32_t>(cpp_dec_float_elem_mask));
-      carry = static_cast<boost::uint64_t>(sum / static_cast<boost::uint32_t>(cpp_dec_float_elem_mask));
+      u[j]  = static_cast<std::uint32_t>(sum % static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
+      carry = static_cast<std::uint64_t>(sum / static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
    }
 
-   return static_cast<boost::uint32_t>(carry);
+   return static_cast<std::uint32_t>(carry);
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-boost::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_n(boost::uint32_t* const u, boost::uint32_t n, const boost::int32_t p)
+std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_n(std::uint32_t* const u, std::uint32_t n, const std::int32_t p)
 {
-   boost::uint64_t carry = static_cast<boost::uint64_t>(0u);
+   std::uint64_t carry = static_cast<std::uint64_t>(0u);
 
    // Multiplication loop.
-   for (boost::int32_t j = p - 1; j >= static_cast<boost::int32_t>(0); j--)
+   for (std::int32_t j = p - 1; j >= static_cast<std::int32_t>(0); j--)
    {
-      const boost::uint64_t t = static_cast<boost::uint64_t>(carry + static_cast<boost::uint64_t>(u[j] * static_cast<boost::uint64_t>(n)));
-      carry                   = static_cast<boost::uint64_t>(t / static_cast<boost::uint32_t>(cpp_dec_float_elem_mask));
-      u[j]                    = static_cast<boost::uint32_t>(t - static_cast<boost::uint64_t>(static_cast<boost::uint32_t>(cpp_dec_float_elem_mask) * static_cast<boost::uint64_t>(carry)));
+      const std::uint64_t t = static_cast<std::uint64_t>(carry + static_cast<std::uint64_t>(u[j] * static_cast<std::uint64_t>(n)));
+      carry                   = static_cast<std::uint64_t>(t / static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
+      u[j]                    = static_cast<std::uint32_t>(t - static_cast<std::uint64_t>(static_cast<std::uint32_t>(cpp_dec_float_elem_mask) * static_cast<std::uint64_t>(carry)));
    }
 
-   return static_cast<boost::uint32_t>(carry);
+   return static_cast<std::uint32_t>(carry);
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-boost::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::div_loop_n(boost::uint32_t* const u, boost::uint32_t n, const boost::int32_t p)
+std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::div_loop_n(std::uint32_t* const u, std::uint32_t n, const std::int32_t p)
 {
-   boost::uint64_t prev = static_cast<boost::uint64_t>(0u);
+   std::uint64_t prev = static_cast<std::uint64_t>(0u);
 
-   for (boost::int32_t j = static_cast<boost::int32_t>(0); j < p; j++)
+   for (std::int32_t j = static_cast<std::int32_t>(0); j < p; j++)
    {
-      const boost::uint64_t t = static_cast<boost::uint64_t>(u[j] + static_cast<boost::uint64_t>(prev * static_cast<boost::uint32_t>(cpp_dec_float_elem_mask)));
-      u[j]                    = static_cast<boost::uint32_t>(t / n);
-      prev                    = static_cast<boost::uint64_t>(t - static_cast<boost::uint64_t>(n * static_cast<boost::uint64_t>(u[j])));
+      const std::uint64_t t = static_cast<std::uint64_t>(u[j] + static_cast<std::uint64_t>(prev * static_cast<std::uint32_t>(cpp_dec_float_elem_mask)));
+      u[j]                    = static_cast<std::uint32_t>(t / n);
+      prev                    = static_cast<std::uint64_t>(t - static_cast<std::uint64_t>(n * static_cast<std::uint64_t>(u[j])));
    }
 
-   return static_cast<boost::uint32_t>(prev);
+   return static_cast<std::uint32_t>(prev);
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -2426,8 +2353,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
    // Create a static const table of p^2 for -128 < p < +128.
    // Note: The size of this table must be odd-numbered and
    // symmetric about 0.
-   init.do_nothing();
-   static const boost::array<cpp_dec_float<Digits10, ExponentType, Allocator>, 255u> p2_data =
+   static const std::array<cpp_dec_float<Digits10, ExponentType, Allocator>, 255u> p2_data =
        {{cpp_dec_float("5.877471754111437539843682686111228389093327783860437607543758531392086297273635864257812500000000000e-39"),
          cpp_dec_float("1.175494350822287507968736537222245677818665556772087521508751706278417259454727172851562500000000000e-38"),
          cpp_dec_float("2.350988701644575015937473074444491355637331113544175043017503412556834518909454345703125000000000000e-38"),
@@ -2575,50 +2501,50 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
          cpp_dec_float(static_cast<boost::ulong_long_type>(131072)),
          cpp_dec_float(static_cast<boost::ulong_long_type>(262144)),
          cpp_dec_float(static_cast<boost::ulong_long_type>(524288)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 20u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 21u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 22u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 23u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 24u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 25u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 26u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 27u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 28u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 29u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 30u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 31u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 32u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 33u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 34u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 35u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 36u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 37u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 38u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 39u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 40u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 41u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 42u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 43u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 44u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 45u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 46u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 47u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 48u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 49u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 50u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 51u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 52u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 53u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 54u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 55u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 56u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 57u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 58u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 59u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 60u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 61u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 62u)),
-         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 63u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 20u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 21u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 22u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 23u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 24u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 25u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 26u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 27u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 28u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 29u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 30u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uL << 31u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 32u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 33u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 34u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 35u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 36u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 37u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 38u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 39u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 40u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 41u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 42u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 43u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 44u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 45u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 46u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 47u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 48u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 49u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 50u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 51u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 52u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 53u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 54u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 55u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 56u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 57u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 58u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 59u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 60u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 61u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 62u)),
+         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 63u)),
          cpp_dec_float("1.844674407370955161600000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
          cpp_dec_float("3.689348814741910323200000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
          cpp_dec_float("7.378697629483820646400000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
@@ -2698,7 +2624,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
       else
       {
          cpp_dec_float<Digits10, ExponentType, Allocator> t;
-         default_ops::detail::pow_imp(t, two(), p, mpl::true_());
+         default_ops::detail::pow_imp(t, two(), p, std::integral_constant<bool, true>());
          return t;
       }
    }
@@ -3014,7 +2940,7 @@ inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-inline typename disable_if<is_same<ExponentType, int> >::type eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x, int* e)
+inline typename std::enable_if< !std::is_same<ExponentType, int>::value>::type eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x, int* e)
 {
    ExponentType t;
    eval_frexp(result, x, &t);
@@ -3044,8 +2970,8 @@ inline std::size_t hash_value(const cpp_dec_float<Digits10, ExponentType, Alloca
 
 using boost::multiprecision::backends::cpp_dec_float;
 
-typedef number<cpp_dec_float<50> >  cpp_dec_float_50;
-typedef number<cpp_dec_float<100> > cpp_dec_float_100;
+using cpp_dec_float_50 = number<cpp_dec_float<50> > ;
+using cpp_dec_float_100 = number<cpp_dec_float<100> >;
 
 namespace detail {
 
@@ -3061,16 +2987,8 @@ struct transcendental_reduction_type<boost::multiprecision::backends::cpp_dec_fl
    // 
    // See ARGUMENT REDUCTION FOR HUGE ARGUMENTS. K C Ng.
    //
-   typedef boost::multiprecision::backends::cpp_dec_float<Digits10 * 3, ExponentType, Allocator> type;
+   using type = boost::multiprecision::backends::cpp_dec_float<Digits10 * 3, ExponentType, Allocator>;
 };
-
-#ifdef BOOST_NO_SFINAE_EXPR
-
-template <unsigned D1, class E1, class A1, unsigned D2, class E2, class A2>
-struct is_explicitly_convertible<cpp_dec_float<D1, E1, A1>, cpp_dec_float<D2, E2, A2> > : public mpl::true_
-{};
-
-#endif
 
 } // namespace detail
 
@@ -3082,89 +3000,86 @@ template <unsigned Digits10, class ExponentType, class Allocator, boost::multipr
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >
 {
  public:
-   BOOST_STATIC_CONSTEXPR bool is_specialized                      = true;
-   BOOST_STATIC_CONSTEXPR bool is_signed                           = true;
-   BOOST_STATIC_CONSTEXPR bool is_integer                          = false;
-   BOOST_STATIC_CONSTEXPR bool is_exact                            = false;
-   BOOST_STATIC_CONSTEXPR bool is_bounded                          = true;
-   BOOST_STATIC_CONSTEXPR bool is_modulo                           = false;
-   BOOST_STATIC_CONSTEXPR bool is_iec559                           = false;
-   BOOST_STATIC_CONSTEXPR int  digits                              = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
-   BOOST_STATIC_CONSTEXPR int  digits10                            = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
-   BOOST_STATIC_CONSTEXPR int  max_digits10                        = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_total_digits10;
-   BOOST_STATIC_CONSTEXPR ExponentType min_exponent                = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp;   // Type differs from int.
-   BOOST_STATIC_CONSTEXPR ExponentType min_exponent10              = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10; // Type differs from int.
-   BOOST_STATIC_CONSTEXPR ExponentType max_exponent                = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp;   // Type differs from int.
-   BOOST_STATIC_CONSTEXPR ExponentType max_exponent10              = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10; // Type differs from int.
-   BOOST_STATIC_CONSTEXPR int          radix                       = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
-   BOOST_STATIC_CONSTEXPR std::float_round_style round_style       = std::round_indeterminate;
-   BOOST_STATIC_CONSTEXPR bool                   has_infinity      = true;
-   BOOST_STATIC_CONSTEXPR bool                   has_quiet_NaN     = true;
-   BOOST_STATIC_CONSTEXPR bool                   has_signaling_NaN = false;
-   BOOST_STATIC_CONSTEXPR std::float_denorm_style has_denorm       = std::denorm_absent;
-   BOOST_STATIC_CONSTEXPR bool                    has_denorm_loss  = false;
-   BOOST_STATIC_CONSTEXPR bool                    traps            = false;
-   BOOST_STATIC_CONSTEXPR bool                    tinyness_before  = false;
+   static constexpr bool is_specialized                      = true;
+   static constexpr bool is_signed                           = true;
+   static constexpr bool is_integer                          = false;
+   static constexpr bool is_exact                            = false;
+   static constexpr bool is_bounded                          = true;
+   static constexpr bool is_modulo                           = false;
+   static constexpr bool is_iec559                           = false;
+   static constexpr int  digits                              = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
+   static constexpr int  digits10                            = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
+   static constexpr int  max_digits10                        = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_total_digits10;
+   static constexpr ExponentType min_exponent                = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp;   // Type differs from int.
+   static constexpr ExponentType min_exponent10              = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10; // Type differs from int.
+   static constexpr ExponentType max_exponent                = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp;   // Type differs from int.
+   static constexpr ExponentType max_exponent10              = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10; // Type differs from int.
+   static constexpr int          radix                       = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
+   static constexpr std::float_round_style round_style       = std::round_indeterminate;
+   static constexpr bool                   has_infinity      = true;
+   static constexpr bool                   has_quiet_NaN     = true;
+   static constexpr bool                   has_signaling_NaN = false;
+   static constexpr std::float_denorm_style has_denorm       = std::denorm_absent;
+   static constexpr bool                    has_denorm_loss  = false;
+   static constexpr bool                    traps            = false;
+   static constexpr bool                    tinyness_before  = false;
 
-   BOOST_STATIC_CONSTEXPR boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates>(min)() { return (boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::min)(); }
-   BOOST_STATIC_CONSTEXPR boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates>(max)() { return (boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::max)(); }
-   BOOST_STATIC_CONSTEXPR boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> lowest() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::zero(); }
-   BOOST_STATIC_CONSTEXPR boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> epsilon() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::eps(); }
-   BOOST_STATIC_CONSTEXPR boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> round_error() { return 0.5L; }
-   BOOST_STATIC_CONSTEXPR boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> infinity() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::inf(); }
-   BOOST_STATIC_CONSTEXPR boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> quiet_NaN() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::nan(); }
-   BOOST_STATIC_CONSTEXPR boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> signaling_NaN() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::zero(); }
-   BOOST_STATIC_CONSTEXPR boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> denorm_min() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::zero(); }
+   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates>(min)() { return (boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::min)(); }
+   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates>(max)() { return (boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::max)(); }
+   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> lowest() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::zero(); }
+   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> epsilon() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::eps(); }
+   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> round_error() { return 0.5L; }
+   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> infinity() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::inf(); }
+   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> quiet_NaN() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::nan(); }
+   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> signaling_NaN() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::zero(); }
+   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> denorm_min() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::zero(); }
 };
 
-#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::digits;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::digits10;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::max_digits10;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_signed;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_integer;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_exact;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::radix;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::min_exponent;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::min_exponent10;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::max_exponent;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::max_exponent10;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_infinity;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_quiet_NaN;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_signaling_NaN;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr float_denorm_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_denorm;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_denorm_loss;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_iec559;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_bounded;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_modulo;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::traps;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::tinyness_before;
+template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+constexpr float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::round_style;
 
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::digits;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::digits10;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::max_digits10;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_signed;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_integer;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_exact;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::radix;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::min_exponent;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::min_exponent10;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::max_exponent;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::max_exponent10;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_infinity;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_quiet_NaN;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_signaling_NaN;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_denorm;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_denorm_loss;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_iec559;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_bounded;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::is_modulo;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::traps;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::tinyness_before;
-template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::round_style;
-
-#endif
 } // namespace std
 
 namespace boost {
@@ -3177,16 +3092,16 @@ struct precision<boost::multiprecision::number<boost::multiprecision::cpp_dec_fl
 {
    // Define a local copy of cpp_dec_float_digits10 because it might differ
    // from the template parameter Digits10 for small or large digit counts.
-   static const boost::int32_t cpp_dec_float_digits10 = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
+   static constexpr const std::int32_t cpp_dec_float_digits10 = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
 
-   typedef typename Policy::precision_type                            precision_type;
-   typedef digits2<((cpp_dec_float_digits10 + 1LL) * 1000LL) / 301LL> digits_2;
-   typedef typename mpl::if_c<
+   using precision_type = typename Policy::precision_type                           ;
+   using digits_2 = digits2<((cpp_dec_float_digits10 + 1LL) * 1000LL) / 301LL>;
+   using type = typename std::conditional<
        ((digits_2::value <= precision_type::value) || (Policy::precision_type::value <= 0)),
        // Default case, full precision for RealType:
        digits_2,
        // User customized precision:
-       precision_type>::type type;
+       precision_type>::type;
 };
 
 }

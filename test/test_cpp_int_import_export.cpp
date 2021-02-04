@@ -53,7 +53,7 @@ T generate_random()
 }
 
 template <class T>
-void test_round_trip_neg(T val, const boost::mpl::true_&)
+void test_round_trip_neg(T val, const std::integral_constant<bool, true>&)
 {
    // Try some negative values:
    std::vector<unsigned char> cv;
@@ -65,7 +65,7 @@ void test_round_trip_neg(T val, const boost::mpl::true_&)
 }
 
 template <class T>
-void test_round_trip_neg(const T&, const boost::mpl::false_&)
+void test_round_trip_neg(const T&, const std::integral_constant<bool, false>&)
 {
 }
 
@@ -96,35 +96,35 @@ void test_round_trip(T val)
    import_bits(newval, cv.begin(), cv.end(), 8, true);
    BOOST_CHECK_EQUAL(val, newval);
 
-   std::vector<boost::uintmax_t> bv;
-   export_bits(val, std::back_inserter(bv), std::numeric_limits<boost::uintmax_t>::digits);
+   std::vector<std::uintmax_t> bv;
+   export_bits(val, std::back_inserter(bv), std::numeric_limits<std::uintmax_t>::digits);
    import_bits(newval, bv.begin(), bv.end());
    BOOST_CHECK_EQUAL(val, newval);
    // Should get the same value if we reverse the values:
    std::reverse(bv.begin(), bv.end());
    newval = 0;
-   import_bits(newval, bv.begin(), bv.end(), std::numeric_limits<boost::uintmax_t>::digits, false);
+   import_bits(newval, bv.begin(), bv.end(), std::numeric_limits<std::uintmax_t>::digits, false);
    BOOST_CHECK_EQUAL(val, newval);
    // Also try importing via pointers as these may memcpy:
    newval = 0;
-   import_bits(newval, &bv[0], &bv[0] + bv.size(), std::numeric_limits<boost::uintmax_t>::digits, false);
+   import_bits(newval, &bv[0], &bv[0] + bv.size(), std::numeric_limits<std::uintmax_t>::digits, false);
    BOOST_CHECK_EQUAL(val, newval);
 
    bv.clear();
-   export_bits(val, std::back_inserter(bv), std::numeric_limits<boost::uintmax_t>::digits, false);
-   import_bits(newval, bv.begin(), bv.end(), std::numeric_limits<boost::uintmax_t>::digits, false);
+   export_bits(val, std::back_inserter(bv), std::numeric_limits<std::uintmax_t>::digits, false);
+   import_bits(newval, bv.begin(), bv.end(), std::numeric_limits<std::uintmax_t>::digits, false);
    BOOST_CHECK_EQUAL(val, newval);
    //
    // Try with an unconventional number of bits, to model some machine with guard bits:
    //
    bv.clear();
-   export_bits(val, std::back_inserter(bv), std::numeric_limits<boost::uintmax_t>::digits - 3);
-   import_bits(newval, bv.begin(), bv.end(), std::numeric_limits<boost::uintmax_t>::digits - 3);
+   export_bits(val, std::back_inserter(bv), std::numeric_limits<std::uintmax_t>::digits - 3);
+   import_bits(newval, bv.begin(), bv.end(), std::numeric_limits<std::uintmax_t>::digits - 3);
    BOOST_CHECK_EQUAL(val, newval);
 
    bv.clear();
-   export_bits(val, std::back_inserter(bv), std::numeric_limits<boost::uintmax_t>::digits - 3, false);
-   import_bits(newval, bv.begin(), bv.end(), std::numeric_limits<boost::uintmax_t>::digits - 3, false);
+   export_bits(val, std::back_inserter(bv), std::numeric_limits<std::uintmax_t>::digits - 3, false);
+   import_bits(newval, bv.begin(), bv.end(), std::numeric_limits<std::uintmax_t>::digits - 3, false);
    BOOST_CHECK_EQUAL(val, newval);
 
    cv.clear();
@@ -137,7 +137,7 @@ void test_round_trip(T val)
    import_bits(newval, cv.begin(), cv.end(), 6, false);
    BOOST_CHECK_EQUAL(val, newval);
 
-   test_round_trip_neg(val, boost::mpl::bool_<std::numeric_limits<T>::is_signed>());
+   test_round_trip_neg(val, std::integral_constant<bool, std::numeric_limits<T>::is_signed>());
 }
 
 template <class T>

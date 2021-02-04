@@ -5,8 +5,17 @@
 
 #include "sf_performance.hpp"
 
+#ifdef __clang__
+#if __has_feature(address_sanitizer) || __has_feature(memory_sanitizer)
+// memory sanitizer is incompatible with this test:
+# define DISABLE_THIS_TEST
+#endif
+#endif
+
 boost::atomic<unsigned>                                                     allocation_count(0);
 std::map<std::string, std::map<std::string, std::pair<double, unsigned> > > result_table;
+
+#ifndef DISABLE_THIS_TEST
 
 void* (*alloc_func_ptr)(size_t);
 void* (*realloc_func_ptr)(void*, size_t, size_t);
@@ -95,3 +104,7 @@ int main()
 
    print_quickbook_tables();
 }
+
+#else
+int main() { return 0; }
+#endif

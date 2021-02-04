@@ -9,7 +9,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/functional/hash_fwd.hpp>
 #include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MSVC
@@ -28,45 +28,44 @@ namespace backends {
 template <class IntBackend>
 struct rational_adaptor
 {
-   typedef number<IntBackend>            integer_type;
-   typedef boost::rational<integer_type> rational_type;
+   using integer_type = number<IntBackend>           ;
+   using rational_type = boost::rational<integer_type>;
 
-   typedef typename IntBackend::signed_types   signed_types;
-   typedef typename IntBackend::unsigned_types unsigned_types;
-   typedef typename IntBackend::float_types    float_types;
+   using signed_types = typename IntBackend::signed_types  ;
+   using unsigned_types = typename IntBackend::unsigned_types;
+   using float_types = typename IntBackend::float_types   ;
 
-   rational_adaptor() BOOST_MP_NOEXCEPT_IF(noexcept(rational_type())) {}
-   rational_adaptor(const rational_adaptor& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<rational_type&>() = std::declval<const rational_type&>()))
+   rational_adaptor() noexcept(noexcept(rational_type())) {}
+   rational_adaptor(const rational_adaptor& o) noexcept(noexcept(std::declval<rational_type&>() = std::declval<const rational_type&>()))
    {
       m_value = o.m_value;
    }
-   rational_adaptor(const IntBackend& o) BOOST_MP_NOEXCEPT_IF(noexcept(rational_type(std::declval<const IntBackend&>()))) : m_value(o) {}
+   rational_adaptor(const IntBackend& o) noexcept(noexcept(rational_type(std::declval<const IntBackend&>()))) : m_value(o) {}
 
    template <class U>
-   rational_adaptor(const U& u, typename enable_if_c<is_convertible<U, IntBackend>::value>::type* = 0)
+   rational_adaptor(const U& u, typename std::enable_if<std::is_convertible<U, IntBackend>::value>::type* = 0)
        : m_value(static_cast<integer_type>(u)) {}
    template <class U>
    explicit rational_adaptor(const U& u,
-                             typename enable_if_c<
-                                 boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_convertible<U, IntBackend>::value>::type* = 0)
+                             typename std::enable_if<
+                                 boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !std::is_convertible<U, IntBackend>::value>::type* = 0)
        : m_value(IntBackend(u)) {}
    template <class U>
-   typename enable_if_c<(boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_arithmetic<U>::value), rational_adaptor&>::type operator=(const U& u)
+   typename std::enable_if<(boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !boost::multiprecision::detail::is_arithmetic<U>::value), rational_adaptor&>::type operator=(const U& u)
    {
       m_value = IntBackend(u);
       return *this;
    }
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-   rational_adaptor(rational_adaptor&& o) BOOST_MP_NOEXCEPT_IF(noexcept(rational_type(std::declval<rational_type>()))) : m_value(static_cast<rational_type&&>(o.m_value))
+   // rvalues:
+   rational_adaptor(rational_adaptor&& o) noexcept(noexcept(rational_type(std::declval<rational_type>()))) : m_value(static_cast<rational_type&&>(o.m_value))
    {}
-   rational_adaptor(IntBackend&& o) BOOST_MP_NOEXCEPT_IF(noexcept(rational_type(std::declval<IntBackend>()))) : m_value(static_cast<IntBackend&&>(o)) {}
-   rational_adaptor& operator=(rational_adaptor&& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<rational_type&>() = std::declval<rational_type>()))
+   rational_adaptor(IntBackend&& o) noexcept(noexcept(rational_type(std::declval<IntBackend>()))) : m_value(static_cast<IntBackend&&>(o)) {}
+   rational_adaptor& operator=(rational_adaptor&& o) noexcept(noexcept(std::declval<rational_type&>() = std::declval<rational_type>()))
    {
       m_value = static_cast<rational_type&&>(o.m_value);
       return *this;
    }
-#endif
    rational_adaptor& operator=(const rational_adaptor& o)
    {
       m_value = o.m_value;
@@ -78,13 +77,13 @@ struct rational_adaptor
       return *this;
    }
    template <class Int>
-   typename enable_if<is_integral<Int>, rational_adaptor&>::type operator=(Int i)
+   typename std::enable_if<boost::multiprecision::detail::is_integral<Int>::value, rational_adaptor&>::type operator=(Int i)
    {
       m_value = i;
       return *this;
    }
    template <class Float>
-   typename enable_if<is_floating_point<Float>, rational_adaptor&>::type operator=(Float i)
+   typename std::enable_if<std::is_floating_point<Float>::value, rational_adaptor&>::type operator=(Float i)
    {
       int   e;
       Float f = std::frexp(i, &e);
@@ -167,12 +166,12 @@ struct rational_adaptor
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
    template <class Arithmatic>
-   typename enable_if_c<is_arithmetic<Arithmatic>::value && !is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
+   typename std::enable_if<boost::multiprecision::detail::is_arithmetic<Arithmatic>::value && !std::is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
    {
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
    }
    template <class Arithmatic>
-   typename enable_if_c<is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
+   typename std::enable_if<std::is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i) const
    {
       rational_adaptor r;
       r = i;
@@ -182,7 +181,7 @@ struct rational_adaptor
    const rational_type& data() const { return m_value; }
 
    template <class Archive>
-   void serialize(Archive& ar, const mpl::true_&)
+   void serialize(Archive& ar, const std::integral_constant<bool, true>&)
    {
       // Saving
       integer_type n(m_value.numerator()), d(m_value.denominator());
@@ -190,7 +189,7 @@ struct rational_adaptor
       ar&          boost::make_nvp("denominator", d);
    }
    template <class Archive>
-   void serialize(Archive& ar, const mpl::false_&)
+   void serialize(Archive& ar, const std::integral_constant<bool, false>&)
    {
       // Loading
       integer_type n, d;
@@ -201,8 +200,9 @@ struct rational_adaptor
    template <class Archive>
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
-      typedef typename Archive::is_saving tag;
-      serialize(ar, tag());
+      using tag = typename Archive::is_saving;
+      using saving_tag = std::integral_constant<bool, tag::value>;
+      serialize(ar, saving_tag());
    }
 
  private:
@@ -236,7 +236,7 @@ inline void eval_divide(rational_adaptor<IntBackend>& result, const rational_ada
 }
 
 template <class R, class IntBackend>
-inline typename enable_if_c<number_category<R>::value == number_kind_floating_point>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+inline typename std::enable_if<number_category<R>::value == number_kind_floating_point>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
    //
    // The generic conversion is as good as anything we can write here:
@@ -245,9 +245,9 @@ inline typename enable_if_c<number_category<R>::value == number_kind_floating_po
 }
 
 template <class R, class IntBackend>
-inline typename enable_if_c<(number_category<R>::value != number_kind_integer) && (number_category<R>::value != number_kind_floating_point)>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+inline typename std::enable_if<(number_category<R>::value != number_kind_integer) && (number_category<R>::value != number_kind_floating_point)>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
-   typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
+   using comp_t = typename component_type<number<rational_adaptor<IntBackend> > >::type;
    comp_t                                                                        num(backend.data().numerator());
    comp_t                                                                        denom(backend.data().denominator());
    *result = num.template convert_to<R>();
@@ -255,9 +255,9 @@ inline typename enable_if_c<(number_category<R>::value != number_kind_integer) &
 }
 
 template <class R, class IntBackend>
-inline typename enable_if_c<number_category<R>::value == number_kind_integer>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+inline typename std::enable_if<number_category<R>::value == number_kind_integer>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
-   typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
+   using comp_t = typename component_type<number<rational_adaptor<IntBackend> > >::type;
    comp_t                                                                        t = backend.data().numerator();
    t /= backend.data().denominator();
    *result = t.template convert_to<R>();
@@ -297,7 +297,7 @@ struct expression_template_default<backends::rational_adaptor<IntBackend> > : pu
 {};
 
 template <class IntBackend>
-struct number_category<backends::rational_adaptor<IntBackend> > : public mpl::int_<number_kind_rational>
+struct number_category<backends::rational_adaptor<IntBackend> > : public std::integral_constant<int, number_kind_rational>
 {};
 
 using boost::multiprecision::backends::rational_adaptor;
@@ -305,7 +305,7 @@ using boost::multiprecision::backends::rational_adaptor;
 template <class Backend, expression_template_option ExpressionTemplates>
 struct component_type<number<backends::rational_adaptor<Backend>, ExpressionTemplates> >
 {
-   typedef number<Backend, ExpressionTemplates> type;
+   using type = number<Backend, ExpressionTemplates>;
 };
 
 template <class IntBackend, expression_template_option ET>
@@ -319,18 +319,6 @@ inline number<IntBackend, ET> denominator(const number<rational_adaptor<IntBacke
    return val.backend().data().denominator();
 }
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
-namespace detail {
-
-template <class U, class IntBackend>
-struct is_explicitly_convertible<U, rational_adaptor<IntBackend> > : public is_explicitly_convertible<U, IntBackend>
-{};
-
-} // namespace detail
-
-#endif
-
 }} // namespace boost::multiprecision
 
 namespace std {
@@ -338,31 +326,27 @@ namespace std {
 template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> > : public std::numeric_limits<boost::multiprecision::number<IntBackend, ExpressionTemplates> >
 {
-   typedef std::numeric_limits<boost::multiprecision::number<IntBackend> >                     base_type;
-   typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend> > number_type;
+   using base_type = std::numeric_limits<boost::multiprecision::number<IntBackend> >                    ;
+   using number_type = boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend> >;
 
  public:
-   BOOST_STATIC_CONSTEXPR bool is_integer = false;
-   BOOST_STATIC_CONSTEXPR bool is_exact   = true;
-   BOOST_STATIC_CONSTEXPR      number_type(min)() { return (base_type::min)(); }
-   BOOST_STATIC_CONSTEXPR      number_type(max)() { return (base_type::max)(); }
-   BOOST_STATIC_CONSTEXPR number_type lowest() { return -(max)(); }
-   BOOST_STATIC_CONSTEXPR number_type epsilon() { return base_type::epsilon(); }
-   BOOST_STATIC_CONSTEXPR number_type round_error() { return epsilon() / 2; }
-   BOOST_STATIC_CONSTEXPR number_type infinity() { return base_type::infinity(); }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() { return base_type::quiet_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() { return base_type::signaling_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type denorm_min() { return base_type::denorm_min(); }
+   static constexpr bool is_integer = false;
+   static constexpr bool is_exact   = true;
+   static constexpr      number_type(min)() { return (base_type::min)(); }
+   static constexpr      number_type(max)() { return (base_type::max)(); }
+   static constexpr number_type lowest() { return -(max)(); }
+   static constexpr number_type epsilon() { return base_type::epsilon(); }
+   static constexpr number_type round_error() { return epsilon() / 2; }
+   static constexpr number_type infinity() { return base_type::infinity(); }
+   static constexpr number_type quiet_NaN() { return base_type::quiet_NaN(); }
+   static constexpr number_type signaling_NaN() { return base_type::signaling_NaN(); }
+   static constexpr number_type denorm_min() { return base_type::denorm_min(); }
 };
 
-#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
-
 template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_integer;
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_integer;
 template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_exact;
-
-#endif
+constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_exact;
 
 } // namespace std
 

@@ -15,15 +15,15 @@ int main()
    if (ui != 256)
       return 1;
 
-   boost::uintmax_t m(1), n;
-   m <<= std::numeric_limits<boost::uintmax_t>::digits - 1;
+   std::uintmax_t m(1), n;
+   m <<= std::numeric_limits<std::uintmax_t>::digits - 1;
    qf = m;
-   n  = qf.convert_to<boost::uintmax_t>();
+   n  = qf.convert_to<std::uintmax_t>();
    if (m != n)
       return 2;
    qf *= 2;
-   n = qf.convert_to<boost::uintmax_t>();
-   m = (std::numeric_limits<boost::uintmax_t>::max)();
+   n = qf.convert_to<std::uintmax_t>();
+   m = (std::numeric_limits<std::uintmax_t>::max)();
    if (m != n)
       return 3;
 
@@ -31,15 +31,15 @@ int main()
    int si = qf.convert_to<int>();
    if (si != 256)
       return 4;
-   boost::intmax_t sm(1), sn;
-   sm <<= std::numeric_limits<boost::intmax_t>::digits - 1;
+   std::intmax_t sm(1), sn;
+   sm <<= std::numeric_limits<std::intmax_t>::digits - 1;
    qf = sm;
-   sn = qf.convert_to<boost::intmax_t>();
+   sn = qf.convert_to<std::intmax_t>();
    if (sm != sn)
       return 5;
    qf *= 2;
-   sn = qf.convert_to<boost::intmax_t>();
-   sm = (std::numeric_limits<boost::intmax_t>::max)();
+   sn = qf.convert_to<std::intmax_t>();
+   sm = (std::numeric_limits<std::intmax_t>::max)();
    if (sm != sn)
       return 6;
 
@@ -49,15 +49,15 @@ int main()
    if (si != -256)
       return 7;
    sm = 1;
-   sm <<= std::numeric_limits<boost::intmax_t>::digits - 1;
+   sm <<= std::numeric_limits<std::intmax_t>::digits - 1;
    sm = -sm;
    qf = sm;
-   sn = qf.convert_to<boost::intmax_t>();
+   sn = qf.convert_to<std::intmax_t>();
    if (sm != sn)
       return 8;
    qf *= 2;
-   sn = qf.convert_to<boost::intmax_t>();
-   sm = (std::numeric_limits<boost::intmax_t>::min)();
+   sn = qf.convert_to<std::intmax_t>();
+   sm = (std::numeric_limits<std::intmax_t>::min)();
    if (sm != sn)
       return 9;
 

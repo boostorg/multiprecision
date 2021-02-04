@@ -11,7 +11,7 @@ namespace boost { namespace multiprecision { namespace detail {
 template <class T>
 struct transcendental_reduction_type
 {
-   typedef T type;
+   using type = T;
 };
 
 }

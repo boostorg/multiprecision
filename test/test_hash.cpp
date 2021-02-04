@@ -44,17 +44,13 @@ void test()
    std::size_t t1  = boost::hash<T>()(val);
    BOOST_CHECK(t1);
 
-#ifndef BOOST_NO_CXX11_HDR_FUNCTIONAL
    std::size_t t2 = std::hash<T>()(val);
    BOOST_CHECK_EQUAL(t1, t2);
-#endif
    val            = -23;
    std::size_t t3 = boost::hash<T>()(val);
    BOOST_CHECK_NE(t1, t3);
-#ifndef BOOST_NO_CXX11_HDR_FUNCTIONAL
    t2 = std::hash<T>()(val);
    BOOST_CHECK_EQUAL(t3, t2);
-#endif
 }
 
 int main()

@@ -14,6 +14,18 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include "test.hpp"
 
+#ifdef __clang__
+#if __has_feature(address_sanitizer) || __has_feature(memory_sanitizer)
+// memory sanitizer is incompatible with this test:
+# define DISABLE_THIS_TEST
+#endif
+#endif
+#ifdef BOOST_CI_ASAN_BUILD
+#define DISABLE_THIS_TEST
+#endif
+
+#ifndef DISABLE_THIS_TEST
+
 unsigned alloc_count = 0;
 void* operator new(std::size_t count)
 {
@@ -205,3 +217,7 @@ int main()
 
    return boost::report_errors();
 }
+
+#else
+int main(){ return 0; }
+#endif

@@ -75,8 +75,8 @@ int main()
 
    test<mpz_int>();
    test<number<gmp_int, et_off> >();
-   test<boost::uint64_t>();
-   test<boost::uint32_t>();
+   test<std::uint64_t>();
+   test<std::uint32_t>();
 
    test<cpp_int>();
    test<number<cpp_int_backend<64, 64, unsigned_magnitude, checked, void>, et_off> >();
