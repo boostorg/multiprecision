@@ -659,7 +659,7 @@ struct expression<tag, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!(is_number<T>::value || std::is_constructible<T const&, result_type>::value || !std::is_constructible<T, result_type>::value), int>::type = 0
+             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -810,7 +810,7 @@ struct expression<terminal, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!(is_number<T>::value || std::is_constructible<T const&, result_type>::value || !std::is_constructible<T, result_type>::value), int>::type = 0
+             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -966,7 +966,7 @@ struct expression<tag, Arg1, Arg2, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!(is_number<T>::value || std::is_constructible<T const&, result_type>::value || !std::is_constructible<T, result_type>::value), int>::type = 0
+             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1132,7 +1132,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!(is_number<T>::value || std::is_constructible<T const&, result_type>::value || !std::is_constructible<T, result_type>::value), int>::type = 0
+             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1306,7 +1306,7 @@ struct expression
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!(is_number<T>::value || std::is_constructible<T const&, result_type>::value || !std::is_constructible<T, result_type>::value), int>::type = 0
+             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
