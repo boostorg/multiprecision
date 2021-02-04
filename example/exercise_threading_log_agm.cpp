@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//      Copyright Christopher Kormanyos 2020.
+//      Copyright Christopher Kormanyos 2020 - 2021.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
@@ -204,19 +204,18 @@ FloatingPointType pown(const FloatingPointType& b, const UnsignedIntegralType& p
 
 const std::vector<std::uint32_t>& primes()
 {
-  static const std::vector<std::uint32_t> my_primes =
-  []() -> std::vector<std::uint32_t>
+  static std::vector<std::uint32_t> my_primes;
+
+  if(my_primes.empty())
   {
-    std::vector<std::uint32_t> local_primes(10000U);
+    my_primes.resize(10000U);
 
     // Get exactly 10,000 primes.
-    for(auto i = 0U; i < local_primes.size(); ++i)
+    for(std::size_t i = 0U; i < my_primes.size(); ++i)
     {
-      local_primes[i] = boost::math::prime(i);
+      my_primes[i] = boost::math::prime((unsigned int) i);
     }
-
-    return local_primes;
-  }();
+  }
 
   return my_primes;
 }
@@ -320,7 +319,21 @@ bool log_agm_concurrent(float& calculation_time)
     [&log_results, &log_control, &concurrent_log_agm_count, &log_agm_lock](std::size_t i)
     {
       while(log_agm_lock.test_and_set()) { ; }
+      const FloatingPointType dx = (FloatingPointType(1U) / (boost::multiprecision::exercise_threading::detail::primes()[i]));
+      log_agm_lock.clear();
+
+      const FloatingPointType  x = boost::math::constants::catalan<FloatingPointType>() + dx;
+
+      const FloatingPointType lr = boost::multiprecision::exercise_threading::log(x);
+      const FloatingPointType lc = boost::multiprecision::log(x);
+
+      while(log_agm_lock.test_and_set()) { ; }
+
+      log_results[i] = lr;
+      log_control[i] = lc;
+
       ++concurrent_log_agm_count;
+
       if((concurrent_log_agm_count % 100U) == 0U)
       {
         std::cout << "log agm concurrent at index "
@@ -334,16 +347,8 @@ bool log_agm_concurrent(float& calculation_time)
                   << "%."
                   << "\r";
       }
+
       log_agm_lock.clear();
-
-      const FloatingPointType dx = (FloatingPointType(1U) / (boost::multiprecision::exercise_threading::detail::primes()[i]));
-      const FloatingPointType  x = boost::math::constants::catalan<FloatingPointType>() + dx;
-
-      const FloatingPointType lr = boost::multiprecision::exercise_threading::log(x);
-      const FloatingPointType lc = boost::multiprecision::log(x);
-
-      log_results[i] = lr;
-      log_control[i] = lc;
     }
   );
 
@@ -355,13 +360,15 @@ bool log_agm_concurrent(float& calculation_time)
 
   bool result_is_ok = true;
 
+  const FloatingPointType tol = std::numeric_limits<FloatingPointType>::epsilon() * 1000000U;
+
   for(std::size_t i = 0U; i < log_results.size(); ++i)
   {
     using std::fabs;
 
     const FloatingPointType close_fraction = fabs(1 - (log_results[i] / log_control[i]));
 
-    result_is_ok &= (close_fraction < std::numeric_limits<FloatingPointType>::epsilon() * 1000000U);
+    result_is_ok &= (close_fraction < tol);
   }
 
   std::cout << std::boolalpha << result_is_ok << std::endl;
@@ -377,13 +384,17 @@ bool log_agm_sequential(float& calculation_time)
   std::vector<FloatingPointType> log_results(count);
   std::vector<FloatingPointType> log_control(count);
 
-  std::atomic_flag log_agm_lock = ATOMIC_FLAG_INIT;
-
   const std::clock_t start = std::clock();
 
   for(std::size_t i = 0U; i < log_results.size(); ++i)
   {
     const std::size_t sequential_log_agm_count = i + 1U;
+
+    const FloatingPointType dx = (FloatingPointType(1U) / (boost::multiprecision::exercise_threading::detail::primes()[i]));
+    const FloatingPointType  x = boost::math::constants::catalan<FloatingPointType>() + dx;
+
+    log_results[i] = boost::multiprecision::exercise_threading::log(x);
+    log_control[i] = boost::multiprecision::log(x);
 
     if((sequential_log_agm_count % 100U) == 0U)
     {
@@ -398,12 +409,6 @@ bool log_agm_sequential(float& calculation_time)
                 << "%."
                 << "\r";
     }
-
-    const FloatingPointType dx = (FloatingPointType(1U) / (boost::multiprecision::exercise_threading::detail::primes()[i]));
-    const FloatingPointType  x = boost::math::constants::catalan<FloatingPointType>() + dx;
-
-    log_results[i] = boost::multiprecision::exercise_threading::log(x);
-    log_control[i] = boost::multiprecision::log(x);
   }
 
   calculation_time = static_cast<float>(std::clock() - start) / static_cast<float>(CLOCKS_PER_SEC);
@@ -414,13 +419,15 @@ bool log_agm_sequential(float& calculation_time)
 
   bool result_is_ok = true;
 
+  const FloatingPointType tol = std::numeric_limits<FloatingPointType>::epsilon() * 1000000U;
+
   for(std::size_t i = 0U; i < log_results.size(); ++i)
   {
     using std::fabs;
 
     const FloatingPointType close_fraction = fabs(1 - (log_results[i] / log_control[i]));
 
-    result_is_ok &= (close_fraction < std::numeric_limits<FloatingPointType>::epsilon() * 1000000U);
+    result_is_ok &= (close_fraction < tol);
   }
 
   std::cout << std::boolalpha << result_is_ok << std::endl;
