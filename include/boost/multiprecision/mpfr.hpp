@@ -18,6 +18,8 @@
 #include <mpfr.h>
 #include <cmath>
 #include <algorithm>
+#include <utility>
+#include <type_traits>
 
 #ifndef BOOST_MULTIPRECISION_MPFR_DEFAULT_PRECISION
 #define BOOST_MULTIPRECISION_MPFR_DEFAULT_PRECISION 20
@@ -1796,7 +1798,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfr_flo
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>;
    template <int N>
-   static inline const result_type& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        has_init = false;
@@ -1807,7 +1809,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfr_flo
       }
       return result;
    }
-   static inline const result_type get(const boost::integral_constant<int, 0>&)
+   static inline const result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfr_const_pi(result.backend().data(), GMP_RNDN);
@@ -1819,7 +1821,7 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfr
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>;
    template <int N>
-   static inline const result_type& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        init = false;
@@ -1830,7 +1832,7 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfr
       }
       return result;
    }
-   static inline const result_type get(const boost::integral_constant<int, 0>&)
+   static inline const result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfr_const_log2(result.backend().data(), GMP_RNDN);
@@ -1842,7 +1844,7 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfr_
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>;
    template <int N>
-   static inline const result_type& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        init = false;
@@ -1853,7 +1855,7 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfr_
       }
       return result;
    }
-   static inline const result_type get(const boost::integral_constant<int, 0>&)
+   static inline const result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfr_const_euler(result.backend().data(), GMP_RNDN);
@@ -1865,7 +1867,7 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>;
    template <int N>
-   static inline const result_type& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        init = false;
@@ -1876,7 +1878,7 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
       }
       return result;
    }
-   static inline const result_type get(const boost::integral_constant<int, 0>&)
+   static inline const result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfr_const_catalan(result.backend().data(), GMP_RNDN);
@@ -1889,7 +1891,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::debug_ad
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>;
    template <int N>
-   static inline const result_type& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        has_init = false;
@@ -1900,7 +1902,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::debug_ad
       }
       return result;
    }
-   static inline const result_type get(const boost::integral_constant<int, 0>&)
+   static inline const result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfr_const_pi(result.backend().value().data(), GMP_RNDN);
@@ -1912,7 +1914,7 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::debu
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>;
    template <int N>
-   static inline const result_type& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        init = false;
@@ -1923,7 +1925,7 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::debu
       }
       return result;
    }
-   static inline const result_type get(const boost::integral_constant<int, 0>&)
+   static inline const result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfr_const_log2(result.backend().value().data(), GMP_RNDN);
@@ -1935,7 +1937,7 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::debug
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>;
    template <int N>
-   static inline const result_type& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        init = false;
@@ -1946,7 +1948,7 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::debug
       }
       return result;
    }
-   static inline const result_type get(const boost::integral_constant<int, 0>&)
+   static inline const result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfr_const_euler(result.backend().value().data(), GMP_RNDN);
@@ -1958,7 +1960,7 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::deb
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>;
    template <int N>
-   static inline const result_type& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        init = false;
@@ -1969,7 +1971,7 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::deb
       }
       return result;
    }
-   static inline const result_type get(const boost::integral_constant<int, 0>&)
+   static inline const result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfr_const_catalan(result.backend().value().data(), GMP_RNDN);
