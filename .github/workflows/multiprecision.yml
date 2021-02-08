@@ -6,7 +6,7 @@
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
 name: multiprecision
-on: [push]
+on: [ push, pull_request ]
 jobs:
   ubuntu-focal:
     runs-on: ubuntu-20.04
