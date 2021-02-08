@@ -395,8 +395,14 @@ inline void eval_sqrt(float128_backend& result, const float128_backend& arg)
 {
    result.value() = sqrtq(arg.value());
 }
+
 inline void eval_rsqrt(float128_backend& result, const float128_backend& arg)
 {
+#if (LDBL_MANT_DIG > 100)
+   // GCC can't mix and match __float128 and quad precision long double
+   // error: __float128 and long double cannot be used in the same expression
+   result.value() = 1 / sqrtq(arg.value());
+#else
    using std::sqrt;
    if (arg.value() < std::numeric_limits<long double>::denorm_min() || arg.value() > (std::numeric_limits<long double>::max)()) {
       result.value() = 1/sqrtq(arg.value());
@@ -409,12 +415,13 @@ inline void eval_rsqrt(float128_backend& result, const float128_backend& arg)
        // If the long double is the same as a double, then we need two Newton iterations:
        xk.value() = xk.value() + xk.value()*(1-arg.value()*xk.value()*xk.value())/2;
        result.value() = xk.value() + xk.value()*(1-arg.value()*xk.value()*xk.value())/2;
-       return;
    }
-
-   // 80 bit long double only needs a single iteration to produce ~2ULPs.
-   result.value() = xk.value() + xk.value()*(1-arg.value()*xk.value()*xk.value())/2;
-   return;
+   else
+   {
+      // 80 bit long double only needs a single iteration to produce ~2ULPs.
+      result.value() = xk.value() + xk.value() * (1 - arg.value() * xk.value() * xk.value()) / 2;
+   }
+#endif
 }
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
 inline BOOST_MP_CXX14_CONSTEXPR 
