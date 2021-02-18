@@ -32,6 +32,9 @@
 #ifdef BOOST_NO_CXX11_HDR_ARRAY
 #error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_ARRAY being set"
 #endif
+#ifdef BOOST_NO_CXX11_HDR_TYPE_TRAITS
+#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_TYPE_TRAITS being set"
+#endif
 #ifdef BOOST_NO_CXX11_ALLOCATOR
 #error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_ALLOCATOR being set"
 #endif

@@ -5,6 +5,7 @@
 
 import modules ;
 import path ;
+import ../../config/checks/config : requires ;
 
 local gmp_path = [ modules.peek : GMP_PATH ] ;
 local mpfr_path = [ modules.peek : MPFR_PATH ] ;
