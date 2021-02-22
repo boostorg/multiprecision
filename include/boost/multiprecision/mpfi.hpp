@@ -6,9 +6,13 @@
 #ifndef BOOST_MATH_BN_MPFI_HPP
 #define BOOST_MATH_BN_MPFI_HPP
 
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <type_traits>
+
 #include <boost/multiprecision/number.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <cstdint>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
@@ -18,8 +22,6 @@
 #include <boost/math/constants/constants.hpp>
 #include <boost/functional/hash_fwd.hpp>
 #include <mpfi.h>
-#include <cmath>
-#include <algorithm>
 
 #ifndef BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION
 #define BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION 20
@@ -1441,7 +1443,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfi_flo
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>;
    template <int N>
-   static inline const result_type& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        has_init = false;
@@ -1452,7 +1454,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfi_flo
       }
       return result;
    }
-   static inline result_type get(const boost::integral_constant<int, 0>&)
+   static inline result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfi_const_pi(result.backend().data());
@@ -1464,7 +1466,7 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfi
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>;
    template <int N>
-   static inline const result_type& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        has_init = false;
@@ -1475,7 +1477,7 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfi
       }
       return result;
    }
-   static inline result_type get(const boost::integral_constant<int, 0>&)
+   static inline result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfi_const_log2(result.backend().data());
@@ -1487,7 +1489,7 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfi_
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>;
    template <int N>
-   static inline result_type const& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        has_init = false;
@@ -1498,7 +1500,7 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfi_
       }
       return result;
    }
-   static inline result_type get(const boost::integral_constant<int, 0>&)
+   static inline result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfi_const_euler(result.backend().data());
@@ -1510,7 +1512,7 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
 {
    using result_type = boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>;
    template <int N>
-   static inline result_type const& get(const boost::integral_constant<int, N>&)
+   static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
       static bool        has_init = false;
@@ -1521,7 +1523,7 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
       }
       return result;
    }
-   static inline result_type get(const boost::integral_constant<int, 0>&)
+   static inline result_type get(const std::integral_constant<int, 0>&)
    {
       result_type result;
       mpfi_const_catalan(result.backend().data());
