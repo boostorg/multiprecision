@@ -166,7 +166,7 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
          }
       }
    }
-   while ((result.size() > digits) && result.size())
+   while ((static_cast<std::streamsize>(result.size()) > digits) && (result.size() != 0U))
    {
       // We may get here as a result of rounding...
       if (result.size() > 1)
