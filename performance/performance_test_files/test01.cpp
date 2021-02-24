@@ -8,6 +8,6 @@
 void test01()
 {
 #ifdef TEST_INT64
-   test<boost::uint64_t>("boost::uint64_t", 64);
+   test<std::uint64_t>("std::uint64_t", 64);
 #endif
 }

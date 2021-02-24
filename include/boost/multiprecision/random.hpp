@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright Jens Maurer 2006-1011
+//  Copyright Jens Maurer 2006-2011
 //  Copyright Steven Watanabe 2011
 //  Copyright 2012 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file

@@ -1,10 +1,10 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Constructing and Interconverting Between Number Types</title>
 <link rel="stylesheet" href="../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="home" href="../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../tut.html" title="Tutorial">
 <link rel="prev" href="misc/visualizers.html" title="Visual C++ Debugger Visualizers">
 <link rel="next" href="random.html" title="Generating Random Numbers">
@@ -34,9 +34,9 @@
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
 <p class="simpara">
-            Any number type can be constructed (or assigned) from any builtin arithmetic
-            type, as long as the conversion isn't lossy (for example float to int
-            conversion):
+            Any number type can be constructed (or assigned) from any <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+            (built-in)</a> arithmetic type, as long as the conversion isn't lossy
+            (for example float to int conversion):
           </p>
 <pre class="programlisting"><span class="identifier">cpp_dec_float_50</span> <span class="identifier">df</span><span class="special">(</span><span class="number">0.5</span><span class="special">);</span>   <span class="comment">// OK construction from double</span>
 <span class="identifier">cpp_int</span>          <span class="identifier">i</span><span class="special">(</span><span class="number">450</span><span class="special">);</span>    <span class="comment">// OK constructs from signed int</span>
@@ -58,7 +58,8 @@
 <li class="listitem">
 <p class="simpara">
             A <code class="computeroutput"><span class="identifier">number</span></code> can be converted
-            to any built in type, via the <code class="computeroutput"><span class="identifier">convert_to</span></code>
+            to any <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+            (built-in)</a> type, via the <code class="computeroutput"><span class="identifier">convert_to</span></code>
             member function:
           </p>
 <pre class="programlisting"><span class="identifier">mpz_int</span> <span class="identifier">z</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
@@ -72,13 +73,16 @@
             an extended precision floating-point type with a large exponent range
             can effectively run the system out of memory, as in the extreme case
             <span class="emphasis"><em>2<sup>max_exponent</sup> / CHAR_BITS</em></span> bytes of storage may be
-            required. This does not represent a problem for built in floating-point
-            types however, as the exponent range for these is rather limited.
+            required. This does not represent a problem for <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+            (built-in)</a> floating-point types however, as the exponent range
+            for these is rather limited.
           </li>
 <li class="listitem">
             Conversions to floating-point numbers from rational ones are rounded
-            to nearest (less than 0.5ulp error) as long as the floating-point number
-            is binary, and the integer type used by the rational number is unbounded.
+            to nearest (less than 0.5 <a href="http://en.wikipedia.org/wiki/Unit_in_the_last_place" target="_top">Unit
+            in the last place (ULP)</a> error) as long as the floating-point
+            number is binary, and the integer type used by the rational number is
+            unbounded.
           </li>
 </ul></div>
 <p>
@@ -88,7 +92,8 @@
 <li class="listitem">
 <p class="simpara">
             A <code class="computeroutput"><span class="identifier">number</span></code> can be converted
-            to any built in type, via an explicit conversion operator: this functionality
+            to any <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+            (built-in)</a> type, via an explicit conversion operator: this functionality
             is only available on compilers supporting C++11's explicit conversion
             syntax.
           </p>
@@ -117,8 +122,9 @@
 </li>
 <li class="listitem">
 <p class="simpara">
-            Any number type will interoperate with the builtin types in arithmetic
-            expressions as long as the conversions are not lossy:
+            Any number type will interoperate with the <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+            (built-in)</a> types in arithmetic expressions as long as the conversions
+            are not lossy:
           </p>
 <pre class="programlisting"><span class="comment">// pi to 50 places from a string:</span>
 <span class="identifier">cpp_dec_float_50</span> <span class="identifier">df</span> <span class="special">=</span> <span class="string">"3.14159265358979323846264338327950288419716939937510"</span><span class="special">;</span>
@@ -202,8 +208,8 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

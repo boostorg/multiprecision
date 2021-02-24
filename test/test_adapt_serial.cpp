@@ -16,7 +16,7 @@
 #include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/timer.hpp>
+#include "timer.hpp"
 #include "test.hpp"
 
 #include <iostream>
@@ -66,7 +66,7 @@ T generate_random(unsigned bits_wanted)
 }
 
 template <class T>
-void test_neg(const T& x, const boost::mpl::true_&)
+void test_neg(const T& x, const std::integral_constant<bool, true>&)
 {
    T val = -x;
 #ifndef BOOST_NO_EXCEPTIONS
@@ -115,7 +115,7 @@ void test_neg(const T& x, const boost::mpl::true_&)
 #endif
 }
 template <class T>
-void test_neg(const T&, const boost::mpl::false_&) {}
+void test_neg(const T&, const std::integral_constant<bool, false>&) {}
 
 template <class T>
 void test()
@@ -124,7 +124,7 @@ void test()
 
    boost::random::mt19937 gen;
    boost::uniform_int<>   d(3, std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits : 3000);
-   boost::timer           tim;
+   timer                  tim;
 
    while (true)
    {
@@ -173,7 +173,7 @@ void test()
          std::cout << e.what() << std::endl;
       }
 #endif
-      test_neg(val, boost::mpl::bool_<std::numeric_limits<T>::is_signed>());
+      test_neg(val, std::integral_constant<bool, std::numeric_limits<T>::is_signed>());
       //
       // Check to see if test is taking too long.
       // Tests run on the compiler farm time out after 300 seconds,

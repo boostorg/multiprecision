@@ -1,10 +1,10 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Calculating a Derivative</title>
 <link rel="stylesheet" href="../../../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="home" href="../../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../fp_eg.html" title="Examples">
 <link rel="prev" href="jel.html" title="Defining a Special Function.">
 <link rel="next" href="gi.html" title="Calculating an Integral">
@@ -31,24 +31,24 @@
             In this example we'll add even more power to generic numeric programming
             using not only different floating-point types but also function objects
             as template parameters. Consider some well-known central difference rules
-            for numerically computing the first derivative of a function <span class="emphasis"><em>f&#8242;(x)</em></span>
-            with <span class="emphasis"><em>x &#8712; &#8476;</em></span>:
+            for numerically computing the first derivative of a function <span class="emphasis"><em>f′(x)</em></span>
+            with <span class="emphasis"><em>x ∈ ℜ</em></span>:
           </p>
 <p>
-            <span class="inlinemediaobject"><img src="../../../../../floating_point_eg1.png"></span>
+            <span class="inlinemediaobject"><img src="../../../../../floating_point_eg1.svg"></span>
           </p>
 <p>
             Where the difference terms <span class="emphasis"><em>m<sub>n</sub></em></span> are given by:
           </p>
 <p>
-            <span class="inlinemediaobject"><img src="../../../../../floating_point_eg2.png"></span>
+            <span class="inlinemediaobject"><img src="../../../../../floating_point_eg2.svg"></span>
           </p>
 <p>
             and <span class="emphasis"><em>dx</em></span> is the step-size of the derivative.
           </p>
 <p>
             The third formula in Equation 1 is a three-point central difference rule.
-            It calculates the first derivative of <span class="emphasis"><em>f&#8242;(x)</em></span> to <span class="emphasis"><em>O(dx<sup>6</sup>)</em></span>,
+            It calculates the first derivative of <span class="emphasis"><em>f′(x)</em></span> to <span class="emphasis"><em>O(dx<sup>6</sup>)</em></span>,
             where <span class="emphasis"><em>dx</em></span> is the given step-size. For example, if
             the step-size is 0.01 this derivative calculation has about 6 decimal
             digits of precision - just about right for the 7 decimal digits of single-precision
@@ -81,10 +81,10 @@
             template function can be used to compute the first derivative of any
             function to <span class="emphasis"><em>O(dx<sup>6</sup>)</em></span>. For example, consider the first
             derivative of <span class="emphasis"><em>sin(x)</em></span> evaluated at <span class="emphasis"><em>x =
-            &#960;/3</em></span>. In other words,
+            π/3</em></span>. In other words,
           </p>
 <p>
-            <span class="inlinemediaobject"><img src="../../../../../floating_point_eg3.png"></span>
+            <span class="inlinemediaobject"><img src="../../../../../floating_point_eg3.svg"></span>
           </p>
 <p>
             The code below computes the derivative in Equation 3 for float, double
@@ -185,8 +185,8 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

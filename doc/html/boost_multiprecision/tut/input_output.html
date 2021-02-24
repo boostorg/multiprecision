@@ -1,10 +1,10 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Input Output</title>
 <link rel="stylesheet" href="../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="home" href="../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../tut.html" title="Tutorial">
 <link rel="prev" href="limits/how_to_tell.html" title="How to Determine the Kind of a Number From std::numeric_limits">
 <link rel="next" href="hash.html" title="Hash Function Support">
@@ -51,7 +51,8 @@
 <p>
         and this can be run in a loop for all possible values of a 32-bit float.
         For other floating-point types <code class="computeroutput"><span class="identifier">T</span></code>,
-        including built-in <code class="computeroutput"><span class="keyword">double</span></code>, it
+        including <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+        (built-in)</a> <code class="computeroutput"><span class="keyword">double</span></code>, it
         takes far too long to test all values, so a reasonable test strategy is to
         use a large number of random values.
       </p>
@@ -72,16 +73,17 @@
 <span class="identifier">BOOST_CHECK_EQUAL</span><span class="special">(</span><span class="identifier">read</span><span class="special">,</span> <span class="identifier">write</span><span class="special">);</span>
 </pre>
 <p>
-        The test at <a href="../../../../test/test_cpp_bin_float_io.cpp" target="_top">test_cpp_bin_float_io.cpp</a>
+        The test at <a href="http://www.boost.org/doc/libs/release/libs/multiprecision/doc/html/../../test/test_cpp_bin_float_io.cpp" target="_top">test_cpp_bin_float_io.cpp</a>
         allows any floating-point type to be <span class="emphasis"><em>round_tripped</em></span> using
         a wide range of fairly random values. It also includes tests compared a collection
-        of <a href="../../../../test/string_data.ipp" target="_top">stringdata</a> test cases
+        of <a href="http://www.boost.org/doc/libs/release/libs/multiprecision/doc/html/../../test/string_data.ipp" target="_top">stringdata</a> test cases
         in a file.
       </p>
 <h5>
 <a name="boost_multiprecision.tut.input_output.h1"></a>
-        <span class="phrase"><a name="boost_multiprecision.tut.input_output.comparing_with_output_using_buil"></a></span><a class="link" href="input_output.html#boost_multiprecision.tut.input_output.comparing_with_output_using_buil">Comparing
-        with output using Built-in types</a>
+        <span class="phrase"><a name="boost_multiprecision.tut.input_output.comparing_with_output_using_fund"></a></span><a class="link" href="input_output.html#boost_multiprecision.tut.input_output.comparing_with_output_using_fund">Comparing
+        with output using fundamental
+        (built-in) types</a>
       </h5>
 <p>
         One can make some comparisons with the output of
@@ -150,7 +152,8 @@
 <p>
         Confusingly, Microsoft (and MinGW) do not conform to this standard and provide
         <span class="bold"><strong>at least three digits</strong></span>, for example <code class="computeroutput"><span class="number">1e+001</span></code>. So if you want the output to match
-        that from built-in floating-point types on compilers that use Microsofts
+        that from <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+        (built-in)</a> floating-point types on compilers that use Microsofts
         runtime then use:
       </p>
 <pre class="programlisting"><span class="preprocessor">#define</span> <span class="identifier">BOOST_MP_MIN_EXPONENT_DIGITS</span> <span class="number">3</span>
@@ -171,8 +174,8 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

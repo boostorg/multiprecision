@@ -52,7 +52,7 @@ T generate_random(unsigned bits_wanted)
 }
 
 template <class Number>
-void test_signed_overflow(Number a, Number b, const boost::mpl::true_&)
+void test_signed_overflow(Number a, Number b, const std::integral_constant<bool, true>&)
 {
    a = -a;
    BOOST_CHECK_THROW(Number(a * b), std::overflow_error);
@@ -60,7 +60,7 @@ void test_signed_overflow(Number a, Number b, const boost::mpl::true_&)
    BOOST_CHECK(Number(a * b) >= (std::numeric_limits<Number>::min)());
 }
 template <class Number>
-void test_signed_overflow(Number a, Number b, const boost::mpl::false_&)
+void test_signed_overflow(Number, Number, const std::integral_constant<bool, false>&)
 {
 }
 
@@ -112,7 +112,7 @@ void test()
             val            = static_cast<test_type>(generate_random<cpp_int>(bits));
             test_type val2 = 1 + (std::numeric_limits<test_type>::max)() / val;
             BOOST_CHECK_THROW(test_type(val2 * val), std::overflow_error);
-            test_signed_overflow(val2, val, boost::mpl::bool_<std::numeric_limits<test_type>::is_signed>());
+            test_signed_overflow(val2, val, std::integral_constant<bool, std::numeric_limits<test_type>::is_signed>());
             --val2;
             BOOST_CHECK(cpp_int(val2) * cpp_int(val) <= cpp_int((std::numeric_limits<test_type>::max)()));
             BOOST_CHECK(val2 * val <= (std::numeric_limits<test_type>::max)());

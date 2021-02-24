@@ -1,9 +1,16 @@
 ///////////////////////////////////////////////////////////////
 //  Copyright 2018 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
+//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
+
+// Contains Quickbook snippets used by boost/libs/multiprecision/doc/multiprecision.qbk,
+// used in section Literal Types and constexpr Support, last example on constexpr randoms.
+
+// A implementation and demonstration of the Keep It Simple Stupid random number generator algorithm https://en.wikipedia.org/wiki/KISS_(algorithm) for cpp_int integers.
+// b2 --abbreviate-paths toolset=clang-9.0.0 address-model=64 cxxstd=2a release misc > multiprecision_clang_misc.log
 
 #include <boost/multiprecision/cpp_int.hpp>
+
 #include <iostream>
 
 struct kiss_rand
@@ -54,8 +61,7 @@ inline constexpr void hash_combine(std::uint64_t& h, std::uint64_t k)
    h ^= k;
    h *= m;
 
-   // Completely arbitrary number, to prevent 0's
-   // from hashing to 0.
+   // Completely arbitrary number, to prevent 0's from hashing to 0.
    h += 0xe6546b64;
 }
 
@@ -116,7 +122,9 @@ int main()
 {
    using namespace boost::multiprecision;
 
+//[random_constexpr_cppint
    constexpr uint1024_t rand = nth_random_value<uint1024_t>(1000);
    std::cout << std::hex << rand << std::endl;
+//] [/random_constexpr_cppint]
    return 0;
 }

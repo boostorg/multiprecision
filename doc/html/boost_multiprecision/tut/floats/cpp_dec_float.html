@@ -1,11 +1,11 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>cpp_dec_float</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
-<link rel="up" href="../floats.html" title="floating-point Numbers">
+<link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
+<link rel="up" href="../floats.html" title="Floating-point Types">
 <link rel="prev" href="cpp_bin_float.html" title="cpp_bin_float">
 <link rel="next" href="gmp_float.html" title="gmp_float">
 </head>
@@ -57,7 +57,8 @@
           of use cases, but larger types such as <code class="computeroutput"><span class="keyword">long</span>
           <span class="keyword">long</span></code> can also be specified if you
           need a truly huge exponent range. In any case the ExponentType must be
-          a built in signed integer type at least 2 bytes and 16-bits wide.
+          a <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+          (built-in)</a> signed integer type at least 2 bytes and 16-bits wide.
         </p>
 <p>
           Normally <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code>
@@ -75,7 +76,7 @@
           digit counts.
         </p>
 <p>
-          There is full standard library and <code class="computeroutput"><span class="identifier">numeric_limits</span></code>
+          There is full standard library and <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span></code>
           support available for this type.
         </p>
 <p>
@@ -96,7 +97,7 @@
               to the user.
             </li>
 <li class="listitem">
-              The type supports both infinities and NaN's. An infinity is generated
+              The type supports both infinities and NaNs. An infinity is generated
               whenever the result would overflow, and a NaN is generated for any
               mathematically undefined operation.
             </li>
@@ -123,7 +124,7 @@
             </li>
 <li class="listitem">
               Operations involving <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code>
-              are always truncating. However, note that since their are guard digits
+              are always truncating. However, note that since there are guard digits
               in effect, in practice this has no real impact on accuracy for most
               use cases.
             </li>
@@ -162,8 +163,8 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

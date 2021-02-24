@@ -53,7 +53,7 @@ void test()
    };
    typedef typename boost::uint_t<require_digits>::least                                                     uint_least;
    typedef typename boost::int_t<require_digits>::least                                                      int_least;
-   typedef typename boost::mpl::if_c<std::numeric_limits<test_type>::is_signed, int_least, uint_least>::type i_type;
+   typedef typename std::conditional<std::numeric_limits<test_type>::is_signed, int_least, uint_least>::type i_type;
 
    i_type ih = (std::numeric_limits<i_type>::max)();
    i_type il = (std::numeric_limits<i_type>::max)();
@@ -111,12 +111,14 @@ int main()
    test<checked_int512_t, checked_int1024_t>();
    test<checked_int256_t, checked_int512_t>();
    test<number<cpp_int_backend<64, 64, signed_magnitude, checked, void>, et_off>, checked_int128_t>();
-   test<boost::int64_t, checked_int128_t>();
+   test<std::int64_t, checked_int128_t>();
+   test<number<cpp_int_backend<4096, 4096, signed_magnitude, checked, void>, et_off>, cpp_int>();
+   test<number<cpp_int_backend<4096> >, cpp_int>();
 
    test<checked_uint512_t, checked_uint1024_t>();
    test<checked_uint256_t, checked_uint512_t>();
    test<number<cpp_int_backend<64, 64, unsigned_magnitude, checked, void>, et_off>, checked_uint128_t>();
-   test<boost::uint64_t, checked_int128_t>();
+   test<std::uint64_t, checked_int128_t>();
 
    return boost::report_errors();
 }

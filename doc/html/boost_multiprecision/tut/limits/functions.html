@@ -1,10 +1,10 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>std::numeric_limits&lt;&gt; functions</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../limits.html" title="Numeric Limits">
 <link rel="prev" href="constants.html" title="std::numeric_limits&lt;&gt; constants">
 <link rel="next" href="limits32.html" title="Numeric limits for 32-bit platform">
@@ -36,7 +36,8 @@
           then returns <code class="computeroutput"><span class="identifier">T</span><span class="special">()</span></code>.
         </p>
 <p>
-          For built-in types there is usually a corresponding MACRO value TYPE_MAX,
+          For <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+          (built-in)</a> types there is usually a corresponding MACRO value TYPE_MAX,
           where TYPE is CHAR, INT, FLOAT etc.
         </p>
 <p>
@@ -85,8 +86,9 @@
           can be represented by the type T.
         </p>
 <p>
-          For built-in types, there is usually a corresponding MACRO value TYPE_MIN,
-          where TYPE is CHAR, INT, FLOAT etc.
+          For <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+          (built-in)</a> types, there is usually a corresponding MACRO value
+          TYPE_MIN, where TYPE is CHAR, INT, FLOAT etc.
         </p>
 <p>
           Other types, including those provided by a <code class="computeroutput"><span class="keyword">typedef</span></code>,
@@ -158,8 +160,9 @@
         </h5>
 <p>
           Function <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">round_error</span><span class="special">()</span></code>
-          returns the maximum error (in units of <a href="http://en.wikipedia.org/wiki/Unit_in_the_last_place" target="_top">ULP</a>)
-          that can be caused by any basic arithmetic operation.
+          returns the maximum error (in units of <a href="http://en.wikipedia.org/wiki/Unit_in_the_last_place" target="_top">Unit
+          in the last place (ULP)</a>) that can be caused by any basic arithmetic
+          operation.
         </p>
 <pre class="programlisting"><span class="identifier">round_style</span> <span class="special">==</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">round_indeterminate</span><span class="special">;</span>
 </pre>
@@ -270,13 +273,15 @@
         </h6>
 <p>
           <a href="https://en.wikipedia.org/wiki/Machine_epsilon" target="_top">Machine epsilon
-          &#949;</a> is very useful to compute a tolerance when comparing floating-point
+          ε</a> is very useful to compute a tolerance when comparing floating-point
           values, a much more difficult task than is commonly imagined.
         </p>
 <p>
           The C++ standard specifies <a href="https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon" target="_top"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;&gt;::</span><span class="identifier">epsilon</span><span class="special">()</span></code></a>
           and Boost.Multiprecision implements this (where possible) for its program-defined
-          types analogous to the __fundamental floating-point types like <code class="computeroutput"><span class="keyword">double</span></code> <code class="computeroutput"><span class="keyword">float</span></code>.
+          types analogous to the <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+          (built-in)</a> floating-point types like <code class="computeroutput"><span class="keyword">double</span></code>
+          <code class="computeroutput"><span class="keyword">float</span></code>.
         </p>
 <p>
           For more information than you probably want (but still need) see <a href="http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html" target="_top">What
@@ -373,7 +378,7 @@
           For floating-point types only, for which <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">has_infinity</span>
           <span class="special">==</span> <span class="keyword">true</span></code>,
           function <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">infinity</span><span class="special">()</span></code>
-          provides an implementation-defined representation for &#8734;.
+          provides an implementation-defined representation for ∞.
         </p>
 <p>
           The 'representation' is a particular bit pattern reserved for infinity.
@@ -395,11 +400,13 @@
         </p>
 <p>
           This implementation-defined-ness has hampered use of infinity (and NaNs)
-          but Boost.Math and Boost.Multiprecision work hard to provide a sensible
-          representation for <span class="bold"><strong>all</strong></span> floating-point
-          types, not just the built-in types, which with the use of suitable facets
-          to define the input and output strings, makes it possible to use these
-          useful features portably and including Boost.Serialization.
+          but <a href="https://www.boost.org/doc/libs/release/libs/math/doc/index.html" target="_top">Boost.Math</a>
+          and <a href="https://www.boost.org/doc/libs/release/libs/multiprecision/doc/index.html" target="_top">Boost.Multiprecision</a>
+          work hard to provide a sensible representation for <span class="bold"><strong>all</strong></span>
+          floating-point types, not just the <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+          (built-in) types</a>, which with the use of suitable facets to define
+          the input and output strings, makes it possible to use these useful features
+          portably and including <a href="https://www.boost.org/doc/libs/release/libs/serialization/doc/index.html" target="_top">Boost.Serialization</a>.
         </p>
 <h5>
 <a name="boost_multiprecision.tut.limits.functions.h8"></a>
@@ -436,8 +443,6 @@
 
 <span class="keyword">if</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">cpp_bin_float_quad</span><span class="special">&gt;::</span><span class="identifier">has_quiet_NaN</span> <span class="special">==</span> <span class="keyword">true</span><span class="special">)</span>
 <span class="special">{</span>
-  <span class="identifier">cpp_bin_float_quad</span> <span class="identifier">tolerance</span> <span class="special">=</span>  <span class="number">3</span> <span class="special">*</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">cpp_bin_float_quad</span><span class="special">&gt;::</span><span class="identifier">epsilon</span><span class="special">();</span>
-
   <span class="identifier">cpp_bin_float_quad</span> <span class="identifier">NaN</span> <span class="special">=</span>  <span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">cpp_bin_float_quad</span><span class="special">&gt;::</span><span class="identifier">quiet_NaN</span><span class="special">();</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cpp_bin_float_quad NaN is "</span>  <span class="special">&lt;&lt;</span> <span class="identifier">NaN</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">//   cpp_bin_float_quad NaN is nan</span>
 
@@ -459,7 +464,7 @@
           NaNs and positive and negative infinity.
         </p>
 <p>
-          See <a href="../../../../../../../libs/math/example/nonfinite_facet_sstream.cpp" target="_top">boost:/libs/math/example/nonfinite_facet_sstream.cpp</a>
+          See <a href="http://www.boost.org/doc/libs/release/libs/multiprecision/doc/html/../../../../libs/math/example/nonfinite_facet_sstream.cpp" target="_top">boost:/libs/math/example/nonfinite_facet_sstream.cpp</a>
           and we also need
         </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">math</span><span class="special">/</span><span class="identifier">special_functions</span><span class="special">/</span><span class="identifier">nonfinite_num_facets</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
@@ -532,8 +537,8 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

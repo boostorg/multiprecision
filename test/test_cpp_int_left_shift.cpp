@@ -16,7 +16,6 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/timer.hpp>
 #include "test.hpp"
 
 #if !defined(TEST1) && !defined(TEST2) && !defined(TEST3)
@@ -73,12 +72,12 @@ void test_value(const T& val)
    }
 }
 
-void test(const boost::mpl::int_<200>&) {}
+void test(const std::integral_constant<int, 200>&) {}
 
 template <int N>
-void test(boost::mpl::int_<N> const&)
+void test(std::integral_constant<int, N> const&)
 {
-   test(boost::mpl::int_<N + 4>());
+   test(std::integral_constant<int, N + 4>());
 
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N, N, boost::multiprecision::unsigned_magnitude>, boost::multiprecision::et_off> mp_type;
 
@@ -93,6 +92,6 @@ void test(boost::mpl::int_<N> const&)
 
 int main()
 {
-   test(boost::mpl::int_<24>());
+   test(std::integral_constant<int, 24>());
    return boost::report_errors();
 }

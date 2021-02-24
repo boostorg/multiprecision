@@ -1,10 +1,10 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>number</title>
 <link rel="stylesheet" href="../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="home" href="../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../ref.html" title="Reference">
 <link rel="prev" href="../ref.html" title="Reference">
 <link rel="next" href="cpp_int_ref.html" title="cpp_int">
@@ -216,7 +216,7 @@
 <span class="keyword">bool</span>                                      <span class="identifier">isgreater</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">isgreaterequal</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">isless</span>     <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
-<span class="keyword">bool</span>                                      <span class="identifier">islessequal</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span>                                      <span class="identifier">islessequal</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-typearea</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">islessgreater</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">isunordered</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="comment">// Complex number functions:</span>
@@ -360,8 +360,9 @@
             An expression template which is the result of one of the arithmetic operators.
           </li>
 <li class="listitem">
-            Any builtin arithmetic type, as long as the result would not be lossy
-            (for example float to integer conversion).
+            Any <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+            (built-in)</a> arithmetic type, as long as the result would not be
+            lossy (for example float to integer conversion).
           </li>
 <li class="listitem">
             Any type that the Backend is implicitly constructible or assignable from.
@@ -478,9 +479,9 @@
           </li>
 </ul></div>
 <p>
-        For the left and right shift operations, the argument must be a builtin integer
-        type with a positive value (negative values result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
-        being thrown).
+        For the left and right shift operations, the argument must be a <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+        (built-in)</a> integer type with a positive value (negative values result
+        in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code> being thrown).
       </p>
 <pre class="programlisting"><span class="keyword">operator</span> <span class="emphasis"><em>convertible-to-bool-type</em></span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
 </pre>
@@ -633,7 +634,8 @@
           </li>
 <li class="listitem">
             Any type for which <code class="computeroutput"><span class="identifier">number</span></code>
-            has an implicit constructor - for example a builtin arithmetic type.
+            has an implicit constructor - for example a <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+            (built-in)</a> arithmetic type.
           </li>
 </ul></div>
 <p>
@@ -658,7 +660,8 @@
 </ul></div>
 <p>
         Finally note that the second argument to the left and right shift operations
-        must be a builtin integer type, and that the argument must be positive (negative
+        must be a <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+        (built-in)</a> integer type, and that the argument must be positive (negative
         arguments result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
         being thrown).
       </p>
@@ -870,7 +873,7 @@
         When these functions use our own implementations, the accuracy of the transcendental
         functions is generally a few epsilon. Note however, that the trigonometrical
         functions incur the usual accuracy loss when reducing arguments by large
-        multiples of &#960;. Also note that both <a class="link" href="../tut/floats/gmp_float.html" title="gmp_float">gmp_float</a>
+        multiples of π. Also note that both <a class="link" href="../tut/floats/gmp_float.html" title="gmp_float">gmp_float</a>
         and <a class="link" href="../tut/floats/cpp_dec_float.html" title="cpp_dec_float">cpp_dec_float</a>
         have a number of guard digits beyond their stated precision, so the error
         rates listed for these are in some sense artificially low.
@@ -1270,8 +1273,8 @@
         <code class="computeroutput"><span class="identifier">number_kind_rational</span></code>, <code class="computeroutput"><span class="identifier">number_kind_fixed_point</span></code>, or <code class="computeroutput"><span class="identifier">number_kind_unknown</span></code>. This traits class
         is specialized for any type that has <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span></code>
         support as well as for classes in this library: which means it can be used
-        for generic code that must work with built in arithmetic types as well as
-        multiprecision ones.
+        for generic code that must work with <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+        (built-in)</a> arithmetic types as well as multiprecision ones.
       </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">is_number</span><span class="special">;</span>
@@ -1294,11 +1297,14 @@
       </h5>
 <p>
         In addition to functioning with types from this library, these functions
-        are also overloaded for built in integer types if you include <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">integer</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>.
-        Further, when used with fixed precision types (whether built in integers
-        or multiprecision ones), the functions will promote to a wider type internally
-        when the algorithm requires it. Versions overloaded for built in integer
-        types return that integer type rather than an expression template.
+        are also overloaded for <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+        (built-in)</a> integer types if you include <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">integer</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>.
+        Further, when used with fixed precision types (whether <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+        (built-in)</a> integers or multiprecision ones), the functions will promote
+        to a wider type internally when the algorithm requires it. Versions overloaded
+        for <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+        (built-in)</a> integer types return that integer type rather than an
+        expression template.
       </p>
 <pre class="programlisting"><span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">gcd</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">);</span>
 </pre>
@@ -1321,8 +1327,9 @@
         function should be used with extreme care as the result can grow so large
         as to take "effectively forever" to compute, or else simply run
         the host machine out of memory. This is the one function in this category
-        that is not overloaded for built in integer types, further, it's probably
-        not a good idea to use it with fixed precision <code class="computeroutput"><span class="identifier">cpp_int</span></code>'s
+        that is not overloaded for <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+        (built-in)</a> integer types, further, it's probably not a good idea
+        to use it with fixed precision <code class="computeroutput"><span class="identifier">cpp_int</span></code>'s
         either.
       </p>
 <pre class="programlisting"><span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">powm</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">p</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">m</span><span class="special">);</span>
@@ -1486,8 +1493,8 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

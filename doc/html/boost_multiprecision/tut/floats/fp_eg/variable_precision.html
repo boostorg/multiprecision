@@ -1,13 +1,13 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>Variable Precision Newton Evaluation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Variable-Precision Newton Evaluation</title>
 <link rel="stylesheet" href="../../../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="home" href="../../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../fp_eg.html" title="Examples">
 <link rel="prev" href="poly_eg.html" title="Polynomial Evaluation">
-<link rel="next" href="../../interval.html" title="Interval Number Types">
+<link rel="next" href="gauss_lagerre_quadrature.html" title="Gauss-Laguerre quadrature">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,12 +20,12 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="poly_eg.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../fp_eg.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../interval.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="poly_eg.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../fp_eg.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="gauss_lagerre_quadrature.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h5 class="title">
-<a name="boost_multiprecision.tut.floats.fp_eg.variable_precision"></a><a class="link" href="variable_precision.html" title="Variable Precision Newton Evaluation">Variable
-          Precision Newton Evaluation</a>
+<a name="boost_multiprecision.tut.floats.fp_eg.variable_precision"></a><a class="link" href="variable_precision.html" title="Variable-Precision Newton Evaluation">Variable-Precision
+          Newton Evaluation</a>
 </h5></div></div></div>
 <p>
             This example illustrates the use of variable-precision arithmetic with
@@ -40,7 +40,7 @@
             to have just enough digits at each iteration.
           </p>
 <p>
-            The full source of the this program is in <a href="../../../../../../example/mpfr_precision.cpp" target="_top">../../example/mpfr_precision.cpp</a>
+            The full source of the this program is in <a href="http://www.boost.org/doc/libs/release/libs/multiprecision/doc/html/../../example/mpfr_precision.cpp" target="_top">../../example/mpfr_precision.cpp</a>
           </p>
 <p>
             We'll skip over the #includes and using declations, and go straight to
@@ -134,11 +134,11 @@
             call <code class="computeroutput"><span class="identifier">ibeta_inv</span></code> with all
             double precision arguments, promote the result to an <code class="computeroutput"><span class="identifier">mpfr_float</span></code>
             and perform Newton steps to obtain the result. Note that our termination
-            condition is somewhat cude: we simply assume that we have approximately
+            condition is somewhat crude: we simply assume that we have approximately
             14 digits correct from the double-precision approximation and that the
             precision doubles with each step. We also cheat, and use an internal
             Boost.Math function that calculates <span class="emphasis"><em>I<sub>x</sub>(a, b)</em></span> and
-            it's derivative in one go:
+            its derivative in one go:
           </p>
 <pre class="programlisting"><span class="identifier">mpfr_float</span> <span class="identifier">beta_distribution_median_method_2</span><span class="special">(</span><span class="identifier">mpfr_float</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">a_</span><span class="special">,</span> <span class="identifier">mpfr_float</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">b_</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">digits10</span><span class="special">)</span>
 <span class="special">{</span>
@@ -158,8 +158,8 @@
 </pre>
 <p>
             Before we refine the method further, it might be wise to take stock and
-            see how method's 1 and 2 compare. We'll ask them both for 1500 digit
-            precision, and compare against the value produced by <code class="computeroutput"><span class="identifier">ibeta_inv</span></code>
+            see how methods 1 and 2 compare. We'll ask them both for 1500 digit precision,
+            and compare against the value produced by <code class="computeroutput"><span class="identifier">ibeta_inv</span></code>
             at 1700 digits. Here's what the results look like:
           </p>
 <pre class="programlisting">Method 1 time = 0.611647
@@ -254,8 +254,8 @@ Relative error: 4.03898e-1501
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
@@ -263,7 +263,7 @@ Relative error: 4.03898e-1501
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="poly_eg.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../fp_eg.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../interval.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="poly_eg.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../fp_eg.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="gauss_lagerre_quadrature.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

@@ -86,7 +86,6 @@ T generate_random_float()
 template <class Float, class Rat>
 void do_round_trip(const Float& val)
 {
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    BOOST_MATH_STD_USING
    Rat   rat(val);
    Float new_f(rat);
@@ -130,19 +129,15 @@ void do_round_trip(const Float& val)
    rounded = rat - delta;
    new_f   = static_cast<Float>(rounded);
    BOOST_CHECK_EQUAL(val, new_f);
-#endif
 }
 
 template <class Float, class Rat>
 void test_round_trip()
 {
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    std::cout << "Testing types " << typeid(Float).name() << " <<==>> " << typeid(Rat).name() << std::endl;
    std::cout << "digits = " << std::numeric_limits<Float>::digits << std::endl;
    std::cout << "digits10 = " << std::numeric_limits<Float>::digits10 << std::endl;
-#ifndef BOOST_NO_CXX11_NUMERIC_LIMITS
    std::cout << "max_digits10 = " << std::numeric_limits<Float>::max_digits10 << std::endl;
-#endif
 
    stopwatch<boost::chrono::high_resolution_clock> w;
 
@@ -166,7 +161,6 @@ void test_round_trip()
 
    std::cout << "Execution time = " << boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() << "s" << std::endl;
    std::cout << "Total values tested: " << count << std::endl;
-#endif
 }
 
 template <class Int>
@@ -191,13 +185,10 @@ Int generate_random_int()
 template <class Float, class Rat>
 void test_random_rationals()
 {
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    std::cout << "Testing types " << typeid(Float).name() << " <<==>> " << typeid(Rat).name() << std::endl;
    std::cout << "digits = " << std::numeric_limits<Float>::digits << std::endl;
    std::cout << "digits10 = " << std::numeric_limits<Float>::digits10 << std::endl;
-#ifndef BOOST_NO_CXX11_NUMERIC_LIMITS
    std::cout << "max_digits10 = " << std::numeric_limits<Float>::max_digits10 << std::endl;
-#endif
 
    typedef typename boost::multiprecision::component_type<Rat>::type i_type;
    stopwatch<boost::chrono::high_resolution_clock>                   w;
@@ -238,7 +229,6 @@ void test_random_rationals()
 
    std::cout << "Execution time = " << boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() << "s" << std::endl;
    std::cout << "Total values tested: " << count << std::endl;
-#endif
 }
 
 #if defined(TEST2)
@@ -271,12 +261,12 @@ int main()
 {
    using namespace boost::multiprecision;
 #if defined(TEST1) && !defined(BOOST_MSVC)
-   test_round_trip<number<cpp_bin_float<113, digit_base_2, void, boost::int16_t> >, cpp_rational>();
+   test_round_trip<number<cpp_bin_float<113, digit_base_2, void, std::int16_t> >, cpp_rational>();
 #elif defined(TEST2)
    double_spot_tests();
    test_round_trip<double, cpp_rational>();
 #elif defined(TEST3) && !defined(BOOST_MSVC)
-   test_random_rationals<number<cpp_bin_float<113, digit_base_2, void, boost::int16_t> >, cpp_rational>();
+   test_random_rationals<number<cpp_bin_float<113, digit_base_2, void, std::int16_t> >, cpp_rational>();
 #elif defined(TEST4)
    test_random_rationals<double, cpp_rational>();
 #elif defined(TEST5)

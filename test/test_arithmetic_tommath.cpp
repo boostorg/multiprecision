@@ -12,7 +12,7 @@
 #include "test_arithmetic.hpp"
 
 template <>
-struct is_twos_complement_integer<boost::multiprecision::tom_int> : public boost::mpl::false_
+struct is_twos_complement_integer<boost::multiprecision::tom_int> : public std::integral_constant<bool, false>
 {};
 
 int main()

@@ -1,10 +1,10 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>mpfi_float</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../interval.html" title="Interval Number Types">
 <link rel="prev" href="../interval.html" title="Interval Number Types">
 <link rel="next" href="../complex.html" title="Complex Number Types">
@@ -58,7 +58,7 @@
           <code class="computeroutput"><span class="identifier">mpfi_float_500</span></code>, <code class="computeroutput"><span class="identifier">mpfi_float_1000</span></code> provide arithmetic types
           at 50, 100, 500 and 1000 decimal digits precision respectively. The <code class="computeroutput"><span class="keyword">typedef</span> <span class="identifier">mpfi_float</span></code>
           provides a variable precision type whose precision can be controlled via
-          the <code class="computeroutput"><span class="identifier">number</span></code>s member functions.
+          theF <code class="computeroutput"><span class="identifier">number</span></code>s member functions.
         </p>
 <div class="note"><table border="0" summary="Note">
 <tr>
@@ -93,7 +93,8 @@
 </ul></div>
 <p>
           It's also possible to access the underlying <code class="computeroutput"><span class="identifier">mpfi_t</span></code>
-          via the data() member function of <code class="computeroutput"><span class="identifier">mpfi_float_backend</span></code>.
+          via the <code class="computeroutput"><span class="identifier">data</span><span class="special">()</span></code>
+          member function of <code class="computeroutput"><span class="identifier">mpfi_float_backend</span></code>.
         </p>
 <p>
           Things you should know when using this type:
@@ -273,8 +274,8 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

@@ -1,11 +1,11 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Tutorial</title>
 <link rel="stylesheet" href="../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
-<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="home" href="../index.html" title="Chapter 1. Boost.Multiprecision">
+<link rel="up" href="../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="prev" href="intro.html" title="Introduction">
 <link rel="next" href="tut/ints.html" title="Integer Types">
 </head>
@@ -38,7 +38,7 @@
 <dt><span class="section"><a href="tut/ints/egs/bitops.html">Bit Operations</a></span></dt>
 </dl></dd>
 </dl></dd>
-<dt><span class="section"><a href="tut/floats.html">floating-point Numbers</a></span></dt>
+<dt><span class="section"><a href="tut/floats.html">Floating-point Types</a></span></dt>
 <dd><dl>
 <dt><span class="section"><a href="tut/floats/cpp_bin_float.html">cpp_bin_float</a></span></dt>
 <dt><span class="section"><a href="tut/floats/cpp_dec_float.html">cpp_dec_float</a></span></dt>
@@ -49,6 +49,8 @@
 <dd><dl>
 <dt><span class="section"><a href="tut/floats/fp_eg/aos.html">Area of
           Circle</a></span></dt>
+<dt><span class="section"><a href="tut/floats/fp_eg/caveats.html">Drop-in
+          Caveats</a></span></dt>
 <dt><span class="section"><a href="tut/floats/fp_eg/jel.html">Defining
           a Special Function.</a></span></dt>
 <dt><span class="section"><a href="tut/floats/fp_eg/nd.html">Calculating
@@ -57,8 +59,10 @@
           an Integral</a></span></dt>
 <dt><span class="section"><a href="tut/floats/fp_eg/poly_eg.html">Polynomial
           Evaluation</a></span></dt>
-<dt><span class="section"><a href="tut/floats/fp_eg/variable_precision.html">Variable
-          Precision Newton Evaluation</a></span></dt>
+<dt><span class="section"><a href="tut/floats/fp_eg/variable_precision.html">Variable-Precision
+          Newton Evaluation</a></span></dt>
+<dt><span class="section"><a href="tut/floats/fp_eg/gauss_lagerre_quadrature.html">Gauss-Laguerre
+          quadrature</a></span></dt>
 </dl></dd>
 </dl></dd>
 <dt><span class="section"><a href="tut/interval.html">Interval Number Types</a></span></dt>
@@ -75,7 +79,7 @@
 <dt><span class="section"><a href="tut/rational/cpp_rational.html">cpp_rational</a></span></dt>
 <dt><span class="section"><a href="tut/rational/gmp_rational.html">gmp_rational</a></span></dt>
 <dt><span class="section"><a href="tut/rational/tommath_rational.html">tommath_rational</a></span></dt>
-<dt><span class="section"><a href="tut/rational/br.html">Use With Boost.Rational</a></span></dt>
+<dt><span class="section"><a href="tut/rational/tommath_rational0.html">tommath_rational</a></span></dt>
 <dt><span class="section"><a href="tut/rational/rational_adaptor.html">rational_adaptor</a></span></dt>
 </dl></dd>
 <dt><span class="section"><a href="tut/misc.html">Miscellaneous Number Types.</a></span></dt>
@@ -112,6 +116,7 @@
 <dt><span class="section"><a href="tut/input_output.html">Input Output</a></span></dt>
 <dt><span class="section"><a href="tut/hash.html">Hash Function Support</a></span></dt>
 <dt><span class="section"><a href="tut/eigen.html">Eigen Interoperability</a></span></dt>
+<dt><span class="section"><a href="tut/new_backend.html">Writing a New Backend</a></span></dt>
 </dl></div>
 <p>
       In order to use this library you need to make two choices:
@@ -119,7 +124,7 @@
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
           What kind of number do I want (<a class="link" href="tut/ints.html" title="Integer Types">integer</a>,
-          <a class="link" href="tut/floats.html" title="floating-point Numbers">floating-point</a>,
+          <a class="link" href="tut/floats.html" title="Floating-point Types">floating-point</a>,
           <a class="link" href="tut/rational.html" title="Rational Number Types">rational</a>, or
           <a class="link" href="tut/complex.html" title="Complex Number Types">complex</a>).
         </li>
@@ -131,8 +136,8 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

@@ -1,13 +1,13 @@
-# \libs\math\example\jamfile.v2
+# \libs\multiprecision\example\jamfile.v2
 # Runs multiprecision examples.
 # Copyright 2014 John Maddock
 # Copyright Paul A. Bristow 2014.
-# Copyright Christpher Kormanyos 2014
+# Copyright Christopher Kormanyos 2014
 
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# bring in the rules for testing
+# Bring in the rules for testing.
 import testing ;
 import modules ;
 import path ;
@@ -31,16 +31,7 @@ project
      <include>../include
      <include>../../..
      
-     <toolset>gcc:<cxxflags>-Wno-missing-braces
-      
-      # Assembler error "File too big" caused by lots of C++ templates, for example, math/floating_point_examples.cpp.
-      # Some projects on some toolsets may require
-      #   <toolset>gcc-mingw:<cxxflags>\"-Wa,-mbig-obj\"
-      # See https://digitalkarabela.com/mingw-w64-how-to-fix-file-too-big-too-many-sections/
-      # <toolset>gcc-mingw:<cxxflags>-Wa,-mbig-obj # Some projects may overflow assembler and require equivalent of MSVC /bigobj.
-      # Requires version 2.30 of GNU binutils.
-      # Best applied only to projects that require this, see run math/floating_point_examples.cpp below.
-
+      <toolset>gcc:<cxxflags>-Wno-missing-braces
       <toolset>darwin:<cxxflags>-Wno-missing-braces
       <toolset>acc:<cxxflags>+W2068,2461,2236,4070
       <toolset>intel:<cxxflags>-Qwd264,239
@@ -56,12 +47,15 @@ project
       <toolset>msvc:<cxxflags>/wd4512
       <toolset>msvc:<cxxflags>/wd4610
       <toolset>msvc:<cxxflags>/wd4510
-      <toolset>msvc:<cxxflags>/wd4127
+      #<toolset>msvc:<cxxflags>/wd4127
       <toolset>msvc:<cxxflags>/wd4701
-      <toolset>msvc:<cxxflags>/wd4127
       <toolset>msvc:<cxxflags>/wd4305
       <toolset>clang:<link>static
-     
+      [ requires  
+         cxx11_rvalue_references cxx11_template_aliases cxx11_hdr_array cxx11_allocator cxx11_constexpr cxx11_explicit_conversion_operators cxx11_ref_qualifiers
+         cxx11_hdr_functional cxx11_variadic_templates cxx11_user_defined_literals cxx11_decltype cxx11_static_assert cxx11_defaulted_functions
+         cxx11_noexcept cxx11_ref_qualifiers cxx11_user_defined_literals cxx11_hdr_type_traits
+         ]
     ;
 
 lib gmp : : <search>$(gmp_path) ;
@@ -71,7 +65,7 @@ lib quadmath ;
 
 if $(tommath_path)
 {
-   lib tommath : [ GLOB $(tommath_path) : *.c ] ;
+   lib tommath : [ GLOB $(tommath_path) : *.c ] : <visibility>global ;
    TOMMATH = tommath ;
 }
 else
@@ -95,7 +89,7 @@ test-suite examples :
       [ run debug_adaptor_snips.cpp no_eh_eg_support ]
       [ run float128_snips.cpp quadmath no_eh_eg_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ]
 
-      [ run floating_point_examples.cpp no_eh_eg_support : : : <toolset>gcc-mingw:<cxxflags>-Wa,-mbig-obj ] # See note above.
+      [ run floating_point_examples.cpp no_eh_eg_support : : : [ check-target-builds ../config//has_big_obj : <cxxflags>-Wa,-mbig-obj <debug-symbols>off ] ]
       [ run gauss_laguerre_quadrature.cpp no_eh_eg_support : : : release [ requires cxx11_lambdas ] ]
       [ run hypergeometric_luke_algorithms.cpp no_eh_eg_support ../../chrono/build//boost_chrono ../../system/build//boost_system : : : [ requires cxx11_nullptr ]  ]
       [ run integer_examples.cpp no_eh_eg_support ]
@@ -110,5 +104,12 @@ test-suite examples :
       [ run mpfr_snips.cpp mpfr gmp no_eh_eg_support : : : [ check-target-builds ../config//has_mpfr : : <build>no ] ]
       [ run tommath_snips.cpp $(TOMMATH) no_eh_eg_support : : : [ check-target-builds ../config//has_tommath : : <build>no ] ]
       [ compile constexpr_float_arithmetic_examples.cpp : [ requires cxx14_constexpr cxx17_if_constexpr ] ]
+      
+      [ run big_seventh.cpp no_eh_eg_support ]
+
+      [ run exercise_threading_log_agm.cpp : : : <define>BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE=101 release [ requires cxx11_hdr_atomic cxx11_hdr_thread ] : exercise_threading_log_agm_cpp_dec_float ]
+      [ run exercise_threading_log_agm.cpp gmp : : : <define>BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE=102 release [ requires cxx11_hdr_atomic cxx11_hdr_thread ] [ check-target-builds ../config//has_gmp : : <build>no ] : exercise_threading_log_agm_gmp ]
+      [ run exercise_threading_log_agm.cpp mpfr gmp : : : <define>BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE=104 release [ requires cxx11_hdr_atomic cxx11_hdr_thread ] [ check-target-builds ../config//has_mpfr : : <build>no ] : exercise_threading_log_agm_mpfr ]
+      [ run exercise_threading_log_agm.cpp : : : <define>BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE=103 release [ requires cxx11_hdr_atomic cxx11_hdr_thread ] : exercise_threading_log_agm_cpp_bin_float ]
 
 ;

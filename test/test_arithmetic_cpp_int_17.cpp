@@ -8,7 +8,7 @@
 #include "test_arithmetic.hpp"
 
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ExpressionTemplates> > : public boost::mpl::false_
+struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ExpressionTemplates> > : public std::integral_constant<bool, false>
 {};
 
 template <>
@@ -23,7 +23,7 @@ struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_int
 };
 
 template <>
-struct is_checked_cpp_int<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > > : public boost::mpl::true_
+struct is_checked_cpp_int<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > > : public std::integral_constant<bool, true>
 {};
 
 int main()

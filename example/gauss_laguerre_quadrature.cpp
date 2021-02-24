@@ -12,21 +12,20 @@
 
 // In this way, the integral representation could be seen
 // as part of a scheme to calculate real-valued Airy functions
-// on the real axis for medium to large argument, whereby
-// a Taylor series or hypergeometric function could be used
-// for smaller arguments.
+// on the positive axis for medium to large argument.
+// A Taylor series or hypergeometric function (not part
+// of this example) could be used for smaller arguments.
 
 // This example has been tested with decimal digits counts
-// ranging from 21...201, via the parameter local::my_digits10.
+// ranging from 21...301, by adjusting the parameter
+// local::my_digits10 at compile time.
 
-// The quadrature integral representaion of airy_ai(x) used in
-// this example can be found in:
+// The quadrature integral representaion of airy_ai(x) used
+// in this example can be found in:
 
 // A. Gil, J. Segura, N.M. Temme, "Numerical Methods for Special
 // Functions" (SIAM Press 2007), Sect. 5.3.3, in particular Eq. 5.110,
-// page 145.
-
-// This book cites the another work:
+// page 145. Subsequently, Gil et al's book cites the another work:
 // W. Gautschi, "Computation of Bessel and Airy functions and of
 // related Gaussian quadrature formulae", BIT, 42 (2002), pp. 110-118.
 
@@ -77,7 +76,7 @@ namespace detail
   class laguerre_l_object BOOST_FINAL
   {
   public:
-    laguerre_l_object(const int n, const T a) BOOST_NOEXCEPT
+    laguerre_l_object(const int n, const T a) noexcept
       : order(n),
         alpha(a),
         p1   (0),
@@ -96,7 +95,7 @@ namespace detail
       return *this;
     }
 
-    T operator()(const T& x) const BOOST_NOEXCEPT
+    T operator()(const T& x) const noexcept
     {
       // Calculate (via forward recursion):
       // * the value of the Laguerre function L(n, alpha, x), called (p2),
@@ -139,10 +138,10 @@ namespace detail
       return p2;
     }
 
-    const T previous  () const BOOST_NOEXCEPT { return p1; }
-    const T derivative() const BOOST_NOEXCEPT { return d2; }
+    const T previous  () const noexcept { return p1; }
+    const T derivative() const noexcept { return d2; }
 
-    static bool root_tolerance(const T& a, const T& b) BOOST_NOEXCEPT
+    static bool root_tolerance(const T& a, const T& b) noexcept
     {
       using std::fabs;
 
@@ -178,8 +177,8 @@ namespace detail
       }
     }
 
-    const std::vector<T>& abscissa_n() const BOOST_NOEXCEPT { return xi; }
-    const std::vector<T>& weight_n  () const BOOST_NOEXCEPT { return wi; }
+    const std::vector<T>& abscissa_n() const noexcept { return xi; }
+    const std::vector<T>& weight_n  () const noexcept { return wi; }
 
   private:
     const int order;
@@ -220,7 +219,7 @@ namespace detail
 
         const bool this_laguerre_value_is_negative = (laguerre_root_object(T(0)) < 0);
 
-        BOOST_CONSTEXPR_OR_CONST int j_max = 10000;
+        constexpr int j_max = 10000;
 
         int j = 0;
 
@@ -310,7 +309,7 @@ namespace detail
 
           // Before storing the approximate root, perform a couple of
           // bisection steps in order to tighten up the root bracket.
-          boost::uintmax_t a_couple_of_iterations = 4U;
+          std::uintmax_t a_couple_of_iterations = 4U;
 
           const std::pair<T, T>
             root_estimate_bracket = boost::math::tools::bisect(laguerre_root_object,
@@ -390,12 +389,12 @@ namespace detail
         // The determination of the maximum allowed iterations is
         // based on the number of decimal digits in the numerical
         // type T.
-        BOOST_CONSTEXPR_OR_CONST int local_math_tools_digits10 =
+        constexpr int local_math_tools_digits10 =
           static_cast<int>(static_cast<boost::float_least32_t>(boost::math::tools::digits<T>()) * BOOST_FLOAT32_C(0.301));
 
-        const boost::uintmax_t number_of_iterations_allowed = (std::max)(20, local_math_tools_digits10 / 2);
+        const std::uintmax_t number_of_iterations_allowed = (std::max)(20, local_math_tools_digits10 / 2);
 
-        boost::uintmax_t number_of_iterations_used = number_of_iterations_allowed;
+        std::uintmax_t number_of_iterations_used = number_of_iterations_allowed;
 
         // Perform the root-finding using ACM TOMS 748 from Boost.Math.
         const std::pair<T, T>
@@ -464,25 +463,32 @@ namespace detail
 
 } } // namespace gauss::laguerre
 
+
+// A float_type is created to handle the desired number of decimal digits from `cpp_dec_float` without using __expression_templates.
 struct local
 {
-  BOOST_STATIC_CONSTEXPR unsigned int my_digits10 = 101U;
+  static constexpr unsigned int my_digits10 = 101U;
 
   typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<my_digits10>,
                                         boost::multiprecision::et_off>
   float_type;
 };
 
-BOOST_STATIC_ASSERT_MSG(local::my_digits10 > 20U,
+static_assert(local::my_digits10 > 20U,
                         "Error: This example is intended to have more than 20 decimal digits");
 
 int main()
 {
-  // Use Gauss-Laguerre integration to compute airy_ai(120 / 7).
-  // We empirically find factors to relate the number of Gauss-Laguerre
-  // coefficients needed for convergence when using varying base-10 digits.
+  // Use Gauss-Laguerre quadrature integration to compute airy_ai(x / 7)
+  // with 7 <= x <= 120 and where x is incremented in steps of 1.
 
-  // Calibrate the number of coefficients needed at the point x = 1.
+  // During development of this example, we have empirically found
+  // the numbers of Gauss-Laguerre coefficients needed for convergence
+  // when using various counts of base-10 digits.
+
+  // Let's calibrate, for instance, the number of coefficients needed
+  // at the point x = 1.
+
   // Empirical data lead to:
   // Fit[{{21.0, 3.5}, {51.0, 11.1}, {101.0, 22.5}, {201.0, 46.8}}, {1, d, d^2}, d]
   // FullSimplify[%]
@@ -494,14 +500,13 @@ int main()
 
   // This Gauss-Laguerre quadrature is designed for airy_ai(x) with real-valued x >= 1.
 
-  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t d = static_cast<boost::float_least32_t>(std::numeric_limits<local::float_type>::digits10);
+  constexpr boost::float_least32_t d = static_cast<boost::float_least32_t>(std::numeric_limits<local::float_type>::digits10);
 
-  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t laguerre_order_factor = -1.28301F + ((0.235487F + (0.0000178915F * d)) * d);
+  constexpr boost::float_least32_t laguerre_order_factor = -1.28301F + ((0.235487F + (0.0000178915F * d)) * d);
 
-  BOOST_CONSTEXPR_OR_CONST int laguerre_order = static_cast<int>(laguerre_order_factor * d);
+  constexpr int laguerre_order = static_cast<int>(laguerre_order_factor * d);
 
   std::cout << "std::numeric_limits<local::float_type>::digits10: " << std::numeric_limits<local::float_type>::digits10 << std::endl;
-
   std::cout << "laguerre_order: " << laguerre_order << std::endl;
 
   typedef gauss::laguerre::detail::abscissas_and_weights<local::float_type> abscissas_and_weights_type;
@@ -525,7 +530,7 @@ int main()
                          local::float_type(0U),
                          std::plus<local::float_type>(),
                          [&the_airy_ai_object](const local::float_type& this_abscissa,
-                                               const local::float_type& this_weight) BOOST_NOEXCEPT -> local::float_type
+                                               const local::float_type& this_weight) -> local::float_type
                          {
                            return the_airy_ai_object(this_abscissa) * this_weight;
                          });
@@ -558,9 +563,52 @@ int main()
     result_is_ok &= (delta < tol);
   }
 
-  std::cout << std::endl 
+  std::cout << std::endl
             << "Total... result_is_ok: "
             << std::boolalpha
             << result_is_ok
             << std::endl;
-}
+} // int main()
+
+/*
+
+
+Partial output:
+
+//[gauss_laguerre_quadrature_output_1
+
+std::numeric_limits<local::float_type>::digits10: 101
+laguerre_order: 2291
+
+Finding the approximate roots...
+root_estimates.size(): 1, 0.0%
+root_estimates.size(): 8, 0.3%
+root_estimates.size(): 16, 0.7%
+...
+root_estimates.size(): 2288, 99.9%
+root_estimates.size(): 2291, 100.0%
+
+
+Calculating abscissas and weights. Processed 1, 0.0%
+Calculating abscissas and weights. Processed 9, 0.4%
+...
+Calculating abscissas and weights. Processed 2289, 99.9%
+Calculating abscissas and weights. Processed 2291, 100.0%
+//] [/gauss_laguerre_quadrature_output_1]
+
+//[gauss_laguerre_quadrature_output_2
+
+airy_ai_value  : 0.13529241631288141552414742351546630617494414298833070600910205475763353480226572366348710990874867334
+airy_ai_control: 0.13529241631288141552414742351546630617494414298833070600910205475763353480226572366348710990874868323
+airy_ai_value  : 0.11392302126009621102904231059693500086750049240884734708541630001378825889924647699516200868335286103
+airy_ai_control: 0.1139230212600962110290423105969350008675004924088473470854163000137882588992464769951620086833528582
+...
+airy_ai_value  : 3.8990420982303275013276114626640705170145070824317976771461533035231088620152288641360519429331427451e-22
+airy_ai_control: 3.8990420982303275013276114626640705170145070824317976771461533035231088620152288641360519429331426481e-22
+
+Total... result_is_ok: true
+
+//] [/gauss_laguerre_quadrature_output_2]
+
+
+*/

@@ -19,22 +19,24 @@ int main()
 {
    using namespace boost::multiprecision;
 
-   BOOST_STATIC_ASSERT((boost::is_convertible<float, cpp_bin_float_single>::value));
-   BOOST_STATIC_ASSERT(!(boost::is_convertible<double, cpp_bin_float_single>::value));
-   BOOST_STATIC_ASSERT(!(boost::is_convertible<long double, cpp_bin_float_single>::value));
+   static_assert((std::is_convertible<float, cpp_bin_float_single>::value), "Error check");
+   static_assert(!(std::is_convertible<double, cpp_bin_float_single>::value), "Error check");
+   static_assert(!(std::is_convertible<long double, cpp_bin_float_single>::value), "Error check");
 
    cpp_bin_float_single s = boost::math::constants::pi<cpp_bin_float_single>();
+   std::cout << s << std::endl;
 
    typedef number<backends::cpp_bin_float<11, backends::digit_base_2, void, boost::int8_t, -14, 15>, et_off> cpp_bin_float_half;
 
-   BOOST_STATIC_ASSERT(!(boost::is_convertible<float, cpp_bin_float_half>::value));
-   BOOST_STATIC_ASSERT(!(boost::is_convertible<double, cpp_bin_float_half>::value));
-   BOOST_STATIC_ASSERT(!(boost::is_convertible<long double, cpp_bin_float_half>::value));
+   static_assert(!(std::is_convertible<float, cpp_bin_float_half>::value), "Error check");
+   static_assert(!(std::is_convertible<double, cpp_bin_float_half>::value), "Error check");
+   static_assert(!(std::is_convertible<long double, cpp_bin_float_half>::value), "Error check");
 #ifdef BOOST_HAS_FLOAT128
-   BOOST_STATIC_ASSERT(!(boost::is_convertible<__float128, cpp_bin_float_half>::value));
+   static_assert(!(std::is_convertible<__float128, cpp_bin_float_half>::value), "Error check");
 #endif
 
    cpp_bin_float_half hs = boost::math::constants::pi<cpp_bin_float_half>();
+   std::cout << hs << std::endl;
 
    return boost::report_errors();
 }

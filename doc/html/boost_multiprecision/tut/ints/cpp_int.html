@@ -1,10 +1,10 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>cpp_int</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../ints.html" title="Integer Types">
 <link rel="prev" href="../ints.html" title="Integer Types">
 <link rel="next" href="gmp_int.html" title="gmp_int">
@@ -267,14 +267,15 @@
               The type uses a sign-magnitude representation internally, so type
               <code class="computeroutput"><span class="identifier">int128_t</span></code> has 128-bits
               of precision plus an extra sign bit. In this respect the behaviour
-              of these types differs from built-in 2's complement types. In might
-              be tempting to use a 127-bit type instead, and indeed this does work,
-              but behaviour is still slightly different from a 2's complement built-in
-              type as the min and max values are identical (apart from the sign),
-              where as they differ by one for a true 2's complement type. That said
-              it should be noted that there's no requirement for built-in types to
-              be 2's complement either - it's simply that this is the most common
-              format by far.
+              of these types differs from <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+              (built-in)</a> 2's complement types. In might be tempting to use
+              a 127-bit type instead, and indeed this does work, but behaviour is
+              still slightly different from a 2's complement <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+              (built-in)</a> type as the minimum and maximum values are identical
+              (apart from the sign), where as they differ by one for a true 2's complement
+              type. That said it should be noted that there's no requirement for
+              fundamental_types to be 2's complement either - it's simply that this
+              is the most common format by far.
             </li>
 <li class="listitem">
               Attempting to print negative values as either an Octal or Hexadecimal
@@ -291,8 +292,9 @@
               Unsigned types support subtraction - the result is "as if"
               a 2's complement operation had been performed as long as they are not
               <span class="emphasis"><em>checked-integers</em></span> (see above). In other words they
-              behave pretty much as a built in integer type would in this situation.
-              So for example if we were using <code class="computeroutput"><span class="identifier">uint128_t</span></code>
+              behave pretty much as a <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+              (built-in)</a> integer type would in this situation. So for example
+              if we were using <code class="computeroutput"><span class="identifier">uint128_t</span></code>
               then <code class="computeroutput"><span class="identifier">uint128_t</span><span class="special">(</span><span class="number">1</span><span class="special">)-</span><span class="number">4</span></code>
               would result in the value <code class="computeroutput"><span class="number">0</span><span class="identifier">xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD</span></code>
               of type <code class="computeroutput"><span class="identifier">uint128_t</span></code>.
@@ -340,12 +342,13 @@
               have some support for <code class="computeroutput"><span class="keyword">constexpr</span></code>
               values and user-defined literals, see <a class="link" href="../lits.html" title="Literal Types and constexpr Support">here</a>
               for the full description. For example <code class="computeroutput"><span class="number">0xfffff</span><span class="identifier">_cppi1024</span></code> specifies a 1024-bit integer
-              with the value 0xffff. This can be used to generate compile time constants
-              that are too large to fit into any built in number type.
+              with the value 0xffff. This can be used to generate compile-time constants
+              that are too large to fit into any <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+              (built-in)</a> number type.
             </li>
 <li class="listitem">
               The <a class="link" href="cpp_int.html" title="cpp_int">cpp_int</a>
-              types support constexpr arithmetic, provided it is a fixed precision
+              types support constexpr arithmetic, provided it is a fixed-precision
               type with no allocator. It may also be a checked integer: in which
               case a compiler error will be generated on overflow or undefined behaviour.
               In addition the free functions <code class="computeroutput"><span class="identifier">abs</span></code>,
@@ -403,8 +406,8 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

@@ -3,13 +3,19 @@
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// Contains Quickbook snippets used by boost/libs/multiprecision/doc/multiprecision.qbk,
+// section Literal Types and constexpr Support.
+
 #include <iostream>
-#include <boost/math/constants/constants.hpp>
+#include <boost/config.hpp>
+
 #ifdef BOOST_HAS_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
 
 //[constexpr_circle
+#include <boost/math/constants/constants.hpp> // For constant pi with full precision of type T.
+// using  boost::math::constants::pi;
 
 template <class T>
 inline constexpr T circumference(T radius)
@@ -22,7 +28,7 @@ inline constexpr T area(T radius)
 {
    return boost::math::constants::pi<T>() * radius * radius;
 }
-//]
+//] [/constexpr_circle]
 
 template <class T, unsigned Order>
 struct const_polynomial
@@ -35,7 +41,7 @@ struct const_polynomial
    constexpr const_polynomial(const std::initializer_list<T>& init) : data{}
    {
       if (init.size() > Order + 1)
-         throw std::range_error("Too many initializers in list");
+         throw std::range_error("Too many initializers in list!");
       for (unsigned i = 0; i < init.size(); ++i)
          data[i] = init.begin()[i];
    }
@@ -208,7 +214,8 @@ class hermite_polynomial
       return m_data(val);
    }
 };
-//]
+//] [/hermite_example]
+
 //[hermite_example2
 template <class T>
 class hermite_polynomial<T, 0>
@@ -253,7 +260,8 @@ class hermite_polynomial<T, 1>
       return m_data(val);
    }
 };
-//]
+//] [/hermite_example2]
+
 
 void test_double()
 {
@@ -285,6 +293,8 @@ void test_double()
    static_assert(pg[1] == 38);
    static_assert(pg[2] == 24);
 
+   #if defined(__clang__) && (__clang_major__ < 6)
+   #else
    constexpr hermite_polynomial<double, 2> h1;
    static_assert(h1[0] == -2);
    static_assert(h1[1] == 0);
@@ -309,13 +319,13 @@ void test_double()
    static_assert(h9[9] == 512);
 
    static_assert(h9(0.5) == 6481);
-
+   #endif
 }
 
 void test_float128()
 {
 #ifdef BOOST_HAS_FLOAT128
-   //[constexpr_circle_usage
+//[constexpr_circle_usage
 
    using boost::multiprecision::float128;
 
@@ -326,7 +336,8 @@ void test_float128()
    std::cout << "Circumference = " << c << std::endl;
    std::cout << "Area = " << a << std::endl;
 
-   //]
+ //]   [/constexpr_circle_usage]
+
 
    constexpr hermite_polynomial<float128, 2> h1;
    static_assert(h1[0] == -2);
@@ -356,11 +367,9 @@ void test_float128()
    static_assert(h9[9] == 512);
    //
    // Define an abscissa value to evaluate at:
-   //
    constexpr float128 abscissa(0.5);
    //
-   // Evaluate H_9(0.5) using all constexpr arithmetic:
-   //
+   // Evaluate H_9(0.5) using all constexpr arithmetic, and check that it has the expected result:
    static_assert(h9(abscissa) == 6481);
    //]
 #endif

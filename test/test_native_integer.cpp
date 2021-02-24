@@ -26,7 +26,7 @@ void test()
    I i(0);
 
 #ifndef BOOST_NO_EXCEPTIONS
-   BOOST_CHECK_THROW(lsb(i), std::range_error);
+   BOOST_CHECK_THROW(lsb(i), std::domain_error);
 #endif
    BOOST_CHECK(bit_test(bit_set(i, 0), 0));
    BOOST_CHECK_EQUAL(bit_set(i, 0), 1);
@@ -49,7 +49,7 @@ void test()
    if (std::numeric_limits<I>::is_signed)
    {
       i = static_cast<I>(-1);
-      BOOST_CHECK_THROW(lsb(i), std::range_error);
+      BOOST_CHECK_THROW(lsb(i), std::domain_error);
    }
 #endif
    H mx = (std::numeric_limits<H>::max)();
@@ -90,12 +90,12 @@ int main()
 {
    using namespace boost::multiprecision;
 
-   test<boost::int16_t, boost::int8_t>();
-   test<boost::int32_t, boost::int16_t>();
-   test<boost::int64_t, boost::int32_t>();
-   test<boost::uint16_t, boost::uint8_t>();
-   test<boost::uint32_t, boost::uint16_t>();
-   test<boost::uint64_t, boost::uint32_t>();
+   test<std::int16_t, boost::int8_t>();
+   test<std::int32_t, std::int16_t>();
+   test<std::int64_t, std::int32_t>();
+   test<std::uint16_t, boost::uint8_t>();
+   test<std::uint32_t, std::uint16_t>();
+   test<std::uint64_t, std::uint32_t>();
 
    return boost::report_errors();
 }
