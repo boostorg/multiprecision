@@ -26,6 +26,6 @@ The following back-ends provide floating-point arithmetic:
 [include tutorial_gmp_float.qbk]
 [include tutorial_mpfr_float.qbk]
 [include tutorial_float128.qbk]
-[include tutorial_float_eg.qbk]
+[include tutorial_float_builtin_ctor.qbk]
 
 [endsect] [/section:floats floating-point Numbers]
