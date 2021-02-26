@@ -90,7 +90,7 @@ The template arguments are:
 [[Allocator][The allocator to use for dynamic memory allocation, or type `void` if MaxBits == MinBits.]]
 ]
 
-The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_integer>`.
+The type of `number_category<cpp_int<Args...> >::type` is `std::integral_constant<int, number_kind_integer>`.
 
 More information on this type can be found in the [link boost_multiprecision.tut.ints.cpp_int tutorial].
 

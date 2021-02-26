@@ -13,7 +13,6 @@ namespace detail {
 template <unsigned digits>
 struct calc_max_digits10
 {
-#ifndef BOOST_NO_CXX11_CONSTEXPR
    static constexpr unsigned max_digits_10(unsigned d)
    {
       //
@@ -25,20 +24,12 @@ struct calc_max_digits10
       //
       return static_cast<unsigned>(0.301029995663981195213738894724493026768189881462108541310 * d) + 2;
    }
-   static const unsigned value = max_digits_10(digits);
-#else
-   //
-   // This version works up to about 15K binary digits, then starts sporadically failing
-   // and giving values that are 1 too small.
-   //
-   BOOST_STATIC_CONSTANT(unsigned, value = 2 + ((static_cast<boost::uint64_t>(digits) * static_cast<boost::uint64_t>(1292913986)) >> 32));
-#endif
+   static constexpr const unsigned value = max_digits_10(digits);
 };
 
 template <unsigned digits>
 struct calc_digits10
 {
-#ifndef BOOST_NO_CXX11_CONSTEXPR
    static constexpr unsigned digits_10(unsigned d)
    {
       //
@@ -48,10 +39,7 @@ struct calc_digits10
       //
       return static_cast<unsigned>(0.301029995663981195213738894724493026768189881462108541310 * (d - 1));
    }
-   static const unsigned value = digits_10(digits);
-#else
-   BOOST_STATIC_CONSTANT(unsigned, value = ((static_cast<boost::uint64_t>(digits - 1) * static_cast<boost::uint64_t>(1292913986)) >> 32));
-#endif
+   static constexpr const unsigned value = digits_10(digits);
 };
 
 }}} // namespace boost::multiprecision::detail

@@ -12,7 +12,7 @@
 
    namespace boost{ namespace multiprecision{
 
-   template <unsigned Digits10, class ExponentType = boost::int32_t, class Allocator = void>
+   template <unsigned Digits10, class ExponentType = std::int32_t, class Allocator = void>
    class cpp_dec_float;
 
    typedef number<cpp_dec_float<50> > cpp_dec_float_50;
@@ -35,7 +35,7 @@ template argument should not be set too high or the class's size will grow unrea
 allocation is performed, but can be set to a standard library allocator if dynamic allocation makes more sense.]]
 ]
 
-The type of `number_category<cpp_dec_float<Args...> >::type` is `mpl::int_<number_kind_floating_point>`.
+The type of `number_category<cpp_dec_float<Args...> >::type` is `std::integral_constant<int, number_kind_floating_point>`.
 
 More information on this type can be found in the [link boost_multiprecision.tut.floats.cpp_dec_float tutorial].
 

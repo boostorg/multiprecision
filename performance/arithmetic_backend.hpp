@@ -9,12 +9,11 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/lexical_cast.hpp>
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/integer/common_factor_rt.hpp>
-#include <boost/type_traits/common_type.hpp>
 #include <boost/container_hash/hash.hpp>
 
 namespace boost {
@@ -29,15 +28,15 @@ namespace backends {
 template <class Arithmetic>
 struct arithmetic_backend
 {
-   typedef mpl::list<short, int, long, long long>                                 signed_types;
-   typedef mpl::list<unsigned short, unsigned, unsigned long, unsigned long long> unsigned_types;
-   typedef mpl::list<float, double, long double>                                  float_types;
+   typedef std::tuple<short, int, long, long long>                                 signed_types;
+   typedef std::tuple<unsigned short, unsigned, unsigned long, unsigned long long> unsigned_types;
+   typedef std::tuple<float, double, long double>                                  float_types;
    typedef int                                                                    exponent_type;
 
    BOOST_MP_CXX14_CONSTEXPR arithmetic_backend() : m_value(0) {}
    BOOST_MP_CXX14_CONSTEXPR arithmetic_backend(const arithmetic_backend& o) : m_value(o.m_value) {}
    template <class A>
-   BOOST_MP_CXX14_CONSTEXPR arithmetic_backend(const A& o, const typename enable_if<is_arithmetic<A> >::type* = 0) : m_value(o) {}
+   BOOST_MP_CXX14_CONSTEXPR arithmetic_backend(const A& o, const typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value >::type* = 0) : m_value(o) {}
    template <class A>
    BOOST_MP_CXX14_CONSTEXPR arithmetic_backend(const arithmetic_backend<A>& o) : m_value(o.data()) {}
    BOOST_MP_CXX14_CONSTEXPR arithmetic_backend& operator=(const arithmetic_backend& o)
@@ -46,9 +45,9 @@ struct arithmetic_backend
       return *this;
    }
    template <class A>
-   BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A>, arithmetic_backend&>::type operator=(A i)
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, arithmetic_backend&>::type operator=(A i)
    {
-      m_value = i;
+      m_value = static_cast<Arithmetic>(i);
       return *this;
    }
    template <class A>
@@ -84,24 +83,24 @@ struct arithmetic_backend
       ss << std::setprecision(digits ? digits : std::numeric_limits<Arithmetic>::digits10 + 4) << m_value;
       return ss.str();
    }
-   BOOST_MP_CXX14_CONSTEXPR void do_negate(const mpl::true_&)
+   BOOST_MP_CXX14_CONSTEXPR void do_negate(const std::integral_constant<bool, true>&)
    {
       m_value = 1 + ~m_value;
    }
-   BOOST_MP_CXX14_CONSTEXPR void do_negate(const mpl::false_&)
+   BOOST_MP_CXX14_CONSTEXPR void do_negate(const std::integral_constant<bool, false>&)
    {
       m_value = -m_value;
    }
    BOOST_MP_CXX14_CONSTEXPR void negate()
    {
-      do_negate(mpl::bool_<is_unsigned<Arithmetic>::value>());
+      do_negate(std::integral_constant<bool, boost::multiprecision::detail::is_unsigned<Arithmetic>::value>());
    }
    BOOST_MP_CXX14_CONSTEXPR int compare(const arithmetic_backend& o) const
    {
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
    template <class A>
-   BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A>, int>::type compare(A i) const
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, int>::type compare(A i) const
    {
       return m_value > static_cast<Arithmetic>(i) ? 1 : (m_value < static_cast<Arithmetic>(i) ? -1 : 0);
    }
@@ -113,16 +112,16 @@ struct arithmetic_backend
 };
 
 template <class R, class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& backend)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<R>::value>::type eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& backend)
 {
-   typedef typename boost::common_type<R, Arithmetic>::type c_type;
-   BOOST_CONSTEXPR const c_type                             max = static_cast<c_type>((std::numeric_limits<R>::max)());
-   BOOST_CONSTEXPR const c_type                             min = static_cast<c_type>((std::numeric_limits<R>::min)());
+   typedef typename std::common_type<R, Arithmetic>::type c_type;
+   constexpr const c_type                             max = static_cast<c_type>((std::numeric_limits<R>::max)());
+   constexpr const c_type                             min = static_cast<c_type>((std::numeric_limits<R>::min)());
    c_type                                                   ct  = static_cast<c_type>(backend.data());
    if ((backend.data() < 0) && !std::numeric_limits<R>::is_signed)
       BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative number to unsigned type."));
    if (ct > max)
-      *result = boost::is_signed<R>::value ? (std::numeric_limits<R>::max)() : backend.data();
+      *result = boost::multiprecision::detail::is_signed<R>::value ? (std::numeric_limits<R>::max)() : backend.data();
    else if (std::numeric_limits<Arithmetic>::is_signed && (ct < min))
       *result = (std::numeric_limits<R>::min)();
    else
@@ -130,7 +129,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<boost::is_integral<R>::valu
 }
 
 template <class R, class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename disable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& backend)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!boost::multiprecision::detail::is_integral<R>::value>::type eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& backend)
 {
    *result = backend.data();
 }
@@ -141,7 +140,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq(const arithmetic_backend<Arithmetic
    return a.data() == b.data();
 }
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A2>, bool>::type eval_eq(const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A2>::value, bool>::type eval_eq(const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    return a.data() == static_cast<Arithmetic>(b);
 }
@@ -151,7 +150,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_lt(const arithmetic_backend<Arithmetic
    return a.data() < b.data();
 }
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A2>, bool>::type eval_lt(const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A2>::value, bool>::type eval_lt(const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    return a.data() < static_cast<Arithmetic>(b);
 }
@@ -161,7 +160,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_gt(const arithmetic_backend<Arithmetic
    return a.data() > b.data();
 }
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A2>, bool>::type eval_gt(const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A2>::value, bool>::type eval_gt(const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    return a.data() > static_cast<Arithmetic>(b);
 }
@@ -182,12 +181,12 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_multiply(arithmetic_backend<Arithmetic
    result.data() *= o.data();
 }
 template <class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
    result.data() /= o.data();
 }
 template <class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename disable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
    if (!o.data())
       BOOST_THROW_EXCEPTION(std::overflow_error("Divide by zero"));
@@ -195,22 +194,22 @@ inline BOOST_MP_CXX14_CONSTEXPR typename disable_if_c<std::numeric_limits<Arithm
 }
 
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A2> >::type eval_add(arithmetic_backend<Arithmetic>& result, const A2& o)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A2>::value>::type eval_add(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
    result.data() += o;
 }
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A2> >::type eval_subtract(arithmetic_backend<Arithmetic>& result, const A2& o)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A2>::value>::type eval_subtract(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
    result.data() -= o;
 }
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A2> >::type eval_multiply(arithmetic_backend<Arithmetic>& result, const A2& o)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A2>::value>::type eval_multiply(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
    result.data() *= o;
 }
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type
 eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
    if (!o)
@@ -218,7 +217,7 @@ eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
    result.data() /= o;
 }
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<(is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type
 eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
    result.data() /= o;
@@ -240,12 +239,12 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_multiply(arithmetic_backend<Arithmetic
    result.data() = a.data() * b.data();
 }
 template <class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
 {
    result.data() = a.data() / b.data();
 }
 template <class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename disable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
 {
    if (!b.data())
       BOOST_THROW_EXCEPTION(std::overflow_error("Divide by zero"));
@@ -253,22 +252,22 @@ inline BOOST_MP_CXX14_CONSTEXPR typename disable_if_c<std::numeric_limits<Arithm
 }
 
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A2> >::type eval_add(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A2>::value>::type eval_add(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    result.data() = a.data() + b;
 }
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A2> >::type eval_subtract(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A2>::value>::type eval_subtract(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    result.data() = a.data() - b;
 }
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A2> >::type eval_multiply(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A2>::value>::type eval_multiply(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    result.data() = a.data() * b;
 }
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type
 eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    if (!b)
@@ -276,7 +275,7 @@ eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Ari
    result.data() = a.data() / b;
 }
 template <class Arithmetic, class A2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<(is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type
 eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    result.data() = a.data() / b;
@@ -289,22 +288,22 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_is_zero(const arithmetic_backend<Arith
 }
 
 template <class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     (!std::numeric_limits<Arithmetic>::is_specialized || std::numeric_limits<Arithmetic>::is_signed), int>::type
 eval_get_sign(const arithmetic_backend<Arithmetic>& val)
 {
    return val.data() == 0 ? 0 : val.data() < 0 ? -1 : 1;
 }
 template <class Arithmetic>
-inline BOOST_MP_CXX14_CONSTEXPR typename disable_if_c<
-    (std::numeric_limits<Arithmetic>::is_specialized || std::numeric_limits<Arithmetic>::is_signed), int>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+    !(std::numeric_limits<Arithmetic>::is_specialized || std::numeric_limits<Arithmetic>::is_signed), int>::type
 eval_get_sign(const arithmetic_backend<Arithmetic>& val)
 {
    return val.data() == 0 ? 0 : 1;
 }
 
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_unsigned<T>, T>::type abs(T v) { return v; }
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_unsigned<T>::value, T>::type abs(T v) { return v; }
 
 template <class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_abs(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
@@ -550,7 +549,7 @@ inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const arithmetic_backend<
 using boost::multiprecision::backends::arithmetic_backend;
 
 template <class Arithmetic>
-struct number_category<arithmetic_backend<Arithmetic> > : public mpl::int_<is_integral<Arithmetic>::value ? number_kind_integer : number_kind_floating_point>
+struct number_category<arithmetic_backend<Arithmetic> > : public std::integral_constant<int, boost::multiprecision::detail::is_integral<Arithmetic>::value ? number_kind_integer : number_kind_floating_point>
 {};
 
 namespace detail {
@@ -564,9 +563,9 @@ struct double_precision_type<number<arithmetic_backend<Arithmetic>, ET> >
    typedef number<arithmetic_backend<typename double_precision_type<Arithmetic>::type>, ET> type;
 };
 template <>
-struct double_precision_type<arithmetic_backend<boost::int32_t> >
+struct double_precision_type<arithmetic_backend<std::int32_t> >
 {
-   typedef arithmetic_backend<boost::int64_t> type;
+   typedef arithmetic_backend<std::int64_t> type;
 };
 
 } // namespace detail
@@ -630,15 +629,15 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::arithm
    typedef boost::multiprecision::number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates> number_type;
 
  public:
-   BOOST_STATIC_CONSTEXPR number_type(min)() BOOST_NOEXCEPT { return (base_type::min)(); }
-   BOOST_STATIC_CONSTEXPR number_type(max)() BOOST_NOEXCEPT { return (base_type::max)(); }
-   BOOST_STATIC_CONSTEXPR number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
-   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
-   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
-   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_NOEXCEPT { return base_type::infinity(); }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_NOEXCEPT { return base_type::quiet_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_NOEXCEPT { return base_type::signaling_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
+   static constexpr number_type(min)() noexcept { return (base_type::min)(); }
+   static constexpr number_type(max)() noexcept { return (base_type::max)(); }
+   static constexpr number_type lowest() noexcept { return -(max)(); }
+   static constexpr number_type epsilon() noexcept { return base_type::epsilon(); }
+   static constexpr number_type round_error() noexcept { return epsilon() / 2; }
+   static constexpr number_type infinity() noexcept { return base_type::infinity(); }
+   static constexpr number_type quiet_NaN() noexcept { return base_type::quiet_NaN(); }
+   static constexpr number_type signaling_NaN() noexcept { return base_type::signaling_NaN(); }
+   static constexpr number_type denorm_min() noexcept { return base_type::denorm_min(); }
 };
 
 template <>
@@ -648,15 +647,15 @@ class numeric_limits<boost::math::concepts::real_concept> : public std::numeric_
    typedef boost::math::concepts::real_concept number_type;
 
  public:
-   static const number_type(min)() BOOST_NOEXCEPT { return (base_type::min)(); }
-   static const number_type(max)() BOOST_NOEXCEPT { return (base_type::max)(); }
-   static const number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
-   static const number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
-   static const number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
-   static const number_type infinity() BOOST_NOEXCEPT { return base_type::infinity(); }
-   static const number_type quiet_NaN() BOOST_NOEXCEPT { return base_type::quiet_NaN(); }
-   static const number_type signaling_NaN() BOOST_NOEXCEPT { return base_type::signaling_NaN(); }
-   static const number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
+   static const number_type(min)() noexcept { return (base_type::min)(); }
+   static const number_type(max)() noexcept { return (base_type::max)(); }
+   static const number_type lowest() noexcept { return -(max)(); }
+   static const number_type epsilon() noexcept { return base_type::epsilon(); }
+   static const number_type round_error() noexcept { return epsilon() / 2; }
+   static const number_type infinity() noexcept { return base_type::infinity(); }
+   static const number_type quiet_NaN() noexcept { return base_type::quiet_NaN(); }
+   static const number_type signaling_NaN() noexcept { return base_type::signaling_NaN(); }
+   static const number_type denorm_min() noexcept { return base_type::denorm_min(); }
 };
 
 } // namespace std

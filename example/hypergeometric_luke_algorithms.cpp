@@ -30,13 +30,7 @@
 #define DIGIT_COUNT 100
 #endif
 
-#if !defined(BOOST_NO_CXX11_HDR_CHRONO)
-  #include <chrono>
-  #define STD_CHRONO std::chrono
-#else
-  #include <boost/chrono.hpp>
-  #define STD_CHRONO boost::chrono
-#endif
+#include <chrono>
 
 #if defined(USE_CPP_BIN_FLOAT)
   #include <boost/multiprecision/cpp_bin_float.hpp>
@@ -642,7 +636,7 @@ T examples::nr_006::luke_ccoef2_hypergeometric_2f1(const T& a, const T& b, const
 
 int main()
 {
-  stopwatch<STD_CHRONO::high_resolution_clock> my_stopwatch;
+  stopwatch<std::chrono::high_resolution_clock> my_stopwatch;
   float total_time = 0.0F;
 
   std::vector<mp_type> hypergeometric_0f1_results(20U);
@@ -675,7 +669,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
+  total_time += std::chrono::duration_cast<std::chrono::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric0F1.
   std::for_each(hypergeometric_0f1_results.begin(),
@@ -703,7 +697,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
+  total_time += std::chrono::duration_cast<std::chrono::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric1F0.
   std::for_each(hypergeometric_1f0_results.begin(),
@@ -731,7 +725,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
+  total_time += std::chrono::duration_cast<std::chrono::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric1F1.
   std::for_each(hypergeometric_1f1_results.begin(),
@@ -759,7 +753,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
+  total_time += std::chrono::duration_cast<std::chrono::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric1F2.
   std::for_each(hypergeometric_1f2_results.begin(),
@@ -787,7 +781,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
+  total_time += std::chrono::duration_cast<std::chrono::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric2F1.
   std::for_each(hypergeometric_2f1_results.begin(),

@@ -20,7 +20,7 @@
 // Just exclude that combination from testing for now as it's purely a testing issue
 // and we have other compilers that cover this sanity check...
 //
-#if !(defined(__clang__) && (__cplusplus > 201300) && (__cplusplus < 201700))
+#if 1// !(defined(__clang__) && (__cplusplus > 201300))
 
 using boost::multiprecision::cpp_int;
 

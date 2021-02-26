@@ -13,33 +13,33 @@ namespace boost {
 namespace multiprecision {
 
 template <class Integer, class I2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value && boost::multiprecision::detail::is_integral<I2>::value, Integer&>::type
 multiply(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) * static_cast<Integer>(b);
 }
 template <class Integer, class I2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value && boost::multiprecision::detail::is_integral<I2>::value, Integer&>::type
 add(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) + static_cast<Integer>(b);
 }
 template <class Integer, class I2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value && boost::multiprecision::detail::is_integral<I2>::value, Integer&>::type
 subtract(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) - static_cast<Integer>(b);
 }
 
 template <class Integer>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value>::type divide_qr(const Integer& x, const Integer& y, Integer& q, Integer& r)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value>::type divide_qr(const Integer& x, const Integer& y, Integer& q, Integer& r)
 {
    q = x / y;
    r = x % y;
 }
 
 template <class I1, class I2>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I1>::value && is_integral<I2>::value, I2>::type integer_modulus(const I1& x, I2 val)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I1>::value && boost::multiprecision::detail::is_integral<I2>::value, I2>::type integer_modulus(const I1& x, I2 val)
 {
    return static_cast<I2>(x % val);
 }
@@ -54,31 +54,31 @@ namespace detail {
 template <class I>
 struct double_integer
 {
-   static const unsigned int_t_digits =
+   static constexpr const unsigned int_t_digits =
        2 * sizeof(I) <= sizeof(boost::long_long_type) ? std::numeric_limits<I>::digits * 2 : 1;
 
-   typedef typename mpl::if_c<
+   using type = typename std::conditional<
        2 * sizeof(I) <= sizeof(boost::long_long_type),
-       typename mpl::if_c<
-           is_signed<I>::value,
+       typename std::conditional<
+           boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value,
            typename boost::int_t<int_t_digits>::least,
            typename boost::uint_t<int_t_digits>::least>::type,
-       typename mpl::if_c<
+       typename std::conditional<
            2 * sizeof(I) <= sizeof(double_limb_type),
-           typename mpl::if_c<
-               is_signed<I>::value,
+           typename std::conditional<
+               boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value,
                signed_double_limb_type,
                double_limb_type>::type,
-           number<cpp_int_backend<sizeof(I) * CHAR_BIT * 2, sizeof(I) * CHAR_BIT * 2, (is_signed<I>::value ? signed_magnitude : unsigned_magnitude), unchecked, void> > >::type>::type type;
+           number<cpp_int_backend<sizeof(I) * CHAR_BIT * 2, sizeof(I) * CHAR_BIT * 2, (boost::multiprecision::detail::is_signed<I>::value ? signed_magnitude : unsigned_magnitude), unchecked, void> > >::type>::type;
 };
 
 } // namespace detail
 
 template <class I1, class I2, class I3>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I1>::value && is_unsigned<I2>::value && is_integral<I3>::value, I1>::type
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I1>::value && boost::multiprecision::detail::is_unsigned<I2>::value && is_integral<I3>::value, I1>::type
 powm(const I1& a, I2 b, I3 c)
 {
-   typedef typename detail::double_integer<I1>::type double_type;
+   using double_type = typename detail::double_integer<I1>::type;
 
    I1          x(1), y(a);
    double_type result(0);
@@ -98,52 +98,52 @@ powm(const I1& a, I2 b, I3 c)
 }
 
 template <class I1, class I2, class I3>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I1>::value && is_signed<I2>::value && is_integral<I3>::value, I1>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I1>::value && boost::multiprecision::detail::is_signed<I2>::value && boost::multiprecision::detail::is_integral<I2>::value && boost::multiprecision::detail::is_integral<I3>::value, I1>::type
 powm(const I1& a, I2 b, I3 c)
 {
    if (b < 0)
    {
       BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
-   return powm(a, static_cast<typename make_unsigned<I2>::type>(b), c);
+   return powm(a, static_cast<typename boost::multiprecision::detail::make_unsigned<I2>::type>(b), c);
 }
 
 template <class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, unsigned>::type lsb(const Integer& val)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, unsigned>::type lsb(const Integer& val)
 {
    if (val <= 0)
    {
       if (val == 0)
       {
-         BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+         BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
       }
       else
       {
-         BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+         BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
       }
    }
    return detail::find_lsb(val);
 }
 
 template <class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, unsigned>::type msb(Integer val)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, unsigned>::type msb(Integer val)
 {
    if (val <= 0)
    {
       if (val == 0)
       {
-         BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+         BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
       }
       else
       {
-         BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+         BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
       }
    }
    return detail::find_msb(val);
 }
 
 template <class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, bool>::type bit_test(const Integer& val, unsigned index)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, bool>::type bit_test(const Integer& val, unsigned index)
 {
    Integer mask = 1;
    if (index >= sizeof(Integer) * CHAR_BIT)
@@ -154,7 +154,7 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, bool>
 }
 
 template <class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_set(Integer& val, unsigned index)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer&>::type bit_set(Integer& val, unsigned index)
 {
    Integer mask = 1;
    if (index >= sizeof(Integer) * CHAR_BIT)
@@ -166,7 +166,7 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integ
 }
 
 template <class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_unset(Integer& val, unsigned index)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer&>::type bit_unset(Integer& val, unsigned index)
 {
    Integer mask = 1;
    if (index >= sizeof(Integer) * CHAR_BIT)
@@ -178,7 +178,7 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integ
 }
 
 template <class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_flip(Integer& val, unsigned index)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer&>::type bit_flip(Integer& val, unsigned index)
 {
    Integer mask = 1;
    if (index >= sizeof(Integer) * CHAR_BIT)
@@ -190,7 +190,7 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integ
 }
 
 template <class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Integer& x, Integer& r)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type sqrt(const Integer& x, Integer& r)
 {
    //
    // This is slow bit-by-bit integer square root, see for example
@@ -235,7 +235,7 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integ
 }
 
 template <class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Integer& x)
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type sqrt(const Integer& x)
 {
    Integer r(0);
    return sqrt(x, r);

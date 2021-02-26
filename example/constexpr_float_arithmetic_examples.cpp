@@ -293,6 +293,8 @@ void test_double()
    static_assert(pg[1] == 38);
    static_assert(pg[2] == 24);
 
+   #if defined(__clang__) && (__clang_major__ < 6)
+   #else
    constexpr hermite_polynomial<double, 2> h1;
    static_assert(h1[0] == -2);
    static_assert(h1[1] == 0);
@@ -317,7 +319,7 @@ void test_double()
    static_assert(h9[9] == 512);
 
    static_assert(h9(0.5) == 6481);
-
+   #endif
 }
 
 void test_float128()

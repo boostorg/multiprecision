@@ -49,6 +49,7 @@ typedef number<cpp_bin_float<std::numeric_limits<good_type>::digits, digit_base_
 
 void test_special_cases()
 {
+#if !defined(BOOST_CI_ASAN_BUILD) && !defined(BOOST_CI_USAN_BUID)
    test_type max_val     = (std::numeric_limits<test_type>::max)();
    test_type min_val     = (std::numeric_limits<test_type>::min)();
    test_type eps         = std::numeric_limits<test_type>::epsilon();
@@ -789,11 +790,15 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-b - -a)), good_type(-gb - -ga));
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
+   #endif
 }
 
 int main()
 {
+   // compile times are too long for CI when ASAN is enabled, prune things down a bit:
+#if !defined(BOOST_CI_ASAN_BUILD) && !defined(BOOST_CI_USAN_BUID)
    test_special_cases();
+#endif
    unsigned error_count = 0;
    for (unsigned i = 0; i < 100000; ++i)
    {
@@ -801,7 +806,6 @@ int main()
       good_type b = generate_random<good_type>();
       test_type ta(a);
       test_type tb(b);
-
       BOOST_CHECK_EQUAL(test_type(a * b), ta * tb);
       BOOST_CHECK_EQUAL(test_type(-a * b), -ta * tb);
       BOOST_CHECK_EQUAL(test_type(a * -b), ta * -tb);

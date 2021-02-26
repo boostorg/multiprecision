@@ -37,7 +37,7 @@
 // static long double const log10Two = 0.30102999566398119521373889472449L; // log10(2.)
 // It is more portable useful to use a Boost macro
 // See https://www.boost.org/doc/libs/release/libs/config/doc/html/boost_config/boost_macro_reference.html
-BOOST_STATIC_CONSTEXPR long double log10Two = 0.30102999566398119521373889472449L;
+static constexpr long double log10Two = 0.30102999566398119521373889472449L;
 // which expands to static constexpr on standard C++11 and up, but static const on earlier versions.
 
   /*`By default, output would only show the standard 6 decimal digits,
@@ -52,12 +52,11 @@ template <typename T>
 int max_digits10()
 {
    int significand_digits = std::numeric_limits<T>::digits;
-  // BOOST_CONSTEXPR_OR_CONST int significand_digits = std::numeric_limits<T>::digits;
+  // constexpr int significand_digits = std::numeric_limits<T>::digits;
    return static_cast<int>(ceil(1 + significand_digits * log10Two));
 } // template <typename T> int max_digits10()
 
 // Used to test max_digits10<>() function below.
-//#define BOOST_NO_CXX11_NUMERIC_LIMITS
 
 BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 {
@@ -74,21 +73,11 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 
   typedef float T;
 
-#if defined BOOST_NO_CXX11_NUMERIC_LIMITS
-   // No max_digits10 implemented.
-    std::cout.precision(max_digits10<T>());
-#else
-  #if(_MSC_VER <= 1600)
-   //  The MSVC 2010 version had the wrong value for std::numeric_limits<float>::max_digits10.
-    std::cout.precision(max_digits10<T>());
-  #else // Use the C++11 max_digits10.
-     std::cout.precision(std::numeric_limits<T>::max_digits10);
-     std::cout.precision(std::numeric_limits<T>::digits10);
-     std::cout.setf(std::ios_base::showpoint); // Append any trailing zeros,
-     // or more memorably
-     std::cout << std::showpoint << std::endl; //
-  #endif
-#endif
+  std::cout.precision(std::numeric_limits<T>::max_digits10);
+  std::cout.precision(std::numeric_limits<T>::digits10);
+  std::cout.setf(std::ios_base::showpoint); // Append any trailing zeros,
+  // or more memorably
+  std::cout << std::showpoint << std::endl; //
 
   std::cout << "std::cout.precision(max_digits10) = " << std::cout.precision() << std::endl; // 9
 

@@ -25,6 +25,10 @@ int main()
       test<big_type2, small_type2>();
       test<big_type1, small_type2>();
       test<big_type2, small_type1>();
+
+      typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float<100, boost::multiprecision::digit_base_10, std::allocator<char> >, boost::multiprecision::et_on> big_type1a;
+
+      test<big_type1, big_type1a>();
 #ifndef BOOST_NO_EXCEPTIONS
    }
    catch (const std::exception& e)

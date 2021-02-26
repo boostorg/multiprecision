@@ -47,12 +47,15 @@ project
       <toolset>msvc:<cxxflags>/wd4512
       <toolset>msvc:<cxxflags>/wd4610
       <toolset>msvc:<cxxflags>/wd4510
-      <toolset>msvc:<cxxflags>/wd4127
+      #<toolset>msvc:<cxxflags>/wd4127
       <toolset>msvc:<cxxflags>/wd4701
-      <toolset>msvc:<cxxflags>/wd4127
       <toolset>msvc:<cxxflags>/wd4305
       <toolset>clang:<link>static
-     
+      [ requires  
+         cxx11_rvalue_references cxx11_template_aliases cxx11_hdr_array cxx11_allocator cxx11_constexpr cxx11_explicit_conversion_operators cxx11_ref_qualifiers
+         cxx11_hdr_functional cxx11_variadic_templates cxx11_user_defined_literals cxx11_decltype cxx11_static_assert cxx11_defaulted_functions
+         cxx11_noexcept cxx11_ref_qualifiers cxx11_user_defined_literals cxx11_hdr_type_traits
+         ]
     ;
 
 lib gmp : : <search>$(gmp_path) ;

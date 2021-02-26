@@ -84,7 +84,7 @@ T get_random()
 }
 
 template <class T, class U>
-typename boost::disable_if_c<boost::multiprecision::is_interval_number<T>::value>::type check_within_half(T a, U u)
+typename std::enable_if<!boost::multiprecision::is_interval_number<T>::value>::type check_within_half(T a, U u)
 {
    BOOST_MATH_STD_USING
    if (fabs(a - u) > 0.5f)
@@ -101,7 +101,7 @@ typename boost::disable_if_c<boost::multiprecision::is_interval_number<T>::value
    }
 }
 template <class T, class U>
-typename boost::enable_if_c<boost::multiprecision::is_interval_number<T>::value>::type check_within_half(T a, U u)
+typename std::enable_if<boost::multiprecision::is_interval_number<T>::value>::type check_within_half(T a, U u)
 {
    BOOST_MATH_STD_USING
    if (upper(T(fabs(a - u))) > 0.5f)
@@ -134,7 +134,7 @@ inline unsigned long long safe_abs(long long const& v)
    return v < 0 ? static_cast<unsigned long long>(1u) + static_cast<unsigned long long>(-(v + 1)) : v;
 }
 template <class T>
-inline typename boost::disable_if_c<boost::is_integral<T>::value, T>::type safe_abs(T const& v)
+inline typename std::enable_if<!boost::multiprecision::detail::is_integral<T>::value, T>::type safe_abs(T const& v)
 {
    return v < 0 ? -v : v;
 }
