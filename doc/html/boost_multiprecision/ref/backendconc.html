@@ -107,7 +107,7 @@
               </td>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">list</span><span class="special">&lt;</span><span class="identifier">type</span><span class="special">-</span><span class="identifier">list</span><span class="special">&gt;</span></code>
+                  <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">type</span><span class="special">-</span><span class="identifier">list</span><span class="special">&gt;</span></code>
                 </p>
               </td>
 <td>
@@ -131,7 +131,7 @@
               </td>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">list</span><span class="special">&lt;</span><span class="identifier">type</span><span class="special">-</span><span class="identifier">list</span><span class="special">&gt;</span></code>
+                  <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">type</span><span class="special">-</span><span class="identifier">list</span><span class="special">&gt;</span></code>
                 </p>
               </td>
 <td>
@@ -155,7 +155,7 @@
               </td>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">list</span><span class="special">&lt;</span><span class="identifier">type</span><span class="special">-</span><span class="identifier">list</span><span class="special">&gt;</span></code>
+                  <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="identifier">type</span><span class="special">-</span><span class="identifier">list</span><span class="special">&gt;</span></code>
                 </p>
               </td>
 <td>
@@ -932,7 +932,7 @@
               </td>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">int_</span><span class="special">&lt;</span><span class="identifier">N</span><span class="special">&gt;</span></code>
+                  <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">integral_constant</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span> <span class="identifier">N</span><span class="special">&gt;</span></code>
                 </p>
               </td>
 <td>
@@ -1581,7 +1581,7 @@
                   function returns <code class="computeroutput"><span class="identifier">cb</span><span class="special">.</span><span class="identifier">compare</span><span class="special">(</span><span class="identifier">ui_type</span><span class="special">(</span><span class="number">0</span><span class="special">))</span> <span class="special">==</span>
                   <span class="number">0</span></code>, where <code class="computeroutput"><span class="identifier">ui_type</span></code>
                   is <code class="computeroutput"><span class="identifier">ui_type</span></code> is
-                  <code class="computeroutput"><span class="keyword">typename</span> <span class="identifier">mpl</span><span class="special">::</span><span class="identifier">front</span><span class="special">&lt;</span><span class="keyword">typename</span>
+                  <code class="computeroutput"><span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple_element</span><span class="special">&lt;</span><span class="number">0</span><span class="special">,</span> <span class="keyword">typename</span>
                   <span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span><span class="special">&gt;::</span><span class="identifier">type</span></code>.
                 </p>
               </td>
@@ -1609,7 +1609,7 @@
                   is positive, and zero if <code class="computeroutput"><span class="identifier">cb</span></code>
                   is zero. The default version of this function returns <code class="computeroutput"><span class="identifier">cb</span><span class="special">.</span><span class="identifier">compare</span><span class="special">(</span><span class="identifier">ui_type</span><span class="special">(</span><span class="number">0</span><span class="special">))</span></code>,
                   where <code class="computeroutput"><span class="identifier">ui_type</span></code> is
-                  <code class="computeroutput"><span class="identifier">ui_type</span></code> is <code class="computeroutput"><span class="keyword">typename</span> <span class="identifier">mpl</span><span class="special">::</span><span class="identifier">front</span><span class="special">&lt;</span><span class="keyword">typename</span>
+                  <code class="computeroutput"><span class="identifier">ui_type</span></code> is <code class="computeroutput"><span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple_element</span><span class="special">&lt;</span><span class="number">0</span><span class="special">,</span> <span class="keyword">typename</span>
                   <span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span><span class="special">&gt;::</span><span class="identifier">type</span></code>.
                 </p>
               </td>
@@ -2337,7 +2337,7 @@
                   by one. When not provided, does the equivalent of <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">ui_type</span><span class="special">&gt;(</span><span class="number">1u</span><span class="special">))</span></code>.
                   Where <code class="computeroutput"><span class="identifier">ui_type</span></code> is
-                  <code class="computeroutput"><span class="keyword">typename</span> <span class="identifier">mpl</span><span class="special">::</span><span class="identifier">front</span><span class="special">&lt;</span><span class="keyword">typename</span>
+                  <code class="computeroutput"><span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple_element</span><span class="special">&lt;</span><span class="number">0</span><span class="special">,</span> <span class="keyword">typename</span>
                   <span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span><span class="special">&gt;::</span><span class="identifier">type</span></code>.
                 </p>
               </td>
@@ -2364,7 +2364,7 @@
                   by one. When not provided, does the equivalent of <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">ui_type</span><span class="special">&gt;(</span><span class="number">1u</span><span class="special">))</span></code>.
                   Where <code class="computeroutput"><span class="identifier">ui_type</span></code> is
-                  <code class="computeroutput"><span class="keyword">typename</span> <span class="identifier">mpl</span><span class="special">::</span><span class="identifier">front</span><span class="special">&lt;</span><span class="keyword">typename</span>
+                  <code class="computeroutput"><span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple_element</span><span class="special">&lt;</span><span class="number">0</span><span class="special">,</span> <span class="keyword">typename</span>
                   <span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span><span class="special">&gt;::</span><span class="identifier">type</span></code>.
                 </p>
               </td>

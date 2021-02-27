@@ -14,15 +14,7 @@ boost_multiprecision/tut/floats/cpp_dec_float.html
 boost_multiprecision/tut/floats/gmp_float.html
 boost_multiprecision/tut/floats/mpfr_float.html
 boost_multiprecision/tut/floats/float128.html
-boost_multiprecision/tut/floats/fp_eg.html
-boost_multiprecision/tut/floats/fp_eg/aos.html
-boost_multiprecision/tut/floats/fp_eg/caveats.html
-boost_multiprecision/tut/floats/fp_eg/jel.html
-boost_multiprecision/tut/floats/fp_eg/nd.html
-boost_multiprecision/tut/floats/fp_eg/gi.html
-boost_multiprecision/tut/floats/fp_eg/poly_eg.html
-boost_multiprecision/tut/floats/fp_eg/variable_precision.html
-boost_multiprecision/tut/floats/fp_eg/gauss_lagerre_quadrature.html
+boost_multiprecision/tut/floats/floatbuiltinctor.html
 boost_multiprecision/tut/interval.html
 boost_multiprecision/tut/interval/mpfi.html
 boost_multiprecision/tut/complex.html
