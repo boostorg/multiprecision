@@ -1,39 +1,39 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Construction from Built-In Floats</title>
-<link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
+<title>Construction from Specific Values Without Precision Loss</title>
+<link rel="stylesheet" href="../../../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
-<link rel="up" href="../floats.html" title="Floating-point Types">
-<link rel="prev" href="float128.html" title="float128">
-<link rel="next" href="../interval.html" title="Interval Number Types">
+<link rel="home" href="../../../../index.html" title="Chapter 1. Boost.Multiprecision">
+<link rel="up" href="../fp_eg.html" title="Examples">
+<link rel="prev" href="../fp_eg.html" title="Examples">
+<link rel="next" href="aos.html" title="Area of Circle">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
-<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../../../boost.png"></td>
-<td align="center"><a href="../../../../../../../index.html">Home</a></td>
-<td align="center"><a href="../../../../../../../libs/libraries.htm">Libraries</a></td>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../../../../libs/libraries.htm">Libraries</a></td>
 <td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
 <td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
-<td align="center"><a href="../../../../../../../more/index.htm">More</a></td>
+<td align="center"><a href="../../../../../../../../more/index.htm">More</a></td>
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="float128.html"><img src="../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../floats.html"><img src="../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../interval.html"><img src="../../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../fp_eg.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../fp_eg.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="aos.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
-<div class="titlepage"><div><div><h4 class="title">
-<a name="boost_multiprecision.tut.floats.floatbuiltinctor"></a><a class="link" href="floatbuiltinctor.html" title="Construction from Built-In Floats">Construction
-        from Built-In Floats</a>
-</h4></div></div></div>
+<div class="titlepage"><div><div><h5 class="title">
+<a name="boost_multiprecision.tut.floats.fp_eg.floatbuiltinctor"></a><a class="link" href="floatbuiltinctor.html" title="Construction from Specific Values Without Precision Loss">Construction
+          from Specific Values Without Precision Loss</a>
+</h5></div></div></div>
 <p>
-          Construction of multiprecision types from built-in floating-point types
-          can lead to potentially unexpected, yet correct, results. Consider, for
-          instance constructing an instance of <code class="computeroutput"><span class="identifier">cpp_dec_float_50</span></code>
-          from the literal built-in floating-point <code class="computeroutput"><span class="keyword">double</span></code>
-          value 11.1.
-        </p>
+            Construction of multiprecision types from built-in floating-point types
+            can lead to potentially unexpected, yet correct, results. Consider, for
+            instance constructing an instance of <code class="computeroutput"><span class="identifier">cpp_dec_float_50</span></code>
+            from the literal built-in floating-point <code class="computeroutput"><span class="keyword">double</span></code>
+            value 11.1.
+          </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">iomanip</span><span class="special">&gt;</span>
 <span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">iostream</span><span class="special">&gt;</span>
 <span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">limits</span><span class="special">&gt;</span>
@@ -55,24 +55,25 @@
 <span class="special">}</span>
 </pre>
 <p>
-          In this example, the system has a 64-bit built in <code class="computeroutput"><span class="keyword">double</span></code>
-          representation. The variable <code class="computeroutput"><span class="identifier">f11</span></code>
-          is initialized with the literal <code class="computeroutput"><span class="keyword">double</span></code>
-          value 11.1. Recall that built-in floating-point representations are based
-          on successive binary fractional approximations. These are, in fact, very
-          close approximations. But they are approximations nonetheless, having their
-          built-in finite precision.
-        </p>
+            In this example, the system has a 64-bit built in <code class="computeroutput"><span class="keyword">double</span></code>
+            representation. The variable <code class="computeroutput"><span class="identifier">f11</span></code>
+            is initialized with the literal <code class="computeroutput"><span class="keyword">double</span></code>
+            value 11.1. Recall that built-in floating-point representations are based
+            on successive binary fractional approximations. These are, in fact, very
+            close approximations. But they are approximations nonetheless, having
+            their built-in finite precision.
+          </p>
 <p>
-          For this reason, the full multiple precision value of the <code class="computeroutput"><span class="keyword">double</span></code> approximation of 11.1 is given by
-          the large value shown above. Observations show us that the value is reliable
-          up to the approximate 15 decimal digit precision of built-in 64-bit <code class="computeroutput"><span class="keyword">double</span></code> on this system.
-        </p>
+            For this reason, the full multiple precision value of the <code class="computeroutput"><span class="keyword">double</span></code> approximation of 11.1 is given
+            by the large value shown above. Observations show us that the value is
+            reliable up to the approximate 15 decimal digit precision of built-in
+            64-bit <code class="computeroutput"><span class="keyword">double</span></code> on this system.
+          </p>
 <p>
-          If the exact value of 11.1 is desired (within the wider precision of the
-          multiprecision type), then construction from literal string or from a rational
-          integral construction/division sequence can be used.
-        </p>
+            If the exact value of 11.1 is desired (within the wider precision of
+            the multiprecision type), then construction from literal string or from
+            a rational integral construction/division sequence should be used.
+          </p>
 <pre class="programlisting"><span class="keyword">const</span> <span class="identifier">my_dec_100</span> <span class="identifier">f11_str</span><span class="special">(</span><span class="string">"11.1"</span><span class="special">);</span>
 <span class="keyword">const</span> <span class="identifier">my_dec_100</span> <span class="identifier">f11_n</span>  <span class="special">(</span><span class="identifier">my_dec_100</span><span class="special">(</span><span class="number">111</span><span class="special">)</span> <span class="special">/</span> <span class="number">10</span><span class="special">);</span>
 </pre>
@@ -88,7 +89,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="float128.html"><img src="../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../floats.html"><img src="../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../interval.html"><img src="../../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../fp_eg.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../fp_eg.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="aos.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>
