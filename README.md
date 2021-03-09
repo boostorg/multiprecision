@@ -1,7 +1,7 @@
 Boost Multiprecision Library
 ============================
 
->ANNOUNCEMENT: Support for C++03 is now deprecated in this library and will be supported in existing features only until March 2021. New features will require at least C++11, as will existing features from next year.
+>ANNOUNCEMENT: Support for C++03 is now removed from this library.  Any attempt to build with a non C++11 conforming compiler is doomed to failure.
 
 |                  |  Master  |   Develop   |
 |------------------|----------|-------------|
