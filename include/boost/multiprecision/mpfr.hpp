@@ -386,23 +386,33 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       mpfr_neg(m_data, m_data, GMP_RNDN);
    }
    template <mpfr_allocation_type AllocationType>
-   int compare(const mpfr_float_backend<digits10, AllocationType>& o) const noexcept
+   int compare(const mpfr_float_backend<digits10, AllocationType>& o) const
    {
       BOOST_ASSERT(m_data[0]._mpfr_d && o.m_data[0]._mpfr_d);
       return mpfr_cmp(m_data, o.m_data);
    }
-   int compare(long i) const noexcept
+   int compare(long i) const
    {
       BOOST_ASSERT(m_data[0]._mpfr_d);
       return mpfr_cmp_si(m_data, i);
    }
-   int compare(unsigned long i) const noexcept
+   int compare(double i) const
+   {
+      BOOST_ASSERT(m_data[0]._mpfr_d);
+      return mpfr_cmp_d(m_data, i);
+   }
+   int compare(long double i) const
+   {
+      BOOST_ASSERT(m_data[0]._mpfr_d);
+      return mpfr_cmp_ld(m_data, i);
+   }
+   int compare(unsigned long i) const
    {
       BOOST_ASSERT(m_data[0]._mpfr_d);
       return mpfr_cmp_ui(m_data, i);
    }
    template <class V>
-   int compare(V v) const noexcept
+   int compare(V v) const
    {
       mpfr_float_backend<digits10, allocate_dynamic> d(0uL, mpfr_get_prec(m_data));
       d = v;
@@ -661,20 +671,28 @@ struct mpfr_float_imp<digits10, allocate_stack>
       mpfr_neg(m_data, m_data, GMP_RNDN);
    }
    template <mpfr_allocation_type AllocationType>
-   int compare(const mpfr_float_backend<digits10, AllocationType>& o) const noexcept
+   int compare(const mpfr_float_backend<digits10, AllocationType>& o) const
    {
       return mpfr_cmp(m_data, o.m_data);
    }
-   int compare(long i) const noexcept
+   int compare(long i) const
    {
       return mpfr_cmp_si(m_data, i);
    }
-   int compare(unsigned long i) const noexcept
+   int compare(unsigned long i) const
    {
       return mpfr_cmp_ui(m_data, i);
    }
+   int compare(double i) const
+   {
+      return mpfr_cmp_d(m_data, i);
+   }
+   int compare(long double i) const
+   {
+      return mpfr_cmp_ld(m_data, i);
+   }
    template <class V>
-   int compare(V v) const noexcept
+   int compare(V v) const
    {
       mpfr_float_backend<digits10, allocate_stack> d;
       d = v;
@@ -1032,19 +1050,35 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
 };
 
 template <unsigned digits10, mpfr_allocation_type AllocationType, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) noexcept
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const mpfr_float_backend<digits10, AllocationType>& a, const T& b)
 {
    return a.compare(b) == 0;
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) noexcept
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_lt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b)
 {
    return a.compare(b) < 0;
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType, class T>
-inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b) noexcept
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_gt(const mpfr_float_backend<digits10, AllocationType>& a, const T& b)
 {
    return a.compare(b) > 0;
+}
+
+template <unsigned digits10, mpfr_allocation_type AllocationType>
+inline bool eval_eq(const mpfr_float_backend<digits10, AllocationType>& a, const mpfr_float_backend<digits10, AllocationType>& b)noexcept
+{
+   return mpfr_equal_p(a.data(), b.data());
+}
+template <unsigned digits10, mpfr_allocation_type AllocationType>
+inline bool eval_lt(const mpfr_float_backend<digits10, AllocationType>& a, const mpfr_float_backend<digits10, AllocationType>& b) noexcept
+{
+   return mpfr_less_p(a.data(), b.data());
+}
+template <unsigned digits10, mpfr_allocation_type AllocationType>
+inline bool eval_gt(const mpfr_float_backend<digits10, AllocationType>& a, const mpfr_float_backend<digits10, AllocationType>& b) noexcept
+{
+   return mpfr_greater_p(a.data(), b.data());
 }
 
 template <unsigned D1, unsigned D2, mpfr_allocation_type A1, mpfr_allocation_type A2>
