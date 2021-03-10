@@ -56,7 +56,7 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j3 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
   ubuntu-focal-ASAN:
     runs-on: ubuntu-20.04
@@ -156,7 +156,7 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j3 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
   ubuntu-xenial:
     runs-on: ubuntu-16.04
@@ -206,7 +206,7 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j3 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
   windows_gcc:
     runs-on: windows-latest
@@ -249,7 +249,7 @@ jobs:
         run: config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ..\..\..\b2 -j3 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
+        run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/multiprecision/test
   windows_msvc_14_0:
     runs-on: windows-latest
@@ -292,7 +292,7 @@ jobs:
         run: config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ..\..\..\b2 -j3 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
+        run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/multiprecision/test
   windows_msvc_14_2:
     runs-on: windows-latest
@@ -335,7 +335,7 @@ jobs:
         run: config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ..\..\..\b2 -j3 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
+        run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/multiprecision/test
   macos:
     runs-on: macos-latest
@@ -373,5 +373,5 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j3 toolset=${{ matrix.toolset }} cxxstd=${{ matrix.standard }} ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 -j2 toolset=${{ matrix.toolset }} cxxstd=${{ matrix.standard }} ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
