@@ -8,14 +8,10 @@
 
 #include <cstddef>
 #include <functional>
-#include <system_error>
 
 namespace boost { namespace multiprecision { namespace detail {
 
-inline void hash_combine(std::size_t& seed) 
-{ 
-    (void)seed; // suppress warning: unused parameter 'seed'
-}
+inline void hash_combine(std::size_t&) {}
 
 template <typename T, typename... Args>
 inline void hash_combine(std::size_t& seed, const T& v, Args... args) 
@@ -23,14 +19,6 @@ inline void hash_combine(std::size_t& seed, const T& v, Args... args)
     std::hash<T> hasher;
     seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
     hash_combine(seed, args...);
-}
-
-inline std::size_t hash_value(std::error_condition const& v) 
-{
-    std::size_t seed = 0;
-    hash_combine(seed, v.value());
-    hash_combine(seed, &v.category());
-    return seed;
 }
 
 }}} // Namespaces

@@ -15,6 +15,7 @@
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <mpfr.h>
 #include <cmath>
 #include <algorithm>
@@ -1654,9 +1655,9 @@ inline std::size_t hash_value(const mpfr_float_backend<Digits10, AllocateType>& 
    if (val.data()[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
    for (std::size_t i = 0; i < len; ++i)
-      boost::hash_combine(result, val.data()[0]._mpfr_d[i]);
-   boost::hash_combine(result, val.data()[0]._mpfr_exp);
-   boost::hash_combine(result, val.data()[0]._mpfr_sign);
+      boost::multiprecision::detail::hash_combine(result, val.data()[0]._mpfr_d[i]);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mpfr_exp);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mpfr_sign);
    return result;
 }
 
