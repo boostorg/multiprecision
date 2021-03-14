@@ -15,7 +15,7 @@
 #include <boost/multiprecision/detail/number_compare.hpp>
 #include <boost/multiprecision/traits/is_restricted_conversion.hpp>
 #include <boost/multiprecision/traits/is_complex.hpp>
-#include <boost/multiprecision/detail/hash_combine.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <istream> // stream operators
 #include <cstdio>  // EOF
 #include <cctype>  // isspace
