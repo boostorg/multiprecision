@@ -8,12 +8,12 @@
 
 #include <iostream>
 #include <iomanip>
+#include <type_traits>
 #include <cstdint>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/detail/rebind.hpp>
 #include <boost/core/empty_value.hpp>
-#include <boost/array.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/traits/is_byte_container.hpp>
@@ -26,8 +26,6 @@
 namespace boost {
 namespace multiprecision {
 namespace backends {
-
-using boost::enable_if;
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -44,7 +42,7 @@ struct cpp_int_backend;
 namespace detail {
 
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
-struct is_byte_container<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> > : public boost::false_type
+struct is_byte_container<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> > : public std::false_type
 {};
 
 } // namespace detail
