@@ -9,9 +9,9 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
-#include <boost/functional/hash_fwd.hpp>
 #include <tommath.h>
 #include <cctype>
 #include <cmath>
@@ -768,8 +768,8 @@ inline std::size_t hash_value(const tommath_int& val)
    std::size_t result = 0;
    std::size_t len    = val.data().used;
    for (std::size_t i = 0; i < len; ++i)
-      boost::hash_combine(result, val.data().dp[i]);
-   boost::hash_combine(result, val.data().sign);
+      boost::multiprecision::detail::hash_combine(result, val.data().dp[i]);
+   boost::multiprecision::detail::hash_combine(result, val.data().sign);
    return result;
 }
 

@@ -21,7 +21,7 @@
 #include <limits>
 #include <array>
 #include <cstdint>
-#include <boost/functional/hash_fwd.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/dynamic_array.hpp>
@@ -224,10 +224,10 @@ class cpp_dec_float
    {
       std::size_t result = 0;
       for (int i = 0; i < prec_elem; ++i)
-         boost::hash_combine(result, data[i]);
-      boost::hash_combine(result, exp);
-      boost::hash_combine(result, neg);
-      boost::hash_combine(result, fpclass);
+         boost::multiprecision::detail::hash_combine(result, data[i]);
+      boost::multiprecision::detail::hash_combine(result, exp);
+      boost::multiprecision::detail::hash_combine(result, neg);
+      boost::multiprecision::detail::hash_combine(result, fpclass);
       return result;
    }
 

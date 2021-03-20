@@ -9,11 +9,12 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <tuple>
+#include <functional>
 #include <cmath>
 #include <cstdint>
 #include <boost/multiprecision/number.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/container_hash/hash.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -201,7 +202,7 @@ inline int eval_fpclassify(const number_backend_float_architype& arg)
 
 inline std::size_t hash_value(const number_backend_float_architype& v)
 {
-   boost::hash<long double> hasher;
+   std::hash<long double> hasher;
    return hasher(v.m_value);
 }
 

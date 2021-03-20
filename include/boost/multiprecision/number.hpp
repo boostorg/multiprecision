@@ -15,7 +15,7 @@
 #include <boost/multiprecision/detail/number_compare.hpp>
 #include <boost/multiprecision/traits/is_restricted_conversion.hpp>
 #include <boost/multiprecision/traits/is_complex.hpp>
-#include <boost/container_hash/hash.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <istream> // stream operators
 #include <cstdio>  // EOF
 #include <cctype>  // isspace
@@ -2162,7 +2162,7 @@ template <class T, multiprecision::expression_template_option ExpressionTemplate
 inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const rational<multiprecision::number<T, ExpressionTemplates> >& val)
 {
    std::size_t result = hash_value(val.numerator());
-   boost::hash_combine(result, hash_value(val.denominator()));
+   boost::multiprecision::detail::hash_combine(result, hash_value(val.denominator()));
    return result;
 }
 
@@ -2195,7 +2195,7 @@ struct hash<boost::rational<boost::multiprecision::number<Backend, ExpressionTem
    BOOST_MP_CXX14_CONSTEXPR std::size_t operator()(const boost::rational<boost::multiprecision::number<Backend, ExpressionTemplates> >& val) const
    {
       std::size_t result = hash_value(val.numerator());
-      boost::hash_combine(result, hash_value(val.denominator()));
+      boost::multiprecision::detail::hash_combine(result, hash_value(val.denominator()));
       return result;
    }
 };

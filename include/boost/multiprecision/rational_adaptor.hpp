@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <sstream>
 #include <cstdint>
-#include <boost/functional/hash_fwd.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -286,7 +286,7 @@ template <class IntBackend>
 inline std::size_t hash_value(const rational_adaptor<IntBackend>& val)
 {
    std::size_t result = hash_value(val.data().numerator());
-   boost::hash_combine(result, val.data().denominator());
+   boost::multiprecision::detail::hash_combine(result, val.data().denominator());
    return result;
 }
 

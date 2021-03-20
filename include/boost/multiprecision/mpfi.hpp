@@ -19,8 +19,8 @@
 #include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/logged_adaptor.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/math/constants/constants.hpp>
-#include <boost/functional/hash_fwd.hpp>
 #include <mpfi.h>
 
 #ifndef BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION
@@ -1069,17 +1069,17 @@ inline std::size_t hash_value(const mpfi_float_backend<Digits10>& val)
    if (val.left_data()[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
    for (std::size_t i = 0; i < len; ++i)
-      boost::hash_combine(result, val.left_data()[0]._mpfr_d[i]);
-   boost::hash_combine(result, val.left_data()[0]._mpfr_exp);
-   boost::hash_combine(result, val.left_data()[0]._mpfr_sign);
+      boost::multiprecision::detail::hash_combine(result, val.left_data()[0]._mpfr_d[i]);
+   boost::multiprecision::detail::hash_combine(result, val.left_data()[0]._mpfr_exp);
+   boost::multiprecision::detail::hash_combine(result, val.left_data()[0]._mpfr_sign);
 
    len = val.right_data()[0]._mpfr_prec / mp_bits_per_limb;
    if (val.right_data()[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
    for (std::size_t i = 0; i < len; ++i)
-      boost::hash_combine(result, val.right_data()[0]._mpfr_d[i]);
-   boost::hash_combine(result, val.right_data()[0]._mpfr_exp);
-   boost::hash_combine(result, val.right_data()[0]._mpfr_sign);
+      boost::multiprecision::detail::hash_combine(result, val.right_data()[0]._mpfr_d[i]);
+   boost::multiprecision::detail::hash_combine(result, val.right_data()[0]._mpfr_exp);
+   boost::multiprecision::detail::hash_combine(result, val.right_data()[0]._mpfr_sign);
    return result;
 }
 

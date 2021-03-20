@@ -12,8 +12,8 @@
 
 #include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
+#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/integer/common_factor_rt.hpp>      // gcd/lcm
-#include <boost/functional/hash_fwd.hpp>
 #include <numeric> // std::gcd
 
 #ifdef BOOST_MSVC
@@ -1278,9 +1278,9 @@ inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const cpp_int_backend<Min
    std::size_t result = 0;
    for (unsigned i = 0; i < val.size(); ++i)
    {
-      boost::hash_combine(result, val.limbs()[i]);
+      boost::multiprecision::detail::hash_combine(result, val.limbs()[i]);
    }
-   boost::hash_combine(result, val.sign());
+   boost::multiprecision::detail::hash_combine(result, val.sign());
    return result;
 }
 

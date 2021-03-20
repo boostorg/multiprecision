@@ -13,7 +13,7 @@
 #include <boost/multiprecision/traits/is_variable_precision.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/logged_adaptor.hpp>
-#include <boost/functional/hash_fwd.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <mpc.h>
 #include <cmath>
 #include <algorithm>
@@ -1452,17 +1452,17 @@ inline std::size_t hash_value(const mpc_complex_backend<Digits10>& val)
    if (val.data()[0].re[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
    for (std::size_t i = 0; i < len; ++i)
-      boost::hash_combine(result, val.data()[0].re[0]._mpfr_d[i]);
-   boost::hash_combine(result, val.data()[0].re[0]._mpfr_exp);
-   boost::hash_combine(result, val.data()[0].re[0]._mpfr_sign);
+      boost::multiprecision::detail::hash_combine(result, val.data()[0].re[0]._mpfr_d[i]);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0].re[0]._mpfr_exp);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0].re[0]._mpfr_sign);
 
    len = val.data()[0].im[0]._mpfr_prec / mp_bits_per_limb;
    if (val.data()[0].im[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
    for (std::size_t i = 0; i < len; ++i)
-      boost::hash_combine(result, val.data()[0].im[0]._mpfr_d[i]);
-   boost::hash_combine(result, val.data()[0].im[0]._mpfr_exp);
-   boost::hash_combine(result, val.data()[0].im[0]._mpfr_sign);
+      boost::multiprecision::detail::hash_combine(result, val.data()[0].im[0]._mpfr_d[i]);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0].im[0]._mpfr_exp);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0].im[0]._mpfr_sign);
    return result;
 }
 

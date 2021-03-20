@@ -9,7 +9,7 @@
 #include <boost/multiprecision/number.hpp>
 #include <cstdint>
 #include <boost/multiprecision/detail/digits.hpp>
-#include <boost/functional/hash_fwd.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <cmath>
 #include <algorithm>
 #include <complex>
@@ -881,7 +881,7 @@ inline std::size_t hash_value(const complex_adaptor<Backend>& val)
 {
    std::size_t result  = hash_value(val.real_data());
    std::size_t result2 = hash_value(val.imag_data());
-   boost::hash_combine(result, result2);
+   boost::multiprecision::detail::hash_combine(result, result2);
    return result;
 }
 
