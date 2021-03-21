@@ -632,7 +632,7 @@ inline int eval_signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const float128_backend&
 
 inline std::size_t hash_value(const float128_backend& val)
 {
-   return hash_value(static_cast<double>(val.value()));
+   return boost::multiprecision::detail::hash_value(static_cast<double>(val.value()));
 }
 
 } // namespace backends
