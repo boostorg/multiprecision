@@ -17,8 +17,7 @@ Boost Multiprecision Library
 Multiprecision consists of a generic interface to the mathematics of large numbers as well as a selection of big number back ends, with 
 support for integer, rational and floating-point types. Boost.Multiprecision provides a selection of back ends provided off-the-rack in 
 including interfaces to GMP, MPFR, MPIR, TomMath as well as its own collection of Boost-licensed, header-only back ends for integers, 
-rationals, floats and complex. In addition, user-defined back ends can be created and used with the interface of Multiprecision
-, provided the class implementation adheres to the necessary concepts.
+rationals, floats and complex. In addition, user-defined back ends can be created and used with the interface of Multiprecision, provided the class implementation adheres to the necessary concepts.
 
 Depending upon the number type, precision may be arbitrarily large (limited only by available memory), fixed at compile time 
 (for example 50 or 100 decimal digits), or a variable controlled at run-time by member functions. The types are expression-template-enabled 
