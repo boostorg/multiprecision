@@ -1991,36 +1991,36 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       }
 
       // Shift the decimal point such that the exponent is an even multiple of cpp_dec_float_elem_digits10.
-      std::size_t       n_shift   = static_cast<std::size_t>(0u);
-      const std::size_t n_exp_rem = static_cast<std::size_t>(exp % static_cast<ExponentType>(cpp_dec_float_elem_digits10));
+      std::ptrdiff_t       n_shift   = static_cast<std::ptrdiff_t>(0);
+      const std::ptrdiff_t n_exp_rem = static_cast<std::ptrdiff_t>(exp % static_cast<exponent_type>(cpp_dec_float_elem_digits10));
 
-      if ((exp % static_cast<ExponentType>(cpp_dec_float_elem_digits10)) != static_cast<ExponentType>(0))
+      if((exp % static_cast<exponent_type>(cpp_dec_float_elem_digits10)) != static_cast<exponent_type>(0))
       {
-         n_shift = ((exp < static_cast<ExponentType>(0))
-                        ? static_cast<std::size_t>(n_exp_rem + static_cast<std::size_t>(cpp_dec_float_elem_digits10))
-                        : static_cast<std::size_t>(n_exp_rem));
+         n_shift = ((exp < static_cast<exponent_type>(0))
+                        ? static_cast<std::ptrdiff_t>(n_exp_rem + static_cast<std::ptrdiff_t>(cpp_dec_float_elem_digits10))
+                        : static_cast<std::ptrdiff_t>(n_exp_rem));
       }
 
       // Make sure that there are enough digits for the decimal point shift.
       pos = str.find(static_cast<char>('.'));
 
-      std::size_t pos_plus_one = static_cast<std::size_t>(pos + 1u);
+      std::ptrdiff_t pos_plus_one = static_cast<std::ptrdiff_t>(pos + 1);
 
-      if ((str.length() - pos_plus_one) < n_shift)
+      if ((static_cast<std::ptrdiff_t>(str.length()) - pos_plus_one) < n_shift)
       {
-         const std::size_t sz = static_cast<std::size_t>(n_shift - (str.length() - pos_plus_one));
+         const std::ptrdiff_t sz = static_cast<std::ptrdiff_t>(n_shift - (static_cast<std::ptrdiff_t>(str.length()) - pos_plus_one));
 
-         str.append(std::string(sz, static_cast<char>('0')));
+         str.append(std::string(static_cast<std::string::size_type>(sz), static_cast<char>('0')));
       }
 
       // Do the decimal point shift.
-      if (n_shift != static_cast<std::size_t>(0u))
+      if (n_shift != static_cast<std::ptrdiff_t>(0))
       {
          str.insert(static_cast<std::string::size_type>(pos_plus_one + n_shift), ".");
 
-         str.erase(pos, static_cast<std::string::size_type>(1u));
+         str.erase(pos, static_cast<std::ptrdiff_t>(1));
 
-         exp -= static_cast<ExponentType>(n_shift);
+         exp -= static_cast<exponent_type>(n_shift);
       }
 
       // Cut the size of the mantissa to <= cpp_dec_float_elem_digits10.
