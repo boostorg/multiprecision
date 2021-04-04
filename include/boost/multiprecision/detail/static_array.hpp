@@ -21,12 +21,12 @@ private:
    using base_class_type = std::array<ValueType, std::size_t(ElemNumber)>;
 
 public:
-   static_array()
+   static_array() noexcept
    {
      base_class_type::fill(typename base_class_type::value_type(0u));
    }
 
-   static_array(std::initializer_list<std::uint32_t> lst)
+   static_array(std::initializer_list<std::uint32_t> lst) noexcept
    {
      std::copy(lst.begin(),
                lst.begin() + (std::min)(std::size_t(lst.size()), std::size_t(ElemNumber)),
