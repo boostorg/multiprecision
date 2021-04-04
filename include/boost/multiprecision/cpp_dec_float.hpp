@@ -29,6 +29,7 @@
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/dynamic_array.hpp>
 #include <boost/multiprecision/detail/itos.hpp>
+#include <boost/multiprecision/detail/static_array.hpp>
 
 //
 // Headers required for Boost.Math integration:
@@ -121,7 +122,7 @@ class cpp_dec_float
 
    using array_type =
       typename std::conditional<std::is_void<Allocator>::value,
-                                std::array<std::uint32_t, cpp_dec_float_elem_number>,
+                                detail::static_array<std::uint32_t, cpp_dec_float_elem_number>,
                                 detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number, Allocator> >::type;
 
    array_type    data;
@@ -556,21 +557,14 @@ class cpp_dec_float
    }
 
  private:
-   cpp_dec_float(std::initializer_list<std::uint32_t> lst,
-                 const exponent_type e = 0,
-                 const bool n = false) : data(),
-                                         exp(e),
-                                         neg(n),
-                                         fpclass(cpp_dec_float_finite),
-                                         prec_elem(cpp_dec_float_elem_number)
+   constexpr cpp_dec_float(std::initializer_list<std::uint32_t> lst,
+                           const exponent_type e = 0,
+                           const bool n = false) : data(lst),
+                                                   exp(e),
+                                                   neg(n),
+                                                   fpclass(cpp_dec_float_finite),
+                                                   prec_elem(cpp_dec_float_elem_number)
    {
-      std::copy(lst.begin(),
-                lst.begin() + (std::min)(std::int32_t(lst.size()), cpp_dec_float_elem_number),
-                data.begin());
-
-      std::fill(data.begin() + (std::min)(std::int32_t(lst.size()), cpp_dec_float_elem_number),
-                data.end(),
-                std::uint32_t(0u));
    }
 
    static bool data_elem_is_non_zero_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(0u)); }
