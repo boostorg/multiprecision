@@ -74,7 +74,7 @@ struct tommath_int
          detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
       return *this;
    }
-#if !defined(MP_DIGIT_BIT)
+#if !defined(mp_get_u64) || !defined(mp_get_u32)
    // Pick off 32 bit chunks for mp_set_int:
    tommath_int& operator=(boost::ulong_long_type i)
    {
