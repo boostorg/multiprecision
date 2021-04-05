@@ -588,9 +588,38 @@ class cpp_dec_float
 
    void from_unsigned_long_long(const boost::ulong_long_type u);
 
-   static int compare_ranges(const std::uint32_t* a,
-                             const std::uint32_t* b,
-                             const std::uint32_t  count = cpp_dec_float_elem_number);
+   template <typename InputIteratorTypeLeft,
+             typename InputIteratorTypeRight>
+   static int compare_ranges(InputIteratorTypeLeft  a,
+                             InputIteratorTypeRight b,
+                             const std::uint32_t    count = cpp_dec_float_elem_number)
+   {
+      using local_iterator_left_type  = InputIteratorTypeLeft;
+      using local_iterator_right_type = InputIteratorTypeRight;
+
+      local_iterator_left_type  begin_a(a);
+      local_iterator_left_type  end_a  (a + count);
+      local_iterator_right_type begin_b(b);
+      local_iterator_right_type end_b  (b + count);
+
+      const auto mismatch_pair = std::mismatch(begin_a, end_a, begin_b);
+
+      int n_return;
+
+      if((mismatch_pair.first != end_a) || (mismatch_pair.second != end_b))
+      {
+         const typename std::iterator_traits<InputIteratorTypeLeft>::value_type  left  = *mismatch_pair.first;
+         const typename std::iterator_traits<InputIteratorTypeRight>::value_type right = *mismatch_pair.second;
+
+         n_return = ((left > right) ?  1 : -1);
+      }
+      else
+      {
+         n_return = 0;
+      }
+
+      return n_return;
+   }
 
    static std::uint32_t eval_add_n(      std::uint32_t* r,
                                    const std::uint32_t* u,
@@ -714,13 +743,13 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       // at a time, each element with carry.
       if (ofs >= static_cast<std::int32_t>(0))
       {
-         std::copy(v.data.begin(), v.data.end() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
+         std::copy(v.data.cbegin(), v.data.cend() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
          std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(ofs), static_cast<std::uint32_t>(0u));
          p_v = n_data.data();
       }
       else
       {
-         std::copy(data.begin(), data.end() - static_cast<size_t>(-ofs), n_data.begin() + static_cast<size_t>(-ofs));
+         std::copy(data.cbegin(), data.cend() - static_cast<size_t>(-ofs), n_data.begin() + static_cast<size_t>(-ofs));
          std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(-ofs), static_cast<std::uint32_t>(0u));
          p_u    = n_data.data();
          b_copy = true;
@@ -738,7 +767,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       // There needs to be a carry into the element -1 of the array data
       if (carry != static_cast<std::uint32_t>(0u))
       {
-         std::copy_backward(data.begin(), data.end() - static_cast<std::size_t>(1u), data.end());
+         std::copy_backward(data.cbegin(), data.cend() - static_cast<std::size_t>(1u), data.end());
          data[0] = carry;
          exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
       }
@@ -747,15 +776,15 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    {
       // Subtract v from *this, where the data array of either *this or v
       // might have to be treated with a positive, negative or zero offset.
-      if (   (ofs > static_cast<std::int32_t>(0))
+      if (    (ofs >  static_cast<std::int32_t>(0))
           || ((ofs == static_cast<std::int32_t>(0))
-          && (compare_ranges(data.data(), v.data.data()) > static_cast<std::int32_t>(0))))
+          && (compare_ranges(data.cbegin(), v.data.cbegin()) > 0)))
       {
          // In this case, |u| > |v| and ofs is positive.
          // Copy the data of v, shifted down to a lower value
          // into the data array m_n. Set the operand pointer p_v
          // to point to the copied, shifted data m_n.
-         std::copy(v.data.begin(), v.data.end() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
+         std::copy(v.data.cbegin(), v.data.cend() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
          std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(ofs), static_cast<std::uint32_t>(0u));
          p_v = n_data.data();
       }
@@ -765,7 +794,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
          {
             // In this case, |u| < |v| and ofs is negative.
             // Shift the data of u down to a lower value.
-            std::copy_backward(data.begin(), data.end() - static_cast<size_t>(-ofs), data.end());
+            std::copy_backward(data.cbegin(), data.cend() - static_cast<size_t>(-ofs), data.end());
             std::fill(data.begin(), data.begin() + static_cast<size_t>(-ofs), static_cast<std::uint32_t>(0u));
          }
 
@@ -781,6 +810,8 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 
       // Subtraction algorithm
       const std::int32_t borrow = eval_subtract_n(p_u, p_u, p_v, cpp_dec_float_elem_number);
+
+      static_cast<void>(borrow);
 
       if (b_copy)
       {
@@ -1003,7 +1034,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
      (   (isfinite)()
       && (fpclass == v.fpclass)
       && (exp == v.exp)
-      && (compare_ranges(data.data(), v.data.data()) == static_cast<std::int32_t>(0)));
+      && (compare_ranges(data.cbegin(), v.data.cbegin()) == 0));
 
    if (u_and_v_are_finite_and_identical)
    {
@@ -1358,37 +1389,6 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-int cpp_dec_float<Digits10, ExponentType, Allocator>::compare_ranges(const std::uint32_t* a,
-                                                                     const std::uint32_t* b,
-                                                                     const std::uint_fast32_t count)
-{
-   using local_const_iterator_type = const std::uint32_t*;
-
-   local_const_iterator_type cbegin_a(a);
-   local_const_iterator_type cend_a  (a + count);
-   local_const_iterator_type cbegin_b(b);
-   local_const_iterator_type cend_b  (b + count);
-
-   const auto mismatch_pair = std::mismatch(cbegin_a, cend_a, cbegin_b);
-
-   int n_return;
-
-   if((mismatch_pair.first != cend_a) || (mismatch_pair.second != cend_b))
-   {
-      const std::uint32_t left  = *mismatch_pair.first;
-      const std::uint32_t right = *mismatch_pair.second;
-
-      n_return = ((left > right) ?  1 : -1);
-   }
-   else
-   {
-      n_return = 0;
-   }
-
-   return n_return;
-}
-
-template <unsigned Digits10, class ExponentType, class Allocator>
 int cpp_dec_float<Digits10, ExponentType, Allocator>::compare(const cpp_dec_float& v) const
 {
    // Compare v with *this.
@@ -1462,7 +1462,7 @@ int cpp_dec_float<Digits10, ExponentType, Allocator>::compare(const cpp_dec_floa
       {
          // The signs are the same and the exponents are the same.
          // Compare the data.
-         const int val_cmp_data = compare_ranges(data.data(), v.data.data());
+         const int val_cmp_data = compare_ranges(data.cbegin(), v.data.cbegin());
 
          return ((!neg) ? val_cmp_data : -val_cmp_data);
       }
@@ -2657,7 +2657,7 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::eval_multiply_kara_n_by_n
       eval_multiply_kara_propagate_carry(r0, nh, carry);
 
       // Step 3
-      const std::int_fast8_t cmp_result_a1a0 = compare_ranges(a1, a0, nh);
+      const int cmp_result_a1a0 = compare_ranges(a1, a0, nh);
 
       if(cmp_result_a1a0 == 1)
          static_cast<void>(eval_subtract_n(t0, a1, a0, nh));
@@ -2665,7 +2665,7 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::eval_multiply_kara_n_by_n
          static_cast<void>(eval_subtract_n(t0, a0, a1, nh));
 
       // Step 4
-      const std::int_fast8_t cmp_result_b0b1 = compare_ranges(b0, b1, nh);
+      const int cmp_result_b0b1 = compare_ranges(b0, b1, nh);
 
       if(cmp_result_b0b1 == 1)
          static_cast<void>(eval_subtract_n(t1, b0, b1, nh));
