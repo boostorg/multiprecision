@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright Christopher Kormanyos 2002 - 2021.
-// Copyright 2011 -2021 John Maddock. Distributed under the Boost
+// Copyright Christopher Kormanyos 2002 - 2013.
+// Copyright 2011 -2013 John Maddock. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -8,9 +8,9 @@
 // "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 //
-// There are some "noexcept" specifications on the functions in this file.
-// Unlike in pre-C++11 versions, compilers can now detect noexcept misuse
-// at compile time, allowing for simple use of it here.
+// Note that there are no "noexcept" specifications on the functions in this file: there are too many
+// calls to lexical_cast (and similar) to easily analyse the code for correctness. So until compilers
+// can detect noexcept misuse at compile time, the only realistic option is to simply not use it here.
 //
 
 #ifndef BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
@@ -58,56 +58,50 @@ template <unsigned Digits10, class ExponentType = std::int32_t, class Allocator 
 class cpp_dec_float;
 
 namespace detail {
-
-   constexpr std::uint32_t a029747_maker_of_upper_limit(std::uint32_t value)
-   {
-      // Sloanes's A029747: Numbers of the form 2^k times 1, 3 or 5.
-      // m = 140000; Select[Union@Flatten@Outer[Times, {1, 3, 5}, 2^Range[0, Floor[Log2[m]]]], # < m &]
-      // In addition, crop the list to begin with 32 or higher.
-      return ((value <=    32UL) ?    32UL :
-             ((value <=    40UL) ?    40UL :
-             ((value <=    48UL) ?    48UL :
-             ((value <=    64UL) ?    64UL :
-             ((value <=    80UL) ?    80UL :
-             ((value <=    96UL) ?    96UL :
-             ((value <=   128UL) ?   128UL :
-             ((value <=   160UL) ?   160UL :
-             ((value <=   192UL) ?   192UL :
-             ((value <=   256UL) ?   256UL :
-             ((value <=   320UL) ?   320UL :
-             ((value <=   384UL) ?   384UL :
-             ((value <=   512UL) ?   512UL :
-             ((value <=   640UL) ?   640UL :
-             ((value <=   768UL) ?   768UL :
-             ((value <=  1024UL) ?  1024UL :
-             ((value <=  1280UL) ?  1280UL :
-             ((value <=  1536UL) ?  1536UL :
-             ((value <=  2048UL) ?  2048UL :
-             ((value <=  2560UL) ?  2560UL :
-             ((value <=  3072UL) ?  3072UL :
-             ((value <=  4096UL) ?  4096UL :
-             ((value <=  5120UL) ?  5120UL :
-             ((value <=  6144UL) ?  6144UL :
-             ((value <=  8192UL) ?  8192UL :
-             ((value <= 10240UL) ? 10240UL :
-             ((value <= 12288UL) ? 12288UL :
-             ((value <= 16384UL) ? 16384UL :
-             ((value <= 20480UL) ? 20480UL :
-             ((value <= 24576UL) ? 24576UL :
-             ((value <= 32768UL) ? 32768UL :
-             ((value <= 40960UL) ? 40960UL :
-             ((value <= 49152UL) ? 49152UL :
-             ((value <= 65536UL) ? 65536UL :
-             ((value <= 81920UL) ? 81920UL :
-             ((value <= 98304UL) ? 98304UL : 131072UL))))))))))))))))))))))))))))))))))));
-   }
-
-   constexpr std::uint32_t pow10_maker(std::uint32_t n)
-   {
-      // Make the constant power of 10^n.
-      return ((n == UINT32_C(0)) ? UINT32_C(1) : pow10_maker(n - UINT32_C(1)) * UINT32_C(10));
-   }
+  constexpr std::uint32_t a029747_maker_of_upper_limit(std::uint32_t value)
+  {
+    // Sloanes's A029747: Numbers of the form 2^k times 1, 3 or 5.
+    // m = 140000; Select[Union@Flatten@Outer[Times, {1, 3, 5}, 2^Range[0, Floor[Log2[m]]]], # < m &]
+    // In addition, crop the list to begin with 32 or higher.
+    return ((value <=    32UL) ?    32UL :
+           ((value <=    40UL) ?    40UL :
+           ((value <=    48UL) ?    48UL :
+           ((value <=    64UL) ?    64UL :
+           ((value <=    80UL) ?    80UL :
+           ((value <=    96UL) ?    96UL :
+           ((value <=   128UL) ?   128UL :
+           ((value <=   160UL) ?   160UL :
+           ((value <=   192UL) ?   192UL :
+           ((value <=   256UL) ?   256UL :
+           ((value <=   320UL) ?   320UL :
+           ((value <=   384UL) ?   384UL :
+           ((value <=   512UL) ?   512UL :
+           ((value <=   640UL) ?   640UL :
+           ((value <=   768UL) ?   768UL :
+           ((value <=  1024UL) ?  1024UL :
+           ((value <=  1280UL) ?  1280UL :
+           ((value <=  1536UL) ?  1536UL :
+           ((value <=  2048UL) ?  2048UL :
+           ((value <=  2560UL) ?  2560UL :
+           ((value <=  3072UL) ?  3072UL :
+           ((value <=  4096UL) ?  4096UL :
+           ((value <=  5120UL) ?  5120UL :
+           ((value <=  6144UL) ?  6144UL :
+           ((value <=  8192UL) ?  8192UL :
+           ((value <= 10240UL) ? 10240UL :
+           ((value <= 12288UL) ? 12288UL :
+           ((value <= 16384UL) ? 16384UL :
+           ((value <= 20480UL) ? 20480UL :
+           ((value <= 24576UL) ? 24576UL :
+           ((value <= 32768UL) ? 32768UL :
+           ((value <= 40960UL) ? 40960UL :
+           ((value <= 49152UL) ? 49152UL :
+           ((value <= 65536UL) ? 65536UL :
+           ((value <= 81920UL) ? 81920UL :
+           ((value <= 98304UL) ? 98304UL : 131072UL))))))))))))))))))))))))))))))))))));
+  }
 }
+
 } // namespace backends
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -158,19 +152,14 @@ class cpp_dec_float
    static constexpr std::int32_t cpp_dec_float_elem_number_request = static_cast<std::int32_t>((cpp_dec_float_digits10 / cpp_dec_float_elem_digits10) + (((cpp_dec_float_digits10 % cpp_dec_float_elem_digits10) != 0) ? 1 : 0));
 
    // The number of elements needed (with a minimum of two) plus three added guard limbs.
-   static constexpr std::int32_t cpp_dec_float_elem_number = static_cast<std::int32_t>(((cpp_dec_float_elem_number_request < 2L) ? 2L : cpp_dec_float_elem_number_request) + 3L);
+   static constexpr std::int32_t cpp_dec_float_elem_number    = static_cast<std::int32_t>(((cpp_dec_float_elem_number_request < 2L) ? 2L : cpp_dec_float_elem_number_request) + 3L);
 
-   static constexpr std::int32_t cpp_dec_float_elems_for_kara = 64 + 1;
+   static constexpr std::int32_t cpp_dec_float_elems_for_kara = static_cast<std::int32_t>(64 + 1);
 
  public:
    static constexpr std::int32_t cpp_dec_float_total_digits10 = static_cast<std::int32_t>(cpp_dec_float_elem_number * cpp_dec_float_elem_digits10);
 
  private:
-   using array_type =
-      typename std::conditional<std::is_void<Allocator>::value,
-                                detail::static_array <std::uint32_t, cpp_dec_float_elem_number>,
-                                detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number, Allocator> >::type;
-
    typedef enum enum_fpclass_type
    {
       cpp_dec_float_finite,
@@ -178,28 +167,25 @@ class cpp_dec_float
       cpp_dec_float_NaN
    } fpclass_type;
 
+   using array_type =
+      typename std::conditional<std::is_void<Allocator>::value,
+                                detail::static_array<std::uint32_t, cpp_dec_float_elem_number>,
+                                detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number, Allocator> >::type;
+
    array_type    data;
    exponent_type exp;
    bool          neg;
    fpclass_type  fpclass;
    std::int32_t  prec_elem;
 
-   // Constructor from the floating-point class type.
+   //
+   // Special values constructor:
+   //
    cpp_dec_float(fpclass_type c) : data(),
                                    exp(static_cast<exponent_type>(0)),
                                    neg(false),
                                    fpclass(c),
                                    prec_elem(cpp_dec_float_elem_number) {}
-
-   // Constructor from an initializer_list, an optional
-   // (value-aligned) exponent and a Boolean sign.
-   cpp_dec_float(std::initializer_list<std::uint32_t> lst,
-                 const exponent_type e = 0,
-                 const bool n = false) : data(lst),
-                                         exp(e),
-                                         neg(n),
-                                         fpclass(cpp_dec_float_finite),
-                                         prec_elem(cpp_dec_float_elem_number) {}
 
  public:
    // Constructors
@@ -219,26 +205,21 @@ class cpp_dec_float
    }
 
    template <class I>
-   cpp_dec_float(I i,
-                 typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value >::type* = nullptr)
-      : data(),
-        exp(static_cast<exponent_type>(0)),
-        neg(false),
-        fpclass(cpp_dec_float_finite),
-        prec_elem(cpp_dec_float_elem_number)
+   cpp_dec_float(I i, typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value >::type* = 0) : data(),
+                                                                        exp(static_cast<exponent_type>(0)),
+                                                                        neg(false),
+                                                                        fpclass(cpp_dec_float_finite),
+                                                                        prec_elem(cpp_dec_float_elem_number)
    {
       from_unsigned_long_long(i);
    }
 
    template <class I>
-   cpp_dec_float(I i,
-                 typename std::enable_if<(   boost::multiprecision::detail::is_signed<I>::value
-                                          && boost::multiprecision::detail::is_integral<I>::value)>::type* = nullptr)
-      : data(),
-        exp(static_cast<exponent_type>(0)),
-        neg(false),
-        fpclass(cpp_dec_float_finite),
-        prec_elem(cpp_dec_float_elem_number)
+   cpp_dec_float(I i, typename std::enable_if<boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value>::type* = 0) : data(),
+                                                                      exp(static_cast<exponent_type>(0)),
+                                                                      neg(false),
+                                                                      fpclass(cpp_dec_float_finite),
+                                                                      prec_elem(cpp_dec_float_elem_number)
    {
       if (i < 0)
       {
@@ -257,7 +238,7 @@ class cpp_dec_float
         prec_elem(f.prec_elem) {}
 
    template <unsigned D, class ET, class A>
-   cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if<D <= Digits10>::type* = nullptr)
+   cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if<D <= Digits10>::type* = 0)
       : data(),
         exp(f.exp),
         neg(f.neg),
@@ -267,7 +248,7 @@ class cpp_dec_float
       std::copy(f.data.begin(), f.data.begin() + f.prec_elem, data.begin());
    }
    template <unsigned D, class ET, class A>
-   explicit cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if< !(D <= Digits10)>::type* = nullptr)
+   explicit cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if< !(D <= Digits10)>::type* = 0)
       : data(),
         exp(f.exp),
         neg(f.neg),
@@ -306,17 +287,65 @@ class cpp_dec_float
    }
 
    // Specific special values.
-   static const cpp_dec_float&  nan  () { static const cpp_dec_float val(cpp_dec_float_NaN); return val; }
-   static const cpp_dec_float&  inf  () { static const cpp_dec_float val(cpp_dec_float_inf); return val; }
-   static const cpp_dec_float& (max) () { static const cpp_dec_float val({ std::uint32_t(1u) }, cpp_dec_float_max_exp10); return val; }
-   static const cpp_dec_float& (min) () { static const cpp_dec_float val({ std::uint32_t(1u) }, cpp_dec_float_min_exp10); return val; }
-   static const cpp_dec_float&  zero () { static const cpp_dec_float val({ std::uint32_t(0u) }); return val; }
-   static const cpp_dec_float&  one  () { static const cpp_dec_float val({ std::uint32_t(1u) }); return val; }
-   static const cpp_dec_float&  two  () { static const cpp_dec_float val({ std::uint32_t(2u) }); return val; }
-   static const cpp_dec_float&  half () { static const cpp_dec_float val({ std::uint32_t(cpp_dec_float_elem_mask / 2)}, -8); return val; }
+   static const cpp_dec_float& nan()
+   {
+      static const cpp_dec_float val(cpp_dec_float_NaN);
+      return val;
+   }
 
-   static const cpp_dec_float& double_min() { static const cpp_dec_float val((std::numeric_limits<double>::min)()); return val; }
-   static const cpp_dec_float& double_max() { static const cpp_dec_float val((std::numeric_limits<double>::max)()); return val; }
+   static const cpp_dec_float& inf()
+   {
+      static const cpp_dec_float val(cpp_dec_float_inf);
+      return val;
+   }
+
+   static const cpp_dec_float&(max)()
+   {
+      static const cpp_dec_float val_max({ std::uint32_t(1u) }, cpp_dec_float_max_exp10);
+      return val_max;
+   }
+
+   static const cpp_dec_float&(min)()
+   {
+      static const cpp_dec_float val_min({ std::uint32_t(1u) }, cpp_dec_float_min_exp10);
+      return val_min;
+   }
+
+   static const cpp_dec_float& zero()
+   {
+      static const cpp_dec_float val({ std::uint32_t(0u) });
+      return val;
+   }
+
+   static const cpp_dec_float& one()
+   {
+      static const cpp_dec_float val({ std::uint32_t(1u) });
+      return val;
+   }
+
+   static const cpp_dec_float& two()
+   {
+      static cpp_dec_float val({ std::uint32_t(2u) });
+      return val;
+   }
+
+   static const cpp_dec_float& half()
+   {
+      static const cpp_dec_float val({ std::uint32_t(cpp_dec_float_elem_mask / 2)}, -8);
+      return val;
+   }
+
+   static const cpp_dec_float& double_min()
+   {
+      static const cpp_dec_float val((std::numeric_limits<double>::min)());
+      return val;
+   }
+
+   static const cpp_dec_float& double_max()
+   {
+      static const cpp_dec_float val((std::numeric_limits<double>::max)());
+      return val;
+   }
 
    static const cpp_dec_float& long_double_min()
    {
@@ -358,14 +387,7 @@ class cpp_dec_float
 
    static const cpp_dec_float& eps()
    {
-      static const cpp_dec_float val
-      (
-        {
-          (std::uint32_t) detail::pow10_maker((std::uint32_t) ((std::int32_t) (INT32_C(1) + (std::int32_t) (((cpp_dec_float_digits10 / cpp_dec_float_elem_digits10) + ((cpp_dec_float_digits10 % cpp_dec_float_elem_digits10) != 0 ? 1 : 0)) * cpp_dec_float_elem_digits10)) - cpp_dec_float_digits10))
-        },
-        -(exponent_type) (((cpp_dec_float_digits10 / cpp_dec_float_elem_digits10) + ((cpp_dec_float_digits10 % cpp_dec_float_elem_digits10) != 0 ? 1 : 0)) * cpp_dec_float_elem_digits10)
-      );
-
+      static const cpp_dec_float val(1.0, 1 - static_cast<int>(cpp_dec_float_digits10));
       return val;
    }
 
@@ -507,16 +529,11 @@ class cpp_dec_float
 
    void precision(const std::int32_t prec_digits)
    {
-      if (prec_digits >= cpp_dec_float_total_digits10)
-      {
-         prec_elem = cpp_dec_float_elem_number;
-      }
-      else
-      {
-         const std::int32_t elems = static_cast<std::int32_t>(static_cast<std::int32_t>((prec_digits + (cpp_dec_float_elem_digits10 / 2)) / cpp_dec_float_elem_digits10) + static_cast<std::int32_t>(((prec_digits % cpp_dec_float_elem_digits10) != 0) ? 1 : 0));
+      const std::int32_t elems =
+        static_cast<std::int32_t>(    static_cast<std::int32_t>(prec_digits / cpp_dec_float_elem_digits10)
+                                  +                          (((prec_digits % cpp_dec_float_elem_digits10) != 0) ? 1 : 0));
 
-         prec_elem = (std::min)(cpp_dec_float_elem_number, (std::max)(elems, static_cast<std::int32_t>(2)));
-      }
+      prec_elem = (std::min)(cpp_dec_float_elem_number, (std::max)(elems, static_cast<std::int32_t>(2)));
    }
    static cpp_dec_float pow2(boost::long_long_type i);
    exponent_type         order() const
@@ -582,6 +599,16 @@ class cpp_dec_float
    }
 
  private:
+   constexpr cpp_dec_float(std::initializer_list<std::uint32_t> lst,
+                           const exponent_type e = 0,
+                           const bool n = false) : data(lst),
+                                                   exp(e),
+                                                   neg(n),
+                                                   fpclass(cpp_dec_float_finite),
+                                                   prec_elem(cpp_dec_float_elem_number)
+   {
+   }
+
    static bool data_elem_is_non_zero_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(0u)); }
    static bool data_elem_is_non_nine_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(cpp_dec_float::cpp_dec_float_elem_mask - 1)); }
    static bool char_is_nonzero_predicate(const char& c) { return (c != static_cast<char>('0')); }
@@ -624,29 +651,268 @@ class cpp_dec_float
    static std::uint32_t eval_add_n(      std::uint32_t* r,
                                    const std::uint32_t* u,
                                    const std::uint32_t* v,
-                                   const std::int32_t   count);
+                                   const std::int32_t   count)
+   {
+      // Addition algorithm
+      std::uint_fast8_t carry = static_cast<std::uint_fast8_t>(0U);
 
-   static std::int32_t eval_subtract_n(      std::uint32_t* r,
-                                       const std::uint32_t* u,
-                                       const std::uint32_t* v,
-                                       const std::int32_t   count);
+      for(std::int32_t j = static_cast<std::int32_t>(count - static_cast<std::int32_t>(1)); j >= static_cast<std::int32_t>(0); --j)
+      {
+         const std::uint32_t t = static_cast<std::uint32_t>(static_cast<std::uint32_t>(u[j] + v[j]) + carry);
+
+         carry = ((t >= static_cast<std::uint32_t>(cpp_dec_float_elem_mask)) ? static_cast<std::uint_fast8_t>(1U)
+                                                                      : static_cast<std::uint_fast8_t>(0U));
+
+         r[j]  = static_cast<std::uint32_t>(t - ((carry != 0U) ? static_cast<std::uint32_t>(cpp_dec_float_elem_mask)
+                                                               : static_cast<std::uint32_t>(0U)));
+      }
+
+      return static_cast<std::uint32_t>(carry);
+   }
+
+   static std::uint32_t eval_subtract_n(      std::uint32_t* r,
+                                        const std::uint32_t* u,
+                                        const std::uint32_t* v,
+                                        const std::int32_t   count)
+   {
+      // Subtraction algorithm
+      std::int_fast8_t borrow = static_cast<std::int_fast8_t>(0);
+
+      for(std::uint32_t j = static_cast<std::uint32_t>(count - static_cast<std::int32_t>(1)); static_cast<std::int32_t>(j) >= static_cast<std::int32_t>(0); --j)
+      {
+         std::int32_t t = static_cast<std::int32_t>(  static_cast<std::int32_t>(u[j])
+                                                    - static_cast<std::int32_t>(v[j])) - borrow;
+
+         // Underflow? Borrow?
+         if(t < 0)
+         {
+            // Yes, underflow and borrow
+            t     += static_cast<std::int32_t>(cpp_dec_float_elem_mask);
+            borrow = static_cast<int_fast8_t>(1);
+         }
+         else
+         {
+            borrow = static_cast<int_fast8_t>(0);
+         }
+
+         r[j] = static_cast<std::uint32_t>(t);
+      }
+
+      return static_cast<std::int32_t>(borrow);
+   }
 
    static void eval_multiply_n_by_n_to_2n(      std::uint32_t* r,
                                           const std::uint32_t* a,
                                           const std::uint32_t* b,
-                                          const std::uint32_t  count);
+                                          const std::uint32_t  count)
+   {
+      using local_limb_type = std::uint32_t;
 
+      using local_double_limb_type = std::uint64_t;
+
+      using local_reverse_iterator_type = std::reverse_iterator<local_limb_type*>;
+
+      local_reverse_iterator_type ir(r + (count * 2));
+
+      local_double_limb_type carry = 0U;
+
+      for(std::int32_t j = static_cast<std::int32_t>(count - 1); j >= static_cast<std::int32_t>(1); --j)
+      {
+         local_double_limb_type sum = carry;
+
+         for(std::int32_t i = static_cast<std::int32_t>(count - 1); i >= j; --i)
+         {
+            sum += local_double_limb_type(
+                   local_double_limb_type(a[i]) * b[  static_cast<std::int32_t>(count - 1)
+                                                   - static_cast<std::int32_t>(i - j)]);
+         }
+
+         carry = static_cast<local_double_limb_type>(sum / static_cast<local_limb_type>       (cpp_dec_float_elem_mask));
+         *ir++ = static_cast<local_limb_type>       (sum - static_cast<local_double_limb_type>(static_cast<local_double_limb_type>(carry) * static_cast<local_limb_type>(cpp_dec_float_elem_mask)));
+      }
+
+      for(std::int32_t j = static_cast<std::int32_t>(count - 1); j >= static_cast<std::int32_t>(0); --j)
+      {
+         local_double_limb_type sum = carry;
+
+         for(std::int32_t i = j; i >= static_cast<std::int32_t>(0); --i)
+         {
+            sum += static_cast<local_double_limb_type>(a[j - i] * static_cast<local_double_limb_type>(b[i]));
+         }
+
+         carry = static_cast<local_double_limb_type>(sum / static_cast<local_limb_type>(cpp_dec_float_elem_mask));
+         *ir++ = static_cast<local_limb_type>       (sum - static_cast<local_double_limb_type>(static_cast<local_double_limb_type>(carry) * static_cast<local_limb_type>(cpp_dec_float_elem_mask)));
+      }
+
+      *ir = static_cast<local_limb_type>(carry);
+   }
+
+   //static std::uint32_t mul_loop_uv(std::uint32_t* const u, const std::uint32_t* const v, const std::int32_t p);
    static std::uint32_t mul_loop_n(std::uint32_t* const u, std::uint32_t n, const std::int32_t p);
    static std::uint32_t div_loop_n(std::uint32_t* const u, std::uint32_t n, const std::int32_t p);
 
-   static void eval_multiply_kara_propagate_carry (std::uint32_t* t, const std::uint32_t n, const std::uint32_t carry);
-   static void eval_multiply_kara_propagate_borrow(std::uint32_t* t, const std::uint32_t n, const bool has_borrow);
+   static void eval_multiply_kara_propagate_carry(std::uint32_t* t, const std::uint32_t n, const std::uint32_t carry)
+   {
+      std::uint_fast8_t carry_out = ((carry != 0U) ? static_cast<std::uint_fast8_t>(1U)
+                                                   : static_cast<std::uint_fast8_t>(0U));
+
+      using local_reverse_iterator_type = std::reverse_iterator<std::uint32_t*>;
+
+      local_reverse_iterator_type ri_t  (t + n);
+      local_reverse_iterator_type rend_t(t);
+
+      while((carry_out != 0U) && (ri_t != rend_t))
+      {
+         const std::uint64_t tt = *ri_t + carry_out;
+
+         carry_out = ((tt >= static_cast<std::uint32_t>(cpp_dec_float_elem_mask)) ? static_cast<std::uint_fast8_t>(1U)
+                                                                                  : static_cast<std::uint_fast8_t>(0U));
+
+         *ri_t++    = static_cast<std::uint32_t>(tt - ((carry_out != 0U) ? static_cast<std::uint32_t>(cpp_dec_float_elem_mask)
+                                                                         : static_cast<std::uint32_t>(0U)));
+      }
+   }
+
+   static void eval_multiply_kara_propagate_borrow(std::uint32_t* t, const std::uint32_t n, const bool has_borrow)
+   {
+      std::int_fast8_t borrow = (has_borrow ? static_cast<std::int_fast8_t>(1)
+                                            : static_cast<std::int_fast8_t>(0));
+
+      using local_reverse_iterator_type = std::reverse_iterator<std::uint32_t*>;
+
+      local_reverse_iterator_type ri_t  (t + n);
+      local_reverse_iterator_type rend_t(t);
+
+      while((borrow != 0U) && (ri_t != rend_t))
+      {
+         std::int32_t tt = static_cast<std::int32_t>(static_cast<std::int32_t>(*ri_t) - borrow);
+
+         // Underflow? Borrow?
+         if(tt < 0)
+         {
+            // Yes, underflow and borrow
+            tt     += static_cast<std::int32_t>(cpp_dec_float_elem_mask);
+            borrow  = static_cast<int_fast8_t>(1);
+         }
+         else
+         {
+            borrow = static_cast<int_fast8_t>(0);
+         }
+
+         *ri_t++ = static_cast<std::uint32_t>(tt);
+      }
+   }
 
    static void eval_multiply_kara_n_by_n_to_2n(      std::uint32_t* r,
                                                const std::uint32_t* a,
                                                const std::uint32_t* b,
                                                const std::uint32_t  n,
-                                                     std::uint32_t* t);
+                                                     std::uint32_t* t)
+   {
+      if(n <= 32U)
+      {
+         static_cast<void>(t);
+
+         eval_multiply_n_by_n_to_2n(r, a, b, n);
+      }
+      else
+      {
+         // Based on "Algorithm 1.3 KaratsubaMultiply", Sect. 1.3.2, page 5
+         // of R.P. Brent and P. Zimmermann, "Modern Computer Arithmetic",
+         // Cambridge University Press (2011).
+
+         // The Karatsuba multipliation computes the product of a*b as:
+         // [b^N + b^(N/2)] a1*b1 + [b^(N/2)](a1 - a0)(b0 - b1) + [b^(N/2) + 1] a0*b0
+
+         // Here we visualize a and b in two components 1,0 corresponding
+         // to the high and low order parts, respectively.
+
+         // Step 1
+         // Calculate a1*b1 and store it in the upper-order part of r.
+         // Calculate a0*b0 and store it in the lower-order part of r.
+         // copy r to t0.
+
+         // Step 2
+         // Add a1*b1 (which is t2) to the middle two-quarters of r (which is r1)
+         // Add a0*b0 (which is t0) to the middle two-quarters of r (which is r1)
+
+         // Step 3
+         // Calculate |a1-a0| in t0 and note the sign (i.e., the borrow flag)
+
+         // Step 4
+         // Calculate |b0-b1| in t1 and note the sign (i.e., the borrow flag)
+
+         // Step 5
+         // Call kara mul to calculate |a1-a0|*|b0-b1| in (t2),
+         // while using temporary storage in t4 along the way.
+
+         // Step 6
+         // Check the borrow signs. If a1-a0 and b0-b1 have the same signs,
+         // then add |a1-a0|*|b0-b1| to r1, otherwise subtract it from r1.
+
+         const std::uint_fast32_t  nh = n / 2U;
+
+         const std::uint32_t* a0 = a + nh;
+         const std::uint32_t* a1 = a + 0U;
+
+         const std::uint32_t* b0 = b + nh;
+         const std::uint32_t* b1 = b + 0U;
+
+               std::uint32_t* r0 = r + 0U;
+               std::uint32_t* r1 = r + nh;
+               std::uint32_t* r2 = r + n;
+
+               std::uint32_t* t0 = t + 0U;
+               std::uint32_t* t1 = t + nh;
+               std::uint32_t* t2 = t + n;
+               std::uint32_t* t4 = t + (n + n);
+
+         // Step 1
+         eval_multiply_kara_n_by_n_to_2n(r0, a1, b1, nh, t);
+         eval_multiply_kara_n_by_n_to_2n(r2, a0, b0, nh, t);
+         std::copy(r0, r0 + (2U * n), t0);
+
+         // Step 2
+         std::uint32_t carry;
+         carry = eval_add_n(r1, r1, t0, n);
+         eval_multiply_kara_propagate_carry(r0, nh, carry);
+         carry = eval_add_n(r1, r1, t2, n);
+         eval_multiply_kara_propagate_carry(r0, nh, carry);
+
+         // Step 3
+         const int cmp_result_a1a0 = compare_ranges(a1, a0, nh);
+
+         if(cmp_result_a1a0 == 1)
+            static_cast<void>(eval_subtract_n(t0, a1, a0, nh));
+         else if(cmp_result_a1a0 == -1)
+            static_cast<void>(eval_subtract_n(t0, a0, a1, nh));
+
+         // Step 4
+         const int cmp_result_b0b1 = compare_ranges(b0, b1, nh);
+
+         if(cmp_result_b0b1 == 1)
+            static_cast<void>(eval_subtract_n(t1, b0, b1, nh));
+         else if(cmp_result_b0b1 == -1)
+            static_cast<void>(eval_subtract_n(t1, b1, b0, nh));
+
+         // Step 5
+         eval_multiply_kara_n_by_n_to_2n(t2, t0, t1, nh, t4);
+
+         // Step 6
+         if((cmp_result_a1a0 * cmp_result_b0b1) == 1)
+         {
+            carry = eval_add_n(r1, r1, t2, n);
+
+            eval_multiply_kara_propagate_carry(r0, nh, carry);
+         }
+         else if((cmp_result_a1a0 * cmp_result_b0b1) == -1)
+         {
+            const bool has_borrow = eval_subtract_n(r1, r1, t2, n);
+
+            eval_multiply_kara_propagate_borrow(r0, nh, has_borrow);
+         }
+      }
+   }
 
    bool rd_string(const char* const s);
 
@@ -743,13 +1009,13 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       // at a time, each element with carry.
       if (ofs >= static_cast<std::int32_t>(0))
       {
-         std::copy(v.data.cbegin(), v.data.cend() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
+         std::copy(v.data.begin(), v.data.end() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
          std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(ofs), static_cast<std::uint32_t>(0u));
          p_v = n_data.data();
       }
       else
       {
-         std::copy(data.cbegin(), data.cend() - static_cast<size_t>(-ofs), n_data.begin() + static_cast<size_t>(-ofs));
+         std::copy(data.begin(), data.end() - static_cast<size_t>(-ofs), n_data.begin() + static_cast<size_t>(-ofs));
          std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(-ofs), static_cast<std::uint32_t>(0u));
          p_u    = n_data.data();
          b_copy = true;
@@ -767,7 +1033,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       // There needs to be a carry into the element -1 of the array data
       if (carry != static_cast<std::uint32_t>(0u))
       {
-         std::copy_backward(data.cbegin(), data.cend() - static_cast<std::size_t>(1u), data.end());
+         std::copy_backward(data.begin(), data.end() - static_cast<std::size_t>(1u), data.end());
          data[0] = carry;
          exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
       }
@@ -776,15 +1042,13 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    {
       // Subtract v from *this, where the data array of either *this or v
       // might have to be treated with a positive, negative or zero offset.
-      if (    (ofs >  static_cast<std::int32_t>(0))
-          || ((ofs == static_cast<std::int32_t>(0))
-          && (compare_ranges(data.cbegin(), v.data.cbegin()) > 0)))
+      if ((ofs > static_cast<std::int32_t>(0)) || ((ofs == static_cast<std::int32_t>(0)) && (compare_ranges(data.cbegin(), v.data.cbegin()) > static_cast<std::int32_t>(0))))
       {
          // In this case, |u| > |v| and ofs is positive.
          // Copy the data of v, shifted down to a lower value
          // into the data array m_n. Set the operand pointer p_v
          // to point to the copied, shifted data m_n.
-         std::copy(v.data.cbegin(), v.data.cend() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
+         std::copy(v.data.begin(), v.data.end() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
          std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(ofs), static_cast<std::uint32_t>(0u));
          p_v = n_data.data();
       }
@@ -794,7 +1058,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
          {
             // In this case, |u| < |v| and ofs is negative.
             // Shift the data of u down to a lower value.
-            std::copy_backward(data.cbegin(), data.cend() - static_cast<size_t>(-ofs), data.end());
+            std::copy_backward(data.begin(), data.end() - static_cast<size_t>(-ofs), data.end());
             std::fill(data.begin(), data.begin() + static_cast<size_t>(-ofs), static_cast<std::uint32_t>(0u));
          }
 
@@ -809,9 +1073,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       }
 
       // Subtraction algorithm
-      const std::int32_t borrow = eval_subtract_n(p_u, p_u, p_v, cpp_dec_float_elem_number);
-
-      static_cast<void>(borrow);
+      static_cast<void>(eval_subtract_n(p_u, p_u, p_v, cpp_dec_float_elem_number));
 
       if (b_copy)
       {
@@ -821,8 +1083,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       }
 
       // Is it necessary to justify the data?
-      const typename array_type::const_iterator first_nonzero_elem =
-        std::find_if(data.begin(), data.end(), data_elem_is_non_zero_predicate);
+      const typename array_type::const_iterator first_nonzero_elem = std::find_if(data.begin(), data.end(), data_elem_is_non_zero_predicate);
 
       if (first_nonzero_elem != data.begin())
       {
@@ -953,17 +1214,18 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    }
    else
    {
-      // Use Karatsuba multiplication.
-      using array_for_karatsuba_mem_type =
-         typename std::conditional<std::is_void<Allocator>::value,
-                                   detail::static_array <std::uint32_t, detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8>,
-                                   detail::dynamic_array<std::uint32_t, detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8, Allocator> >::type;
+      // Use Karatsuba multiplication multiplication.
 
-      array_for_karatsuba_mem_type my_kara_mul_pool;
+      using array_for_kara_tmp_type =
+         typename std::conditional<std::is_void<Allocator>::value,
+                                   detail::static_array <std::uint32_t, detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U>,
+                                   detail::dynamic_array<std::uint32_t, detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U, Allocator> >::type;
 
       // Sloanes's A029747: Numbers of the form 2^k times 1, 3 or 5.
       const std::uint32_t kara_elems_for_multiply =
          detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(prec_mul));
+
+      array_for_kara_tmp_type my_kara_mul_pool;
 
       std::uint32_t* result  = my_kara_mul_pool.data() + (kara_elems_for_multiply * 0U);
       std::uint32_t* t       = my_kara_mul_pool.data() + (kara_elems_for_multiply * 2U);
@@ -972,10 +1234,14 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 
       std::copy(  data.cbegin(),   data.cbegin() + prec_mul, u_local);
       std::copy(v.data.cbegin(), v.data.cbegin() + prec_mul, v_local);
-      std::fill(u_local + prec_mul, u_local + kara_elems_for_multiply, std::uint32_t(0U));
-      std::fill(v_local + prec_mul, v_local + kara_elems_for_multiply, std::uint32_t(0U));
+      std::fill(u_local + prec_mul, u_local + kara_elems_for_multiply * 1, std::uint32_t(0U));
+      std::fill(v_local + prec_mul, v_local + kara_elems_for_multiply * 1, std::uint32_t(0U));
 
-      eval_multiply_kara_n_by_n_to_2n(result, u_local, v_local, prec_mul, t);
+      eval_multiply_kara_n_by_n_to_2n(result,
+                                      u_local,
+                                      v_local,
+                                      kara_elems_for_multiply,
+                                      t);
 
       // Handle a potential carry.
       if(result[0U] != static_cast<std::uint32_t>(0U))
@@ -1030,11 +1296,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       }
    }
 
-   const bool u_and_v_are_finite_and_identical =
-     (   (isfinite)()
-      && (fpclass == v.fpclass)
-      && (exp == v.exp)
-      && (compare_ranges(data.cbegin(), v.data.cbegin()) == 0));
+   const bool u_and_v_are_finite_and_identical = ((isfinite)() && (fpclass == v.fpclass) && (exp == v.exp) && (compare_ranges(data.cbegin(), v.data.cbegin()) == static_cast<std::int32_t>(0)));
 
    if (u_and_v_are_finite_and_identical)
    {
@@ -2392,107 +2654,36 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::from_unsigned_long_long(c
    std::copy(temp, temp + (std::min)(i, static_cast<std::size_t>(cpp_dec_float_elem_number)), data.begin());
 }
 
+#if 0
 template <unsigned Digits10, class ExponentType, class Allocator>
-std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::eval_add_n(      std::uint32_t* r,
-                                                                           const std::uint32_t* u,
-                                                                           const std::uint32_t* v,
-                                                                           const std::int32_t   count)
+std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_uv(std::uint32_t* const u, const std::uint32_t* const v, const std::int32_t p)
 {
-   // Addition algorithm
-   std::uint_fast8_t carry = static_cast<std::uint_fast8_t>(0U);
+   //
+   // There is a limit on how many limbs this algorithm can handle without dropping digits
+   // due to overflow in the carry, it is:
+   //
+   // FLOOR( (2^64 - 1) / (10^8 * 10^8) ) == 1844
+   //
+   static_assert(cpp_dec_float_elem_number < 1800, "Too many limbs in the data type for the multiplication algorithm - unsupported precision in cpp_dec_float.");
 
-   for(std::int32_t j = static_cast<std::int32_t>(count - static_cast<std::int32_t>(1)); j >= static_cast<std::int32_t>(0); --j)
+   std::uint64_t carry = static_cast<std::uint64_t>(0u);
+
+   for (std::int32_t j = static_cast<std::int32_t>(p - 1u); j >= static_cast<std::int32_t>(0); j--)
    {
-      const std::uint32_t t = static_cast<std::uint32_t>(static_cast<std::uint32_t>(u[j] + v[j]) + carry);
+      std::uint64_t sum = carry;
 
-      carry = ((t >= static_cast<std::uint32_t>(cpp_dec_float_elem_mask)) ? static_cast<std::uint_fast8_t>(1U)
-                                                                      : static_cast<std::uint_fast8_t>(0U));
+      for (std::int32_t i = j; i >= static_cast<std::int32_t>(0); i--)
+      {
+         sum += static_cast<std::uint64_t>(u[j - i] * static_cast<std::uint64_t>(v[i]));
+      }
 
-      r[j]  = static_cast<std::uint32_t>(t - ((carry != 0U) ? static_cast<std::uint32_t>(cpp_dec_float_elem_mask)
-                                                            : static_cast<std::uint32_t>(0U)));
+      u[j]  = static_cast<std::uint32_t>(sum % static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
+      carry = static_cast<std::uint64_t>(sum / static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
    }
 
    return static_cast<std::uint32_t>(carry);
 }
-
-template <unsigned Digits10, class ExponentType, class Allocator>
-std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::eval_subtract_n(      std::uint32_t* r,
-                                                                               const std::uint32_t* u,
-                                                                               const std::uint32_t* v,
-                                                                               const std::int32_t   count)
-{
-   // Subtraction algorithm
-   std::int_fast8_t borrow = static_cast<std::int_fast8_t>(0);
-
-   for(std::uint32_t j = static_cast<std::uint32_t>(count - static_cast<std::int32_t>(1)); static_cast<std::int32_t>(j) >= static_cast<std::int32_t>(0); --j)
-   {
-      std::int32_t t = static_cast<std::int32_t>(  static_cast<std::int32_t>(u[j])
-                                                 - static_cast<std::int32_t>(v[j])) - borrow;
-
-      // Underflow? Borrow?
-      if(t < 0)
-      {
-         // Yes, underflow and borrow
-         t     += static_cast<std::int32_t>(cpp_dec_float_elem_mask);
-         borrow = static_cast<int_fast8_t>(1);
-      }
-      else
-      {
-         borrow = static_cast<int_fast8_t>(0);
-      }
-
-      r[j] = static_cast<std::uint32_t>(t);
-   }
-
-   return static_cast<std::int32_t>(borrow);
-}
-
-template <unsigned Digits10, class ExponentType, class Allocator>
-void cpp_dec_float<Digits10, ExponentType, Allocator>::eval_multiply_n_by_n_to_2n(      std::uint32_t* r,
-                                                                                  const std::uint32_t* a,
-                                                                                  const std::uint32_t* b,
-                                                                                  const std::uint32_t  count)
-{
-   using local_limb_type = std::uint32_t;
-
-   using local_double_limb_type = std::uint64_t;
-
-   using local_reverse_iterator_type = std::reverse_iterator<local_limb_type*>;
-
-   local_reverse_iterator_type ir(r + (count * 2));
-
-   local_double_limb_type carry = 0U;
-
-   for(std::int32_t j = static_cast<std::int32_t>(count - 1); j >= static_cast<std::int32_t>(1); --j)
-   {
-      local_double_limb_type sum = carry;
-
-      for(std::int32_t i = static_cast<std::int32_t>(count - 1); i >= j; --i)
-      {
-         sum += local_double_limb_type(
-                local_double_limb_type(a[i]) * b[  static_cast<std::int32_t>(count - 1)
-                                                 - static_cast<std::int32_t>(i - j)]);
-      }
-
-      carry = static_cast<local_double_limb_type>(sum / static_cast<local_limb_type>       (cpp_dec_float_elem_mask));
-      *ir++ = static_cast<local_limb_type>       (sum - static_cast<local_double_limb_type>(static_cast<local_double_limb_type>(carry) * static_cast<local_limb_type>(cpp_dec_float_elem_mask)));
-   }
-
-   for(std::int32_t j = static_cast<std::int32_t>(count - 1); j >= static_cast<std::int32_t>(0); --j)
-   {
-     local_double_limb_type sum = carry;
-
-     for(std::int32_t i = j; i >= static_cast<std::int32_t>(0); --i)
-     {
-        sum += static_cast<local_double_limb_type>(a[j - i] * static_cast<local_double_limb_type>(b[i]));
-     }
-
-     carry = static_cast<local_double_limb_type>(sum / static_cast<local_limb_type>(cpp_dec_float_elem_mask));
-     *ir++ = static_cast<local_limb_type>       (sum - static_cast<local_double_limb_type>(static_cast<local_double_limb_type>(carry) * static_cast<local_limb_type>(cpp_dec_float_elem_mask)));
-   }
-
-   *ir = static_cast<local_limb_type>(carry);
-}
+#endif
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_n(std::uint32_t* const u, std::uint32_t n, const std::int32_t p)
@@ -2503,8 +2694,8 @@ std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_n(std::
    for (std::int32_t j = p - 1; j >= static_cast<std::int32_t>(0); j--)
    {
       const std::uint64_t t = static_cast<std::uint64_t>(carry + static_cast<std::uint64_t>(u[j] * static_cast<std::uint64_t>(n)));
-      carry                 = static_cast<std::uint64_t>(t / static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
-      u[j]                  = static_cast<std::uint32_t>(t - static_cast<std::uint64_t>(static_cast<std::uint32_t>(cpp_dec_float_elem_mask) * static_cast<std::uint64_t>(carry)));
+      carry                   = static_cast<std::uint64_t>(t / static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
+      u[j]                    = static_cast<std::uint32_t>(t - static_cast<std::uint64_t>(static_cast<std::uint32_t>(cpp_dec_float_elem_mask) * static_cast<std::uint64_t>(carry)));
    }
 
    return static_cast<std::uint32_t>(carry);
@@ -2523,172 +2714,6 @@ std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::div_loop_n(std::
    }
 
    return static_cast<std::uint32_t>(prev);
-}
-
-template <unsigned Digits10, class ExponentType, class Allocator>
-void cpp_dec_float<Digits10, ExponentType, Allocator>::eval_multiply_kara_propagate_carry(std::uint32_t* t, const std::uint32_t n, const std::uint32_t carry)
-{
-   std::uint_fast8_t carry_out = ((carry != 0U) ? static_cast<std::uint_fast8_t>(1U)
-                                                : static_cast<std::uint_fast8_t>(0U));
-
-   using local_reverse_iterator_type = std::reverse_iterator<std::uint32_t*>;
-
-   local_reverse_iterator_type ri_t  (t + n);
-   local_reverse_iterator_type rend_t(t);
-
-   while((carry_out != 0U) && (ri_t != rend_t))
-   {
-      const std::uint64_t tt = *ri_t + carry_out;
-
-      carry_out = ((tt >= static_cast<std::uint32_t>(cpp_dec_float_elem_mask)) ? static_cast<std::uint_fast8_t>(1U)
-                                                                       : static_cast<std::uint_fast8_t>(0U));
-
-      *ri_t++    = static_cast<std::uint32_t>(tt - ((carry_out != 0U) ? static_cast<std::uint32_t>(cpp_dec_float_elem_mask)
-                                                                      : static_cast<std::uint32_t>(0U)));
-   }
-}
-
-template <unsigned Digits10, class ExponentType, class Allocator>
-void cpp_dec_float<Digits10, ExponentType, Allocator>::eval_multiply_kara_propagate_borrow(std::uint32_t* t, const std::uint32_t n, const bool has_borrow)
-{
-   std::int_fast8_t borrow = (has_borrow ? static_cast<std::int_fast8_t>(1)
-                                         : static_cast<std::int_fast8_t>(0));
-
-   using local_reverse_iterator_type = std::reverse_iterator<std::uint32_t*>;
-
-   local_reverse_iterator_type ri_t  (t + n);
-   local_reverse_iterator_type rend_t(t);
-
-   while((borrow != 0U) && (ri_t != rend_t))
-   {
-      std::int32_t tt = static_cast<std::int32_t>(static_cast<std::int32_t>(*ri_t) - borrow);
-
-      // Underflow? Borrow?
-      if(tt < 0)
-      {
-         // Yes, underflow and borrow
-         tt    += static_cast<std::int32_t>(cpp_dec_float_elem_mask);
-         borrow = static_cast<int_fast8_t>(1);
-      }
-      else
-      {
-         borrow = static_cast<int_fast8_t>(0);
-      }
-
-      *ri_t++ = static_cast<std::uint32_t>(tt);
-   }
-}
-
-template <unsigned Digits10, class ExponentType, class Allocator>
-void cpp_dec_float<Digits10, ExponentType, Allocator>::eval_multiply_kara_n_by_n_to_2n(      std::uint32_t* r,
-                                                                                       const std::uint32_t* a,
-                                                                                       const std::uint32_t* b,
-                                                                                       const std::uint32_t  n,
-                                                                                             std::uint32_t* t)
-{
-   if(n <= 24U)
-   {
-      static_cast<void>(t);
-
-      eval_multiply_n_by_n_to_2n(r, a, b, n);
-   }
-   else
-   {
-      // Based on "Algorithm 1.3 KaratsubaMultiply", Sect. 1.3.2, page 5
-      // of R.P. Brent and P. Zimmermann, "Modern Computer Arithmetic",
-      // Cambridge University Press (2011).
-
-      // The Karatsuba multipliation computes the product of a*b as:
-      // [b^N + b^(N/2)] a1*b1 + [b^(N/2)](a1 - a0)(b0 - b1) + [b^(N/2) + 1] a0*b0
-
-      // Here we visualize a and b in two components 1,0 corresponding
-      // to the high and low order parts, respectively.
-
-      // Step 1
-      // Calculate a1*b1 and store it in the upper-order part of r.
-      // Calculate a0*b0 and store it in the lower-order part of r.
-      // copy r to t0.
-
-      // Step 2
-      // Add a1*b1 (which is t2) to the middle two-quarters of r (which is r1)
-      // Add a0*b0 (which is t0) to the middle two-quarters of r (which is r1)
-
-      // Step 3
-      // Calculate |a1-a0| in t0 and note the sign (i.e., the borrow flag)
-
-      // Step 4
-      // Calculate |b0-b1| in t1 and note the sign (i.e., the borrow flag)
-
-      // Step 5
-      // Call kara mul to calculate |a1-a0|*|b0-b1| in (t2),
-      // while using temporary storage in t4 along the way.
-
-      // Step 6
-      // Check the borrow signs. If a1-a0 and b0-b1 have the same signs,
-      // then add |a1-a0|*|b0-b1| to r1, otherwise subtract it from r1.
-
-      const std::uint_fast32_t  nh = n / 2U;
-
-      const std::uint32_t* a0 = a + nh;
-      const std::uint32_t* a1 = a + 0U;
-
-      const std::uint32_t* b0 = b + nh;
-      const std::uint32_t* b1 = b + 0U;
-
-            std::uint32_t* r0 = r + 0U;
-            std::uint32_t* r1 = r + nh;
-            std::uint32_t* r2 = r + n;
-
-            std::uint32_t* t0 = t + 0U;
-            std::uint32_t* t1 = t + nh;
-            std::uint32_t* t2 = t + n;
-            std::uint32_t* t4 = t + (n + n);
-
-      // Step 1
-      eval_multiply_kara_n_by_n_to_2n(r0, a1, b1, nh, t);
-      eval_multiply_kara_n_by_n_to_2n(r2, a0, b0, nh, t);
-      std::copy(r0, r0 + (2U * n), t0);
-
-      // Step 2
-      std::uint32_t carry;
-      carry = eval_add_n(r1, r1, t0, n);
-      eval_multiply_kara_propagate_carry(r0, nh, carry);
-      carry = eval_add_n(r1, r1, t2, n);
-      eval_multiply_kara_propagate_carry(r0, nh, carry);
-
-      // Step 3
-      const int cmp_result_a1a0 = compare_ranges(a1, a0, nh);
-
-      if(cmp_result_a1a0 == 1)
-         static_cast<void>(eval_subtract_n(t0, a1, a0, nh));
-      else if(cmp_result_a1a0 == -1)
-         static_cast<void>(eval_subtract_n(t0, a0, a1, nh));
-
-      // Step 4
-      const int cmp_result_b0b1 = compare_ranges(b0, b1, nh);
-
-      if(cmp_result_b0b1 == 1)
-         static_cast<void>(eval_subtract_n(t1, b0, b1, nh));
-      else if(cmp_result_b0b1 == -1)
-         static_cast<void>(eval_subtract_n(t1, b1, b0, nh));
-
-      // Step 5
-      eval_multiply_kara_n_by_n_to_2n(t2, t0, t1, nh, t4);
-
-      // Step 6
-      if((cmp_result_a1a0 * cmp_result_b0b1) == 1)
-      {
-         carry = eval_add_n(r1, r1, t2, n);
-
-         eval_multiply_kara_propagate_carry(r0, nh, carry);
-      }
-      else if((cmp_result_a1a0 * cmp_result_b0b1) == -1)
-      {
-         const bool has_borrow = eval_subtract_n(r1, r1, t2, n);
-
-         eval_multiply_kara_propagate_borrow(r0, nh, has_borrow);
-      }
-   }
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
