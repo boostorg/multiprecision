@@ -121,7 +121,8 @@ class number
                                                         typename std::enable_if<(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value && !std::is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2, *this);
+      detail::scoped_default_precision<typename component_type<self_type>::type> component_precision_guard(v1, v2, *this);
       assign_components(m_backend, canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)));
    }
    template <class V, class U>
@@ -130,7 +131,8 @@ class number
                                                                      (std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<typename component_type<self_type>::type, self_type>::value && !std::is_same<V, self_type>::value && !(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2, this);
+      detail::scoped_default_precision<typename component_type<self_type>::type> component_precision_guard(v1, v2, *this);
       assign_components(m_backend, canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)));
    }
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
@@ -193,11 +195,14 @@ class number
       // optimised away, but we can't prevent instantiation of the dead code leading
       // to longer build and possibly link times.
       //
-      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      BOOST_IF_CONSTEXPR (std::is_same<self_type, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
-         number t(e);
-         return *this = std::move(t);
+         BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+            if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+            {
+               number t(e);
+               return *this = std::move(t);
+            }
       }
       do_assign(e, tag_type());
       return *this;
@@ -216,12 +221,15 @@ class number
       // optimised away, but we can't prevent instantiation of the dead code leading
       // to longer build and possibly link times.
       //
-      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      BOOST_IF_CONSTEXPR(std::is_same<self_type, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
-         number t;
-         t.assign(e);
-         return *this = std::move(t);
+         BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+            if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+            {
+               number t;
+               t.assign(e);
+               return *this = std::move(t);
+            }
       }
       do_assign(e, tag_type());
       return *this;
@@ -264,8 +272,8 @@ class number
       // Attempt a generic interconvertion:
       //
       using detail::generic_interconvert;
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v);
-      detail::scoped_default_precision<number<Other, ET> >                    precision_guard2(v);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, v);
+      detail::scoped_default_precision<number<Other, ET> >                    precision_guard2(*this, v);
       //
       // If the current precision of *this differs from that of value v, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -380,11 +388,14 @@ class number
       // optimised away, but we can't prevent instantiation of the dead code leading
       // to longer build and possibly link times.
       //
-      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      BOOST_IF_CONSTEXPR(std::is_same<self_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
-         number t(*this + e);
-         return *this = std::move(t);
+         BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+            if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+            {
+               number t(*this + e);
+               return *this = std::move(t);
+            }
       }
       //
       // Fused multiply-add:
@@ -464,11 +475,14 @@ class number
       // optimised away, but we can't prevent instantiation of the dead code leading
       // to longer build and possibly link times.
       //
-      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      BOOST_IF_CONSTEXPR(std::is_same<self_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
-         number t(*this - e);
-         return *this = std::move(t);
+         BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+            if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+            {
+               number t(*this - e);
+               return *this = std::move(t);
+            }
       }
       //
       // Fused multiply-subtract:

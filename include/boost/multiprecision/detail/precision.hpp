@@ -13,12 +13,12 @@
 namespace boost { namespace multiprecision { namespace detail {
 
 template <class B, boost::multiprecision::expression_template_option ET>
-inline constexpr unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>&, const std::integral_constant<bool, false>&)
+inline constexpr unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>&, const std::integral_constant<int, 0>&)
 {
    return std::numeric_limits<boost::multiprecision::number<B, ET> >::digits10;
 }
 template <class B, boost::multiprecision::expression_template_option ET>
-inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>& val, const std::integral_constant<bool, true>&)
+inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>& val, const std::integral_constant<int, 1>&)
 {
    //
    // We have an arbitrary precision integer, take it's "precision" as the
@@ -27,6 +27,15 @@ inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_last_chance_imp(co
    // the value assuming we will have an exponent to shift things by:
    //
    return val.is_zero() ? 1 : digits2_2_10(msb(abs(val)) - lsb(abs(val)) + 1);
+}
+template <class B, boost::multiprecision::expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>& val, const std::integral_constant<int, 2>&)
+{
+   //
+   // We have an arbitrary precision rational, take it's "precision" as the
+   // the larger of the "precision" of numerator and denominator:
+   //
+   return (std::max)(current_precision_of_last_chance_imp(numerator(val), std::integral_constant<int, 1>()), current_precision_of_last_chance_imp(denominator(val), std::integral_constant<int, 1>()));
 }
 
 template <class B, boost::multiprecision::expression_template_option ET>
@@ -37,10 +46,15 @@ inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_imp(const boost::m
 template <class B, boost::multiprecision::expression_template_option ET>
 inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& val, const std::integral_constant<bool, false>&)
 {
-   return current_precision_of_last_chance_imp(val,
-                                               std::integral_constant<bool, 
-                                                       std::numeric_limits<boost::multiprecision::number<B, ET> >::is_specialized &&
-                                                   std::numeric_limits<boost::multiprecision::number<B, ET> >::is_integer && std::numeric_limits<boost::multiprecision::number<B, ET> >::is_exact && !std::numeric_limits<boost::multiprecision::number<B, ET> >::is_modulo > ());
+   using tag = std::integral_constant<int,
+                                      std::numeric_limits<boost::multiprecision::number<B, ET> >::is_specialized &&
+                                              std::numeric_limits<boost::multiprecision::number<B, ET> >::is_integer &&
+                                              std::numeric_limits<boost::multiprecision::number<B, ET> >::is_exact &&
+                                              !std::numeric_limits<boost::multiprecision::number<B, ET> >::is_modulo
+                                          ? 1
+                                      : boost::multiprecision::number_category<boost::multiprecision::number<B, ET> >::value == boost::multiprecision::number_kind_rational ? 2
+                                                                                                                                                                            : 0>;
+   return current_precision_of_last_chance_imp(val, tag());
 }
 
 template <class Terminal>
