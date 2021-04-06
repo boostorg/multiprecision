@@ -153,6 +153,34 @@ bool test_pisot(const T tol = std::numeric_limits<T>::epsilon() * 1000000U)
    return result_is_ok;
 }
 
+template <class T>
+bool test_sqrt_pi_modify_one_digit_to_fail(const T tol = std::numeric_limits<T>::epsilon() * 1000000U)
+{
+   using std::fabs;
+   using std::sqrt;
+
+   const T sqrt_pi = sqrt(boost::math::constants::pi<T>());
+
+   std::string str_wrong(str_control_sqrt_pi);
+
+   // We will now purposefully modify the string at position 9502.
+   // This is the character '8' at the beginning of the final complete
+   // line of the initialization of the string str_control_sqrt_pi.
+   if(str_wrong[9502U] == (char) '8')
+   {
+     str_wrong[9502U] = (char) '9';
+   }
+
+   const T control(str_wrong);
+
+   const T closeness = fabs(1 - fabs(sqrt_pi / control));
+
+   // Ensure that the answer is wrong (which is the correct behavior).
+   const bool wrong_result_is_ok = (closeness > tol);
+
+   return wrong_result_is_ok;
+}
+
 int main()
 {
     #if defined(TEST_CPP_DEC_FLOAT)
@@ -169,6 +197,11 @@ int main()
    {
       const bool result_pisot_is_ok = test_pisot<big_float_type>(local_tol);
       BOOST_CHECK_EQUAL(result_pisot_is_ok, true);
+   }
+
+   {
+      const bool result_sqrt_pi_modify_one_digit_to_fail_is_ok = test_sqrt_pi_modify_one_digit_to_fail<big_float_type>(local_tol);
+      BOOST_CHECK_EQUAL(result_sqrt_pi_modify_one_digit_to_fail_is_ok, true);
    }
 
    return boost::report_errors();
