@@ -220,21 +220,26 @@ class cpp_dec_float
    }
 
    template <class I>
-   cpp_dec_float(I i, typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value >::type* = 0) : data(),
-                                                                        exp(static_cast<exponent_type>(0)),
-                                                                        neg(false),
-                                                                        fpclass(cpp_dec_float_finite),
-                                                                        prec_elem(cpp_dec_float_elem_number)
+   cpp_dec_float(I i,
+                 typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value >::type* = nullptr)
+      : data(),
+        exp(static_cast<exponent_type>(0)),
+        neg(false),
+        fpclass(cpp_dec_float_finite),
+        prec_elem(cpp_dec_float_elem_number)
    {
       from_unsigned_long_long(i);
    }
 
    template <class I>
-   cpp_dec_float(I i, typename std::enable_if<boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value>::type* = 0) : data(),
-                                                                      exp(static_cast<exponent_type>(0)),
-                                                                      neg(false),
-                                                                      fpclass(cpp_dec_float_finite),
-                                                                      prec_elem(cpp_dec_float_elem_number)
+   cpp_dec_float(I i,
+                 typename std::enable_if<(   boost::multiprecision::detail::is_signed<I>::value
+                                          && boost::multiprecision::detail::is_integral<I>::value)>::type* = nullptr)
+      : data(),
+        exp(static_cast<exponent_type>(0)),
+        neg(false),
+        fpclass(cpp_dec_float_finite),
+        prec_elem(cpp_dec_float_elem_number)
    {
       if (i < 0)
       {
@@ -253,7 +258,7 @@ class cpp_dec_float
         prec_elem(f.prec_elem) {}
 
    template <unsigned D, class ET, class A>
-   cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if<D <= Digits10>::type* = 0)
+   cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if<D <= Digits10>::type* = nullptr)
       : data(),
         exp(f.exp),
         neg(f.neg),
@@ -263,7 +268,7 @@ class cpp_dec_float
       std::copy(f.data.begin(), f.data.begin() + f.prec_elem, data.begin());
    }
    template <unsigned D, class ET, class A>
-   explicit cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if< !(D <= Digits10)>::type* = 0)
+   explicit cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if< !(D <= Digits10)>::type* = nullptr)
       : data(),
         exp(f.exp),
         neg(f.neg),
@@ -600,6 +605,127 @@ class cpp_dec_float
                                                    const std::uint32_t  n,
                                                          std::uint32_t* t);
 
+   template<const std::int32_t OtherDigits10>
+   void eval_mul_dispatch_multiplication_method(
+      const cpp_dec_float<OtherDigits10, ExponentType, Allocator>& v,
+      const std::int32_t prec_elems_for_multiply,
+      const typename std::enable_if<   (OtherDigits10 == Digits10)
+                                    && (cpp_dec_float<OtherDigits10, ExponentType, Allocator>::cpp_dec_float_elem_number < cpp_dec_float_elems_for_kara)>::type* = nullptr)
+   {
+      // Use school multiplication.
+
+      using array_for_mul_result_type =
+         typename std::conditional<std::is_void<Allocator>::value,
+                                   detail::static_array <std::uint32_t, cpp_dec_float_elem_number * 2>,
+                                   detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number * 2, Allocator> >::type;
+
+      array_for_mul_result_type result;
+
+      eval_multiply_n_by_n_to_2n(result.data(), data.data(), v.data.data(), prec_elems_for_multiply);
+
+      // Handle a potential carry.
+      if(result[0U] != static_cast<std::uint32_t>(0U))
+      {
+         exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
+
+         // Shift the result of the multiplication one element to the right.
+         std::copy(result.cbegin(),
+                   result.cbegin() + static_cast<std::ptrdiff_t>(prec_elems_for_multiply),
+                   data.begin());
+      }
+      else
+      {
+         std::copy(result.cbegin() + 1,
+                   result.cbegin() + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+                   data.begin());
+      }
+   }
+
+   template<const std::int32_t OtherDigits10>
+   void eval_mul_dispatch_multiplication_method(
+      const cpp_dec_float<OtherDigits10, ExponentType, Allocator>& v,
+      const std::int32_t prec_elems_for_multiply,
+      const typename std::enable_if<    (OtherDigits10 == Digits10)
+                                    && !(cpp_dec_float<OtherDigits10, ExponentType, Allocator>::cpp_dec_float_elem_number < cpp_dec_float_elems_for_kara)>::type* = nullptr)
+   {
+      if(prec_elems_for_multiply < cpp_dec_float_elems_for_kara)
+      {
+         // Use school multiplication.
+
+         using array_for_mul_result_type =
+            typename std::conditional<std::is_void<Allocator>::value,
+                                      detail::static_array <std::uint32_t, cpp_dec_float_elem_number * 2>,
+                                      detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number * 2, Allocator> >::type;
+
+         array_for_mul_result_type result;
+
+         eval_multiply_n_by_n_to_2n(result.data(), data.data(), v.data.data(), prec_elems_for_multiply);
+
+         // Handle a potential carry.
+         if(result[0U] != static_cast<std::uint32_t>(0U))
+         {
+            exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
+         
+            // Shift the result of the multiplication one element to the right.
+            std::copy(result.cbegin(),
+                      result.cbegin() + static_cast<std::ptrdiff_t>(prec_elems_for_multiply),
+                      data.begin());
+         }
+         else
+         {
+            std::copy(result.cbegin() + 1,
+                      result.cbegin() + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+                      data.begin());
+         }
+      }
+      else
+      {
+         // Use Karatsuba multiplication multiplication.
+
+         using array_for_kara_tmp_type =
+            typename std::conditional<std::is_void<Allocator>::value,
+                                      detail::static_array <std::uint32_t, detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U>,
+                                      detail::dynamic_array<std::uint32_t, detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U, Allocator> >::type;
+
+         // Sloanes's A029747: Numbers of the form 2^k times 1, 3 or 5.
+         const std::uint32_t kara_elems_for_multiply =
+            detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(prec_elems_for_multiply));
+
+         array_for_kara_tmp_type my_kara_mul_pool;
+
+         std::uint32_t* result  = my_kara_mul_pool.data() + (kara_elems_for_multiply * 0U);
+         std::uint32_t* t       = my_kara_mul_pool.data() + (kara_elems_for_multiply * 2U);
+         std::uint32_t* u_local = my_kara_mul_pool.data() + (kara_elems_for_multiply * 6U);
+         std::uint32_t* v_local = my_kara_mul_pool.data() + (kara_elems_for_multiply * 7U);
+
+         std::copy(  data.cbegin(),   data.cbegin() + prec_elems_for_multiply, u_local);
+         std::copy(v.data.cbegin(), v.data.cbegin() + prec_elems_for_multiply, v_local);
+
+         eval_multiply_kara_n_by_n_to_2n(result,
+                                         u_local,
+                                         v_local,
+                                         kara_elems_for_multiply,
+                                         t);
+
+         // Handle a potential carry.
+         if(result[0U] != static_cast<std::uint32_t>(0U))
+         {
+            exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
+
+            // Shift the result of the multiplication one element to the right.
+            std::copy(result,
+                      result + static_cast<std::ptrdiff_t>(prec_elems_for_multiply),
+                      data.begin());
+         }
+         else
+         {
+            std::copy(result + 1,
+                      result + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+                      data.begin());
+         }
+      }
+   }
+
    bool rd_string(const char* const s);
 
    template <unsigned D, class ET, class A>
@@ -868,82 +994,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 
    const std::int32_t prec_mul = (std::min)(prec_elem, v.prec_elem);
 
-   if(prec_mul < cpp_dec_float_elems_for_kara)
-   {
-      // Use school multiplication.
-
-      using array_for_mul_result_type =
-         typename std::conditional<std::is_void<Allocator>::value,
-                                   detail::static_array <std::uint32_t, cpp_dec_float_elem_number * 2>,
-                                   detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number * 2, Allocator> >::type;
-
-      array_for_mul_result_type result;
-
-      eval_multiply_n_by_n_to_2n(result.data(), data.data(), v.data.data(), prec_mul);
-
-      // Handle a potential carry.
-      if(result[0U] != static_cast<std::uint32_t>(0U))
-      {
-         exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
-
-         // Shift the result of the multiplication one element to the right.
-         std::copy(result.cbegin(),
-                   result.cbegin() + static_cast<std::ptrdiff_t>(prec_mul),
-                   data.begin());
-      }
-      else
-      {
-         std::copy(result.cbegin() + 1,
-                   result.cbegin() + (std::min)(static_cast<std::int32_t>(prec_mul + 1), cpp_dec_float_elem_number),
-                   data.begin());
-      }
-   }
-   else
-   {
-      // Use Karatsuba multiplication multiplication.
-
-      using array_for_kara_tmp_type =
-         typename std::conditional<std::is_void<Allocator>::value,
-                                   detail::static_array <std::uint32_t, detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U>,
-                                   detail::dynamic_array<std::uint32_t, detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U, Allocator> >::type;
-
-      // Sloanes's A029747: Numbers of the form 2^k times 1, 3 or 5.
-      const std::uint32_t kara_elems_for_multiply =
-         detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(prec_mul));
-
-      array_for_kara_tmp_type my_kara_mul_pool;
-
-      std::uint32_t* result  = my_kara_mul_pool.data() + (kara_elems_for_multiply * 0U);
-      std::uint32_t* t       = my_kara_mul_pool.data() + (kara_elems_for_multiply * 2U);
-      std::uint32_t* u_local = my_kara_mul_pool.data() + (kara_elems_for_multiply * 6U);
-      std::uint32_t* v_local = my_kara_mul_pool.data() + (kara_elems_for_multiply * 7U);
-
-      std::copy(  data.cbegin(),   data.cbegin() + prec_mul, u_local);
-      std::copy(v.data.cbegin(), v.data.cbegin() + prec_mul, v_local);
-
-      eval_multiply_kara_n_by_n_to_2n(result,
-                                      u_local,
-                                      v_local,
-                                      kara_elems_for_multiply,
-                                      t);
-
-      // Handle a potential carry.
-      if(result[0U] != static_cast<std::uint32_t>(0U))
-      {
-         exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
-
-         // Shift the result of the multiplication one element to the right.
-         std::copy(result,
-                   result + static_cast<std::ptrdiff_t>(prec_mul),
-                   data.begin());
-      }
-      else
-      {
-         std::copy(result + 1,
-                   result + (std::min)(static_cast<std::int32_t>(prec_mul + 1), cpp_dec_float_elem_number),
-                   data.begin());
-      }
-   }
+   eval_mul_dispatch_multiplication_method(v, prec_mul);
 
    // Handle overflow.
    if (b_result_might_overflow && (compare((cpp_dec_float::max)()) > 0))
@@ -2513,8 +2564,8 @@ std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_n(std::
    for (std::int32_t j = p - 1; j >= static_cast<std::int32_t>(0); j--)
    {
       const std::uint64_t t = static_cast<std::uint64_t>(carry + static_cast<std::uint64_t>(u[j] * static_cast<std::uint64_t>(n)));
-      carry                   = static_cast<std::uint64_t>(t / static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
-      u[j]                    = static_cast<std::uint32_t>(t - static_cast<std::uint64_t>(static_cast<std::uint32_t>(cpp_dec_float_elem_mask) * static_cast<std::uint64_t>(carry)));
+      carry                 = static_cast<std::uint64_t>(t / static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
+      u[j]                  = static_cast<std::uint32_t>(t - static_cast<std::uint64_t>(static_cast<std::uint32_t>(cpp_dec_float_elem_mask) * static_cast<std::uint64_t>(carry)));
    }
 
    return static_cast<std::uint32_t>(carry);

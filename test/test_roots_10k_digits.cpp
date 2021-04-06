@@ -12,6 +12,8 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
+#include <cmath>
+
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/detail/lightweight_test.hpp>
@@ -25,8 +27,19 @@
 #error ERROR!!: Backend type must be specified as cpp_dec_float or cpp_bin_float
 #endif
 
+#if defined(TEST_CPP_DEC_FLOAT)
+using big_float_type =
+   boost::multiprecision::number<boost::multiprecision::cpp_dec_float<10001, std::int32_t, std::allocator<void>>,
+                                 boost::multiprecision::et_off>;
+#elif defined(TEST_CPP_BIN_FLOAT)
+using big_float_type =
+   boost::multiprecision::number<boost::multiprecision::cpp_bin_float<10001>,
+                                 boost::multiprecision::et_off>;
+#endif
+
 static const std::string str_control_sqrt_pi
 {
+   // N[Sqrt[Pi], 10003]
    "1."
    "77245385090551602729816748334114518279754945612238712821380778985291128459103218137495065673854466541622682362428257066623615286572442260252509370960278706846203769865310512284992517302895082622893209537926796280017463901535147972051670019018523401858544697449491264031392177552590621640541933250090639840761373347747515343366798978936585183640879545116516173876005906739343179133280985484624818490205465485219561325156164746751504273876105610799612710721006037204448367236529661370809432349883166842"
    "42138457096091204204277857780686947665700052183056851254133966369446541815107166938833219429293570622688652244205421499480499207564863988748385059306402182140292858112330649789452036211490789622873894032459781985131348712665125062932600446563821096750268124969305954204615607619522173915250702077927580990543329006622230676144696612481887430699788352050614644438541853079735742571791856359597499599522638492422038891039664064472939728413450430021405642334330392617561341763363200170376541634763206692"
@@ -53,6 +66,13 @@ static const std::string str_control_sqrt_pi
 
 static const std::string str_control_pisot
 {
+   // Consider a fascinating near-integer number with a lot of zeros,
+   // a so-called, Pisot number.
+
+   // N[((2/(27 + 3 Sqrt[69]))^(1/3) + (1/3) ((27 + 3 Sqrt[69])/2)^(1/3))^30000, 10003]
+   // The exact page at Wolftam Alpha that can calculate this number is:
+   // https://www.wolframalpha.com/input/?i=N%5B%28%282%2F%2827+%2B+3+Sqrt%5B69%5D%29%29%5E%281%2F3%29+%2B+%281%2F3%29+%28%2827+%2B+3+Sqrt%5B69%5D%29%2F2%29%5E%281%2F3%29%29%5E30000%2C+10003%5D
+
    "5."
    "04316596065665493215059469242757481077610274680893503167844467712875718226486210610398076581934068275385782540821330947870035477787176694685987718254576565515786375180403084108087720197360263045377599299252600787464343711547834066265665424226316713797047087646002867659572088255372994141399119295425729390551598734162316493172898778929854821816913956381635362412821599451025319364903651110221515233814364527904893091337135424027258899192161986823235528295581059873200107875550497563219302434498746973"
    "20814894295138750508150895446761509382533298841076293708877836604655306868577285538664595048264681443930199901657433773640659222556791170905179712854907731191277888814410873665970386217401864110691757499520236594196403021789595612659015207824257477907567818590472521187834397950104895326861429034026538474079051464877355002168754758452522250419043608706810782792271044572273623687966932417337841611669591984103046776829649194090438705230027320037702374804434310323316910942614411443802983487519201990"
@@ -78,13 +98,36 @@ static const std::string str_control_pisot
 };
 
 template <class T>
+const T& test_control_value_sqrt_pi() { return T(); }
+
+template <>
+const big_float_type& test_control_value_sqrt_pi<big_float_type>()
+{
+  static const big_float_type val(str_control_sqrt_pi);
+
+  return val;
+}
+
+template <class T>
+const T& test_control_value_pisot() { return T(); }
+
+template <>
+const big_float_type& test_control_value_pisot<big_float_type>()
+{
+  static const big_float_type val(str_control_pisot);
+
+  return val;
+}
+
+template <class T>
 bool test_sqrt_pi(const T tol = std::numeric_limits<T>::epsilon() * 1000000U)
 {
+   using std::fabs;
+   using std::sqrt;
+
    const T sqrt_pi = sqrt(boost::math::constants::pi<T>());
 
-   const T control(str_control_sqrt_pi);
-
-   const T closeness = fabs(1 - fabs(sqrt_pi / control));
+   const T closeness = fabs(1 - fabs(sqrt_pi / test_control_value_sqrt_pi<T>()));
 
    const bool result_is_ok = (closeness < tol);
 
@@ -94,18 +137,16 @@ bool test_sqrt_pi(const T tol = std::numeric_limits<T>::epsilon() * 1000000U)
 template <class T>
 bool test_pisot(const T tol = std::numeric_limits<T>::epsilon() * 1000000U)
 {
-   // Consider a fascinating number.
+   using std::cbrt;
+   using std::fabs;
+   using std::pow;
+   using std::sqrt;
+
    const T term  = T(27U) + (sqrt(T(69)) * 3U);
 
    const T pisot = pow(cbrt(2 / term) + (cbrt(term / 2) / 3), 30000U);
 
-   // N[((2/(27 + 3 Sqrt[69]))^(1/3) + (1/3) ((27 + 3 Sqrt[69])/2)^(1/3))^30000, 10003]
-   // The exact page at Wolftam Alpha that can calculate this number is:
-   // https://www.wolframalpha.com/input/?i=N%5B%28%282%2F%2827+%2B+3+Sqrt%5B69%5D%29%29%5E%281%2F3%29+%2B+%281%2F++++++++3%29+%28%2827+%2B+3+Sqrt%5B69%5D%29%2F2%29%5E%281%2F3%29%29%5E30000%2C+10003%5D
-
-   const T control(str_control_pisot);
-
-   const T closeness = fabs(1 - fabs(pisot / control));
+   const T closeness = fabs(1 - fabs(pisot / test_control_value_pisot<T>()));
 
    const bool result_is_ok = (closeness < tol);
 
@@ -114,21 +155,11 @@ bool test_pisot(const T tol = std::numeric_limits<T>::epsilon() * 1000000U)
 
 int main()
 {
-   #if defined(TEST_CPP_DEC_FLOAT)
-   using big_float_type =
-      boost::multiprecision::number<boost::multiprecision::cpp_dec_float<10001, std::int32_t, std::allocator<void>>,
-                                    boost::multiprecision::et_off>;
-   #elif defined(TEST_CPP_BIN_FLOAT)
-   using big_float_type =
-      boost::multiprecision::number<boost::multiprecision::cpp_bin_float<10001>,
-                                    boost::multiprecision::et_off>;
-   #endif
-
-   #if defined(TEST_CPP_DEC_FLOAT)
-   const big_float_type local_tol = std::numeric_limits<big_float_type>::epsilon() * 100U;
-   #elif defined(TEST_CPP_BIN_FLOAT)
-   const big_float_type local_tol = std::numeric_limits<big_float_type>::epsilon() * 1000000U;
-   #endif
+    #if defined(TEST_CPP_DEC_FLOAT)
+    const big_float_type local_tol = std::numeric_limits<big_float_type>::epsilon() * 100U;
+    #elif defined(TEST_CPP_BIN_FLOAT)
+    const big_float_type local_tol = std::numeric_limits<big_float_type>::epsilon() * 1000000U;
+    #endif
 
    {
       const bool result_sqrt_pi_is_ok = test_sqrt_pi<big_float_type>(local_tol);
