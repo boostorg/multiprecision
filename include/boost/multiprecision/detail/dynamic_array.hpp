@@ -24,18 +24,16 @@ private:
 
 public:
    dynamic_array()
-     : base_class_type(static_cast<typename base_class_type::size_type>(ElemNumber),
-                       static_cast<typename base_class_type::value_type>(0u))
-   {
-   }
+      : base_class_type(static_cast<typename base_class_type::size_type>(ElemNumber),
+                        static_cast<typename base_class_type::value_type>(0u)) { }
 
    dynamic_array(std::initializer_list<std::uint32_t> lst)
-     : base_class_type(static_cast<typename base_class_type::size_type>(ElemNumber),
-                       static_cast<typename base_class_type::value_type>(0u))
+      : base_class_type(static_cast<typename base_class_type::size_type>(ElemNumber),
+                        static_cast<typename base_class_type::value_type>(0u))
    {
-     std::copy(lst.begin(),
-               lst.begin() + (std::min)(std::size_t(lst.size()), std::size_t(ElemNumber)),
-               data());
+      std::copy(lst.begin(),
+                lst.begin() + (std::min)(std::size_t(lst.size()), std::size_t(ElemNumber)),
+                data());
    }
 
          typename base_class_type::value_type* data()       { return &(*(this->begin())); }
