@@ -605,7 +605,7 @@ class cpp_dec_float
                                                    const std::uint32_t  n,
                                                          std::uint32_t* t);
 
-   template<const std::int32_t OtherDigits10>
+   template<unsigned OtherDigits10>
    void eval_mul_dispatch_multiplication_method(
       const cpp_dec_float<OtherDigits10, ExponentType, Allocator>& v,
       const std::int32_t prec_elems_for_multiply,
@@ -641,7 +641,7 @@ class cpp_dec_float
       }
    }
 
-   template<const std::int32_t OtherDigits10>
+   template<unsigned OtherDigits10>
    void eval_mul_dispatch_multiplication_method(
       const cpp_dec_float<OtherDigits10, ExponentType, Allocator>& v,
       const std::int32_t prec_elems_for_multiply,
