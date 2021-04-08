@@ -24,12 +24,13 @@
 #include <initializer_list>
 #include <limits>
 
-#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/detail/big_lanczos.hpp>
+
 #include <boost/multiprecision/detail/dynamic_array.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/itos.hpp>
 #include <boost/multiprecision/detail/static_array.hpp>
+#include <boost/multiprecision/detail/tables.hpp>
 
 //
 // Headers required for Boost.Math integration:
@@ -38,8 +39,8 @@
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
-#include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
+#include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/expm1.hpp>
@@ -57,58 +58,6 @@ namespace backends {
 template <unsigned Digits10, class ExponentType = std::int32_t, class Allocator = void>
 class cpp_dec_float;
 
-namespace detail {
-
-   constexpr std::uint32_t a029747_maker_of_upper_limit(std::uint32_t value)
-   {
-      // Sloanes's A029747: Numbers of the form 2^k times 1, 3 or 5.
-      // m = 140000; Select[Union@Flatten@Outer[Times, {1, 3, 5}, 2^Range[0, Floor[Log2[m]]]], # < m &]
-      // In addition, crop the list to begin with 32 or higher.
-      return ((value <=    32UL) ?    32UL :
-             ((value <=    40UL) ?    40UL :
-             ((value <=    48UL) ?    48UL :
-             ((value <=    64UL) ?    64UL :
-             ((value <=    80UL) ?    80UL :
-             ((value <=    96UL) ?    96UL :
-             ((value <=   128UL) ?   128UL :
-             ((value <=   160UL) ?   160UL :
-             ((value <=   192UL) ?   192UL :
-             ((value <=   256UL) ?   256UL :
-             ((value <=   320UL) ?   320UL :
-             ((value <=   384UL) ?   384UL :
-             ((value <=   512UL) ?   512UL :
-             ((value <=   640UL) ?   640UL :
-             ((value <=   768UL) ?   768UL :
-             ((value <=  1024UL) ?  1024UL :
-             ((value <=  1280UL) ?  1280UL :
-             ((value <=  1536UL) ?  1536UL :
-             ((value <=  2048UL) ?  2048UL :
-             ((value <=  2560UL) ?  2560UL :
-             ((value <=  3072UL) ?  3072UL :
-             ((value <=  4096UL) ?  4096UL :
-             ((value <=  5120UL) ?  5120UL :
-             ((value <=  6144UL) ?  6144UL :
-             ((value <=  8192UL) ?  8192UL :
-             ((value <= 10240UL) ? 10240UL :
-             ((value <= 12288UL) ? 12288UL :
-             ((value <= 16384UL) ? 16384UL :
-             ((value <= 20480UL) ? 20480UL :
-             ((value <= 24576UL) ? 24576UL :
-             ((value <= 32768UL) ? 32768UL :
-             ((value <= 40960UL) ? 40960UL :
-             ((value <= 49152UL) ? 49152UL :
-             ((value <= 65536UL) ? 65536UL :
-             ((value <= 81920UL) ? 81920UL :
-             ((value <= 98304UL) ? 98304UL : 131072UL))))))))))))))))))))))))))))))))))));
-   }
-
-   constexpr std::uint32_t pow10_maker(std::uint32_t n)
-   {
-      // Make the constant power of 10^n.
-      return ((n == UINT32_C(0)) ? UINT32_C(1) : pow10_maker(n - UINT32_C(1)) * UINT32_C(10));
-   }
-} // namespace detail
-
 } // namespace backends
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -121,10 +70,17 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 class cpp_dec_float
 {
  private:
-   // We need at least 16-bits in the exponent type to do anything sensible:
-   static_assert(boost::multiprecision::detail::is_signed<ExponentType>::value, "ExponentType must be a signed built in integer type.");
-   static_assert(sizeof(ExponentType) > 1, "ExponentType is too small.");
+   // Perform some static sanity checks.
+   static_assert(boost::multiprecision::detail::is_signed<ExponentType>::value,
+                 "ExponentType must be a signed built in integer type.");
 
+   static_assert(sizeof(ExponentType) > 1,
+                 "ExponentType is too small.");
+
+   static_assert(Digits10 < UINT32_C(0x80000000),
+                 "Digits10 exceeds the maximum.");
+
+   // Private class-local constants.
    static constexpr std::int32_t  cpp_dec_float_digits10_limit_lo = INT32_C(9);
    static constexpr std::int32_t  cpp_dec_float_digits10_limit_hi = static_cast<std::int32_t>((std::numeric_limits<std::int32_t>::max)() - 100);
 
@@ -139,6 +95,7 @@ class cpp_dec_float
    using float_types    = std::tuple<double, long double>;
    using exponent_type  = ExponentType;
 
+   // Public class-local constants.
    static constexpr std::int32_t  cpp_dec_float_radix             = INT32_C(10);
    static constexpr std::int32_t  cpp_dec_float_digits10          = ((static_cast<std::int32_t>(Digits10) < cpp_dec_float_digits10_limit_lo) ? cpp_dec_float_digits10_limit_lo : ((static_cast<std::int32_t>(Digits10) > cpp_dec_float_digits10_limit_hi) ? cpp_dec_float_digits10_limit_hi : static_cast<std::int32_t>(Digits10)));
    static constexpr exponent_type cpp_dec_float_max_exp10         = (static_cast<exponent_type>(1) << (std::numeric_limits<exponent_type>::digits - 5));
@@ -179,7 +136,7 @@ class cpp_dec_float
    fpclass_type  fpclass;
    std::int32_t  prec_elem;
 
-   // Constructor from the floating-point class type.
+   // Private constructor from the floating-point class type.
    explicit cpp_dec_float(fpclass_type c) : data(),
                                             exp(static_cast<exponent_type>(0)),
                                             neg(false),
@@ -197,7 +154,7 @@ class cpp_dec_float
                                                   prec_elem(cpp_dec_float_elem_number) {}
 
  public:
-   // Constructors
+   // Public Constructors
    cpp_dec_float() noexcept(noexcept(array_type())) : data(),
                                                       exp(static_cast<exponent_type>(0)),
                                                       neg(false),
@@ -585,9 +542,6 @@ class cpp_dec_float
                                           const std::uint32_t* b,
                                           const std::uint32_t  count);
 
-   #if 0
-   static std::uint32_t mul_loop_uv(std::uint32_t* const u, const std::uint32_t* const v, const std::int32_t p);
-   #endif
    static std::uint32_t mul_loop_n(std::uint32_t* const u, std::uint32_t n, const std::int32_t p);
    static std::uint32_t div_loop_n(std::uint32_t* const u, std::uint32_t n, const std::int32_t p);
 
@@ -674,16 +628,16 @@ class cpp_dec_float
       }
       else
       {
-         // Use Karatsuba multiplication multiplication.
+         // Use Karatsuba multiplication.
 
          using array_for_kara_tmp_type =
             typename std::conditional<std::is_void<Allocator>::value,
-                                      detail::static_array <std::uint32_t, detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U>,
-                                      detail::dynamic_array<std::uint32_t, detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U, Allocator> >::type;
+                                      detail::static_array <std::uint32_t, detail::a029750::a029750_as_constexpr(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U>,
+                                      detail::dynamic_array<std::uint32_t, detail::a029750::a029750_as_constexpr(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U, Allocator> >::type;
 
          // Sloanes's A029747: Numbers of the form 2^k times 1, 3 or 5.
          const std::uint32_t kara_elems_for_multiply =
-            detail::a029747_maker_of_upper_limit(static_cast<std::uint32_t>(prec_elems_for_multiply));
+            detail::a029750::a029750_as_runtime_value(static_cast<std::uint32_t>(prec_elems_for_multiply));
 
          array_for_kara_tmp_type my_kara_mul_pool;
 
@@ -1340,9 +1294,8 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    // limited to the minimum required in order to minimize
    // the run-time.
    //
-   // Book references:
-   // https://doi.org/10.1007/978-3-642-56735-3
-   // http://www.amazon.com/exec/obidos/tg/detail/-/3540665722/qid=1035535482/sr=8-7/ref=sr_8_7/104-3357872-6059916?v=glance&n=507846
+   // Book reference to "Pi Unleashed:
+   // https://www.springer.com/gp/book/9783642567353
 
    constexpr std::uint32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
 
@@ -2411,37 +2364,6 @@ int cpp_dec_float<Digits10, ExponentType, Allocator>::compare_ranges(InputIterat
 
    return n_return;
 }
-
-#if 0
-template <unsigned Digits10, class ExponentType, class Allocator>
-std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_uv(std::uint32_t* const u, const std::uint32_t* const v, const std::int32_t p)
-{
-   //
-   // There is a limit on how many limbs this algorithm can handle without dropping digits
-   // due to overflow in the carry, it is:
-   //
-   // FLOOR( (2^64 - 1) / (10^8 * 10^8) ) == 1844
-   //
-   static_assert(cpp_dec_float_elem_number < 1800, "Too many limbs in the data type for the multiplication algorithm - unsupported precision in cpp_dec_float.");
-
-   std::uint64_t carry = static_cast<std::uint64_t>(0u);
-
-   for (std::int32_t j = static_cast<std::int32_t>(p - 1u); j >= static_cast<std::int32_t>(0); j--)
-   {
-      std::uint64_t sum = carry;
-
-      for (std::int32_t i = j; i >= static_cast<std::int32_t>(0); i--)
-      {
-         sum += static_cast<std::uint64_t>(u[j - i] * static_cast<std::uint64_t>(v[i]));
-      }
-
-      u[j]  = static_cast<std::uint32_t>(sum % static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
-      carry = static_cast<std::uint64_t>(sum / static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
-   }
-
-   return static_cast<std::uint32_t>(carry);
-}
-#endif
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::eval_add_n(      std::uint32_t* r,
