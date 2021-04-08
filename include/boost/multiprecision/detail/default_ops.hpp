@@ -2849,6 +2849,18 @@ sqrt(const number<B, ExpressionTemplates>& x)
    eval_integer_sqrt(s.backend(), r.backend(), x.backend());
    return s;
 }
+template <class tag, class A1, class A2, class A3, class A4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type 
+         sqrt(const detail::expression<tag, A1, A2, A3, A4>& arg)
+{
+   using default_ops::eval_integer_sqrt;
+   using result_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
+   detail::scoped_default_precision<result_type> precision_guard(arg);
+   result_type                                   result, v(arg), r;
+   eval_integer_sqrt(result.backend(), r.backend(), v.backend());
+   return result;
+}
+
 //
 // fma:
 //
@@ -3068,6 +3080,17 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
    using default_ops::eval_integer_sqrt;
    detail::scoped_default_precision<multiprecision::number<B, ExpressionTemplates> > precision_guard(x, r);
    number<B, ExpressionTemplates>                                                    s;
+   eval_integer_sqrt(s.backend(), r.backend(), x.backend());
+   return s;
+}
+template <class B, expression_template_option ExpressionTemplates, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer, number<B, ExpressionTemplates> >::type
+sqrt(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& arg, number<B, ExpressionTemplates>& r)
+{
+   using default_ops::eval_integer_sqrt;
+   detail::scoped_default_precision<multiprecision::number<B, ExpressionTemplates> > precision_guard(r);
+   number<B, ExpressionTemplates>                                                    s;
+   number<B, ExpressionTemplates>                                                    x(arg);
    eval_integer_sqrt(s.backend(), r.backend(), x.backend());
    return s;
 }
