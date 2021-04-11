@@ -74,7 +74,7 @@ struct tommath_int
          detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
       return *this;
    }
-#if !defined(mp_get_u64) || !defined(mp_get_u32)
+#ifndef mp_get_u64
    // Pick off 32 bit chunks for mp_set_int:
    tommath_int& operator=(boost::ulong_long_type i)
    {
@@ -153,7 +153,7 @@ struct tommath_int
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-#ifndef MP_DIGIT_BIT
+#ifndef mp_get_u32
       detail::check_tommath_result((mp_set_int(&m_data, i)));
 #else
       mp_set_u32(&m_data, i);
@@ -181,7 +181,7 @@ struct tommath_int
 
       if (a == 0)
       {
-#ifndef MP_DIGIT_BIT
+#ifndef mp_get_u32
          detail::check_tommath_result(mp_set_int(&m_data, 0));
 #else
          mp_set_i32(&m_data, 0);
@@ -191,7 +191,7 @@ struct tommath_int
 
       if (a == 1)
       {
-#ifndef MP_DIGIT_BIT
+#ifndef mp_get_u32
          detail::check_tommath_result(mp_set_int(&m_data, 1));
 #else
          mp_set_i32(&m_data, 1);
@@ -204,7 +204,7 @@ struct tommath_int
 
       int         e;
       long double f, term;
-#ifndef MP_DIGIT_BIT
+#ifndef mp_get_u32
       detail::check_tommath_result(mp_set_int(&m_data, 0u));
 #else
       mp_set_i32(&m_data, 0);
@@ -231,7 +231,7 @@ struct tommath_int
          detail::check_tommath_result(mp_mul_2d(&m_data, shift, &m_data));
          if (term > 0)
          {
-#ifndef MP_DIGIT_BIT
+#ifndef mp_get_u64
             detail::check_tommath_result(mp_set_int(&t, static_cast<part_type>(term)));
 #else
             mp_set_i64(&t, static_cast<part_type>(term));
@@ -240,7 +240,7 @@ struct tommath_int
          }
          else
          {
-#ifndef MP_DIGIT_BIT
+#ifndef mp_get_u64
             detail::check_tommath_result(mp_set_int(&t, static_cast<part_type>(-term)));
 #else
             mp_set_i64(&t, static_cast<part_type>(-term));
@@ -392,7 +392,7 @@ struct tommath_int
       detail::check_tommath_result(mp_radix_size(const_cast< ::mp_int*>(&m_data), base, &s));
 #endif
       std::unique_ptr<char[]> a(new char[s + 1]);
-#ifndef MP_DIGIT_BIT
+#ifndef mp_to_binary
       detail::check_tommath_result(mp_toradix_n(const_cast< ::mp_int*>(&m_data), a.get(), base, s + 1));
 #else
       std::size_t written;
