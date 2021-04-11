@@ -54,7 +54,7 @@ struct NumTraits<boost::multiprecision::number<Backend, ExpressionTemplates> >
    template <bool B>
    static int digits10_imp(const std::integral_constant<bool, B>&)
    {
-      return Real::default_precision();
+      return Real::thread_default_precision();
    }
    static int digits10()
    {

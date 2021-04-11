@@ -880,6 +880,15 @@ class number
    static BOOST_MP_CXX14_CONSTEXPR void default_precision(unsigned digits10)
    {
       Backend::default_precision(digits10);
+      Backend::thread_default_precision(digits10);
+   }
+   static BOOST_MP_CXX14_CONSTEXPR unsigned thread_default_precision() noexcept
+   {
+      return Backend::thread_default_precision();
+   }
+   static BOOST_MP_CXX14_CONSTEXPR void thread_default_precision(unsigned digits10)
+   {
+      Backend::thread_default_precision(digits10);
    }
    BOOST_MP_CXX14_CONSTEXPR unsigned precision() const noexcept
    {

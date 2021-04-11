@@ -128,6 +128,14 @@ struct debug_adaptor
    {
       Backend::default_precision(v);
    }
+   static unsigned thread_default_precision() noexcept
+   {
+      return Backend::thread_default_precision();
+   }
+   static void thread_default_precision(unsigned v) noexcept
+   {
+      Backend::thread_default_precision(v);
+   }
    unsigned precision() const noexcept
    {
       return value().precision();

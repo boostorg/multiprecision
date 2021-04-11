@@ -316,9 +316,14 @@ struct mpc_complex_imp
 
  protected:
    mpc_t            m_data;
-   static boost::multiprecision::detail::precision_type& get_default_precision() noexcept
+   static boost::multiprecision::detail::precision_type& get_global_default_precision() noexcept
    {
       static boost::multiprecision::detail::precision_type val(BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION);
+      return val;
+   }
+   static unsigned& get_default_precision() noexcept
+   {
+      static thread_local unsigned val(get_global_default_precision());
       return val;
    }
 };
@@ -702,9 +707,17 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    }
    static unsigned default_precision() noexcept
    {
-      return get_default_precision();
+      return get_global_default_precision();
    }
    static void default_precision(unsigned v) noexcept
+   {
+      get_global_default_precision() = v;
+   }
+   static unsigned thread_default_precision() noexcept
+   {
+      return get_default_precision();
+   }
+   static void thread_default_precision(unsigned v) noexcept
    {
       get_default_precision() = v;
    }

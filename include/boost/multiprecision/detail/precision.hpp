@@ -149,7 +149,7 @@ struct scoped_default_precision<R, true>
    ~scoped_default_precision()
    {
       if(m_new_prec != m_old_prec)
-         R::default_precision(m_old_prec);
+         R::thread_default_precision(m_old_prec);
    }
    BOOST_MP_CXX14_CONSTEXPR unsigned precision() const
    {
@@ -159,10 +159,10 @@ struct scoped_default_precision<R, true>
  private:
    BOOST_MP_CXX14_CONSTEXPR void init(unsigned p)
    {
-      m_old_prec = R::default_precision();
+      m_old_prec = R::thread_default_precision();
       if (p && (p != m_old_prec))
       {
-         R::default_precision(p);
+         R::thread_default_precision(p);
          m_new_prec = p;
       }
       else
@@ -177,9 +177,9 @@ inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T*, const std::inte
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T* obj, const std::integral_constant<bool, true>&)
 {
-   if (obj->precision() != T::default_precision())
+   if (obj->precision() != T::thread_default_precision())
    {
-      obj->precision(T::default_precision());
+      obj->precision(T::thread_default_precision());
    }
 }
 

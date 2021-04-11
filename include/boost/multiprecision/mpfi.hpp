@@ -334,9 +334,14 @@ struct mpfi_float_imp
 
  protected:
    mpfi_t           m_data;
-   static boost::multiprecision::detail::precision_type& get_default_precision() noexcept
+   static boost::multiprecision::detail::precision_type& get_global_default_precision() noexcept
    {
       static boost::multiprecision::detail::precision_type val(BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION);
+      return val;
+   }
+   static unsigned& get_default_precision() noexcept
+   {
+      static thread_local unsigned val(get_global_default_precision());
       return val;
    }
 };
@@ -486,13 +491,21 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
       mpfi_set(this->m_data, val.data());
       return *this;
    }
-   static unsigned default_precision() noexcept
+   static unsigned thread_default_precision() noexcept
    {
       return get_default_precision();
    }
-   static void default_precision(unsigned v) noexcept
+   static void thread_default_precision(unsigned v) noexcept
    {
       get_default_precision() = v;
+   }
+   static unsigned default_precision() noexcept
+   {
+      return get_global_default_precision();
+   }
+   static void default_precision(unsigned v) noexcept
+   {
+      get_global_default_precision() = v;
    }
    unsigned precision() const noexcept
    {
@@ -1314,7 +1327,7 @@ inline int digits<boost::multiprecision::mpfi_float>()
     noexcept
 #endif
 {
-   return multiprecision::detail::digits10_2_2(boost::multiprecision::mpfi_float::default_precision());
+   return multiprecision::detail::digits10_2_2(boost::multiprecision::mpfi_float::thread_default_precision());
 }
 template <>
 inline int digits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<0>, boost::multiprecision::et_off> >()
@@ -1322,7 +1335,7 @@ inline int digits<boost::multiprecision::number<boost::multiprecision::mpfi_floa
     noexcept
 #endif
 {
-   return multiprecision::detail::digits10_2_2(boost::multiprecision::mpfi_float::default_precision());
+   return multiprecision::detail::digits10_2_2(boost::multiprecision::mpfi_float::thread_default_precision());
 }
 
 template <>
@@ -1375,7 +1388,7 @@ inline int digits<logged_type1>()
     noexcept
 #endif
 {
-   return multiprecision::detail::digits10_2_2(logged_type1::default_precision());
+   return multiprecision::detail::digits10_2_2(logged_type1::thread_default_precision());
 }
 template <>
 inline int digits<logged_type2>()
@@ -1383,7 +1396,7 @@ inline int digits<logged_type2>()
     noexcept
 #endif
 {
-   return multiprecision::detail::digits10_2_2(logged_type1::default_precision());
+   return multiprecision::detail::digits10_2_2(logged_type1::thread_default_precision());
 }
 
 template <>
@@ -1446,11 +1459,16 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfi_flo
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
-      static bool        has_init = false;
+      static std::atomic_bool has_init = false;
+      static std::mutex       mut;
       if (!has_init)
       {
-         has_init = true;
-         mpfi_const_pi(result.backend().data());
+         std::unique_lock<std::mutex> l(mut);
+         if (!has_init)
+         {
+            has_init = true;
+            mpfi_const_pi(result.backend().data());
+         }
       }
       return result;
    }
@@ -1469,11 +1487,16 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfi
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
-      static bool        has_init = false;
+      static std::atomic_bool has_init = false;
+      static std::mutex       mut;
       if (!has_init)
       {
-         has_init = true;
-         mpfi_const_log2(result.backend().data());
+         std::unique_lock<std::mutex> l(mut);
+         if (!has_init)
+         {
+            has_init = true;
+            mpfi_const_log2(result.backend().data());
+         }
       }
       return result;
    }
@@ -1492,11 +1515,16 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfi_
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
-      static bool        has_init = false;
+      static std::atomic_bool has_init = false;
+      static std::mutex       mut;
       if (!has_init)
       {
-         has_init = true;
-         mpfi_const_euler(result.backend().data());
+         std::unique_lock<std::mutex> l(mut);
+         if (!has_init)
+         {
+            has_init = true;
+            mpfi_const_euler(result.backend().data());
+         }
       }
       return result;
    }
@@ -1515,11 +1543,16 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
-      static bool        has_init = false;
+      static std::atomic_bool has_init = false;
+      static std::mutex       mut;
       if (!has_init)
       {
-         has_init = true;
-         mpfi_const_catalan(result.backend().data());
+         std::unique_lock<std::mutex> l(mut);
+         if (!has_init)
+         {
+            has_init = true;
+            mpfi_const_catalan(result.backend().data());
+         }
       }
       return result;
    }

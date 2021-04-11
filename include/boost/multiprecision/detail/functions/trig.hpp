@@ -86,14 +86,14 @@ struct scoped_N_precision<T, N, true>
    unsigned old_precision, old_arg_precision;
    scoped_N_precision(T& arg)
    {
-      old_precision = T::default_precision();
+      old_precision     = T::thread_default_precision();
       old_arg_precision = arg.precision();
-      T::default_precision(old_arg_precision * N);
+      T::thread_default_precision(old_arg_precision * N);
       arg.precision(old_arg_precision * N);
    }
    ~scoped_N_precision()
    {
-      T::default_precision(old_precision);
+      T::thread_default_precision(old_precision);
    }
    void reduce(T& arg) 
    {
