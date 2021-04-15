@@ -89,37 +89,47 @@ struct mpfi_float_imp
 
    mpfi_float_imp(const mpfi_float_imp& o)
    {
-      mpfi_init2(m_data, mpfi_get_prec(o.data()));
+      mpfi_init2(m_data, preserve_source_precision() ? mpfi_get_prec(o.data()) : boost::multiprecision::detail::digits10_2_2(get_default_precision()));
       if (o.m_data[0].left._mpfr_d)
          mpfi_set(m_data, o.m_data);
    }
    // rvalue copy
    mpfi_float_imp(mpfi_float_imp&& o) noexcept
    {
-      m_data[0]                = o.m_data[0];
-      o.m_data[0].left._mpfr_d = 0;
-   }
-   mpfi_float_imp& operator=(const mpfi_float_imp& o)
-   {
-      if (m_data[0].left._mpfr_d == 0)
-         mpfi_init2(m_data, mpfi_get_prec(o.data()));
-      if (mpfi_get_prec(o.data()) != mpfi_get_prec(data()))
+      mpfr_prec_t binary_default_precision = boost::multiprecision::detail::digits10_2_2(get_default_precision());
+      if (preserve_source_precision() || (mpfi_get_prec(o.data()) == binary_default_precision))
       {
-         mpfi_float_imp t(mpfi_get_prec(o.data()));
-         t = o;
-         t.swap(*this);
+         m_data[0]                = o.m_data[0];
+         o.m_data[0].left._mpfr_d = 0;
       }
       else
       {
-         if (o.m_data[0].left._mpfr_d)
-            mpfi_set(m_data, o.m_data);
+         // NOTE: C allocation interface must not throw:
+         mpfi_init2(m_data, binary_default_precision);
+         mpfi_set(m_data, o.m_data);
+      }
+   }
+   mpfi_float_imp& operator=(const mpfi_float_imp& o)
+   {
+      if (this != &o)
+      {
+         if (m_data[0].left._mpfr_d == 0)
+            mpfi_init2(m_data, preserve_source_precision() ? mpfi_get_prec(o.m_data) : boost::multiprecision::detail::digits10_2_2(get_default_precision()));
+         else if (preserve_source_precision() && (mpfi_get_prec(o.data()) != mpfi_get_prec(data())))
+         {
+            mpfi_set_prec(m_data, mpfi_get_prec(o.m_data));
+         }
+         mpfi_set(m_data, o.m_data);
       }
       return *this;
    }
    // rvalue assign
    mpfi_float_imp& operator=(mpfi_float_imp&& o) noexcept
    {
-      mpfi_swap(m_data, o.m_data);
+      if (preserve_source_precision() || (mpfi_get_prec(o.data()) == mpfi_get_prec(data())))
+         mpfi_swap(m_data, o.m_data);
+      else
+         *this = static_cast<const mpfi_float_imp&>(o);
       return *this;
    }
 #ifdef BOOST_HAS_LONG_LONG
@@ -344,6 +354,20 @@ struct mpfi_float_imp
       static thread_local unsigned val(get_global_default_precision());
       return val;
    }
+   static std::atomic<variable_precision_options>& get_global_default_options() noexcept
+   {
+      static std::atomic<variable_precision_options> val{variable_precision_options::preserve_source_precision | variable_precision_options::ignore_alian_types};
+      return val;
+   }
+   static variable_precision_options& get_default_options() noexcept
+   {
+      static thread_local variable_precision_options val(get_global_default_options());
+      return val;
+   }
+   static bool preserve_source_precision() noexcept
+   {
+      return static_cast<unsigned>(get_default_options() & variable_precision_options::precision_group) == 0;
+   }
 };
 
 } // namespace detail
@@ -460,18 +484,10 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
    {
       mpfi_set(this->m_data, val.data());
    }
-   mpfi_float_backend& operator=(const mpfi_float_backend& o)
-   {
-      mpfi_set_prec(this->m_data, mpfi_get_prec(o.data()));
-      mpfi_set(this->m_data, o.data());
-      return *this;
-   }
+   mpfi_float_backend& operator=(const mpfi_float_backend& o) = default;
    // rvalue assign
-   mpfi_float_backend& operator=(mpfi_float_backend&& o) noexcept
-   {
-      *static_cast<detail::mpfi_float_imp<0>*>(this) = static_cast<detail::mpfi_float_imp<0>&&>(o);
-      return *this;
-   }
+   mpfi_float_backend& operator=(mpfi_float_backend&& o) noexcept = default;
+
    template <class V>
    mpfi_float_backend& operator=(const V& v)
    {
@@ -515,6 +531,25 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
    {
       mpfi_float_backend t(*this, digits10);
       this->swap(t);
+   }
+   //
+   // Variable precision options:
+   //
+   static variable_precision_options default_variable_precision_options() noexcept
+   {
+      return get_global_default_options();
+   }
+   static variable_precision_options thread_default_variable_precision_options() noexcept
+   {
+      return get_default_options();
+   }
+   static void default_variable_precision_options(variable_precision_options opts, variable_precision_options group = variable_precision_options::all_options)
+   {
+      get_global_default_options() = (get_global_default_options() & ~group) | opts;
+   }
+   static void thread_default_variable_precision_options(variable_precision_options opts, variable_precision_options group = variable_precision_options::all_options)
+   {
+      get_default_options() = (get_default_options() & ~group) | opts;
    }
 };
 

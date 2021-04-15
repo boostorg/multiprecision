@@ -173,6 +173,33 @@ enum expression_template_option
    et_on  = 1
 };
 
+enum struct variable_precision_options : unsigned char
+{
+   preserve_source_precision = 0,
+   preserve_target_precision = 1,
+
+   precision_group = 1,
+
+   ignore_alian_types = 0,
+   use_alian_types = 2,
+
+   alian_types_group = 2,
+   all_options = 0xff,
+};
+
+inline constexpr variable_precision_options operator|(variable_precision_options a, variable_precision_options b)
+{
+   return static_cast<variable_precision_options>(static_cast<unsigned>(a) | static_cast<unsigned>(b));
+}
+inline constexpr variable_precision_options operator&(variable_precision_options a, variable_precision_options b)
+{
+   return static_cast<variable_precision_options>(static_cast<unsigned>(a) & static_cast<unsigned>(b));
+}
+inline constexpr variable_precision_options operator~(variable_precision_options a)
+{
+   return static_cast<variable_precision_options>(~static_cast<unsigned>(a));
+}
+
 template <class Backend>
 struct expression_template_default
 {

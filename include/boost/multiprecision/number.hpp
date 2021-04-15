@@ -899,6 +899,25 @@ class number
       m_backend.precision(digits10);
    }
    //
+   // Variable precision options:
+   // 
+   static constexpr variable_precision_options default_variable_precision_options()noexcept
+   {
+      return Backend::default_variable_precision_options();
+   }
+   static constexpr variable_precision_options thread_default_variable_precision_options()noexcept
+   {
+      return Backend::thread_default_variable_precision_options();
+   }
+   static constexpr void default_variable_precision_options(variable_precision_options opts, variable_precision_options group = variable_precision_options::all_options)
+   {
+      Backend::default_variable_precision_options(opts, group);
+   }
+   static constexpr void thread_default_variable_precision_options(variable_precision_options opts, variable_precision_options group = variable_precision_options::all_options)
+   {
+      Backend::thread_default_variable_precision_options(opts, group);
+   }
+   //
    // Comparison:
    //
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR int compare(const number<Backend, ExpressionTemplates>& o) const
