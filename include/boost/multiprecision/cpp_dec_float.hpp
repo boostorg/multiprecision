@@ -87,7 +87,7 @@ class cpp_dec_float
    static constexpr std::int32_t cpp_dec_float_elem_digits10      = INT32_C(8);
    static constexpr std::int32_t cpp_dec_float_elem_mask          = INT32_C(100000000);
 
-   static constexpr std::int32_t cpp_dec_float_elems_for_kara     = static_cast<std::int32_t>(64 + 1);
+   static constexpr std::int32_t cpp_dec_float_elems_for_kara     = static_cast<std::int32_t>(128 + 1);
 
  public:
    using signed_types   = std::tuple<boost::long_long_type> ;
@@ -335,7 +335,7 @@ class cpp_dec_float
    {
       if (v < 0)
       {
-         from_unsigned_long_long(1u - boost::ulong_long_type(v + 1)); // Avoid undefined behaviour in negation of minimum value for long long
+         from_unsigned_long_long(boost::multiprecision::detail::unsigned_abs(v));
          negate();
       }
       else
