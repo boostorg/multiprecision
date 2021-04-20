@@ -409,6 +409,23 @@ class number
    typename std::enable_if<std::is_convertible<V, self_type>::value, number<Backend, ExpressionTemplates>&>::type
       BOOST_MP_CXX14_CONSTEXPR operator+=(const V& v)
    {
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, v);
+      //
+      // If the current precision of *this differs from that of value v, then we
+      // create a temporary (which will have the correct precision thanks to precision_guard)
+      // and then move the result into *this.  In C++17 we add a leading "if constexpr"
+      // which causes this code to be eliminated in the common case that this type is
+      // not actually variable precision.  Pre C++17 this code should still be mostly
+      // optimised away, but we can't prevent instantiation of the dead code leading
+      // to longer build and possibly link times.
+      //
+      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+         {
+            number t(*this + v);
+            return *this = std::move(t);
+         }
+
       using default_ops::eval_add;
       eval_add(m_backend, canonical_value(v));
       return *this;
@@ -457,6 +474,23 @@ class number
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, self_type>::value, number<Backend, ExpressionTemplates>&>::type
    operator-=(const V& v)
    {
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, v);
+      //
+      // If the current precision of *this differs from that of value v, then we
+      // create a temporary (which will have the correct precision thanks to precision_guard)
+      // and then move the result into *this.  In C++17 we add a leading "if constexpr"
+      // which causes this code to be eliminated in the common case that this type is
+      // not actually variable precision.  Pre C++17 this code should still be mostly
+      // optimised away, but we can't prevent instantiation of the dead code leading
+      // to longer build and possibly link times.
+      //
+      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+         {
+            number t(*this - v);
+            return *this = std::move(t);
+         }
+
       using default_ops::eval_subtract;
       eval_subtract(m_backend, canonical_value(v));
       return *this;
@@ -536,6 +570,23 @@ class number
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, self_type>::value, number<Backend, ExpressionTemplates>&>::type
    operator*=(const V& v)
    {
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, v);
+      //
+      // If the current precision of *this differs from that of value v, then we
+      // create a temporary (which will have the correct precision thanks to precision_guard)
+      // and then move the result into *this.  In C++17 we add a leading "if constexpr"
+      // which causes this code to be eliminated in the common case that this type is
+      // not actually variable precision.  Pre C++17 this code should still be mostly
+      // optimised away, but we can't prevent instantiation of the dead code leading
+      // to longer build and possibly link times.
+      //
+      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+         {
+            number t(*this + v);
+            return *this = std::move(t);
+         }
+
       using default_ops::eval_multiply;
       eval_multiply(m_backend, canonical_value(v));
       return *this;
@@ -689,6 +740,23 @@ class number
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, self_type>::value, number<Backend, ExpressionTemplates>&>::type
    operator/=(const V& v)
    {
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, v);
+      //
+      // If the current precision of *this differs from that of value v, then we
+      // create a temporary (which will have the correct precision thanks to precision_guard)
+      // and then move the result into *this.  In C++17 we add a leading "if constexpr"
+      // which causes this code to be eliminated in the common case that this type is
+      // not actually variable precision.  Pre C++17 this code should still be mostly
+      // optimised away, but we can't prevent instantiation of the dead code leading
+      // to longer build and possibly link times.
+      //
+      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+         {
+            number t(*this + v);
+            return *this = std::move(t);
+         }
+
       using default_ops::eval_divide;
       eval_divide(m_backend, canonical_value(v));
       return *this;

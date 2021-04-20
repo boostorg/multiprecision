@@ -77,6 +77,52 @@ void test()
    BOOST_CHECK_EQUAL(a.precision(), 35);
    a -= b * hp3;
    BOOST_CHECK_EQUAL(a.precision(), 35);
+
+   if constexpr (!std::is_same_v<T, typename T::value_type>)
+   {
+      //
+      // If we have a component type: ie we are an interval or a complex number, then
+      // operations involving the component type should match those of T:
+      //
+      using component_t = typename T::value_type;
+      component_t::thread_default_precision(100);
+      component_t::thread_default_variable_precision_options(boost::multiprecision::variable_precision_options::preserve_source_precision);
+
+      component_t cp1("0.1"), cp2("0.3"), cp3("0.11"), cp4("0.1231");
+
+      BOOST_CHECK_EQUAL(cp1.precision(), 100);
+      BOOST_CHECK_EQUAL(cp2.precision(), 100);
+
+      T::thread_default_precision(35);
+
+      T aa(cp1);
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      T cc(cp1, cp2);
+      BOOST_CHECK_EQUAL(cc.precision(), 35);
+      T dd(cp1, cp2, 20);
+      BOOST_CHECK_EQUAL(dd.precision(), 20);
+      aa = cp1;
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa = std::move(cp1);
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      T bb(std::move(cp2));
+      BOOST_CHECK_EQUAL(bb.precision(), 35);
+
+      aa = bb + cp3;
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa = cp3 * bb;
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa += cp3;
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa -= cp3;
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa *= cp4;
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa /= cp4;
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa -= bb * cp3;
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+   }
 }
 
 int main()

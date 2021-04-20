@@ -197,6 +197,20 @@ inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T* obj)
 #define BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(T) if (boost::multiprecision::detail::is_variable_precision<T>::value)
 #endif
 
+template <class T>
+struct scoped_target_precision
+{
+   variable_precision_options opts;
+   scoped_target_precision() : opts(T::thread_default_variable_precision_options())
+   {
+      T::thread_default_variable_precision_options(variable_precision_options::preserve_target_precision, variable_precision_options::precision_group);
+   }
+   ~scoped_target_precision()
+   {
+      T::thread_default_variable_precision_options(opts);
+   }
+};
+
 }
 }
 } // namespace boost::multiprecision::detail

@@ -15,6 +15,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
+#include <boost/multiprecision/detail/precision.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/multiprecision/mpfr.hpp>
@@ -92,6 +93,13 @@ struct mpfi_float_imp
       mpfi_init2(m_data, preserve_source_precision() ? mpfi_get_prec(o.data()) : boost::multiprecision::detail::digits10_2_2(get_default_precision()));
       if (o.m_data[0].left._mpfr_d)
          mpfi_set(m_data, o.m_data);
+   }
+   template <unsigned D, mpfr_allocation_type AllocationType>
+   mpfi_float_imp(const mpfr_float_imp<D, AllocationType>& o)
+   {
+      mpfi_init2(m_data, preserve_source_precision() ? mpfr_get_prec(o.data()) : boost::multiprecision::detail::digits10_2_2(get_default_precision()));
+      if (o.data()[0]._mpfr_d)
+         mpfi_set_fr(m_data, o.data());
    }
    // rvalue copy
    mpfi_float_imp(mpfi_float_imp&& o) noexcept
@@ -386,6 +394,10 @@ struct mpfi_float_backend : public detail::mpfi_float_imp<digits10>
    {
       mpfi_set(this->m_data, val.data());
    }
+   template <unsigned D, mpfr_allocation_type AllocationType>
+   mpfi_float_backend(const mpfr_float_backend<D, AllocationType>& val, typename std::enable_if<D <= digits10>::type* = 0)
+       : detail::mpfi_float_imp<digits10>(val) {}
+
    template <unsigned D>
    explicit mpfi_float_backend(const mpfi_float_backend<D>& val, typename std::enable_if<!(D <= digits10)>::type* = 0)
        : detail::mpfi_float_imp<digits10>()
@@ -463,6 +475,11 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
       mpfi_set(this->m_data, val);
    }
    mpfi_float_backend(const mpfi_float_backend& o) : detail::mpfi_float_imp<0>(o) {}
+
+   template <unsigned D, mpfr_allocation_type AllocationType>
+   mpfi_float_backend(const mpfr_float_backend<D, AllocationType>& val)
+       : detail::mpfi_float_imp<0>(val) {}
+
    // rvalue copy
    mpfi_float_backend(mpfi_float_backend&& o) noexcept : detail::mpfi_float_imp<0>(static_cast<detail::mpfi_float_imp<0>&&>(o))
    {}
@@ -475,6 +492,7 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
    mpfi_float_backend(const V& a, const V& b, unsigned digits10)
        : detail::mpfi_float_imp<0>(multiprecision::detail::digits10_2_2(digits10))
    {
+      boost::multiprecision::detail::scoped_target_precision<mpfi_float_backend<0> > opts;
       assign_components(*this, a, b);
    }
 
@@ -850,6 +868,19 @@ inline void eval_convert_to(long double* result, const mpfi_float_backend<digits
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
 inline void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_backend<D2, AllocationType>& a, const mpfr_float_backend<D2, AllocationType>& b)
 {
+   //
+   // This is called from class number's constructors, so if we have variable
+   // precision, then copy the precision of the source variables.
+   //
+   BOOST_IF_CONSTEXPR(!D1)
+   {
+      if ((result.thread_default_variable_precision_options() & variable_precision_options::precision_group) == variable_precision_options::preserve_source_precision)
+      {
+         unsigned long prec = (std::max)(mpfr_get_prec(a.data()), mpfr_get_prec(b.data()));
+         mpfi_set_prec(result.data(), prec);
+      }
+   }
+
    using default_ops::eval_fpclassify;
    if (eval_fpclassify(a) == (int)FP_NAN)
    {
