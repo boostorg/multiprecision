@@ -12,6 +12,14 @@
 
 [section:hist History]
 
+[h4 Multiprecision-4.0.0 (Boost-1.76)]
+
+* [*BREAKING CHANGE]: Massive refactoring and code simpification makes C++11 an absolute requirement.
+* Use BOOST_TRY/CATCH in headers so code can be use din s=exception-free environments.
+* Correct corner case in pow, fixes [@https://github.com/boostorg/multiprecision/issues/277 #277]. 
+* Correct exception type thrown to match docs in lsb/msb: fixes [@https://github.com/boostorg/multiprecision/issues/257 #257].
+* Allow moves and operators between related but different types (ie types with the same allocator), fixes [@https://github.com/boostorg/multiprecision/issues/278 #278].
+
 [h4 Multiprecision-3.2.5 (Boost-1.75)]
 
 * Much improved gcd and modulus operations for __cpp_int.

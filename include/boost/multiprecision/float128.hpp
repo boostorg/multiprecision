@@ -6,9 +6,10 @@
 #ifndef BOOST_MP_FLOAT128_HPP
 #define BOOST_MP_FLOAT128_HPP
 
+#include <tuple>
 #include <boost/config.hpp>
-#include <boost/functional/hash.hpp>
 #include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 
 #if defined(BOOST_INTEL) && !defined(BOOST_MP_USE_FLOAT128) && !defined(BOOST_MP_USE_QUAD)
 #if defined(BOOST_INTEL_CXX_VERSION) && (BOOST_INTEL_CXX_VERSION >= 1310) && defined(__GNUC__)
@@ -631,7 +632,7 @@ inline int eval_signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const float128_backend&
 
 inline std::size_t hash_value(const float128_backend& val)
 {
-   return boost::hash_value(static_cast<double>(val.value()));
+   return boost::multiprecision::detail::hash_value(static_cast<double>(val.value()));
 }
 
 } // namespace backends

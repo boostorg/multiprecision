@@ -37,6 +37,7 @@
 #include <boost/functional/hash.hpp>
 
 #include "test.hpp"
+#include <functional> // std::hash
 #include <iostream>
 #include <iomanip>
 

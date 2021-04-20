@@ -587,6 +587,13 @@ struct tester
          a                                 = sqrt(test_type(ui), b);
          BOOST_CHECK_EQUAL(a.str(), s1.str());
          BOOST_CHECK_EQUAL(b.str(), t.str());
+         a = sqrt(test_type(ui) + test_type(0));
+         BOOST_CHECK_EQUAL(a.str(), s1.str());
+         a = sqrt(test_type(ui) * test_type(1));
+         BOOST_CHECK_EQUAL(a.str(), s1.str());
+         a = sqrt(test_type(ui) * 1, b);
+         BOOST_CHECK_EQUAL(a.str(), s1.str());
+         BOOST_CHECK_EQUAL(b.str(), t.str());
       }
       a = -1;
       ++a;

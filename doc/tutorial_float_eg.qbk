@@ -10,6 +10,8 @@
 
 [section:fp_eg Examples]
 
+[include tutorial_float_builtin_ctor.qbk]
+
 [import ../example/floating_point_examples.cpp]
 
 [section:aos Area of Circle]

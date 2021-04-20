@@ -88,7 +88,7 @@
    <span class="comment">// Comparison:</span>
    <span class="keyword">int</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
    <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">V</span><span class="special">&gt;</span>
-   <span class="keyword">typename</span> <span class="identifier">enable_if</span><span class="special">&lt;</span><span class="identifier">is_convertible</span><span class="special">&lt;</span><span class="identifier">V</span><span class="special">,</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span> <span class="special">&gt;,</span> <span class="keyword">int</span><span class="special">&gt;::</span><span class="identifier">type</span>
+   <span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">enable_if</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_convertible</span><span class="special">&lt;</span><span class="identifier">V</span><span class="special">,</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;::</span><span class="identifier">value</span> <span class="special">&gt;,</span> <span class="keyword">int</span><span class="special">&gt;::</span><span class="identifier">type</span>
       <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">V</span><span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
    <span class="comment">// real and imaginary parts:</span>
    <span class="identifier">value_type</span> <span class="identifier">real</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
@@ -548,7 +548,7 @@
       </p>
 <pre class="programlisting"><span class="keyword">int</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">V</span><span class="special">&gt;</span>
-<span class="keyword">typename</span> <span class="identifier">enable_if</span><span class="special">&lt;</span><span class="identifier">is_convertible</span><span class="special">&lt;</span><span class="identifier">V</span><span class="special">,</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span> <span class="special">&gt;,</span> <span class="keyword">int</span><span class="special">&gt;::</span><span class="identifier">type</span>
+<span class="keyword">typename</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">enable_if</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_convertible</span><span class="special">&lt;</span><span class="identifier">V</span><span class="special">,</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;::</span><span class="identifier">value</span> <span class="special">&gt;,</span> <span class="keyword">int</span><span class="special">&gt;::</span><span class="identifier">type</span>
    <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">V</span><span class="special">&amp;</span> <span class="identifier">other</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
 </pre>
 <p>
@@ -1266,7 +1266,8 @@
 <span class="keyword">struct</span> <span class="identifier">number_category</span><span class="special">;</span>
 </pre>
 <p>
-        A traits class that inherits from <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">int_</span><span class="special">&lt;</span><span class="identifier">N</span><span class="special">&gt;</span></code>
+        A traits class that inherits from <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">integral_constant</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span>
+        <span class="identifier">N</span><span class="special">&gt;</span></code>
         where <code class="computeroutput"><span class="identifier">N</span></code> is one of the enumerated
         values <code class="computeroutput"><span class="identifier">number_kind_integer</span></code>,
         <code class="computeroutput"><span class="identifier">number_kind_floating_point</span></code>,
@@ -1280,15 +1281,19 @@
 <span class="keyword">struct</span> <span class="identifier">is_number</span><span class="special">;</span>
 </pre>
 <p>
-        A traits class that inherits from <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">true_</span></code>
-        if T is an instance of <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;&gt;</span></code>, otherwise from <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">false_</span></code>.
+        A traits class that inherits from <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">integral_constant</span><span class="special">&lt;</span><span class="keyword">bool</span><span class="special">,</span>
+        <span class="keyword">true</span><span class="special">&gt;</span></code>
+        if T is an instance of <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;&gt;</span></code>, otherwise from <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">integral_constant</span><span class="special">&lt;</span><span class="keyword">bool</span><span class="special">,</span>
+        <span class="keyword">false</span><span class="special">&gt;</span></code>.
       </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">is_number_expression</span><span class="special">;</span>
 </pre>
 <p>
-        A traits class that inherits from <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">true_</span></code>
-        if T is an expression template type derived from <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;&gt;</span></code>, otherwise from <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">false_</span></code>.
+        A traits class that inherits from <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">integral_constant</span><span class="special">&lt;</span><span class="keyword">bool</span><span class="special">,</span>
+        <span class="keyword">true</span><span class="special">&gt;</span></code>
+        if T is an expression template type derived from <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;&gt;</span></code>, otherwise from <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">integral_constant</span><span class="special">&lt;</span><span class="keyword">bool</span><span class="special">,</span>
+        <span class="keyword">false</span><span class="special">&gt;</span></code>.
       </p>
 <h5>
 <a name="boost_multiprecision.ref.number.h8"></a>

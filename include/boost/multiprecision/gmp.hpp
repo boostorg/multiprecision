@@ -12,9 +12,10 @@
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
-#include <boost/functional/hash_fwd.hpp>
+
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
@@ -1103,9 +1104,9 @@ inline std::size_t hash_value(const gmp_float<Digits10>& val)
 {
    std::size_t result = 0;
    for (int i = 0; i < std::abs(val.data()[0]._mp_size); ++i)
-      boost::hash_combine(result, val.data()[0]._mp_d[i]);
-   boost::hash_combine(result, val.data()[0]._mp_exp);
-   boost::hash_combine(result, val.data()[0]._mp_size);
+      boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_d[i]);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_exp);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_size);
    return result;
 }
 
@@ -2007,8 +2008,8 @@ inline std::size_t hash_value(const gmp_int& val)
    // We should really use mpz_limbs_read here, but that's unsupported on older versions:
    std::size_t result = 0;
    for (int i = 0; i < std::abs(val.data()[0]._mp_size); ++i)
-      boost::hash_combine(result, val.data()[0]._mp_d[i]);
-   boost::hash_combine(result, val.data()[0]._mp_size);
+      boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_d[i]);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_size);
    return result;
 }
 
@@ -2399,10 +2400,10 @@ inline std::size_t hash_value(const gmp_rational& val)
 {
    std::size_t result = 0;
    for (int i = 0; i < std::abs(val.data()[0]._mp_num._mp_size); ++i)
-      boost::hash_combine(result, val.data()[0]._mp_num._mp_d[i]);
+      boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_num._mp_d[i]);
    for (int i = 0; i < std::abs(val.data()[0]._mp_den._mp_size); ++i)
-      boost::hash_combine(result, val.data()[0]._mp_den._mp_d[i]);
-   boost::hash_combine(result, val.data()[0]._mp_num._mp_size);
+      boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_den._mp_d[i]);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_num._mp_size);
    return result;
 }
 

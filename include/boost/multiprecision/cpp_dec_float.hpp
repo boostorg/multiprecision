@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright Christopher Kormanyos 2002 - 2013.
-// Copyright 2011 -2013 John Maddock. Distributed under the Boost
+// Copyright Christopher Kormanyos 2002 - 2021.
+// Copyright 2011 -2021 John Maddock. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -8,24 +8,29 @@
 // "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 //
-// Note that there are no "noexcept" specifications on the functions in this file: there are too many
-// calls to lexical_cast (and similar) to easily analyse the code for correctness. So until compilers
-// can detect noexcept misuse at compile time, the only realistic option is to simply not use it here.
+// There are some "noexcept" specifications on the functions in this file.
+// Unlike in pre-C++11 versions, compilers can now detect noexcept misuse
+// at compile time, allowing for simple use of it here.
 //
 
 #ifndef BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 #define BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 
 #include <boost/config.hpp>
-#include <cstdint>
-#include <limits>
+
+#include <algorithm>
 #include <array>
 #include <cstdint>
-#include <boost/functional/hash_fwd.hpp>
+#include <initializer_list>
+#include <limits>
+
 #include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/detail/big_lanczos.hpp>
+
 #include <boost/multiprecision/detail/dynamic_array.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/itos.hpp>
+#include <boost/multiprecision/detail/static_array.hpp>
+#include <boost/multiprecision/detail/tables.hpp>
 
 //
 // Headers required for Boost.Math integration:
@@ -34,8 +39,8 @@
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
-#include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
+#include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/expm1.hpp>
@@ -65,50 +70,59 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 class cpp_dec_float
 {
  private:
-   static constexpr const std::int32_t cpp_dec_float_digits10_setting = Digits10;
+   // Perform some static sanity checks.
+   static_assert(boost::multiprecision::detail::is_signed<ExponentType>::value,
+                 "ExponentType must be a signed built in integer type.");
 
-   // We need at least 16-bits in the exponent type to do anything sensible:
-   static_assert(boost::multiprecision::detail::is_signed<ExponentType>::value, "ExponentType must be a signed built in integer type.");
-   static_assert(sizeof(ExponentType) > 1, "ExponentType is too small.");
+   static_assert(sizeof(ExponentType) > 1,
+                 "ExponentType is too small.");
+
+   static_assert(Digits10 < UINT32_C(0x80000000),
+                 "Digits10 exceeds the maximum.");
+
+   // Private class-local constants.
+   static constexpr std::int32_t  cpp_dec_float_digits10_limit_lo = INT32_C(9);
+   static constexpr std::int32_t  cpp_dec_float_digits10_limit_hi = static_cast<std::int32_t>((std::numeric_limits<std::int32_t>::max)() - 100);
+
+   static constexpr std::int32_t cpp_dec_float_elem_digits10      = INT32_C(8);
+   static constexpr std::int32_t cpp_dec_float_elem_mask          = INT32_C(100000000);
+
+   static constexpr std::int32_t cpp_dec_float_elems_for_kara     = static_cast<std::int32_t>(64 + 1);
 
  public:
-   using signed_types = std::tuple<boost::long_long_type> ;
+   using signed_types   = std::tuple<boost::long_long_type> ;
    using unsigned_types = std::tuple<boost::ulong_long_type>;
-   using float_types = std::tuple<double, long double>   ;
-   using exponent_type = ExponentType                     ;
+   using float_types    = std::tuple<double, long double>;
+   using exponent_type  = ExponentType;
 
-   static constexpr const std::int32_t cpp_dec_float_radix             = 10L;
-   static constexpr const std::int32_t cpp_dec_float_digits10_limit_lo = 9L;
-   static constexpr const std::int32_t cpp_dec_float_digits10_limit_hi = boost::integer_traits<std::int32_t>::const_max - 100;
-   static constexpr const std::int32_t cpp_dec_float_digits10          = ((cpp_dec_float_digits10_setting < cpp_dec_float_digits10_limit_lo) ? cpp_dec_float_digits10_limit_lo : ((cpp_dec_float_digits10_setting > cpp_dec_float_digits10_limit_hi) ? cpp_dec_float_digits10_limit_hi : cpp_dec_float_digits10_setting));
-   static constexpr const ExponentType cpp_dec_float_max_exp10         = (static_cast<ExponentType>(1) << (std::numeric_limits<ExponentType>::digits - 5));
-   static constexpr const ExponentType cpp_dec_float_min_exp10         = -cpp_dec_float_max_exp10;
-   static constexpr const ExponentType cpp_dec_float_max_exp           = cpp_dec_float_max_exp10;
-   static constexpr const ExponentType cpp_dec_float_min_exp           = cpp_dec_float_min_exp10;
+   // Public class-local constants.
+   static constexpr std::int32_t  cpp_dec_float_radix             = INT32_C(10);
+   static constexpr std::int32_t  cpp_dec_float_digits10          = ((static_cast<std::int32_t>(Digits10) < cpp_dec_float_digits10_limit_lo) ? cpp_dec_float_digits10_limit_lo : ((static_cast<std::int32_t>(Digits10) > cpp_dec_float_digits10_limit_hi) ? cpp_dec_float_digits10_limit_hi : static_cast<std::int32_t>(Digits10)));
+   static constexpr exponent_type cpp_dec_float_max_exp10         = (static_cast<exponent_type>(1) << (std::numeric_limits<exponent_type>::digits - 5));
+   static constexpr exponent_type cpp_dec_float_min_exp10         = -cpp_dec_float_max_exp10;
+   static constexpr exponent_type cpp_dec_float_max_exp           = cpp_dec_float_max_exp10;
+   static constexpr exponent_type cpp_dec_float_min_exp           = cpp_dec_float_min_exp10;
 
    static_assert(cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10 == -cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10, "Failed exponent range check");
 
- private:
-   static constexpr const std::int32_t cpp_dec_float_elem_digits10 = 8L;
-   static constexpr const std::int32_t cpp_dec_float_elem_mask     = 100000000L;
-
    static_assert(0 == cpp_dec_float_max_exp10 % cpp_dec_float_elem_digits10, "Failed digit sanity check");
 
+ private:
    // There are three guard limbs.
    // 1) The first limb has 'play' from 1...8 decimal digits.
    // 2) The last limb also has 'play' from 1...8 decimal digits.
-   // 3) One limb can get lost when justifying after multiply,
-   // as only half of the triangle is multiplied and a carry
-   // from below is missing.
-   static constexpr const std::int32_t cpp_dec_float_elem_number_request = static_cast<std::int32_t>((cpp_dec_float_digits10 / cpp_dec_float_elem_digits10) + (((cpp_dec_float_digits10 % cpp_dec_float_elem_digits10) != 0) ? 1 : 0));
-
-   // The number of elements needed (with a minimum of two) plus three added guard limbs.
-   static constexpr const std::int32_t cpp_dec_float_elem_number = static_cast<std::int32_t>(((cpp_dec_float_elem_number_request < 2L) ? 2L : cpp_dec_float_elem_number_request) + 3L);
+   // 3) One limb can get lost when justifying after multiply.
+   static constexpr std::int32_t cpp_dec_float_elem_number    = static_cast<std::int32_t>(((Digits10 / cpp_dec_float_elem_digits10) + (((Digits10 % cpp_dec_float_elem_digits10) != 0) ? 1 : 0)) + 3);
 
  public:
-   static constexpr const std::int32_t cpp_dec_float_total_digits10 = static_cast<std::int32_t>(cpp_dec_float_elem_number * cpp_dec_float_elem_digits10);
+   static constexpr std::int32_t cpp_dec_float_max_digits10   = static_cast<std::int32_t>(cpp_dec_float_elem_number * cpp_dec_float_elem_digits10);
 
  private:
+   using array_type =
+      typename std::conditional<std::is_void<Allocator>::value,
+                                detail::static_array <std::uint32_t, cpp_dec_float_elem_number>,
+                                detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number, Allocator> >::type;
+
    typedef enum enum_fpclass_type
    {
       cpp_dec_float_finite,
@@ -116,35 +130,39 @@ class cpp_dec_float
       cpp_dec_float_NaN
    } fpclass_type;
 
-   using array_type = typename std::conditional<std::is_void<Allocator>::value,
-                             std::array<std::uint32_t, cpp_dec_float_elem_number>,
-                             detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number, Allocator> >::type;
+   array_type    data;
+   exponent_type exp;
+   bool          neg;
+   fpclass_type  fpclass;
+   std::int32_t  prec_elem;
 
-   array_type     data;
-   ExponentType   exp;
-   bool           neg;
-   fpclass_type   fpclass;
-   std::int32_t prec_elem;
+   // Private constructor from the floating-point class type.
+   explicit cpp_dec_float(fpclass_type c) : data(),
+                                            exp(static_cast<exponent_type>(0)),
+                                            neg(false),
+                                            fpclass(c),
+                                            prec_elem(cpp_dec_float_elem_number) {}
 
-   //
-   // Special values constructor:
-   //
-   cpp_dec_float(fpclass_type c) : data(),
-                                   exp(static_cast<ExponentType>(0)),
-                                   neg(false),
-                                   fpclass(c),
-                                   prec_elem(cpp_dec_float_elem_number) {}
+   // Constructor from an initializer_list, an optional
+   // (value-aligned) exponent and a Boolean sign.
+   explicit cpp_dec_float(std::initializer_list<std::uint32_t> lst,
+                          const exponent_type e = 0,
+                          const bool n = false) : data(lst),
+                                                  exp(e),
+                                                  neg(n),
+                                                  fpclass(cpp_dec_float_finite),
+                                                  prec_elem(cpp_dec_float_elem_number) {}
 
  public:
-   // Constructors
+   // Public Constructors
    cpp_dec_float() noexcept(noexcept(array_type())) : data(),
-                                                                  exp(static_cast<ExponentType>(0)),
-                                                                  neg(false),
-                                                                  fpclass(cpp_dec_float_finite),
-                                                                  prec_elem(cpp_dec_float_elem_number) {}
+                                                      exp(static_cast<exponent_type>(0)),
+                                                      neg(false),
+                                                      fpclass(cpp_dec_float_finite),
+                                                      prec_elem(cpp_dec_float_elem_number) {}
 
    cpp_dec_float(const char* s) : data(),
-                                  exp(static_cast<ExponentType>(0)),
+                                  exp(static_cast<exponent_type>(0)),
                                   neg(false),
                                   fpclass(cpp_dec_float_finite),
                                   prec_elem(cpp_dec_float_elem_number)
@@ -153,21 +171,26 @@ class cpp_dec_float
    }
 
    template <class I>
-   cpp_dec_float(I i, typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value >::type* = 0) : data(),
-                                                                        exp(static_cast<ExponentType>(0)),
-                                                                        neg(false),
-                                                                        fpclass(cpp_dec_float_finite),
-                                                                        prec_elem(cpp_dec_float_elem_number)
+   cpp_dec_float(I i,
+                 typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value >::type* = nullptr)
+      : data(),
+        exp(static_cast<exponent_type>(0)),
+        neg(false),
+        fpclass(cpp_dec_float_finite),
+        prec_elem(cpp_dec_float_elem_number)
    {
       from_unsigned_long_long(i);
    }
 
    template <class I>
-   cpp_dec_float(I i, typename std::enable_if<boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value>::type* = 0) : data(),
-                                                                      exp(static_cast<ExponentType>(0)),
-                                                                      neg(false),
-                                                                      fpclass(cpp_dec_float_finite),
-                                                                      prec_elem(cpp_dec_float_elem_number)
+   cpp_dec_float(I i,
+                 typename std::enable_if<(   boost::multiprecision::detail::is_signed<I>::value
+                                          && boost::multiprecision::detail::is_integral<I>::value)>::type* = nullptr)
+      : data(),
+        exp(static_cast<exponent_type>(0)),
+        neg(false),
+        fpclass(cpp_dec_float_finite),
+        prec_elem(cpp_dec_float_elem_number)
    {
       if (i < 0)
       {
@@ -178,27 +201,30 @@ class cpp_dec_float
          from_unsigned_long_long(i);
    }
 
-   cpp_dec_float(const cpp_dec_float& f) noexcept(noexcept(array_type(std::declval<const array_type&>()))) : data(f.data),
-                                                                                                                         exp(f.exp),
-                                                                                                                         neg(f.neg),
-                                                                                                                         fpclass(f.fpclass),
-                                                                                                                         prec_elem(f.prec_elem) {}
+   cpp_dec_float(const cpp_dec_float& f) noexcept(noexcept(array_type(std::declval<const array_type&>())))
+      : data(f.data),
+        exp(f.exp),
+        neg(f.neg),
+        fpclass(f.fpclass),
+        prec_elem(f.prec_elem) {}
 
    template <unsigned D, class ET, class A>
-   cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if<D <= Digits10>::type* = 0) : data(),
-                                                                                                     exp(f.exp),
-                                                                                                     neg(f.neg),
-                                                                                                     fpclass(static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
-                                                                                                     prec_elem(cpp_dec_float_elem_number)
+   cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if<D <= Digits10>::type* = nullptr)
+      : data(),
+        exp(f.exp),
+        neg(f.neg),
+        fpclass(static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
+        prec_elem(cpp_dec_float_elem_number)
    {
       std::copy(f.data.begin(), f.data.begin() + f.prec_elem, data.begin());
    }
    template <unsigned D, class ET, class A>
-   explicit cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if< !(D <= Digits10)>::type* = 0) : data(),
-                                                                                                               exp(f.exp),
-                                                                                                               neg(f.neg),
-                                                                                                               fpclass(static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
-                                                                                                               prec_elem(cpp_dec_float_elem_number)
+   explicit cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if< !(D <= Digits10)>::type* = nullptr)
+      : data(),
+        exp(f.exp),
+        neg(f.neg),
+        fpclass(static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
+        prec_elem(cpp_dec_float_elem_number)
    {
       // TODO: this doesn't round!
       std::copy(f.data.begin(), f.data.begin() + prec_elem, data.begin());
@@ -210,7 +236,7 @@ class cpp_dec_float
                                                    && !std::is_same<F, __float128>::value
 #endif
                                                    >::type* = 0) : data(),
-                                                                   exp(static_cast<ExponentType>(0)),
+                                                                   exp(static_cast<exponent_type>(0)),
                                                                    neg(false),
                                                                    fpclass(cpp_dec_float_finite),
                                                                    prec_elem(cpp_dec_float_elem_number)
@@ -218,86 +244,38 @@ class cpp_dec_float
       *this = val;
    }
 
-   cpp_dec_float(const double mantissa, const ExponentType exponent);
+   cpp_dec_float(const double mantissa, const exponent_type exponent);
 
    std::size_t hash() const
    {
       std::size_t result = 0;
       for (int i = 0; i < prec_elem; ++i)
-         boost::hash_combine(result, data[i]);
-      boost::hash_combine(result, exp);
-      boost::hash_combine(result, neg);
-      boost::hash_combine(result, fpclass);
+         boost::multiprecision::detail::hash_combine(result, data[i]);
+      boost::multiprecision::detail::hash_combine(result, exp);
+      boost::multiprecision::detail::hash_combine(result, neg);
+      boost::multiprecision::detail::hash_combine(result, fpclass);
       return result;
    }
 
    // Specific special values.
-   static const cpp_dec_float& nan()
-   {
-      static const cpp_dec_float val(cpp_dec_float_NaN);
-      return val;
-   }
+   static const cpp_dec_float&  nan () { static const cpp_dec_float val(cpp_dec_float_NaN); return val; }
+   static const cpp_dec_float&  inf () { static const cpp_dec_float val(cpp_dec_float_inf); return val; }
+   static const cpp_dec_float& (max)() { static const cpp_dec_float val({ std::uint32_t(1u) }, cpp_dec_float_max_exp10); return val; }
+   static const cpp_dec_float& (min)() { static const cpp_dec_float val({ std::uint32_t(1u) }, cpp_dec_float_min_exp10); return val; }
+   static const cpp_dec_float&  zero() { static const cpp_dec_float val({ std::uint32_t(0u) }); return val; }
+   static const cpp_dec_float&  one () { static const cpp_dec_float val({ std::uint32_t(1u) }); return val; }
+   static const cpp_dec_float&  two () { static const cpp_dec_float val({ std::uint32_t(2u) }); return val; }
+   static const cpp_dec_float&  half() { static const cpp_dec_float val({ std::uint32_t(cpp_dec_float_elem_mask / 2)}, -8); return val; }
 
-   static const cpp_dec_float& inf()
-   {
-      static const cpp_dec_float val(cpp_dec_float_inf);
-      return val;
-   }
-
-   static const cpp_dec_float&(max)()
-   {
-      static cpp_dec_float val_max = std::string("1.0e" + boost::multiprecision::detail::itos(cpp_dec_float_max_exp10)).c_str();
-      return val_max;
-   }
-
-   static const cpp_dec_float&(min)()
-   {
-      static cpp_dec_float val_min = std::string("1.0e" + boost::multiprecision::detail::itos(cpp_dec_float_min_exp10)).c_str();
-      return val_min;
-   }
-
-   static const cpp_dec_float& zero()
-   {
-      static cpp_dec_float val(static_cast<boost::ulong_long_type>(0u));
-      return val;
-   }
-
-   static const cpp_dec_float& one()
-   {
-      static cpp_dec_float val(static_cast<boost::ulong_long_type>(1u));
-      return val;
-   }
-
-   static const cpp_dec_float& two()
-   {
-      static cpp_dec_float val(static_cast<boost::ulong_long_type>(2u));
-      return val;
-   }
-
-   static const cpp_dec_float& half()
-   {
-      static cpp_dec_float val(0.5L);
-      return val;
-   }
-
-   static const cpp_dec_float& double_min()
-   {
-      static cpp_dec_float val((std::numeric_limits<double>::min)());
-      return val;
-   }
-
-   static const cpp_dec_float& double_max()
-   {
-      static cpp_dec_float val((std::numeric_limits<double>::max)());
-      return val;
-   }
+   static const cpp_dec_float& double_min() { static const cpp_dec_float val((std::numeric_limits<double>::min)()); return val; }
+   static const cpp_dec_float& double_max() { static const cpp_dec_float val((std::numeric_limits<double>::max)()); return val; }
 
    static const cpp_dec_float& long_double_min()
    {
 #ifdef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
-      static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::min)()));
+      static const cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::min)()));
 #else
-      static cpp_dec_float val((std::numeric_limits<long double>::min)());
+      static const cpp_dec_float val((std::numeric_limits<long double>::min)());
 #endif
       return val;
    }
@@ -305,34 +283,27 @@ class cpp_dec_float
    static const cpp_dec_float& long_double_max()
    {
 #ifdef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
-      static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::max)()));
+      static const cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::max)()));
 #else
-      static cpp_dec_float val((std::numeric_limits<long double>::max)());
+      static const cpp_dec_float val((std::numeric_limits<long double>::max)());
 #endif
       return val;
    }
 
-   static const cpp_dec_float& long_long_max()
-   {
-      static cpp_dec_float val((std::numeric_limits<boost::long_long_type>::max)());
-      return val;
-   }
-
-   static const cpp_dec_float& long_long_min()
-   {
-      static cpp_dec_float val((std::numeric_limits<boost::long_long_type>::min)());
-      return val;
-   }
-
-   static const cpp_dec_float& ulong_long_max()
-   {
-      static cpp_dec_float val((std::numeric_limits<boost::ulong_long_type>::max)());
-      return val;
-   }
+   static const cpp_dec_float& long_long_max () { static const cpp_dec_float val((std::numeric_limits<boost::long_long_type>::max)()); return val; }
+   static const cpp_dec_float& long_long_min () { static const cpp_dec_float val((std::numeric_limits<boost::long_long_type>::min)()); return val; }
+   static const cpp_dec_float& ulong_long_max() { static const cpp_dec_float val((std::numeric_limits<boost::ulong_long_type>::max)()); return val; }
 
    static const cpp_dec_float& eps()
    {
-      static cpp_dec_float val(1.0, 1 - static_cast<int>(cpp_dec_float_digits10));
+      static const cpp_dec_float val
+      (
+        {
+          (std::uint32_t) detail::pow10_maker((std::uint32_t) ((std::int32_t) (INT32_C(1) + (std::int32_t) (((cpp_dec_float_digits10 / cpp_dec_float_elem_digits10) + ((cpp_dec_float_digits10 % cpp_dec_float_elem_digits10) != 0 ? 1 : 0)) * cpp_dec_float_elem_digits10)) - cpp_dec_float_digits10))
+        },
+        -(exponent_type) (((cpp_dec_float_digits10 / cpp_dec_float_elem_digits10) + ((cpp_dec_float_digits10 % cpp_dec_float_elem_digits10) != 0 ? 1 : 0)) * cpp_dec_float_elem_digits10)
+      );
+
       return val;
    }
 
@@ -469,30 +440,25 @@ class cpp_dec_float
    long double            extract_long_double() const;
    boost::long_long_type  extract_signed_long_long() const;
    boost::ulong_long_type extract_unsigned_long_long() const;
-   void                   extract_parts(double& mantissa, ExponentType& exponent) const;
+   void                   extract_parts(double& mantissa, exponent_type& exponent) const;
    cpp_dec_float          extract_integer_part() const;
 
    void precision(const std::int32_t prec_digits)
    {
-      if (prec_digits >= cpp_dec_float_total_digits10)
-      {
-         prec_elem = cpp_dec_float_elem_number;
-      }
-      else
-      {
-         const std::int32_t elems = static_cast<std::int32_t>(static_cast<std::int32_t>((prec_digits + (cpp_dec_float_elem_digits10 / 2)) / cpp_dec_float_elem_digits10) + static_cast<std::int32_t>(((prec_digits % cpp_dec_float_elem_digits10) != 0) ? 1 : 0));
+      const std::int32_t elems =
+        static_cast<std::int32_t>(    static_cast<std::int32_t>(prec_digits / cpp_dec_float_elem_digits10)
+                                  +                          (((prec_digits % cpp_dec_float_elem_digits10) != 0) ? 1 : 0));
 
-         prec_elem = (std::min)(cpp_dec_float_elem_number, (std::max)(elems, static_cast<std::int32_t>(2)));
-      }
+      prec_elem = (std::min)(cpp_dec_float_elem_number, (std::max)(elems, static_cast<std::int32_t>(2)));
    }
    static cpp_dec_float pow2(boost::long_long_type i);
-   ExponentType         order() const
+   exponent_type order() const
    {
       const bool bo_order_is_zero = ((!(isfinite)()) || (data[0] == static_cast<std::uint32_t>(0u)));
       //
       // Binary search to find the order of the leading term:
       //
-      ExponentType prefix = 0;
+      exponent_type prefix = 0;
 
       if (data[0] >= 100000UL)
       {
@@ -534,7 +500,7 @@ class cpp_dec_float
          }
       }
 
-      return (bo_order_is_zero ? static_cast<ExponentType>(0) : static_cast<ExponentType>(exp + prefix));
+      return (bo_order_is_zero ? static_cast<exponent_type>(0) : static_cast<exponent_type>(exp + prefix));
    }
 
    template <class Archive>
@@ -555,11 +521,158 @@ class cpp_dec_float
 
    void from_unsigned_long_long(const boost::ulong_long_type u);
 
-   int cmp_data(const array_type& vd) const;
+   template <typename InputIteratorTypeLeft,
+             typename InputIteratorTypeRight>
+   static int compare_ranges(InputIteratorTypeLeft  a,
+                             InputIteratorTypeRight b,
+                             const std::uint32_t    count = cpp_dec_float_elem_number);
 
-   static std::uint32_t mul_loop_uv(std::uint32_t* const u, const std::uint32_t* const v, const std::int32_t p);
+   static std::uint32_t eval_add_n(      std::uint32_t* r,
+                                   const std::uint32_t* u,
+                                   const std::uint32_t* v,
+                                   const std::int32_t   count);
+
+   static std::uint32_t eval_subtract_n(      std::uint32_t* r,
+                                        const std::uint32_t* u,
+                                        const std::uint32_t* v,
+                                        const std::int32_t   count);
+
+   static void eval_multiply_n_by_n_to_2n(      std::uint32_t* r,
+                                          const std::uint32_t* a,
+                                          const std::uint32_t* b,
+                                          const std::uint32_t  count);
+
    static std::uint32_t mul_loop_n(std::uint32_t* const u, std::uint32_t n, const std::int32_t p);
    static std::uint32_t div_loop_n(std::uint32_t* const u, std::uint32_t n, const std::int32_t p);
+
+   static void eval_multiply_kara_propagate_carry (std::uint32_t* t, const std::uint32_t n, const std::uint32_t carry);
+   static void eval_multiply_kara_propagate_borrow(std::uint32_t* t, const std::uint32_t n, const bool has_borrow);
+   static void eval_multiply_kara_n_by_n_to_2n    (      std::uint32_t* r,
+                                                   const std::uint32_t* a,
+                                                   const std::uint32_t* b,
+                                                   const std::uint32_t  n,
+                                                         std::uint32_t* t);
+
+   template<unsigned D>
+   void eval_mul_dispatch_multiplication_method(
+      const cpp_dec_float<D, ExponentType, Allocator>& v,
+      const std::int32_t prec_elems_for_multiply,
+      const typename std::enable_if<   (D == Digits10)
+                                    && (cpp_dec_float<D, ExponentType, Allocator>::cpp_dec_float_elem_number < cpp_dec_float_elems_for_kara)>::type* = nullptr)
+   {
+      // Use school multiplication.
+
+      using array_for_mul_result_type =
+         typename std::conditional<std::is_void<Allocator>::value,
+                                   detail::static_array <std::uint32_t, cpp_dec_float_elem_number * 2>,
+                                   detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number * 2, Allocator> >::type;
+
+      array_for_mul_result_type result;
+
+      eval_multiply_n_by_n_to_2n(result.data(), data.data(), v.data.data(), prec_elems_for_multiply);
+
+      // Handle a potential carry.
+      if(result[0U] != static_cast<std::uint32_t>(0U))
+      {
+         exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
+
+         // Shift the result of the multiplication one element to the right.
+         std::copy(result.cbegin(),
+                   result.cbegin() + static_cast<std::ptrdiff_t>(prec_elems_for_multiply),
+                   data.begin());
+      }
+      else
+      {
+         std::copy(result.cbegin() + 1,
+                   result.cbegin() + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+                   data.begin());
+      }
+   }
+
+   template<unsigned D>
+   void eval_mul_dispatch_multiplication_method(
+      const cpp_dec_float<D, ExponentType, Allocator>& v,
+      const std::int32_t prec_elems_for_multiply,
+      const typename std::enable_if<    (D == Digits10)
+                                    && !(cpp_dec_float<D, ExponentType, Allocator>::cpp_dec_float_elem_number < cpp_dec_float_elems_for_kara)>::type* = nullptr)
+   {
+      if(prec_elems_for_multiply < cpp_dec_float_elems_for_kara)
+      {
+         // Use school multiplication.
+
+         using array_for_mul_result_type =
+            typename std::conditional<std::is_void<Allocator>::value,
+                                      detail::static_array <std::uint32_t, cpp_dec_float_elem_number * 2>,
+                                      detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number * 2, Allocator> >::type;
+
+         array_for_mul_result_type result;
+
+         eval_multiply_n_by_n_to_2n(result.data(), data.data(), v.data.data(), prec_elems_for_multiply);
+
+         // Handle a potential carry.
+         if(result[0U] != static_cast<std::uint32_t>(0U))
+         {
+            exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
+         
+            // Shift the result of the multiplication one element to the right.
+            std::copy(result.cbegin(),
+                      result.cbegin() + static_cast<std::ptrdiff_t>(prec_elems_for_multiply),
+                      data.begin());
+         }
+         else
+         {
+            std::copy(result.cbegin() + 1,
+                      result.cbegin() + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+                      data.begin());
+         }
+      }
+      else
+      {
+         // Use Karatsuba multiplication.
+
+         using array_for_kara_tmp_type =
+            typename std::conditional<std::is_void<Allocator>::value,
+                                      detail::static_array <std::uint32_t, detail::a029750::a029750_as_constexpr(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U>,
+                                      detail::dynamic_array<std::uint32_t, detail::a029750::a029750_as_constexpr(static_cast<std::uint32_t>(cpp_dec_float_elem_number)) * 8U, Allocator> >::type;
+
+         // Sloanes's A029747: Numbers of the form 2^k times 1, 3 or 5.
+         const std::uint32_t kara_elems_for_multiply =
+            detail::a029750::a029750_as_runtime_value(static_cast<std::uint32_t>(prec_elems_for_multiply));
+
+         array_for_kara_tmp_type my_kara_mul_pool;
+
+         std::uint32_t* result  = my_kara_mul_pool.data() + (kara_elems_for_multiply * 0U);
+         std::uint32_t* t       = my_kara_mul_pool.data() + (kara_elems_for_multiply * 2U);
+         std::uint32_t* u_local = my_kara_mul_pool.data() + (kara_elems_for_multiply * 6U);
+         std::uint32_t* v_local = my_kara_mul_pool.data() + (kara_elems_for_multiply * 7U);
+
+         std::copy(  data.cbegin(),   data.cbegin() + prec_elems_for_multiply, u_local);
+         std::copy(v.data.cbegin(), v.data.cbegin() + prec_elems_for_multiply, v_local);
+
+         eval_multiply_kara_n_by_n_to_2n(result,
+                                         u_local,
+                                         v_local,
+                                         kara_elems_for_multiply,
+                                         t);
+
+         // Handle a potential carry.
+         if(result[0U] != static_cast<std::uint32_t>(0U))
+         {
+            exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
+
+            // Shift the result of the multiplication one element to the right.
+            std::copy(result,
+                      result + static_cast<std::ptrdiff_t>(prec_elems_for_multiply),
+                      data.begin());
+         }
+         else
+         {
+            std::copy(result + 1,
+                      result + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+                      data.begin());
+         }
+      }
+   }
 
    bool rd_string(const char* const s);
 
@@ -569,8 +682,6 @@ class cpp_dec_float
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
-template <unsigned Digits10, class ExponentType, class Allocator>
-const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_setting;
 template <unsigned Digits10, class ExponentType, class Allocator>
 const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_limit_lo;
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -587,8 +698,6 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 const ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10;
 template <unsigned Digits10, class ExponentType, class Allocator>
 const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_digits10;
-template <unsigned Digits10, class ExponentType, class Allocator>
-const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_number_request;
 template <unsigned Digits10, class ExponentType, class Allocator>
 const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_number;
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -623,9 +732,10 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    }
 
    // Get the offset for the add/sub operation.
-   constexpr const ExponentType max_delta_exp = static_cast<ExponentType>((cpp_dec_float_elem_number - 1) * cpp_dec_float_elem_digits10);
+   constexpr exponent_type max_delta_exp =
+     static_cast<exponent_type>((cpp_dec_float_elem_number - 1) * cpp_dec_float_elem_digits10);
 
-   const ExponentType ofs_exp = static_cast<ExponentType>(exp - v.exp);
+   const exponent_type ofs_exp = static_cast<exponent_type>(exp - v.exp);
 
    // Check if the operation is out of range, requiring special handling.
    if (v.iszero() || (ofs_exp > max_delta_exp))
@@ -641,11 +751,11 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 
    // Do the add/sub operation.
 
-   typename array_type::iterator       p_u    = data.begin();
-   typename array_type::const_iterator p_v    = v.data.begin();
-   bool                                b_copy = false;
-   const std::int32_t                ofs    = static_cast<std::int32_t>(static_cast<std::int32_t>(ofs_exp) / cpp_dec_float_elem_digits10);
-   array_type                          n_data;
+   typename array_type::pointer       p_u    = data.data();
+   typename array_type::const_pointer p_v    = v.data.data();
+   bool                               b_copy = false;
+   const std::int32_t                 ofs    = static_cast<std::int32_t>(static_cast<std::int32_t>(ofs_exp) / cpp_dec_float_elem_digits10);
+   array_type                         n_data;
 
    if (neg == v.neg)
    {
@@ -655,27 +765,20 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       // at a time, each element with carry.
       if (ofs >= static_cast<std::int32_t>(0))
       {
-         std::copy(v.data.begin(), v.data.end() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
+         std::copy(v.data.cbegin(), v.data.cend() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
          std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(ofs), static_cast<std::uint32_t>(0u));
-         p_v = n_data.begin();
+         p_v = n_data.data();
       }
       else
       {
-         std::copy(data.begin(), data.end() - static_cast<size_t>(-ofs), n_data.begin() + static_cast<size_t>(-ofs));
+         std::copy(data.cbegin(), data.cend() - static_cast<size_t>(-ofs), n_data.begin() + static_cast<size_t>(-ofs));
          std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(-ofs), static_cast<std::uint32_t>(0u));
-         p_u    = n_data.begin();
+         p_u    = n_data.data();
          b_copy = true;
       }
 
       // Addition algorithm
-      std::uint32_t carry = static_cast<std::uint32_t>(0u);
-
-      for (std::int32_t j = static_cast<std::int32_t>(cpp_dec_float_elem_number - static_cast<std::int32_t>(1)); j >= static_cast<std::int32_t>(0); j--)
-      {
-         std::uint32_t t = static_cast<std::uint32_t>(static_cast<std::uint32_t>(p_u[j] + p_v[j]) + carry);
-         carry             = t / static_cast<std::uint32_t>(cpp_dec_float_elem_mask);
-         p_u[j]            = static_cast<std::uint32_t>(t - static_cast<std::uint32_t>(carry * static_cast<std::uint32_t>(cpp_dec_float_elem_mask)));
-      }
+      const std::uint32_t carry = eval_add_n(p_u, p_u, p_v, cpp_dec_float_elem_number);
 
       if (b_copy)
       {
@@ -686,24 +789,24 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       // There needs to be a carry into the element -1 of the array data
       if (carry != static_cast<std::uint32_t>(0u))
       {
-         std::copy_backward(data.begin(), data.end() - static_cast<std::size_t>(1u), data.end());
+         std::copy_backward(data.cbegin(), data.cend() - static_cast<std::size_t>(1u), data.end());
          data[0] = carry;
-         exp += static_cast<ExponentType>(cpp_dec_float_elem_digits10);
+         exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
       }
    }
    else
    {
       // Subtract v from *this, where the data array of either *this or v
       // might have to be treated with a positive, negative or zero offset.
-      if ((ofs > static_cast<std::int32_t>(0)) || ((ofs == static_cast<std::int32_t>(0)) && (cmp_data(v.data) > static_cast<std::int32_t>(0))))
+      if ((ofs > static_cast<std::int32_t>(0)) || ((ofs == static_cast<std::int32_t>(0)) && (compare_ranges(data.cbegin(), v.data.cbegin()) > static_cast<std::int32_t>(0))))
       {
          // In this case, |u| > |v| and ofs is positive.
          // Copy the data of v, shifted down to a lower value
          // into the data array m_n. Set the operand pointer p_v
          // to point to the copied, shifted data m_n.
-         std::copy(v.data.begin(), v.data.end() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
+         std::copy(v.data.cbegin(), v.data.cend() - static_cast<size_t>(ofs), n_data.begin() + static_cast<size_t>(ofs));
          std::fill(n_data.begin(), n_data.begin() + static_cast<size_t>(ofs), static_cast<std::uint32_t>(0u));
-         p_v = n_data.begin();
+         p_v = n_data.data();
       }
       else
       {
@@ -711,7 +814,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
          {
             // In this case, |u| < |v| and ofs is negative.
             // Shift the data of u down to a lower value.
-            std::copy_backward(data.begin(), data.end() - static_cast<size_t>(-ofs), data.end());
+            std::copy_backward(data.cbegin(), data.cend() - static_cast<size_t>(-ofs), data.end());
             std::fill(data.begin(), data.begin() + static_cast<size_t>(-ofs), static_cast<std::uint32_t>(0u));
          }
 
@@ -720,34 +823,13 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
          // operand pointer p_v to point to the shifted
          // data m_data.
          n_data = v.data;
-         p_u    = n_data.begin();
-         p_v    = data.begin();
+         p_u    = n_data.data();
+         p_v    = data.data();
          b_copy = true;
       }
 
-      std::int32_t j;
-
       // Subtraction algorithm
-      std::int32_t borrow = static_cast<std::int32_t>(0);
-
-      for (j = static_cast<std::int32_t>(cpp_dec_float_elem_number - static_cast<std::int32_t>(1)); j >= static_cast<std::int32_t>(0); j--)
-      {
-         std::int32_t t = static_cast<std::int32_t>(static_cast<std::int32_t>(static_cast<std::int32_t>(p_u[j]) - static_cast<std::int32_t>(p_v[j])) - borrow);
-
-         // Underflow? Borrow?
-         if (t < static_cast<std::int32_t>(0))
-         {
-            // Yes, underflow and borrow
-            t += static_cast<std::int32_t>(cpp_dec_float_elem_mask);
-            borrow = static_cast<std::int32_t>(1);
-         }
-         else
-         {
-            borrow = static_cast<std::int32_t>(0);
-         }
-
-         p_u[j] = static_cast<std::uint32_t>(static_cast<std::uint32_t>(t) % static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
-      }
+      static_cast<void>(eval_subtract_n(p_u, p_u, p_v, cpp_dec_float_elem_number));
 
       if (b_copy)
       {
@@ -766,7 +848,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
             // This result of the subtraction is exactly zero.
             // Reset the sign and the exponent.
             neg = false;
-            exp = static_cast<ExponentType>(0);
+            exp = static_cast<exponent_type>(0);
          }
          else
          {
@@ -776,7 +858,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
             std::copy(data.begin() + static_cast<std::size_t>(sj), data.end(), data.begin());
             std::fill(data.end() - sj, data.end(), static_cast<std::uint32_t>(0u));
 
-            exp -= static_cast<ExponentType>(sj * static_cast<std::size_t>(cpp_dec_float_elem_digits10));
+            exp -= static_cast<exponent_type>(sj * static_cast<std::size_t>(cpp_dec_float_elem_digits10));
          }
       }
    }
@@ -786,7 +868,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       return (*this = zero());
 
    // Check for potential overflow.
-   const bool b_result_might_overflow = (exp >= static_cast<ExponentType>(cpp_dec_float_max_exp10));
+   const bool b_result_might_overflow = (exp >= static_cast<exponent_type>(cpp_dec_float_max_exp10));
 
    // Handle overflow.
    if (b_result_might_overflow)
@@ -848,29 +930,15 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    }
 
    // Check for potential overflow or underflow.
-   const bool b_result_might_overflow  = ((exp + v.exp) >= static_cast<ExponentType>(cpp_dec_float_max_exp10));
-   const bool b_result_might_underflow = ((exp + v.exp) <= static_cast<ExponentType>(cpp_dec_float_min_exp10));
+   const bool b_result_might_overflow  = ((exp + v.exp) >= static_cast<exponent_type>(cpp_dec_float_max_exp10));
+   const bool b_result_might_underflow = ((exp + v.exp) <= static_cast<exponent_type>(cpp_dec_float_min_exp10));
 
    // Set the exponent of the result.
    exp += v.exp;
 
    const std::int32_t prec_mul = (std::min)(prec_elem, v.prec_elem);
 
-   const std::uint32_t carry = mul_loop_uv(data.data(), v.data.data(), prec_mul);
-
-   // Handle a potential carry.
-   if (carry != static_cast<std::uint32_t>(0u))
-   {
-      exp += cpp_dec_float_elem_digits10;
-
-      // Shift the result of the multiplication one element to the right...
-      std::copy_backward(data.begin(),
-                         data.begin() + static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1)),
-                         data.begin() + static_cast<std::size_t>(prec_elem));
-
-      // ... And insert the carry.
-      data.front() = carry;
-   }
+   eval_mul_dispatch_multiplication_method(v, prec_mul);
 
    // Handle overflow.
    if (b_result_might_overflow && (compare((cpp_dec_float::max)()) > 0))
@@ -907,7 +975,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       }
    }
 
-   const bool u_and_v_are_finite_and_identical = ((isfinite)() && (fpclass == v.fpclass) && (exp == v.exp) && (cmp_data(v.data) == static_cast<std::int32_t>(0)));
+   const bool u_and_v_are_finite_and_identical = ((isfinite)() && (fpclass == v.fpclass) && (exp == v.exp) && (compare_ranges(data.cbegin(), v.data.cbegin()) == static_cast<std::int32_t>(0)));
 
    if (u_and_v_are_finite_and_identical)
    {
@@ -983,7 +1051,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    // Handle the carry and adjust the exponent.
    if (carry != static_cast<std::uint32_t>(0u))
    {
-      exp += static_cast<ExponentType>(cpp_dec_float_elem_digits10);
+      exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
 
       // Shift the result of the multiplication one element to the right.
       std::copy_backward(data.begin(),
@@ -1074,7 +1142,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       if (data[0] == static_cast<std::uint32_t>(0u))
       {
          // Adjust the exponent
-         exp -= static_cast<ExponentType>(cpp_dec_float_elem_digits10);
+         exp -= static_cast<exponent_type>(cpp_dec_float_elem_digits10);
 
          // Shift result of the division one element to the left.
          std::copy(data.begin() + static_cast<std::size_t>(1u),
@@ -1138,8 +1206,8 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    // Generate the initial estimate using division.
    // Extract the mantissa and exponent for a "manual"
    // computation of the estimate.
-   double       dd;
-   ExponentType ne;
+   double        dd;
+   exponent_type ne;
    x.extract_parts(dd, ne);
 
    // Do the inverse estimate using double precision estimates of mantissa and exponent.
@@ -1149,9 +1217,9 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    // is used. During the iterative steps, the precision of the calculation is limited
    // to the minimum required in order to minimize the run-time.
 
-   constexpr const std::int32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
+   constexpr std::int32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
 
-   for (std::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_total_digits10; digits *= static_cast<std::int32_t>(2))
+   for (std::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_max_digits10; digits *= static_cast<std::int32_t>(2))
    {
       // Adjust precision of the terms.
       precision(static_cast<std::int32_t>((digits + 10) * static_cast<std::int32_t>(2)));
@@ -1200,12 +1268,12 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    // Generate the initial estimate using division.
    // Extract the mantissa and exponent for a "manual"
    // computation of the estimate.
-   double       dd;
-   ExponentType ne;
+   double        dd;
+   exponent_type ne;
    extract_parts(dd, ne);
 
    // Force the exponent to be an even multiple of two.
-   if ((ne % static_cast<ExponentType>(2)) != static_cast<ExponentType>(0))
+   if ((ne % static_cast<exponent_type>(2)) != static_cast<exponent_type>(0))
    {
       ++ne;
       dd /= 10.0;
@@ -1226,13 +1294,12 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    // limited to the minimum required in order to minimize
    // the run-time.
    //
-   // Book references:
-   // https://doi.org/10.1007/978-3-642-56735-3
-   // http://www.amazon.com/exec/obidos/tg/detail/-/3540665722/qid=1035535482/sr=8-7/ref=sr_8_7/104-3357872-6059916?v=glance&n=507846
+   // Book reference to "Pi Unleashed:
+   // https://www.springer.com/gp/book/9783642567353
 
-   constexpr const std::uint32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
+   constexpr std::uint32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
 
-   for (std::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_total_digits10; digits *= 2u)
+   for (std::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_max_digits10; digits *= 2u)
    {
       // Adjust precision of the terms.
       precision((digits + 10) * 2);
@@ -1259,28 +1326,6 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    prec_elem = cpp_dec_float_elem_number;
 
    return *this;
-}
-
-template <unsigned Digits10, class ExponentType, class Allocator>
-int cpp_dec_float<Digits10, ExponentType, Allocator>::cmp_data(const array_type& vd) const
-{
-   // Compare the data of *this with those of v.
-   // Return +1 for *this > v
-   // 0 for *this = v
-   // -1 for *this < v
-
-   const std::pair<typename array_type::const_iterator, typename array_type::const_iterator> mismatch_pair = std::mismatch(data.begin(), data.end(), vd.begin());
-
-   const bool is_equal = ((mismatch_pair.first == data.end()) && (mismatch_pair.second == vd.end()));
-
-   if (is_equal)
-   {
-      return 0;
-   }
-   else
-   {
-      return ((*mismatch_pair.first > *mismatch_pair.second) ? 1 : -1);
-   }
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -1357,7 +1402,7 @@ int cpp_dec_float<Digits10, ExponentType, Allocator>::compare(const cpp_dec_floa
       {
          // The signs are the same and the exponents are the same.
          // Compare the data.
-         const int val_cmp_data = cmp_data(v.data);
+         const int val_cmp_data = compare_ranges(data.cbegin(), v.data.cbegin());
 
          return ((!neg) ? val_cmp_data : -val_cmp_data);
       }
@@ -1373,12 +1418,12 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::isone() const
 
    if (not_negative_and_is_finite)
    {
-      if ((data[0u] == static_cast<std::uint32_t>(1u)) && (exp == static_cast<ExponentType>(0)))
+      if ((data[0u] == static_cast<std::uint32_t>(1u)) && (exp == static_cast<exponent_type>(0)))
       {
          const typename array_type::const_iterator it_non_zero = std::find_if(data.begin(), data.end(), data_elem_is_non_zero_predicate);
          return (it_non_zero == data.end());
       }
-      else if ((data[0u] == static_cast<std::uint32_t>(cpp_dec_float_elem_mask - 1)) && (exp == static_cast<ExponentType>(-cpp_dec_float_elem_digits10)))
+      else if ((data[0u] == static_cast<std::uint32_t>(cpp_dec_float_elem_mask - 1)) && (exp == static_cast<exponent_type>(-cpp_dec_float_elem_digits10)))
       {
          const typename array_type::const_iterator it_non_nine = std::find_if(data.begin(), data.end(), data_elem_is_non_nine_predicate);
          return (it_non_nine == data.end());
@@ -1401,7 +1446,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::isint() const
       return true;
    }
 
-   if (exp < static_cast<ExponentType>(0))
+   if (exp < static_cast<exponent_type>(0))
    {
       return false;
    } // |*this| < 1.
@@ -1570,7 +1615,7 @@ boost::long_long_type cpp_dec_float<Digits10, ExponentType, Allocator>::extract_
    // If (x > maximum of long long) or (x < minimum of long long),
    // then the maximum or minimum of long long is returned accordingly.
 
-   if (exp < static_cast<ExponentType>(0))
+   if (exp < static_cast<exponent_type>(0))
    {
       return static_cast<boost::long_long_type>(0);
    }
@@ -1636,7 +1681,7 @@ boost::ulong_long_type cpp_dec_float<Digits10, ExponentType, Allocator>::extract
       return static_cast<boost::ulong_long_type>(extract_signed_long_long());
    }
 
-   if (exp < static_cast<ExponentType>(0))
+   if (exp < static_cast<exponent_type>(0))
    {
       return static_cast<boost::ulong_long_type>(0u);
    }
@@ -1718,10 +1763,10 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
 
    std::string     str;
    std::intmax_t org_digits(number_of_digits);
-   ExponentType    my_exp = order();
+   exponent_type    my_exp = order();
 
    if (number_of_digits == 0)
-      number_of_digits = cpp_dec_float_total_digits10;
+      number_of_digits = cpp_dec_float_max_digits10;
 
    if (f & std::ios_base::fixed)
    {
@@ -1872,14 +1917,14 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // the code complexity (and perhaps the run-time) of rd_string().
 
       // Get a possible exponent and remove it.
-      exp = static_cast<ExponentType>(0);
+      exp = static_cast<exponent_type>(0);
 
       std::size_t pos;
 
       if (((pos = str.find('e')) != std::string::npos) || ((pos = str.find('E')) != std::string::npos))
       {
          // Remove the exponent part from the string.
-         exp = boost::lexical_cast<ExponentType>(static_cast<const char*>(str.c_str() + (pos + 1u)));
+         exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(str.c_str() + (pos + 1u)));
          str = str.substr(static_cast<std::size_t>(0u), pos);
       }
 
@@ -1981,7 +2026,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
             // Bring one single digit into the mantissa and adjust the exponent accordingly.
             str.erase(str.begin(), it_non_zero);
             str.insert(static_cast<std::string::size_type>(1u), ".");
-            exp -= static_cast<ExponentType>(delta_exp + 1u);
+            exp -= static_cast<exponent_type>(delta_exp + 1u);
          }
       }
       else
@@ -1991,36 +2036,36 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       }
 
       // Shift the decimal point such that the exponent is an even multiple of cpp_dec_float_elem_digits10.
-      std::size_t       n_shift   = static_cast<std::size_t>(0u);
-      const std::size_t n_exp_rem = static_cast<std::size_t>(exp % static_cast<ExponentType>(cpp_dec_float_elem_digits10));
+      std::ptrdiff_t       n_shift   = static_cast<std::ptrdiff_t>(0);
+      const std::ptrdiff_t n_exp_rem = static_cast<std::ptrdiff_t>(exp % static_cast<exponent_type>(cpp_dec_float_elem_digits10));
 
-      if ((exp % static_cast<ExponentType>(cpp_dec_float_elem_digits10)) != static_cast<ExponentType>(0))
+      if((exp % static_cast<exponent_type>(cpp_dec_float_elem_digits10)) != static_cast<exponent_type>(0))
       {
-         n_shift = ((exp < static_cast<ExponentType>(0))
-                        ? static_cast<std::size_t>(n_exp_rem + static_cast<std::size_t>(cpp_dec_float_elem_digits10))
-                        : static_cast<std::size_t>(n_exp_rem));
+         n_shift = ((exp < static_cast<exponent_type>(0))
+                        ? static_cast<std::ptrdiff_t>(n_exp_rem + static_cast<std::ptrdiff_t>(cpp_dec_float_elem_digits10))
+                        : static_cast<std::ptrdiff_t>(n_exp_rem));
       }
 
       // Make sure that there are enough digits for the decimal point shift.
       pos = str.find(static_cast<char>('.'));
 
-      std::size_t pos_plus_one = static_cast<std::size_t>(pos + 1u);
+      std::ptrdiff_t pos_plus_one = static_cast<std::ptrdiff_t>(pos + 1);
 
-      if ((str.length() - pos_plus_one) < n_shift)
+      if ((static_cast<std::ptrdiff_t>(str.length()) - pos_plus_one) < n_shift)
       {
-         const std::size_t sz = static_cast<std::size_t>(n_shift - (str.length() - pos_plus_one));
+         const std::ptrdiff_t sz = static_cast<std::ptrdiff_t>(n_shift - (static_cast<std::ptrdiff_t>(str.length()) - pos_plus_one));
 
-         str.append(std::string(sz, static_cast<char>('0')));
+         str.append(std::string(static_cast<std::string::size_type>(sz), static_cast<char>('0')));
       }
 
       // Do the decimal point shift.
-      if (n_shift != static_cast<std::size_t>(0u))
+      if (n_shift != static_cast<std::ptrdiff_t>(0))
       {
          str.insert(static_cast<std::string::size_type>(pos_plus_one + n_shift), ".");
 
-         str.erase(pos, static_cast<std::string::size_type>(1u));
+         str.erase(pos, static_cast<std::ptrdiff_t>(1));
 
-         exp -= static_cast<ExponentType>(n_shift);
+         exp -= static_cast<exponent_type>(n_shift);
       }
 
       // Cut the size of the mantissa to <= cpp_dec_float_elem_digits10.
@@ -2037,7 +2082,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
          str.erase(pos_plus_one, static_cast<std::size_t>(1u));
 
-         exp += static_cast<ExponentType>(static_cast<ExponentType>(n) * static_cast<ExponentType>(cpp_dec_float_elem_digits10));
+         exp += static_cast<exponent_type>(static_cast<exponent_type>(n) * static_cast<exponent_type>(cpp_dec_float_elem_digits10));
       }
 
       // Pad the decimal part such that its value is an even
@@ -2105,7 +2150,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
             // Check for identity with the minimum value.
             cpp_dec_float<Digits10, ExponentType, Allocator> test = *this;
 
-            test.exp = static_cast<ExponentType>(0);
+            test.exp = static_cast<exponent_type>(0);
 
             if (test.isone())
             {
@@ -2154,7 +2199,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
    const bool b_neg = (mantissa < 0.0);
 
    double       d = ((!b_neg) ? mantissa : -mantissa);
-   ExponentType e = exponent;
+   exponent_type e = exponent;
 
    while (d > 10.0)
    {
@@ -2180,8 +2225,8 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
 
    std::fill(data.begin(), data.end(), static_cast<std::uint32_t>(0u));
 
-   constexpr const std::int32_t digit_ratio = static_cast<std::int32_t>(static_cast<std::int32_t>(std::numeric_limits<double>::digits10) / static_cast<std::int32_t>(cpp_dec_float_elem_digits10));
-   constexpr const std::int32_t digit_loops = static_cast<std::int32_t>(digit_ratio + static_cast<std::int32_t>(2));
+   constexpr std::int32_t digit_ratio = static_cast<std::int32_t>(static_cast<std::int32_t>(std::numeric_limits<double>::digits10) / static_cast<std::int32_t>(cpp_dec_float_elem_digits10));
+   constexpr std::int32_t digit_loops = static_cast<std::int32_t>(digit_ratio + static_cast<std::int32_t>(2));
 
    for (std::int32_t i = static_cast<std::int32_t>(0); i < digit_loops; i++)
    {
@@ -2227,7 +2272,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
    // See https://svn.boost.org/trac/boost/ticket/10924 for an example of why this may go wrong:
    BOOST_ASSERT((boost::math::isfinite)(f));
 
-   constexpr const int shift = std::numeric_limits<int>::digits - 1;
+   constexpr int shift = std::numeric_limits<int>::digits - 1;
 
    while (f)
    {
@@ -2255,7 +2300,7 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::from_unsigned_long_long(c
 {
    std::fill(data.begin(), data.end(), static_cast<std::uint32_t>(0u));
 
-   exp       = static_cast<ExponentType>(0);
+   exp       = static_cast<exponent_type>(0);
    neg       = false;
    fpclass   = cpp_dec_float_finite;
    prec_elem = cpp_dec_float_elem_number;
@@ -2280,7 +2325,7 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::from_unsigned_long_long(c
 
    if (i > static_cast<std::size_t>(1u))
    {
-      exp += static_cast<ExponentType>((i - 1u) * static_cast<std::size_t>(cpp_dec_float_elem_digits10));
+      exp += static_cast<exponent_type>((i - 1u) * static_cast<std::size_t>(cpp_dec_float_elem_digits10));
    }
 
    std::reverse(temp, temp + i);
@@ -2288,32 +2333,138 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::from_unsigned_long_long(c
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_uv(std::uint32_t* const u, const std::uint32_t* const v, const std::int32_t p)
+template <typename InputIteratorTypeLeft, typename InputIteratorTypeRight>
+int cpp_dec_float<Digits10, ExponentType, Allocator>::compare_ranges(InputIteratorTypeLeft  a,
+                                                                     InputIteratorTypeRight b,
+                                                                     const std::uint32_t    count)
 {
-   //
-   // There is a limit on how many limbs this algorithm can handle without dropping digits
-   // due to overflow in the carry, it is:
-   //
-   // FLOOR( (2^64 - 1) / (10^8 * 10^8) ) == 1844
-   //
-   static_assert(cpp_dec_float_elem_number < 1800, "Too many limbs in the data type for the multiplication algorithm - unsupported precision in cpp_dec_float.");
+   using local_iterator_left_type  = InputIteratorTypeLeft;
+   using local_iterator_right_type = InputIteratorTypeRight;
 
-   std::uint64_t carry = static_cast<std::uint64_t>(0u);
+   local_iterator_left_type  begin_a(a);
+   local_iterator_left_type  end_a  (a + count);
+   local_iterator_right_type begin_b(b);
+   local_iterator_right_type end_b  (b + count);
 
-   for (std::int32_t j = static_cast<std::int32_t>(p - 1u); j >= static_cast<std::int32_t>(0); j--)
+   const auto mismatch_pair = std::mismatch(begin_a, end_a, begin_b);
+
+   int n_return;
+
+   if((mismatch_pair.first != end_a) || (mismatch_pair.second != end_b))
    {
-      std::uint64_t sum = carry;
+      const typename std::iterator_traits<InputIteratorTypeLeft>::value_type  left  = *mismatch_pair.first;
+      const typename std::iterator_traits<InputIteratorTypeRight>::value_type right = *mismatch_pair.second;
 
-      for (std::int32_t i = j; i >= static_cast<std::int32_t>(0); i--)
-      {
-         sum += static_cast<std::uint64_t>(u[j - i] * static_cast<std::uint64_t>(v[i]));
-      }
+      n_return = ((left > right) ?  1 : -1);
+   }
+   else
+   {
+      n_return = 0;
+   }
 
-      u[j]  = static_cast<std::uint32_t>(sum % static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
-      carry = static_cast<std::uint64_t>(sum / static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
+   return n_return;
+}
+
+template <unsigned Digits10, class ExponentType, class Allocator>
+std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::eval_add_n(      std::uint32_t* r,
+                                                                           const std::uint32_t* u,
+                                                                           const std::uint32_t* v,
+                                                                           const std::int32_t   count)
+{
+   // Addition algorithm
+   std::uint_fast8_t carry = static_cast<std::uint_fast8_t>(0U);
+
+   for(std::int32_t j = static_cast<std::int32_t>(count - static_cast<std::int32_t>(1)); j >= static_cast<std::int32_t>(0); --j)
+   {
+      const std::uint32_t t = static_cast<std::uint32_t>(static_cast<std::uint32_t>(u[j] + v[j]) + carry);
+
+      carry = ((t >= static_cast<std::uint32_t>(cpp_dec_float_elem_mask)) ? static_cast<std::uint_fast8_t>(1U)
+                                                                   : static_cast<std::uint_fast8_t>(0U));
+
+      r[j]  = static_cast<std::uint32_t>(t - ((carry != 0U) ? static_cast<std::uint32_t>(cpp_dec_float_elem_mask)
+                                                            : static_cast<std::uint32_t>(0U)));
    }
 
    return static_cast<std::uint32_t>(carry);
+}
+
+template <unsigned Digits10, class ExponentType, class Allocator>
+std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::eval_subtract_n(      std::uint32_t* r,
+                                                                                const std::uint32_t* u,
+                                                                                const std::uint32_t* v,
+                                                                                const std::int32_t   count)
+{
+   // Subtraction algorithm
+   std::int_fast8_t borrow = static_cast<std::int_fast8_t>(0);
+
+   for(std::uint32_t j = static_cast<std::uint32_t>(count - static_cast<std::int32_t>(1)); static_cast<std::int32_t>(j) >= static_cast<std::int32_t>(0); --j)
+   {
+      std::int32_t t = static_cast<std::int32_t>(  static_cast<std::int32_t>(u[j])
+                                                 - static_cast<std::int32_t>(v[j])) - borrow;
+
+      // Underflow? Borrow?
+      if(t < 0)
+      {
+         // Yes, underflow and borrow
+         t     += static_cast<std::int32_t>(cpp_dec_float_elem_mask);
+         borrow = static_cast<int_fast8_t>(1);
+      }
+      else
+      {
+         borrow = static_cast<int_fast8_t>(0);
+      }
+
+      r[j] = static_cast<std::uint32_t>(t);
+   }
+
+   return static_cast<std::int32_t>(borrow);
+}
+
+template <unsigned Digits10, class ExponentType, class Allocator>
+void cpp_dec_float<Digits10, ExponentType, Allocator>::eval_multiply_n_by_n_to_2n(      std::uint32_t* r,
+                                                                                  const std::uint32_t* a,
+                                                                                  const std::uint32_t* b,
+                                                                                  const std::uint32_t  count)
+{
+   using local_limb_type = std::uint32_t;
+
+   using local_double_limb_type = std::uint64_t;
+
+   using local_reverse_iterator_type = std::reverse_iterator<local_limb_type*>;
+
+   local_reverse_iterator_type ir(r + (count * 2));
+
+   local_double_limb_type carry = 0U;
+
+   for(std::int32_t j = static_cast<std::int32_t>(count - 1); j >= static_cast<std::int32_t>(1); --j)
+   {
+      local_double_limb_type sum = carry;
+
+      for(std::int32_t i = static_cast<std::int32_t>(count - 1); i >= j; --i)
+      {
+         sum += local_double_limb_type(
+                local_double_limb_type(a[i]) * b[  static_cast<std::int32_t>(count - 1)
+                                                - static_cast<std::int32_t>(i - j)]);
+      }
+
+      carry = static_cast<local_double_limb_type>(sum / static_cast<local_limb_type>       (cpp_dec_float_elem_mask));
+      *ir++ = static_cast<local_limb_type>       (sum - static_cast<local_double_limb_type>(static_cast<local_double_limb_type>(carry) * static_cast<local_limb_type>(cpp_dec_float_elem_mask)));
+   }
+
+   for(std::int32_t j = static_cast<std::int32_t>(count - 1); j >= static_cast<std::int32_t>(0); --j)
+   {
+      local_double_limb_type sum = carry;
+
+      for(std::int32_t i = j; i >= static_cast<std::int32_t>(0); --i)
+      {
+         sum += static_cast<local_double_limb_type>(a[j - i] * static_cast<local_double_limb_type>(b[i]));
+      }
+
+      carry = static_cast<local_double_limb_type>(sum / static_cast<local_limb_type>(cpp_dec_float_elem_mask));
+      *ir++ = static_cast<local_limb_type>       (sum - static_cast<local_double_limb_type>(static_cast<local_double_limb_type>(carry) * static_cast<local_limb_type>(cpp_dec_float_elem_mask)));
+   }
+
+   *ir = static_cast<local_limb_type>(carry);
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -2325,8 +2476,8 @@ std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::mul_loop_n(std::
    for (std::int32_t j = p - 1; j >= static_cast<std::int32_t>(0); j--)
    {
       const std::uint64_t t = static_cast<std::uint64_t>(carry + static_cast<std::uint64_t>(u[j] * static_cast<std::uint64_t>(n)));
-      carry                   = static_cast<std::uint64_t>(t / static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
-      u[j]                    = static_cast<std::uint32_t>(t - static_cast<std::uint64_t>(static_cast<std::uint32_t>(cpp_dec_float_elem_mask) * static_cast<std::uint64_t>(carry)));
+      carry                 = static_cast<std::uint64_t>(t / static_cast<std::uint32_t>(cpp_dec_float_elem_mask));
+      u[j]                  = static_cast<std::uint32_t>(t - static_cast<std::uint64_t>(static_cast<std::uint32_t>(cpp_dec_float_elem_mask) * static_cast<std::uint64_t>(carry)));
    }
 
    return static_cast<std::uint32_t>(carry);
@@ -2348,286 +2499,444 @@ std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::div_loop_n(std::
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(const boost::long_long_type p)
+void cpp_dec_float<Digits10, ExponentType, Allocator>::eval_multiply_kara_propagate_carry(std::uint32_t* t, const std::uint32_t n, const std::uint32_t carry)
 {
-   // Create a static const table of p^2 for -128 < p < +128.
-   // Note: The size of this table must be odd-numbered and
-   // symmetric about 0.
-   static const std::array<cpp_dec_float<Digits10, ExponentType, Allocator>, 255u> p2_data =
-       {{cpp_dec_float("5.877471754111437539843682686111228389093327783860437607543758531392086297273635864257812500000000000e-39"),
-         cpp_dec_float("1.175494350822287507968736537222245677818665556772087521508751706278417259454727172851562500000000000e-38"),
-         cpp_dec_float("2.350988701644575015937473074444491355637331113544175043017503412556834518909454345703125000000000000e-38"),
-         cpp_dec_float("4.701977403289150031874946148888982711274662227088350086035006825113669037818908691406250000000000000e-38"),
-         cpp_dec_float("9.403954806578300063749892297777965422549324454176700172070013650227338075637817382812500000000000000e-38"),
-         cpp_dec_float("1.880790961315660012749978459555593084509864890835340034414002730045467615127563476562500000000000000e-37"),
-         cpp_dec_float("3.761581922631320025499956919111186169019729781670680068828005460090935230255126953125000000000000000e-37"),
-         cpp_dec_float("7.523163845262640050999913838222372338039459563341360137656010920181870460510253906250000000000000000e-37"),
-         cpp_dec_float("1.504632769052528010199982767644474467607891912668272027531202184036374092102050781250000000000000000e-36"),
-         cpp_dec_float("3.009265538105056020399965535288948935215783825336544055062404368072748184204101562500000000000000000e-36"),
-         cpp_dec_float("6.018531076210112040799931070577897870431567650673088110124808736145496368408203125000000000000000000e-36"),
-         cpp_dec_float("1.203706215242022408159986214115579574086313530134617622024961747229099273681640625000000000000000000e-35"),
-         cpp_dec_float("2.407412430484044816319972428231159148172627060269235244049923494458198547363281250000000000000000000e-35"),
-         cpp_dec_float("4.814824860968089632639944856462318296345254120538470488099846988916397094726562500000000000000000000e-35"),
-         cpp_dec_float("9.629649721936179265279889712924636592690508241076940976199693977832794189453125000000000000000000000e-35"),
-         cpp_dec_float("1.925929944387235853055977942584927318538101648215388195239938795566558837890625000000000000000000000e-34"),
-         cpp_dec_float("3.851859888774471706111955885169854637076203296430776390479877591133117675781250000000000000000000000e-34"),
-         cpp_dec_float("7.703719777548943412223911770339709274152406592861552780959755182266235351562500000000000000000000000e-34"),
-         cpp_dec_float("1.540743955509788682444782354067941854830481318572310556191951036453247070312500000000000000000000000e-33"),
-         cpp_dec_float("3.081487911019577364889564708135883709660962637144621112383902072906494140625000000000000000000000000e-33"),
-         cpp_dec_float("6.162975822039154729779129416271767419321925274289242224767804145812988281250000000000000000000000000e-33"),
-         cpp_dec_float("1.232595164407830945955825883254353483864385054857848444953560829162597656250000000000000000000000000e-32"),
-         cpp_dec_float("2.465190328815661891911651766508706967728770109715696889907121658325195312500000000000000000000000000e-32"),
-         cpp_dec_float("4.930380657631323783823303533017413935457540219431393779814243316650390625000000000000000000000000000e-32"),
-         cpp_dec_float("9.860761315262647567646607066034827870915080438862787559628486633300781250000000000000000000000000000e-32"),
-         cpp_dec_float("1.972152263052529513529321413206965574183016087772557511925697326660156250000000000000000000000000000e-31"),
-         cpp_dec_float("3.944304526105059027058642826413931148366032175545115023851394653320312500000000000000000000000000000e-31"),
-         cpp_dec_float("7.888609052210118054117285652827862296732064351090230047702789306640625000000000000000000000000000000e-31"),
-         cpp_dec_float("1.577721810442023610823457130565572459346412870218046009540557861328125000000000000000000000000000000e-30"),
-         cpp_dec_float("3.155443620884047221646914261131144918692825740436092019081115722656250000000000000000000000000000000e-30"),
-         cpp_dec_float("6.310887241768094443293828522262289837385651480872184038162231445312500000000000000000000000000000000e-30"),
-         cpp_dec_float("1.262177448353618888658765704452457967477130296174436807632446289062500000000000000000000000000000000e-29"),
-         cpp_dec_float("2.524354896707237777317531408904915934954260592348873615264892578125000000000000000000000000000000000e-29"),
-         cpp_dec_float("5.048709793414475554635062817809831869908521184697747230529785156250000000000000000000000000000000000e-29"),
-         cpp_dec_float("1.009741958682895110927012563561966373981704236939549446105957031250000000000000000000000000000000000e-28"),
-         cpp_dec_float("2.019483917365790221854025127123932747963408473879098892211914062500000000000000000000000000000000000e-28"),
-         cpp_dec_float("4.038967834731580443708050254247865495926816947758197784423828125000000000000000000000000000000000000e-28"),
-         cpp_dec_float("8.077935669463160887416100508495730991853633895516395568847656250000000000000000000000000000000000000e-28"),
-         cpp_dec_float("1.615587133892632177483220101699146198370726779103279113769531250000000000000000000000000000000000000e-27"),
-         cpp_dec_float("3.231174267785264354966440203398292396741453558206558227539062500000000000000000000000000000000000000e-27"),
-         cpp_dec_float("6.462348535570528709932880406796584793482907116413116455078125000000000000000000000000000000000000000e-27"),
-         cpp_dec_float("1.292469707114105741986576081359316958696581423282623291015625000000000000000000000000000000000000000e-26"),
-         cpp_dec_float("2.584939414228211483973152162718633917393162846565246582031250000000000000000000000000000000000000000e-26"),
-         cpp_dec_float("5.169878828456422967946304325437267834786325693130493164062500000000000000000000000000000000000000000e-26"),
-         cpp_dec_float("1.033975765691284593589260865087453566957265138626098632812500000000000000000000000000000000000000000e-25"),
-         cpp_dec_float("2.067951531382569187178521730174907133914530277252197265625000000000000000000000000000000000000000000e-25"),
-         cpp_dec_float("4.135903062765138374357043460349814267829060554504394531250000000000000000000000000000000000000000000e-25"),
-         cpp_dec_float("8.271806125530276748714086920699628535658121109008789062500000000000000000000000000000000000000000000e-25"),
-         cpp_dec_float("1.654361225106055349742817384139925707131624221801757812500000000000000000000000000000000000000000000e-24"),
-         cpp_dec_float("3.308722450212110699485634768279851414263248443603515625000000000000000000000000000000000000000000000e-24"),
-         cpp_dec_float("6.617444900424221398971269536559702828526496887207031250000000000000000000000000000000000000000000000e-24"),
-         cpp_dec_float("1.323488980084844279794253907311940565705299377441406250000000000000000000000000000000000000000000000e-23"),
-         cpp_dec_float("2.646977960169688559588507814623881131410598754882812500000000000000000000000000000000000000000000000e-23"),
-         cpp_dec_float("5.293955920339377119177015629247762262821197509765625000000000000000000000000000000000000000000000000e-23"),
-         cpp_dec_float("1.058791184067875423835403125849552452564239501953125000000000000000000000000000000000000000000000000e-22"),
-         cpp_dec_float("2.117582368135750847670806251699104905128479003906250000000000000000000000000000000000000000000000000e-22"),
-         cpp_dec_float("4.235164736271501695341612503398209810256958007812500000000000000000000000000000000000000000000000000e-22"),
-         cpp_dec_float("8.470329472543003390683225006796419620513916015625000000000000000000000000000000000000000000000000000e-22"),
-         cpp_dec_float("1.694065894508600678136645001359283924102783203125000000000000000000000000000000000000000000000000000e-21"),
-         cpp_dec_float("3.388131789017201356273290002718567848205566406250000000000000000000000000000000000000000000000000000e-21"),
-         cpp_dec_float("6.776263578034402712546580005437135696411132812500000000000000000000000000000000000000000000000000000e-21"),
-         cpp_dec_float("1.355252715606880542509316001087427139282226562500000000000000000000000000000000000000000000000000000e-20"),
-         cpp_dec_float("2.710505431213761085018632002174854278564453125000000000000000000000000000000000000000000000000000000e-20"),
-         cpp_dec_float("5.421010862427522170037264004349708557128906250000000000000000000000000000000000000000000000000000000e-20"),
-         cpp_dec_float("1.084202172485504434007452800869941711425781250000000000000000000000000000000000000000000000000000000e-19"),
-         cpp_dec_float("2.168404344971008868014905601739883422851562500000000000000000000000000000000000000000000000000000000e-19"),
-         cpp_dec_float("4.336808689942017736029811203479766845703125000000000000000000000000000000000000000000000000000000000e-19"),
-         cpp_dec_float("8.673617379884035472059622406959533691406250000000000000000000000000000000000000000000000000000000000e-19"),
-         cpp_dec_float("1.734723475976807094411924481391906738281250000000000000000000000000000000000000000000000000000000000e-18"),
-         cpp_dec_float("3.469446951953614188823848962783813476562500000000000000000000000000000000000000000000000000000000000e-18"),
-         cpp_dec_float("6.938893903907228377647697925567626953125000000000000000000000000000000000000000000000000000000000000e-18"),
-         cpp_dec_float("1.387778780781445675529539585113525390625000000000000000000000000000000000000000000000000000000000000e-17"),
-         cpp_dec_float("2.775557561562891351059079170227050781250000000000000000000000000000000000000000000000000000000000000e-17"),
-         cpp_dec_float("5.551115123125782702118158340454101562500000000000000000000000000000000000000000000000000000000000000e-17"),
-         cpp_dec_float("1.110223024625156540423631668090820312500000000000000000000000000000000000000000000000000000000000000e-16"),
-         cpp_dec_float("2.220446049250313080847263336181640625000000000000000000000000000000000000000000000000000000000000000e-16"),
-         cpp_dec_float("4.440892098500626161694526672363281250000000000000000000000000000000000000000000000000000000000000000e-16"),
-         cpp_dec_float("8.881784197001252323389053344726562500000000000000000000000000000000000000000000000000000000000000000e-16"),
-         cpp_dec_float("1.776356839400250464677810668945312500000000000000000000000000000000000000000000000000000000000000000e-15"),
-         cpp_dec_float("3.552713678800500929355621337890625000000000000000000000000000000000000000000000000000000000000000000e-15"),
-         cpp_dec_float("7.105427357601001858711242675781250000000000000000000000000000000000000000000000000000000000000000000e-15"),
-         cpp_dec_float("1.421085471520200371742248535156250000000000000000000000000000000000000000000000000000000000000000000e-14"),
-         cpp_dec_float("2.842170943040400743484497070312500000000000000000000000000000000000000000000000000000000000000000000e-14"),
-         cpp_dec_float("5.684341886080801486968994140625000000000000000000000000000000000000000000000000000000000000000000000e-14"),
-         cpp_dec_float("1.136868377216160297393798828125000000000000000000000000000000000000000000000000000000000000000000000e-13"),
-         cpp_dec_float("2.273736754432320594787597656250000000000000000000000000000000000000000000000000000000000000000000000e-13"),
-         cpp_dec_float("4.547473508864641189575195312500000000000000000000000000000000000000000000000000000000000000000000000e-13"),
-         cpp_dec_float("9.094947017729282379150390625000000000000000000000000000000000000000000000000000000000000000000000000e-13"),
-         cpp_dec_float("1.818989403545856475830078125000000000000000000000000000000000000000000000000000000000000000000000000e-12"),
-         cpp_dec_float("3.637978807091712951660156250000000000000000000000000000000000000000000000000000000000000000000000000e-12"),
-         cpp_dec_float("7.275957614183425903320312500000000000000000000000000000000000000000000000000000000000000000000000000e-12"),
-         cpp_dec_float("1.455191522836685180664062500000000000000000000000000000000000000000000000000000000000000000000000000e-11"),
-         cpp_dec_float("2.910383045673370361328125000000000000000000000000000000000000000000000000000000000000000000000000000e-11"),
-         cpp_dec_float("5.820766091346740722656250000000000000000000000000000000000000000000000000000000000000000000000000000e-11"),
-         cpp_dec_float("1.164153218269348144531250000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
-         cpp_dec_float("2.328306436538696289062500000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
-         cpp_dec_float("4.656612873077392578125000000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
-         cpp_dec_float("9.313225746154785156250000000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
-         cpp_dec_float("1.862645149230957031250000000000000000000000000000000000000000000000000000000000000000000000000000000e-9"),
-         cpp_dec_float("3.725290298461914062500000000000000000000000000000000000000000000000000000000000000000000000000000000e-9"),
-         cpp_dec_float("7.450580596923828125000000000000000000000000000000000000000000000000000000000000000000000000000000000e-9"),
-         cpp_dec_float("1.490116119384765625000000000000000000000000000000000000000000000000000000000000000000000000000000000e-8"),
-         cpp_dec_float("2.980232238769531250000000000000000000000000000000000000000000000000000000000000000000000000000000000e-8"),
-         cpp_dec_float("5.960464477539062500000000000000000000000000000000000000000000000000000000000000000000000000000000000e-8"),
-         cpp_dec_float("1.192092895507812500000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
-         cpp_dec_float("2.384185791015625000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
-         cpp_dec_float("4.768371582031250000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
-         cpp_dec_float("9.536743164062500000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
-         cpp_dec_float("1.907348632812500000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-6"),
-         cpp_dec_float("3.814697265625000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-6"),
-         cpp_dec_float("7.629394531250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-6"),
-         cpp_dec_float("0.000015258789062500000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.000030517578125000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.000061035156250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.000122070312500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.000244140625000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.000488281250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.000976562500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.001953125000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.003906250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.007812500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.01562500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.03125000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.06250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_dec_float("0.125"),
-         cpp_dec_float("0.25"),
-         cpp_dec_float("0.5"),
-         one(),
-         two(),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(4)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(8)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(16)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(32)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(64)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(128)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(256)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(512)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(1024)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(2048)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(4096)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(8192)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(16384)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(32768)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(65536)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(131072)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(262144)),
-         cpp_dec_float(static_cast<boost::ulong_long_type>(524288)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 20u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 21u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 22u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 23u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 24u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 25u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 26u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 27u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 28u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 29u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 30u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uL << 31u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 32u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 33u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 34u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 35u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 36u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 37u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 38u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 39u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 40u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 41u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 42u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 43u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 44u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 45u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 46u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 47u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 48u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 49u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 50u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 51u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 52u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 53u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 54u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 55u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 56u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 57u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 58u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 59u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 60u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 61u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 62u)),
-         cpp_dec_float(static_cast<std::uint64_t>(1uLL << 63u)),
-         cpp_dec_float("1.844674407370955161600000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
-         cpp_dec_float("3.689348814741910323200000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
-         cpp_dec_float("7.378697629483820646400000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
-         cpp_dec_float("1.475739525896764129280000000000000000000000000000000000000000000000000000000000000000000000000000000e20"),
-         cpp_dec_float("2.951479051793528258560000000000000000000000000000000000000000000000000000000000000000000000000000000e20"),
-         cpp_dec_float("5.902958103587056517120000000000000000000000000000000000000000000000000000000000000000000000000000000e20"),
-         cpp_dec_float("1.180591620717411303424000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
-         cpp_dec_float("2.361183241434822606848000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
-         cpp_dec_float("4.722366482869645213696000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
-         cpp_dec_float("9.444732965739290427392000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
-         cpp_dec_float("1.888946593147858085478400000000000000000000000000000000000000000000000000000000000000000000000000000e22"),
-         cpp_dec_float("3.777893186295716170956800000000000000000000000000000000000000000000000000000000000000000000000000000e22"),
-         cpp_dec_float("7.555786372591432341913600000000000000000000000000000000000000000000000000000000000000000000000000000e22"),
-         cpp_dec_float("1.511157274518286468382720000000000000000000000000000000000000000000000000000000000000000000000000000e23"),
-         cpp_dec_float("3.022314549036572936765440000000000000000000000000000000000000000000000000000000000000000000000000000e23"),
-         cpp_dec_float("6.044629098073145873530880000000000000000000000000000000000000000000000000000000000000000000000000000e23"),
-         cpp_dec_float("1.208925819614629174706176000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
-         cpp_dec_float("2.417851639229258349412352000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
-         cpp_dec_float("4.835703278458516698824704000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
-         cpp_dec_float("9.671406556917033397649408000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
-         cpp_dec_float("1.934281311383406679529881600000000000000000000000000000000000000000000000000000000000000000000000000e25"),
-         cpp_dec_float("3.868562622766813359059763200000000000000000000000000000000000000000000000000000000000000000000000000e25"),
-         cpp_dec_float("7.737125245533626718119526400000000000000000000000000000000000000000000000000000000000000000000000000e25"),
-         cpp_dec_float("1.547425049106725343623905280000000000000000000000000000000000000000000000000000000000000000000000000e26"),
-         cpp_dec_float("3.094850098213450687247810560000000000000000000000000000000000000000000000000000000000000000000000000e26"),
-         cpp_dec_float("6.189700196426901374495621120000000000000000000000000000000000000000000000000000000000000000000000000e26"),
-         cpp_dec_float("1.237940039285380274899124224000000000000000000000000000000000000000000000000000000000000000000000000e27"),
-         cpp_dec_float("2.475880078570760549798248448000000000000000000000000000000000000000000000000000000000000000000000000e27"),
-         cpp_dec_float("4.951760157141521099596496896000000000000000000000000000000000000000000000000000000000000000000000000e27"),
-         cpp_dec_float("9.903520314283042199192993792000000000000000000000000000000000000000000000000000000000000000000000000e27"),
-         cpp_dec_float("1.980704062856608439838598758400000000000000000000000000000000000000000000000000000000000000000000000e28"),
-         cpp_dec_float("3.961408125713216879677197516800000000000000000000000000000000000000000000000000000000000000000000000e28"),
-         cpp_dec_float("7.922816251426433759354395033600000000000000000000000000000000000000000000000000000000000000000000000e28"),
-         cpp_dec_float("1.584563250285286751870879006720000000000000000000000000000000000000000000000000000000000000000000000e29"),
-         cpp_dec_float("3.169126500570573503741758013440000000000000000000000000000000000000000000000000000000000000000000000e29"),
-         cpp_dec_float("6.338253001141147007483516026880000000000000000000000000000000000000000000000000000000000000000000000e29"),
-         cpp_dec_float("1.267650600228229401496703205376000000000000000000000000000000000000000000000000000000000000000000000e30"),
-         cpp_dec_float("2.535301200456458802993406410752000000000000000000000000000000000000000000000000000000000000000000000e30"),
-         cpp_dec_float("5.070602400912917605986812821504000000000000000000000000000000000000000000000000000000000000000000000e30"),
-         cpp_dec_float("1.014120480182583521197362564300800000000000000000000000000000000000000000000000000000000000000000000e31"),
-         cpp_dec_float("2.028240960365167042394725128601600000000000000000000000000000000000000000000000000000000000000000000e31"),
-         cpp_dec_float("4.056481920730334084789450257203200000000000000000000000000000000000000000000000000000000000000000000e31"),
-         cpp_dec_float("8.112963841460668169578900514406400000000000000000000000000000000000000000000000000000000000000000000e31"),
-         cpp_dec_float("1.622592768292133633915780102881280000000000000000000000000000000000000000000000000000000000000000000e32"),
-         cpp_dec_float("3.245185536584267267831560205762560000000000000000000000000000000000000000000000000000000000000000000e32"),
-         cpp_dec_float("6.490371073168534535663120411525120000000000000000000000000000000000000000000000000000000000000000000e32"),
-         cpp_dec_float("1.298074214633706907132624082305024000000000000000000000000000000000000000000000000000000000000000000e33"),
-         cpp_dec_float("2.596148429267413814265248164610048000000000000000000000000000000000000000000000000000000000000000000e33"),
-         cpp_dec_float("5.192296858534827628530496329220096000000000000000000000000000000000000000000000000000000000000000000e33"),
-         cpp_dec_float("1.038459371706965525706099265844019200000000000000000000000000000000000000000000000000000000000000000e34"),
-         cpp_dec_float("2.076918743413931051412198531688038400000000000000000000000000000000000000000000000000000000000000000e34"),
-         cpp_dec_float("4.153837486827862102824397063376076800000000000000000000000000000000000000000000000000000000000000000e34"),
-         cpp_dec_float("8.307674973655724205648794126752153600000000000000000000000000000000000000000000000000000000000000000e34"),
-         cpp_dec_float("1.661534994731144841129758825350430720000000000000000000000000000000000000000000000000000000000000000e35"),
-         cpp_dec_float("3.323069989462289682259517650700861440000000000000000000000000000000000000000000000000000000000000000e35"),
-         cpp_dec_float("6.646139978924579364519035301401722880000000000000000000000000000000000000000000000000000000000000000e35"),
-         cpp_dec_float("1.329227995784915872903807060280344576000000000000000000000000000000000000000000000000000000000000000e36"),
-         cpp_dec_float("2.658455991569831745807614120560689152000000000000000000000000000000000000000000000000000000000000000e36"),
-         cpp_dec_float("5.316911983139663491615228241121378304000000000000000000000000000000000000000000000000000000000000000e36"),
-         cpp_dec_float("1.063382396627932698323045648224275660800000000000000000000000000000000000000000000000000000000000000e37"),
-         cpp_dec_float("2.126764793255865396646091296448551321600000000000000000000000000000000000000000000000000000000000000e37"),
-         cpp_dec_float("4.253529586511730793292182592897102643200000000000000000000000000000000000000000000000000000000000000e37"),
-         cpp_dec_float("8.507059173023461586584365185794205286400000000000000000000000000000000000000000000000000000000000000e37"),
-         cpp_dec_float("1.701411834604692317316873037158841057280000000000000000000000000000000000000000000000000000000000000e38")}};
+   std::uint_fast8_t carry_out = ((carry != 0U) ? static_cast<std::uint_fast8_t>(1U)
+                                                : static_cast<std::uint_fast8_t>(0U));
 
-   if ((p > static_cast<boost::long_long_type>(-128)) && (p < static_cast<boost::long_long_type>(+128)))
+   using local_reverse_iterator_type = std::reverse_iterator<std::uint32_t*>;
+
+   local_reverse_iterator_type ri_t  (t + n);
+   local_reverse_iterator_type rend_t(t);
+
+   while((carry_out != 0U) && (ri_t != rend_t))
    {
-      return p2_data[static_cast<std::size_t>(p + ((p2_data.size() - 1u) / 2u))];
+      const std::uint64_t tt = *ri_t + carry_out;
+
+      carry_out = ((tt >= static_cast<std::uint32_t>(cpp_dec_float_elem_mask)) ? static_cast<std::uint_fast8_t>(1U)
+                                                                               : static_cast<std::uint_fast8_t>(0U));
+
+      *ri_t++    = static_cast<std::uint32_t>(tt - ((carry_out != 0U) ? static_cast<std::uint32_t>(cpp_dec_float_elem_mask)
+                                                                      : static_cast<std::uint32_t>(0U)));
    }
-   else
+}
+
+template <unsigned Digits10, class ExponentType, class Allocator>
+void cpp_dec_float<Digits10, ExponentType, Allocator>::eval_multiply_kara_propagate_borrow(std::uint32_t* t, const std::uint32_t n, const bool has_borrow)
+{
+   std::int_fast8_t borrow = (has_borrow ? static_cast<std::int_fast8_t>(1)
+                                         : static_cast<std::int_fast8_t>(0));
+
+   using local_reverse_iterator_type = std::reverse_iterator<std::uint32_t*>;
+
+   local_reverse_iterator_type ri_t  (t + n);
+   local_reverse_iterator_type rend_t(t);
+
+   while((borrow != 0U) && (ri_t != rend_t))
    {
-      // Compute and return 2^p.
-      if (p < static_cast<boost::long_long_type>(0))
+      std::int32_t tt = static_cast<std::int32_t>(static_cast<std::int32_t>(*ri_t) - borrow);
+
+      // Underflow? Borrow?
+      if(tt < 0)
       {
-         return pow2(static_cast<boost::long_long_type>(-p)).calculate_inv();
+         // Yes, underflow and borrow
+         tt     += static_cast<std::int32_t>(cpp_dec_float_elem_mask);
+         borrow  = static_cast<int_fast8_t>(1);
       }
       else
       {
-         cpp_dec_float<Digits10, ExponentType, Allocator> t;
-         default_ops::detail::pow_imp(t, two(), p, std::integral_constant<bool, true>());
-         return t;
+         borrow = static_cast<int_fast8_t>(0);
+      }
+
+      *ri_t++ = static_cast<std::uint32_t>(tt);
+   }
+}
+
+template <unsigned Digits10, class ExponentType, class Allocator>
+void cpp_dec_float<Digits10, ExponentType, Allocator>::eval_multiply_kara_n_by_n_to_2n(      std::uint32_t* r,
+                                                                                       const std::uint32_t* a,
+                                                                                       const std::uint32_t* b,
+                                                                                       const std::uint32_t  n,
+                                                                                             std::uint32_t* t)
+{
+   if(n <= 32U)
+   {
+      static_cast<void>(t);
+
+      eval_multiply_n_by_n_to_2n(r, a, b, n);
+   }
+   else
+   {
+      // Based on "Algorithm 1.3 KaratsubaMultiply", Sect. 1.3.2, page 5
+      // of R.P. Brent and P. Zimmermann, "Modern Computer Arithmetic",
+      // Cambridge University Press (2011).
+
+      // The Karatsuba multipliation computes the product of a*b as:
+      // [b^N + b^(N/2)] a1*b1 + [b^(N/2)](a1 - a0)(b0 - b1) + [b^(N/2) + 1] a0*b0
+
+      // Here we visualize a and b in two components 1,0 corresponding
+      // to the high and low order parts, respectively.
+
+      // Step 1
+      // Calculate a1*b1 and store it in the upper-order part of r.
+      // Calculate a0*b0 and store it in the lower-order part of r.
+      // copy r to t0.
+
+      // Step 2
+      // Add a1*b1 (which is t2) to the middle two-quarters of r (which is r1)
+      // Add a0*b0 (which is t0) to the middle two-quarters of r (which is r1)
+
+      // Step 3
+      // Calculate |a1-a0| in t0 and note the sign (i.e., the borrow flag)
+
+      // Step 4
+      // Calculate |b0-b1| in t1 and note the sign (i.e., the borrow flag)
+
+      // Step 5
+      // Call kara mul to calculate |a1-a0|*|b0-b1| in (t2),
+      // while using temporary storage in t4 along the way.
+
+      // Step 6
+      // Check the borrow signs. If a1-a0 and b0-b1 have the same signs,
+      // then add |a1-a0|*|b0-b1| to r1, otherwise subtract it from r1.
+
+      const std::uint_fast32_t  nh = n / 2U;
+
+      const std::uint32_t* a0 = a + nh;
+      const std::uint32_t* a1 = a + 0U;
+
+      const std::uint32_t* b0 = b + nh;
+      const std::uint32_t* b1 = b + 0U;
+
+            std::uint32_t* r0 = r + 0U;
+            std::uint32_t* r1 = r + nh;
+            std::uint32_t* r2 = r + n;
+
+            std::uint32_t* t0 = t + 0U;
+            std::uint32_t* t1 = t + nh;
+            std::uint32_t* t2 = t + n;
+            std::uint32_t* t4 = t + (n + n);
+
+      // Step 1
+      eval_multiply_kara_n_by_n_to_2n(r0, a1, b1, nh, t);
+      eval_multiply_kara_n_by_n_to_2n(r2, a0, b0, nh, t);
+      std::copy(r0, r0 + (2U * n), t0);
+
+      // Step 2
+      std::uint32_t carry;
+      carry = eval_add_n(r1, r1, t0, n);
+      eval_multiply_kara_propagate_carry(r0, nh, carry);
+      carry = eval_add_n(r1, r1, t2, n);
+      eval_multiply_kara_propagate_carry(r0, nh, carry);
+
+      // Step 3
+      const int cmp_result_a1a0 = compare_ranges(a1, a0, nh);
+
+      if(cmp_result_a1a0 == 1)
+         static_cast<void>(eval_subtract_n(t0, a1, a0, nh));
+      else if(cmp_result_a1a0 == -1)
+         static_cast<void>(eval_subtract_n(t0, a0, a1, nh));
+
+      // Step 4
+      const int cmp_result_b0b1 = compare_ranges(b0, b1, nh);
+
+      if(cmp_result_b0b1 == 1)
+         static_cast<void>(eval_subtract_n(t1, b0, b1, nh));
+      else if(cmp_result_b0b1 == -1)
+         static_cast<void>(eval_subtract_n(t1, b1, b0, nh));
+
+      // Step 5
+      eval_multiply_kara_n_by_n_to_2n(t2, t0, t1, nh, t4);
+
+      // Step 6
+      if((cmp_result_a1a0 * cmp_result_b0b1) == 1)
+      {
+         carry = eval_add_n(r1, r1, t2, n);
+
+         eval_multiply_kara_propagate_carry(r0, nh, carry);
+      }
+      else if((cmp_result_a1a0 * cmp_result_b0b1) == -1)
+      {
+         const bool has_borrow = eval_subtract_n(r1, r1, t2, n);
+
+         eval_multiply_kara_propagate_borrow(r0, nh, has_borrow);
       }
    }
+}
+
+template <unsigned Digits10, class ExponentType, class Allocator>
+cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(const boost::long_long_type p)
+{
+   static const std::array<cpp_dec_float<Digits10, ExponentType, Allocator>, 256u> local_pow2_data =
+   {{
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       29u, 38735877u,  5571876u, 99218413u, 43055614u, 19454666u, 38919302u, 18803771u, 87926569u, 60431486u, 36817932u, 12890625u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       58u, 77471754u, 11143753u, 98436826u, 86111228u, 38909332u, 77838604u, 37607543u, 75853139u, 20862972u, 73635864u, 25781250u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      117u, 54943508u, 22287507u, 96873653u, 72222456u, 77818665u, 55677208u, 75215087u, 51706278u, 41725945u, 47271728u, 51562500u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      235u,  9887016u, 44575015u, 93747307u, 44444913u, 55637331u, 11354417u, 50430175u,  3412556u, 83451890u, 94543457u,  3125000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      470u, 19774032u, 89150031u, 87494614u, 88889827u, 11274662u, 22708835u,   860350u,  6825113u, 66903781u, 89086914u,  6250000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      940u, 39548065u, 78300063u, 74989229u, 77779654u, 22549324u, 45417670u,  1720700u, 13650227u, 33807563u, 78173828u, 12500000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     1880u, 79096131u, 56600127u, 49978459u, 55559308u, 45098648u, 90835340u,  3441400u, 27300454u, 67615127u, 56347656u, 25000000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     3761u, 58192263u, 13200254u, 99956919u, 11118616u, 90197297u, 81670680u,  6882800u, 54600909u, 35230255u, 12695312u, 50000000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     7523u, 16384526u, 26400509u, 99913838u, 22237233u, 80394595u, 63341360u, 13765601u,  9201818u, 70460510u, 25390625u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    15046u, 32769052u, 52801019u, 99827676u, 44474467u, 60789191u, 26682720u, 27531202u, 18403637u, 40921020u, 50781250u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    30092u, 65538105u,  5602039u, 99655352u, 88948935u, 21578382u, 53365440u, 55062404u, 36807274u, 81842041u,  1562500u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    60185u, 31076210u, 11204079u, 99310705u, 77897870u, 43156765u,  6730881u, 10124808u, 73614549u, 63684082u,  3125000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   120370u, 62152420u, 22408159u, 98621411u, 55795740u, 86313530u, 13461762u, 20249617u, 47229099u, 27368164u,  6250000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   240741u, 24304840u, 44816319u, 97242823u, 11591481u, 72627060u, 26923524u, 40499234u, 94458198u, 54736328u, 12500000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   481482u, 48609680u, 89632639u, 94485646u, 23182963u, 45254120u, 53847048u, 80998469u, 88916397u,  9472656u, 25000000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   962964u, 97219361u, 79265279u, 88971292u, 46365926u, 90508241u,  7694097u, 61996939u, 77832794u, 18945312u, 50000000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  1925929u, 94438723u, 58530559u, 77942584u, 92731853u, 81016482u, 15388195u, 23993879u, 55665588u, 37890625u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  3851859u, 88877447u, 17061119u, 55885169u, 85463707u, 62032964u, 30776390u, 47987759u, 11331176u, 75781250u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  7703719u, 77754894u, 34122239u, 11770339u, 70927415u, 24065928u, 61552780u, 95975518u, 22662353u, 51562500u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 15407439u, 55509788u, 68244478u, 23540679u, 41854830u, 48131857u, 23105561u, 91951036u, 45324707u,  3125000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 30814879u, 11019577u, 36488956u, 47081358u, 83709660u, 96263714u, 46211123u, 83902072u, 90649414u,  6250000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 61629758u, 22039154u, 72977912u, 94162717u, 67419321u, 92527428u, 92422247u, 67804145u, 81298828u, 12500000u }, -40 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        1u, 23259516u, 44078309u, 45955825u, 88325435u, 34838643u, 85054857u, 84844495u, 35608291u, 62597656u, 25000000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        2u, 46519032u, 88156618u, 91911651u, 76650870u, 69677287u, 70109715u, 69688990u, 71216583u, 25195312u, 50000000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        4u, 93038065u, 76313237u, 83823303u, 53301741u, 39354575u, 40219431u, 39377981u, 42433166u, 50390625u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        9u, 86076131u, 52626475u, 67646607u,  6603482u, 78709150u, 80438862u, 78755962u, 84866333u,   781250u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       19u, 72152263u,  5252951u, 35293214u, 13206965u, 57418301u, 60877725u, 57511925u, 69732666u,  1562500u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       39u, 44304526u, 10505902u, 70586428u, 26413931u, 14836603u, 21755451u, 15023851u, 39465332u,  3125000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       78u, 88609052u, 21011805u, 41172856u, 52827862u, 29673206u, 43510902u, 30047702u, 78930664u,  6250000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      157u, 77218104u, 42023610u, 82345713u,  5655724u, 59346412u, 87021804u, 60095405u, 57861328u, 12500000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      315u, 54436208u, 84047221u, 64691426u, 11311449u, 18692825u, 74043609u, 20190811u, 15722656u, 25000000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      631u,  8872417u, 68094443u, 29382852u, 22622898u, 37385651u, 48087218u, 40381622u, 31445312u, 50000000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     1262u, 17744835u, 36188886u, 58765704u, 45245796u, 74771302u, 96174436u, 80763244u, 62890625u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     2524u, 35489670u, 72377773u, 17531408u, 90491593u, 49542605u, 92348873u, 61526489u, 25781250u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     5048u, 70979341u, 44755546u, 35062817u, 80983186u, 99085211u, 84697747u, 23052978u, 51562500u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    10097u, 41958682u, 89511092u, 70125635u, 61966373u, 98170423u, 69395494u, 46105957u,  3125000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    20194u, 83917365u, 79022185u, 40251271u, 23932747u, 96340847u, 38790988u, 92211914u,  6250000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    40389u, 67834731u, 58044370u, 80502542u, 47865495u, 92681694u, 77581977u, 84423828u, 12500000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    80779u, 35669463u, 16088741u, 61005084u, 95730991u, 85363389u, 55163955u, 68847656u, 25000000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   161558u, 71338926u, 32177483u, 22010169u, 91461983u, 70726779u, 10327911u, 37695312u, 50000000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   323117u, 42677852u, 64354966u, 44020339u, 82923967u, 41453558u, 20655822u, 75390625u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   646234u, 85355705u, 28709932u, 88040679u, 65847934u, 82907116u, 41311645u, 50781250u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  1292469u, 70711410u, 57419865u, 76081359u, 31695869u, 65814232u, 82623291u,  1562500u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  2584939u, 41422821u, 14839731u, 52162718u, 63391739u, 31628465u, 65246582u,  3125000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  5169878u, 82845642u, 29679463u,  4325437u, 26783478u, 63256931u, 30493164u,  6250000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 10339757u, 65691284u, 59358926u,  8650874u, 53566957u, 26513862u, 60986328u, 12500000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 20679515u, 31382569u, 18717852u, 17301749u,  7133914u, 53027725u, 21972656u, 25000000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 41359030u, 62765138u, 37435704u, 34603498u, 14267829u,  6055450u, 43945312u, 50000000u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 82718061u, 25530276u, 74871408u, 69206996u, 28535658u, 12110900u, 87890625u }, -32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        1u, 65436122u, 51060553u, 49742817u, 38413992u, 57071316u, 24221801u, 75781250u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        3u, 30872245u,  2121106u, 99485634u, 76827985u, 14142632u, 48443603u, 51562500u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        6u, 61744490u,  4242213u, 98971269u, 53655970u, 28285264u, 96887207u,  3125000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       13u, 23488980u,  8484427u, 97942539u,  7311940u, 56570529u, 93774414u,  6250000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       26u, 46977960u, 16968855u, 95885078u, 14623881u, 13141059u, 87548828u, 12500000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       52u, 93955920u, 33937711u, 91770156u, 29247762u, 26282119u, 75097656u, 25000000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      105u, 87911840u, 67875423u, 83540312u, 58495524u, 52564239u, 50195312u, 50000000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      211u, 75823681u, 35750847u, 67080625u, 16991049u,  5128479u,   390625u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      423u, 51647362u, 71501695u, 34161250u, 33982098u, 10256958u,   781250u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      847u,  3294725u, 43003390u, 68322500u, 67964196u, 20513916u,  1562500u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     1694u,  6589450u, 86006781u, 36645001u, 35928392u, 41027832u,  3125000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     3388u, 13178901u, 72013562u, 73290002u, 71856784u, 82055664u,  6250000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     6776u, 26357803u, 44027125u, 46580005u, 43713569u, 64111328u, 12500000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    13552u, 52715606u, 88054250u, 93160010u, 87427139u, 28222656u, 25000000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    27105u,  5431213u, 76108501u, 86320021u, 74854278u, 56445312u, 50000000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    54210u, 10862427u, 52217003u, 72640043u, 49708557u, 12890625u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   108420u, 21724855u,  4434007u, 45280086u, 99417114u, 25781250u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   216840u, 43449710u,  8868014u, 90560173u, 98834228u, 51562500u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   433680u, 86899420u, 17736029u, 81120347u, 97668457u,  3125000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   867361u, 73798840u, 35472059u, 62240695u, 95336914u,  6250000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  1734723u, 47597680u, 70944119u, 24481391u, 90673828u, 12500000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  3469446u, 95195361u, 41888238u, 48962783u, 81347656u, 25000000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  6938893u, 90390722u, 83776476u, 97925567u, 62695312u, 50000000u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 13877787u, 80781445u, 67552953u, 95851135u, 25390625u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 27755575u, 61562891u, 35105907u, 91702270u, 50781250u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 55511151u, 23125782u, 70211815u, 83404541u,  1562500u }, -24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        1u, 11022302u, 46251565u, 40423631u, 66809082u,  3125000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        2u, 22044604u, 92503130u, 80847263u, 33618164u,  6250000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        4u, 44089209u, 85006261u, 61694526u, 67236328u, 12500000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        8u, 88178419u, 70012523u, 23389053u, 34472656u, 25000000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       17u, 76356839u, 40025046u, 46778106u, 68945312u, 50000000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       35u, 52713678u, 80050092u, 93556213u, 37890625u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       71u,  5427357u, 60100185u, 87112426u, 75781250u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      142u, 10854715u, 20200371u, 74224853u, 51562500u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      284u, 21709430u, 40400743u, 48449707u,  3125000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      568u, 43418860u, 80801486u, 96899414u,  6250000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     1136u, 86837721u, 61602973u, 93798828u, 12500000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     2273u, 73675443u, 23205947u, 87597656u, 25000000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     4547u, 47350886u, 46411895u, 75195312u, 50000000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     9094u, 94701772u, 92823791u, 50390625u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    18189u, 89403545u, 85647583u,   781250u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    36379u, 78807091u, 71295166u,  1562500u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    72759u, 57614183u, 42590332u,  3125000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   145519u, 15228366u, 85180664u,  6250000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   291038u, 30456733u, 70361328u, 12500000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   582076u, 60913467u, 40722656u, 25000000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  1164153u, 21826934u, 81445312u, 50000000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  2328306u, 43653869u, 62890625u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  4656612u, 87307739u, 25781250u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  9313225u, 74615478u, 51562500u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 18626451u, 49230957u,  3125000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 37252902u, 98461914u,  6250000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 74505805u, 96923828u, 12500000u }, -16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        1u, 49011611u, 93847656u, 25000000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        2u, 98023223u, 87695312u, 50000000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        5u, 96046447u, 75390625u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       11u, 92092895u, 50781250u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       23u, 84185791u,  1562500u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       47u, 68371582u,  3125000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       95u, 36743164u,  6250000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      190u, 73486328u, 12500000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      381u, 46972656u, 25000000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      762u, 93945312u, 50000000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     1525u, 87890625u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     3051u, 75781250u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     6103u, 51562500u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    12207u,  3125000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    24414u,  6250000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    48828u, 12500000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    97656u, 25000000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   195312u, 50000000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   390625u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   781250u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  1562500u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  3125000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  6250000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 12500000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 25000000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 50000000u }, -8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        1u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        2u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        4u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        8u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       16u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       32u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       64u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      128u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      256u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      512u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     1024u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     2048u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     4096u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     8192u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    16384u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    32768u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    65536u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   131072u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   262144u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   524288u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  1048576u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  2097152u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  4194304u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  8388608u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 16777216u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 33554432u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 67108864u },  0 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        1u, 34217728u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        2u, 68435456u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        5u, 36870912u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       10u, 73741824u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       21u, 47483648u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       42u, 94967296u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       85u, 89934592u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      171u, 79869184u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      343u, 59738368u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      687u, 19476736u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     1374u, 38953472u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     2748u, 77906944u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     5497u, 55813888u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    10995u, 11627776u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    21990u, 23255552u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    43980u, 46511104u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    87960u, 93022208u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   175921u, 86044416u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   351843u, 72088832u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   703687u, 44177664u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  1407374u, 88355328u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  2814749u, 76710656u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  5629499u, 53421312u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 11258999u,  6842624u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 22517998u, 13685248u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 45035996u, 27370496u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 90071992u, 54740992u },  8 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        1u, 80143985u,  9481984u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        3u, 60287970u, 18963968u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        7u, 20575940u, 37927936u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       14u, 41151880u, 75855872u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       28u, 82303761u, 51711744u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       57u, 64607523u,  3423488u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      115u, 29215046u,  6846976u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      230u, 58430092u, 13693952u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      461u, 16860184u, 27387904u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      922u, 33720368u, 54775808u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     1844u, 67440737u,  9551616u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     3689u, 34881474u, 19103232u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     7378u, 69762948u, 38206464u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    14757u, 39525896u, 76412928u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    29514u, 79051793u, 52825856u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    59029u, 58103587u,  5651712u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   118059u, 16207174u, 11303424u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   236118u, 32414348u, 22606848u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   472236u, 64828696u, 45213696u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   944473u, 29657392u, 90427392u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  1888946u, 59314785u, 80854784u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  3777893u, 18629571u, 61709568u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  7555786u, 37259143u, 23419136u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 15111572u, 74518286u, 46838272u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 30223145u, 49036572u, 93676544u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 60446290u, 98073145u, 87353088u }, 16 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        1u, 20892581u, 96146291u, 74706176u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        2u, 41785163u, 92292583u, 49412352u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        4u, 83570327u, 84585166u, 98824704u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        9u, 67140655u, 69170333u, 97649408u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       19u, 34281311u, 38340667u, 95298816u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       38u, 68562622u, 76681335u, 90597632u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       77u, 37125245u, 53362671u, 81195264u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      154u, 74250491u,  6725343u, 62390528u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      309u, 48500982u, 13450687u, 24781056u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      618u, 97001964u, 26901374u, 49562112u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     1237u, 94003928u, 53802748u, 99124224u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     2475u, 88007857u,  7605497u, 98248448u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     4951u, 76015714u, 15210995u, 96496896u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     9903u, 52031428u, 30421991u, 92993792u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    19807u,  4062856u, 60843983u, 85987584u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    39614u,  8125713u, 21687967u, 71975168u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    79228u, 16251426u, 43375935u, 43950336u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   158456u, 32502852u, 86751870u, 87900672u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   316912u, 65005705u, 73503741u, 75801344u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   633825u, 30011411u, 47007483u, 51602688u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  1267650u, 60022822u, 94014967u,  3205376u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  2535301u, 20045645u, 88029934u,  6410752u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  5070602u, 40091291u, 76059868u, 12821504u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 10141204u, 80182583u, 52119736u, 25643008u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 20282409u, 60365167u,  4239472u, 51286016u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 40564819u, 20730334u,  8478945u,  2572032u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( { 81129638u, 41460668u, 16957890u,  5144064u }, 24 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        1u, 62259276u, 82921336u, 33915780u, 10288128u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        3u, 24518553u, 65842672u, 67831560u, 20576256u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {        6u, 49037107u, 31685345u, 35663120u, 41152512u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       12u, 98074214u, 63370690u, 71326240u, 82305024u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       25u, 96148429u, 26741381u, 42652481u, 64610048u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {       51u, 92296858u, 53482762u, 85304963u, 29220096u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      103u, 84593717u,  6965525u, 70609926u, 58440192u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      207u, 69187434u, 13931051u, 41219853u, 16880384u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      415u, 38374868u, 27862102u, 82439706u, 33760768u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {      830u, 76749736u, 55724205u, 64879412u, 67521536u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     1661u, 53499473u, 11448411u, 29758825u, 35043072u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     3323u,  6998946u, 22896822u, 59517650u, 70086144u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {     6646u, 13997892u, 45793645u, 19035301u, 40172288u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    13292u, 27995784u, 91587290u, 38070602u, 80344576u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    26584u, 55991569u, 83174580u, 76141205u, 60689152u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {    53169u, 11983139u, 66349161u, 52282411u, 21378304u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   106338u, 23966279u, 32698323u,  4564822u, 42756608u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   212676u, 47932558u, 65396646u,  9129644u, 85513216u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   425352u, 95865117u, 30793292u, 18259289u, 71026432u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {   850705u, 91730234u, 61586584u, 36518579u, 42052864u }, 32 ),
+      cpp_dec_float<Digits10, ExponentType, Allocator>( {  1701411u, 83460469u, 23173168u, 73037158u, 84105728u }, 32 ),
+   }};
+
+   cpp_dec_float<Digits10, ExponentType, Allocator> t;
+
+   if(p < -128L)
+      default_ops::detail::pow_imp(t, cpp_dec_float<Digits10, ExponentType, Allocator>::half(), boost::ulong_long_type(-p), std::integral_constant<bool, false>());
+   else if ((p >= -128L) && (p <= 127L))
+      t = local_pow2_data[std::size_t(p + 128)];
+   else
+      default_ops::detail::pow_imp(t, cpp_dec_float<Digits10, ExponentType, Allocator>::two(), boost::ulong_long_type(p), std::integral_constant<bool, false>());
+
+   return t;
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -2819,7 +3128,7 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 inline ExponentType eval_ilogb(const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
 {
    if (val.iszero())
-      return (std::numeric_limits<ExponentType>::min)();
+      return (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::min)();
    if ((val.isinf)())
       return INT_MAX;
    if ((val.isnan)())
@@ -2835,7 +3144,7 @@ template <unsigned Digits10, class ExponentType, class Allocator, class ArgType>
 inline void eval_scalbn(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val, ArgType e_)
 {
    using default_ops::eval_multiply;
-   const ExponentType                               e = static_cast<ExponentType>(e_);
+   const typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type                               e = static_cast<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>(e_);
    cpp_dec_float<Digits10, ExponentType, Allocator> t(1.0, e);
    eval_multiply(result, val, t);
 }
@@ -2845,7 +3154,7 @@ inline void eval_ldexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
 {
    const boost::long_long_type the_exp = static_cast<boost::long_long_type>(e);
 
-   if ((the_exp > (std::numeric_limits<ExponentType>::max)()) || (the_exp < (std::numeric_limits<ExponentType>::min)()))
+   if ((the_exp > (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)()) || (the_exp < (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::min)()))
       BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Exponent value is out of range.")));
 
    result = x;
@@ -2884,9 +3193,9 @@ inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
    if (result.isneg())
       result.negate();
 
-   ExponentType t = result.order();
+   typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type t = result.order();
    BOOST_MP_USING_ABS
-   if (abs(t) < ((std::numeric_limits<ExponentType>::max)() / 1000))
+   if (abs(t) < ((std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)() / 1000))
    {
       t *= 1000;
       t /= 301;
@@ -2912,13 +3221,13 @@ inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
    if (abs(result.order()) > 5)
    {
       // If our first estimate doesn't get close enough then try recursion until we do:
-      ExponentType                                     e2;
-      cpp_dec_float<Digits10, ExponentType, Allocator> r2;
+      typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type e2;
+      cpp_dec_float<Digits10, ExponentType, Allocator>                         r2;
       eval_frexp(r2, result, &e2);
       // overflow protection:
-      if ((t > 0) && (e2 > 0) && (t > (std::numeric_limits<ExponentType>::max)() - e2))
+      if ((t > 0) && (e2 > 0) && (t > (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)() - e2))
          BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
-      if ((t < 0) && (e2 < 0) && (t < (std::numeric_limits<ExponentType>::min)() - e2))
+      if ((t < 0) && (e2 < 0) && (t < (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::min)() - e2))
          BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
       t += e2;
       result = r2;
@@ -2942,7 +3251,7 @@ inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline typename std::enable_if< !std::is_same<ExponentType, int>::value>::type eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x, int* e)
 {
-   ExponentType t;
+   typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type t;
    eval_frexp(result, x, &t);
    if ((t > (std::numeric_limits<int>::max)()) || (t < (std::numeric_limits<int>::min)()))
       BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is outside the range of an int"));
@@ -3000,29 +3309,29 @@ template <unsigned Digits10, class ExponentType, class Allocator, boost::multipr
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >
 {
  public:
-   static constexpr bool is_specialized                      = true;
-   static constexpr bool is_signed                           = true;
-   static constexpr bool is_integer                          = false;
-   static constexpr bool is_exact                            = false;
-   static constexpr bool is_bounded                          = true;
-   static constexpr bool is_modulo                           = false;
-   static constexpr bool is_iec559                           = false;
-   static constexpr int  digits                              = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
-   static constexpr int  digits10                            = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
-   static constexpr int  max_digits10                        = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_total_digits10;
-   static constexpr ExponentType min_exponent                = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp;   // Type differs from int.
-   static constexpr ExponentType min_exponent10              = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10; // Type differs from int.
-   static constexpr ExponentType max_exponent                = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp;   // Type differs from int.
-   static constexpr ExponentType max_exponent10              = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10; // Type differs from int.
-   static constexpr int          radix                       = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
-   static constexpr std::float_round_style round_style       = std::round_indeterminate;
-   static constexpr bool                   has_infinity      = true;
-   static constexpr bool                   has_quiet_NaN     = true;
-   static constexpr bool                   has_signaling_NaN = false;
-   static constexpr std::float_denorm_style has_denorm       = std::denorm_absent;
-   static constexpr bool                    has_denorm_loss  = false;
-   static constexpr bool                    traps            = false;
-   static constexpr bool                    tinyness_before  = false;
+   static constexpr bool                    is_specialized    = true;
+   static constexpr bool                    is_signed         = true;
+   static constexpr bool                    is_integer        = false;
+   static constexpr bool                    is_exact          = false;
+   static constexpr bool                    is_bounded        = true;
+   static constexpr bool                    is_modulo         = false;
+   static constexpr bool                    is_iec559         = false;
+   static constexpr int                     digits            = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
+   static constexpr int                     digits10          = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
+   static constexpr int                     max_digits10      = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_digits10;
+   static constexpr typename boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type min_exponent                = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp;   // Type differs from int.
+   static constexpr typename boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type min_exponent10              = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10; // Type differs from int.
+   static constexpr typename boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type max_exponent                = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp;   // Type differs from int.
+   static constexpr typename boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type max_exponent10              = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10; // Type differs from int.
+   static constexpr int                     radix             = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
+   static constexpr std::float_round_style  round_style       = std::round_indeterminate;
+   static constexpr bool                    has_infinity      = true;
+   static constexpr bool                    has_quiet_NaN     = true;
+   static constexpr bool                    has_signaling_NaN = false;
+   static constexpr std::float_denorm_style has_denorm        = std::denorm_absent;
+   static constexpr bool                    has_denorm_loss   = false;
+   static constexpr bool                    traps             = false;
+   static constexpr bool                    tinyness_before   = false;
 
    static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates>(min)() { return (boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::min)(); }
    static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates>(max)() { return (boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::max)(); }
@@ -3050,13 +3359,13 @@ constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecisio
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::radix;
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-constexpr ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::min_exponent;
+constexpr typename boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::min_exponent;
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-constexpr ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::min_exponent10;
+constexpr typename boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::min_exponent10;
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-constexpr ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::max_exponent;
+constexpr typename boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::max_exponent;
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-constexpr ExponentType numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::max_exponent10;
+constexpr typename boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::max_exponent10;
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_infinity;
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
@@ -3092,7 +3401,7 @@ struct precision<boost::multiprecision::number<boost::multiprecision::cpp_dec_fl
 {
    // Define a local copy of cpp_dec_float_digits10 because it might differ
    // from the template parameter Digits10 for small or large digit counts.
-   static constexpr const std::int32_t cpp_dec_float_digits10 = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
+   static constexpr std::int32_t cpp_dec_float_digits10 = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
 
    using precision_type = typename Policy::precision_type                           ;
    using digits_2 = digits2<((cpp_dec_float_digits10 + 1LL) * 1000LL) / 301LL>;

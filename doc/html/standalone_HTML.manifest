@@ -15,6 +15,7 @@ boost_multiprecision/tut/floats/gmp_float.html
 boost_multiprecision/tut/floats/mpfr_float.html
 boost_multiprecision/tut/floats/float128.html
 boost_multiprecision/tut/floats/fp_eg.html
+boost_multiprecision/tut/floats/fp_eg/floatbuiltinctor.html
 boost_multiprecision/tut/floats/fp_eg/aos.html
 boost_multiprecision/tut/floats/fp_eg/caveats.html
 boost_multiprecision/tut/floats/fp_eg/jel.html

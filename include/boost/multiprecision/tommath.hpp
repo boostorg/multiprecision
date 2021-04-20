@@ -9,14 +9,15 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
-#include <boost/functional/hash_fwd.hpp>
 #include <tommath.h>
 #include <cctype>
 #include <cmath>
 #include <limits>
 #include <climits>
+#include <cstddef>
 
 namespace boost {
 namespace multiprecision {
@@ -73,7 +74,7 @@ struct tommath_int
          detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
       return *this;
    }
-#if defined(DIGIT_BIT)
+#ifndef mp_get_u64
    // Pick off 32 bit chunks for mp_set_int:
    tommath_int& operator=(boost::ulong_long_type i)
    {
@@ -152,7 +153,7 @@ struct tommath_int
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-#ifdef DIGIT_BIT
+#ifndef mp_get_u32
       detail::check_tommath_result((mp_set_int(&m_data, i)));
 #else
       mp_set_u32(&m_data, i);
@@ -180,7 +181,7 @@ struct tommath_int
 
       if (a == 0)
       {
-#ifdef DIGIT_BIT
+#ifndef mp_get_u32
          detail::check_tommath_result(mp_set_int(&m_data, 0));
 #else
          mp_set_i32(&m_data, 0);
@@ -190,7 +191,7 @@ struct tommath_int
 
       if (a == 1)
       {
-#ifdef DIGIT_BIT
+#ifndef mp_get_u32
          detail::check_tommath_result(mp_set_int(&m_data, 1));
 #else
          mp_set_i32(&m_data, 1);
@@ -203,7 +204,7 @@ struct tommath_int
 
       int         e;
       long double f, term;
-#ifdef DIGIT_BIT
+#ifndef mp_get_u32
       detail::check_tommath_result(mp_set_int(&m_data, 0u));
 #else
       mp_set_i32(&m_data, 0);
@@ -213,7 +214,7 @@ struct tommath_int
 
       f = frexp(a, &e);
 
-#ifdef DIGIT_BIT
+#ifdef MP_DIGIT_BIT
       constexpr const int shift = std::numeric_limits<int>::digits - 1;
       using part_type = int     ;
 #else
@@ -230,7 +231,7 @@ struct tommath_int
          detail::check_tommath_result(mp_mul_2d(&m_data, shift, &m_data));
          if (term > 0)
          {
-#ifdef DIGIT_BIT
+#ifndef mp_get_u64
             detail::check_tommath_result(mp_set_int(&t, static_cast<part_type>(term)));
 #else
             mp_set_i64(&t, static_cast<part_type>(term));
@@ -239,7 +240,7 @@ struct tommath_int
          }
          else
          {
-#ifdef DIGIT_BIT
+#ifndef mp_get_u64
             detail::check_tommath_result(mp_set_int(&t, static_cast<part_type>(-term)));
 #else
             mp_set_i64(&t, static_cast<part_type>(-term));
@@ -294,7 +295,7 @@ struct tommath_int
          if (radix == 8 || radix == 16)
          {
             unsigned shift = radix == 8 ? 3 : 4;
-#ifdef DIGIT_BIT
+#ifndef MP_DIGIT_BIT
             unsigned block_count = DIGIT_BIT / shift;
 #else
             unsigned block_count = MP_DIGIT_BIT / shift;
@@ -383,15 +384,11 @@ struct tommath_int
       //
       if ((base != 10) && m_data.sign)
          BOOST_THROW_EXCEPTION(std::runtime_error("Formatted output in bases 8 or 16 is only available for positive numbers"));
-#ifdef DIGIT_BIT
+      
       int s;
       detail::check_tommath_result(mp_radix_size(const_cast< ::mp_int*>(&m_data), base, &s));
-#else
-      std::size_t s;
-      detail::check_tommath_result(mp_radix_size(const_cast< ::mp_int*>(&m_data), base, &s));
-#endif
       std::unique_ptr<char[]> a(new char[s + 1]);
-#ifdef DIGIT_BIT
+#ifndef mp_to_binary
       detail::check_tommath_result(mp_toradix_n(const_cast< ::mp_int*>(&m_data), a.get(), base, s + 1));
 #else
       std::size_t written;
@@ -459,7 +456,7 @@ struct tommath_int
    ::mp_int m_data;
 };
 
-#ifdef SIGN
+#ifndef mp_isneg
 #define BOOST_MP_TOMMATH_BIT_OP_CHECK(x) \
    if (SIGN(&x.data()))                  \
    BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
@@ -658,7 +655,7 @@ inline bool eval_is_zero(const tommath_int& val)
 }
 inline int eval_get_sign(const tommath_int& val)
 {
-#ifdef SIGN
+#ifndef mp_isneg
    return mp_iszero(&val.data()) ? 0 : SIGN(&val.data()) ? -1 : 1;
 #else
    return mp_iszero(&val.data()) ? 0 : mp_isneg(&val.data()) ? -1 : 1;
@@ -741,7 +738,7 @@ inline unsigned eval_msb(const tommath_int& val)
 template <class Integer>
 inline typename std::enable_if<boost::multiprecision::detail::is_unsigned<Integer>::value, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
 {
-#ifdef DIGIT_BIT
+#ifndef MP_DIGIT_BIT
    constexpr const mp_digit m = (static_cast<mp_digit>(1) << DIGIT_BIT) - 1;
 #else
    constexpr const mp_digit m = (static_cast<mp_digit>(1) << MP_DIGIT_BIT) - 1;
@@ -768,8 +765,8 @@ inline std::size_t hash_value(const tommath_int& val)
    std::size_t result = 0;
    std::size_t len    = val.data().used;
    for (std::size_t i = 0; i < len; ++i)
-      boost::hash_combine(result, val.data().dp[i]);
-   boost::hash_combine(result, val.data().sign);
+      boost::multiprecision::detail::hash_combine(result, val.data().dp[i]);
+   boost::multiprecision::detail::hash_combine(result, val.data().sign);
    return result;
 }
 

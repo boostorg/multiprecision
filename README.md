@@ -1,11 +1,11 @@
 Boost Multiprecision Library
 ============================
 
->ANNOUNCEMENT: Support for C++03 is now deprecated in this library and will be supported in existing features only until March 2021. New features will require at least C++11, as will existing features from next year.
+>ANNOUNCEMENT: Support for C++03 is now removed from this library.  Any attempt to build with a non C++11 conforming compiler is doomed to failure.
 
 |                  |  Master  |   Develop   |
 |------------------|----------|-------------|
-| Drone            |  [![Build Status](https://drone.cpp.al/api/badges/boostorg/multiprecision/status.svg?ref=refs/heads/master)](https://drone.cpp.al/boostorg/multiprecision) | [![Build Status](https://drone.cpp.al/api/badges/boostorg/multiprecision/status.svg)](https:/drone.cpp.al/boostorg/multiprecision) |
+| Drone            |  [![Build Status](https://drone.cpp.al/api/badges/boostorg/multiprecision/status.svg?ref=refs/heads/master)](https://drone.cpp.al/boostorg/multiprecision) | [![Build Status](https://drone.cpp.al/api/badges/boostorg/multiprecision/status.svg)](https://drone.cpp.al/boostorg/multiprecision) |
 | Github Actions | [![Build Status](https://github.com/boostorg/multiprecision/workflows/multiprecision/badge.svg?branch=master)](https://github.com/boostorg/multiprecision/actions) | [![Build Status](https://github.com/boostorg/multiprecision/workflows/multiprecision/badge.svg?branch=develop)](https://github.com/boostorg/multiprecision/actions) |
 
  The Multiprecision Library provides integer, rational, floating-point, complex and interval number types in C++ that have more range and 
@@ -17,8 +17,7 @@ Boost Multiprecision Library
 Multiprecision consists of a generic interface to the mathematics of large numbers as well as a selection of big number back ends, with 
 support for integer, rational and floating-point types. Boost.Multiprecision provides a selection of back ends provided off-the-rack in 
 including interfaces to GMP, MPFR, MPIR, TomMath as well as its own collection of Boost-licensed, header-only back ends for integers, 
-rationals, floats and complex. In addition, user-defined back ends can be created and used with the interface of Multiprecision
-, provided the class implementation adheres to the necessary concepts.
+rationals, floats and complex. In addition, user-defined back ends can be created and used with the interface of Multiprecision, provided the class implementation adheres to the necessary concepts.
 
 Depending upon the number type, precision may be arbitrarily large (limited only by available memory), fixed at compile time 
 (for example 50 or 100 decimal digits), or a variable controlled at run-time by member functions. The types are expression-template-enabled 

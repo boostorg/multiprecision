@@ -28,7 +28,7 @@
 </h3></div></div></div>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">Digits10</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">ExponentType</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">int32_t</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Allocator</span> <span class="special">=</span> <span class="keyword">void</span><span class="special">&gt;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">Digits10</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">ExponentType</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">int32_t</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Allocator</span> <span class="special">=</span> <span class="keyword">void</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">cpp_dec_float</span><span class="special">;</span>
 
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">cpp_dec_float_50</span><span class="special">;</span>
@@ -70,7 +70,8 @@
 </dl>
 </div>
 <p>
-        The type of <code class="computeroutput"><span class="identifier">number_category</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="identifier">Args</span><span class="special">...&gt;</span> <span class="special">&gt;::</span><span class="identifier">type</span></code> is <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">int_</span><span class="special">&lt;</span><span class="identifier">number_kind_floating_point</span><span class="special">&gt;</span></code>.
+        The type of <code class="computeroutput"><span class="identifier">number_category</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="identifier">Args</span><span class="special">...&gt;</span> <span class="special">&gt;::</span><span class="identifier">type</span></code> is <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">integral_constant</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span>
+        <span class="identifier">number_kind_floating_point</span><span class="special">&gt;</span></code>.
       </p>
 <p>
         More information on this type can be found in the <a class="link" href="../tut/floats/cpp_dec_float.html" title="cpp_dec_float">tutorial</a>.

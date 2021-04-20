@@ -8,7 +8,7 @@
   http://www.boost.org/LICENSE_1_0.txt).
 ]
 
-[section:floatbuiltinctor Construction from Built-In Floats]
+[section:floatbuiltinctor Construction from Specific Values Without Precision Loss]
 
 Construction of multiprecision types from built-in floating-point types
 can lead to potentially unexpected, yet correct, results.
@@ -51,7 +51,7 @@ digit precision of built-in 64-bit `double` on this system.
 If the exact value of 11.1 is desired
 (within the wider precision of the multiprecision type),
 then construction from literal string or from a rational
-integral construction/division sequence can be used.
+integral construction/division sequence should be used.
 
    const my_dec_100 f11_str("11.1");
    const my_dec_100 f11_n  (my_dec_100(111) / 10);
