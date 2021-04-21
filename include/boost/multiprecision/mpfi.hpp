@@ -1525,7 +1525,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfi_flo
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
-      static std::atomic_bool has_init = false;
+      static std::atomic_bool has_init{false};
       static std::mutex       mut;
       if (!has_init)
       {
@@ -1553,7 +1553,7 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfi
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
-      static std::atomic_bool has_init = false;
+      static std::atomic_bool has_init{false};
       static std::mutex       mut;
       if (!has_init)
       {
@@ -1581,7 +1581,7 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfi_
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
-      static std::atomic_bool has_init = false;
+      static std::atomic_bool has_init{false};
       static std::mutex       mut;
       if (!has_init)
       {
@@ -1609,7 +1609,7 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       static result_type result;
-      static std::atomic_bool has_init = false;
+      static std::atomic_bool has_init{false};
       static std::mutex       mut;
       if (!has_init)
       {
