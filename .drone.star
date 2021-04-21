@@ -231,14 +231,6 @@ def main(ctx):
   osx_cxx("XCode 8.3, c++14 misc", "clang++", packages="", buildtype="boost", xcode_version="8.3", environment={'TOOLSET': 'clang', 'COMPILER': 'clang++', 'CXXSTD': 'c++14', 'TEST_SUITE': 'misc', }, globalenv=globalenv),
   osx_cxx("XCode 8.3, c++14 compile_fail examples", "clang++", packages="", buildtype="boost", xcode_version="8.3", environment={'TEST_SUITE': 'compile_fail examples', 'TOOLSET': 'clang', 'COMPILER': 'clang++', 'CXXSTD': 'c++14', }, globalenv=globalenv),
   osx_cxx("XCode 8.3, c++14 concepts", "clang++", packages="", buildtype="boost", xcode_version="8.3", environment={'TOOLSET': 'clang', 'COMPILER': 'clang++', 'CXXSTD': 'c++14', 'TEST_SUITE': 'concepts', }, globalenv=globalenv),
-
-  osx_cxx("XCode 7.3, c++14 arithmetic_tests", "clang++", packages="", buildtype="boost", xcode_version="7.3", environment={'TOOLSET': 'clang', 'COMPILER': 'clang++', 'CXXSTD': 'c++14', 'TEST_SUITE': 'arithmetic_tests', }, globalenv=globalenv),
-  osx_cxx("XCode 7.3, c++14 cpp_int_tests", "clang++", packages="", buildtype="boost", xcode_version="7.3", environment={'TOOLSET': 'clang', 'COMPILER': 'clang++', 'CXXSTD': 'c++14', 'TEST_SUITE': 'cpp_int_tests', }, globalenv=globalenv),
-  osx_cxx("XCode 7.3, c++14 functions_and_limits", "clang++", packages="", buildtype="boost", xcode_version="7.3", environment={'TOOLSET': 'clang', 'COMPILER': 'clang++', 'CXXSTD': 'c++14', 'TEST_SUITE': 'functions_and_limits', }, globalenv=globalenv),
-  osx_cxx("XCode 7.3, c++14 conversions performance", "clang++", packages="", buildtype="boost", xcode_version="7.3", environment={'TEST_SUITE': 'conversions performance', 'TOOLSET': 'clang', 'COMPILER': 'clang++', 'CXXSTD': 'c++14', }, globalenv=globalenv),
-  osx_cxx("XCode 7.3, c++14 misc", "clang++", packages="", buildtype="boost", xcode_version="7.3", environment={'TOOLSET': 'clang', 'COMPILER': 'clang++', 'CXXSTD': 'c++14', 'TEST_SUITE': 'misc', }, globalenv=globalenv),
-  osx_cxx("XCode 7.3, c++14 compile_fail examples", "clang++", packages="", buildtype="boost", xcode_version="7.3", environment={'TEST_SUITE': 'compile_fail examples', 'TOOLSET': 'clang', 'COMPILER': 'clang++', 'CXXSTD': 'c++14', }, globalenv=globalenv),
-  osx_cxx("XCode 7.3, c++14 concepts", "clang++", packages="", buildtype="boost", xcode_version="7.3", environment={'TOOLSET': 'clang', 'COMPILER': 'clang++', 'CXXSTD': 'c++14', 'TEST_SUITE': 'concepts', }, globalenv=globalenv),
   ]
 
 # from https://github.com/boostorg/boost-ci

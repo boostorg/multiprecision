@@ -96,7 +96,7 @@ jobs:
           command: |
             cd $BOOST/boost && ./bootstrap.sh && ./b2 headers
       - run:
-          name: Building MPFR Tests
+          name: Building specfun MPFR Tests
           command: |
             cd $BOOST/boost/libs/multiprecision/test && ../../../b2 -j2 address-model=64 architecture=x86 toolset=gcc cxxstd=17 cxxstd-dialect=gnu specfun_mpfr
   specfun_gmp:
@@ -140,7 +140,7 @@ jobs:
           command: |
             cd $BOOST/boost && ./bootstrap.sh && ./b2 headers
       - run:
-          name: Building MPFR Tests
+          name: Building specfun GMP Tests
           command: |
             cd $BOOST/boost/libs/multiprecision/test && ../../../b2 -j2 address-model=64 architecture=x86 toolset=gcc cxxstd=17 cxxstd-dialect=gnu specfun_gmp
   specfun_cpp_dec_float:
@@ -184,7 +184,7 @@ jobs:
           command: |
             cd $BOOST/boost && ./bootstrap.sh && ./b2 headers
       - run:
-          name: Building MPFR Tests
+          name: Building specfun cpp_dec_float Tests
           command: |
             cd $BOOST/boost/libs/multiprecision/test && ../../../b2 -j2 address-model=64 architecture=x86 toolset=gcc cxxstd=17 cxxstd-dialect=gnu specfun_cpp_dec_float
   specfun_cpp_bin_float:
@@ -228,7 +228,7 @@ jobs:
           command: |
             cd $BOOST/boost && ./bootstrap.sh && ./b2 headers
       - run:
-          name: Building MPFR Tests
+          name: Building specfun cpp_bin_float Tests
           command: |
             cd $BOOST/boost/libs/multiprecision/test && ../../../b2 -j2 address-model=64 architecture=x86 toolset=gcc cxxstd=17 cxxstd-dialect=gnu specfun_cpp_bin_float
   specfun_float128:
@@ -272,7 +272,7 @@ jobs:
           command: |
             cd $BOOST/boost && ./bootstrap.sh && ./b2 headers
       - run:
-          name: Building MPFR Tests
+          name: Building specfun float128 Tests
           command: |
             cd $BOOST/boost/libs/multiprecision/test && ../../../b2 -j2 address-model=64 architecture=x86 toolset=gcc cxxstd=17 cxxstd-dialect=gnu specfun_float128
 workflows:

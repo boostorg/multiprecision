@@ -427,6 +427,20 @@ test-suite functions_and_limits :
       [ run test_cos_near_half_pi.cpp mpfr gmp : : : <define>TEST_MPFR_50 release [ check-target-builds ../config//has_mpfr : : <build>no ] : test_cos_near_half_pi_mpfr_50 ]
       [ run test_cos_near_half_pi.cpp mpfr gmp quadmath : : : <define>TEST_FLOAT128 release [ check-target-builds ../config//has_mpfr : : <build>no ] [ check-target-builds ../config//has_float128 : : <build>no ] : test_cos_near_half_pi_float128 ]
 
+      [ run test_roots_10k_digits.cpp
+              : # command line
+              : # input files
+              : # requirements
+              <define>TEST_CPP_DEC_FLOAT
+              : test_roots_10k_digits_cpp_dec_float ]
+
+      [ run test_roots_10k_digits.cpp
+              : # command line
+              : # input files
+              : # requirements
+              <define>TEST_CPP_BIN_FLOAT
+              : test_roots_10k_digits_cpp_bin_float ]
+
       [ get_function_tests ]
 ;
 
@@ -1046,6 +1060,7 @@ test-suite misc :
       [ run git_issue_248.cpp ]
       [ run git_issue_265.cpp : : : [ check-target-builds ../config//has_mpfr : <source>gmp <source>mpfr : <build>no ] ]
       [ run git_issue_277.cpp ]
+      [ run git_issue_313.cpp ]
       [ compile git_issue_98.cpp : 
          [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]

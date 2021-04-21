@@ -8,8 +8,6 @@
 
 #include <boost/config.hpp>
 #include <cstdint>
-#include <boost/assert.hpp>
-#include <boost/throw_exception.hpp>
 #include <boost/multiprecision/detail/precision.hpp>
 #include <boost/multiprecision/detail/generic_interconvert.hpp>
 #include <boost/multiprecision/detail/number_compare.hpp>
