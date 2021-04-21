@@ -192,12 +192,12 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_complex_adaptor_2.cpp : : : <toolset>msvc:<cxxflags>-bigobj ]
    [ run test_arithmetic_complex128.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 
-   [ run test_preserve_source_precision.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] <define>TEST_MPF_50 : test_preserve_source_precision_gmp ]
-   [ run test_preserve_source_precision.cpp gmp mpfr : : : [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPFR_50  : test_preserve_source_precision_mpfr ]
+   [ run test_preserve_source_precision.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] <define>TEST_MPF : test_preserve_source_precision_gmp ]
+   [ run test_preserve_source_precision.cpp gmp mpfr : : : [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPFR  : test_preserve_source_precision_mpfr ]
    [ run test_preserve_source_precision.cpp gmp mpfr mpc : : : [ check-target-builds ../config//has_mpc : : <build>no ] <define>TEST_MPC : test_preserve_source_precision_mpc ]
    [ run test_preserve_source_precision.cpp gmp mpfr mpfi : : : [ check-target-builds ../config//has_mpfi : : <build>no ] <define>TEST_MPFI : test_preserve_source_precision_mpfi ]
-   [ run test_preserve_target_precision.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] <define>TEST_MPF_50 : test_preserve_target_precision_gmp ]
-   [ run test_preserve_target_precision.cpp gmp mpfr : : : [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPFR_50 : test_preserve_target_precision_mpfr ]
+   [ run test_preserve_target_precision.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] <define>TEST_MPF : test_preserve_target_precision_gmp ]
+   [ run test_preserve_target_precision.cpp gmp mpfr : : : [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPFR : test_preserve_target_precision_mpfr ]
    [ run test_preserve_target_precision.cpp gmp mpfr mpc : : : [ check-target-builds ../config//has_mpc : : <build>no ] <define>TEST_MPC : test_preserve_target_precision_mpc ]
    [ run test_preserve_target_precision.cpp gmp mpfr mpfi : : : [ check-target-builds ../config//has_mpfi : : <build>no ] <define>TEST_MPFI : test_preserve_target_precision_mpfi ]
 

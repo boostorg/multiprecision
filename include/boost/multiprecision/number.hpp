@@ -234,6 +234,18 @@ class number
       do_assign(e, tag_type());
       return *this;
    }
+   BOOST_MP_CXX14_CONSTEXPR number& assign(const value_type& a, const value_type& b)
+   {
+      assign_components(backend(), a.backend(), b.backend());
+      return *this;
+   }
+   BOOST_MP_CXX14_CONSTEXPR number& assign(const value_type& a, const value_type& b, unsigned Digits)
+   {
+      this->precision(Digits);
+      boost::multiprecision::detail::scoped_target_precision<self_type> scoped;
+      assign_components(backend(), a.backend(), b.backend());
+      return *this;
+   }
 
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number& operator=(const number& e)
        noexcept(noexcept(std::declval<Backend&>() = std::declval<Backend const&>()))
@@ -262,6 +274,7 @@ class number
        noexcept(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
    {
       number t(v, digits10);
+      boost::multiprecision::detail::scoped_source_precision<self_type> scope;
       return *this = t;
    }
    template <class Other, expression_template_option ET>

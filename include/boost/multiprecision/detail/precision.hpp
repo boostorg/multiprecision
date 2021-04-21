@@ -211,6 +211,20 @@ struct scoped_target_precision
    }
 };
 
+template <class T>
+struct scoped_source_precision
+{
+   variable_precision_options opts;
+   scoped_source_precision() : opts(T::thread_default_variable_precision_options())
+   {
+      T::thread_default_variable_precision_options(variable_precision_options::preserve_source_precision, variable_precision_options::precision_group);
+   }
+   ~scoped_source_precision()
+   {
+      T::thread_default_variable_precision_options(opts);
+   }
+};
+
 }
 }
 } // namespace boost::multiprecision::detail

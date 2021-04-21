@@ -16,9 +16,9 @@
 #include <boost/math/quadrature/tanh_sinh.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI) && !defined(TEST_MPC)
-#define TEST_MPF_50
-#define TEST_MPFR_50
+#if !defined(TEST_MPF) && !defined(TEST_MPFR) && !defined(TEST_MPFI) && !defined(TEST_MPC)
+#define TEST_MPF
+#define TEST_MPFR
 #define TEST_MPFI
 #define TEST_MPC
 
@@ -31,10 +31,10 @@
 
 #endif
 
-#if defined(TEST_MPFR_50)
+#if defined(TEST_MPFR)
 #include <boost/multiprecision/mpfr.hpp>
 #endif
-#if defined(TEST_MPF_50)
+#if defined(TEST_MPF)
 #include <boost/multiprecision/gmp.hpp>
 #endif
 #if defined(TEST_MPFI)
@@ -172,16 +172,41 @@ void test()
          aa = new_value<T>();
          BOOST_CHECK_EQUAL(aa.precision(), 35);
       }
+      aa.assign(cp1);
+      BOOST_CHECK_EQUAL(aa.precision(), 100);
+      aa = new_value<T>();
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa.assign(cp1, cp2);
+      BOOST_CHECK_EQUAL(aa.precision(), 100);
+      aa = new_value<T>();
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa.assign(cp1, cp2, 20);
+      BOOST_CHECK_EQUAL(aa.precision(), 20);
+      aa = new_value<T>();
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+   }
+   else
+   {
+      T aa(hp4, 20);
+      BOOST_CHECK_EQUAL(aa.precision(), 20);
+      aa = new_value<T>();
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa.assign(hp4);
+      BOOST_CHECK_EQUAL(aa.precision(), 100);
+      aa = new_value<T>();
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa.assign(hp4, 20);
+      BOOST_CHECK_EQUAL(aa.precision(), 20);
    }
 }
 
 int main()
 {
-#ifdef TEST_MPF_50
+#ifdef TEST_MPF
    test<boost::multiprecision::mpf_float>();
    test<boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boost::multiprecision::et_off>>();
 #endif
-#ifdef TEST_MPFR_50
+#ifdef TEST_MPFR
    test<boost::multiprecision::mpfr_float>();
    test<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> >();
 #endif
