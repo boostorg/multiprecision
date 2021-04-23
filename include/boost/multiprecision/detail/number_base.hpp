@@ -180,10 +180,10 @@ enum struct variable_precision_options : unsigned char
 
    precision_group = 1,
 
-   ignore_alian_types = 0,
-   use_alian_types = 2,
+   ignore_alien_types = 0,
+   use_alien_types = 2,
 
-   alian_types_group = 2,
+   alien_types_group = 2,
    all_options = 0xff,
 };
 

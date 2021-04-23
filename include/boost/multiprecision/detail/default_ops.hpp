@@ -878,6 +878,31 @@ inline BOOST_MP_CXX14_CONSTEXPR int eval_get_sign(const T& val)
 }
 
 template <class T, class V, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& v1, const U& v2, const std::false_type&, const std::false_type&)
+{
+   using component_number_type = typename component_type<number<T> >::type;
+
+   component_number_type x(v1), y(v2);
+   assign_components(result, x.backend(), y.backend());
+}
+template <class T, class V, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& v1, const U& v2, const std::true_type&, const std::false_type&)
+{
+   assign_components_imp2(result, number<V>(v1), v2, std::false_type(), std::false_type());
+}
+template <class T, class V, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& v1, const U& v2, const std::true_type&, const std::true_type&)
+{
+   assign_components_imp2(result, number<V>(v1), number<U>(v2), std::false_type(), std::false_type());
+}
+template <class T, class V, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& v1, const U& v2, const std::false_type&, const std::true_type&)
+{
+   assign_components_imp2(result, v1, number<U>(v2), std::false_type(), std::false_type());
+}
+
+
+template <class T, class V, class U>
 inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v1, const U& v2, const std::integral_constant<int, number_kind_rational>&)
 {
    result = v1;
@@ -889,10 +914,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v
 template <class T, class V, class U, int N>
 inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v1, const U& v2, const std::integral_constant<int, N>&)
 {
-   using component_number_type = typename component_type<number<T> >::type;
-
-   component_number_type x(v1), y(v2);
-   assign_components(result, x.backend(), y.backend());
+   assign_components_imp2(result, v1, v2, boost::multiprecision::detail::is_backend<V>(), boost::multiprecision::detail::is_backend<U>());
 }
 
 template <class T, class V, class U>

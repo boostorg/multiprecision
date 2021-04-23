@@ -39,10 +39,7 @@ struct has_float_types
 };
 
 template <class T>
-struct is_backend
-{
-   static constexpr const bool value = has_signed_types<T>::value && has_unsigned_types<T>::value && has_float_types<T>::value;
-};
+struct is_backend : public std::integral_constant<bool, has_signed_types<T>::value && has_unsigned_types<T>::value && has_float_types<T>::value> {};
 
 template <class Backend>
 struct other_backend
@@ -62,15 +59,10 @@ struct number_from_backend
 };
 
 template <bool b, class T, class U>
-struct is_first_backend_imp
-{
-   static constexpr const bool value = false;
-};
+struct is_first_backend_imp : public std::false_type {};
+
 template <class T, class U>
-struct is_first_backend_imp<true, T, U>
-{
-   static constexpr const bool value = std::is_convertible<U, number<T, et_on> >::value || std::is_convertible<U, number<T, et_off> >::value;
-};
+    struct is_first_backend_imp<true, T, U> : public std::integral_constant < bool, std::is_convertible<U, number<T, et_on> >::value || std::is_convertible<U, number<T, et_off> >::value> {};
 
 template <class T, class U>
 struct is_first_backend : is_first_backend_imp<is_backend<T>::value, T, U>

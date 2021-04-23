@@ -346,7 +346,7 @@ struct mpc_complex_imp
    }
    static std::atomic<variable_precision_options>& get_global_default_options() noexcept
    {
-      static std::atomic<variable_precision_options> val{variable_precision_options::preserve_source_precision | variable_precision_options::ignore_alian_types};
+      static std::atomic<variable_precision_options> val{variable_precision_options::preserve_source_precision | variable_precision_options::ignore_alien_types};
       return val;
    }
    static variable_precision_options& get_default_options() noexcept
@@ -600,14 +600,14 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
       return *this;
    }
    template <unsigned digits10>
-   mpc_complex_backend(gmp_float<digits10> const& val) : detail::mpc_complex_imp<0>((unsigned)mpf_get_prec(val.data()))
+   mpc_complex_backend(gmp_float<digits10> const& val) : detail::mpc_complex_imp<0>(preserve_source_precision() ? (unsigned)mpf_get_prec(val.data()) : multiprecision::detail::digits10_2_2(get_default_precision()))
    {
       mpc_set_f(this->m_data, val.data(), GMP_RNDN);
    }
    template <unsigned digits10>
    mpc_complex_backend& operator=(gmp_float<digits10> const& val)
    {
-      if (mpc_get_prec(data()) != (mpfr_prec_t)mpf_get_prec(val.data()))
+      if (preserve_source_precision() && (mpc_get_prec(data()) != (mpfr_prec_t)mpf_get_prec(val.data())))
       {
          mpc_complex_backend t(val);
          t.swap(*this);

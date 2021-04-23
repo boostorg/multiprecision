@@ -589,6 +589,33 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
 
    generic_interconvert_complex_to_scalar(to, from, std::integral_constant<bool, std::is_same<component_backend, To>::value>(), std::integral_constant<bool, std::is_constructible<To, const component_backend&>::value>());
 }
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_complex>& /*to_type*/, const std::integral_constant<int, number_kind_integer>& /*from_type*/)
+{
+   using component_number = typename component_type<number<To> >::type;
+   number<From> f(from);
+   component_number scalar(f);
+   number<To> result(scalar);
+   to = result.backend();
+}
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_complex>& /*to_type*/, const std::integral_constant<int, number_kind_rational>& /*from_type*/)
+{
+   using component_number = typename component_type<number<To> >::type;
+   number<From> f(from);
+   component_number scalar(f);
+   number<To> result(scalar);
+   to = result.backend();
+}
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_complex>& /*to_type*/, const std::integral_constant<int, number_kind_floating_point>& /*from_type*/)
+{
+   using component_number = typename component_type<number<To> >::type;
+   number<From> f(from);
+   component_number scalar(f);
+   number<To> result(scalar);
+   to = result.backend();
+}
 
 }
 }

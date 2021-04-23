@@ -31,11 +31,13 @@
 
 #endif
 
+#include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
 #if defined(TEST_MPFR)
 #include <boost/multiprecision/mpfr.hpp>
-#endif
-#if defined(TEST_MPF)
-#include <boost/multiprecision/gmp.hpp>
 #endif
 #if defined(TEST_MPFI)
 #include <boost/multiprecision/mpfi.hpp>
@@ -44,6 +46,113 @@
 #include <boost/multiprecision/mpc.hpp>
 #endif
 
+template <class T>
+T new_value()
+{
+   return T("0.1");
+}
+
+template <class T>
+struct et_option;
+
+template <class B, boost::multiprecision::expression_template_option et>
+struct et_option<boost::multiprecision::number<B, et>>
+{
+   static constexpr boost::multiprecision::expression_template_option value = et;
+};
+
+template <class Other>
+Other make_other_big_value()
+{
+   if constexpr (std::numeric_limits<Other>::is_integer && !std::numeric_limits<Other>::is_bounded)
+      return (Other(1) << 1000) + 1;
+   else if constexpr (!std::numeric_limits<Other>::is_integer && std::numeric_limits<Other>::is_exact && (std::numeric_limits<Other>::max_exponent == std::numeric_limits<Other>::min_exponent))
+   {
+      using value_type = typename Other::value_type;
+      return Other(1) / ((value_type(1) << 1000) + 1);
+   }
+   else
+      return (std::numeric_limits<Other>::max)();
+}
+
+template <class T, class Other>
+void test_mixed()
+{
+   T::thread_default_precision(10);
+   T::thread_default_variable_precision_options(boost::multiprecision::variable_precision_options::ignore_alien_types, boost::multiprecision::variable_precision_options::alien_types_group);
+   Other big_a(make_other_big_value<Other>()), big_b(make_other_big_value<Other>()), big_c(make_other_big_value<Other>()), big_d(make_other_big_value<Other>());
+
+   T a(big_a);
+   BOOST_CHECK_EQUAL(a.precision(), 10);
+   T b(std::move(big_d));
+   BOOST_CHECK_EQUAL(a.precision(), 10);
+   if constexpr (std::is_assignable_v<T, Other>)
+   {
+      a = big_b;
+      BOOST_CHECK_EQUAL(a.precision(), 10);
+      b = std::move(big_c);
+      BOOST_CHECK_EQUAL(a.precision(), 10);
+
+      if constexpr (!std::is_assignable_v<Other, T>)
+      {
+         a = b + big_a;
+         BOOST_CHECK_EQUAL(a.precision(), 10);
+         a = b * big_a;
+         BOOST_CHECK_EQUAL(a.precision(), 10);
+         a = b - big_a;
+         BOOST_CHECK_EQUAL(a.precision(), 10);
+         a = b / big_a;
+         BOOST_CHECK_EQUAL(a.precision(), 10);
+         a += big_a;
+         BOOST_CHECK_EQUAL(a.precision(), 10);
+         a -= big_a;
+         BOOST_CHECK_EQUAL(a.precision(), 10);
+         a *= big_a;
+         BOOST_CHECK_EQUAL(a.precision(), 10);
+         a /= big_a;
+         BOOST_CHECK_EQUAL(a.precision(), 10);
+      }
+   }
+   if constexpr (!std::is_same_v<T, typename T::value_type>)
+   {
+      T cc(big_a, big_b);
+      BOOST_CHECK_EQUAL(cc.precision(), 10);
+      T dd(big_a, big_b, 55);
+      BOOST_CHECK_EQUAL(dd.precision(), 55);
+      T aa = new_value<T>();
+      BOOST_CHECK_EQUAL(aa.precision(), 10);
+      aa.assign(big_a);
+      BOOST_CHECK_EQUAL(aa.precision(), 10);
+      aa.assign(big_a, big_b);
+      BOOST_CHECK_EQUAL(aa.precision(), 10);
+      if constexpr (0 && std::is_constructible_v<T, Other, Other, int>)
+      {
+         aa.assign(big_a, big_b, 55);
+         BOOST_CHECK_EQUAL(aa.precision(), 55);
+      }
+   }
+   else
+   {
+      if constexpr (std::is_constructible_v<T, Other, int>)
+      {
+         T aa(big_a, 55);
+         BOOST_CHECK_EQUAL(aa.precision(), 55);
+         aa.precision(10);
+         BOOST_CHECK_EQUAL(aa.precision(), 10);
+         aa.assign(big_a);
+         BOOST_CHECK_EQUAL(aa.precision(), 10);
+         aa.assign(big_a, 55);
+         BOOST_CHECK_EQUAL(aa.precision(), 55);
+      }
+      else
+      {
+         T aa;
+         BOOST_CHECK_EQUAL(aa.precision(), 10);
+         aa.assign(big_a);
+         BOOST_CHECK_EQUAL(aa.precision(), 10);
+      }
+   }
+}
 
 template <class T>
 void test()
@@ -140,6 +249,34 @@ void test()
       aa.assign(hp4, 20);
       BOOST_CHECK_EQUAL(aa.precision(), 20);
    }
+
+   test_mixed<T, char>();
+   test_mixed<T, unsigned char>();
+   test_mixed<T, signed char>();
+   test_mixed<T, short>();
+   test_mixed<T, unsigned short>();
+   test_mixed<T, int>();
+   test_mixed<T, unsigned int>();
+   test_mixed<T, long>();
+   test_mixed<T, unsigned long>();
+   test_mixed<T, long long>();
+   test_mixed<T, unsigned long long>();
+   test_mixed<T, float>();
+   test_mixed<T, double>();
+   test_mixed<T, long double>();
+   //
+   // Test with other compatible multiprecision types:
+   //
+   test_mixed<T, boost::multiprecision::mpz_int>();
+   test_mixed<T, boost::multiprecision::cpp_int>();
+   test_mixed<T, boost::multiprecision::mpq_rational>();
+   test_mixed<T, boost::multiprecision::cpp_rational>();
+   test_mixed<T, boost::multiprecision::cpp_bin_float_100>();
+   test_mixed<T, boost::multiprecision::cpp_dec_float_100>();
+   test_mixed<T, boost::multiprecision::number<boost::multiprecision::gmp_float<100>, et_option<T>::value>>();
+#if defined(TEST_MPFR) || defined(TEST_MPC) || defined(TEST_MPFI)
+   test_mixed<T, boost::multiprecision::mpfr_float_100>();
+#endif
 }
 
 int main()

@@ -50,6 +50,73 @@ T new_value()
    return T("0.1");
 }
 
+template <class Other>
+Other make_other_big_value()
+{
+   return (std::numeric_limits<Other>::max)();
+}
+
+template <class T, class Other>
+void test_mixed()
+{
+   T::thread_default_precision(35);
+   T::thread_default_variable_precision_options(boost::multiprecision::variable_precision_options::ignore_alien_types, boost::multiprecision::variable_precision_options::alien_types_group);
+   Other big_a(make_other_big_value<Other>()), big_b(make_other_big_value<Other>()), big_c(make_other_big_value<Other>()), big_d(make_other_big_value<Other>());
+
+   T a(big_a);
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+   a = big_b;
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+   T b(std::move(big_d));
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+   b = std::move(big_c);
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+
+   a = b + big_a;
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+   a = b * big_a;
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+   a = b - big_a;
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+   a = b / big_a;
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+   a += big_a;
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+   a -= big_a;
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+   a *= big_a;
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+   a /= big_a;
+   BOOST_CHECK_EQUAL(a.precision(), 35);
+
+   if constexpr (!std::is_same_v<T, typename T::value_type>)
+   {
+      T cc(big_a, big_b);
+      BOOST_CHECK_EQUAL(cc.precision(), 35);
+      T dd(big_a, big_b, 55);
+      BOOST_CHECK_EQUAL(dd.precision(), 55);
+      T aa = new_value<T>();
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa.assign(big_a);
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa.assign(big_a, big_b);
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa.assign(big_a, big_b, 55);
+      BOOST_CHECK_EQUAL(aa.precision(), 55);
+   }
+   else
+   {
+      T aa(big_a, 55);
+      BOOST_CHECK_EQUAL(aa.precision(), 55);
+      aa = new_value<T>();
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa.assign(big_a);
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
+      aa.assign(big_a, 55);
+      BOOST_CHECK_EQUAL(aa.precision(), 55);
+   }
+}
+
 
 template <class T>
 void test()
@@ -198,6 +265,21 @@ void test()
       aa.assign(hp4, 20);
       BOOST_CHECK_EQUAL(aa.precision(), 20);
    }
+
+   test_mixed<T, char>();
+   test_mixed<T, unsigned char>();
+   test_mixed<T, signed char>();
+   test_mixed<T, short>();
+   test_mixed<T, unsigned short>();
+   test_mixed<T, int>();
+   test_mixed<T, unsigned int>();
+   test_mixed<T, long>();
+   test_mixed<T, unsigned long>();
+   test_mixed<T, long long>();
+   test_mixed<T, unsigned long long>();
+   test_mixed<T, float>();
+   test_mixed<T, double>();
+   test_mixed<T, long double>();
 }
 
 int main()

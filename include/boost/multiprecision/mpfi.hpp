@@ -364,7 +364,7 @@ struct mpfi_float_imp
    }
    static std::atomic<variable_precision_options>& get_global_default_options() noexcept
    {
-      static std::atomic<variable_precision_options> val{variable_precision_options::preserve_source_precision | variable_precision_options::ignore_alian_types};
+      static std::atomic<variable_precision_options> val{variable_precision_options::preserve_source_precision | variable_precision_options::ignore_alien_types};
       return val;
    }
    static variable_precision_options& get_default_options() noexcept
