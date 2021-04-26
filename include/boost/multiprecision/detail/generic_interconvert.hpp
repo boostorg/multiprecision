@@ -593,7 +593,13 @@ template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_complex>& /*to_type*/, const std::integral_constant<int, number_kind_integer>& /*from_type*/)
 {
    using component_number = typename component_type<number<To> >::type;
-   number<From> f(from);
+
+   scoped_source_precision<number<From> >     scope1;
+   scoped_precision_options<component_number> scope2(number<To>::thread_default_precision(), number<To>::thread_default_variable_precision_options());
+   (void)scope1;
+   (void)scope2;
+
+   number<From>     f(from);
    component_number scalar(f);
    number<To> result(scalar);
    to = result.backend();
@@ -602,7 +608,13 @@ template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_complex>& /*to_type*/, const std::integral_constant<int, number_kind_rational>& /*from_type*/)
 {
    using component_number = typename component_type<number<To> >::type;
-   number<From> f(from);
+
+   scoped_source_precision<number<From> >     scope1;
+   scoped_precision_options<component_number> scope2(number<To>::thread_default_precision(), number<To>::thread_default_variable_precision_options());
+   (void)scope1;
+   (void)scope2;
+
+   number<From>     f(from);
    component_number scalar(f);
    number<To> result(scalar);
    to = result.backend();
@@ -611,6 +623,12 @@ template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_complex>& /*to_type*/, const std::integral_constant<int, number_kind_floating_point>& /*from_type*/)
 {
    using component_number = typename component_type<number<To> >::type;
+
+   scoped_source_precision<number<From> > scope1;
+   scoped_precision_options<component_number> scope2(number<To>::thread_default_precision(), number<To>::thread_default_variable_precision_options());
+   (void)scope1;
+   (void)scope2;
+
    number<From> f(from);
    component_number scalar(f);
    number<To> result(scalar);

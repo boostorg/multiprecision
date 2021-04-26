@@ -199,6 +199,10 @@ inline constexpr variable_precision_options operator~(variable_precision_options
 {
    return static_cast<variable_precision_options>(~static_cast<unsigned>(a));
 }
+inline constexpr bool operator==(variable_precision_options a, variable_precision_options b)
+{
+   return static_cast<unsigned>(a) == static_cast<unsigned>(b);
+}
 
 template <class Backend>
 struct expression_template_default

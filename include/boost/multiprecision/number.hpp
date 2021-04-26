@@ -116,21 +116,27 @@ class number
 
    template <class V, class U>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2,
-                                                        typename std::enable_if<(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value && !std::is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
+                                                        typename std::enable_if<(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value && !std::is_same<value_type, self_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2, *this);
-      detail::scoped_default_precision<typename component_type<self_type>::type> component_precision_guard(v1, v2, *this);
+      // Copy precision options from this type to component_type:
+      boost::multiprecision::detail::scoped_precision_options<value_type> scoped_opts(*this);
+      // precision guards:
+      detail::scoped_default_precision<self_type>  precision_guard(v1, v2, *this);
+      detail::scoped_default_precision<value_type> component_precision_guard(v1, v2, *this);
       assign_components(m_backend, canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)));
    }
    template <class V, class U>
    BOOST_MP_FORCEINLINE explicit BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2,
                                         typename std::enable_if<
-                                                                     (std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<typename component_type<self_type>::type, self_type>::value && !std::is_same<V, self_type>::value && !(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value)>::type* = 0)
+                                                                     (std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<value_type, self_type>::value && !std::is_same<V, self_type>::value && !(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2, this);
-      detail::scoped_default_precision<typename component_type<self_type>::type> component_precision_guard(v1, v2, *this);
+      // Copy precision options from this type to component_type:
+      boost::multiprecision::detail::scoped_precision_options<value_type> scoped_opts(*this);
+      // precision guards:
+      detail::scoped_default_precision<self_type>  precision_guard(v1, v2, *this);
+      detail::scoped_default_precision<value_type> component_precision_guard(v1, v2, *this);
       assign_components(m_backend, canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)));
    }
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
@@ -163,12 +169,12 @@ class number
 
    template <class V, class U>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2, unsigned digits10,
-                                                        typename std::enable_if<(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value && !std::is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
+                                                        typename std::enable_if<(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value && !std::is_same<value_type, self_type>::value)>::type* = 0)
        : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)), digits10)
    {}
    template <class V, class U>
    BOOST_MP_FORCEINLINE explicit BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2, unsigned digits10,
-                                                                 typename std::enable_if<((std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<typename component_type<self_type>::type, self_type>::value) && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
+                                                                 typename std::enable_if<((std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<value_type, self_type>::value) && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
        : m_backend(detail::evaluate_if_expression(v1), detail::evaluate_if_expression(v2), digits10) {}
 
    template <class Other, expression_template_option ET>
@@ -196,7 +202,7 @@ class number
       BOOST_IF_CONSTEXPR (std::is_same<self_type, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
          BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-            if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+            if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
             {
                number t(e);
                return *this = std::move(t);
@@ -222,7 +228,7 @@ class number
       BOOST_IF_CONSTEXPR(std::is_same<self_type, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
          BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-            if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
             {
                number t;
                t.assign(e);
@@ -238,7 +244,7 @@ class number
       return *this;
    }
    template <class V, class U>
-   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(std::is_convertible<V, value_type>::value&& std::is_convertible<U, value_type>::value && !std::is_same<typename component_type<self_type>::type, self_type>::value), number&>::type 
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(std::is_convertible<V, value_type>::value&& std::is_convertible<U, value_type>::value && !std::is_same<value_type, self_type>::value), number&>::type 
       assign(const V& v1, const U& v2, unsigned Digits)
    {
       self_type r(v1, v2, Digits);
@@ -303,7 +309,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(v);
          return *this = std::move(t);
@@ -367,7 +373,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(*this + val);
          return *this = std::move(t);
@@ -410,7 +416,7 @@ class number
       BOOST_IF_CONSTEXPR(std::is_same<self_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
          BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-            if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
             {
                number t(*this + e);
                return *this = std::move(t);
@@ -439,7 +445,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
          {
             number t(*this + v);
             return *this = std::move(t);
@@ -463,7 +469,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(*this - val);
          return *this = std::move(t);
@@ -504,7 +510,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
          {
             number t(*this - v);
             return *this = std::move(t);
@@ -531,7 +537,7 @@ class number
       BOOST_IF_CONSTEXPR(std::is_same<self_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
          BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-            if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
             {
                number t(*this - e);
                return *this = std::move(t);
@@ -558,7 +564,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(*this * e);
          return *this = std::move(t);
@@ -600,7 +606,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
          {
             number t(*this + v);
             return *this = std::move(t);
@@ -625,7 +631,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(*this % e);
          return *this = std::move(t);
@@ -729,7 +735,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(*this / e);
          return *this = std::move(t);
@@ -770,7 +776,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
          {
             number t(*this + v);
             return *this = std::move(t);

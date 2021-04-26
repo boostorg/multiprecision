@@ -594,9 +594,9 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    template <unsigned D>
    gmp_float(const gmp_float<D>& o)
    {
-      mpf_init2(this->m_data, preserve_source_precision() ? mpf_get_prec(o.data()) : multiprecision::detail::digits10_2_2(get_default_precision()));
+      mpf_init2(this->m_data, preserve_alien_precision() ? mpf_get_prec(o.data()) : multiprecision::detail::digits10_2_2(get_default_precision()));
       mpf_set(this->m_data, o.data());
-      requested_precision = preserve_source_precision() ? D : get_default_precision();
+      requested_precision = preserve_alien_precision() ? D : get_default_precision();
    }
    // rvalue copy
    gmp_float(gmp_float&& o) noexcept : detail::gmp_float_imp<0>(static_cast<detail::gmp_float_imp<0>&&>(o)), requested_precision(preserve_source_precision() ? o.requested_precision : get_default_precision())
@@ -647,14 +647,14 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    {
       if (this->m_data[0]._mp_d == 0)
       {
-         mpf_init2(this->m_data, mpf_get_prec(o.data()));
+         mpf_init2(this->m_data, preserve_alien_precision() ? mpf_get_prec(o.data()) : multiprecision::detail::digits10_2_2(get_default_precision()));
       }
-      else
+      else if(preserve_alien_precision())
       {
          mpf_set_prec(this->m_data, mpf_get_prec(o.data()));
       }
       mpf_set(this->m_data, o.data());
-      if (preserve_source_precision())
+      if (preserve_alien_precision())
          requested_precision = D;
       return *this;
    }
@@ -739,6 +739,14 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    static void thread_default_variable_precision_options(variable_precision_options opts, variable_precision_options group = variable_precision_options::all_options)
    {
       get_default_options() = (get_default_options() & ~group) | opts;
+   }
+   static bool preserve_source_precision()
+   {
+      return (get_default_options() & variable_precision_options::precision_group) == variable_precision_options::preserve_source_precision;
+   }
+   static bool preserve_alien_precision()
+   {
+      return (get_default_options() & variable_precision_options::alien_types_group) == variable_precision_options::use_alien_types;
    }
    //
    // swap:

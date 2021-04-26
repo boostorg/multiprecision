@@ -46,6 +46,13 @@ struct interval_error : public std::runtime_error
    interval_error(const std::string& s) : std::runtime_error(s) {}
 };
 
+namespace detail {
+   template <>
+   struct is_variable_precision<backends::mpfi_float_backend<0> > : public std::integral_constant<bool, true>
+   {};
+} // namespace detail
+
+
 namespace backends {
 
 namespace detail {
@@ -97,7 +104,7 @@ struct mpfi_float_imp
    template <unsigned D, mpfr_allocation_type AllocationType>
    mpfi_float_imp(const mpfr_float_imp<D, AllocationType>& o)
    {
-      mpfi_init2(m_data, preserve_source_precision() ? mpfr_get_prec(o.data()) : boost::multiprecision::detail::digits10_2_2(get_default_precision()));
+      mpfi_init2(m_data, (D == 0 ? preserve_source_precision() : preserve_alien_precision()) ? mpfr_get_prec(o.data()) : boost::multiprecision::detail::digits10_2_2(get_default_precision()));
       if (o.data()[0]._mpfr_d)
          mpfi_set_fr(m_data, o.data());
    }
@@ -375,6 +382,10 @@ struct mpfi_float_imp
    static bool preserve_source_precision() noexcept
    {
       return static_cast<unsigned>(get_default_options() & variable_precision_options::precision_group) == 0;
+   }
+   static bool preserve_alien_precision() noexcept
+   {
+      return (get_default_options() & variable_precision_options::alien_types_group) == variable_precision_options::use_alien_types;
    }
 };
 
@@ -865,6 +876,30 @@ inline void eval_convert_to(long double* result, const mpfi_float_backend<digits
    eval_convert_to(result, t);
 }
 
+template <mpfr_allocation_type AllocationType>
+inline void assign_components_set_precision(mpfi_float_backend<0>& result, const mpfr_float_backend<0, AllocationType>& a, const mpfr_float_backend<0, AllocationType>& b)
+{
+   if ((result.thread_default_variable_precision_options() & variable_precision_options::precision_group) == variable_precision_options::preserve_source_precision)
+   {
+      unsigned long prec = (std::max)(mpfr_get_prec(a.data()), mpfr_get_prec(b.data()));
+      mpfi_set_prec(result.data(), prec);
+   }
+}
+template <unsigned D2, mpfr_allocation_type AllocationType>
+inline void assign_components_set_precision(mpfi_float_backend<0>& result, const mpfr_float_backend<D2, AllocationType>& a, const mpfr_float_backend<D2, AllocationType>& b)
+{
+   if ((result.thread_default_variable_precision_options() & variable_precision_options::precision_group) == variable_precision_options::use_alien_types)
+   {
+      unsigned long prec = (std::max)(mpfr_get_prec(a.data()), mpfr_get_prec(b.data()));
+      mpfi_set_prec(result.data(), prec);
+   }
+}
+template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
+inline void assign_components_set_precision(mpfi_float_backend<D1>&, const mpfr_float_backend<D2, AllocationType>&, const mpfr_float_backend<D2, AllocationType>&)
+{
+}
+
+
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
 inline void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_backend<D2, AllocationType>& a, const mpfr_float_backend<D2, AllocationType>& b)
 {
@@ -872,14 +907,7 @@ inline void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_b
    // This is called from class number's constructors, so if we have variable
    // precision, then copy the precision of the source variables.
    //
-   BOOST_IF_CONSTEXPR(!D1)
-   {
-      if ((result.thread_default_variable_precision_options() & variable_precision_options::precision_group) == variable_precision_options::preserve_source_precision)
-      {
-         unsigned long prec = (std::max)(mpfr_get_prec(a.data()), mpfr_get_prec(b.data()));
-         mpfi_set_prec(result.data(), prec);
-      }
-   }
+   assign_components_set_precision(result, a, b);
 
    using default_ops::eval_fpclassify;
    if (eval_fpclassify(a) == (int)FP_NAN)
@@ -1190,12 +1218,6 @@ void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const std::
 }
 
 } // namespace backends
-
-namespace detail {
-template <>
-struct is_variable_precision<backends::mpfi_float_backend<0> > : public std::integral_constant<bool, true>
-{};
-} // namespace detail
 
 template <>
 struct number_category<detail::canonical<mpfi_t, backends::mpfi_float_backend<0> >::type> : public std::integral_constant<int, number_kind_floating_point>

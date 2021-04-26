@@ -52,15 +52,6 @@ T new_value()
    return T("0.1");
 }
 
-template <class T>
-struct et_option;
-
-template <class B, boost::multiprecision::expression_template_option et>
-struct et_option<boost::multiprecision::number<B, et>>
-{
-   static constexpr boost::multiprecision::expression_template_option value = et;
-};
-
 template <class Other>
 Other make_other_big_value()
 {
@@ -273,7 +264,7 @@ void test()
    test_mixed<T, boost::multiprecision::cpp_rational>();
    test_mixed<T, boost::multiprecision::cpp_bin_float_100>();
    test_mixed<T, boost::multiprecision::cpp_dec_float_100>();
-   test_mixed<T, boost::multiprecision::number<boost::multiprecision::gmp_float<100>, et_option<T>::value>>();
+   test_mixed<T, boost::multiprecision::mpf_float_100>();
 #if defined(TEST_MPFR) || defined(TEST_MPC) || defined(TEST_MPFI)
    test_mixed<T, boost::multiprecision::mpfr_float_100>();
 #endif

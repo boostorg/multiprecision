@@ -882,22 +882,33 @@ inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& 
 {
    using component_number_type = typename component_type<number<T> >::type;
 
+   boost::multiprecision::detail::scoped_precision_options<component_number_type> sp(result);
+   (void)sp;
+
    component_number_type x(v1), y(v2);
    assign_components(result, x.backend(), y.backend());
 }
 template <class T, class V, class U>
 inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& v1, const U& v2, const std::true_type&, const std::false_type&)
 {
+   boost::multiprecision::detail::scoped_source_precision<number<V>> scope;
+   (void)scope;
    assign_components_imp2(result, number<V>(v1), v2, std::false_type(), std::false_type());
 }
 template <class T, class V, class U>
 inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& v1, const U& v2, const std::true_type&, const std::true_type&)
 {
+   boost::multiprecision::detail::scoped_source_precision<number<V>> scope1;
+   boost::multiprecision::detail::scoped_source_precision<number<U>> scope2;
+   (void)scope1;
+   (void)scope2;
    assign_components_imp2(result, number<V>(v1), number<U>(v2), std::false_type(), std::false_type());
 }
 template <class T, class V, class U>
 inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& v1, const U& v2, const std::false_type&, const std::true_type&)
 {
+   boost::multiprecision::detail::scoped_source_precision<number<U>> scope;
+   (void)scope;
    assign_components_imp2(result, v1, number<U>(v2), std::false_type(), std::false_type());
 }
 

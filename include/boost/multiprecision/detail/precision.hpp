@@ -57,46 +57,57 @@ inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::
    return current_precision_of_last_chance_imp(val, tag());
 }
 
-template <class Terminal>
+template <class R, class Terminal>
 inline constexpr unsigned current_precision_of(const Terminal&)
 {
-   return std::numeric_limits<Terminal>::digits10;
+   return (R::thread_default_variable_precision_options() & variable_precision_options::alien_types_group) == variable_precision_options::use_alien_types ? std::numeric_limits<Terminal>::digits10 : 0;
 }
 
-template <class Terminal, std::size_t N>
+template <class R, class Terminal, std::size_t N>
 inline constexpr unsigned current_precision_of(const Terminal (&)[N])
 { // For string literals:
    return 0;
 }
 
-template <class B, boost::multiprecision::expression_template_option ET>
+template <class R, class B, boost::multiprecision::expression_template_option ET>
+inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& n, const std::true_type&)
+{
+   return std::is_same<R, boost::multiprecision::number<B, ET> >::value || std::is_same<typename R::value_type, boost::multiprecision::number<B, ET> >::value || ((R::thread_default_variable_precision_options() & variable_precision_options::alien_types_group) == variable_precision_options::use_alien_types) ? current_precision_of_imp(n, boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<B, ET> >()) : 0;
+}
+template <class R, class B, boost::multiprecision::expression_template_option ET>
+inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& n, const std::false_type&)
+{
+   return std::is_same<R, boost::multiprecision::number<B, ET> >::value || std::is_same<typename R::value_type, boost::multiprecision::number<B, ET> >::value ? current_precision_of_imp(n, boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<B, ET> >()) : 0;
+}
+
+template <class R, class B, boost::multiprecision::expression_template_option ET>
 inline constexpr unsigned current_precision_of(const boost::multiprecision::number<B, ET>& n)
 {
-   return current_precision_of_imp(n, boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<B, ET> >());
+   return current_precision_of_imp<R>(n, boost::multiprecision::detail::is_variable_precision<R>());
 }
 
-template <class tag, class Arg1>
+template <class R, class tag, class Arg1>
 inline constexpr unsigned current_precision_of(const expression<tag, Arg1, void, void, void>& expr)
 {
-   return current_precision_of(expr.left_ref());
+   return current_precision_of<R>(expr.left_ref());
 }
 
-template <class Arg1>
+template <class R, class Arg1>
 inline constexpr unsigned current_precision_of(const expression<terminal, Arg1, void, void, void>& expr)
 {
-   return current_precision_of(expr.value());
+   return current_precision_of<R>(expr.value());
 }
 
-template <class tag, class Arg1, class Arg2>
+template <class R, class tag, class Arg1, class Arg2>
 inline constexpr unsigned current_precision_of(const expression<tag, Arg1, Arg2, void, void>& expr)
 {
-   return (std::max)(current_precision_of(expr.left_ref()), current_precision_of(expr.right_ref()));
+   return (std::max)(current_precision_of<R>(expr.left_ref()), current_precision_of<R>(expr.right_ref()));
 }
 
-template <class tag, class Arg1, class Arg2, class Arg3>
+template <class R, class tag, class Arg1, class Arg2, class Arg3>
 inline constexpr unsigned current_precision_of(const expression<tag, Arg1, Arg2, Arg3, void>& expr)
 {
-   return (std::max)((std::max)(current_precision_of(expr.left_ref()), current_precision_of(expr.right_ref())), current_precision_of(expr.middle_ref()));
+   return (std::max)((std::max)(current_precision_of<R>(expr.left_ref()), current_precision_of<R>(expr.right_ref())), current_precision_of<R>(expr.middle_ref()));
 }
 
 #ifdef BOOST_MSVC
@@ -134,17 +145,17 @@ struct scoped_default_precision<R, true>
    template <class T>
    BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a)
    {
-      init(current_precision_of(a));
+      init(current_precision_of<R>(a));
    }
    template <class T, class U>
    BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b)
    {
-      init((std::max)(current_precision_of(a), current_precision_of(b)));
+      init((std::max)(current_precision_of<R>(a), current_precision_of<R>(b)));
    }
    template <class T, class U, class V>
    BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b, const V& c)
    {
-      init((std::max)((std::max)(current_precision_of(a), current_precision_of(b)), current_precision_of(c)));
+      init((std::max)((std::max)(current_precision_of<R>(a), current_precision_of<R>(b)), current_precision_of<R>(c)));
    }
    ~scoped_default_precision()
    {
@@ -197,7 +208,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T* obj)
 #define BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(T) if (boost::multiprecision::detail::is_variable_precision<T>::value)
 #endif
 
-template <class T>
+template <class T, bool = boost::multiprecision::detail::is_variable_precision<T>::value>
 struct scoped_target_precision
 {
    variable_precision_options opts;
@@ -210,8 +221,10 @@ struct scoped_target_precision
       T::thread_default_variable_precision_options(opts);
    }
 };
-
 template <class T>
+struct scoped_target_precision<T, false> {};
+
+template <class T, bool = boost::multiprecision::detail::is_variable_precision<T>::value>
 struct scoped_source_precision
 {
    variable_precision_options opts;
@@ -223,6 +236,49 @@ struct scoped_source_precision
    {
       T::thread_default_variable_precision_options(opts);
    }
+};
+template <class T>
+struct scoped_source_precision<T, false> {};
+
+template <class T, bool = boost::multiprecision::detail::is_variable_precision<T>::value>
+struct scoped_precision_options
+{
+   unsigned saved_digits;
+   boost::multiprecision::variable_precision_options saved_options;
+
+   scoped_precision_options(unsigned digits) 
+      : saved_digits(T::thread_default_precision()), saved_options(T::thread_default_variable_precision_options())
+   {
+      T::thread_default_precision(digits);
+   }
+   scoped_precision_options(unsigned digits, variable_precision_options opts)
+      : saved_digits(T::thread_default_precision()), saved_options(T::thread_default_variable_precision_options())
+   {
+      T::thread_default_precision(digits);
+      T::thread_default_variable_precision_options(opts);
+   }
+   template <class U>
+   scoped_precision_options(const U&)
+      : saved_digits(T::thread_default_precision()), saved_options(T::thread_default_variable_precision_options())
+   {
+      T::thread_default_precision(U::thread_default_precision());
+      T::thread_default_variable_precision_options(U::thread_default_variable_precision_options());
+   }
+   ~scoped_precision_options()
+   {
+      T::thread_default_variable_precision_options(saved_options);
+      T::thread_default_precision(saved_digits);
+   }
+};
+
+template <class T>
+struct scoped_precision_options<T, false>
+{
+   scoped_precision_options(unsigned) {}
+   scoped_precision_options(unsigned, variable_precision_options) {}
+   template <class U>
+   scoped_precision_options(const U&) {}
+   ~scoped_precision_options() {}
 };
 
 }
