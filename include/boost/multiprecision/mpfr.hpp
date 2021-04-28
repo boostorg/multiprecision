@@ -466,7 +466,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
    }
    static std::atomic<variable_precision_options>& get_global_default_options()noexcept
    {
-      static std::atomic<variable_precision_options> val{variable_precision_options::preserve_source_precision};
+      static std::atomic<variable_precision_options> val{variable_precision_options::preserve_related_precision};
       return val;
    }
    static variable_precision_options& get_default_options()noexcept
