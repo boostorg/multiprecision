@@ -69,7 +69,7 @@ template <class T, class Other>
 void test_mixed()
 {
    T::thread_default_precision(10);
-   T::thread_default_variable_precision_options(boost::multiprecision::variable_precision_options::ignore_alien_types, boost::multiprecision::variable_precision_options::alien_types_group);
+   T::thread_default_variable_precision_options(boost::multiprecision::variable_precision_options::preserve_source_precision);
    Other big_a(make_other_big_value<Other>()), big_b(make_other_big_value<Other>()), big_c(make_other_big_value<Other>()), big_d(make_other_big_value<Other>());
 
    unsigned target_precision;
@@ -214,74 +214,53 @@ void test()
 
       BOOST_CHECK_EQUAL(cp1.precision(), 100);
       BOOST_CHECK_EQUAL(cp2.precision(), 100);
+      BOOST_CHECK_EQUAL(cp3.precision(), 100);
+      BOOST_CHECK_EQUAL(cp4.precision(), 100);
 
       component_t::thread_default_precision(35);
 
       T aa(cp1);
-      BOOST_CHECK_EQUAL(aa.precision(), 100);
+      BOOST_CHECK_EQUAL(aa.precision(), 35);
       T cc(cp1, cp2);
-      BOOST_CHECK_EQUAL(cc.precision(), 100);
+      BOOST_CHECK_EQUAL(cc.precision(), 35);
       T dd(cp1, cp2, 55);
       BOOST_CHECK_EQUAL(dd.precision(), 55);
-      aa = new_value<T>();
-      BOOST_CHECK_EQUAL(aa.precision(), 35);
+
       if constexpr (std::is_assignable_v<T, component_t>)
       {
          aa = cp1;
-         BOOST_CHECK_EQUAL(aa.precision(), 100);
-         aa = new_value<T>();
          BOOST_CHECK_EQUAL(aa.precision(), 35);
          aa = std::move(cp1);
-         BOOST_CHECK_EQUAL(aa.precision(), 100);
-         aa = new_value<T>();
          BOOST_CHECK_EQUAL(aa.precision(), 35);
       }
       T bb(std::move(cp2));
-      BOOST_CHECK_EQUAL(bb.precision(), 100);
-      bb = new_value<T>();
       BOOST_CHECK_EQUAL(bb.precision(), 35);
 
       if constexpr (boost::multiprecision::is_compatible_arithmetic_type<component_t, T>::value)
       {
          aa = bb + cp3;
-         BOOST_CHECK_EQUAL(aa.precision(), 100);
-         aa = new_value<T>();
          BOOST_CHECK_EQUAL(aa.precision(), 35);
          aa = cp3 * bb;
-         BOOST_CHECK_EQUAL(aa.precision(), 100);
-         aa = new_value<T>();
          BOOST_CHECK_EQUAL(aa.precision(), 35);
          aa += cp3;
-         BOOST_CHECK_EQUAL(aa.precision(), 100);
+         BOOST_CHECK_EQUAL(aa.precision(), 35);
          aa = new_value<T>();
          aa -= cp3;
-         BOOST_CHECK_EQUAL(aa.precision(), 100);
-         aa = new_value<T>();
          BOOST_CHECK_EQUAL(aa.precision(), 35);
          aa *= cp4;
-         BOOST_CHECK_EQUAL(aa.precision(), 100);
+         BOOST_CHECK_EQUAL(aa.precision(), 35);
          aa = new_value<T>();
          aa /= cp4;
-         BOOST_CHECK_EQUAL(aa.precision(), 100);
-         aa = new_value<T>();
          BOOST_CHECK_EQUAL(aa.precision(), 35);
          aa -= bb * cp3;
-         BOOST_CHECK_EQUAL(aa.precision(), 100);
-         aa = new_value<T>();
          BOOST_CHECK_EQUAL(aa.precision(), 35);
       }
       aa.assign(cp1);
-      BOOST_CHECK_EQUAL(aa.precision(), 100);
-      aa = new_value<T>();
       BOOST_CHECK_EQUAL(aa.precision(), 35);
       aa.assign(cp1, cp2);
-      BOOST_CHECK_EQUAL(aa.precision(), 100);
-      aa = new_value<T>();
       BOOST_CHECK_EQUAL(aa.precision(), 35);
       aa.assign(cp1, cp2, 20);
       BOOST_CHECK_EQUAL(aa.precision(), 20);
-      aa = new_value<T>();
-      BOOST_CHECK_EQUAL(aa.precision(), 35);
    }
    else
    {
@@ -295,6 +274,19 @@ void test()
       BOOST_CHECK_EQUAL(aa.precision(), 35);
       aa.assign(hp4, 20);
       BOOST_CHECK_EQUAL(aa.precision(), 20);
+   }
+
+   if constexpr (boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_complex)
+   {
+      T aa(1, 2, 75);
+      BOOST_CHECK_EQUAL(aa.precision(), 75);
+      BOOST_CHECK_EQUAL(aa.real().precision(), 75);
+      BOOST_CHECK_EQUAL(aa.imag().precision(), 75);
+      BOOST_CHECK_EQUAL(real(aa).precision(), 75);
+      BOOST_CHECK_EQUAL(imag(aa).precision(), 75);
+      BOOST_CHECK_EQUAL(abs(aa).precision(), 75);
+      BOOST_CHECK_EQUAL(arg(aa).precision(), 75);
+      BOOST_CHECK_EQUAL(norm(aa).precision(), 75);
    }
 
    test_mixed<T, char>();

@@ -1002,13 +1002,13 @@ class number
    {
       return Backend::thread_default_variable_precision_options();
    }
-   static constexpr void default_variable_precision_options(variable_precision_options opts, variable_precision_options group = variable_precision_options::all_options)
+   static constexpr void default_variable_precision_options(variable_precision_options opts)
    {
-      Backend::default_variable_precision_options(opts, group);
+      Backend::default_variable_precision_options(opts);
    }
-   static constexpr void thread_default_variable_precision_options(variable_precision_options opts, variable_precision_options group = variable_precision_options::all_options)
+   static constexpr void thread_default_variable_precision_options(variable_precision_options opts)
    {
-      Backend::thread_default_variable_precision_options(opts, group);
+      Backend::thread_default_variable_precision_options(opts);
    }
    //
    // Comparison:

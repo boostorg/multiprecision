@@ -175,16 +175,11 @@ enum expression_template_option
 
 enum struct variable_precision_options : unsigned char
 {
-   preserve_source_precision = 0,
-   preserve_target_precision = 1,
-
-   precision_group = 1,
-
-   ignore_alien_types = 0,
-   use_alien_types = 2,
-
-   alien_types_group = 2,
-   all_options = 0xff,
+   preserve_target_precision = 0,
+   preserve_source_precision = 1,
+   preserve_component_precision = 2,
+   preserve_related_precision = 3,
+   preserve_all_precision = 4,
 };
 
 inline constexpr variable_precision_options operator|(variable_precision_options a, variable_precision_options b)

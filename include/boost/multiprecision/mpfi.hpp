@@ -104,7 +104,7 @@ struct mpfi_float_imp
    template <unsigned D, mpfr_allocation_type AllocationType>
    mpfi_float_imp(const mpfr_float_imp<D, AllocationType>& o)
    {
-      mpfi_init2(m_data, (D == 0 ? preserve_source_precision() : preserve_alien_precision()) ? mpfr_get_prec(o.data()) : boost::multiprecision::detail::digits10_2_2(get_default_precision()));
+      mpfi_init2(m_data, (D == 0 ? preserve_component_precision() : preserve_related_precision()) ? mpfr_get_prec(o.data()) : boost::multiprecision::detail::digits10_2_2(get_default_precision()));
       if (o.data()[0]._mpfr_d)
          mpfi_set_fr(m_data, o.data());
    }
@@ -371,7 +371,7 @@ struct mpfi_float_imp
    }
    static std::atomic<variable_precision_options>& get_global_default_options() noexcept
    {
-      static std::atomic<variable_precision_options> val{variable_precision_options::preserve_source_precision | variable_precision_options::ignore_alien_types};
+      static std::atomic<variable_precision_options> val{variable_precision_options::preserve_related_precision};
       return val;
    }
    static variable_precision_options& get_default_options() noexcept
@@ -381,11 +381,19 @@ struct mpfi_float_imp
    }
    static bool preserve_source_precision() noexcept
    {
-      return static_cast<unsigned>(get_default_options() & variable_precision_options::precision_group) == 0;
+      return get_default_options() >= variable_precision_options::preserve_source_precision;
    }
-   static bool preserve_alien_precision() noexcept
+   static bool preserve_component_precision() noexcept
    {
-      return (get_default_options() & variable_precision_options::alien_types_group) == variable_precision_options::use_alien_types;
+      return get_default_options() >= variable_precision_options::preserve_component_precision;
+   }
+   static bool preserve_related_precision() noexcept
+   {
+      return get_default_options() >= variable_precision_options::preserve_related_precision;
+   }
+   static bool preserve_all_precision() noexcept
+   {
+      return get_default_options() >= variable_precision_options::preserve_all_precision;
    }
 };
 
@@ -572,13 +580,13 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
    {
       return get_default_options();
    }
-   static void default_variable_precision_options(variable_precision_options opts, variable_precision_options group = variable_precision_options::all_options)
+   static void default_variable_precision_options(variable_precision_options opts)
    {
-      get_global_default_options() = (get_global_default_options() & ~group) | opts;
+      get_global_default_options() = opts;
    }
-   static void thread_default_variable_precision_options(variable_precision_options opts, variable_precision_options group = variable_precision_options::all_options)
+   static void thread_default_variable_precision_options(variable_precision_options opts)
    {
-      get_default_options() = (get_default_options() & ~group) | opts;
+      get_default_options() = opts;
    }
 };
 
@@ -879,7 +887,7 @@ inline void eval_convert_to(long double* result, const mpfi_float_backend<digits
 template <mpfr_allocation_type AllocationType>
 inline void assign_components_set_precision(mpfi_float_backend<0>& result, const mpfr_float_backend<0, AllocationType>& a, const mpfr_float_backend<0, AllocationType>& b)
 {
-   if ((result.thread_default_variable_precision_options() & variable_precision_options::precision_group) == variable_precision_options::preserve_source_precision)
+   if (result.thread_default_variable_precision_options() >= variable_precision_options::preserve_component_precision)
    {
       unsigned long prec = (std::max)(mpfr_get_prec(a.data()), mpfr_get_prec(b.data()));
       mpfi_set_prec(result.data(), prec);
@@ -888,7 +896,7 @@ inline void assign_components_set_precision(mpfi_float_backend<0>& result, const
 template <unsigned D2, mpfr_allocation_type AllocationType>
 inline void assign_components_set_precision(mpfi_float_backend<0>& result, const mpfr_float_backend<D2, AllocationType>& a, const mpfr_float_backend<D2, AllocationType>& b)
 {
-   if ((result.thread_default_variable_precision_options() & variable_precision_options::precision_group) == variable_precision_options::use_alien_types)
+   if (result.thread_default_variable_precision_options() >= variable_precision_options::preserve_related_precision)
    {
       unsigned long prec = (std::max)(mpfr_get_prec(a.data()), mpfr_get_prec(b.data()));
       mpfi_set_prec(result.data(), prec);
@@ -1240,7 +1248,7 @@ using mpfi_float = number<mpfi_float_backend<0> >   ;
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 inline number<mpfr_float_backend<Digits10>, ExpressionTemplates> lower(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& val)
 {
-   boost::multiprecision::detail::scoped_default_precision<number<mpfr_float_backend<Digits10>, ExpressionTemplates> > precision_guard(val);
+   boost::multiprecision::detail::scoped_precision_options<number<mpfr_float_backend<Digits10>, ExpressionTemplates> > precision_guard(val);
    number<mpfr_float_backend<Digits10> >                                                                               result;
    mpfr_set(result.backend().data(), val.backend().left_data(), GMP_RNDN);
    return result;
@@ -1249,7 +1257,7 @@ inline number<mpfr_float_backend<Digits10>, ExpressionTemplates> lower(const num
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 inline number<mpfr_float_backend<Digits10>, ExpressionTemplates> upper(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& val)
 {
-   boost::multiprecision::detail::scoped_default_precision<number<mpfr_float_backend<Digits10>, ExpressionTemplates> > precision_guard(val);
+   boost::multiprecision::detail::scoped_precision_options<number<mpfr_float_backend<Digits10>, ExpressionTemplates> > precision_guard(val);
    number<mpfr_float_backend<Digits10> >                                                                               result;
    mpfr_set(result.backend().data(), val.backend().right_data(), GMP_RNDN);
    return result;
@@ -1258,7 +1266,7 @@ inline number<mpfr_float_backend<Digits10>, ExpressionTemplates> upper(const num
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 inline number<mpfr_float_backend<Digits10>, ExpressionTemplates> median(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& val)
 {
-   boost::multiprecision::detail::scoped_default_precision<number<mpfr_float_backend<Digits10>, ExpressionTemplates> > precision_guard(val);
+   boost::multiprecision::detail::scoped_precision_options<number<mpfr_float_backend<Digits10>, ExpressionTemplates> > precision_guard(val);
    number<mpfr_float_backend<Digits10> >                                                                               result;
    mpfi_mid(result.backend().data(), val.backend().data());
    return result;
@@ -1267,7 +1275,7 @@ inline number<mpfr_float_backend<Digits10>, ExpressionTemplates> median(const nu
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 inline number<mpfr_float_backend<Digits10>, ExpressionTemplates> width(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& val)
 {
-   boost::multiprecision::detail::scoped_default_precision<number<mpfr_float_backend<Digits10>, ExpressionTemplates> > precision_guard(val);
+   boost::multiprecision::detail::scoped_precision_options<number<mpfr_float_backend<Digits10>, ExpressionTemplates> > precision_guard(val);
    number<mpfr_float_backend<Digits10> >                                                                               result;
    mpfi_diam_abs(result.backend().data(), val.backend().data());
    return result;

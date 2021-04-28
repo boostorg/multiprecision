@@ -70,7 +70,7 @@ template <class T, class Other>
 void test_mixed()
 {
    T::thread_default_precision(10);
-   T::thread_default_variable_precision_options(boost::multiprecision::variable_precision_options::ignore_alien_types, boost::multiprecision::variable_precision_options::alien_types_group);
+   T::thread_default_variable_precision_options(boost::multiprecision::variable_precision_options::preserve_target_precision);
    Other big_a(make_other_big_value<Other>()), big_b(make_other_big_value<Other>()), big_c(make_other_big_value<Other>()), big_d(make_other_big_value<Other>());
 
    T a(big_a);

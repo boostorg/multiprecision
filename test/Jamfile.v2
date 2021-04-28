@@ -196,6 +196,14 @@ test-suite arithmetic_tests :
    [ run test_preserve_source_precision.cpp gmp mpfr : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPFR  : test_preserve_source_precision_mpfr ]
    [ run test_preserve_source_precision.cpp gmp mpfr mpc : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpc : : <build>no ] <define>TEST_MPC : test_preserve_source_precision_mpc ]
    [ run test_preserve_source_precision.cpp gmp mpfr mpfi : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpfi : : <build>no ] <define>TEST_MPFI : test_preserve_source_precision_mpfi ]
+   [ run test_preserve_component_precision.cpp gmp : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_gmp : : <build>no ] <define>TEST_MPF : test_preserve_component_precision_gmp ]
+   [ run test_preserve_component_precision.cpp gmp mpfr : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPFR  : test_preserve_component_precision_mpfr ]
+   [ run test_preserve_component_precision.cpp gmp mpfr mpc : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpc : : <build>no ] <define>TEST_MPC : test_preserve_component_precision_mpc ]
+   [ run test_preserve_component_precision.cpp gmp mpfr mpfi : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpfi : : <build>no ] <define>TEST_MPFI : test_preserve_component_precision_mpfi ]
+   [ run test_preserve_related_precision.cpp gmp : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_gmp : : <build>no ] <define>TEST_MPF : test_preserve_related_precision_gmp ]
+   [ run test_preserve_related_precision.cpp gmp mpfr : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPFR  : test_preserve_related_precision_mpfr ]
+   [ run test_preserve_related_precision.cpp gmp mpfr mpc : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpc : : <build>no ] <define>TEST_MPC : test_preserve_related_precision_mpc ]
+   [ run test_preserve_related_precision.cpp gmp mpfr mpfi : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpfi : : <build>no ] <define>TEST_MPFI : test_preserve_related_precision_mpfi ]
    [ run test_preserve_target_precision.cpp gmp : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_gmp : : <build>no ] <define>TEST_MPF : test_preserve_target_precision_gmp ]
    [ run test_preserve_target_precision.cpp gmp mpfr : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPFR : test_preserve_target_precision_mpfr ]
    [ run test_preserve_target_precision.cpp gmp mpfr mpc : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpc : : <build>no ] <define>TEST_MPC : test_preserve_target_precision_mpc ]
@@ -204,7 +212,10 @@ test-suite arithmetic_tests :
 ;
 
 alias precision_tests : test_preserve_source_precision_gmp test_preserve_source_precision_mpfr test_preserve_source_precision_mpc test_preserve_source_precision_mpfi 
-   test_preserve_target_precision_gmp test_preserve_target_precision_mpfr test_preserve_target_precision_mpc test_preserve_target_precision_mpfi ;
+   test_preserve_component_precision_gmp test_preserve_component_precision_mpfr test_preserve_component_precision_mpc test_preserve_component_precision_mpfi 
+   test_preserve_related_precision_gmp test_preserve_related_precision_mpfr test_preserve_related_precision_mpc test_preserve_related_precision_mpfi 
+   test_preserve_target_precision_gmp test_preserve_target_precision_mpfr test_preserve_target_precision_mpc test_preserve_target_precision_mpfi 
+   test_mpfr_mpc_precisions test_mpfi_precisions test_mpf_precisions test_threaded_precision_mpf ;
 
 rule get_function_tests
 {

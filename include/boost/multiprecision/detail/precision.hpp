@@ -60,7 +60,7 @@ inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::
 template <class R, class Terminal>
 inline constexpr unsigned current_precision_of(const Terminal&)
 {
-   return (R::thread_default_variable_precision_options() & variable_precision_options::alien_types_group) == variable_precision_options::use_alien_types ? std::numeric_limits<Terminal>::digits10 : 0;
+   return (R::thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision) ? std::numeric_limits<Terminal>::digits10 : 0;
 }
 
 template <class R, class Terminal, std::size_t N>
@@ -72,12 +72,17 @@ inline constexpr unsigned current_precision_of(const Terminal (&)[N])
 template <class R, class B, boost::multiprecision::expression_template_option ET>
 inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& n, const std::true_type&)
 {
-   return std::is_same<R, boost::multiprecision::number<B, ET> >::value || std::is_same<typename R::value_type, boost::multiprecision::number<B, ET> >::value || ((R::thread_default_variable_precision_options() & variable_precision_options::alien_types_group) == variable_precision_options::use_alien_types) ? current_precision_of_imp(n, boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<B, ET> >()) : 0;
+   return std::is_same<R, boost::multiprecision::number<B, ET> >::value 
+      || (std::is_same<typename R::value_type, boost::multiprecision::number<B, ET> >::value && (R::thread_default_variable_precision_options() >= variable_precision_options::preserve_component_precision))
+      || (R::thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision) 
+      ? current_precision_of_imp(n, boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<B, ET> >()) : 0;
 }
 template <class R, class B, boost::multiprecision::expression_template_option ET>
 inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& n, const std::false_type&)
 {
-   return std::is_same<R, boost::multiprecision::number<B, ET> >::value || std::is_same<typename R::value_type, boost::multiprecision::number<B, ET> >::value ? current_precision_of_imp(n, boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<B, ET> >()) : 0;
+   return std::is_same<R, boost::multiprecision::number<B, ET> >::value 
+      || std::is_same<typename R::value_type, boost::multiprecision::number<B, ET> >::value
+      ? current_precision_of_imp(n, boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<B, ET> >()) : 0;
 }
 
 template <class R, class B, boost::multiprecision::expression_template_option ET>
@@ -214,7 +219,7 @@ struct scoped_target_precision
    variable_precision_options opts;
    scoped_target_precision() : opts(T::thread_default_variable_precision_options())
    {
-      T::thread_default_variable_precision_options(variable_precision_options::preserve_target_precision, variable_precision_options::precision_group);
+      T::thread_default_variable_precision_options(variable_precision_options::preserve_target_precision);
    }
    ~scoped_target_precision()
    {
@@ -230,7 +235,7 @@ struct scoped_source_precision
    variable_precision_options opts;
    scoped_source_precision() : opts(T::thread_default_variable_precision_options())
    {
-      T::thread_default_variable_precision_options(variable_precision_options::preserve_source_precision, variable_precision_options::precision_group);
+      T::thread_default_variable_precision_options(variable_precision_options::preserve_source_precision);
    }
    ~scoped_source_precision()
    {
@@ -258,10 +263,10 @@ struct scoped_precision_options
       T::thread_default_variable_precision_options(opts);
    }
    template <class U>
-   scoped_precision_options(const U&)
+   scoped_precision_options(const U& u)
       : saved_digits(T::thread_default_precision()), saved_options(T::thread_default_variable_precision_options())
    {
-      T::thread_default_precision(U::thread_default_precision());
+      T::thread_default_precision(u.precision());
       T::thread_default_variable_precision_options(U::thread_default_variable_precision_options());
    }
    ~scoped_precision_options()
