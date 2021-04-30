@@ -75,6 +75,7 @@ template <>
 struct is_related_type<boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boost::multiprecision::et_off>, boost::multiprecision::mpf_float_100> : public std::true_type
 {};
 
+#if defined(TEST_MPFR) || defined(TEST_MPFI) || defined(TEST_MPC)
 template <>
 struct is_related_type<boost::multiprecision::mpfr_float, boost::multiprecision::mpfr_float_100> : public std::true_type
 {};
@@ -95,7 +96,7 @@ struct is_related_type<boost::multiprecision::mpc_complex, boost::multiprecision
 template <>
 struct is_related_type<boost::multiprecision::number<boost::multiprecision::mpc_complex_backend<0>, boost::multiprecision::et_off>, boost::multiprecision::mpfr_float_100> : public std::true_type
 {};
-
+#endif
 
 template <class T, class Other>
 void test_mixed()
