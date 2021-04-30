@@ -75,21 +75,23 @@ template <>
 struct is_related_type<boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boost::multiprecision::et_off>, boost::multiprecision::mpf_float_100> : public std::true_type
 {};
 
-#if defined(TEST_MPFR) || defined(TEST_MPFI) || defined(TEST_MPC)
+#if defined(TEST_MPFR)
 template <>
 struct is_related_type<boost::multiprecision::mpfr_float, boost::multiprecision::mpfr_float_100> : public std::true_type
 {};
 template <>
 struct is_related_type<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off>, boost::multiprecision::mpfr_float_100> : public std::true_type
 {};
-
+#endif
+#if defined(TEST_MPFI)
 template <>
 struct is_related_type<boost::multiprecision::mpfi_float, boost::multiprecision::mpfr_float_100> : public std::true_type
 {};
 template <>
 struct is_related_type<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<0>, boost::multiprecision::et_off>, boost::multiprecision::mpfr_float_100> : public std::true_type
 {};
-
+#endif
+#if defined(TEST_MPFC)
 template <>
 struct is_related_type<boost::multiprecision::mpc_complex, boost::multiprecision::mpfr_float_100> : public std::true_type
 {};
