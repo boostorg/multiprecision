@@ -91,7 +91,7 @@ template <>
 struct is_related_type<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<0>, boost::multiprecision::et_off>, boost::multiprecision::mpfr_float_100> : public std::true_type
 {};
 #endif
-#if defined(TEST_MPFC)
+#if defined(TEST_MPC)
 template <>
 struct is_related_type<boost::multiprecision::mpc_complex, boost::multiprecision::mpfr_float_100> : public std::true_type
 {};
