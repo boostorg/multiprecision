@@ -107,6 +107,16 @@ class number
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard_1(val);
       detail::scoped_default_precision<number<Other, ET> >                    precision_guard_2(val);
       using detail::generic_interconvert;
+      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+      {
+         if (precision_guard_1.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
+         {
+            self_type t;
+            generic_interconvert(t.backend(), val.backend(), number_category<Backend>(), number_category<Other>());
+            *this = std::move(t);
+            return;
+         }
+      }
       generic_interconvert(backend(), val.backend(), number_category<Backend>(), number_category<Other>());
    }
    template <class Other, expression_template_option ET>

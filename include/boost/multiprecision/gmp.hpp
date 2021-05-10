@@ -693,6 +693,12 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    template <class V>
    gmp_float& operator=(const V& v)
    {
+      constexpr unsigned d10 = std::is_floating_point<V>::value ?
+         std::numeric_limits<V>::digits10 :
+         std::numeric_limits<V>::digits10 ? 1 + std::numeric_limits<V>::digits10 :
+         1 + boost::multiprecision::detail::digits2_2_10(std::numeric_limits<V>::digits);
+      if((thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision) && (precision() < d10))
+         this->precision(d10);
       *static_cast<detail::gmp_float_imp<0>*>(this) = v;
       return *this;
    }
@@ -2494,6 +2500,20 @@ inline std::size_t hash_value(const gmp_rational& val)
 }
 
 //
+// Some useful helpers:
+//
+inline unsigned used_gmp_int_bits(const gmp_int& val)
+{
+   return eval_msb(val) - eval_lsb(val) + 1;
+}
+inline unsigned used_gmp_rational_bits(const gmp_rational& val)
+{
+   unsigned d2_d = static_cast<unsigned>(mpz_sizeinbase(mpq_denref(val.data()), 2) - mpz_scan1(mpq_denref(val.data()), 0));
+   unsigned d2_n = static_cast<unsigned>(mpz_sizeinbase(mpq_numref(val.data()), 2) - mpz_scan1(mpq_numref(val.data()), 0));
+   return (std::max)(d2_d, d2_n);
+}
+
+//
 // Some member functions that are dependent upon previous code go here:
 //
 template <unsigned Digits10>
@@ -2549,11 +2569,24 @@ inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_rational& o
 }
 inline gmp_float<0>::gmp_float(const gmp_int& o) : requested_precision(get_default_precision())
 {
+   if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+   {
+      unsigned d2 = used_gmp_int_bits(o);
+      unsigned d10 = 1 + multiprecision::detail::digits2_2_10(d2);
+      if (d10 > requested_precision)
+         requested_precision = d10;
+   }
    mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(requested_precision));
    mpf_set_z(this->data(), o.data());
 }
 inline gmp_float<0>::gmp_float(const gmp_rational& o) : requested_precision(get_default_precision())
 {
+   if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+   {
+      unsigned d10 = 1 + multiprecision::detail::digits2_2_10(used_gmp_rational_bits(o));
+      if (d10 > requested_precision)
+         requested_precision = d10;
+   }
    mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(requested_precision));
    mpf_set_q(this->data(), o.data());
 }
@@ -2562,7 +2595,21 @@ inline gmp_float<0>& gmp_float<0>::operator=(const gmp_int& o)
    if (this->m_data[0]._mp_d == 0)
    {
       requested_precision = this->get_default_precision();
+      if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+      {
+         unsigned d2 = used_gmp_int_bits(o);
+         unsigned d10 = 1 + multiprecision::detail::digits2_2_10(d2);
+         if (d10 > requested_precision)
+            requested_precision = d10;
+      }
       mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(requested_precision));
+   }
+   else if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+   {
+      unsigned d2 = used_gmp_int_bits(o);
+      unsigned d10 = 1 + multiprecision::detail::digits2_2_10(d2);
+      if (d10 > requested_precision)
+         this->precision(d10);
    }
    mpf_set_z(this->data(), o.data());
    return *this;
@@ -2572,7 +2619,19 @@ inline gmp_float<0>& gmp_float<0>::operator=(const gmp_rational& o)
    if (this->m_data[0]._mp_d == 0)
    {
       requested_precision = this->get_default_precision();
+      if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+      {
+         unsigned d10 = 1 + multiprecision::detail::digits2_2_10(used_gmp_rational_bits(o));
+         if (d10 > requested_precision)
+            requested_precision = d10;
+      }
       mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(requested_precision));
+   }
+   else if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+   {
+      unsigned d10 = 1 + multiprecision::detail::digits2_2_10(used_gmp_rational_bits(o));
+      if (d10 > requested_precision)
+         this->precision(d10);
    }
    mpf_set_q(this->data(), o.data());
    return *this;

@@ -528,6 +528,25 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
    template <class V>
    mpfi_float_backend& operator=(const V& v)
    {
+      constexpr unsigned d10 = std::is_floating_point<V>::value ?
+         std::numeric_limits<V>::digits10 :
+         std::numeric_limits<V>::digits10 ? 1 + std::numeric_limits<V>::digits10 :
+         1 + boost::multiprecision::detail::digits2_2_10(std::numeric_limits<V>::digits);
+
+      if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+      {
+         BOOST_IF_CONSTEXPR(std::is_floating_point<V>::value)
+         {
+            if (std::numeric_limits<V>::digits > mpfi_get_prec(this->data()))
+               mpfi_set_prec(this->data(), std::numeric_limits<V>::digits);
+         }
+         else
+         {
+            if (precision() < d10)
+               this->precision(d10);
+         }
+      }
+
       *static_cast<detail::mpfi_float_imp<0>*>(this) = v;
       return *this;
    }
@@ -1202,6 +1221,7 @@ template <class To, unsigned D>
 void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const std::integral_constant<int, number_kind_integer>& to_type, const std::integral_constant<int, number_kind_floating_point>& from_type)
 {
    using boost::multiprecision::detail::generic_interconvert;
+   boost::multiprecision::detail::scoped_precision_options<number<mpfr_float_backend<D>>> scoped(from);
    mpfr_float_backend<D> t;
    mpfi_mid(t.data(), from.data());
    generic_interconvert(to, t, to_type, from_type);
@@ -1211,6 +1231,7 @@ template <class To, unsigned D>
 void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const std::integral_constant<int, number_kind_rational>& to_type, const std::integral_constant<int, number_kind_floating_point>& from_type)
 {
    using boost::multiprecision::detail::generic_interconvert;
+   boost::multiprecision::detail::scoped_precision_options<number<mpfr_float_backend<D>>> scoped(from);
    mpfr_float_backend<D> t;
    mpfi_mid(t.data(), from.data());
    generic_interconvert(to, t, to_type, from_type);
@@ -1220,6 +1241,7 @@ template <class To, unsigned D>
 void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const std::integral_constant<int, number_kind_floating_point>& to_type, const std::integral_constant<int, number_kind_floating_point>& from_type)
 {
    using boost::multiprecision::detail::generic_interconvert;
+   boost::multiprecision::detail::scoped_precision_options<number<mpfr_float_backend<D>>> scoped(from);
    mpfr_float_backend<D> t;
    mpfi_mid(t.data(), from.data());
    generic_interconvert(to, t, to_type, from_type);

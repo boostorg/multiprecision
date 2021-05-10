@@ -81,13 +81,13 @@ void test_mixed()
    T a(big_a);
    BOOST_CHECK_EQUAL(a.precision(), target_precision);
    T b(std::move(big_d));
-   BOOST_CHECK_EQUAL(a.precision(), target_precision);
+   BOOST_CHECK_EQUAL(b.precision(), target_precision);
    if constexpr (std::is_assignable_v<T, Other>)
    {
       a = big_b;
       BOOST_CHECK_EQUAL(a.precision(), target_precision);
       b = std::move(big_c);
-      BOOST_CHECK_EQUAL(a.precision(), target_precision);
+      BOOST_CHECK_EQUAL(b.precision(), target_precision);
 
       if constexpr (!std::is_assignable_v<Other, T>)
       {

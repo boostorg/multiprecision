@@ -26,7 +26,7 @@ inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_last_chance_imp(co
    // least-significant-bit, ie the number of bits required to represent the
    // the value assuming we will have an exponent to shift things by:
    //
-   return val.is_zero() ? 1 : digits2_2_10(msb(abs(val)) - lsb(abs(val)) + 1);
+   return val.is_zero() ? 1 : 1 + digits2_2_10(msb(abs(val)) - lsb(abs(val)) + 1);
 }
 template <class B, boost::multiprecision::expression_template_option ET>
 inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>& val, const std::integral_constant<int, 2>&)
@@ -60,7 +60,16 @@ inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::
 template <class R, class Terminal>
 inline constexpr unsigned current_precision_of(const Terminal&)
 {
-   return (R::thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision) ? std::numeric_limits<Terminal>::digits10 : 0;
+   return (R::thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision) 
+      ? (std::numeric_limits<Terminal>::min_exponent ? std::numeric_limits<Terminal>::digits10 : 1 + std::numeric_limits<Terminal>::digits10) : 0;
+}
+template <class R>
+inline constexpr unsigned current_precision_of(const float&)
+{
+   using list = typename R::backend_type::float_types;
+   using first_float = typename std::tuple_element<0, list>::type;
+
+   return (R::thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision) ? std::numeric_limits<first_float>::digits10 : 0;
 }
 
 template <class R, class Terminal, std::size_t N>

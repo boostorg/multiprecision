@@ -973,12 +973,12 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
       mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
    }
    mpfr_float_backend(const gmp_int& val)
-       : detail::mpfr_float_imp<0, allocate_dynamic>()
+       : detail::mpfr_float_imp<0, allocate_dynamic>(preserve_all_precision() ? used_gmp_int_bits(val) : boost::multiprecision::detail::digits10_2_2(thread_default_precision()))
    {
       mpfr_set_z(this->m_data, val.data(), GMP_RNDN);
    }
    mpfr_float_backend(const gmp_rational& val)
-       : detail::mpfr_float_imp<0, allocate_dynamic>()
+       : detail::mpfr_float_imp<0, allocate_dynamic>(preserve_all_precision() ? used_gmp_rational_bits(val) : boost::multiprecision::detail::digits10_2_2(thread_default_precision()))
    {
       mpfr_set_q(this->m_data, val.data(), GMP_RNDN);
    }
@@ -990,6 +990,25 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    template <class V>
    mpfr_float_backend& operator=(const V& v)
    {
+      constexpr unsigned d10 = std::is_floating_point<V>::value ?
+         std::numeric_limits<V>::digits10 :
+         std::numeric_limits<V>::digits10 ? 1 + std::numeric_limits<V>::digits10 :
+         1 + boost::multiprecision::detail::digits2_2_10(std::numeric_limits<V>::digits);
+
+      if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+      {
+         BOOST_IF_CONSTEXPR(std::is_floating_point<V>::value)
+         {
+            if (std::numeric_limits<V>::digits > mpfr_get_prec(this->data()))
+               mpfr_set_prec(this->data(), std::numeric_limits<V>::digits);
+         }
+         else
+         {
+            if(precision() < d10)
+               this->precision(d10);
+         }
+      }
+
       *static_cast<detail::mpfr_float_imp<0, allocate_dynamic>*>(this) = v;
       return *this;
    }
@@ -1048,14 +1067,48 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    mpfr_float_backend& operator=(const gmp_int& val)
    {
       if (this->m_data[0]._mpfr_d == 0)
-         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(get_default_precision()));
+      {
+         unsigned requested_precision = this->thread_default_precision();
+         if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+         {
+            unsigned d2 = used_gmp_int_bits(val);
+            unsigned d10 = 1 + multiprecision::detail::digits2_2_10(d2);
+            if (d10 > requested_precision)
+               requested_precision = d10;
+         }
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(requested_precision));
+      }
+      else if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+      {
+         unsigned requested_precision = this->thread_default_precision();
+         unsigned d2 = used_gmp_int_bits(val);
+         unsigned d10 = 1 + multiprecision::detail::digits2_2_10(d2);
+         if (d10 > requested_precision)
+            this->precision(d10);
+      }
       mpfr_set_z(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const gmp_rational& val)
    {
       if (this->m_data[0]._mpfr_d == 0)
-         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(get_default_precision()));
+      {
+         unsigned requested_precision = this->get_default_precision();
+         if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+         {
+            unsigned d10 = 1 + multiprecision::detail::digits2_2_10(used_gmp_rational_bits(val));
+            if (d10 > requested_precision)
+               requested_precision = d10;
+         }
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(requested_precision));
+      }
+      else if (thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision)
+      {
+         unsigned requested_precision = this->get_default_precision();
+         unsigned d10 = 1 + multiprecision::detail::digits2_2_10(used_gmp_rational_bits(val));
+         if (d10 > requested_precision)
+            this->precision(d10);
+      }
       mpfr_set_q(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
