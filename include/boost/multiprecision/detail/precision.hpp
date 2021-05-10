@@ -159,17 +159,17 @@ struct scoped_default_precision<R, true>
    template <class T>
    BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a)
    {
-      init(current_precision_of<R>(a));
+      init(has_uniform_precision() ? R::thread_default_precision() : current_precision_of<R>(a));
    }
    template <class T, class U>
    BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b)
    {
-      init((std::max)(current_precision_of<R>(a), current_precision_of<R>(b)));
+      init(has_uniform_precision() ? R::thread_default_precision() : (std::max)(current_precision_of<R>(a), current_precision_of<R>(b)));
    }
    template <class T, class U, class V>
    BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b, const V& c)
    {
-      init((std::max)((std::max)(current_precision_of<R>(a), current_precision_of<R>(b)), current_precision_of<R>(c)));
+      init(has_uniform_precision() ? R::thread_default_precision() : (std::max)((std::max)(current_precision_of<R>(a), current_precision_of<R>(b)), current_precision_of<R>(c)));
    }
    ~scoped_default_precision()
    {
@@ -179,6 +179,11 @@ struct scoped_default_precision<R, true>
    BOOST_MP_CXX14_CONSTEXPR unsigned precision() const
    {
       return m_new_prec;
+   }
+
+   static constexpr bool has_uniform_precision()
+   {
+      return R::thread_default_variable_precision_options() <= boost::multiprecision::variable_precision_options::assume_uniform_precision;
    }
 
  private:

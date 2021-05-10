@@ -92,7 +92,7 @@ struct mpc_complex_imp
    mpc_complex_imp(mpc_complex_imp&& o) noexcept
    {
       mpfr_prec_t binary_default_precision = boost::multiprecision::detail::digits10_2_2(get_default_precision());
-      if (preserve_source_precision() || (mpc_get_prec(o.data()) == binary_default_precision))
+      if ((this->get_default_options() != variable_precision_options::preserve_target_precision) || (mpc_get_prec(o.data()) == binary_default_precision))
       {
          m_data[0] = o.m_data[0];
          o.m_data[0].re[0]._mpfr_d = 0;
@@ -122,7 +122,7 @@ struct mpc_complex_imp
    // rvalue assign
    mpc_complex_imp& operator=(mpc_complex_imp&& o) noexcept
    {
-      if (preserve_source_precision() || (mpc_get_prec(o.data()) == mpc_get_prec(data())))
+      if ((this->get_default_options() != variable_precision_options::preserve_target_precision) || (mpc_get_prec(o.data()) == mpc_get_prec(data())))
          mpc_swap(m_data, o.m_data);
       else
          *this = static_cast<const mpc_complex_imp&>(o);

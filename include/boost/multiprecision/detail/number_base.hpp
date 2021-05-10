@@ -173,8 +173,9 @@ enum expression_template_option
    et_on  = 1
 };
 
-enum struct variable_precision_options : unsigned char
+enum struct variable_precision_options : signed char
 {
+   assume_uniform_precision = -1,
    preserve_target_precision = 0,
    preserve_source_precision = 1,
    preserve_component_precision = 2,

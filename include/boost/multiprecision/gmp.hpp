@@ -115,7 +115,7 @@ struct gmp_float_imp
    // rvalue copy
    gmp_float_imp(gmp_float_imp&& o) noexcept
    {
-      if (!preserve_source_precision() && (mpf_get_prec(o.data()) != boost::multiprecision::detail::digits10_2_2(get_default_precision())))
+      if ((this->get_default_options() == variable_precision_options::preserve_target_precision) && (mpf_get_prec(o.data()) != boost::multiprecision::detail::digits10_2_2(get_default_precision())))
       {
          mpf_init2(m_data, boost::multiprecision::detail::digits10_2_2(get_default_precision()));
          *this = static_cast<const gmp_float_imp&>(o);
@@ -151,7 +151,7 @@ struct gmp_float_imp
    // rvalue assign
    gmp_float_imp& operator=(gmp_float_imp&& o) noexcept
    {
-      if (!preserve_source_precision() && (mpf_get_prec(o.data()) != mpf_get_prec(data())))
+      if ((this->get_default_options() == variable_precision_options::preserve_target_precision) && (mpf_get_prec(o.data()) != mpf_get_prec(data())))
          *this = static_cast<const gmp_float_imp&>(o);
       else
       {
@@ -599,7 +599,7 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       requested_precision = preserve_related_precision() ? D : get_default_precision();
    }
    // rvalue copy
-   gmp_float(gmp_float&& o) noexcept : detail::gmp_float_imp<0>(static_cast<detail::gmp_float_imp<0>&&>(o)), requested_precision(preserve_source_precision() ? o.requested_precision : get_default_precision())
+   gmp_float(gmp_float&& o) noexcept : detail::gmp_float_imp<0>(static_cast<detail::gmp_float_imp<0>&&>(o)), requested_precision((this->get_default_options() != variable_precision_options::preserve_target_precision) ? o.requested_precision : get_default_precision())
    {}
    gmp_float(const gmp_int& o);
    gmp_float(const gmp_rational& o);
@@ -638,7 +638,7 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    gmp_float& operator=(gmp_float&& o) noexcept
    {
       *static_cast<detail::gmp_float_imp<0>*>(this) = static_cast<detail::gmp_float_imp<0>&&>(o);
-      if (preserve_source_precision())
+      if ((this->get_default_options() != variable_precision_options::preserve_target_precision))
          requested_precision = o.requested_precision;
       return *this;
    }

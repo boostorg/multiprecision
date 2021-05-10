@@ -112,7 +112,7 @@ struct mpfi_float_imp
    mpfi_float_imp(mpfi_float_imp&& o) noexcept
    {
       mpfr_prec_t binary_default_precision = boost::multiprecision::detail::digits10_2_2(get_default_precision());
-      if (preserve_source_precision() || (mpfi_get_prec(o.data()) == binary_default_precision))
+      if ((this->get_default_options() != variable_precision_options::preserve_target_precision) || (mpfi_get_prec(o.data()) == binary_default_precision))
       {
          m_data[0]                = o.m_data[0];
          o.m_data[0].left._mpfr_d = 0;
@@ -141,7 +141,7 @@ struct mpfi_float_imp
    // rvalue assign
    mpfi_float_imp& operator=(mpfi_float_imp&& o) noexcept
    {
-      if (preserve_source_precision() || (mpfi_get_prec(o.data()) == mpfi_get_prec(data())))
+      if ((this->get_default_options() != variable_precision_options::preserve_target_precision) || (mpfi_get_prec(o.data()) == mpfi_get_prec(data())))
          mpfi_swap(m_data, o.m_data);
       else
          *this = static_cast<const mpfi_float_imp&>(o);
