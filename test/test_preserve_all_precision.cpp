@@ -77,10 +77,6 @@ unsigned precision_of(const T&)
 {
    return std::numeric_limits<T>::min_exponent ? std::numeric_limits<T>::digits10 : 1 + std::numeric_limits<T>::digits10;
 }
-unsigned precision_of(const float&)
-{
-   return std::numeric_limits<double>::digits10;
-}
 
 template <class Backend, boost::multiprecision::expression_template_option ET>
 typename std::enable_if<boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<Backend, ET> >::value, unsigned>::type 
@@ -112,7 +108,30 @@ void test_mixed()
    T::thread_default_variable_precision_options(boost::multiprecision::variable_precision_options::preserve_all_precision);
    Other big_a(make_other_big_value<Other>()), big_b(make_other_big_value<Other>()), big_c(make_other_big_value<Other>()), big_d(make_other_big_value<Other>());
 
-   unsigned target_precision = (std::max)(T::thread_default_precision(), precision_of(big_a));
+   unsigned target_precision;
+   if constexpr (std::is_integral_v<Other>)
+   {
+      if constexpr (std::is_unsigned_v<Other>)
+      {
+         using backend_t = typename T::backend_type;
+         using smallest_unsigned = std::tuple_element_t<0, typename backend_t::unsigned_types>;
+         target_precision        = (std::max)(T::thread_default_precision(), (std::max)(precision_of(big_a), precision_of(smallest_unsigned(0))));
+      }
+      else
+      {
+         using backend_t = typename T::backend_type;
+         using smallest_signed = std::tuple_element_t<0, typename backend_t::signed_types>;
+         target_precision        = (std::max)(T::thread_default_precision(), (std::max)(precision_of(big_a), precision_of(smallest_signed(0))));
+      }
+   }
+   else if constexpr (std::is_floating_point_v<Other>)
+   {
+      using backend_t         = typename T::backend_type;
+      using smallest_float = std::tuple_element_t<0, typename backend_t::float_types>;
+      target_precision        = (std::max)(T::thread_default_precision(), (std::max)(precision_of(big_a), precision_of(smallest_float(0))));
+   }
+   else
+      target_precision = (std::max)(T::thread_default_precision(), precision_of(big_a));
 
    T a(big_a);
    // We don't guarentee equivalent decimal precision, only that we can round trip (same number of bits):
