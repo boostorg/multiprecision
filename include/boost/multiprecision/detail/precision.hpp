@@ -58,10 +58,15 @@ inline constexpr unsigned current_precision_of_imp(const boost::multiprecision::
 }
 
 template <class R, class Terminal>
-inline constexpr unsigned current_precision_of(const Terminal&)
+inline constexpr unsigned current_precision_of_terminal(const Terminal&)
 {
    return (R::thread_default_variable_precision_options() >= variable_precision_options::preserve_all_precision) 
       ? (std::numeric_limits<Terminal>::min_exponent ? std::numeric_limits<Terminal>::digits10 : 1 + std::numeric_limits<Terminal>::digits10) : 0;
+}
+template <class R, class Terminal>
+inline constexpr unsigned current_precision_of(const Terminal& r)
+{
+   return current_precision_of_terminal<R>(R::canonical_value(r));
 }
 template <class R>
 inline constexpr unsigned current_precision_of(const float&)
