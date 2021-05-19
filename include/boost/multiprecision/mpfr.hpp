@@ -22,7 +22,6 @@
 #include <utility>
 #include <type_traits>
 #include <atomic>
-#include <mutex>
 
 #ifndef BOOST_MULTIPRECISION_MPFR_DEFAULT_PRECISION
 #define BOOST_MULTIPRECISION_MPFR_DEFAULT_PRECISION 20
@@ -461,17 +460,25 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
    }
    static unsigned& get_default_precision() noexcept
    {
-      static thread_local unsigned val(get_global_default_precision());
+      static BOOST_MP_THREAD_LOCAL unsigned val(get_global_default_precision());
       return val;
    }
-   static std::atomic<variable_precision_options>& get_global_default_options()noexcept
+#ifndef BOOST_MT_NO_ATOMIC_INT
+   static std::atomic<variable_precision_options>& get_global_default_options() noexcept
    {
       static std::atomic<variable_precision_options> val{variable_precision_options::preserve_related_precision};
       return val;
    }
+#else
+   static variable_precision_options& get_global_default_options() noexcept
+   {
+      static variable_precision_options val{variable_precision_options::preserve_related_precision};
+      return val;
+   }
+#endif
    static variable_precision_options& get_default_options()noexcept
    {
-      static thread_local variable_precision_options val(get_global_default_options());
+      static BOOST_MP_THREAD_LOCAL variable_precision_options val(get_global_default_options());
       return val;
    }
    static bool preserve_source_precision() noexcept
@@ -1954,18 +1961,8 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfr_flo
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static std::atomic_bool has_init{false};
-      static std::mutex mut;
-      if (!has_init)
-      {
-         std::unique_lock<std::mutex> l(mut);
-         if (!has_init)
-         {
-            mpfr_const_pi(result.backend().data(), GMP_RNDN);
-            has_init = true;
-         }
-      }
+      // Rely on C++11 thread safe initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -1982,18 +1979,8 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfr
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static std::atomic_bool has_init{false};
-      static std::mutex mut;
-      if (!has_init)
-      {
-         std::unique_lock<std::mutex> l(mut);
-         if (!has_init)
-         {
-            mpfr_const_log2(result.backend().data(), GMP_RNDN);
-            has_init = true;
-         }
-      }
+      // Rely on C++11 thread safe initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2010,18 +1997,8 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfr_
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static std::atomic_bool has_init{false};
-      static std::mutex mut;
-      if (!has_init)
-      {
-         std::unique_lock<std::mutex> l(mut);
-         if (!has_init)
-         {
-            mpfr_const_euler(result.backend().data(), GMP_RNDN);
-            has_init = true;
-         }
-      }
+      // Rely on C++11 thread safe initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2038,18 +2015,8 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static std::atomic_bool has_init{false};
-      static std::mutex mut;
-      if (!has_init)
-      {
-         std::unique_lock<std::mutex> l(mut);
-         if (!has_init)
-         {
-            mpfr_const_catalan(result.backend().data(), GMP_RNDN);
-            has_init = true;
-         }
-      }
+      // Rely on C++11 thread safe initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2067,18 +2034,8 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::debug_ad
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static std::atomic_bool has_init{false};
-      static std::mutex mut;
-      if (!has_init)
-      {
-         std::unique_lock<std::mutex> l(mut);
-         if (!has_init)
-         {
-            mpfr_const_pi(result.backend().value().data(), GMP_RNDN);
-            has_init = true;
-         }
-      }
+      // Rely on C++11 thread safe initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2095,18 +2052,8 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::debu
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static std::atomic_bool has_init{false};
-      static std::mutex mut;
-      if (!has_init)
-      {
-         std::unique_lock<std::mutex> l(mut);
-         if (!has_init)
-         {
-            mpfr_const_log2(result.backend().value().data(), GMP_RNDN);
-            has_init = true;
-         }
-      }
+      // Rely on C++11 thread safe initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2123,18 +2070,8 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::debug
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static std::atomic_bool has_init{false};
-      static std::mutex mut;
-      if (!has_init)
-      {
-         std::unique_lock<std::mutex> l(mut);
-         if (!has_init)
-         {
-            mpfr_const_euler(result.backend().value().data(), GMP_RNDN);
-            has_init = true;
-         }
-      }
+      // Rely on C++11 thread safe initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2151,18 +2088,8 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::deb
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static std::atomic_bool has_init{false};
-      static std::mutex mut;
-      if (!has_init)
-      {
-         std::unique_lock<std::mutex> l(mut);
-         if (!has_init)
-         {
-            mpfr_const_catalan(result.backend().value().data(), GMP_RNDN);
-            has_init = true;
-         }
-      }
+      // Rely on C++11 thread safe initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2540,29 +2467,36 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
 {
    using number_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>;
 
+   static number_type get_min()
+   {
+      number_type result{0.5};
+      mpfr_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin(), GMP_RNDN);
+      return result;
+   }
+   static number_type get_max()
+   {
+      number_type result{0.5};
+      mpfr_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax(), GMP_RNDN);
+      return result;
+   }
+   static number_type get_eps()
+   {
+      number_type result{1};
+      mpfr_div_2exp(result.backend().data(), result.backend().data(), std::numeric_limits<number_type>::digits - 1, GMP_RNDN);
+      return result;
+   }
+
  public:
    static constexpr bool is_specialized = true;
    static number_type(min)()
    {
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 0.5;
-         mpfr_div_2exp(value.second.backend().data(), value.second.backend().data(), -mpfr_get_emin(), GMP_RNDN);
-      }
-      return value.second;
+      static number_type value{get_min()};
+      return value;
    }
    static number_type(max)()
    {
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 0.5;
-         mpfr_mul_2exp(value.second.backend().data(), value.second.backend().data(), mpfr_get_emax(), GMP_RNDN);
-      }
-      return value.second;
+      static number_type value{get_max()};
+      return value;
    }
    static constexpr number_type lowest()
    {
@@ -2578,27 +2512,14 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    static constexpr int  radix        = 2;
    static number_type          epsilon()
    {
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 1;
-         mpfr_div_2exp(value.second.backend().data(), value.second.backend().data(), std::numeric_limits<number_type>::digits - 1, GMP_RNDN);
-      }
-      return value.second;
+      static number_type value{get_eps()};
+      return value;
    }
    // What value should this be????
    static number_type round_error()
    {
       // returns epsilon/2
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 1;
-         mpfr_div_2exp(value.second.backend().data(), value.second.backend().data(), 1, GMP_RNDN);
-      }
-      return value.second;
+      return epsilon() / 2;
    }
    static constexpr long min_exponent                  = MPFR_EMIN_DEFAULT;
    static constexpr long min_exponent10                = (MPFR_EMIN_DEFAULT / 1000) * 301L;
@@ -2611,27 +2532,15 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    static constexpr bool               has_denorm_loss = false;
    static number_type                        infinity()
    {
-      // returns epsilon/2
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 1;
-         mpfr_set_inf(value.second.backend().data(), 1);
-      }
-      return value.second;
+      number_type value;
+      mpfr_set_inf(value.backend().data(), 1);
+      return value;
    }
    static number_type quiet_NaN()
    {
-      // returns epsilon/2
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 1;
-         mpfr_set_nan(value.second.backend().data());
-      }
-      return value.second;
+      number_type value;
+      mpfr_set_nan(value.backend().data());
+      return value;
    }
    static constexpr number_type signaling_NaN()
    {

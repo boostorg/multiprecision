@@ -341,17 +341,25 @@ struct mpc_complex_imp
    }
    static unsigned& get_default_precision() noexcept
    {
-      static thread_local unsigned val(get_global_default_precision());
+      static BOOST_MP_THREAD_LOCAL unsigned val(get_global_default_precision());
       return val;
    }
+#ifndef BOOST_MT_NO_ATOMIC_INT
    static std::atomic<variable_precision_options>& get_global_default_options() noexcept
+#else
+   static variable_precision_options& get_global_default_options() noexcept
+#endif
    {
+#ifndef BOOST_MT_NO_ATOMIC_INT
       static std::atomic<variable_precision_options> val{variable_precision_options::preserve_related_precision};
+#else
+      static variable_precision_options val{variable_precision_options::preserve_related_precision};
+#endif
       return val;
    }
    static variable_precision_options& get_default_options() noexcept
    {
-      static thread_local variable_precision_options val(get_global_default_options());
+      static BOOST_MP_THREAD_LOCAL variable_precision_options val(get_global_default_options());
       return val;
    }
    static bool preserve_source_precision() noexcept

@@ -171,7 +171,9 @@ struct gmp_float_imp
    gmp_float_imp& operator=(boost::ulong_long_type i)
    {
       if (m_data[0]._mp_d == 0)
+      {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      }
       boost::ulong_long_type mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
       unsigned               shift = 0;
       mpf_t                  t;
@@ -193,7 +195,9 @@ struct gmp_float_imp
    gmp_float_imp& operator=(boost::long_long_type i)
    {
       if (m_data[0]._mp_d == 0)
+      {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      }
       bool neg = i < 0;
       *this    = static_cast<boost::ulong_long_type>(boost::multiprecision::detail::unsigned_abs(i));
       if (neg)
@@ -204,21 +208,27 @@ struct gmp_float_imp
    gmp_float_imp& operator=(unsigned long i)
    {
       if (m_data[0]._mp_d == 0)
+      {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      }
       mpf_set_ui(m_data, i);
       return *this;
    }
    gmp_float_imp& operator=(long i)
    {
       if (m_data[0]._mp_d == 0)
+      {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      }
       mpf_set_si(m_data, i);
       return *this;
    }
    gmp_float_imp& operator=(double d)
    {
       if (m_data[0]._mp_d == 0)
+      {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      }
       mpf_set_d(m_data, d);
       return *this;
    }
@@ -229,7 +239,9 @@ struct gmp_float_imp
       using std::ldexp;
 
       if (m_data[0]._mp_d == 0)
+      {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      }
 
       if (a == 0)
       {
@@ -276,7 +288,9 @@ struct gmp_float_imp
    gmp_float_imp& operator=(const char* s)
    {
       if (m_data[0]._mp_d == 0)
+      {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      }
       if (s && (*s == '+'))
          ++s;  // Leading "+" sign not supported by mpf_set_str:
       if (0 != mpf_set_str(m_data, s, 10))
@@ -401,11 +415,7 @@ struct gmp_float_imp
    {
       if (m_data[0]._mp_d)
       {
-         if ((m_data[0]._mp_d == (void*)0xfeeefeeefeeefeee) || (m_data[0]._mp_prec < 0))
-            printf("Ooops");
-         else
-            mpf_clear(m_data);
-         m_data[0]._mp_d = (mp_limb_t*)(void*)1;
+         mpf_clear(m_data);
       }
    }
    void negate() noexcept
@@ -450,7 +460,7 @@ struct gmp_float_imp
    mpf_t            m_data;
    static unsigned& get_default_precision() noexcept
    {
-      static thread_local unsigned val(get_global_default_precision());
+      static BOOST_MP_THREAD_LOCAL unsigned val(get_global_default_precision());
       return val;
    }
    static boost::multiprecision::detail::precision_type& get_global_default_precision() noexcept
@@ -458,14 +468,22 @@ struct gmp_float_imp
       static boost::multiprecision::detail::precision_type val(50);
       return val;
    }
-   static std::atomic<variable_precision_options>& get_global_default_options()noexcept
+#ifndef BOOST_MT_NO_ATOMIC_INT
+   static std::atomic<variable_precision_options>& get_global_default_options() noexcept
+#else
+   static variable_precision_options& get_global_default_options() noexcept
+#endif
    {
+#ifndef BOOST_MT_NO_ATOMIC_INT
       static std::atomic<variable_precision_options> val{variable_precision_options::preserve_related_precision};
+#else
+      static variable_precision_options val{variable_precision_options::preserve_related_precision};
+#endif
       return val;
    }
    static variable_precision_options& get_default_options()noexcept
    {
-      static thread_local variable_precision_options val(get_global_default_options());
+      static BOOST_MP_THREAD_LOCAL variable_precision_options val(get_global_default_options());
       return val;
    }
    static bool preserve_source_precision() noexcept
@@ -2877,34 +2895,43 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_fl
 {
    using number_type = boost::multiprecision::number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates>;
 
- public:
-   static constexpr bool is_specialized = true;
    //
    // min and max values chosen so as to not cause segfaults when calling
    // mpf_get_str on 64-bit Linux builds.  Possibly we could use larger
    // exponent values elsewhere.
    //
+   static number_type calc_min()
+   {
+      number_type result(1);
+      mpf_div_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
+      return result;
+   }
+   static number_type calc_max()
+   {
+      number_type result(1);
+      mpf_mul_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
+      return result;
+   }
+   static number_type calc_epsilon()
+   {
+      number_type result(1);
+      mpf_div_2exp(result.backend().data(), result.backend().data(), std::numeric_limits<number_type>::digits - 1);
+      return result;
+   }
+
+
+ public:
+   static constexpr bool is_specialized = true;
    static number_type(min)()
    {
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 1;
-         mpf_div_2exp(value.second.backend().data(), value.second.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
-      }
-      return value.second;
+      // rely on C++11 thread safe initialization of statics:
+      static const number_type value{calc_min()};
+      return value;
    }
    static number_type(max)()
    {
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 1;
-         mpf_mul_2exp(value.second.backend().data(), value.second.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
-      }
-      return value.second;
+      static number_type value{calc_max()};
+      return value;
    }
    static constexpr number_type lowest()
    {
@@ -2920,26 +2947,14 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_fl
    static constexpr int  radix        = 2;
    static number_type          epsilon()
    {
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 1;
-         mpf_div_2exp(value.second.backend().data(), value.second.backend().data(), std::numeric_limits<number_type>::digits - 1);
-      }
-      return value.second;
+      static const number_type value{calc_epsilon()};
+      return value;
    }
    // What value should this be????
    static number_type round_error()
    {
       // returns epsilon/2
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 1;
-      }
-      return value.second;
+      return epsilon() / 2;
    }
    static constexpr long               min_exponent      = LONG_MIN;
    static constexpr long               min_exponent10    = (LONG_MIN / 1000) * 301L;
