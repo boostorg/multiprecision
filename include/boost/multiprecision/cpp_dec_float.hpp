@@ -26,6 +26,7 @@
 
 #include <boost/multiprecision/number.hpp>
 
+#include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/dynamic_array.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/itos.hpp>
