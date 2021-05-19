@@ -2953,8 +2953,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_fl
    // What value should this be????
    static number_type round_error()
    {
-      // returns epsilon/2
-      return epsilon() / 2;
+      return 1;
    }
    static constexpr long               min_exponent      = LONG_MIN;
    static constexpr long               min_exponent10    = (LONG_MIN / 1000) * 301L;

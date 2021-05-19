@@ -1664,30 +1664,52 @@ template <unsigned Digits10, boost::multiprecision::expression_template_option E
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> >
 {
    using number_type = boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>;
+   static number_type get_min()
+   {
+      number_type value(0.5);
+      mpfi_div_2exp(value.backend().data(), value.backend().data(), -mpfr_get_emin());
+      return value;
+   }
+   static number_type get_max()
+   {
+      number_type value(0.5);
+      mpfi_mul_2exp(value.backend().data(), value.backend().data(), mpfr_get_emax());
+      return value;
+   }
+   static number_type get_epsilon()
+   {
+      number_type value(1);
+      mpfi_div_2exp(value.backend().data(), value.backend().data(), std::numeric_limits<number_type>::digits - 1);
+      return value;
+   }
+   static number_type get_infinity()
+   {
+      number_type value;
+      boost::multiprecision::mpfr_float_backend<Digits10> t;
+      mpfr_set_inf(t.data(), 1);
+      mpfi_set_fr(value.backend().data(), t.data());
+      return value;
+   }
+   static number_type get_quiet_NaN()
+   {
+      number_type value;
+      boost::multiprecision::mpfr_float_backend<Digits10> t;
+      mpfr_set_nan(t.data());
+      mpfi_set_fr(value.backend().data(), t.data());
+      return value;
+   }
 
  public:
    static constexpr bool is_specialized = true;
    static number_type(min)()
    {
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 0.5;
-         mpfi_div_2exp(value.second.backend().data(), value.second.backend().data(), -mpfr_get_emin());
-      }
-      return value.second;
+      static number_type value{get_min()};
+      return value;
    }
    static number_type(max)()
    {
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 0.5;
-         mpfi_mul_2exp(value.second.backend().data(), value.second.backend().data(), mpfr_get_emax());
-      }
-      return value.second;
+      static number_type value{get_max()};
+      return value;
    }
    static constexpr number_type lowest()
    {
@@ -1703,27 +1725,13 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
    static constexpr int  radix        = 2;
    static number_type          epsilon()
    {
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 1;
-         mpfi_div_2exp(value.second.backend().data(), value.second.backend().data(), std::numeric_limits<number_type>::digits - 1);
-      }
-      return value.second;
+      static number_type value{get_epsilon()};
+      return value;
    }
    // What value should this be????
    static number_type round_error()
    {
-      // returns epsilon/2
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         value.first  = true;
-         value.second = 1;
-         mpfi_div_2exp(value.second.backend().data(), value.second.backend().data(), 1);
-      }
-      return value.second;
+      return 0.5;
    }
    static constexpr long min_exponent                  = MPFR_EMIN_DEFAULT;
    static constexpr long min_exponent10                = (MPFR_EMIN_DEFAULT / 1000) * 301L;
@@ -1736,27 +1744,13 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
    static constexpr bool               has_denorm_loss = false;
    static number_type                        infinity()
    {
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         boost::multiprecision::mpfr_float_backend<Digits10> t;
-         mpfr_set_inf(t.data(), 1);
-         value.first = true;
-         mpfi_set_fr(value.second.backend().data(), t.data());
-      }
-      return value.second;
+      static number_type value{get_infinity()};
+      return value;
    }
    static number_type quiet_NaN()
    {
-      static std::pair<bool, number_type> value;
-      if (!value.first)
-      {
-         boost::multiprecision::mpfr_float_backend<Digits10> t;
-         mpfr_set_nan(t.data());
-         value.first = true;
-         mpfi_set_fr(value.second.backend().data(), t.data());
-      }
-      return value.second;
+      static number_type value{get_quiet_NaN()};
+      return value;
    }
    static constexpr number_type signaling_NaN()
    {

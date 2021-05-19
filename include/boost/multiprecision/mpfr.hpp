@@ -2519,7 +2519,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    static number_type round_error()
    {
       // returns epsilon/2
-      return epsilon() / 2;
+      return 0.5;
    }
    static constexpr long min_exponent                  = MPFR_EMIN_DEFAULT;
    static constexpr long min_exponent10                = (MPFR_EMIN_DEFAULT / 1000) * 301L;
@@ -2638,7 +2638,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    }
    static number_type round_error()
    {
-      return epsilon() / 2;
+      return 0.5;
    }
    static constexpr long min_exponent                  = MPFR_EMIN_DEFAULT;
    static constexpr long min_exponent10                = (MPFR_EMIN_DEFAULT / 1000) * 301L;
