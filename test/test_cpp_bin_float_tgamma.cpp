@@ -9,7 +9,7 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include "test.hpp"
 
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
 
 namespace local
 {
@@ -34,9 +34,9 @@ namespace local
 
 int main()
 {
-   using big_float_type_016 = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(local::max)((int) (std::numeric_limits<double>::digits + 1), 16)>>;
-   using big_float_type_035 = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(local::max)((int) (std::numeric_limits<double>::digits + 1), 35)>>;
-   using big_float_type_105 = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<105>>;
+   using big_float_type_016 = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<(local::max)((int) (std::numeric_limits<double>::digits + 1), 16)>>;
+   using big_float_type_035 = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<(local::max)((int) (std::numeric_limits<double>::digits + 1), 35)>>;
+   using big_float_type_105 = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<105>>;
 
    local::test<big_float_type_016>();
    local::test<big_float_type_035>();
