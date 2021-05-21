@@ -182,6 +182,25 @@ struct logged_adaptor
    {
       value().precision(digits10);
    }
+   //
+   // Variable precision options:
+   // 
+   static constexpr variable_precision_options default_variable_precision_options()noexcept
+   {
+      return Backend::default_variable_precision_options();
+   }
+   static constexpr variable_precision_options thread_default_variable_precision_options()noexcept
+   {
+      return Backend::thread_default_variable_precision_options();
+   }
+   static BOOST_MP_CXX14_CONSTEXPR void default_variable_precision_options(variable_precision_options opts)
+   {
+      Backend::default_variable_precision_options(opts);
+   }
+   static BOOST_MP_CXX14_CONSTEXPR void thread_default_variable_precision_options(variable_precision_options opts)
+   {
+      Backend::thread_default_variable_precision_options(opts);
+   }
 };
 
 template <class T>
@@ -595,6 +614,14 @@ using backends::logged_adaptor;
 template <class Backend>
 struct number_category<backends::logged_adaptor<Backend> > : public number_category<Backend>
 {};
+
+namespace detail {
+   template <class Backend>
+   struct is_variable_precision<logged_adaptor<Backend> > : public is_variable_precision<Backend>
+   {};
+} // namespace detail
+
+
 
 }} // namespace boost::multiprecision
 

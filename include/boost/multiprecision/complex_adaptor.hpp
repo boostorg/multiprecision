@@ -905,6 +905,14 @@ struct complex_result_from_scalar<number<Backend, ExpressionTemplates> >
    using type = number<complex_adaptor<Backend>, ExpressionTemplates>;
 };
 
+namespace detail {
+   template <class Backend>
+   struct is_variable_precision<complex_adaptor<Backend> > : public is_variable_precision<Backend>
+   {};
+} // namespace detail
+
+
+
 }
 
 } // namespace boost::multiprecision
