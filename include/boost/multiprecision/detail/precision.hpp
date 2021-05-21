@@ -164,17 +164,17 @@ struct scoped_default_precision<R, true>
    template <class T>
    BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a)
    {
-      init(has_uniform_precision() ? R::thread_default_precision() : current_precision_of<R>(a));
+      init(has_uniform_precision() ? R::thread_default_precision() : (std::max)(R::thread_default_precision(), current_precision_of<R>(a)));
    }
    template <class T, class U>
    BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b)
    {
-      init(has_uniform_precision() ? R::thread_default_precision() : (std::max)(current_precision_of<R>(a), current_precision_of<R>(b)));
+      init(has_uniform_precision() ? R::thread_default_precision() : (std::max)(R::thread_default_precision(), (std::max)(current_precision_of<R>(a), current_precision_of<R>(b))));
    }
    template <class T, class U, class V>
    BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b, const V& c)
    {
-      init(has_uniform_precision() ? R::thread_default_precision() : (std::max)((std::max)(current_precision_of<R>(a), current_precision_of<R>(b)), current_precision_of<R>(c)));
+      init(has_uniform_precision() ? R::thread_default_precision() : (std::max)((std::max)(current_precision_of<R>(a), current_precision_of<R>(b)), (std::max)(R::thread_default_precision(), current_precision_of<R>(c))));
    }
    ~scoped_default_precision()
    {
