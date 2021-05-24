@@ -15,7 +15,6 @@ SOURCES=\
 ../../../../boost/multiprecision/miller_rabin.hpp\
 ../../../../boost/multiprecision/rational_adaptor.hpp\
 ../../../../boost/multiprecision/concepts/mp_number_archetypes.hpp\
-../../../../boost/multiprecision/detail/big_lanczos.hpp\
 ../../../../boost/multiprecision/detail/digits.hpp\
 ../../../../boost/multiprecision/detail/no_et_ops.hpp\
 ../../../../boost/multiprecision/detail/number_base.hpp\
