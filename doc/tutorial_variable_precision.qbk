@@ -93,4 +93,10 @@ per-variable basis since they control whole expressions, not individual variable
 [[N::thread_default_variable_precision_options(opts)][`void`][Sets the options for the current thread to `opts` which must be one of the `variable_precision_options` enumerated values.]]
 ]
 
+[h4 Examples]
+
+[import ../example/scoped_precision_example.cpp]
+
+[scoped_precision_1]
+
 [endsect] [/section:variable Variable Precision Arithmetic]
