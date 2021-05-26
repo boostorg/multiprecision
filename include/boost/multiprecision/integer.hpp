@@ -190,48 +190,50 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
 }
 
 template <class Integer>
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type karatsuba_sqrt(const Integer& x, Integer& r, size_t bits)
+{
+   // we can calculate it faster with std::sqrt
+   if (bits <= 64) {
+		const uint64_t int32max = uint64_t(std::numeric_limits<uint32_t>::max());
+      uint64_t val = static_cast<uint64_t>(x);
+		uint64_t s = static_cast<uint64_t>(std::sqrt(static_cast<long double>(val)));
+		// converting to long double can loose some precision, and `sqrt` can give eps error, so we'll fix this
+      // this is needed
+		while (s > int32max || s * s > val) s--;
+      // in my tests this never fired, but theoretically this might be needed
+		while (s < int32max && (s + 1) * (s + 1) <= val) s++;
+      r = Integer(val - s * s);
+      return Integer(s);
+   }
+   // https://hal.inria.fr/file/index/docid/72854/filename/RR-3805.pdf
+   return Integer(0);
+   size_t b = bits / 4;
+   Integer s = karatsuba_sqrt(Integer(x >> (b * 2)), r, bits - b * 2);
+   Integer q;
+   r <<= b;
+   divide_qr(Integer(r + ((x & ((Integer(1) << (b * 2)) - 1)) >> b)), Integer(s << 1), q, r);
+   r <<= b;
+   r += (x & ((Integer(1) << b) - 1));
+   s <<= b;
+   s += q;
+   q *= q;
+   // we substract after, so it works for unsigned integers too
+   if (r < q) {
+      r += (s << 1) - 1;
+      s--;
+   }
+   r -= q;
+   return s;
+}
+
+template <class Integer>
 BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type sqrt(const Integer& x, Integer& r)
 {
-   //
-   // This is slow bit-by-bit integer square root, see for example
-   // http://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Binary_numeral_system_.28base_2.29
-   // There are better methods such as http://hal.inria.fr/docs/00/07/28/54/PDF/RR-3805.pdf
-   // and http://hal.inria.fr/docs/00/07/21/13/PDF/RR-4475.pdf which should be implemented
-   // at some point.
-   //
-   Integer s = 0;
-   if (x == 0)
-   {
-      r = 0;
-      return s;
+   if (x == Integer(0)) {
+      r = Integer(0);
+      return Integer(0);
    }
-   int g = msb(x);
-   if (g == 0)
-   {
-      r = 1;
-      return s;
-   }
-
-   Integer t = 0;
-   r         = x;
-   g /= 2;
-   bit_set(s, g);
-   bit_set(t, 2 * g);
-   r = x - t;
-   --g;
-   do
-   {
-      t = s;
-      t <<= g + 1;
-      bit_set(t, 2 * g);
-      if (t <= r)
-      {
-         bit_set(s, g);
-         r -= t;
-      }
-      --g;
-   } while (g >= 0);
-   return s;
+   return karatsuba_sqrt(x, r, msb(x) + 1);
 }
 
 template <class Integer>

@@ -196,7 +196,7 @@ test-suite arithmetic_tests :
 rule get_function_tests
 {
    local result ;
-   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
+   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
    {
          result += [ run $(source) gmp no_eh_support
               : # command line
@@ -821,6 +821,8 @@ test-suite cpp_int_tests :
             <define>TEST=4
             : test_cpp_int_karatsuba_4
             ]
+
+      [ run test_int_sqrt.cpp no_eh_support ]
 
       [ run test_checked_cpp_int.cpp no_eh_support ]
       [ run test_unchecked_cpp_int.cpp no_eh_support : : : release ]
