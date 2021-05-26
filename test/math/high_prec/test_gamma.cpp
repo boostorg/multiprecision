@@ -1,4 +1,4 @@
-//  (C) Copyright John Maddock 2006.
+//  (C) Copyright John Maddock 2006, 2021.
 //  Use, modification and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,8 +6,15 @@
 #include "test_gamma.hpp"
 #ifdef TEST_MPFR
 #include <boost/multiprecision/mpfr.hpp>
-#else
+#endif
+#ifdef TEST_MPF
+#include <boost/multiprecision/gmp.hpp>
+#endif
+#ifdef TEST_CPP_BIN_FLOAT
 #include <boost/multiprecision/cpp_bin_float.hpp>
+#endif
+#ifdef TEST_CPP_DEC_FLOAT
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
 
 void expected_results()
@@ -59,17 +66,30 @@ void expected_results()
              << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
+#ifndef TEST_PRECISION
+#define TEST_PRECISION 450
+#endif
+
 BOOST_AUTO_TEST_CASE(test_main)
 {
    expected_results();
    BOOST_MATH_CONTROL_FP;
 
 #ifdef TEST_MPFR
-   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<450> > mp_type;
-   const char*                                                                            name = "number<mpfr_float_backend<450> >";
-#else
-   typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float<450> > mp_type;
-   const char*                                                                       name = "number<cpp_bin_float<450> >";
+   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<TEST_PRECISION> > mp_type;
+   const char*                                                                            name = "number<mpfr_float_backend<" BOOST_STRINGIZE(TEST_PRECISION) "> >";
+#endif
+#ifdef TEST_MPF
+   typedef boost::multiprecision::number<boost::multiprecision::gmp_float<TEST_PRECISION> > mp_type;
+   const char*                                                                              name = "number<gmp_float<" BOOST_STRINGIZE(TEST_PRECISION) "> >";
+#endif
+#ifdef TEST_CPP_BIN_FLOAT
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float<TEST_PRECISION> > mp_type;
+   const char*                                                                                  name = "number<cpp_bin_float<" BOOST_STRINGIZE(TEST_PRECISION) "> >";
+#endif
+#ifdef TEST_CPP_DEC_FLOAT
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<TEST_PRECISION> > mp_type;
+   const char*                                                                                  name = "number<cpp_dec_float<" BOOST_STRINGIZE(TEST_PRECISION) "> >";
 #endif
 
    test_gamma(mp_type(0), name);
