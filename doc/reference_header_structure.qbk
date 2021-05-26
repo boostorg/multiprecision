@@ -35,7 +35,6 @@
 [[cpp_int/limits.hpp][`numeric_limits` support for `cpp_int_backend`.]]
 [[cpp_int/misc.hpp][Miscellaneous operators for `cpp_int_backend`.]]
 [[cpp_int/multiply.hpp][Multiply operators for `cpp_int_backend`.]]
-[[detail/big_lanczos.hpp][Lanczos support for Boost.Math integration.]]
 [[detail/default_ops.hpp][Default versions of the optional backend non-member functions.]]
 [[detail/generic_interconvert.hpp][Generic interconversion routines.]]
 [[detail/number_base.hpp][All the expression template code, metaprogramming, and operator overloads for `number`.]]

@@ -1091,6 +1091,8 @@ test-suite misc :
 run test_cpp_bin_float_round.cpp mpfr gmp ;
 explicit test_cpp_bin_float_round ;
 
+high_precision_points = 35 40 41 50 51 60 61 70 71 80 81 100 101 450 ;
+
 rule get_specfun_tests_mpfr
 {
    local result ;
@@ -1098,7 +1100,6 @@ rule get_specfun_tests_mpfr
    {
       result += [ run $(source) mpfr gmp 
             /boost/test//boost_unit_test_framework/<link>static 
-            /boost/regex//boost_regex/<link>static 
             math/instances//test_instances_mpfr/<link>static
            : # command line
            : # input files
@@ -1114,26 +1115,23 @@ rule get_specfun_tests_mpfr
             release
            : $(source:B)_mpfr ] ;
    }
-   #
-   # High precision tests are rather different, as they test only one
-   # multiprecision type and are more a test of Boost.Math:
-   #
-   for local source in [ glob math/high_prec/*.cpp ]
+   for local digits in $(high_precision_points)
    {
-      result += [ run $(source)
+      result += [ run math/high_prec/test_gamma.cpp
             /boost/test//boost_unit_test_framework/<link>static 
-            /boost/regex//boost_regex/<link>static 
            : # command line
            : # input files
            : # requirements
             <optimization>speed
             <define>BOOST_ALL_NO_LIB
-            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
+            <define>TEST_PRECISION=$(digits)
             <toolset>msvc:<cxxflags>-bigobj
-            [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>gmp <source>mpfr :  ]
+            [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>gmp <source>mpfr : <build>no ]
             [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <include>../../math/include_private
-            release ] ;
+            release
+            : test_gamma_mpfr_$(digits) ] ;
+
    }
    return $(result) ;
 }
@@ -1145,7 +1143,6 @@ rule get_specfun_tests_gmp
    {
       result += [ run $(source) gmp 
             /boost/test//boost_unit_test_framework/<link>static 
-            /boost/regex//boost_regex/<link>static
             math/instances//test_instances_mpf/<link>static
            : # command line
            : # input files
@@ -1155,11 +1152,28 @@ rule get_specfun_tests_gmp
             <optimization>speed
             <define>TEST_MPF_50
             <define>BOOST_ALL_NO_LIB
-            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <toolset>msvc:<cxxflags>-bigobj
             <include>../../math/include_private
             release
            : $(source:B)_mpf ] ;
+   }
+   for local digits in $(high_precision_points)
+   {
+      result += [ run math/high_prec/test_gamma.cpp
+            /boost/test//boost_unit_test_framework/<link>static 
+           : # command line
+           : # input files
+           : # requirements
+            <optimization>speed
+            <define>BOOST_ALL_NO_LIB
+            <define>TEST_PRECISION=$(digits)
+            <toolset>msvc:<cxxflags>-bigobj
+            [ check-target-builds ../config//has_gmp : <define>TEST_MPF <source>gmp : <build>no ]
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
+            <include>../../math/include_private
+            release
+            : test_gamma_gmp_$(digits) ] ;
+
    }
    return $(result) ;
 }
@@ -1170,7 +1184,6 @@ rule get_specfun_tests_cpp_dec_float
    for local source in [ glob math/*.cpp ]
    {
       result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static 
-               /boost/regex//boost_regex/<link>static
                math/instances//test_instances_cpp_dec_float/<link>static
            : # command line
            : # input files
@@ -1178,12 +1191,26 @@ rule get_specfun_tests_cpp_dec_float
             [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <define>TEST_CPP_DEC_FLOAT
             <define>BOOST_ALL_NO_LIB
-            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
-            <optimization>speed
             <toolset>msvc:<cxxflags>-bigobj
             <include>../../math/include_private
             release
            : $(source:B)_cpp_dec_float ] ;
+   }
+   for local digits in $(high_precision_points)
+   {
+      result += [ run math/high_prec/test_gamma.cpp
+            /boost/test//boost_unit_test_framework/<link>static 
+           : # command line
+           : # input files
+           : # requirements
+            <optimization>speed
+            <define>BOOST_ALL_NO_LIB
+            <define>TEST_PRECISION=$(digits)
+            <toolset>msvc:<cxxflags>-bigobj
+            <define>TEST_CPP_DEC_FLOAT
+            <include>../../math/include_private
+            release
+            : test_gamma_cpp_dec_float_$(digits) ] ;
    }
    return $(result) ;
 }
@@ -1194,20 +1221,35 @@ rule get_specfun_tests_cpp_bin_float
    for local source in [ glob math/*.cpp ]
    {
       result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static 
-               /boost/regex//boost_regex/<link>static
                math/instances//test_instances_cpp_bin_float/<link>static
            : # command line
            : # input files
            : # requirements
             <define>TEST_CPP_BIN_FLOAT
             <define>BOOST_ALL_NO_LIB
-            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
-            <optimization>speed
             <toolset>msvc:<cxxflags>-bigobj
             <include>../../math/include_private
             release
             [ check-target-builds ../config//has_float128 : <source>quadmath ]
            : $(source:B)_cpp_bin_float ] ;
+   }
+   for local digits in $(high_precision_points)
+   {
+      result += [ run math/high_prec/test_gamma.cpp
+            /boost/test//boost_unit_test_framework/<link>static 
+           : # command line
+           : # input files
+           : # requirements
+            <optimization>speed
+            <define>BOOST_ALL_NO_LIB
+            <define>TEST_PRECISION=$(digits)
+            <toolset>msvc:<cxxflags>-bigobj
+            <define>TEST_CPP_BIN_FLOAT
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
+            <include>../../math/include_private
+            release
+            : test_gamma_cpp_bin_float_$(digits) ] ;
+
    }
    return $(result) ;
 }
@@ -1219,7 +1261,6 @@ rule get_specfun_tests_float128
    {
       result += [ run $(source) quadmath 
             /boost/test//boost_unit_test_framework/<link>static 
-            /boost/regex//boost_regex/<link>static
             math/instances//test_instances_float128/<link>static
            : # command line
            : # input files
@@ -1244,7 +1285,6 @@ rule get_specfun_tests_intel_quad
    {
       result += [ run $(source)
             /boost/test//boost_unit_test_framework/<link>static 
-            /boost/regex//boost_regex/<link>static
             math/instances//test_instances_intel_quad/<link>static
            : # command line
            : # input files
