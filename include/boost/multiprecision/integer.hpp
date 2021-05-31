@@ -194,7 +194,7 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
 {
    // we can calculate it faster with std::sqrt
    if (bits <= 64) {
-      const uint64_t int32max = uint64_t(std::numeric_limits<uint32_t>::max());
+      const uint64_t int32max = uint64_t((std::numeric_limits<uint32_t>::max)());
       uint64_t val = static_cast<uint64_t>(x);
       uint64_t s = static_cast<uint64_t>(std::sqrt(static_cast<long double>(val)));
       // converting to long double can loose some precision, and `sqrt` can give eps error, so we'll fix this
@@ -209,7 +209,7 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
    return Integer(0);
    size_t b = bits / 4;
    Integer s = karatsuba_sqrt(Integer(x >> (b * 2)), r, bits - b * 2);
-   Integer q;
+   Integer q{};
    r <<= b;
    divide_qr(Integer(r + ((x & ((Integer(1) << (b * 2)) - 1)) >> b)), Integer(s << 1), q, r);
    r <<= b;
