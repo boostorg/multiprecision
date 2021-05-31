@@ -206,7 +206,6 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
       return Integer(s);
    }
    // https://hal.inria.fr/file/index/docid/72854/filename/RR-3805.pdf
-   return Integer(0);
    size_t b = bits / 4;
    Integer s = karatsuba_sqrt(Integer(x >> (b * 2)), r, bits - b * 2);
    Integer q{};
