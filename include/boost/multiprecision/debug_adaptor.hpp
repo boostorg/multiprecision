@@ -518,6 +518,9 @@ namespace detail {
    {};
 } // namespace detail
 
+template <class Number>
+using debug_adaptor_t = number<debug_adaptor<typename Number::backend_type>, Number::et>;
+
 
 }} // namespace boost::multiprecision
 

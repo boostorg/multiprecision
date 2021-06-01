@@ -621,7 +621,8 @@ namespace detail {
    {};
 } // namespace detail
 
-
+template <class Number>
+using logged_adaptor_t = number<logged_adaptor<typename Number::backend_type>, Number::et>;
 
 }} // namespace boost::multiprecision
 
