@@ -58,12 +58,16 @@ The behaviour of the library is controlled by the following enumerated values:
 
    }
 
-The enumerated values have the following meanings, with `preserve_related_precision` being the default:
+The enumerated values have the following meanings, with `preserve_related_precision` being the default.  Note that the values `preserve_source_precision`, `preserve_component_precision`,
+`preserve_related_precision` and `preserve_all_precision` form a hierarchy, with each adding progressively more types to the one before to the list of types that are considered when calculating
+the precision of an expression.  So if an expression has type N, then `preserve_source_precision` includes only sub-expressions of type N, `preserve_component_precision` also considers N::value_type,
+`preserve_related_precision` adds to that other template instantiations of `number<N::backend_type>`, and `preserve_all_precision` includes everything, including completely unrelated types
+such as integers and rationals.
 
 [table
 [[Value][Meaning]]
 [[assume_uniform_precision][This is the most efficient option - it simply assumes that all variables in the current thread have the same precision, and ignores the precision of all other types.
-   Shoud these assumptions not hold, then strange unexpected things may happen.  No checks are made to ensure that all variables really are of the same precision.]]
+   Should these assumptions not hold, then strange unexpected things may happen.  No checks are made to ensure that all variables really are of the same precision.]]
 [[preserve_target_precision][All expressions are evaluated at the precision of the highest precision variable within the expression, and then rounded to the precision
    of the target variable upon assignment.  The precision of other types (including related or component types - see below) contained within the expression are ignored.
    This option has the unfortunate side effect, that moves may become full deep copies.]]
@@ -74,12 +78,15 @@ The enumerated values have the following meanings, with `preserve_related_precis
    If the expression contains component types then these are also considered when calculating the precision of the expression.  Component types are the types which make up the two 
    components of the number when dealing with interval or complex numbers.  They are the same type as `N::value_type`.
    Moves, are true moves not copies.]]
-[[preserve_related_precision][As above, but in addition to component types, all related types are considered when evaluating the precision of the expression.
+[[preserve_related_precision][All expressions are evaluated at the precision of the highest precision variable within the expression, and that precision is preserved upon assignment.  
+   If the expression contains component types then these are also considered when calculating the precision of the expression.  In addition to component types, 
+   all related types are considered when evaluating the precision of the expression.
    Related types are considered to be instantiations of the same template, but with different parameters.  So for example `mpfr_float_100` would be a related type to `mpfr_float`, and all expressions
-   containing an `mpfr_float_100` variable would have at least 100 decimal digits of precision when evaluated as an `mpfr_float` expression.]]
-[[preserve_all_precision][As above, but all types are considered when evaluating the precision of the expression.
+   containing an `mpfr_float_100` variable would have at least 100 decimal digits of precision when evaluated as an `mpfr_float` expression.  Moves, are true moves not copies.]]
+[[preserve_all_precision][All expressions are evaluated at the precision of the highest precision variable within the expression, and that precision is preserved upon assignment.  
+   In addition to component and related types, all types are considered when evaluating the precision of the expression.
    For example, if the expression contains an `mpz_int`, then the precision of the expression will be sufficient to store all of the digits in the integer unchanged.
-   This option should generally be used with extreme caution, as it can easily cause unintentional precision inflation.]]
+   This option should generally be used with extreme caution, as it can easily cause unintentional precision inflation.  Moves, are true moves not copies.]]
 ]
 
 As with working precision, the above options can be set or queried on either a global or thread-local level, note that these options can not be set on a 

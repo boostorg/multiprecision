@@ -26,6 +26,8 @@
       typedef          Backend                          backend_type;
       typedef typename component_type<self_type>::type  value_type;
 
+      static constexpr expression_template_option et = ExpressionTemplates;
+
       number();
       number(see-below);
       number& operator=(see-below);

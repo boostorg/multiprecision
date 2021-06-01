@@ -40,6 +40,9 @@ class number
  public:
    using backend_type = Backend                                 ;
    using value_type = typename component_type<self_type>::type;
+
+   static constexpr expression_template_option et = ExpressionTemplates;
+
    BOOST_MP_FORCEINLINE constexpr number() noexcept(noexcept(Backend())) {}
    BOOST_MP_FORCEINLINE constexpr number(const number& e) noexcept(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(e.m_backend) {}
    template <class V>
