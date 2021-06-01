@@ -192,6 +192,30 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
 template <class Integer>
 BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type karatsuba_sqrt(const Integer& x, Integer& r, size_t bits)
 {
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   // std::sqrt is not constexpr by standard, so use this 
+   if (BOOST_MP_IS_CONST_EVALUATED(bits)) {
+      if (bits <= 4) {
+         if (x == 0) {
+            r = 0;
+            return 0;
+         }
+         else if (x < 4) {
+            r = x - 1;
+            return 1;
+         }
+         else if (x < 9) {
+            r = x - 4;
+            return 2;
+         }
+         else {
+            r = x - 9;
+            return 3;
+         }
+      }
+   }
+   else
+#endif
    // we can calculate it faster with std::sqrt
    if (bits <= 64) {
       const uint64_t int32max = uint64_t((std::numeric_limits<uint32_t>::max)());
