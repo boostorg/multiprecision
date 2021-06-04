@@ -73,7 +73,7 @@ class number
    //
    template <class V>
    BOOST_MP_FORCEINLINE constexpr number(const V& v, typename std::enable_if<
-      std::is_enum<V>::value && std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<typename std::underlying_type<V>::type, Backend>::type, Backend>::value>::type* = 0)
+      std::is_enum<V>::value && std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
       : number(static_cast<typename std::underlying_type<V>::type>(v))
    {}
    //
@@ -81,7 +81,7 @@ class number
    //
    template <class V>
    BOOST_MP_FORCEINLINE explicit constexpr number(const V& v, typename std::enable_if<
-      std::is_enum<V>::value && !std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<typename std::underlying_type<V>::type, Backend>::type, Backend>::value>::type* = 0)
+      std::is_enum<V>::value && !std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
       : number(static_cast<typename std::underlying_type<V>::type>(v))
    {}
 
