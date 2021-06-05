@@ -61,7 +61,11 @@ class number
        : m_backend(canonical_value(v))
    {}
    template <class V>
-   BOOST_MP_FORCEINLINE constexpr number(const V& v, unsigned digits10, typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<V>::value || std::is_same<std::string, V>::value || std::is_convertible<V, const char*>::value) && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_complex) && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational)
+   BOOST_MP_FORCEINLINE 
+#if !(defined(BOOST_MSVC) && (BOOST_MSVC <= 1900))
+       constexpr
+#endif
+       number(const V& v, unsigned digits10, typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<V>::value || std::is_same<std::string, V>::value || std::is_convertible<V, const char*>::value) && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_complex) && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational)
 #ifdef BOOST_HAS_FLOAT128
                                                                                                 && !std::is_same<V, __float128>::value
 #endif
@@ -72,7 +76,11 @@ class number
    // Conversions from unscoped enum's are implicit:
    //
    template <class V>
-   BOOST_MP_FORCEINLINE constexpr number(const V& v, typename std::enable_if<
+   BOOST_MP_FORCEINLINE 
+#if !(defined(BOOST_MSVC) && (BOOST_MSVC <= 1900))
+      constexpr 
+#endif
+      number(const V& v, typename std::enable_if<
       std::is_enum<V>::value && std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
       : number(static_cast<typename std::underlying_type<V>::type>(v))
    {}
@@ -250,19 +258,11 @@ class number
    }
 
    template <class V>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, self_type>::value && !std::is_enum<V>::value, number<Backend, ExpressionTemplates>&>::type
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, self_type>::value, number<Backend, ExpressionTemplates>&>::type
    operator=(const V& v)
        noexcept(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
    {
       m_backend = canonical_value(v);
-      return *this;
-   }
-   template <class V>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, self_type>::value && std::is_enum<V>::value, number<Backend, ExpressionTemplates>&>::type
-   operator=(const V& v)
-       noexcept(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<typename std::underlying_type<V>::type, Backend>::type&>()))
-   {
-      m_backend = canonical_value(static_cast<typename std::underlying_type<V>::type>(v));
       return *this;
    }
    template <class V>
@@ -879,13 +879,6 @@ class number
    {
       return !is_zero();
    }
-#if 0//!(BOOST_WORKAROUND(BOOST_MSVC, < 1900) || (defined(__apple_build_version__) && BOOST_WORKAROUND(__clang_major__, < 9)))
-   template <class T, class = typename std::enable_if<std::is_enum<T>::value, T>::type>
-   explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
-   {
-      return static_cast<T>(this->template convert_to<typename std::underlying_type<T>::type>());
-   }
-#endif
    //
    // Default precision:
    //

@@ -1025,7 +1025,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !boost::multiprecision:
 template <class R, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_enum<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
-   typename std::underlying_type<R>::type t;
+   typename std::underlying_type<R>::type t{};
    eval_convert_to(&t, backend);
    *result = static_cast<R>(t);
 }
