@@ -61,11 +61,7 @@ class number
        : m_backend(canonical_value(v))
    {}
    template <class V>
-   BOOST_MP_FORCEINLINE 
-#if !(defined(BOOST_MSVC) && (BOOST_MSVC <= 1900))
-       constexpr
-#endif
-       number(const V& v, unsigned digits10, typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<V>::value || std::is_same<std::string, V>::value || std::is_convertible<V, const char*>::value) && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_complex) && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational)
+   BOOST_MP_FORCEINLINE constexpr number(const V& v, unsigned digits10, typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<V>::value || std::is_same<std::string, V>::value || std::is_convertible<V, const char*>::value) && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_complex) && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational)
 #ifdef BOOST_HAS_FLOAT128
                                                                                                 && !std::is_same<V, __float128>::value
 #endif
@@ -88,7 +84,11 @@ class number
    // Conversions from scoped enum's are explicit:
    //
    template <class V>
-   BOOST_MP_FORCEINLINE explicit constexpr number(const V& v, typename std::enable_if<
+   BOOST_MP_FORCEINLINE explicit 
+#if !(defined(BOOST_MSVC) && (BOOST_MSVC <= 1900))
+       constexpr
+#endif
+       number(const V& v, typename std::enable_if<
       std::is_enum<V>::value && !std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
       : number(static_cast<typename std::underlying_type<V>::type>(v))
    {}
