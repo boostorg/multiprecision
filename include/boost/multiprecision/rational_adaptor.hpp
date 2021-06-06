@@ -245,7 +245,7 @@ inline typename std::enable_if<number_category<R>::value == number_kind_floating
 }
 
 template <class R, class IntBackend>
-inline typename std::enable_if<(number_category<R>::value != number_kind_integer) && (number_category<R>::value != number_kind_floating_point)>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+inline typename std::enable_if<(number_category<R>::value != number_kind_integer) && (number_category<R>::value != number_kind_floating_point) && !std::is_enum<R>::value>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
    using comp_t = typename component_type<number<rational_adaptor<IntBackend> > >::type;
    comp_t                                                                        num(backend.data().numerator());

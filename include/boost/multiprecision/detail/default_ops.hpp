@@ -1004,7 +1004,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::d
 }
 
 template <class R, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !boost::multiprecision::detail::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !boost::multiprecision::detail::is_integral<R>::value && !std::is_enum<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
    using next_type = typename calculate_next_larger_type<R, B>::type;
    next_type                                               n = next_type();
@@ -1020,6 +1020,14 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !boost::multiprecision:
    }
    else
       *result = static_cast<R>(n);
+}
+
+template <class R, class B>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_enum<R>::value>::type eval_convert_to(R* result, const B& backend)
+{
+   typename std::underlying_type<R>::type t{};
+   eval_convert_to(&t, backend);
+   *result = static_cast<R>(t);
 }
 
 template <class R, class B>
