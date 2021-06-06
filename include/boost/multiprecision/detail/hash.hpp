@@ -18,15 +18,37 @@ inline std::size_t hash_value(const T& v)
     return hasher(v);
 }
 
+#if defined(BOOST_HAS_INT128)
+
+std::size_t hash_value(const unsigned __int128& val);
+
+inline std::size_t hash_value(const __int128& val)
+{
+   return hash_value(static_cast<unsigned __int128>(val));
+}
+
+#endif
+
 inline void hash_combine(std::size_t&) {}
 
 template <typename T, typename... Args>
 inline void hash_combine(std::size_t& seed, const T& v, Args... args) 
 {
-    // gmp types require explicit casting
-    seed = seed ^ (hash_value(v) + 0x9e3779b9 + (seed<<6) + (seed>>2));
+    constexpr std::size_t adder = 0x9e3779b9;
+    seed = seed ^ (hash_value(v) + adder + (seed<<6) + (seed>>2));
     hash_combine(seed, args...);
 }
+
+#if defined(BOOST_HAS_INT128)
+
+inline std::size_t hash_value(const unsigned __int128& val)
+{
+   std::size_t result = static_cast<std::size_t>(val);
+   hash_combine(result, static_cast<std::size_t>(val >> 64));
+   return result;
+}
+
+#endif
 
 }}} // Namespaces
 
