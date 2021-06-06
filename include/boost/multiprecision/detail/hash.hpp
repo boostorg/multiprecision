@@ -11,21 +11,21 @@
 
 namespace boost { namespace multiprecision { namespace detail {
 
+template <typename T>
+inline std::size_t hash_value(const T& v)
+{
+    std::hash<T> hasher;
+    return hasher(v);
+}
+
 inline void hash_combine(std::size_t&) {}
 
 template <typename T, typename... Args>
 inline void hash_combine(std::size_t& seed, const T& v, Args... args) 
 {
     // gmp types require explicit casting
-    seed = static_cast<std::size_t>(static_cast<T>(seed) ^ (v + 0x9e3779b9 + (seed<<6) + (seed>>2)));
+    seed = seed ^ (hash_value(v) + 0x9e3779b9 + (seed<<6) + (seed>>2));
     hash_combine(seed, args...);
-}
-
-template <typename T>
-inline std::size_t hash_value(const T& v)
-{
-    std::hash<T> hasher;
-    return hasher(v);
 }
 
 }}} // Namespaces

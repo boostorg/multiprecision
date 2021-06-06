@@ -1104,8 +1104,7 @@ inline std::size_t hash_value(const gmp_float<Digits10>& val)
    std::size_t result = 0;
    for (int i = 0; i < std::abs(val.data()[0]._mp_size); ++i)
       boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_d[i]);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_exp);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_size);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_exp, val.data()[0]._mp_size);
    return result;
 }
 
