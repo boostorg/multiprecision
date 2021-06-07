@@ -1655,8 +1655,7 @@ inline std::size_t hash_value(const mpfr_float_backend<Digits10, AllocateType>& 
       ++len;
    for (std::size_t i = 0; i < len; ++i)
       boost::multiprecision::detail::hash_combine(result, val.data()[0]._mpfr_d[i]);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mpfr_exp);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mpfr_sign);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mpfr_exp, val.data()[0]._mpfr_sign);
    return result;
 }
 

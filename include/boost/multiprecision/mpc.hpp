@@ -1453,16 +1453,14 @@ inline std::size_t hash_value(const mpc_complex_backend<Digits10>& val)
       ++len;
    for (std::size_t i = 0; i < len; ++i)
       boost::multiprecision::detail::hash_combine(result, val.data()[0].re[0]._mpfr_d[i]);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0].re[0]._mpfr_exp);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0].re[0]._mpfr_sign);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0].re[0]._mpfr_exp, val.data()[0].re[0]._mpfr_sign);
 
    len = val.data()[0].im[0]._mpfr_prec / mp_bits_per_limb;
    if (val.data()[0].im[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
    for (std::size_t i = 0; i < len; ++i)
       boost::multiprecision::detail::hash_combine(result, val.data()[0].im[0]._mpfr_d[i]);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0].im[0]._mpfr_exp);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0].im[0]._mpfr_sign);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0].im[0]._mpfr_exp, val.data()[0].im[0]._mpfr_sign);
    return result;
 }
 
