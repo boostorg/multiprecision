@@ -33,6 +33,9 @@ namespace backends {
 template <unsigned digits10>
 struct mpfi_float_backend;
 
+template <class Backend>
+struct debug_adaptor;
+
 } // namespace backends
 
 template <unsigned digits10>
@@ -1232,6 +1235,207 @@ inline bool singleton(const number<mpfi_float_backend<Digits10>, ExpressionTempl
    return mpfr_cmp(a.backend().left_data(), a.backend().right_data()) == 0;
 }
 
+//
+// Again with debug_adaptor:
+//
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<debug_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> lower(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& val)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<debug_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(val);
+   number<debug_adaptor<mpfr_float_backend<Digits10> > >                                                                               result;
+   mpfr_set(result.backend().value().data(), val.backend().value().left_data(), GMP_RNDN);
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<debug_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> upper(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& val)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<debug_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(val);
+   number<debug_adaptor<mpfr_float_backend<Digits10> > >                                                                               result;
+   mpfr_set(result.backend().value().data(), val.backend().value().right_data(), GMP_RNDN);
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<debug_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> median(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& val)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<debug_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(val);
+   number<debug_adaptor<mpfr_float_backend<Digits10> > >                                                                               result;
+   mpfi_mid(result.backend().value().data(), val.backend().value().data());
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<debug_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> width(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& val)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<debug_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(val);
+   number<debug_adaptor<mpfr_float_backend<Digits10> > >                                                                               result;
+   mpfi_diam_abs(result.backend().value().data(), val.backend().value().data());
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> intersect(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a, const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& b)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(a, b);
+   number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>                                                           result;
+   mpfi_intersect(result.backend().value().data(), a.backend().value().data(), b.backend().value().data());
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> hull(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a, const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& b)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(a, b);
+   number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>                                                           result;
+   mpfi_union(result.backend().value().data(), a.backend().value().data(), b.backend().value().data());
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool overlap(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a, const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& b)
+{
+   return (lower(a) <= lower(b) && lower(b) <= upper(a)) ||
+          (lower(b) <= lower(a) && lower(a) <= upper(b));
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates1, expression_template_option ExpressionTemplates2>
+inline bool in(const number<debug_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates1>& a, const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates2>& b)
+{
+   return mpfi_is_inside_fr(a.backend().value().data(), b.backend().value().data()) != 0;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool zero_in(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a)
+{
+   return mpfi_has_zero(a.backend().value().data()) != 0;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool subset(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a, const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& b)
+{
+   return mpfi_is_inside(a.backend().value().data(), b.backend().value().data()) != 0;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool proper_subset(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a, const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& b)
+{
+   return mpfi_is_strictly_inside(a.backend().value().data(), b.backend().value().data()) != 0;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool empty(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a)
+{
+   return mpfi_is_empty(a.backend().value().data()) != 0;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool singleton(const number<debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a)
+{
+   return mpfr_cmp(a.backend().value().left_data(), a.backend().value().right_data()) == 0;
+}
+//
+// Again with logged_adaptor:
+//
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<logged_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> lower(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& val)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<logged_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(val);
+   number<logged_adaptor<mpfr_float_backend<Digits10> > >                                                                               result;
+   mpfr_set(result.backend().value().data(), val.backend().value().left_data(), GMP_RNDN);
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<logged_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> upper(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& val)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<logged_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(val);
+   number<logged_adaptor<mpfr_float_backend<Digits10> > >                                                                               result;
+   mpfr_set(result.backend().value().data(), val.backend().value().right_data(), GMP_RNDN);
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<logged_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> median(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& val)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<logged_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(val);
+   number<logged_adaptor<mpfr_float_backend<Digits10> > >                                                                               result;
+   mpfi_mid(result.backend().value().data(), val.backend().value().data());
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<logged_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> width(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& val)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<logged_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(val);
+   number<logged_adaptor<mpfr_float_backend<Digits10> > >                                                                               result;
+   mpfi_diam_abs(result.backend().value().data(), val.backend().value().data());
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> intersect(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a, const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& b)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(a, b);
+   number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>                                                           result;
+   mpfi_intersect(result.backend().value().data(), a.backend().value().data(), b.backend().value().data());
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> hull(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a, const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& b)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(a, b);
+   number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>                                                           result;
+   mpfi_union(result.backend().value().data(), a.backend().value().data(), b.backend().value().data());
+   return result;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool overlap(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a, const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& b)
+{
+   return (lower(a) <= lower(b) && lower(b) <= upper(a)) ||
+          (lower(b) <= lower(a) && lower(a) <= upper(b));
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates1, expression_template_option ExpressionTemplates2>
+inline bool in(const number<logged_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates1>& a, const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates2>& b)
+{
+   return mpfi_is_inside_fr(a.backend().value().data(), b.backend().value().data()) != 0;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool zero_in(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a)
+{
+   return mpfi_has_zero(a.backend().value().data()) != 0;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool subset(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a, const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& b)
+{
+   return mpfi_is_inside(a.backend().value().data(), b.backend().value().data()) != 0;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool proper_subset(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a, const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& b)
+{
+   return mpfi_is_strictly_inside(a.backend().value().data(), b.backend().value().data()) != 0;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool empty(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a)
+{
+   return mpfi_is_empty(a.backend().value().data()) != 0;
+}
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline bool singleton(const number<logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates>& a)
+{
+   return mpfr_cmp(a.backend().value().left_data(), a.backend().value().right_data()) == 0;
+}
+//
+// component_type specialization:
+//
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 struct component_type<number<mpfi_float_backend<Digits10>, ExpressionTemplates> >
 {
@@ -1293,6 +1497,122 @@ inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<D
 
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result;
    mpfi_log1p(result.backend().data(), arg.backend().data());
+   return result;
+}
+
+//
+// And again with debug_adaptor:
+//
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> asinh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_asinh(result.backend().value().data(), arg.backend().value().data());
+   return result;
+}
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> acosh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_acosh(result.backend().value().data(), arg.backend().value().data());
+   return result;
+}
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> atanh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_atanh(result.backend().value().data(), arg.backend().value().data());
+   return result;
+}
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_cbrt(result.backend().value().data(), arg.backend().value().data());
+   return result;
+}
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_expm1(result.backend().value().data(), arg.backend().value().data());
+   return result;
+}
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::debug_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_log1p(result.backend().value().data(), arg.backend().value().data());
+   return result;
+}
+
+//
+// And again with logged_adaptor:
+//
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> asinh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_asinh(result.backend().value().data(), arg.backend().value().data());
+   return result;
+}
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> acosh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_acosh(result.backend().value().data(), arg.backend().value().data());
+   return result;
+}
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> atanh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_atanh(result.backend().value().data(), arg.backend().value().data());
+   return result;
+}
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_cbrt(result.backend().value().data(), arg.backend().value().data());
+   return result;
+}
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_expm1(result.backend().value().data(), arg.backend().value().data());
+   return result;
+}
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::detail::scoped_default_precision<number<boost::multiprecision::backends::logged_adaptor<mpfi_float_backend<Digits10> >, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> result;
+   mpfi_log1p(result.backend().value().data(), arg.backend().value().data());
    return result;
 }
 
@@ -1424,6 +1744,71 @@ min_value<logged_type2>()
    //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
+// mpfi gets used with debug_adaptor fairly often, so specialize for that use case as well:
+using debug_type1 = boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float::backend_type>, boost::multiprecision::et_on> ;
+using debug_type2 = boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float::backend_type>, boost::multiprecision::et_off>;
+
+template <>
+inline int digits<debug_type1>()
+#ifdef BOOST_MATH_NOEXCEPT
+    noexcept
+#endif
+{
+   return multiprecision::detail::digits10_2_2(debug_type1::default_precision());
+}
+template <>
+inline int digits<debug_type2>()
+#ifdef BOOST_MATH_NOEXCEPT
+    noexcept
+#endif
+{
+   return multiprecision::detail::digits10_2_2(debug_type1::default_precision());
+}
+
+template <>
+inline debug_type1
+max_value<debug_type1>()
+{
+   debug_type1 result(0.5);
+   mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
+   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   result.backend().update_view();
+   return result;
+}
+
+template <>
+inline debug_type1
+min_value<debug_type1>()
+{
+   debug_type1 result(0.5);
+   mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
+   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   result.backend().update_view();
+   return result;
+}
+
+template <>
+inline debug_type2
+max_value<debug_type2>()
+{
+   debug_type2 result(0.5);
+   mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
+   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   result.backend().update_view();
+   return result;
+}
+
+template <>
+inline debug_type2
+min_value<debug_type2>()
+{
+   debug_type2 result(0.5);
+   mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
+   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   result.backend().update_view();
+   return result;
+}
+
 } // namespace tools
 
 namespace constants { namespace detail {
@@ -1526,6 +1911,204 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
    {
       result_type result;
       mpfi_const_catalan(result.backend().data());
+      return result;
+   }
+};
+//
+// And again with debug_adaptor:
+//
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_pi<boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> >
+{
+   using result_type = boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>;
+   template <int N>
+   static inline const result_type& get(const std::integral_constant<int, N>&)
+   {
+      static result_type result;
+      static bool        has_init = false;
+      if (!has_init)
+      {
+         has_init = true;
+         mpfi_const_pi(result.backend().value().data());
+         result.backend().update_view();
+      }
+      return result;
+   }
+   static inline result_type get(const std::integral_constant<int, 0>&)
+   {
+      result_type result;
+      mpfi_const_pi(result.backend().value().data());
+      result.backend().update_view();
+      return result;
+   }
+};
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> >
+{
+   using result_type = boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>;
+   template <int N>
+   static inline const result_type& get(const std::integral_constant<int, N>&)
+   {
+      static result_type result;
+      static bool        has_init = false;
+      if (!has_init)
+      {
+         has_init = true;
+         mpfi_const_log2(result.backend().value().data());
+         result.backend().update_view();
+      }
+      return result;
+   }
+   static inline result_type get(const std::integral_constant<int, 0>&)
+   {
+      result_type result;
+      mpfi_const_log2(result.backend().value().data());
+      result.backend().update_view();
+      return result;
+   }
+};
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_euler<boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> >
+{
+   using result_type = boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>;
+   template <int N>
+   static inline const result_type& get(const std::integral_constant<int, N>&)
+   {
+      static result_type result;
+      static bool        has_init = false;
+      if (!has_init)
+      {
+         has_init = true;
+         mpfi_const_euler(result.backend().value().data());
+         result.backend().update_view();
+      }
+      return result;
+   }
+   static inline result_type get(const std::integral_constant<int, 0>&)
+   {
+      result_type result;
+      mpfi_const_euler(result.backend().value().data());
+      result.backend().update_view();
+      return result;
+   }
+};
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_catalan<boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> >
+{
+   using result_type = boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>;
+   template <int N>
+   static inline const result_type& get(const std::integral_constant<int, N>&)
+   {
+      static result_type result;
+      static bool        has_init = false;
+      if (!has_init)
+      {
+         has_init = true;
+         mpfi_const_catalan(result.backend().value().data());
+         result.backend().update_view();
+      }
+      return result;
+   }
+   static inline result_type get(const std::integral_constant<int, 0>&)
+   {
+      result_type result;
+      mpfi_const_catalan(result.backend().value().data());
+      result.backend().update_view();
+      return result;
+   }
+};
+//
+// And again with logged_adaptor:
+//
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_pi<boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> >
+{
+   using result_type = boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>;
+   template <int N>
+   static inline const result_type& get(const std::integral_constant<int, N>&)
+   {
+      static result_type result;
+      static bool        has_init = false;
+      if (!has_init)
+      {
+         has_init = true;
+         mpfi_const_pi(result.backend().value().data());
+      }
+      return result;
+   }
+   static inline result_type get(const std::integral_constant<int, 0>&)
+   {
+      result_type result;
+      mpfi_const_pi(result.backend().value().data());
+      return result;
+   }
+};
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> >
+{
+   using result_type = boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>;
+   template <int N>
+   static inline const result_type& get(const std::integral_constant<int, N>&)
+   {
+      static result_type result;
+      static bool        has_init = false;
+      if (!has_init)
+      {
+         has_init = true;
+         mpfi_const_log2(result.backend().value().data());
+      }
+      return result;
+   }
+   static inline result_type get(const std::integral_constant<int, 0>&)
+   {
+      result_type result;
+      mpfi_const_log2(result.backend().value().data());
+      return result;
+   }
+};
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_euler<boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> >
+{
+   using result_type = boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>;
+   template <int N>
+   static inline const result_type& get(const std::integral_constant<int, N>&)
+   {
+      static result_type result;
+      static bool        has_init = false;
+      if (!has_init)
+      {
+         has_init = true;
+         mpfi_const_euler(result.backend().value().data());
+      }
+      return result;
+   }
+   static inline result_type get(const std::integral_constant<int, 0>&)
+   {
+      result_type result;
+      mpfi_const_euler(result.backend().value().data());
+      return result;
+   }
+};
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_catalan<boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates> >
+{
+   using result_type = boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>;
+   template <int N>
+   static inline const result_type& get(const std::integral_constant<int, N>&)
+   {
+      static result_type result;
+      static bool        has_init = false;
+      if (!has_init)
+      {
+         has_init = true;
+         mpfi_const_catalan(result.backend().value().data());
+      }
+      return result;
+   }
+   static inline result_type get(const std::integral_constant<int, 0>&)
+   {
+      result_type result;
+      mpfi_const_catalan(result.backend().value().data());
       return result;
    }
 };
