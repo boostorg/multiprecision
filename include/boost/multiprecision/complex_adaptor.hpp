@@ -19,6 +19,12 @@ namespace multiprecision {
 namespace backends {
 
 template <class Backend>
+struct debug_adaptor;
+
+template <class Backend>
+struct logged_adaptor;
+
+template <class Backend>
 struct complex_adaptor
 {
  protected:
@@ -903,6 +909,18 @@ template <class Backend, expression_template_option ExpressionTemplates>
 struct complex_result_from_scalar<number<Backend, ExpressionTemplates> >
 {
    using type = number<complex_adaptor<Backend>, ExpressionTemplates>;
+};
+
+template <class Backend, expression_template_option ExpressionTemplates>
+struct complex_result_from_scalar<number<backends::debug_adaptor<Backend>, ExpressionTemplates> >
+{
+   using type = number<backends::debug_adaptor<complex_adaptor<Backend> >, ExpressionTemplates>;
+};
+
+template <class Backend, expression_template_option ExpressionTemplates>
+struct complex_result_from_scalar<number<backends::logged_adaptor<Backend>, ExpressionTemplates> >
+{
+   using type = number<backends::logged_adaptor<complex_adaptor<Backend> >, ExpressionTemplates>;
 };
 
 }
