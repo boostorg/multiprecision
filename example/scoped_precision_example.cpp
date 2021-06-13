@@ -357,7 +357,7 @@ for example:
 
    // calculate 2^1000 - 1:
    mpz_int i(1);
-   i << 1000;
+   i <<= 1000;
    i -= 1;
 
    mp_t f = i;
