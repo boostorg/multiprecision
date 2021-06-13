@@ -818,6 +818,7 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
       }
       v = tu - t;
       ++i;
+      BOOST_ASSERT((u <= v) || (t / q == old_v));
       if (u <= v)
       {
          // We've gone terribly wrong, probably numeric overflow:
@@ -825,13 +826,11 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
       }
       if ((i & 1u) == 0)
       {
-         BOOST_ASSERT(u > v);
          if ((static_cast<limb_type>(v >> bits_per_limb) < x[2]) || ((static_cast<limb_type>(u >> bits_per_limb) - static_cast<limb_type>(v >> bits_per_limb)) < (y[2] + y[1])))
             break;
       }
       else
       {
-         BOOST_ASSERT(u > v);
          if ((static_cast<limb_type>(v >> bits_per_limb) < y[2]) || ((static_cast<limb_type>(u >> bits_per_limb) - static_cast<limb_type>(v >> bits_per_limb)) < (x[2] + x[1])))
             break;
       }
