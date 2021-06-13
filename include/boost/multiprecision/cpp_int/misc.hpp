@@ -818,6 +818,11 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
       }
       v = tu - t;
       ++i;
+      if (u <= v)
+      {
+         // We've gone terribly wrong, probably numeric overflow:
+         break;
+      }
       if ((i & 1u) == 0)
       {
          BOOST_ASSERT(u > v);
