@@ -71,6 +71,31 @@ class number
                                                                                                           >::type* = 0)
        : m_backend(canonical_value(v), digits10)
    {}
+   //
+   // Conversions from unscoped enum's are implicit:
+   //
+   template <class V>
+   BOOST_MP_FORCEINLINE 
+#if !(defined(BOOST_MSVC) && (BOOST_MSVC <= 1900))
+      constexpr 
+#endif
+      number(const V& v, typename std::enable_if<
+      std::is_enum<V>::value && std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
+      : number(static_cast<typename std::underlying_type<V>::type>(v))
+   {}
+   //
+   // Conversions from scoped enum's are explicit:
+   //
+   template <class V>
+   BOOST_MP_FORCEINLINE explicit 
+#if !(defined(BOOST_MSVC) && (BOOST_MSVC <= 1900))
+       constexpr
+#endif
+       number(const V& v, typename std::enable_if<
+      std::is_enum<V>::value && !std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
+      : number(static_cast<typename std::underlying_type<V>::type>(v))
+   {}
+
    BOOST_MP_FORCEINLINE constexpr number(const number& e, unsigned digits10)
        noexcept(noexcept(Backend(std::declval<Backend const&>(), std::declval<unsigned>())))
        : m_backend(e.m_backend, digits10) {}
@@ -966,7 +991,7 @@ class number
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1900) || (defined(__apple_build_version__) && BOOST_WORKAROUND(__clang_major__, < 9))
    template <class T>
 #else
-   template <class T, class = typename std::enable_if<!(std::is_constructible<T, self_type const&>::value || !std::is_default_constructible<T>::value || (!boost::multiprecision::detail::is_arithmetic<T>::value && !boost::multiprecision::detail::is_complex<T>::value)), T>::type>
+   template <class T, class = typename std::enable_if<std::is_enum<T>::value || !(std::is_constructible<T, self_type const&>::value || !std::is_default_constructible<T>::value || (!boost::multiprecision::detail::is_arithmetic<T>::value && !boost::multiprecision::detail::is_complex<T>::value)), T>::type>
 #endif
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
    {

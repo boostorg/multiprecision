@@ -12,7 +12,6 @@
 #include <boost/multiprecision/detail/atomic.hpp>
 #include <boost/multiprecision/traits/is_variable_precision.hpp>
 #include <boost/multiprecision/mpfr.hpp>
-#include <boost/multiprecision/logged_adaptor.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <mpc.h>
 #include <cmath>
@@ -29,6 +28,11 @@ namespace backends {
 
 template <unsigned digits10>
 struct mpc_complex_backend;
+
+template <class Backend>
+struct logged_adaptor;
+template <class Backend>
+struct debug_adaptor;
 
 } // namespace backends
 
@@ -1605,16 +1609,14 @@ inline std::size_t hash_value(const mpc_complex_backend<Digits10>& val)
       ++len;
    for (std::size_t i = 0; i < len; ++i)
       boost::multiprecision::detail::hash_combine(result, val.data()[0].re[0]._mpfr_d[i]);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0].re[0]._mpfr_exp);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0].re[0]._mpfr_sign);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0].re[0]._mpfr_exp, val.data()[0].re[0]._mpfr_sign);
 
    len = val.data()[0].im[0]._mpfr_prec / mp_bits_per_limb;
    if (val.data()[0].im[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
    for (std::size_t i = 0; i < len; ++i)
       boost::multiprecision::detail::hash_combine(result, val.data()[0].im[0]._mpfr_d[i]);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0].im[0]._mpfr_exp);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0].im[0]._mpfr_sign);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0].im[0]._mpfr_exp, val.data()[0].im[0]._mpfr_sign);
    return result;
 }
 
@@ -1645,15 +1647,30 @@ struct component_type<number<mpc_complex_backend<Digits10>, ExpressionTemplates>
 };
 
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
-struct component_type<number<logged_adaptor<mpc_complex_backend<Digits10> >, ExpressionTemplates> >
+struct component_type<number<backends::logged_adaptor<mpc_complex_backend<Digits10> >, ExpressionTemplates> >
 {
    using type = number<mpfr_float_backend<Digits10>, ExpressionTemplates>;
+};
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+struct component_type<number<backends::debug_adaptor<mpc_complex_backend<Digits10> >, ExpressionTemplates> >
+{
+   using type = number<backends::debug_adaptor<mpfr_float_backend<Digits10> >, ExpressionTemplates>;
 };
 
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 struct complex_result_from_scalar<number<mpfr_float_backend<Digits10>, ExpressionTemplates> >
 {
    using type = number<mpc_complex_backend<Digits10>, ExpressionTemplates>;
+};
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+struct complex_result_from_scalar<number<backends::logged_adaptor<mpfr_float_backend<Digits10>>, ExpressionTemplates> >
+{
+   using type = number<mpc_complex_backend<Digits10>, ExpressionTemplates>;
+};
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+struct complex_result_from_scalar<number<backends::debug_adaptor<mpfr_float_backend<Digits10>>, ExpressionTemplates> >
+{
+   using type = number<backends::debug_adaptor<mpc_complex_backend<Digits10> >, ExpressionTemplates>;
 };
 
 }

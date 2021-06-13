@@ -26,7 +26,6 @@
 
 #include <boost/multiprecision/number.hpp>
 
-#include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/dynamic_array.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/itos.hpp>
@@ -259,9 +258,7 @@ class cpp_dec_float
       std::size_t result = 0;
       for (int i = 0; i < prec_elem; ++i)
          boost::multiprecision::detail::hash_combine(result, data[i]);
-      boost::multiprecision::detail::hash_combine(result, exp);
-      boost::multiprecision::detail::hash_combine(result, neg);
-      boost::multiprecision::detail::hash_combine(result, fpclass);
+      boost::multiprecision::detail::hash_combine(result, exp, neg, static_cast<std::size_t>(fpclass));
       return result;
    }
 

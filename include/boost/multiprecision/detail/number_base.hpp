@@ -375,6 +375,13 @@ struct canonical_imp<Val, Backend, std::integral_constant<int, 3> >
 {
    using type = const char*;
 };
+template <class Val, class Backend>
+struct canonical_imp<Val, Backend, std::integral_constant<int, 4> >
+{
+   using underlying = typename std::underlying_type<Val>::type;
+   using tag = typename std::conditional<boost::multiprecision::detail::is_signed<Val>::value, std::integral_constant<int, 0>, std::integral_constant<int, 1>>::type;
+   using type = typename canonical_imp<underlying, Backend, tag>::type;
+};
 
 template <class Val, class Backend>
 struct canonical
@@ -391,7 +398,10 @@ struct canonical
                typename std::conditional<
                    (std::is_convertible<Val, const char*>::value || std::is_same<Val, std::string>::value),
                    std::integral_constant<int, 3>,
-                   std::integral_constant<int, 4> >::type>::type>::type>::type;
+                   typename std::conditional<
+                     std::is_enum<Val>::value,
+                     std::integral_constant<int, 4>,
+                     std::integral_constant<int, 5> >::type>::type>::type>::type>::type;
 
    using type = typename canonical_imp<Val, Backend, tag_type>::type;
 };

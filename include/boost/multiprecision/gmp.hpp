@@ -9,7 +9,6 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
-#include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
@@ -1215,8 +1214,7 @@ inline std::size_t hash_value(const gmp_float<Digits10>& val)
    std::size_t result = 0;
    for (int i = 0; i < std::abs(val.data()[0]._mp_size); ++i)
       boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_d[i]);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_exp);
-   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_size);
+   boost::multiprecision::detail::hash_combine(result, val.data()[0]._mp_exp, val.data()[0]._mp_size);
    return result;
 }
 
