@@ -190,48 +190,89 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
 }
 
 template <class Integer>
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type karatsuba_sqrt(const Integer& x, Integer& r, Integer& t, size_t bits)
+{
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   // std::sqrt is not constexpr by standard, so use this 
+   if (BOOST_MP_IS_CONST_EVALUATED(bits)) {
+      if (bits <= 4) {
+         if (x == 0) {
+            r = 0u;
+            return 0u; 
+         }
+         else if (x < 4) {
+            r = x - 1;
+            return 1u; 
+         }
+         else if (x < 9) {
+            r = x - 4;
+            return 2u; 
+         }
+         else {
+            r = x - 9;
+            return 3u; 
+         }
+      }
+   }
+   else
+#endif
+   // we can calculate it faster with std::sqrt
+   if (bits <= 64) {
+      const uint64_t int32max = uint64_t((std::numeric_limits<uint32_t>::max)());
+      uint64_t val = static_cast<uint64_t>(x);
+      uint64_t s64 = static_cast<uint64_t>(std::sqrt(static_cast<long double>(val)));
+      // converting to long double can loose some precision, and `sqrt` can give eps error, so we'll fix this
+      // this is needed
+      while (s64 > int32max || s64 * s64 > val) s64--;
+      // in my tests this never fired, but theoretically this might be needed
+      while (s64 < int32max && (s64 + 1) * (s64 + 1) <= val) s64++;
+      r = val - s64 * s64;
+      return s64;
+   }
+   // https://hal.inria.fr/file/index/docid/72854/filename/RR-3805.pdf
+   size_t b = bits / 4;
+   Integer q = x;
+   q >>= b * 2;
+   Integer s = karatsuba_sqrt(q, r, t, bits - b * 2);
+   t = 0u;
+   bit_set(t, b * 2);
+   r <<= b;
+   t--;
+   t &= x;
+   t >>= b;
+   t += r;
+   s <<= 1;
+   divide_qr(t, s, q, r);
+   r <<= b;
+   t = 0u;
+   bit_set(t, b);
+   t--;
+   t &= x;
+   r += t;
+   s <<= (b - 1); // we already <<1 it before
+   s += q;
+   q *= q;
+   // we substract after, so it works for unsigned integers too
+   if (r < q) {
+      t = s;
+      t <<= 1;
+      t--;
+      r += t;
+      s--;
+   }
+   r -= q;
+   return s;
+}
+
+template <class Integer>
 BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type sqrt(const Integer& x, Integer& r)
 {
-   //
-   // This is slow bit-by-bit integer square root, see for example
-   // http://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Binary_numeral_system_.28base_2.29
-   // There are better methods such as http://hal.inria.fr/docs/00/07/28/54/PDF/RR-3805.pdf
-   // and http://hal.inria.fr/docs/00/07/21/13/PDF/RR-4475.pdf which should be implemented
-   // at some point.
-   //
-   Integer s = 0;
-   if (x == 0)
-   {
-      r = 0;
-      return s;
+   if (x == 0u) {
+      r = 0u;
+      return 0u;
    }
-   int g = msb(x);
-   if (g == 0)
-   {
-      r = 1;
-      return s;
-   }
-
-   Integer t = 0;
-   r         = x;
-   g /= 2;
-   bit_set(s, g);
-   bit_set(t, 2 * g);
-   r = x - t;
-   --g;
-   do
-   {
-      t = s;
-      t <<= g + 1;
-      bit_set(t, 2 * g);
-      if (t <= r)
-      {
-         bit_set(s, g);
-         r -= t;
-      }
-      --g;
-   } while (g >= 0);
-   return s;
+   Integer t{};
+   return karatsuba_sqrt(x, r, t, msb(x) + 1);
 }
 
 template <class Integer>
