@@ -26,22 +26,32 @@ void test_manual() {
    std::cout << "a: " << a << "\tb: " << b << std::endl;
    std::cout << std::endl;
 
+
    std::cout << "a + b = " << a + b << std::endl;
    std::cout << "a - b = " << a - b << std::endl;
    std::cout << "a * b = " << a * b << std::endl;
-   std::cout << "a / b = " << std::endl;
+   std::cout << "a / b = " << a / b << std::endl;
    std::cout << std::endl;
+
 
    std::cout << "a += b";
    a += b;
    std::cout << " (a = " << a << ")" << std::endl;
+
    std::cout << "a -= b";
    a -= b;
    std::cout << " (a = " << a << ")" << std::endl;
+
    std::cout << "a *= b";
    a *= b;
    std::cout << " (a = " << a << ")" << std::endl;
+
+   std::cout << "a /= b";
+   a /= b;
+   std::cout << " (a = " << a << ")" << std::endl;
+
    std::cout << std::endl;
+
 
    std::cout << "a = " << a << std::endl;
    std::cout << "++a = " << ++a << " (a = " << a << ")" << std::endl;
@@ -55,9 +65,17 @@ void test_manual() {
    std::cout << "a + -a =  " << a + -a << std::endl;
 
    std::cout << std::endl;
+
+
+   std::cout << "(a / b) * (b / a) = ";
+   std::cout << (a / b) * (b / a) << std::endl;
+
+   std::cout << std::endl;
 }
+
 int  main()
 {
+   std::srand((unsigned int)clock());
    test_manual<double>();
    test_manual<float >();
 

@@ -51,7 +51,7 @@ class cpp_double_float
 
    // Constructors
    cpp_double_float() {}
-   cpp_double_float(const float_type& a) : data(std::make_pair(a, 0)) {}
+   cpp_double_float(const float_type& a) : data(std::make_pair(a, (float_type)0)) {}
    cpp_double_float(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
    cpp_double_float(const std::pair<float_type, float_type>& p) : data(p) {}
    cpp_double_float(const cpp_double_float& a) : data(a.data) {}
@@ -82,7 +82,9 @@ class cpp_double_float
    // Helper functions
    static std::pair<float_type, float_type> fast_exact_sum(const float_type& a, const float_type& b);
    static std::pair<float_type, float_type> exact_sum(const float_type& a, const float_type& b);
+   static std::pair<float_type, float_type> exact_difference(const float_type& a, const float_type& b);
    static std::pair<float_type, float_type> exact_product(const float_type& a, const float_type& b);
+
    static std::pair<float_type, float_type> split(const float_type& a);
 
    static void normalize_pair(std::pair<float_type, float_type>& p, bool fast = true);
@@ -93,10 +95,12 @@ class cpp_double_float
       data = a.data;
       return *this;
    }
+   cpp_double_float& operator=(const std::string& str);
 
    cpp_double_float& operator+=(const cpp_double_float& a);
    cpp_double_float& operator-=(const cpp_double_float& a);
    cpp_double_float& operator*=(const cpp_double_float& a);
+   cpp_double_float& operator/=(const cpp_double_float& a);
    cpp_double_float  operator++(int);
    cpp_double_float  operator--(int);
    cpp_double_float& operator++() { return *this += cpp_double_float<float_type>((double)1.); }
@@ -139,7 +143,20 @@ cpp_double_float<FloatingPointType>::exact_sum(const float_type& a, const float_
    return out;
 }
 
-// Convert a pair of floats to standard form
+// Exact subtraction of two floating point numbers
+template <typename FloatingPointType>
+std::pair<FloatingPointType, FloatingPointType>
+cpp_double_float<FloatingPointType>::exact_difference(const float_type& a, const float_type& b)
+{
+   std::pair<float_type, float_type> out;
+
+   out.first    = a - b;
+   float_type v = out.first - a;
+   out.second   = (a - (out.first - v)) + (b + v);
+
+   return out;
+}
+   // Convert a pair of floats to standard form
 template <typename FloatingPointType>
 inline void
 cpp_double_float<FloatingPointType>::normalize_pair(std::pair<float_type, float_type>& p, bool fast)
@@ -198,6 +215,7 @@ cpp_double_float<FloatingPointType>::exact_product(const float_type& a, const fl
 
    return p;
 }
+
 // --
 
 // -- Double-float arithmetic
@@ -221,7 +239,14 @@ template <typename FloatingPointType>
 inline cpp_double_float<FloatingPointType>
 operator-(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b)
 {
-   return cpp_double_float<FloatingPointType>(a + (-b));
+   using double_float_t = cpp_double_float<FloatingPointType>;
+
+   auto s = double_float_t::exact_difference(a.first(), b);
+
+   s.second += a.second();
+   double_float_t::normalize_pair(s);
+
+   return double_float_t(s);
 }
 
 // double_float<> + double_float<>
@@ -250,7 +275,20 @@ template <typename FloatingPointType>
 inline cpp_double_float<FloatingPointType>
 operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b)
 {
-   return cpp_double_float<FloatingPointType>(a + b.negative());
+   using double_float_t = cpp_double_float<FloatingPointType>;
+
+   double_float_t::rep_type s, t;
+
+   s = double_float_t::exact_difference(a.first(), b.first());
+   t = double_float_t::exact_difference(a.second(), b.second());
+
+   s.second += t.first;
+   double_float_t::normalize_pair(s, false);
+
+   s.second += t.second;
+   double_float_t::normalize_pair(s, false);
+
+   return double_float_t(s);
 }
 
 // double_float<> * native-float
@@ -282,8 +320,58 @@ operator*(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<F
 
    return double_float_t(p);
 }
+
+// double_float<> / native-float
+template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>
+operator/(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b)
+{
+   using double_float_t = cpp_double_float<FloatingPointType>;
+   
+   std::pair<FloatingPointType, FloatingPointType> p, q, s;
+
+   p.first = a.first() / b;
+
+   q = double_float_t::exact_product(p.first, b);
+   s = double_float_t::exact_difference(a.first(), q.first);
+   s.second += a.second();
+   s.second -= q.second;
+
+   p.second = (s.first + s.second) / b;
+
+   double_float_t::normalize_pair(p);
+
+   return double_float_t(p);
+}
+
+// double_float<> / double_float<>
+template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>
+operator/(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b)
+{
+   using double_float_t = cpp_double_float<FloatingPointType>;
+
+   std::pair<FloatingPointType, FloatingPointType> p;
+   FloatingPointType p_prime;
+   double_float_t r;
+
+   p.first = a.first() / b.first(); // First approximation
+   r       = a - b * p.first;
+
+   p.second = r.first() / b.first();
+   r -= b * p.second;
+
+   p_prime = r.first() / b.first();
+
+   double_float_t::normalize_pair(p);
+
+   r = double_float_t(p) + p_prime;
+
+   return r;
+}
 // --
 
+// -- String Conversions
 // [FIXME] Basic string conversion
 template <typename FloatingPointType>
 inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) const
@@ -297,34 +385,66 @@ inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) c
       d = -d;
       ss << "-";
    }
-
-   while (precision-- >= 0 || d.first() > 1.)
+   else if (d.first() == 0.0)
    {
-      using namespace std;
+     // FIXME
+      return "0";
+   }
 
-      if (d.first() > 1.)
+   int pos = (int)std::floor(std::log10(d.first())), digits_printed = 0;
+
+   // Print the whole number part
+   if (pos >= 0)
+   {
+      while (pos >= 0)
       {
-         int d_exp = (int)std::log10(d.first());
-         int digit = std::floor(d.first() / std::pow(10, d_exp));
-
+         int digit = (int)std::fmod(double(d / (FloatingPointType)std::pow(10.0, pos)), 10.0);
          ss << digit;
-         d -= float_type(digit * std::pow(10, d_exp));
-      }
-      else
-      {
-         if (ss.str().find('.') == std::string::npos)
-            ss << '.';
 
-         d *= (float_type)10.;
+         d -= FloatingPointType(digit * std::pow(10, pos));
 
-         int digit = int(d.first());
-         ss << digit;
-         d = d - (FloatingPointType)digit;
+         pos--, digits_printed++;
       }
    }
+   else ss << "0";
+
+   ss << '.';
+   // Print the decimal part
+   do
+   {
+      d *= 10;
+      int digit = (int)std::floor(d.first());
+      ss << digit;
+
+      d -= (FloatingPointType)digit;
+
+      digits_printed++;
+   } while (digits_printed <= precision);
 
    return ss.str();
 }
+
+template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>&
+boost::multiprecision::backends::cpp_double_float<FloatingPointType>::operator=(const std::string& str)
+{
+   int digit_idx = 0;
+   cpp_double_float<FloatingPointType> d(0.0);
+
+   for (char c : str)
+   {
+      if (c == '.')
+         digit_idx = -1, continue;
+
+      if (digit_idx >= 0)
+         d = d * 10 + (FloatingPointType)(c - '0')
+      else
+         d += (FloatingPointType)((c - '0') / std::pow(10.0, digit_idx--));
+   }
+
+   *this = d;
+}
+// --
 
 // -- Overloaded operators
 template <typename FloatingPointType>
@@ -352,6 +472,14 @@ cpp_double_float<FloatingPointType>::operator*=(const cpp_double_float<FloatingP
 }
 
 template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>&
+cpp_double_float<FloatingPointType>::operator/=(const cpp_double_float<FloatingPointType>& a)
+{
+   *this = *this / a;
+   return *this;
+}
+
+template <typename FloatingPointType>
 inline cpp_double_float<FloatingPointType>
 cpp_double_float<FloatingPointType>::operator++(int)
 {
@@ -373,7 +501,7 @@ template <typename FloatingPointType, typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>& operator<<
 (std::basic_ostream<char_type, traits_type>& os, const cpp_double_float<FloatingPointType>& f)
 {
-   os << f.get_str(os.precision());
+   os << f.get_str((int)os.precision());
    return os;
 }
 // --
