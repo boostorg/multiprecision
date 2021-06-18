@@ -73,7 +73,9 @@ class cpp_double_float
 
    // Methods
    cpp_double_float<float_type> negative() const { return cpp_double_float<float_type>(-data.first, -data.second); }
-   std::string                  get_str(int precision) const;
+
+   std::string get_str(int precision) const;
+   void set_str(const std::string& str);
 
    // Getters/Setters
    const float_type& first() const { return data.first; }
@@ -409,7 +411,7 @@ inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) c
    else ss << "0";
 
    ss << '.';
-   // Print the decimal part
+   // Print the decimal number part
    do
    {
       d *= 10;
@@ -422,6 +424,42 @@ inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) c
    } while (digits_printed <= precision);
 
    return ss.str();
+}
+
+template <typename FloatingPointType>
+inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
+{
+   *this = 0.0;
+   
+   int pos = 0;
+   while (!std::isdigit(str[pos]))
+      if (str[pos] == '.')
+         break;
+      else pos++;
+
+   // Set the whole number part
+   while (std::isdigit(str[pos]))
+      *this = *this * FloatingPointType(10) + FloatingPointType(str[pos++] - '0');
+
+   BOOST_ASSERT(str[pos] == '.');
+
+   int decimal_idx = pos;
+   pos++;
+
+   // Set the decimal number part
+   while (std::isdigit(str[pos]) && pos < str.size())
+   {
+      *this += (FloatingPointType)((str[pos] - '0') * std::pow(10.0, decimal_idx - pos));
+      pos++;
+   }
+
+   // Get the sign
+   for (char c : str) {
+      if (c == '-')
+         *this = -*this;
+      if (c <= '9' || c >= '0' || c == '.')
+         break;
+   }
 }
 
 template <typename FloatingPointType>
@@ -498,11 +536,21 @@ cpp_double_float<FloatingPointType>::operator--(int)
 }
 
 template <typename FloatingPointType, typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>& operator<<
-(std::basic_ostream<char_type, traits_type>& os, const cpp_double_float<FloatingPointType>& f)
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_float<FloatingPointType>& f)
 {
    os << f.get_str((int)os.precision());
    return os;
+}
+
+template <typename FloatingPointType, typename char_type, typename traits_type>
+std::basic_istream<char_type, traits_type>&
+operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_float<FloatingPointType>& f)
+{
+   std::string str;
+   is >> str;
+   f.set_str(str);
+   return is;
 }
 // --
 

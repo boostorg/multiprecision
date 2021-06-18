@@ -14,12 +14,12 @@
 
 // Test compilation, basic operatory
 template <typename FloatingPointType>
-void test_manual() {
-   using double_float = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
+void test_basic_operations() {
+   using double_float_t = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
 
-   std::cout << "Testing cpp_double_float<" << typeid(FloatingPointType).name() << ">...\n" << std::endl;
-   double_float a = std::rand() * (FloatingPointType)std::rand() / RAND_MAX;
-   double_float b = std::rand() * (FloatingPointType)std::rand() / RAND_MAX;
+   std::cout << "Testing cpp_double_float< " << typeid(FloatingPointType).name() << " >...\n" << std::endl;
+   double_float_t a = std::rand() * (FloatingPointType)std::rand() / RAND_MAX;
+   double_float_t b = std::rand() * (FloatingPointType)std::rand() / RAND_MAX;
 
    std::cout.precision(std::numeric_limits<FloatingPointType>::digits10 * 2);
 
@@ -53,7 +53,7 @@ void test_manual() {
    std::cout << std::endl;
 
 
-   std::cout << "a = " << a << std::endl;
+   std::cout << "a   = " << a << std::endl;
    std::cout << "++a = " << ++a << " (a = " << a << ")" << std::endl;
    std::cout << "--a = " << --a << " (a = " << a << ")" << std::endl;
    std::cout << "a++ = " << a++ << " (a = " << a << ")" << std::endl;
@@ -73,11 +73,11 @@ void test_manual() {
    std::cout << std::endl;
 }
 
-int  main()
-{
-   std::srand((unsigned int)clock());
-   test_manual<double>();
-   test_manual<float >();
-
-  return 0;
-}
+//int  main()
+//{
+//   std::srand((unsigned int)clock());
+//   test_basic_operations<double>();
+//   test_basic_operations<float >();
+//
+//  return 0;
+//}
