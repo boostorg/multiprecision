@@ -45,6 +45,9 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_rational>& /*to_type*/, const std::integral_constant<int, number_kind_integer>& /*from_type*/);
 
+template <class Integer>
+BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, Integer& t, size_t bits);
+
 } // namespace detail
 
 namespace default_ops {
@@ -1588,62 +1591,100 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_unset(T& val, unsigned index)
       eval_bitwise_xor(val, mask);
 }
 
-template <class B>
-void BOOST_MP_CXX14_CONSTEXPR eval_integer_sqrt(B& s, B& r, const B& x)
+template <class Backend>
+BOOST_MP_CXX14_CONSTEXPR void eval_qr(const Backend& x, const Backend& y, Backend& q, Backend& r);
+
+template <class Backend>
+BOOST_MP_CXX14_CONSTEXPR void eval_karatsuba_sqrt(Backend& result, const Backend& x, Backend& r, Backend& t, size_t bits)
 {
-   //
-   // This is slow bit-by-bit integer square root, see for example
-   // http://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Binary_numeral_system_.28base_2.29
-   // There are better methods such as http://hal.inria.fr/docs/00/07/28/54/PDF/RR-3805.pdf
-   // and http://hal.inria.fr/docs/00/07/21/13/PDF/RR-4475.pdf which should be implemented
-   // at some point.
-   //
-   using ui_type = typename boost::multiprecision::detail::canonical<unsigned char, B>::type;
+   using default_ops::eval_is_zero;
+   using default_ops::eval_subtract;
+   using default_ops::eval_right_shift;
+   using default_ops::eval_left_shift;
+   using default_ops::eval_bit_set;
+   using default_ops::eval_decrement;
+   using default_ops::eval_bitwise_and;
+   using default_ops::eval_add;
+   using default_ops::eval_qr;
 
-   s = ui_type(0u);
-   if (eval_get_sign(x) == 0)
+   using small_uint = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
+
+   constexpr small_uint zero = 0u;
+
+   // we can calculate it faster with std::sqrt
+#ifdef BOOST_HAS_INT128
+   if (bits <= 128)
    {
-      r = ui_type(0u);
+      unsigned __int128 a, b, c;
+      eval_convert_to(&a, x);
+      c = boost::multiprecision::detail::karatsuba_sqrt(a, b, c, bits);
+      r = number<Backend>::canonical_value(b);
+      result = number<Backend>::canonical_value(c);
       return;
    }
-   int g = eval_msb(x);
-   if (g <= 1)
+#else
+   if (bits <= std::numeric_limits<std::uintmax_t>::digits)
    {
-      s = ui_type(1);
-      eval_subtract(r, x, s);
+      std::uintmax_t a, b, c;
+      eval_convert_to(&a, x);
+      c = boost::multiprecision::detail::karatsuba_sqrt(a, b, c, bits);
+      r = number<Backend>::canonical_value(b);
+      result = number<Backend>::canonical_value(c);
       return;
    }
-
-   B t;
-   r = x;
-   g /= 2;
-   int org_g = g;
-   eval_bit_set(s, g);
-   eval_bit_set(t, 2 * g);
-   eval_subtract(r, x, t);
-   --g;
-   if (eval_get_sign(r) == 0)
-      return;
-   int msbr = eval_msb(r);
-   do
+#endif
+   // https://hal.inria.fr/file/index/docid/72854/filename/RR-3805.pdf
+   std::size_t  b = bits / 4;
+   Backend q(x);
+   eval_right_shift(q, b * 2);
+   Backend s;
+   eval_karatsuba_sqrt(s, q, r, t, bits - b * 2);
+   t = zero;
+   eval_bit_set(t, b * 2);
+   eval_left_shift(r, b);
+   eval_decrement(t);
+   eval_bitwise_and(t, x);
+   eval_right_shift(t, b);
+   eval_add(t, r);
+   eval_left_shift(s, 1u);
+   eval_qr(t, s, q, r);
+   eval_left_shift(r, b);
+   t = zero;
+   eval_bit_set(t, b);
+   eval_decrement(t);
+   eval_bitwise_and(t, x);
+   eval_add(r, t);
+   eval_left_shift(s, b - 1);
+   eval_add(s, q);
+   eval_multiply(q, q);
+   // we substract after, so it works for unsigned integers too
+   if (r.compare(q) < 0)
    {
-      if (msbr >= org_g + g + 1)
-      {
-         t = s;
-         eval_left_shift(t, g + 1);
-         eval_bit_set(t, 2 * g);
-         if (t.compare(r) <= 0)
-         {
-            BOOST_ASSERT(g >= 0);
-            eval_bit_set(s, g);
-            eval_subtract(r, t);
-            if (eval_get_sign(r) == 0)
-               return;
-            msbr = eval_msb(r);
-         }
-      }
-      --g;
-   } while (g >= 0);
+      t = s;
+      eval_left_shift(t, 1u);
+      eval_decrement(t);
+      eval_add(r, t);
+      eval_decrement(s);
+   }
+   eval_subtract(r, q);
+   result = s;
+}
+
+template <class Backend>
+BOOST_MP_CXX14_CONSTEXPR void eval_integer_sqrt(Backend& result, Backend& r, const Backend& x)
+{
+   using small_uint = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
+
+   constexpr small_uint zero = 0u;
+
+   if (eval_is_zero(x))
+   {
+      r = zero;
+      result = zero;
+      return;
+   }
+   Backend t;
+   eval_karatsuba_sqrt(result, x, r, t, eval_msb(x) + 1);
 }
 
 template <class B>

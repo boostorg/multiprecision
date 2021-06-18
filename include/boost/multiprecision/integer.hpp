@@ -189,52 +189,63 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
    return val;
 }
 
+namespace detail {
+
 template <class Integer>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type karatsuba_sqrt(const Integer& x, Integer& r, Integer& t, size_t bits)
+BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, Integer& t, size_t bits)
 {
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-   // std::sqrt is not constexpr by standard, so use this 
-   if (BOOST_MP_IS_CONST_EVALUATED(bits)) {
-      if (bits <= 4) {
-         if (x == 0) {
+   // std::sqrt is not constexpr by standard, so use this
+   if (BOOST_MP_IS_CONST_EVALUATED(bits))
+   {
+      if (bits <= 4)
+      {
+         if (x == 0)
+         {
             r = 0u;
-            return 0u; 
+            return 0u;
          }
-         else if (x < 4) {
+         else if (x < 4)
+         {
             r = x - 1;
-            return 1u; 
+            return 1u;
          }
-         else if (x < 9) {
+         else if (x < 9)
+         {
             r = x - 4;
-            return 2u; 
+            return 2u;
          }
-         else {
+         else
+         {
             r = x - 9;
-            return 3u; 
+            return 3u;
          }
       }
    }
    else
 #endif
    // we can calculate it faster with std::sqrt
-   if (bits <= 64) {
-      const uint64_t int32max = uint64_t((std::numeric_limits<uint32_t>::max)());
-      uint64_t val = static_cast<uint64_t>(x);
-      uint64_t s64 = static_cast<uint64_t>(std::sqrt(static_cast<long double>(val)));
+   if (bits <= 64)
+   {
+      const std::uint64_t int32max = std::uint64_t((std::numeric_limits<std::uint32_t>::max)());
+      std::uint64_t       val      = static_cast<std::uint64_t>(x);
+      std::uint64_t       s64      = static_cast<std::uint64_t>(std::sqrt(static_cast<long double>(val)));
       // converting to long double can loose some precision, and `sqrt` can give eps error, so we'll fix this
       // this is needed
-      while (s64 > int32max || s64 * s64 > val) s64--;
+      while (s64 > int32max || s64 * s64 > val)
+         s64--;
       // in my tests this never fired, but theoretically this might be needed
-      while (s64 < int32max && (s64 + 1) * (s64 + 1) <= val) s64++;
+      while (s64 < int32max && (s64 + 1) * (s64 + 1) <= val)
+         s64++;
       r = val - s64 * s64;
       return s64;
    }
    // https://hal.inria.fr/file/index/docid/72854/filename/RR-3805.pdf
-   size_t b = bits / 4;
+   std::size_t b = bits / 4;
    Integer q = x;
    q >>= b * 2;
    Integer s = karatsuba_sqrt(q, r, t, bits - b * 2);
-   t = 0u;
+   t         = 0u;
    bit_set(t, b * 2);
    r <<= b;
    t--;
@@ -253,7 +264,8 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
    s += q;
    q *= q;
    // we substract after, so it works for unsigned integers too
-   if (r < q) {
+   if (r < q)
+   {
       t = s;
       t <<= 1;
       t--;
@@ -264,6 +276,8 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
    return s;
 }
 
+} // namespace detail
+
 template <class Integer>
 BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type sqrt(const Integer& x, Integer& r)
 {
@@ -272,7 +286,7 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
       return 0u;
    }
    Integer t{};
-   return karatsuba_sqrt(x, r, t, msb(x) + 1);
+   return detail::karatsuba_sqrt(x, r, t, msb(x) + 1);
 }
 
 template <class Integer>
