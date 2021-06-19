@@ -59,17 +59,17 @@ class cpp_double_float
    // Casts
    operator signed char() const { return (signed char)data.first; }
    operator signed short() const { return (signed short)data.first; }
-   operator signed int() const { return (signed int)data.first; }
-   operator signed long() const { return (signed long)data.first; }
-   operator signed long long() const { return (signed long long)data.first; }
+   operator signed int() const { return (signed int)data.first + (signed int)data.second; }
+   operator signed long() const { return (signed long)data.first + (signed long)data.second; }
+   operator signed long long() const { return (signed long long)data.first + (signed long long)data.second; }
    operator unsigned char() const { return (unsigned char)data.first; }
    operator unsigned short() const { return (unsigned short)data.first; }
-   operator unsigned int() const { return (unsigned int)data.first; }
-   operator unsigned long() const { return (unsigned long)data.first; }
-   operator unsigned long long() const { return (unsigned long long)data.first + (unsigned long long)data.second; } // FIXME
-   operator float() const { return (float)data.first; }
-   operator double() const { return (double)data.first + (double)data.second; }                // FIXME
-   operator long double() const { return (long double)data.first + (long double)data.second; } // FIXME
+   operator unsigned int() const { return (unsigned int)data.first + (unsigned int)data.second; }
+   operator unsigned long() const { return (unsigned long)data.first + (unsigned long)data.second; }
+   operator unsigned long long() const { return (unsigned long long)data.first + (unsigned long long)data.second; }
+   operator float() const { return (float)data.first + (float)data.second; }
+   operator double() const { return (double)data.first + (double)data.second; }
+   operator long double() const { return (long double)data.first + (long double)data.second; }
 
    // Methods
    cpp_double_float<float_type> negative() const { return cpp_double_float<float_type>(-data.first, -data.second); }
@@ -415,7 +415,7 @@ inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) c
    do
    {
       d *= 10;
-      int digit = (int)std::floor(d.first());
+      int digit = (int)std::trunc(d.first());
       ss << digit;
 
       d -= (FloatingPointType)digit;
@@ -431,7 +431,7 @@ inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
 {
    *this = 0.0;
    
-   int pos = 0;
+   size_t pos = 0;
    while (!std::isdigit(str[pos]))
       if (str[pos] == '.')
          break;
@@ -443,13 +443,19 @@ inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
 
    BOOST_ASSERT(str[pos] == '.');
 
-   int decimal_idx = pos;
+   size_t decimal_idx = pos;
    pos++;
 
    // Set the decimal number part
    while (std::isdigit(str[pos]) && pos < str.size())
    {
-      *this += (FloatingPointType)((str[pos] - '0') * std::pow(10.0, decimal_idx - pos));
+      auto inv_pow10 = [](int exp) {
+         cpp_double_float<FloatingPointType> x(1.0);
+         while (exp--) x /= 10.0;
+         return x;
+      };
+
+      *this += inv_pow10(pos - decimal_idx) * (FloatingPointType)(str[pos] - '0');
       pos++;
    }
 
