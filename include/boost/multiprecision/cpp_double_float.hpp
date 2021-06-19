@@ -305,7 +305,7 @@ operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<F
 {
    using double_float_t = cpp_double_float<FloatingPointType>;
 
-   double_float_t::rep_type s, t;
+   typename double_float_t::rep_type s, t;
 
    s = double_float_t::exact_difference(a.first(), b.first());
    t = double_float_t::exact_difference(a.second(), b.second());
