@@ -61,23 +61,6 @@ class cpp_double_float
    cpp_double_float(const std::string str)
    {
       set_str(str);
-/*
-      int digit_idx = 0;
-      cpp_double_float<FloatingPointType> d(0.0);
-
-      for (char c : str)
-      {
-        if (c == '.')
-           digit_idx = -1, continue;
-
-         if (digit_idx >= 0)
-            d = d * 10 + (FloatingPointType)(c - '0')
-         else
-            d += (FloatingPointType)((c - '0') / std::pow(10.0, digit_idx--));
-      }
-
-      *this = d;
-*/
    }
 
 
