@@ -420,32 +420,38 @@ inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) c
    }
 
    int pos = (int)std::floor(std::log10(d.first())), digits_printed = 0;
-
-   // Print the whole number part
-   if (pos >= 0)
+   auto pow10 = [](int x)
    {
-      while (pos >= 0)
-      {
-         int digit = (int)std::fmod(double(d / (FloatingPointType)std::pow(10.0, pos)), 10.0);
-         ss << digit;
+      cpp_double_float<FloatingPointType> b(1.0);
+      while (x-- > 0)
+         b *= (FloatingPointType)10.;
+      return b;
+   };
 
-         d -= FloatingPointType(digit * std::pow(10, pos));
+   auto d_prime(d / pow10(pos));
 
-         pos--, digits_printed++;
-      }
-   }
-   else ss << "0";
+   
+
+   auto print_next_digit = [&]() {
+      int digit = (int)(d_prime.first());
+      ss << digit;
+
+      d_prime -= FloatingPointType(digit);
+      d_prime *= (FloatingPointType)10.0;
+   };
+
+   do
+   {
+      print_next_digit();
+      pos--, digits_printed++;
+   } while (pos >= 0);
 
    ss << '.';
+
    // Print the decimal number part
    do
    {
-      d *= 10;
-      int digit = (int)std::trunc(d.first());
-      ss << digit;
-
-      d -= (FloatingPointType)digit;
-
+      print_next_digit();
       digits_printed++;
    } while (digits_printed <= precision);
 
@@ -569,7 +575,8 @@ template <typename FloatingPointType>
 inline std::string cpp_double_float<FloatingPointType>::to_string_raw() const
 {
    std::stringstream ss;
-   ss << std::hexfloat << data.first << " + " << std::hexfloat << data.second;
+   ss.precision(34);
+   ss /*<< std::hexfloat*/ << data.first << " + " /*<< std::hexfloat*/ << data.second;
    return ss.str();
 }
 // --
