@@ -63,8 +63,11 @@ jobs:
           ./b2 headers
       - name: gcc-clang-native
         run: |
+          echo "where am i"
+          pwd
           echo "compile ./test.exe"
+          echo "compiler version"
           ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Werror -Wall -Wextra -Wconversion -Wsign-conversion -std=${{ matrix.standard }} -I. -I../boost-root test/test_arithmetic_cpp_double_float.cpp -o test.exe
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Werror -Wall -Wextra -Wconversion -Wsign-conversion -std=${{ matrix.standard }} -I.include -I../boost-root test/test_arithmetic_cpp_double_float.cpp -o test.exe
           ls -la ./test.exe
           ./test.exe
