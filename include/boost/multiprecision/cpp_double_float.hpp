@@ -50,11 +50,21 @@ class cpp_double_float
    using rep_type = std::pair<float_type, float_type>;
 
    // Constructors
-   cpp_double_float() {}
-   cpp_double_float(const float_type& a) : data(std::make_pair(a, (float_type)0)) {}
-   cpp_double_float(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
-   cpp_double_float(const std::pair<float_type, float_type>& p) : data(p) {}
-   cpp_double_float(const cpp_double_float& a) : data(a.data) {}
+   cpp_double_float() { }
+
+   constexpr cpp_double_float(const float_type& a) : data(std::make_pair(a, (float_type)0)) {}
+   constexpr cpp_double_float(float_type&& a) : data(std::make_pair(a, (float_type)0)) {}
+   constexpr cpp_double_float(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
+   constexpr cpp_double_float(const std::pair<float_type, float_type>& p) : data(p) {}
+   constexpr cpp_double_float(const cpp_double_float& a) : data(a.data) {}
+
+   cpp_double_float(const std::string str)
+   {
+      set_str(str);
+   }
+
+
+   ~cpp_double_float() = default;
 
    // Casts
    operator signed char() const { return (signed char)data.first; }
@@ -78,8 +88,12 @@ class cpp_double_float
    void set_str(const std::string& str);
 
    // Getters/Setters
-   const float_type& first() const { return data.first; }
+   const float_type& first () const { return data.first; }
    const float_type& second() const { return data.second; }
+
+         rep_type&  rep()       { return data; }
+   const rep_type&  rep() const { return data; }
+   const rep_type& crep() const { return data; }
 
    // Helper functions
    static std::pair<float_type, float_type> fast_exact_sum(const float_type& a, const float_type& b);
@@ -94,9 +108,21 @@ class cpp_double_float
    // Operators
    cpp_double_float& operator=(const cpp_double_float& a)
    {
-      data = a.data;
+      if(this != &a)
+      {
+        data = a.data;
+      }
+
       return *this;
    }
+
+   cpp_double_float& operator=(cpp_double_float&& a)
+   {
+      data = a.data;
+
+      return *this;
+   }
+
    cpp_double_float& operator=(const std::string& str);
 
    cpp_double_float& operator+=(const cpp_double_float& a);
@@ -279,7 +305,7 @@ operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<F
 {
    using double_float_t = cpp_double_float<FloatingPointType>;
 
-   double_float_t::rep_type s, t;
+   typename double_float_t::rep_type s, t;
 
    s = double_float_t::exact_difference(a.first(), b.first());
    t = double_float_t::exact_difference(a.second(), b.second());
@@ -394,32 +420,38 @@ inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) c
    }
 
    int pos = (int)std::floor(std::log10(d.first())), digits_printed = 0;
-
-   // Print the whole number part
-   if (pos >= 0)
+   auto pow10 = [](int x)
    {
-      while (pos >= 0)
-      {
-         int digit = (int)std::fmod(double(d / (FloatingPointType)std::pow(10.0, pos)), 10.0);
-         ss << digit;
+      cpp_double_float<FloatingPointType> b(1.0);
+      while (x-- > 0)
+         b *= (FloatingPointType)10.;
+      return b;
+   };
 
-         d -= FloatingPointType(digit * std::pow(10, pos));
+   auto d_prime(d / pow10(pos));
 
-         pos--, digits_printed++;
-      }
-   }
-   else ss << "0";
+   
+
+   auto print_next_digit = [&]() {
+      int digit = (int)(d_prime.first());
+      ss << digit;
+
+      d_prime -= FloatingPointType(digit);
+      d_prime *= (FloatingPointType)10.0;
+   };
+
+   do
+   {
+      print_next_digit();
+      pos--, digits_printed++;
+   } while (pos >= 0);
 
    ss << '.';
+
    // Print the decimal number part
    do
    {
-      d *= 10;
-      int digit = (int)std::trunc(d.first());
-      ss << digit;
-
-      d -= (FloatingPointType)digit;
-
+      print_next_digit();
       digits_printed++;
    } while (digits_printed <= precision);
 
@@ -430,8 +462,8 @@ template <typename FloatingPointType>
 inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
 {
    *this = 0.0;
-   
-   size_t pos = 0;
+
+   std::string::size_type pos = 0;
    while (!std::isdigit(str[pos]))
       if (str[pos] == '.')
          break;
@@ -443,7 +475,7 @@ inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
 
    BOOST_ASSERT(str[pos] == '.');
 
-   size_t decimal_idx = pos;
+   std::string::size_type decimal_idx = pos;
    pos++;
 
    // Set the decimal number part
@@ -455,7 +487,7 @@ inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
          return x;
       };
 
-      *this += inv_pow10(pos - decimal_idx) * (FloatingPointType)(str[pos] - '0');
+      *this += inv_pow10((int) ((int) pos - (int) decimal_idx)) * (FloatingPointType)(str[pos] - '0');
       pos++;
    }
 
@@ -467,28 +499,6 @@ inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
          break;
    }
 }
-
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>&
-boost::multiprecision::backends::cpp_double_float<FloatingPointType>::operator=(const std::string& str)
-{
-   int digit_idx = 0;
-   cpp_double_float<FloatingPointType> d(0.0);
-
-   for (char c : str)
-   {
-      if (c == '.')
-         digit_idx = -1, continue;
-
-      if (digit_idx >= 0)
-         d = d * 10 + (FloatingPointType)(c - '0')
-      else
-         d += (FloatingPointType)((c - '0') / std::pow(10.0, digit_idx--));
-   }
-
-   *this = d;
-}
-// --
 
 // -- Overloaded operators
 template <typename FloatingPointType>
@@ -565,7 +575,8 @@ template <typename FloatingPointType>
 inline std::string cpp_double_float<FloatingPointType>::to_string_raw() const
 {
    std::stringstream ss;
-   ss << std::hexfloat << data.first << " + " << std::hexfloat << data.second;
+   ss.precision(34);
+   ss /*<< std::hexfloat*/ << data.first << " + " /*<< std::hexfloat*/ << data.second;
    return ss.str();
 }
 // --
