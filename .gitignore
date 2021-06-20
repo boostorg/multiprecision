@@ -1,1 +1,7 @@
 # /boost/libs/multiprecision/.gitignore# Use of manifest is unclear, so add to .gitignore./doc/html/standalone_HTML.manifest
+/.vs/multiprecision/v16
+/Debug
+/multiprecision.vcxproj.user
+/multiprecision.vcxproj.filters
+/multiprecision.vcxproj
+/multiprecision.sln
