@@ -12,12 +12,11 @@
 
 #include <boost/config.hpp>
 
-#include <cstdint>
-#include <limits>
 #include <type_traits>
-#include <sstream>
 #include <string>
 #include <utility>
+#include <limits>
+#include <sstream>
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/assert.hpp>
@@ -38,13 +37,6 @@ struct number_category<backends::cpp_double_float<FloatingPointType>>
 };
 
 namespace backends {
-
-namespace detail {
-
-template<typename FloatingPointType>
-cpp_double_float<FloatingPointType> pow10_maker(std::int32_t n);
-
-}
 
 /*
 * A cpp_double_float is represented by an unevaluated sum of two floating-point
@@ -149,48 +141,6 @@ class cpp_double_float
  private:
    rep_type data;
 };
-
-namespace detail {
-
-template<typename FloatingPointType>
-cpp_double_float<FloatingPointType> pow10_maker(std::int32_t n)
-{
-  using local_double_float_type = cpp_double_float<FloatingPointType>;
-
-  local_double_float_type result;
-
-  if     (n <  0) { result = local_double_float_type(1) / pow10_maker<FloatingPointType>(-n); }
-  else if(n == 0) { result = local_double_float_type(1); }
-  else if(n == 1) { result = local_double_float_type(10); }
-  else if(n == 2) { result = local_double_float_type(100); }
-  else if(n == 3) { result = local_double_float_type(1000); }
-  else if(n == 4) { result = local_double_float_type(10000); }
-  else
-  {
-    // Use the so-called ladder method for computing higher powers of 10.
-    local_double_float_type x(1U);
-    local_double_float_type y(10U);
-    std::uint32_t           p(n);
-
-    while(p != 0U)
-    {
-      if((p & 1U) != 0U)
-      {
-        x *= y;
-      }
-
-      y *= y;
-
-      p >>= 1;
-    }
-
-    result = x;
-  }
-
-  return result;
-}
-
-}
 
 // -- Arithmetic backends
 // Exact addition of two floating point numbers, given |a| > |b|
@@ -355,7 +305,7 @@ operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<F
 {
    using double_float_t = cpp_double_float<FloatingPointType>;
 
-   double_float_t::rep_type s, t;
+   typename double_float_t::rep_type s, t;
 
    s = double_float_t::exact_difference(a.first(), b.first());
    t = double_float_t::exact_difference(a.second(), b.second());
@@ -470,32 +420,38 @@ inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) c
    }
 
    int pos = (int)std::floor(std::log10(d.first())), digits_printed = 0;
-
-   // Print the whole number part
-   if (pos >= 0)
+   auto pow10 = [](int x)
    {
-      while (pos >= 0)
-      {
-         int digit = (int)std::fmod(double(d / detail::pow10_maker<FloatingPointType>(pos)), 10.0);
-         ss << digit;
+      cpp_double_float<FloatingPointType> b(1.0);
+      while (x-- > 0)
+         b *= (FloatingPointType)10.;
+      return b;
+   };
 
-         d -= FloatingPointType(digit * std::pow(10, pos));
+   auto d_prime(d / pow10(pos));
 
-         pos--, digits_printed++;
-      }
-   }
-   else ss << "0";
+   
+
+   auto print_next_digit = [&]() {
+      int digit = (int)(d_prime.first());
+      ss << digit;
+
+      d_prime -= FloatingPointType(digit);
+      d_prime *= (FloatingPointType)10.0;
+   };
+
+   do
+   {
+      print_next_digit();
+      pos--, digits_printed++;
+   } while (pos >= 0);
 
    ss << '.';
+
    // Print the decimal number part
    do
    {
-      d *= 10;
-      int digit = (int)std::trunc(d.first());
-      ss << digit;
-
-      d -= (FloatingPointType)digit;
-
+      print_next_digit();
       digits_printed++;
    } while (digits_printed <= precision);
 
@@ -619,7 +575,8 @@ template <typename FloatingPointType>
 inline std::string cpp_double_float<FloatingPointType>::to_string_raw() const
 {
    std::stringstream ss;
-   ss << std::hexfloat << data.first << " + " << std::hexfloat << data.second;
+   ss.precision(34);
+   ss /*<< std::hexfloat*/ << data.first << " + " /*<< std::hexfloat*/ << data.second;
    return ss.str();
 }
 // --
