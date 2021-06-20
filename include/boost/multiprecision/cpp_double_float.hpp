@@ -12,11 +12,12 @@
 
 #include <boost/config.hpp>
 
+#include <cstdint>
+#include <limits>
 #include <type_traits>
+#include <sstream>
 #include <string>
 #include <utility>
-#include <limits>
-#include <sstream>
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/assert.hpp>
@@ -37,6 +38,13 @@ struct number_category<backends::cpp_double_float<FloatingPointType>>
 };
 
 namespace backends {
+
+namespace detail {
+
+template<typename FloatingPointType>
+cpp_double_float<FloatingPointType> pow10_maker(std::int32_t n);
+
+}
 
 /*
 * A cpp_double_float is represented by an unevaluated sum of two floating-point
@@ -141,6 +149,48 @@ class cpp_double_float
  private:
    rep_type data;
 };
+
+namespace detail {
+
+template<typename FloatingPointType>
+cpp_double_float<FloatingPointType> pow10_maker(std::int32_t n)
+{
+  using local_double_float_type = cpp_double_float<FloatingPointType>;
+
+  local_double_float_type result;
+
+  if     (n <  0) { result = local_double_float_type(1) / pow10_maker<FloatingPointType>(-n); }
+  else if(n == 0) { result = local_double_float_type(1); }
+  else if(n == 1) { result = local_double_float_type(10); }
+  else if(n == 2) { result = local_double_float_type(100); }
+  else if(n == 3) { result = local_double_float_type(1000); }
+  else if(n == 4) { result = local_double_float_type(10000); }
+  else
+  {
+    // Use the so-called ladder method for computing higher powers of 10.
+    local_double_float_type x(1U);
+    local_double_float_type y(10U);
+    std::uint32_t           p(n);
+
+    while(p != 0U)
+    {
+      if((p & 1U) != 0U)
+      {
+        x *= y;
+      }
+
+      y *= y;
+
+      p >>= 1;
+    }
+
+    result = x;
+  }
+
+  return result;
+}
+
+}
 
 // -- Arithmetic backends
 // Exact addition of two floating point numbers, given |a| > |b|
@@ -426,7 +476,7 @@ inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) c
    {
       while (pos >= 0)
       {
-         int digit = (int)std::fmod(double(d / (FloatingPointType)std::pow(10.0, pos)), 10.0);
+         int digit = (int)std::fmod(double(d / detail::pow10_maker<FloatingPointType>(pos)), 10.0);
          ss << digit;
 
          d -= FloatingPointType(digit * std::pow(10, pos));
