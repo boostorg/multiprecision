@@ -1610,7 +1610,6 @@ BOOST_MP_CXX14_CONSTEXPR void eval_karatsuba_sqrt(Backend& result, const Backend
    using small_uint = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
 
    constexpr small_uint zero = 0u;
-
    // we can calculate it faster with std::sqrt
 #ifdef BOOST_HAS_INT128
    if (bits <= 128)
@@ -1625,7 +1624,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_karatsuba_sqrt(Backend& result, const Backend
 #else
    if (bits <= std::numeric_limits<std::uintmax_t>::digits)
    {
-      std::uintmax_t a, b, c;
+      std::uintmax_t a{ 0 }, b{ 0 }, c{ 0 };
       eval_convert_to(&a, x);
       c = boost::multiprecision::detail::karatsuba_sqrt(a, b, c, bits);
       r = number<Backend>::canonical_value(b);
