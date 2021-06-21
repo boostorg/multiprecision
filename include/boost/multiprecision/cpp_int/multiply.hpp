@@ -291,6 +291,7 @@ setup_karatsuba(
       variable_precision_type t(result.limbs(), 0, result.size());
       typename variable_precision_type::scoped_shared_storage storage(t.allocator(), storage_size);
       multiply_karatsuba(t, a_t, b_t, storage);
+      result.resize(t.size(), t.size());
    }
    else
    {
