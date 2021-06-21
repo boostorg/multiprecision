@@ -649,7 +649,7 @@ eval_right_shift(
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
    if ((s & byte_shift_mask) == 0)
 #else
-   constexpr limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, unsigned_magnitude, Checked1, Allocator1>::limb_bits - 1;
+   constexpr limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
    if (BOOST_MP_IS_CONST_EVALUATED(s) && ((s & limb_shift_mask) == 0))
       right_shift_limb(result, s);
    else if (((s & byte_shift_mask) == 0) && !BOOST_MP_IS_CONST_EVALUATED(s))

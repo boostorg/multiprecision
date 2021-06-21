@@ -246,7 +246,7 @@ BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, In
    q >>= b * 2;
    Integer s = karatsuba_sqrt(q, r, t, bits - b * 2);
    t         = 0u;
-   bit_set(t, b * 2);
+   bit_set(t, static_cast<unsigned>(b * 2));
    r <<= b;
    t--;
    t &= x;
@@ -256,7 +256,7 @@ BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, In
    divide_qr(t, s, q, r);
    r <<= b;
    t = 0u;
-   bit_set(t, b);
+   bit_set(t, static_cast<unsigned>(b));
    t--;
    t &= x;
    r += t;
