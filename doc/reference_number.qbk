@@ -117,6 +117,10 @@
    template <class Backend, expression_template_option ExpressionTemplates>
    std::istream& operator >> (std::istream& is, number<Backend, ExpressionTemplates>& r);
 
+   // to_string support:
+   template <class Backend, expression_template_option ExpressionTemplates>
+   std::string to_string(const number<Backend, ExpressionTemplates>& val);
+
    // Arithmetic with a higher precision result:
    template <class ResultType, class Source1 class Source2>
    ResultType& add(ResultType& result, const Source1& a, const Source2& b);
@@ -521,6 +525,14 @@ These operators provided formatted input-output operations on `number` types, an
 
 It's down to the back-end type to actually implement string conversion.  However, the back-ends provided with
 this library support all of the iostream formatting flags, field width and precision settings.
+
+In addition, the C++11 `to_string` function is provided for use in generic code:
+
+      template <class Backend, expression_template_option ExpressionTemplates>
+      std::string to_string(const number<Backend, ExpressionTemplates>& val);
+
+This a string with 6 digits of accuracy past the decimal point, matching the behavior of `std::to_string`.
+Note that this is a /fixed precision/ representation, and hence monstrous strings can be returned.
 
 [h4 Arithmetic with a higher precision result]
 
