@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2012 John Maddock. Distributed under the Boost
+//  Copyright 2012-21 John Maddock.
+//  Copyright 2021 Iskandarov Lev. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
@@ -224,21 +225,46 @@ BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, In
    }
    else
 #endif
-   // we can calculate it faster with std::sqrt
-   if (bits <= 64)
    {
-      const std::uint64_t int32max = std::uint64_t((std::numeric_limits<std::uint32_t>::max)());
-      std::uint64_t       val      = static_cast<std::uint64_t>(x);
-      std::uint64_t       s64      = static_cast<std::uint64_t>(std::sqrt(static_cast<long double>(val)));
-      // converting to long double can loose some precision, and `sqrt` can give eps error, so we'll fix this
-      // this is needed
-      while (s64 > int32max || s64 * s64 > val)
-         s64--;
-      // in my tests this never fired, but theoretically this might be needed
-      while (s64 < int32max && (s64 + 1) * (s64 + 1) <= val)
-         s64++;
-      r = val - s64 * s64;
-      return s64;
+      //
+      // Define the floating point type used for std::sqrt, in our tests, sqrt(double) and sqrt(long double) take
+      // about the same amount of time as long as long double is not an emulated 128-bit type (ie the same type
+      // as __float128 from libquadmath).  So only use long double if it's an 80-bit type:
+      //
+      typedef typename std::conditional<(std::numeric_limits<long double>::digits == 64), long double, double>::type real_cast_type;
+      //
+      // As per the Karatsuba sqrt algorithm, the low order bits/4 bits pay no part in the result, only in the remainder,
+      // so define the number of bits our argument must have before passing to std::sqrt is safe, even if doing so
+      // looses a few bits:
+      //
+      constexpr std::size_t cutoff = (std::numeric_limits<real_cast_type>::digits * 4) / 3;
+      //
+      // Type which can hold at least "cutoff" bits:
+      // 
+#ifdef BOOST_HAS_INT128
+      using cutoff_t = typename std::conditional<(cutoff > 64), unsigned __int128, std::uint64_t>::type;
+#else
+      using cutoff_t = std::uint64_t;
+#endif
+      //
+      // See if we can take the fast path:
+      //
+      if (bits <= cutoff)
+      {
+         constexpr cutoff_t half_bits = (cutoff_t(1u) << ((sizeof(cutoff_t) * CHAR_BIT) / 2)) - 1;
+         cutoff_t       val = static_cast<cutoff_t>(x);
+         real_cast_type real_val = static_cast<real_cast_type>(val);
+         cutoff_t       s64 = static_cast<cutoff_t>(std::sqrt(real_val));
+         // converting to long double can loose some precision, and `sqrt` can give eps error, so we'll fix this
+         // this is needed
+         while ((s64 > half_bits) || (s64 * s64 > val))
+            s64--;
+         // in my tests this never fired, but theoretically this might be needed
+         while ((s64 < half_bits) && ((s64 + 1) * (s64 + 1) <= val))
+            s64++;
+         r = static_cast<Integer>(val - s64 * s64);
+         return static_cast<Integer>(s64);
+      }
    }
    // https://hal.inria.fr/file/index/docid/72854/filename/RR-3805.pdf
    std::size_t b = bits / 4;
