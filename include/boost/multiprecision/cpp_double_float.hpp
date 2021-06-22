@@ -40,7 +40,7 @@ namespace backends {
 
 /*
 * A cpp_double_float is represented by an unevaluated sum of two floating-point
-* units (say a0 and a1), which satisfy |a1| <= (1 / 2) * ulp(a0)
+* units (say a0 and a1) which satisfy |a1| <= (1 / 2) * ulp(a0)
 */
 template <typename FloatingPointType>
 class cpp_double_float
@@ -57,6 +57,19 @@ class cpp_double_float
    constexpr cpp_double_float(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
    constexpr cpp_double_float(const std::pair<float_type, float_type>& p) : data(p) {}
    constexpr cpp_double_float(const cpp_double_float& a) : data(a.data) {}
+   template <typename IntegralType,
+             typename std::enable_if<((std::is_integral<IntegralType>::value == true)
+               && (sizeof(IntegralType) < sizeof(FloatingPointType)))>::type const* = nullptr>
+   constexpr cpp_double_float(const IntegralType& u) : data(std::make_pair((float_type)u, (float_type)0.0)) {}
+   template <typename IntegralType,
+             typename std::enable_if<((std::is_integral<IntegralType>::value == true) && (sizeof(IntegralType) < sizeof(FloatingPointType)))>::type const* = nullptr>
+   constexpr cpp_double_float(IntegralType&& u) : data(std::make_pair((float_type)u, (float_type)0.0)) {}
+
+   // FIXME
+   //template <typename IntegralType,
+   //          typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (sizeof(IntegralType) >= sizeof(FloatingPointType)))::type const* = nullptr>>
+   //cpp_double_float(const IntegralType& u);
+
 
    cpp_double_float(const std::string str)
    {
@@ -136,10 +149,12 @@ class cpp_double_float
    cpp_double_float  operator-() const { return negative(); }
 
    // -- DEBUGGING
-   std::string to_string_raw() const;
+   std::string get_raw_str() const;
    // --
  private:
    rep_type data;
+
+   static cpp_double_float<float_type> pow10(int x);
 };
 
 // -- Arithmetic backends
@@ -148,7 +163,7 @@ template <typename FloatingPointType>
 std::pair<FloatingPointType, FloatingPointType>
 cpp_double_float<FloatingPointType>::fast_exact_sum(const float_type& a, const float_type& b)
 {
-   assert(std::abs(a) >= std::abs(b));
+   BOOST_ASSERT(std::abs(a) >= std::abs(b) || a == 0.0);
 
    std::pair<float_type, float_type> out;
    out.first  = a + b;
@@ -180,7 +195,7 @@ cpp_double_float<FloatingPointType>::exact_difference(const float_type& a, const
 
    out.first    = a - b;
    float_type v = out.first - a;
-   out.second   = (a - (out.first - v)) + (b + v);
+   out.second   = (a - (out.first - v)) - (b + v);
 
    return out;
 }
@@ -200,11 +215,12 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
    static_assert(std::numeric_limits<FloatingPointType>::is_iec559,
                  "double_float<> invoked with non-native floating-point unit");
 
+   // TODO Replace bit shifts with constexpr funcs for better compaitibility
    constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits;
    constexpr int               SplitBits = MantissaBits / 2 + 1;
    constexpr FloatingPointType SplitThreshold =
-       std::numeric_limits<FloatingPointType>::max() / FloatingPointType(1 << (SplitBits + 1));
-   constexpr FloatingPointType Splitter = FloatingPointType((1 << SplitBits) + 1);
+       std::numeric_limits<FloatingPointType>::max() / FloatingPointType(1ULL << (SplitBits + 1));
+   constexpr FloatingPointType Splitter = FloatingPointType((1ULL << SplitBits) + 1);
 
    FloatingPointType                               temp, hi, lo;
    std::pair<FloatingPointType, FloatingPointType> out;
@@ -212,12 +228,12 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
    // Handle if multiplication with the splitter would cause overflow
    if (a > SplitThreshold || a < -SplitThreshold)
    {
-      FloatingPointType a_ = a / FloatingPointType(1 << (SplitBits + 1));
+      FloatingPointType a_ = a / FloatingPointType(1ULL << (SplitBits + 1));
       temp = Splitter * a;
       hi   = temp - (temp - a_);
       lo   = a_ - hi;
-      hi *= FloatingPointType(1 << (SplitBits + 1));
-      lo *= FloatingPointType(1 << (SplitBits + 1));
+      hi *= FloatingPointType(1ULL << (SplitBits + 1));
+      lo *= FloatingPointType(1ULL << (SplitBits + 1));
    }
    else
    {
@@ -311,10 +327,10 @@ operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<F
    t = double_float_t::exact_difference(a.second(), b.second());
 
    s.second += t.first;
-   double_float_t::normalize_pair(s, false);
+   double_float_t::normalize_pair(s);
 
    s.second += t.second;
-   double_float_t::normalize_pair(s, false);
+   double_float_t::normalize_pair(s);
 
    return double_float_t(s);
 }
@@ -372,6 +388,13 @@ operator/(const cpp_double_float<FloatingPointType>& a, const FloatingPointType&
    return double_float_t(p);
 }
 
+template <typename NumericType, typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>
+operator/(const NumericType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return cpp_double_float<FloatingPointType>(a) / b;
+}
+
 // double_float<> / double_float<>
 template <typename FloatingPointType>
 inline cpp_double_float<FloatingPointType>
@@ -420,20 +443,13 @@ inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) c
    }
 
    int pos = (int)std::floor(std::log10(d.first())), digits_printed = 0;
-   auto pow10 = [](int x)
-   {
-      cpp_double_float<FloatingPointType> b(1.0);
-      while (x-- > 0)
-         b *= (FloatingPointType)10.;
-      return b;
-   };
 
-   auto d_prime(d / pow10(pos));
-
-   
+   auto d_prime(pos < 0 ? d : d / pow10(pos));
 
    auto print_next_digit = [&]() {
       int digit = (int)(d_prime.first());
+      BOOST_ASSERT(digit >= 0 && digit <= 9);
+
       ss << digit;
 
       d_prime -= FloatingPointType(digit);
@@ -461,13 +477,16 @@ inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) c
 template <typename FloatingPointType>
 inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
 {
-   *this = 0.0;
+   *this = 0;
 
    std::string::size_type pos = 0;
-   while (!std::isdigit(str[pos]))
+   while (!std::isdigit(str[pos]) && pos < str.size())
       if (str[pos] == '.')
          break;
       else pos++;
+
+   if (pos == str.size())
+      return;
 
    // Set the whole number part
    while (std::isdigit(str[pos]))
@@ -481,13 +500,7 @@ inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
    // Set the decimal number part
    while (std::isdigit(str[pos]) && pos < str.size())
    {
-      auto inv_pow10 = [](int exp) {
-         cpp_double_float<FloatingPointType> x(1.0);
-         while (exp--) x /= 10.0;
-         return x;
-      };
-
-      *this += inv_pow10((int) ((int) pos - (int) decimal_idx)) * (FloatingPointType)(str[pos] - '0');
+      *this += (str[pos] - '0') / pow10(pos - decimal_idx);
       pos++;
    }
 
@@ -570,9 +583,22 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_float<Floa
 }
 // --
 
+// -- Misc helper functions
+template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType> cpp_double_float<FloatingPointType>::pow10(int x)
+{
+   BOOST_ASSERT(x >= 0);
+
+   cpp_double_float<FloatingPointType> b(1.0);
+   while (x-- > 0)
+      b *= (FloatingPointType)10.;
+   return b;
+}
+// --
+
 // -- DEBUGGING
 template <typename FloatingPointType>
-inline std::string cpp_double_float<FloatingPointType>::to_string_raw() const
+inline std::string cpp_double_float<FloatingPointType>::get_raw_str() const
 {
    std::stringstream ss;
    ss.precision(34);

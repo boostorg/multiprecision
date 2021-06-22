@@ -77,10 +77,10 @@ void test_basic_io()
    std::cout << std::endl;
 }
 
-int  main()
-{
-   test_basic_io<double>();
-   test_basic_io<float >();
-
-  return 0;
-}
+//int  main()
+//{
+//   test_basic_io<double>();
+//   test_basic_io<float >();
+//
+//  return 0;
+//}
