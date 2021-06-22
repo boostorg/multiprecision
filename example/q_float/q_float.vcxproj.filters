@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{902f6a91-0347-49d8-944a-9cdc63472687}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\q_float">
+      <UniqueIdentifier>{873d349a-9512-4b59-ada7-fe9ee0937af8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\test">
+      <UniqueIdentifier>{ea96c974-541a-4a16-962d-787de5440bff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_make">
+      <UniqueIdentifier>{e70423f9-a086-454e-b0a9-d68472708691}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="q_float\q_float.cpp">
+      <Filter>Source Files\q_float</Filter>
+    </ClCompile>
+    <ClCompile Include="q_float\q_float_gamma.cpp">
+      <Filter>Source Files\q_float</Filter>
+    </ClCompile>
+    <ClCompile Include="q_float\q_float_math.cpp">
+      <Filter>Source Files\q_float</Filter>
+    </ClCompile>
+    <ClCompile Include="q_float\q_float_z_math.cpp">
+      <Filter>Source Files\q_float</Filter>
+    </ClCompile>
+    <ClCompile Include="test.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="q_float\q_float.h">
+      <Filter>Source Files\q_float</Filter>
+    </ClInclude>
+    <ClInclude Include="q_float\q_float_exception.h">
+      <Filter>Source Files\q_float</Filter>
+    </ClInclude>
+    <ClInclude Include="q_float\q_float_limits.h">
+      <Filter>Source Files\q_float</Filter>
+    </ClInclude>
+    <ClInclude Include="q_float\q_float_types.h">
+      <Filter>Source Files\q_float</Filter>
+    </ClInclude>
+    <ClInclude Include="q_float\q_float_z.h">
+      <Filter>Source Files\q_float</Filter>
+    </ClInclude>
+    <ClInclude Include="q_float\q_float_qf.h">
+      <Filter>Source Files\q_float</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile">
+      <Filter>_make</Filter>
+    </None>
+  </ItemGroup>
+</Project>
