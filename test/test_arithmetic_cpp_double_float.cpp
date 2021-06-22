@@ -246,7 +246,7 @@ int main()
   const bool result_div_is_ok = local::test_div(1024U); std::cout << "result_div_is_ok: " << std::boolalpha << result_div_is_ok << std::endl;
 
   const bool result_all_is_ok = (   result_add_is_ok
-                                 /*&& result_sub_is_ok*/
+                                 && result_sub_is_ok
                                  && result_mul_is_ok
                                  /*&& result_div_is_ok*/);
 
