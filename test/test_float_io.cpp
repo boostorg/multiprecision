@@ -302,14 +302,15 @@ void test_round_trip()
 template<typename T>
 void test_to_string()
 {
+   using std::to_string;
    T x0{"23.43"};
-   BOOST_CHECK_EQUAL(x0, "23.430000");
+   BOOST_CHECK_EQUAL(to_string(x0), "23.430000");
 
    T x1{"1e-9"};
-   BOOST_CHECK_EQUAL(x1, "0.000000");
+   BOOST_CHECK_EQUAL(to_string(x1), "0.000000");
 
    T x2{"123456789"};
-   BOOST_CHECK_EQUAL(x2, "123456789.000000");
+   BOOST_CHECK_EQUAL(to_string(x2), "123456789.000000");
 }
 
 #ifdef TEST_FLOAT128
