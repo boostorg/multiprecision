@@ -2015,6 +2015,12 @@ inline std::ostream& operator<<(std::ostream& os, const number<Backend, Expressi
    return os << s;
 }
 
+template <class Backend, expression_template_option ExpressionTemplates>
+std::string to_string(const number<Backend, ExpressionTemplates>& val)
+{
+  return val.str(6, std::ios_base::fixed|std::ios_base::showpoint);
+}
+
 namespace detail {
 
 template <class tag, class A1, class A2, class A3, class A4>
