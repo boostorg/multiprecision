@@ -1671,9 +1671,72 @@ BOOST_MP_CXX14_CONSTEXPR void eval_karatsuba_sqrt(Backend& result, const Backend
    result = s;
 }
 
+template <class B>
+void BOOST_MP_CXX14_CONSTEXPR eval_integer_sqrt_bitwise(B& s, B& r, const B& x)
+{
+   //
+   // This is slow bit-by-bit integer square root, see for example
+   // http://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Binary_numeral_system_.28base_2.29
+   // There are better methods such as http://hal.inria.fr/docs/00/07/28/54/PDF/RR-3805.pdf
+   // and http://hal.inria.fr/docs/00/07/21/13/PDF/RR-4475.pdf which should be implemented
+   // at some point.
+   //
+   using ui_type = typename boost::multiprecision::detail::canonical<unsigned char, B>::type;
+
+   s = ui_type(0u);
+   if (eval_get_sign(x) == 0)
+   {
+      r = ui_type(0u);
+      return;
+   }
+   int g = eval_msb(x);
+   if (g <= 1)
+   {
+      s = ui_type(1);
+      eval_subtract(r, x, s);
+      return;
+   }
+
+   B t;
+   r = x;
+   g /= 2;
+   int org_g = g;
+   eval_bit_set(s, g);
+   eval_bit_set(t, 2 * g);
+   eval_subtract(r, x, t);
+   --g;
+   if (eval_get_sign(r) == 0)
+      return;
+   int msbr = eval_msb(r);
+   do
+   {
+      if (msbr >= org_g + g + 1)
+      {
+         t = s;
+         eval_left_shift(t, g + 1);
+         eval_bit_set(t, 2 * g);
+         if (t.compare(r) <= 0)
+         {
+            BOOST_ASSERT(g >= 0);
+            eval_bit_set(s, g);
+            eval_subtract(r, t);
+            if (eval_get_sign(r) == 0)
+               return;
+            msbr = eval_msb(r);
+         }
+      }
+      --g;
+   } while (g >= 0);
+}
+
 template <class Backend>
 BOOST_MP_CXX14_CONSTEXPR void eval_integer_sqrt(Backend& result, Backend& r, const Backend& x)
 {
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   // recursive Karatsuba sqrt can cause issues in constexpr context:
+   if (BOOST_MP_IS_CONST_EVALUATED(result.size()))
+      return eval_integer_sqrt_bitwise(result, r, x);
+#endif
    using small_uint = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
 
    constexpr small_uint zero = 0u;
