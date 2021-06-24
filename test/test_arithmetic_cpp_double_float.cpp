@@ -223,7 +223,7 @@ bool test_div__(const unsigned count)
 
     std::stringstream strm;
 
-    strm << std::setprecision(33) << df_c;
+    strm << std::setprecision(128) << df_c;
 
     const std::string str_df_c = strm.str();
 
@@ -304,7 +304,7 @@ int main()
   ok &= (   result_add___is_ok
          && result_sub___is_ok
          && result_mul___is_ok
-         /*&& result_div___is_ok*/);
+         && result_div___is_ok);
 
   std::cout << "ok: " << std::boolalpha << ok << std::endl;
 
