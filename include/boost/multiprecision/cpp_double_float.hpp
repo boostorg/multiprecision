@@ -53,17 +53,17 @@ class cpp_double_float
    cpp_double_float() { }
 
    constexpr cpp_double_float(const float_type& a) : data(std::make_pair(a, (float_type)0)) {}
-   constexpr cpp_double_float(float_type&& a) : data(std::make_pair(a, (float_type)0)) {}
    constexpr cpp_double_float(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
    constexpr cpp_double_float(const std::pair<float_type, float_type>& p) : data(p) {}
    constexpr cpp_double_float(const cpp_double_float& a) : data(a.data) {}
    template <typename IntegralType,
-             typename std::enable_if<((std::is_integral<IntegralType>::value == true)
-               && (sizeof(IntegralType) < sizeof(FloatingPointType)))>::type const* = nullptr>
+             typename std::enable_if<(std::is_integral<IntegralType>::value)>::type const* = nullptr,
+             typename std::enable_if<(sizeof(IntegralType) < sizeof(FloatingPointType))>::type const* = nullptr>
    constexpr cpp_double_float(const IntegralType& u) : data(std::make_pair((float_type)u, (float_type)0.0)) {}
    template <typename IntegralType,
-             typename std::enable_if<((std::is_integral<IntegralType>::value == true) && (sizeof(IntegralType) < sizeof(FloatingPointType)))>::type const* = nullptr>
-   constexpr cpp_double_float(IntegralType&& u) : data(std::make_pair((float_type)u, (float_type)0.0)) {}
+             typename std::enable_if<std::is_integral<IntegralType>::value>::type const*                   = nullptr,
+             typename std::enable_if<sizeof(IntegralType) >= sizeof(FloatingPointType)>::type const* = nullptr>
+   cpp_double_float(const IntegralType& u);
 
    // FIXME
    //template <typename IntegralType,
@@ -87,9 +87,9 @@ class cpp_double_float
    operator signed long long() const { return (signed long long)data.first + (signed long long)data.second; }
    operator unsigned char() const { return (unsigned char)data.first; }
    operator unsigned short() const { return (unsigned short)data.first; }
-   operator unsigned int() const { return (unsigned int)data.first + (unsigned int)data.second; }
-   operator unsigned long() const { return (unsigned long)data.first + (unsigned long)data.second; }
-   operator unsigned long long() const { return (unsigned long long)data.first + (unsigned long long)data.second; }
+   operator unsigned int() const { return (unsigned int)((unsigned int)data.first + (signed int)data.second); }
+   operator unsigned long() const { return (unsigned long)((unsigned long)data.first + (signed long)data.second); }
+   operator unsigned long long() const { return (unsigned long long)((unsigned long long)data.first + (signed long long)data.second); }
    operator float() const { return (float)data.first + (float)data.second; }
    operator double() const { return (double)data.first + (double)data.second; }
    operator long double() const { return (long double)data.first + (long double)data.second; }
@@ -156,6 +156,20 @@ class cpp_double_float
 
    static cpp_double_float<float_type> pow10(int x);
 };
+
+// -- Special Constructors
+// Construct from an integral type with size >= what the cpp_double_float can represent
+template <typename FloatingPointType>
+template <typename IntegralType,
+          typename std::enable_if<std::is_integral<IntegralType>::value>::type const*,
+          typename std::enable_if<sizeof(IntegralType) >= sizeof(FloatingPointType)>::type const*>
+inline cpp_double_float<FloatingPointType>::cpp_double_float(const IntegralType& u)
+{
+   data.first  = static_cast<FloatingPointType>(u);
+   data.second = static_cast<FloatingPointType>(std::make_signed<IntegralType>::type(u - (IntegralType)data.first));
+   normalize_pair(data, false);
+}
+//
 
 // -- Arithmetic backends
 // Exact addition of two floating point numbers, given |a| > |b|

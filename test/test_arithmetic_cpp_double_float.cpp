@@ -133,15 +133,15 @@ bool test()
    return all_ok;
 }
 
-int main()
-{
-   bool ok = true;
-   ok      = ok && test<double>();
-   ok      = ok && test<long double>();
-   ok      = ok && test<float>();
-   //ok      = ok && test<boost::multiprecision::float128>();
-   //ok      = ok && test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<34>, boost::multiprecision::et_off> >();
-   //ok = ok && test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<40>, boost::multiprecision::et_off>>(); // error because 1ULL - we could use std::conditional there.
-   //ok = ok && test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<90>, boost::multiprecision::et_off> >();
-   std::cout << "OK: " << std::boolalpha << ok << std::endl;
-}
+//int main()
+//{
+//   bool ok = true;
+//   ok      = ok && test<double>();
+//   ok      = ok && test<long double>();
+//   ok      = ok && test<float>();
+//   //ok      = ok && test<boost::multiprecision::float128>();
+//   //ok      = ok && test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<34>, boost::multiprecision::et_off> >();
+//   //ok = ok && test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<40>, boost::multiprecision::et_off>>(); // error because 1ULL - we could use std::conditional there.
+//   //ok = ok && test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<90>, boost::multiprecision::et_off> >();
+//   std::cout << "OK: " << std::boolalpha << ok << std::endl;
+//}
