@@ -223,7 +223,7 @@ bool test_div__(const unsigned count)
 
     std::stringstream strm;
 
-    strm << std::setprecision(33) << df_c;
+    strm << std::setprecision(128) << df_c;
 
     const std::string str_df_c = strm.str();
 
@@ -296,15 +296,15 @@ int main()
    ok      = ok && test<boost::multiprecision::float128>();
    #endif
 
-  const bool result_add___is_ok = local::test_add__(8192U); std::cout << "result_add___is_ok: " << std::boolalpha << result_add___is_ok << std::endl;
-  const bool result_sub___is_ok = local::test_sub__(8192U); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
-  const bool result_mul___is_ok = local::test_mul__(8192U); std::cout << "result_mul___is_ok: " << std::boolalpha << result_mul___is_ok << std::endl;
-  const bool result_div___is_ok = local::test_div__(8192U); std::cout << "result_div___is_ok: " << std::boolalpha << result_div___is_ok << std::endl;
+  const bool result_add___is_ok = local::test_add__(0x20000U); std::cout << "result_add___is_ok: " << std::boolalpha << result_add___is_ok << std::endl;
+  const bool result_sub___is_ok = local::test_sub__(0x20000U); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
+  const bool result_mul___is_ok = local::test_mul__(0x20000U); std::cout << "result_mul___is_ok: " << std::boolalpha << result_mul___is_ok << std::endl;
+  const bool result_div___is_ok = local::test_div__(0x20000U); std::cout << "result_div___is_ok: " << std::boolalpha << result_div___is_ok << std::endl;
 
   ok &= (   result_add___is_ok
          && result_sub___is_ok
          && result_mul___is_ok
-         /*&& result_div___is_ok*/);
+         && result_div___is_ok);
 
   std::cout << "ok: " << std::boolalpha << ok << std::endl;
 

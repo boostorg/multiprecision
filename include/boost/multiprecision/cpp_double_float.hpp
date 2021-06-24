@@ -529,7 +529,9 @@ inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
    // Set the decimal number part
    while (std::isdigit(str[pos]) && pos < str.size())
    {
-      *this += (str[pos] - '0') / pow10(pos - decimal_idx);
+      // TBD: Do not use plain int as the input parameter to this pow10 function.
+      // Use std::int_fast16_t/32_t, etc. or something similar.
+      *this += (str[pos] - '0') / pow10((int) ((int) pos - (int) decimal_idx));
       pos++;
    }
 
@@ -614,14 +616,41 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_float<Floa
 
 // -- Misc helper functions
 template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType> cpp_double_float<FloatingPointType>::pow10(int x)
+inline cpp_double_float<FloatingPointType> cpp_double_float<FloatingPointType>::pow10(int p)
 {
-   BOOST_ASSERT(x >= 0);
+   using local_float_type = cpp_double_float<FloatingPointType>;
 
-   cpp_double_float<FloatingPointType> b(1.0);
-   while (x-- > 0)
-      b *= (FloatingPointType)10.;
-   return b;
+   local_float_type result;
+
+   if     (p <  0) { result = local_float_type(1U) / pow10(-p); }
+   else if(p == 0) { result = local_float_type(1U); }
+   else if(p == 1) { result = local_float_type(10U); }
+   else if(p == 2) { result = local_float_type(100U); }
+   else if(p == 3) { result = local_float_type(1000U); }
+   else if(p == 4) { result = local_float_type(10000U); }
+   else
+   {
+      result = local_float_type(1U);
+
+      local_float_type y(10U);
+
+      std::uint32_t p_local = (std::uint32_t) p;
+
+      for(;;)
+      {
+         if(std::uint_fast8_t(p_local & 1U) != 0U)
+         {
+            result *= y;
+         }
+
+         p_local >>= 1U;
+
+         if  (p_local == 0U) { break; }
+         else                { y *= y; }
+      }
+   }
+
+   return result;
 }
 // --
 
