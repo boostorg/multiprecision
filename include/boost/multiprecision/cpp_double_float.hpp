@@ -618,13 +618,11 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_float<Floa
 template <typename FloatingPointType>
 inline cpp_double_float<FloatingPointType> cpp_double_float<FloatingPointType>::pow10(int p)
 {
-   BOOST_ASSERT(x >= 0);
-
    using local_float_type = cpp_double_float<FloatingPointType>;
 
    local_float_type result;
 
-   if     (p <  0) { result = 1 / pow10(-p); }
+   if     (p <  0) { result = local_float_type(1U) / pow10(-p); }
    else if(p == 0) { result = local_float_type(1U); }
    else if(p == 1) { result = local_float_type(10U); }
    else if(p == 2) { result = local_float_type(100U); }
