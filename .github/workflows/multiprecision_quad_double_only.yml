@@ -1,0 +1,75 @@
+# Copyright 2020 Evan Miller
+# Copyright 2020 Matt Borland
+# Copyright 2021 John Maddock
+# Copyright 2021 Fahad Syed
+# Copyright 2021 Janek Kozicki
+# Copyright 2021 Christopher Kormanyos
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
+
+name: multiprecision_quad_double_only
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+jobs:
+  gcc-clang-native:
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [ g++, clang++ ]
+        standard: [ c++11, c++14, c++17, c++2a ]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: clone-submods-bootstrap-headers-boost-develop
+        run: |
+          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+          cd ../boost-root
+          git submodule update --init tools
+          git submodule update --init libs/array
+          git submodule update --init libs/assert
+          git submodule update --init libs/concept_check
+          git submodule update --init libs/config
+          git submodule update --init libs/container
+          git submodule update --init libs/core
+          git submodule update --init libs/detail
+          git submodule update --init libs/exception
+          git submodule update --init libs/headers
+          git submodule update --init libs/integer
+          git submodule update --init libs/iterator
+          git submodule update --init libs/lexical_cast
+          git submodule update --init libs/math
+          git submodule update --init libs/move
+          git submodule update --init libs/mpl
+          git submodule update --init libs/multiprecision
+          git submodule update --init libs/numeric/conversion
+          git submodule update --init libs/predef
+          git submodule update --init libs/preprocessor
+          git submodule update --init libs/rational
+          git submodule update --init libs/range
+          git submodule update --init libs/smart_ptr
+          git submodule update --init libs/static_assert
+          git submodule update --init libs/throw_exception
+          git submodule update --init libs/type_traits
+          git submodule update --init libs/utility
+          ./bootstrap.sh
+          ./b2 headers
+      - name: gcc-clang-native
+        run: |
+          echo "where am i (via pwd)"
+          pwd
+          echo "compile to ./test.exe"
+          echo "compiler version"
+          ${{ matrix.compiler }} -v
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_arithmetic_cpp_double_float.cpp -o test.exe
+          echo "ls -la of ./test.exe"
+          ls -la ./test.exe
+          echo "execute ./test.exe"
+          ./test.exe
