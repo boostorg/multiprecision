@@ -6,7 +6,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Basic compilation and operatory tests for cpp_double_float<>
+// Basic I/O tests for cpp_double_float<>
+// Note that the I/O of cpp_double_float<> is currently extremely underdeveloped
 
 #include <boost/multiprecision/cpp_double_float.hpp>
 #include <iostream>
@@ -14,25 +15,30 @@
 
 // Test compilation, basic operatory
 template <typename FloatingPointType>
-void test_basic_operations() {
+void test_basic_io()
+{
    using double_float_t = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
 
-   std::cout << "Testing cpp_double_float< " << typeid(FloatingPointType).name() << " >...\n" << std::endl;
-   double_float_t a = std::rand() * (FloatingPointType)std::rand() / RAND_MAX;
-   double_float_t b = std::rand() * (FloatingPointType)std::rand() / RAND_MAX;
+   std::cout << "Testing cpp_double_float< " << typeid(FloatingPointType).name() << " >...\n"
+             << std::endl;
+
+   double_float_t a, b;
+
+   std::cout << "a = ";
+   std::cin >> a;
+   std::cout << "b = ";
+   std::cin >> b;
 
    std::cout.precision(std::numeric_limits<FloatingPointType>::digits10 * 2);
 
    std::cout << "a: " << a << "\tb: " << b << std::endl;
    std::cout << std::endl;
 
-
    std::cout << "a + b = " << a + b << std::endl;
    std::cout << "a - b = " << a - b << std::endl;
    std::cout << "a * b = " << a * b << std::endl;
    std::cout << "a / b = " << a / b << std::endl;
    std::cout << std::endl;
-
 
    std::cout << "a += b";
    a += b;
@@ -52,7 +58,6 @@ void test_basic_operations() {
 
    std::cout << std::endl;
 
-
    std::cout << "a   = " << a << std::endl;
    std::cout << "++a = " << ++a << " (a = " << a << ")" << std::endl;
    std::cout << "--a = " << --a << " (a = " << a << ")" << std::endl;
@@ -66,7 +71,6 @@ void test_basic_operations() {
 
    std::cout << std::endl;
 
-
    std::cout << "(a / b) * (b / a) = ";
    std::cout << (a / b) * (b / a) << std::endl;
 
@@ -75,9 +79,8 @@ void test_basic_operations() {
 
 //int  main()
 //{
-//   std::srand((unsigned int)clock());
-//   test_basic_operations<double>();
-//   test_basic_operations<float >();
+//   test_basic_io<double>();
+//   test_basic_io<float >();
 //
 //  return 0;
 //}
