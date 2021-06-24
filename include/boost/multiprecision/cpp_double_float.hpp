@@ -251,8 +251,7 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
        std::numeric_limits<FloatingPointType>::max() / FloatingPointType(1ULL << (SplitBits + 1));
    constexpr FloatingPointType Splitter = FloatingPointType((1ULL << SplitBits) + 1);
 
-   FloatingPointType                               temp, hi, lo;
-   std::pair<FloatingPointType, FloatingPointType> out;
+   FloatingPointType temp, hi, lo;
 
    // Handle if multiplication with the splitter would cause overflow
    if (a > SplitThreshold || a < -SplitThreshold)
