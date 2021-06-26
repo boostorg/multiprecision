@@ -72,35 +72,17 @@ class cpp_double_float
                     : std::make_pair(-(float_type) -n, (float_type) 0.0L)) {}
 
    template <typename UnsignedIntegralType,
-             typename std::enable_if<(   (std::is_integral<UnsignedIntegralType>::value == true)
-                                      && (std::is_unsigned<UnsignedIntegralType>::value == true)
-                                      && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   cpp_double_float(UnsignedIntegralType u)
-   {
-      data.first  = static_cast<float_type>(u);
-      data.second = static_cast<float_type>(UnsignedIntegralType(u - (UnsignedIntegralType) data.first));
-      normalize_pair(data, false);
-   }
+             typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   cpp_double_float(UnsignedIntegralType u);
 
    template <typename SignedIntegralType,
              typename std::enable_if<(   (std::is_integral<SignedIntegralType>::value == true)
                                       && (std::is_signed  <SignedIntegralType>::value == true)
                                       && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   cpp_double_float(SignedIntegralType n)
+   cpp_double_float(SignedIntegralType n) : cpp_double_float(static_cast<std::make_unsigned<SignedIntegralType>::type>(std::abs(n)))
    {
-      const bool is_neg = (n < 0);
-
-      const SignedIntegralType un = is_neg == false ? n : -n;
-
-      data.first  = static_cast<float_type>(un);
-      data.second = static_cast<float_type>(SignedIntegralType(un - (SignedIntegralType) data.first));
-      normalize_pair(data, false);
-
-      if(is_neg)
-      {
-        data.first  = -data.first;
-        data.second = -data.second;
-      }
+      if (n < 0)
+         *this = -*this;
    }
 
    cpp_double_float(const std::string str)
@@ -111,6 +93,8 @@ class cpp_double_float
    ~cpp_double_float() = default;
 
    // Casts
+   template <typename cast_type>
+   cast_type cast() const { return (cast_type) (static_cast<std::make_signed<cast_type>::type>(data.first) + data.second); }
    operator signed char() const { return (signed char)data.first; }
    operator signed short() const { return (signed short)data.first; }
    operator signed int() const { return (signed int)data.first + (signed int)data.second; }
@@ -171,6 +155,10 @@ class cpp_double_float
    cpp_double_float& operator-=(const cpp_double_float& a);
    cpp_double_float& operator*=(const cpp_double_float& a);
    cpp_double_float& operator/=(const cpp_double_float& a);
+   cpp_double_float& operator+=(const float_type& a);
+   cpp_double_float& operator-=(const float_type& a);
+   cpp_double_float& operator*=(const float_type& a);
+   cpp_double_float& operator/=(const float_type& a);
    cpp_double_float  operator++(int);
    cpp_double_float  operator--(int);
    cpp_double_float& operator++() { return *this += cpp_double_float<float_type>((double)1.); }
@@ -185,6 +173,35 @@ class cpp_double_float
 
    static cpp_double_float<float_type> pow10(int x);
 };
+
+// -- Special Constructors
+template <typename FloatingPointType>
+template <typename UnsignedIntegralType,
+          typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<FloatingPointType>::digits))>::type const*>
+inline cpp_double_float<FloatingPointType>::cpp_double_float(UnsignedIntegralType u)
+{
+   constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits - 1;
+
+   int bit_index = sizeof(UnsignedIntegralType) * 8;
+
+   for (;;)
+   {
+      // Mask the maximum number of bits that can be stored without
+      // precision loss in a single FloatingPointType, then sum and shift
+      UnsignedIntegralType hi = u >> std::max(bit_index - MantissaBits, 0);
+      u &= ~(hi << std::max(bit_index - MantissaBits, 0));
+
+      *this += static_cast<FloatingPointType>(hi);  // sum
+
+      bit_index -= MantissaBits;
+
+      if (bit_index < 0)
+         break;
+      else  // shift
+         *this *= static_cast<FloatingPointType>(UnsignedIntegralType(1) << std::min(MantissaBits, bit_index));
+   }
+}
+// --
 
 // -- Arithmetic backends
 // Exact addition of two floating point numbers, given |a| > |b|
@@ -570,6 +587,38 @@ cpp_double_float<FloatingPointType>::operator*=(const cpp_double_float<FloatingP
 template <typename FloatingPointType>
 inline cpp_double_float<FloatingPointType>&
 cpp_double_float<FloatingPointType>::operator/=(const cpp_double_float<FloatingPointType>& a)
+{
+   *this = *this / a;
+   return *this;
+}
+
+template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>&
+cpp_double_float<FloatingPointType>::operator+=(const FloatingPointType& a)
+{
+   *this = *this + a;
+   return *this;
+}
+
+template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>&
+cpp_double_float<FloatingPointType>::operator-=(const FloatingPointType& a)
+{
+   *this = *this - a;
+   return *this;
+}
+
+template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>&
+cpp_double_float<FloatingPointType>::operator*=(const FloatingPointType& a)
+{
+   *this = *this * a;
+   return *this;
+}
+
+template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>&
+cpp_double_float<FloatingPointType>::operator/=(const FloatingPointType& a)
 {
    *this = *this / a;
    return *this;
