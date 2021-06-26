@@ -47,7 +47,7 @@ template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_rational>& /*to_type*/, const std::integral_constant<int, number_kind_integer>& /*from_type*/);
 
 template <class Integer>
-BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, Integer& t, size_t bits);
+BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, size_t bits);
 
 } // namespace detail
 
@@ -1618,7 +1618,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_karatsuba_sqrt(Backend& result, const Backend
    {
       unsigned __int128 a{}, b{}, c{};
       eval_convert_to(&a, x);
-      c = boost::multiprecision::detail::karatsuba_sqrt(a, b, c, bits);
+      c = boost::multiprecision::detail::karatsuba_sqrt(a, b, bits);
       r = number<Backend>::canonical_value(b);
       result = number<Backend>::canonical_value(c);
       return;
@@ -1628,7 +1628,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_karatsuba_sqrt(Backend& result, const Backend
    {
       std::uintmax_t a{ 0 }, b{ 0 }, c{ 0 };
       eval_convert_to(&a, x);
-      c = boost::multiprecision::detail::karatsuba_sqrt(a, b, c, bits);
+      c = boost::multiprecision::detail::karatsuba_sqrt(a, b, bits);
       r = number<Backend>::canonical_value(b);
       result = number<Backend>::canonical_value(c);
       return;

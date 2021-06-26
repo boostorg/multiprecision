@@ -193,85 +193,53 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
 namespace detail {
 
 template <class Integer>
-BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, Integer& t, size_t bits)
+BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, size_t bits)
 {
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-   // std::sqrt is not constexpr by standard, so use this
-   if (BOOST_MP_IS_CONST_EVALUATED(bits))
-   {
-      if (bits <= 4)
-      {
-         if (x == 0)
-         {
-            r = 0u;
-            return 0u;
-         }
-         else if (x < 4)
-         {
-            r = x - 1;
-            return 1u;
-         }
-         else if (x < 9)
-         {
-            r = x - 4;
-            return 2u;
-         }
-         else
-         {
-            r = x - 9;
-            return 3u;
-         }
-      }
-   }
-   else
-#endif
-   {
-      //
-      // Define the floating point type used for std::sqrt, in our tests, sqrt(double) and sqrt(long double) take
-      // about the same amount of time as long as long double is not an emulated 128-bit type (ie the same type
-      // as __float128 from libquadmath).  So only use long double if it's an 80-bit type:
-      //
-      typedef typename std::conditional<(std::numeric_limits<long double>::digits == 64), long double, double>::type real_cast_type;
-      //
-      // As per the Karatsuba sqrt algorithm, the low order bits/4 bits pay no part in the result, only in the remainder,
-      // so define the number of bits our argument must have before passing to std::sqrt is safe, even if doing so
-      // looses a few bits:
-      //
-      constexpr std::size_t cutoff = (std::numeric_limits<real_cast_type>::digits * 4) / 3;
-      //
-      // Type which can hold at least "cutoff" bits:
-      // 
+   //
+   // Define the floating point type used for std::sqrt, in our tests, sqrt(double) and sqrt(long double) take
+   // about the same amount of time as long as long double is not an emulated 128-bit type (ie the same type
+   // as __float128 from libquadmath).  So only use long double if it's an 80-bit type:
+   //
+   typedef typename std::conditional<(std::numeric_limits<long double>::digits == 64), long double, double>::type real_cast_type;
+   //
+   // As per the Karatsuba sqrt algorithm, the low order bits/4 bits pay no part in the result, only in the remainder,
+   // so define the number of bits our argument must have before passing to std::sqrt is safe, even if doing so
+   // looses a few bits:
+   //
+   constexpr std::size_t cutoff = (std::numeric_limits<real_cast_type>::digits * 4) / 3;
+   //
+   // Type which can hold at least "cutoff" bits:
+   // 
 #ifdef BOOST_HAS_INT128
-      using cutoff_t = typename std::conditional<(cutoff > 64), unsigned __int128, std::uint64_t>::type;
+   using cutoff_t = typename std::conditional<(cutoff > 64), unsigned __int128, std::uint64_t>::type;
 #else
-      using cutoff_t = std::uint64_t;
+   using cutoff_t = std::uint64_t;
 #endif
-      //
-      // See if we can take the fast path:
-      //
-      if (bits <= cutoff)
-      {
-         constexpr cutoff_t half_bits = (cutoff_t(1u) << ((sizeof(cutoff_t) * CHAR_BIT) / 2)) - 1;
-         cutoff_t       val = static_cast<cutoff_t>(x);
-         real_cast_type real_val = static_cast<real_cast_type>(val);
-         cutoff_t       s64 = static_cast<cutoff_t>(std::sqrt(real_val));
-         // converting to long double can loose some precision, and `sqrt` can give eps error, so we'll fix this
-         // this is needed
-         while ((s64 > half_bits) || (s64 * s64 > val))
-            s64--;
-         // in my tests this never fired, but theoretically this might be needed
-         while ((s64 < half_bits) && ((s64 + 1) * (s64 + 1) <= val))
-            s64++;
-         r = static_cast<Integer>(val - s64 * s64);
-         return static_cast<Integer>(s64);
-      }
+   //
+   // See if we can take the fast path:
+   //
+   if (bits <= cutoff)
+   {
+      constexpr cutoff_t half_bits = (cutoff_t(1u) << ((sizeof(cutoff_t) * CHAR_BIT) / 2)) - 1;
+      cutoff_t       val = static_cast<cutoff_t>(x);
+      real_cast_type real_val = static_cast<real_cast_type>(val);
+      cutoff_t       s64 = static_cast<cutoff_t>(std::sqrt(real_val));
+      // converting to long double can loose some precision, and `sqrt` can give eps error, so we'll fix this
+      // this is needed
+      while ((s64 > half_bits) || (s64 * s64 > val))
+         s64--;
+      // in my tests this never fired, but theoretically this might be needed
+      while ((s64 < half_bits) && ((s64 + 1) * (s64 + 1) <= val))
+         s64++;
+      r = static_cast<Integer>(val - s64 * s64);
+      return static_cast<Integer>(s64);
    }
    // https://hal.inria.fr/file/index/docid/72854/filename/RR-3805.pdf
    std::size_t b = bits / 4;
    Integer q = x;
    q >>= b * 2;
-   Integer s = karatsuba_sqrt(q, r, t, bits - b * 2);
-   t         = 0u;
+   Integer s = karatsuba_sqrt(q, r, bits - b * 2);
+   Integer t = 0u;
    bit_set(t, static_cast<unsigned>(b * 2));
    r <<= b;
    t--;
@@ -302,17 +270,67 @@ BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, In
    return s;
 }
 
+template <class Integer>
+BOOST_MP_CXX14_CONSTEXPR Integer bitwise_sqrt(const Integer& x, Integer& r)
+{
+   //
+   // This is slow bit-by-bit integer square root, see for example
+   // http://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Binary_numeral_system_.28base_2.29
+   // There are better methods such as http://hal.inria.fr/docs/00/07/28/54/PDF/RR-3805.pdf
+   // and http://hal.inria.fr/docs/00/07/21/13/PDF/RR-4475.pdf which should be implemented
+   // at some point.
+   //
+   Integer s = 0;
+   if (x == 0)
+   {
+      r = 0;
+      return s;
+   }
+   int g = msb(x);
+   if (g == 0)
+   {
+      r = 1;
+      return s;
+   }
+
+   Integer t = 0;
+   r = x;
+   g /= 2;
+   bit_set(s, g);
+   bit_set(t, 2 * g);
+   r = x - t;
+   --g;
+   do
+   {
+      t = s;
+      t <<= g + 1;
+      bit_set(t, 2 * g);
+      if (t <= r)
+      {
+         bit_set(s, g);
+         r -= t;
+      }
+      --g;
+   } while (g >= 0);
+   return s;
+}
+
 } // namespace detail
 
 template <class Integer>
 BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type sqrt(const Integer& x, Integer& r)
 {
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   // recursive Karatsuba sqrt can cause issues in constexpr context:
+   if (BOOST_MP_IS_CONST_EVALUATED(x))
+      return detail::bitwise_sqrt(x, r);
+#endif
    if (x == 0u) {
       r = 0u;
       return 0u;
    }
    Integer t{};
-   return detail::karatsuba_sqrt(x, r, t, msb(x) + 1);
+   return detail::karatsuba_sqrt(x, r, msb(x) + 1);
 }
 
 template <class Integer>
