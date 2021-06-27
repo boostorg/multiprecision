@@ -134,10 +134,10 @@ void test_basic_operations()
    std::cout << std::endl;
 }
 
-int main()
-{
-   test_basic_operations<double>();
-   test_basic_operations<float>();
-
-   return 0;
-}
+//int main()
+//{
+//   test_basic_operations<double>();
+//   test_basic_operations<float>();
+//
+//   return 0;
+//}

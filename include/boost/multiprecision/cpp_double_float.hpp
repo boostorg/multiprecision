@@ -85,7 +85,7 @@ class cpp_double_float
          *this = -*this;
    }
 
-   cpp_double_float(const std::string str)
+   cpp_double_float(const std::string& str)
    {
       set_str(str);
    }
@@ -113,7 +113,7 @@ class cpp_double_float
    cpp_double_float<float_type> negative() const { return cpp_double_float<float_type>(-data.first, -data.second); }
 
    std::string get_str(int precision) const;
-   void set_str(const std::string& str);
+   void set_str(std::string str);
 
    // Getters/Setters
    const float_type& first () const { return data.first; }
@@ -521,11 +521,21 @@ inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) c
 }
 
 template <typename FloatingPointType>
-inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
+inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
 {
    *this = 0;
 
-   std::string::size_type pos = 0;
+   int final_exponent = 0;
+   std::string::size_type pos;
+   if ((pos = str.find('e')) != std::string::npos || (pos = str.find('E')) != std::string::npos)
+   {
+      std::stringstream ss;
+      ss << str.data() + pos + 1 << std::endl;
+      ss >> final_exponent;
+      str = str.substr(0, pos);
+   }
+
+   pos = 0;
    while (!std::isdigit(str[pos]) && pos < str.size())
       if (str[pos] == '.')
          break;
@@ -554,9 +564,11 @@ inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str)
    for (char c : str) {
       if (c == '-')
          *this = -*this;
-      if (c <= '9' || c >= '0' || c == '.')
+      if ((c <= '9' && c >= '0') || c == '.')
          break;
    }
+
+   *this *= pow10(final_exponent);
 }
 
 // -- Overloaded operators
@@ -663,14 +675,38 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_float<Floa
 
 // -- Misc helper functions
 template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType> cpp_double_float<FloatingPointType>::pow10(int x)
+inline cpp_double_float<FloatingPointType> cpp_double_float<FloatingPointType>::pow10(int p)
 {
-   BOOST_ASSERT(x >= 0);
+   using local_float_type = cpp_double_float<FloatingPointType>;
 
-   cpp_double_float<FloatingPointType> b(1.0);
-   while (x-- > 0)
-      b *= (FloatingPointType)10.;
-   return b;
+   local_float_type result;
+
+   if (p < 0) result = local_float_type(1U) / pow10(-p);
+   else if (p == 0) result = local_float_type(1U);
+   else if (p == 1) result = local_float_type(10U);
+   else if (p == 2) result = local_float_type(100U);
+   else if (p == 3) result = local_float_type(1000U);
+   else if (p == 4) result = local_float_type(10000U);
+   else
+   {
+      result = local_float_type(1U);
+
+      local_float_type y(10U);
+
+      std::uint32_t p_local = (std::uint32_t)p;
+
+      for (;;)
+      {
+         if (std::uint_fast8_t(p_local & 1U) != 0U) result *= y;
+
+         p_local >>= 1U;
+
+         if (p_local == 0U) break;
+         else y *= y;
+      }
+   }
+
+   return result;
 }
 // --
 
