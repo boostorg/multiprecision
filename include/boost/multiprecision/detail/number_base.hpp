@@ -173,6 +173,21 @@ enum expression_template_option
    et_on  = 1
 };
 
+enum struct variable_precision_options : signed char
+{
+   assume_uniform_precision = -1,
+   preserve_target_precision = 0,
+   preserve_source_precision = 1,
+   preserve_component_precision = 2,
+   preserve_related_precision = 3,
+   preserve_all_precision = 4,
+};
+
+inline constexpr bool operator==(variable_precision_options a, variable_precision_options b)
+{
+   return static_cast<unsigned>(a) == static_cast<unsigned>(b);
+}
+
 template <class Backend>
 struct expression_template_default
 {

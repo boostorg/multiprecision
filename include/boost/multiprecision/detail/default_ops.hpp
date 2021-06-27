@@ -882,6 +882,42 @@ inline BOOST_MP_CXX14_CONSTEXPR int eval_get_sign(const T& val)
 }
 
 template <class T, class V, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& v1, const U& v2, const std::false_type&, const std::false_type&)
+{
+   using component_number_type = typename component_type<number<T> >::type;
+
+   boost::multiprecision::detail::scoped_precision_options<component_number_type> sp(result);
+   (void)sp;
+
+   component_number_type x(v1), y(v2);
+   assign_components(result, x.backend(), y.backend());
+}
+template <class T, class V, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& v1, const U& v2, const std::true_type&, const std::false_type&)
+{
+   boost::multiprecision::detail::scoped_source_precision<number<V>> scope;
+   (void)scope;
+   assign_components_imp2(result, number<V>(v1), v2, std::false_type(), std::false_type());
+}
+template <class T, class V, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& v1, const U& v2, const std::true_type&, const std::true_type&)
+{
+   boost::multiprecision::detail::scoped_source_precision<number<V>> scope1;
+   boost::multiprecision::detail::scoped_source_precision<number<U>> scope2;
+   (void)scope1;
+   (void)scope2;
+   assign_components_imp2(result, number<V>(v1), number<U>(v2), std::false_type(), std::false_type());
+}
+template <class T, class V, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp2(T& result, const V& v1, const U& v2, const std::false_type&, const std::true_type&)
+{
+   boost::multiprecision::detail::scoped_source_precision<number<U>> scope;
+   (void)scope;
+   assign_components_imp2(result, v1, number<U>(v2), std::false_type(), std::false_type());
+}
+
+
+template <class T, class V, class U>
 inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v1, const U& v2, const std::integral_constant<int, number_kind_rational>&)
 {
    result = v1;
@@ -893,10 +929,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v
 template <class T, class V, class U, int N>
 inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v1, const U& v2, const std::integral_constant<int, N>&)
 {
-   using component_number_type = typename component_type<number<T> >::type;
-
-   component_number_type x(v1), y(v2);
-   assign_components(result, x.backend(), y.backend());
+   assign_components_imp2(result, v1, v2, boost::multiprecision::detail::is_backend<V>(), boost::multiprecision::detail::is_backend<U>());
 }
 
 template <class T, class V, class U>
@@ -3209,14 +3242,18 @@ sqrt(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& arg, number<B, Expre
 }
 
 // clang-format off
-
+//
+// Regrettably, when the argument to a function is an rvalue we must return by value, and not return an 
+// expression template, otherwise we can end up with dangling references.  
+// See https://github.com/boostorg/multiprecision/issues/175.
+//
 #define UNARY_OP_FUNCTOR_CXX11_RVALUE(func, category)\
    template <class Backend>                                                                                                                                                                               \
    inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == category, number<Backend, et_on> > ::type                                                                      \
    func(number<Backend, et_on>&& arg)                                                                                                                                                                     \
    {                                                                                                                                                                                                      \
-      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg);                                                                                                    \
-      number<Backend, et_off>                                                    result;                                                                                                                  \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_on> > precision_guard(arg);                                                                                                    \
+      number<Backend, et_on>                                                    result;                                                                                                                  \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                         \
       BOOST_JOIN(eval_, func)(result.backend(), arg.backend());                                                                                                                                                                  \
       return result;                                                                                                                                                                       \
@@ -3226,8 +3263,8 @@ sqrt(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& arg, number<B, Expre
    template <class Backend>                                                                                                                                                                                                                                \
    inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == category, number<Backend, et_on> >::type func(number<Backend, et_on>&& arg, const number<Backend, et_on>& a)                                                                                              \
    {                                                                                                                                                                                                                                                       \
-      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                                                                  \
-      number<Backend, et_off>                                                    result;                                                                                                                                                                   \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_on> > precision_guard(arg, a);                                                                                                                                                  \
+      number<Backend, et_on>                                                    result;                                                                                                                                                                   \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)(result.backend(), arg.backend(), a.backend());                                                                                                                                                                                                      \
       return result;                                                                                                                                                                                                                        \
@@ -3235,8 +3272,8 @@ sqrt(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& arg, number<B, Expre
    template <class Backend>                                                                                                                                                                                                                                \
    inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == category, number<Backend, et_on> >::type func(const number<Backend, et_on>& arg, number<Backend, et_on>&& a)                                                                                              \
    {                                                                                                                                                                                                                                                       \
-      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                                                                  \
-      number<Backend, et_off>                                                    result;                                                                                                                                                                   \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_on> > precision_guard(arg, a);                                                                                                                                                  \
+      number<Backend, et_on>                                                    result;                                                                                                                                                                   \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)(result.backend(), arg.backend(), a.backend());                                                                                                                                                                                                      \
       return result;                                                                                                                                                                                                                        \
@@ -3244,8 +3281,8 @@ sqrt(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& arg, number<B, Expre
    template <class Backend>                                                                                                                                                                                                                                \
    inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == category, number<Backend, et_on> >::type func(number<Backend, et_on>&& arg, number<Backend, et_on>&& a)                                                                                              \
    {                                                                                                                                                                                                                                                       \
-      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                                                                  \
-      number<Backend, et_off>                                                    result;                                                                                                                                                                   \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_on> > precision_guard(arg, a);                                                                                                                                                  \
+      number<Backend, et_on>                                                    result;                                                                                                                                                                   \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)(result.backend(), arg.backend(), a.backend());                                                                                                                                                                                                      \
       return result;                                                                                                                                                                                                                        \

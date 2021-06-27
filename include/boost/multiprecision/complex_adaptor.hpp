@@ -911,6 +911,14 @@ struct complex_result_from_scalar<number<Backend, ExpressionTemplates> >
    using type = number<complex_adaptor<Backend>, ExpressionTemplates>;
 };
 
+namespace detail {
+   template <class Backend>
+   struct is_variable_precision<complex_adaptor<Backend> > : public is_variable_precision<Backend>
+   {};
+} // namespace detail
+
+
+
 template <class Backend, expression_template_option ExpressionTemplates>
 struct complex_result_from_scalar<number<backends::debug_adaptor<Backend>, ExpressionTemplates> >
 {

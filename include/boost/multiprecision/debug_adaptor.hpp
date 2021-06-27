@@ -139,6 +139,14 @@ struct debug_adaptor
    {
       Backend::default_precision(v);
    }
+   static unsigned thread_default_precision() noexcept
+   {
+      return Backend::thread_default_precision();
+   }
+   static void thread_default_precision(unsigned v) noexcept
+   {
+      Backend::thread_default_precision(v);
+   }
    unsigned precision() const noexcept
    {
       return value().precision();
@@ -146,6 +154,25 @@ struct debug_adaptor
    void precision(unsigned digits10) noexcept
    {
       value().precision(digits10);
+   }
+   //
+   // Variable precision options:
+   // 
+   static constexpr variable_precision_options default_variable_precision_options()noexcept
+   {
+      return Backend::default_variable_precision_options();
+   }
+   static constexpr variable_precision_options thread_default_variable_precision_options()noexcept
+   {
+      return Backend::thread_default_variable_precision_options();
+   }
+   static BOOST_MP_CXX14_CONSTEXPR void default_variable_precision_options(variable_precision_options opts)
+   {
+      Backend::default_variable_precision_options(opts);
+   }
+   static BOOST_MP_CXX14_CONSTEXPR void thread_default_variable_precision_options(variable_precision_options opts)
+   {
+      Backend::thread_default_variable_precision_options(opts);
    }
 };
 
@@ -647,6 +674,10 @@ namespace detail {
 template <class Backend>
 struct number_category<backends::debug_adaptor<Backend> > : public number_category<Backend>
 {};
+
+template <class Number>
+using debug_adaptor_t = number<debug_adaptor<typename Number::backend_type>, Number::et>;
+
 
 template <class Backend, expression_template_option ExpressionTemplates>
 struct component_type<number<debug_adaptor<Backend>, ExpressionTemplates>>
