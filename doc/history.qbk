@@ -12,6 +12,23 @@
 
 [section:hist History]
 
+[h4 Multiprecision-4.0.1 (Boost-1.77)]
+
+* Much improved Karatsuba sqrt for cpp_int/cpp_bin_float.
+* Added C++11 compatible `to_string` free function.
+* Fixed bug in Lehmer GCD code, see [@https://github.com/boostorg/multiprecision/issues/322 #322]. 
+* Fixed debug_adaptor/logged_adaptor to work better with complex, rational and interval types, see [@https://github.com/boostorg/multiprecision/issues/329 #329].
+* Big update to mixed-variable precision arithmetic code with better options and thread safety, see [link boost_multiprecision.tut.variable docs].
+* Fixed up hashing of bools and enums when creating hash values.
+* Improved conversions to and from enum types.
+* Restricted use of Intel intrinsics to when we really are building for Intel even though the header may be available, see [@https://github.com/boostorg/multiprecision/issues/321 #321].
+* Tidied up Lanczos approximation usage, in conjunction with Boost.Math this improves the reliability and accuracy of many special functions.
+* Fix use of libtommath deprecated features.
+* Fixed missing sqrt overload, see [@https://github.com/boostorg/multiprecision/issues/319 #319].
+* Added Karatsuba multiplication to cpp_dec_float to bring it into line with the other types in this library.
+* Added some minor optimizations to mpfr comparison operators.
+
+
 [h4 Multiprecision-4.0.0 (Boost-1.76)]
 
 * [*BREAKING CHANGE]: Massive refactoring and code simpification makes C++11 an absolute requirement.

@@ -48,6 +48,9 @@
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">logged_adaptor</span><span class="special">;</span>
 
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Number</span><span class="special">&gt;</span>
+<span class="keyword">using</span> <span class="identifier">logged_adaptor_t</span> <span class="special">=</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">logged_adaptor</span><span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">Number</span><span class="special">::</span><span class="identifier">backend_type</span><span class="special">&gt;,</span> <span class="identifier">Number</span><span class="special">::</span><span class="identifier">et</span><span class="special">&gt;;</span>
+
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
@@ -78,6 +81,11 @@
 <p>
           This type provides <code class="computeroutput"><span class="identifier">numeric_limits</span></code>
           support whenever the template argument Backend does so.
+        </p>
+<p>
+          Template alias <code class="computeroutput"><span class="identifier">logged_adaptor_t</span></code>
+          can be used as a shortcut for converting some instantiation of <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;&gt;</span></code>
+          to it's logged euqivalent.
         </p>
 <p>
           This type is particularly useful when combined with an interval number

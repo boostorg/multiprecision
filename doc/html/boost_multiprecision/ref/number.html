@@ -44,6 +44,8 @@
    <span class="keyword">typedef</span>          <span class="identifier">Backend</span>                          <span class="identifier">backend_type</span><span class="special">;</span>
    <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="identifier">component_type</span><span class="special">&lt;</span><span class="identifier">self_type</span><span class="special">&gt;::</span><span class="identifier">type</span>  <span class="identifier">value_type</span><span class="special">;</span>
 
+   <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="identifier">expression_template_option</span> <span class="identifier">et</span> <span class="special">=</span> <span class="identifier">ExpressionTemplates</span><span class="special">;</span>
+
    <span class="identifier">number</span><span class="special">();</span>
    <span class="identifier">number</span><span class="special">(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
    <span class="identifier">number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
@@ -134,6 +136,10 @@
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">os</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>unmentionable-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">r</span><span class="special">);</span>
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&gt;&gt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="identifier">is</span><span class="special">,</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+
+<span class="comment">// to_string support:</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">to_string</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">val</span><span class="special">);</span>
 
 <span class="comment">// Arithmetic with a higher precision result:</span>
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">ResultType</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Source1</span> <span class="keyword">class</span> <span class="identifier">Source2</span><span class="special">&gt;</span>
@@ -695,6 +701,18 @@
         It's down to the back-end type to actually implement string conversion. However,
         the back-ends provided with this library support all of the iostream formatting
         flags, field width and precision settings.
+      </p>
+<p>
+        In addition, the C++11 <code class="computeroutput"><span class="identifier">to_string</span></code>
+        function is provided for use in generic code:
+      </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">to_string</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">val</span><span class="special">);</span>
+</pre>
+<p>
+        This a string with 6 digits of accuracy past the decimal point, matching
+        the behavior of <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">to_string</span></code>. Note that this is a <span class="emphasis"><em>fixed
+        precision</em></span> representation, and hence monstrous strings can be returned.
       </p>
 <h5>
 <a name="boost_multiprecision.ref.number.h5"></a>
