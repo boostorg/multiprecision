@@ -15,7 +15,7 @@
 
 // Test compilation, basic operatory
 template <typename FloatingPointType>
-void test_basic_io()
+void test_basic_io_manual()
 {
    using double_float_t = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
 
@@ -23,13 +23,42 @@ void test_basic_io()
              << std::endl;
 
    double_float_t a, b;
+   char           c;
 
    std::cout << "a = ";
-   std::cin >> a;
-   std::cout << "b = ";
-   std::cin >> b;
+   double d;
+   std::cin >> d;
+   a = FloatingPointType(d);
+   //std::cin >> a;
+   b = (a * FloatingPointType(std::rand())) / FloatingPointType(std::rand());
 
-   std::cout.precision(std::numeric_limits<FloatingPointType>::digits10 * 2);
+   int p;
+   std::cout << "Precision: ";
+   std::cin >> p;
+   std::cout.precision(p);
+
+   std::cout << "(f)ixed/(s)cientific/(d)efault: ";
+   std::cin >> c;
+   switch (c)
+   {
+   case 'f':
+      std::cout.setf(std::ios::fixed);
+      break;
+   case 's':
+      std::cout.setf(std::ios::scientific);
+      break;
+   case 'd':
+      std::cout.unsetf(std::ios::floatfield);
+   default:
+      break;
+   }
+
+   std::cout << "showpoint (y/n): ";
+   std::cin >> c;
+   if (c == 'y')
+      std::cout.setf(std::ios::showpoint);
+   else if (c == 'n')
+      std::cout.unsetf(std::ios::showpoint);
 
    std::cout << "a: " << a << "\tb: " << b << std::endl;
    std::cout << std::endl;
@@ -77,10 +106,10 @@ void test_basic_io()
    std::cout << std::endl;
 }
 
-int  main()
-{
-   test_basic_io<double>();
-   test_basic_io<float >();
-
-  return 0;
-}
+//int main()
+//{
+//   test_basic_io_manual<double>();
+//   test_basic_io_manual<float>();
+//
+//   return 0;
+//}

@@ -14,7 +14,7 @@
 // cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
 // g++ -Wall -Wextra -O3 -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test.exe
 
-namespace local {
+namespace test_arithmetic_cpp_double_float {
 
 std::mt19937                                                         engine_man;
 std::ranlux24_base                                                   engine_sgn;
@@ -101,8 +101,8 @@ bool test_add__(const unsigned count)
     std::string str_a;
     std::string str_b;
 
-    local::get_random_fixed_string<33U>(str_a);
-    local::get_random_fixed_string<33U>(str_b);
+    test_arithmetic_cpp_double_float::get_random_fixed_string<33U>(str_a);
+    test_arithmetic_cpp_double_float::get_random_fixed_string<33U>(str_b);
 
     const naked_double_float_type df_a  (str_a);
     const naked_double_float_type df_b  (str_b);
@@ -137,8 +137,8 @@ bool test_sub__(const unsigned count)
     std::string str_a;
     std::string str_b;
 
-    local::get_random_fixed_string<33U>(str_a);
-    local::get_random_fixed_string<33U>(str_b);
+    test_arithmetic_cpp_double_float::get_random_fixed_string<33U>(str_a);
+    test_arithmetic_cpp_double_float::get_random_fixed_string<33U>(str_b);
 
     const naked_double_float_type df_a  (str_a);
     const naked_double_float_type df_b  (str_b);
@@ -173,8 +173,8 @@ bool test_mul__(const unsigned count)
     std::string str_a;
     std::string str_b;
 
-    local::get_random_fixed_string<33U>(str_a);
-    local::get_random_fixed_string<33U>(str_b);
+    test_arithmetic_cpp_double_float::get_random_fixed_string<33U>(str_a);
+    test_arithmetic_cpp_double_float::get_random_fixed_string<33U>(str_b);
 
     const naked_double_float_type df_a  (str_a);
     const naked_double_float_type df_b  (str_b);
@@ -209,8 +209,8 @@ bool test_div__(const unsigned count)
     std::string str_a;
     std::string str_b;
 
-    local::get_random_fixed_string<33U>(str_a);
-    local::get_random_fixed_string<33U>(str_b);
+    test_arithmetic_cpp_double_float::get_random_fixed_string<33U>(str_a);
+    test_arithmetic_cpp_double_float::get_random_fixed_string<33U>(str_b);
 
     const naked_double_float_type df_a  (str_a);
     const naked_double_float_type df_b  (str_b);
@@ -236,7 +236,7 @@ bool test_div__(const unsigned count)
   return result_is_ok;
 }
 
-} // namespace local
+} // namespace test_arithmetic_cpp_double_float
 
 template <typename T>
 bool test()
@@ -250,8 +250,8 @@ bool test()
       std::string str_a;
       std::string str_b;
 
-      local::get_random_fixed_string<digs * 2 + 1>(str_a);
-      local::get_random_fixed_string<digs * 2 + 1>(str_b);
+      test_arithmetic_cpp_double_float::get_random_fixed_string<digs * 2 + 1>(str_a);
+      test_arithmetic_cpp_double_float::get_random_fixed_string<digs * 2 + 1>(str_b);
 
       std::cout << "Testing " << str_a << " / " << str_b << std::endl;
 
@@ -296,10 +296,10 @@ bool test()
 //   ok      = ok && test<boost::multiprecision::float128>();
 //   #endif
 //
-//  const bool result_add___is_ok = local::test_add__(8192U); std::cout << "result_add___is_ok: " << std::boolalpha << result_add___is_ok << std::endl;
-//  const bool result_sub___is_ok = local::test_sub__(8192U); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
-//  const bool result_mul___is_ok = local::test_mul__(8192U); std::cout << "result_mul___is_ok: " << std::boolalpha << result_mul___is_ok << std::endl;
-//  const bool result_div___is_ok = local::test_div__(8192U); std::cout << "result_div___is_ok: " << std::boolalpha << result_div___is_ok << std::endl;
+//  const bool result_add___is_ok = test_arithmetic_cpp_double_float::test_add__(8192U); std::cout << "result_add___is_ok: " << std::boolalpha << result_add___is_ok << std::endl;
+//  const bool result_sub___is_ok = test_arithmetic_cpp_double_float::test_sub__(8192U); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
+//  const bool result_mul___is_ok = test_arithmetic_cpp_double_float::test_mul__(8192U); std::cout << "result_mul___is_ok: " << std::boolalpha << result_mul___is_ok << std::endl;
+//  const bool result_div___is_ok = test_arithmetic_cpp_double_float::test_div__(8192U); std::cout << "result_div___is_ok: " << std::boolalpha << result_div___is_ok << std::endl;
 //
 //  ok &= (   result_add___is_ok
 //         && result_sub___is_ok

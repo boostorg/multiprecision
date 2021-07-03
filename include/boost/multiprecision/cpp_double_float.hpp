@@ -17,6 +17,7 @@
 #include <utility>
 #include <limits>
 #include <sstream>
+#include <vector>
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/assert.hpp>
@@ -79,7 +80,7 @@ class cpp_double_float
              typename std::enable_if<(   (std::is_integral<SignedIntegralType>::value == true)
                                       && (std::is_signed  <SignedIntegralType>::value == true)
                                       && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   cpp_double_float(SignedIntegralType n) : cpp_double_float(static_cast<std::make_unsigned<SignedIntegralType>::type>(std::abs(n)))
+   cpp_double_float(SignedIntegralType n) : cpp_double_float(static_cast<typename std::make_unsigned<SignedIntegralType>::type>(std::abs(n)))
    {
       if (n < 0)
          *this = -*this;
@@ -93,8 +94,6 @@ class cpp_double_float
    ~cpp_double_float() = default;
 
    // Casts
-   template <typename cast_type>
-   cast_type cast() const { return (cast_type) (static_cast<std::make_signed<cast_type>::type>(data.first) + data.second); }
    operator signed char() const { return (signed char)data.first; }
    operator signed short() const { return (signed short)data.first; }
    operator signed int() const { return (signed int)data.first + (signed int)data.second; }
@@ -112,7 +111,7 @@ class cpp_double_float
    // Methods
    cpp_double_float<float_type> negative() const { return cpp_double_float<float_type>(-data.first, -data.second); }
 
-   std::string get_str(int precision) const;
+   // FIXME Merge set_str() to operator<<
    void set_str(std::string str);
 
    // Getters/Setters
@@ -165,13 +164,16 @@ class cpp_double_float
    cpp_double_float& operator--() { return *this -= cpp_double_float<float_type>(1.); }
    cpp_double_float  operator-() const { return negative(); }
 
+   bool operator>(const float_type& a) const;
+   bool operator<(const float_type& a) const;
+   bool operator==(const float_type& a) const;
+   bool operator!=(const float_type& a) const;
    // -- DEBUGGING
    std::string get_raw_str() const;
    // --
+   static cpp_double_float<float_type> pow10(int x);
  private:
    rep_type data;
-
-   static cpp_double_float<float_type> pow10(int x);
 };
 
 // -- Special Constructors
@@ -469,57 +471,7 @@ operator/(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<F
 // --
 
 // -- String Conversions
-// [FIXME] Basic string conversion
-template <typename FloatingPointType>
-inline std::string cpp_double_float<FloatingPointType>::get_str(int precision) const
-{
-   std::ostringstream ss;
-
-   cpp_double_float<FloatingPointType> d(*this);
-
-   if (d.first() < 0)
-   {
-      d = -d;
-      ss << "-";
-   }
-   else if (d.first() == 0.0)
-   {
-     // FIXME
-      return "0";
-   }
-
-   int pos = (int)std::floor(std::log10(d.first())), digits_printed = 0;
-
-   auto d_prime(pos < 0 ? d : d / pow10(pos));
-
-   auto print_next_digit = [&]() {
-      int digit = (int)(d_prime.first());
-      BOOST_ASSERT(digit >= 0 && digit <= 9);
-
-      ss << digit;
-
-      d_prime -= FloatingPointType(digit);
-      d_prime *= (FloatingPointType)10.0;
-   };
-
-   do
-   {
-      print_next_digit();
-      pos--, digits_printed++;
-   } while (pos >= 0);
-
-   ss << '.';
-
-   // Print the decimal number part
-   do
-   {
-      print_next_digit();
-      digits_printed++;
-   } while (digits_printed <= precision);
-
-   return ss.str();
-}
-
+// FIXME Merge set_str() to operator<<
 template <typename FloatingPointType>
 inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
 {
@@ -548,16 +500,18 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
    while (std::isdigit(str[pos]))
       *this = *this * FloatingPointType(10) + FloatingPointType(str[pos++] - '0');
 
-   BOOST_ASSERT(str[pos] == '.');
-
-   std::string::size_type decimal_idx = pos;
-   pos++;
-
+   
    // Set the decimal number part
-   while (std::isdigit(str[pos]) && pos < str.size())
+   if (str[pos] == '.')
    {
-      *this += (str[pos] - '0') / pow10(pos - decimal_idx);
+      std::string::size_type decimal_idx = pos;
       pos++;
+
+      while (std::isdigit(str[pos]) && pos < str.size())
+      {
+         *this += (str[pos] - '0') / pow10(pos - decimal_idx);
+         pos++;
+      }
    }
 
    // Get the sign
@@ -654,11 +608,226 @@ cpp_double_float<FloatingPointType>::operator--(int)
    return t;
 }
 
+template <typename FloatingPointType>
+inline bool
+cpp_double_float<FloatingPointType>::operator>(const float_type& a) const
+{
+  // TODO Test
+   return a - data.first < data.second;
+}
+
+template <typename FloatingPointType>
+inline bool
+cpp_double_float<FloatingPointType>::operator<(const float_type& a) const
+{
+   return a - data.first > data.second;
+}
+
+template <typename FloatingPointType>
+inline bool
+cpp_double_float<FloatingPointType>::operator==(const float_type& a) const
+{
+   return a - data.first == data.second;
+}
+
+template <typename FloatingPointType>
+inline bool
+cpp_double_float<FloatingPointType>::operator!=(const float_type& a) const
+{
+   return a - data.first != data.second;
+}
+
 template <typename FloatingPointType, typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_float<FloatingPointType>& f)
 {
-   os << f.get_str((int)os.precision());
+   auto is_set = [&](std::ios::fmtflags flg) {
+      return os.flags() & flg;
+   };
+
+  if (f < FloatingPointType(0) || os.flags() & std::ios::showpos)
+      os << (f < FloatingPointType(0) ? "-" : "+");
+
+   int exp10, digits_printed = 0;
+
+   if (f != FloatingPointType(0))
+      exp10 = (int)std::floor(std::log10(std::abs(f.first())));
+   else
+      exp10 = 0;
+
+   auto f_prime = (f > FloatingPointType(0) ? f : -f) / cpp_double_float<FloatingPointType>::pow10(exp10);
+
+   if (f_prime < FloatingPointType(1) && f_prime > FloatingPointType(0))
+   {
+      f_prime *= FloatingPointType(10);
+      exp10++;
+   }
+
+   // Collect all the required digits to print (plus one digit for rounding)
+   std::vector<int> digits;
+
+   int p = (int)os.precision();
+   if (is_set(std::ios::fixed))
+      p += exp10 + 1;
+   else if (is_set(std::ios::scientific))
+      p = std::max(1, p + 1);
+   else
+      p = std::max(p, 1);
+
+   while (p-- > 0)
+   {
+      int digit = static_cast<int>(f_prime.first());
+
+      if (f_prime.first() == FloatingPointType(10) && f_prime.second() < 0)
+         digit = 9;
+
+      BOOST_ASSERT(digit >= 0 && digit <= 9);
+
+      digits.push_back(digit);
+
+      f_prime -= static_cast<FloatingPointType>(digit);
+      f_prime *= static_cast<FloatingPointType>(10);
+   }
+
+   auto round_up = [&]() {
+      int i = digits.size() - 1;
+      if (i > -1)
+      {
+         do
+         {
+            if (digits[i] == 9)
+               digits[i--] = 0;
+            else
+            {
+               digits[i--] += 1;
+               break;
+            }
+         } while (i >= 0);
+
+         // Special case in which all of the collected digits are incorrectly
+         // rounded (e.g. 9.999 rounded to three significant figures = 10.0)
+         if (i == -1 && digits[0] == 0)
+         {
+            digits = {1};
+            exp10++;
+         }
+      }
+      else
+      {
+         digits.insert(digits.begin(), 1);
+         exp10++;
+      }
+   };
+
+   // Perform rounding (rounding mode = round-to-nearest, ties-to-even)
+   // Three possible cases: the remaining part of the number is
+   // (1) greater than 0.5 (round-up)
+   // (2) less than 0.5 (round-down)
+   // (3) equal to 0.5 (round-to-even)
+   if (f_prime > FloatingPointType(5))
+      round_up();
+   else if (f_prime < FloatingPointType(5))  // do nothing. already correctly rounded
+   {
+      // TODO add some kind of an option for configurable rounding mode
+   }
+   else if (digits.back() % 2 != 0)
+      // remaining part is exactly 0.5, so round-to-even
+      round_up();
+
+   // Remove trailing zeroes
+   if (!is_set(std::ios::fixed) && !is_set(std::ios::scientific) && !is_set(std::ios::showpoint))
+      while (digits.back() == 0 && (digits.size() > 1 + exp10 || exp10 < 0))
+         digits.pop_back();
+
+   auto fill_zeroes = [](std::string& s, size_t pos, int n) {
+      for (int i = 0; i < n; ++i)
+         s.insert(pos, "0");
+   };
+
+   // Print the required numbers to a string
+   std::string str = "";
+   size_t      str_size;
+
+   for (auto d : digits)
+      str.push_back(static_cast<char>(d + '0'));
+
+   // Fixed-point style
+   if (is_set(std::ios::fixed) || (exp10 >= -4 && (exp10 < os.precision()) && !is_set(std::ios::scientific)))
+   {
+      if (exp10 + 1 <= 0) // Number < 1
+      {
+         str_size = (size_t)os.precision() + 2;
+
+         if (!is_set(std::ios::fixed) && os.precision() == 0)
+            str_size++;
+
+         str.insert(0, "0.");
+
+         fill_zeroes(str, 2, -(exp10 + 1));
+         if (!is_set(std::ios::fixed))
+            str_size += -(exp10 + 1);
+      }
+      else  // Number >= 1
+      {
+         str_size = 1 + os.precision();
+         if (is_set(std::ios::fixed))
+            str_size += exp10 + 1;
+
+         fill_zeroes(str, str.size(), str_size - str.size() - 1);
+
+         BOOST_ASSERT(exp10 + 1 <= str.size());
+         str.insert(exp10 + 1, ".");
+      }
+ 
+      while (str.size() > str_size)
+         str.pop_back();
+      while (str.size() < str_size)
+         str.push_back('0');
+      while (!is_set(std::ios::showpoint) && !is_set(std::ios::fixed) && str.back() == '0')
+         str.pop_back();
+
+      if (str.back() == '.' && !is_set(std::ios::showpoint))
+         str.pop_back();
+   }
+   // Scientific style
+   else if (is_set(std::ios::scientific) || (exp10 < -4 || (exp10 + 1 > std::max((int)os.precision(), 1))))
+   {
+      str_size = (size_t)os.precision() + 1;
+      if (os.precision() == 0 || is_set(std::ios::scientific))
+         str_size++;
+
+      str.insert(1, ".");
+      // Pad with zeroes
+      fill_zeroes(str, str.size(), str_size - str.size());
+
+      // Remove trailing zeroes
+      while (str.size() > str_size)
+         str.pop_back();
+      while (!is_set(std::ios::scientific) && !is_set(std::ios::showpoint) && str.back() == '0')
+         str.pop_back();
+
+      // Remove unnecessary point
+      if (str.back() == '.' && !is_set(std::ios::showpoint))
+         str.pop_back();
+
+      std::stringstream ss;
+
+      ss << str;
+      ss << (os.flags() & std::ios::uppercase ? "E" : "e");
+      ss << (exp10 < 0 ? "-" : "+");
+      ss.width(std::max(1 + (std::streamsize)std::log10(exp10), (std::streamsize)2));
+      ss.fill('0');
+      ss << std::abs(exp10);
+
+      str = ss.str();
+   }
+   else if (exp10 == os.precision())
+   {
+      if (os.flags() & std::ios::showpoint)
+         str.push_back('.');
+   }
+
+   os << str;
    return os;
 }
 
