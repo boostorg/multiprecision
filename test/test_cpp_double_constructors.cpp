@@ -56,7 +56,7 @@ bool test_constructor()
 
       double_float_t d(n);
 
-      double_float_t::rep_type rep(d.rep());
+      typename double_float_t::rep_type rep(d.rep());
       double_float_t::normalize_pair(rep);
 
       // Check if representation of the cpp_double_float is not normalized
