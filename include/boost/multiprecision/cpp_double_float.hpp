@@ -53,38 +53,47 @@ class cpp_double_float
    // Constructors
    cpp_double_float() { }
 
-   constexpr cpp_double_float(const float_type& a) : data(std::make_pair(a, (float_type)0)) {}
-   constexpr cpp_double_float(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
-   constexpr cpp_double_float(const std::pair<float_type, float_type>& p) : data(p) {}
    constexpr cpp_double_float(const cpp_double_float& a) : data(a.data) {}
 
-   template <typename UnsignedIntegralType,
-             typename std::enable_if<(   (std::is_integral<UnsignedIntegralType>::value == true)
-                                      && (std::is_unsigned<UnsignedIntegralType>::value == true)
-                                      && (std::numeric_limits<UnsignedIntegralType>::digits <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   constexpr cpp_double_float(UnsignedIntegralType u) : data(std::make_pair((float_type) u, (float_type) 0.0L)) {}
+   // Constructors from other floating-point types
+   template <typename FloatType,
+             typename std::enable_if<(std::is_floating_point<FloatType>::value == true)
+             && (sizeof(FloatType) < 2*sizeof(FloatingPointType))>::type const* = nullptr>
+   cpp_double_float(const FloatType& f) : data(std::make_pair(f, (float_type)0)) {}
+   template <typename FloatType,
+             typename std::enable_if<(std::numeric_limits<FloatType>::is_iec559 == true)
+             && (sizeof(FloatType) >= 2 * sizeof(FloatingPointType))>::type const* = nullptr>
+   cpp_double_float(const FloatType& f)
+       : data(std::make_pair(static_cast<float_type>(f),
+                             static_cast<float_type>(f - (FloatType) static_cast<float_type>(f)))) {}
 
-   template <typename SignedIntegralType,
-             typename std::enable_if<(   (std::is_integral<SignedIntegralType>::value == true)
-                                      && (std::is_signed  <SignedIntegralType>::value == true)
-                                      && (std::numeric_limits<SignedIntegralType>::digits + 1 <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   constexpr cpp_double_float(SignedIntegralType n)
-      : data(n >= 0 ? std::make_pair( (float_type)  n, (float_type) 0.0L)
-                    : std::make_pair(-(float_type) -n, (float_type) 0.0L)) {}
+   // Constructors from integers
+   template <typename IntegralType,
+             typename std::enable_if<(std::numeric_limits<IntegralType>::is_iec559 == false) && (std::numeric_limits<IntegralType>::digits <= std::numeric_limits<FloatingPointType>::digits)>::type const* = nullptr>
+   cpp_double_float(const IntegralType& f) : data(std::make_pair(static_cast<float_type>(f), (float_type)0)) {}
 
+   // Constructors from integers which hold more information than *this can contain
    template <typename UnsignedIntegralType,
-             typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+             typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true)
+               && (std::numeric_limits<UnsignedIntegralType>::is_iec559 == false)
+               && (std::is_unsigned<UnsignedIntegralType>::value == true)
+               && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    cpp_double_float(UnsignedIntegralType u);
 
    template <typename SignedIntegralType,
-             typename std::enable_if<(   (std::is_integral<SignedIntegralType>::value == true)
-                                      && (std::is_signed  <SignedIntegralType>::value == true)
-                                      && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+             typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true)
+               && (std::numeric_limits<SignedIntegralType>::is_iec559 == false)
+               && (std::is_signed<SignedIntegralType>::value == true)
+               && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    cpp_double_float(SignedIntegralType n) : cpp_double_float(static_cast<typename std::make_unsigned<SignedIntegralType>::type>(std::abs(n)))
    {
       if (n < 0)
          *this = -*this;
    }
+
+   
+   constexpr cpp_double_float(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
+   constexpr cpp_double_float(const std::pair<float_type, float_type>& p) : data(p) {}
 
    cpp_double_float(const std::string& str)
    {
@@ -166,6 +175,8 @@ class cpp_double_float
 
    bool operator>(const float_type& a) const;
    bool operator<(const float_type& a) const;
+   bool operator>=(const float_type& a) const;
+   bool operator<=(const float_type& a) const;
    bool operator==(const float_type& a) const;
    bool operator!=(const float_type& a) const;
    // -- DEBUGGING
@@ -179,9 +190,12 @@ class cpp_double_float
 // -- Special Constructors
 template <typename FloatingPointType>
 template <typename UnsignedIntegralType,
-          typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<FloatingPointType>::digits))>::type const*>
+          typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::is_iec559 == false)
+            && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<FloatingPointType>::digits))>::type const*>
 inline cpp_double_float<FloatingPointType>::cpp_double_float(UnsignedIntegralType u)
 {
+   auto          u_(u);
+
    constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits - 1;
 
    int bit_index = sizeof(UnsignedIntegralType) * 8;
@@ -199,8 +213,12 @@ inline cpp_double_float<FloatingPointType>::cpp_double_float(UnsignedIntegralTyp
 
       if (bit_index < 0)
          break;
-      else  // shift
-         *this *= static_cast<FloatingPointType>(UnsignedIntegralType(1) << std::min(MantissaBits, bit_index));
+      else
+      {  // shift
+        // FIXME replace with a single ldexp function once you implement it
+         data.first = std::ldexp(data.first, std::min(MantissaBits, bit_index));
+         data.second = std::ldexp(data.second, std::min(MantissaBits, bit_index));
+      }
    }
 }
 // --
@@ -884,8 +902,7 @@ template <typename FloatingPointType>
 inline std::string cpp_double_float<FloatingPointType>::get_raw_str() const
 {
    std::stringstream ss;
-   ss.precision(34);
-   ss /*<< std::hexfloat*/ << data.first << " + " /*<< std::hexfloat*/ << data.second;
+   ss << std::hexfloat << data.first << " + " << std::hexfloat << data.second;
    return ss.str();
 }
 // --
