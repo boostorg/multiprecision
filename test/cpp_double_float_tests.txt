@@ -1,0 +1,12 @@
+ ________________________________________________________________________________________
+|                  Test                      |                Description                |
+|--------------------------------------------+-------------------------------------------|
+| test_arithmetic_cpp_double_float.cpp       | Arithmetic tests (add, mul, sub, div)     |
+|                                            |                                           |
+| test_cpp_double_float_io_manual.cpp        | I/O test but manual                       |
+|                                            |                                           |
+| test_cpp_double_float_io.cpp               | Output tests against standard             |
+|                                            | float/double                              |
+|                                            |                                           |
+| test_cpp_double_constructors.cpp           | Detailed tests for constructors           |
+|____________________________________________|___________________________________________|
