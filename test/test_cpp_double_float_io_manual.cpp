@@ -106,10 +106,10 @@ void test_basic_io_manual()
    std::cout << std::endl;
 }
 
-//int main()
-//{
-//   test_basic_io_manual<double>();
-//   test_basic_io_manual<float>();
-//
-//   return 0;
-//}
+int main()
+{
+   test_basic_io_manual<double>();
+   test_basic_io_manual<float>();
+
+   return 0;
+}

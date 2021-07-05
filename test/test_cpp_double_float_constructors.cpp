@@ -40,10 +40,8 @@ NumericType uniform_integral_number() {
 }
 
 template <typename FloatingPointType, typename NumericType>
-bool test_constructor()
+int test_constructor()
 {
-   bool result_is_ok = true;
-
    constexpr int Trials = 50000;
    std::cout << "Testing constructor for ";
    std::cout.width(30);
@@ -64,10 +62,7 @@ bool test_constructor()
       {
          std::cerr << "[FAILED]\n" << typeid(NumericType).name() << " = " << n
            << " (cpp_double_float<" << typeid(FloatingPointType).name() << "> = " << d.get_raw_str() << ")" << std::endl;
-
-         result_is_ok = false;
-
-         break;
+         return -1;
       }
 
       // Check if value is accurately represented and correctly rounded
@@ -80,9 +75,9 @@ bool test_constructor()
 
       n_prime >>= NumericTypeBits - MaxRepresentableBits;
       // Round correctly
-      if ((n & RoundedBitsMask) > RoundedMargin)
+      if (n & RoundedBitsMask > RoundedMargin)
          n_prime |= 1;
-      if ((n & RoundedBitsMask) < RoundedMargin)
+      if (n & RoundedBitsMask < RoundedMargin)
          n_prime &= ~NumericType(1);
 
       n_prime <<= NumericTypeBits - MaxRepresentableBits;
@@ -93,21 +88,17 @@ bool test_constructor()
                    << "> = 0x" << std::hex << static_cast<NumericType>(d)
                    << " (expected 0x" << std::hex << n_prime << ")"
                    << std::endl;
-
-         result_is_ok = false;
-
-         break;
+         return -1;
       }
    }
 
    std::cout << "[PASSED] (" << Trials << " cases tested)" << std::endl;
-
-   return result_is_ok;
+   return 0;
 }
 
 // Test compilation, constructors, basic operatory
 template <typename FloatingPointType>
-bool test_constructors()
+int test_constructors()
 {
    using double_float_t = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
    double_float_t a, b;
@@ -115,33 +106,32 @@ bool test_constructors()
    std::cout << "Testing cpp_double_float< " << typeid(FloatingPointType).name() << " >...\n==="
              << std::endl;
 
-   bool result_is_ok = true;
+   int e = 0;
+   e += test_constructor<FloatingPointType, long long int>();
+   e += test_constructor<FloatingPointType, unsigned long long int>();
+   e += test_constructor<FloatingPointType, long int>();
+   e += test_constructor<FloatingPointType, unsigned long int>();
+   e += test_constructor<FloatingPointType, short int>();
+   e += test_constructor<FloatingPointType, unsigned short int>();
+   e += test_constructor<FloatingPointType, signed char>();
+   e += test_constructor<FloatingPointType, unsigned char>();
 
-   result_is_ok &= test_constructor<FloatingPointType, long long int>         (); std::cout << "test_constructor<FloatingPointType, long long int>         (): " << std::boolalpha << result_is_ok << std::endl;
-   result_is_ok &= test_constructor<FloatingPointType, unsigned long long int>(); std::cout << "test_constructor<FloatingPointType, unsigned long long int>(): " << std::boolalpha << result_is_ok << std::endl;
-   result_is_ok &= test_constructor<FloatingPointType, long int>              (); std::cout << "test_constructor<FloatingPointType, long int>              (): " << std::boolalpha << result_is_ok << std::endl;
-   result_is_ok &= test_constructor<FloatingPointType, unsigned long int>     (); std::cout << "test_constructor<FloatingPointType, unsigned long int>     (): " << std::boolalpha << result_is_ok << std::endl;
-   result_is_ok &= test_constructor<FloatingPointType, short int>             (); std::cout << "test_constructor<FloatingPointType, short int>             (): " << std::boolalpha << result_is_ok << std::endl;
-   result_is_ok &= test_constructor<FloatingPointType, unsigned short int>    (); std::cout << "test_constructor<FloatingPointType, unsigned short int>    (): " << std::boolalpha << result_is_ok << std::endl;
-   result_is_ok &= test_constructor<FloatingPointType, signed char>           (); std::cout << "test_constructor<FloatingPointType, signed char>           (): " << std::boolalpha << result_is_ok << std::endl;
-   result_is_ok &= test_constructor<FloatingPointType, unsigned char>         (); std::cout << "test_constructor<FloatingPointType, unsigned char>         (): " << std::boolalpha << result_is_ok << std::endl;
-
-   if (result_is_ok)
+   if (e == 0)
       std::cout << "PASSED ALL TESTS";
    else
-      std::cout << "FAILED at least one of the TESTS";
+      std::cout << "FAILED " << -e << " TESTS";
    std::cout << std::endl << std::endl;
 
-   return result_is_ok;
+   return e == 0 ? 0 : -1;
 }
 } // namespace test_cpp_double_constructors
 
 int main()
 {
-   const bool result_float_is_ok  = test_cpp_double_constructors::test_constructors<float>();
-   const bool result_double_is_ok = test_cpp_double_constructors::test_constructors<double>();
+   test_cpp_double_constructors::test_constructors<float>();
+   test_cpp_double_constructors::test_constructors<double>();
 
-   const bool result_is_ok = (result_float_is_ok && result_double_is_ok);
+   std::cin.get();
 
-   return (result_is_ok ? 0 : -1);
+   return 0;
 }
