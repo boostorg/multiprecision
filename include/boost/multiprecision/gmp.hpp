@@ -2468,18 +2468,15 @@ inline void eval_convert_to(__float128* result, const gmp_rational& val)
 }
 #endif
 
-inline void eval_convert_to(long* result, const gmp_rational& val)
+template <class R>
+inline typename std::enable_if<number_category<R>::value == number_kind_integer>::type eval_convert_to(R* result, const gmp_rational& backend)
 {
-   double r;
-   eval_convert_to(&r, val);
-   *result = static_cast<long>(r);
-}
-
-inline void eval_convert_to(unsigned long* result, const gmp_rational& val)
-{
-   double r;
-   eval_convert_to(&r, val);
-   *result = static_cast<long>(r);
+   gmp_int n(mpq_numref(backend.data()));
+   gmp_int d(mpq_denref(backend.data()));
+   using default_ops::eval_divide;
+   eval_divide(n, d);
+   using default_ops::eval_convert_to;
+   eval_convert_to(result, n);
 }
 
 inline void eval_abs(gmp_rational& result, const gmp_rational& val)
