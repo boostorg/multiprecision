@@ -34,7 +34,7 @@ NumericType uniform_integral_number()
 {
    NumericType out = 0;
 
-   for (int i = 0; i < sizeof(NumericType); ++i)
+   for (int i = 0; i < int(sizeof(NumericType)); ++i)
       out = (out << 8) + static_cast<NumericType>(std::round(256.0 * uniform_real<float>()));
 
    return out;
