@@ -22,15 +22,16 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/assert.hpp>
 
-namespace boost { namespace multiprecision {
-
-namespace backends {
-
-template<typename FloatingPointType>
+namespace boost { namespace multiprecision { namespace backends {
+template <typename FloatingPointType>
 class cpp_double_float;
+}}} 
 
-} // namespace backends
+// Foward decleration for std::numeric_limits
+template <typename FloatingPointType>
+class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >;
 
+namespace boost { namespace multiprecision {
 template<typename FloatingPointType>
 struct number_category<backends::cpp_double_float<FloatingPointType>>
   : public std::integral_constant<int, number_kind_floating_point>
@@ -52,8 +53,16 @@ class cpp_double_float
 
    // Constructors
    cpp_double_float() { }
-
+   
+   // Constructors from other cpp_double_float<> objects
    constexpr cpp_double_float(const cpp_double_float& a) : data(a.data) {}
+
+   template <typename OtherFloatType, typename std::enable_if<!std::is_same<FloatingPointType, OtherFloatType>::value>::type const* = nullptr>
+   cpp_double_float(const cpp_double_float<OtherFloatType>& a)
+     : data(std::make_pair(static_cast<float_type>(a.first()), static_cast<float_type>(a.second())))
+   {
+     normalize_pair(data);
+   }
 
    // Constructors from other floating-point types
    template <typename FloatType,
@@ -69,20 +78,18 @@ class cpp_double_float
 
    // Constructors from integers
    template <typename IntegralType,
-             typename std::enable_if<(std::numeric_limits<IntegralType>::is_iec559 == false) && (std::numeric_limits<IntegralType>::digits <= std::numeric_limits<FloatingPointType>::digits)>::type const* = nullptr>
+             typename std::enable_if<(std::is_integral<IntegralType>::value == true) && (std::numeric_limits<IntegralType>::digits <= std::numeric_limits<FloatingPointType>::digits)>::type const* = nullptr>
    cpp_double_float(const IntegralType& f) : data(std::make_pair(static_cast<float_type>(f), (float_type)0)) {}
 
    // Constructors from integers which hold more information than *this can contain
    template <typename UnsignedIntegralType,
              typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true)
-               && (std::numeric_limits<UnsignedIntegralType>::is_iec559 == false)
                && (std::is_unsigned<UnsignedIntegralType>::value == true)
                && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    cpp_double_float(UnsignedIntegralType u);
 
    template <typename SignedIntegralType,
              typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true)
-               && (std::numeric_limits<SignedIntegralType>::is_iec559 == false)
                && (std::is_signed<SignedIntegralType>::value == true)
                && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    cpp_double_float(SignedIntegralType n) : cpp_double_float(static_cast<typename std::make_unsigned<SignedIntegralType>::type>(std::abs(n)))
@@ -119,13 +126,14 @@ class cpp_double_float
 
    // Methods
    cpp_double_float<float_type> negative() const { return cpp_double_float<float_type>(-data.first, -data.second); }
+   constexpr bool               is_negative() const { return data.first < 0; }
 
    // FIXME Merge set_str() to operator<<
    void set_str(std::string str);
 
    // Getters/Setters
-   const float_type& first () const { return data.first; }
-   const float_type& second() const { return data.second; }
+   constexpr const float_type& first () const { return data.first; }
+   constexpr const float_type& second() const { return data.second; }
 
          rep_type&  rep()       { return data; }
    const rep_type&  rep() const { return data; }
@@ -173,12 +181,6 @@ class cpp_double_float
    cpp_double_float& operator--() { return *this -= cpp_double_float<float_type>(1.); }
    cpp_double_float  operator-() const { return negative(); }
 
-   bool operator>(const float_type& a) const;
-   bool operator<(const float_type& a) const;
-   bool operator>=(const float_type& a) const;
-   bool operator<=(const float_type& a) const;
-   bool operator==(const float_type& a) const;
-   bool operator!=(const float_type& a) const;
    // -- DEBUGGING
    std::string get_raw_str() const;
    // --
@@ -190,12 +192,9 @@ class cpp_double_float
 // -- Special Constructors
 template <typename FloatingPointType>
 template <typename UnsignedIntegralType,
-          typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::is_iec559 == false)
-            && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<FloatingPointType>::digits))>::type const*>
+          typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<FloatingPointType>::digits))>::type const*>
 inline cpp_double_float<FloatingPointType>::cpp_double_float(UnsignedIntegralType u)
 {
-   auto          u_(u);
-
    constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits - 1;
 
    int bit_index = sizeof(UnsignedIntegralType) * 8;
@@ -229,7 +228,7 @@ template <typename FloatingPointType>
 std::pair<FloatingPointType, FloatingPointType>
 cpp_double_float<FloatingPointType>::fast_exact_sum(const float_type& a, const float_type& b)
 {
-   BOOST_ASSERT(std::abs(a) >= std::abs(b) || a == 0.0);
+   BOOST_ASSERT(std::fabs(a) >= std::fabs(b) || a == 0.0);
 
    std::pair<float_type, float_type> out;
    out.first  = a + b;
@@ -283,10 +282,10 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
 
    // TODO Replace bit shifts with constexpr funcs for better compaitibility
    constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits;
-   constexpr int               SplitBits = MantissaBits / 2 + 1;
+   constexpr int               SplitBits    = MantissaBits / 2 + 2;
+   constexpr FloatingPointType Splitter     = FloatingPointType((1ULL << SplitBits) + 1);
    constexpr FloatingPointType SplitThreshold =
-       std::numeric_limits<FloatingPointType>::max() / FloatingPointType(1ULL << (SplitBits + 1));
-   constexpr FloatingPointType Splitter = FloatingPointType((1ULL << SplitBits) + 1);
+       std::numeric_limits<FloatingPointType>::max() / Splitter;
 
    FloatingPointType                               temp, hi, lo;
    std::pair<FloatingPointType, FloatingPointType> out;
@@ -295,11 +294,11 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
    if (a > SplitThreshold || a < -SplitThreshold)
    {
       FloatingPointType a_ = a / FloatingPointType(1ULL << (SplitBits + 1));
-      temp = Splitter * a;
+      temp = Splitter * a_;
       hi   = temp - (temp - a_);
       lo   = a_ - hi;
-      hi *= FloatingPointType(1ULL << (SplitBits + 1));
-      lo *= FloatingPointType(1ULL << (SplitBits + 1));
+      hi *= Splitter;
+      lo *= Splitter;
    }
    else
    {
@@ -482,9 +481,7 @@ operator/(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<F
 
    double_float_t::normalize_pair(p);
 
-   r = double_float_t(p) + p_prime;
-
-   return r;
+   return double_float_t(p) + p_prime;
 }
 // --
 
@@ -626,39 +623,248 @@ cpp_double_float<FloatingPointType>::operator--(int)
    return t;
 }
 
-template <typename FloatingPointType>
-inline bool
-cpp_double_float<FloatingPointType>::operator>(const float_type& a) const
+// -- Comparision Operators
+// operator>
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator>(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
-  // TODO Test
-   return a - data.first < data.second;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? false // Check for negative values
+                                 : larger_type(a) > larger_type(b);
 }
 
-template <typename FloatingPointType>
-inline bool
-cpp_double_float<FloatingPointType>::operator<(const float_type& a) const
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator>(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
 {
-   return a - data.first > data.second;
+   return a.first() > b.first() ? true : a.first() == b.first() ? (a.second() > b.second() ? true : false) : false;
 }
 
-template <typename FloatingPointType>
-inline bool
-cpp_double_float<FloatingPointType>::operator==(const float_type& a) const
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator>(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
 {
-   return a - data.first == data.second;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+   
+   return static_cast<larger_type>(a) > static_cast<larger_type>(b);
 }
 
-template <typename FloatingPointType>
-inline bool
-cpp_double_float<FloatingPointType>::operator!=(const float_type& a) const
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator>(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
 {
-   return a - data.first != data.second;
+   return b < a;
 }
 
+// operator<
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator<(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? true // Check for negative values
+                                 : larger_type(a) < larger_type(b);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator<(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   return a.first() < b.first() ? true : (a.first() == b.first()) ? (a.second() < b.second() ? true : false) : false;
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator<(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+   
+   return static_cast<larger_type>(a) < static_cast<larger_type>(b);
+}
+
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator<(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return b > a;
+}
+
+// operator>=
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator>=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? false // Check for negative values
+                                 : larger_type(a) >= larger_type(b);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator>=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   return a.first() > b.first() ? true : (a.first() == b.first()) ? (a.second() >= b.second() ? true : false) : false;
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator>=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return static_cast<larger_type>(a) >= static_cast<larger_type>(b);
+}
+
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator>=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return b <= a;
+}
+
+// operator <=
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator<=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? true // Check for negative values
+                                 : larger_type(a) <= larger_type(b);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator<=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   return a.first() < b.first() ? true : (a.first() == b.first()) ? (a.second() <= b.second() ? true : false) : false;
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator<=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return static_cast<larger_type>(a) <= static_cast<larger_type>(b);
+}
+
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator<=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return b >= a;
+}
+
+// operator ==
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator==(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? false // Check for negative values
+                                 : larger_type(a) == larger_type(b);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator==(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   return a.first() == b.first() ? (a.second() == b.second() ? true : false) : false;
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator==(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return static_cast<larger_type>(a) == static_cast<larger_type>(b);
+}
+
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator==(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return b == a;
+}
+
+// operator !=
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator!=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? true // Check for negative values
+                                 : larger_type(a) != larger_type(b);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator!=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   return a.first() != b.first() ? true : (a.second() != b.second() ? true : false);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator!=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return static_cast<larger_type>(a) != static_cast<larger_type>(b);
+}
+
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+operator!=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return b != a;
+}
+// --
+
+// -- Input/Output Streaming
 template <typename FloatingPointType, typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_float<FloatingPointType>& f)
 {
+  using std::fabs;
    auto is_set = [&](std::ios::fmtflags flg) {
       return os.flags() & flg;
    };
@@ -666,10 +872,10 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
   if (f < FloatingPointType(0) || os.flags() & std::ios::showpos)
       os << (f < FloatingPointType(0) ? "-" : "+");
 
-   int exp10, digits_printed = 0;
+   int exp10 = 0;
 
    if (f != FloatingPointType(0))
-      exp10 = (int)std::floor(std::log10(std::abs(f.first())));
+      exp10 = (int)std::floor(std::log10(fabs(f.first())));
    else
       exp10 = 0;
 
@@ -679,6 +885,11 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    {
       f_prime *= FloatingPointType(10);
       exp10++;
+   }
+   else if (f_prime >= 10)
+   {
+      f_prime /= FloatingPointType(10);
+      exp10--;
    }
 
    // Collect all the required digits to print (plus one digit for rounding)
@@ -754,7 +965,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
 
    // Remove trailing zeroes
    if (!is_set(std::ios::fixed) && !is_set(std::ios::scientific) && !is_set(std::ios::showpoint))
-      while (digits.back() == 0 && (digits.size() > 1 + exp10 || exp10 < 0))
+      while (digits.back() == 0 && (std::ptrdiff_t(digits.size()) > std::ptrdiff_t(1 + exp10) || exp10 < 0))
          digits.pop_back();
 
    auto fill_zeroes = [](std::string& s, size_t pos, int n) {
@@ -793,7 +1004,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
 
          fill_zeroes(str, str.size(), str_size - str.size() - 1);
 
-         BOOST_ASSERT(exp10 + 1 <= str.size());
+         BOOST_ASSERT(std::ptrdiff_t(exp10 + 1) <= std::ptrdiff_t(str.size()));
          str.insert(exp10 + 1, ".");
       }
  
@@ -835,7 +1046,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
       ss << (exp10 < 0 ? "-" : "+");
       ss.width(std::max(1 + (std::streamsize)std::log10(exp10), (std::streamsize)2));
       ss.fill('0');
-      ss << std::abs(exp10);
+      ss << fabs(exp10);
 
       str = ss.str();
    }
@@ -908,5 +1119,28 @@ inline std::string cpp_double_float<FloatingPointType>::get_raw_str() const
 // --
 
 } } } // namespace boost::multiprecision::backends
+
+// Specialization of numeric_limits for cpp_double_float<>
+template <typename FloatingPointType>
+class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> > : public std::numeric_limits<FloatingPointType>
+{
+ public:
+   static constexpr bool is_iec559 = false;
+
+   static constexpr int digits       = 2 * std::numeric_limits<FloatingPointType>::digits + 1;
+   static constexpr int digits10     = 2 * std::numeric_limits<FloatingPointType>::digits10;
+   static constexpr int max_digits10 = 2 * std::numeric_limits<FloatingPointType>::max_digits10;
+
+   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(min)() noexcept { return std::numeric_limits<FloatingPointType>::min(); }
+   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(max)() noexcept { return std::numeric_limits<FloatingPointType>::max(); }
+   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> lowest() noexcept { return std::numeric_limits<FloatingPointType>::lowest(); }
+   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> epsilon() noexcept { return std::numeric_limits<FloatingPointType>::epsilon(); }
+   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> round_error() noexcept { return std::numeric_limits<FloatingPointType>::round_error(); }
+   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> denorm_min() noexcept { return std::numeric_limits<FloatingPointType>::denorm_min(); }
+   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> infinity() noexcept { return std::numeric_limits<FloatingPointType>::infinity(); }
+   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> quiet_NaN() noexcept { return std::numeric_limits<FloatingPointType>::quiet_NaN(); }
+   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> signaling_NaN() noexcept { return std::numeric_limits<FloatingPointType>::signaling_NaN(); }
+};
+// TODO have explicit specializations for cpp_double_float< float/double >
 
 #endif // BOOST_MP_CPP_DOUBLE_FLOAT_2021_06_05_HPP
