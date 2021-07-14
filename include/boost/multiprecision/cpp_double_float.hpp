@@ -632,12 +632,10 @@ operator>(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b
    using first_type  = typename std::remove_reference<decltype(a)>::type;
    using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
-   
-   if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
-      if (a.is_negative()) // Check for negative values
-         return false;
 
-   return larger_type(a) > larger_type(b);
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? false // Check for negative values
+                                 : larger_type(a) > larger_type(b);
 }
 
 template <typename FloatingPointType, typename ComparisionType>
