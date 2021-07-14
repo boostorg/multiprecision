@@ -965,7 +965,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
 
    // Remove trailing zeroes
    if (!is_set(std::ios::fixed) && !is_set(std::ios::scientific) && !is_set(std::ios::showpoint))
-      while (digits.back() == 0 && (digits.size() > 1 + exp10 || exp10 < 0))
+      while (digits.back() == 0 && (digits.size() > std::size_t(1 + exp10) || exp10 < 0))
          digits.pop_back();
 
    auto fill_zeroes = [](std::string& s, size_t pos, int n) {

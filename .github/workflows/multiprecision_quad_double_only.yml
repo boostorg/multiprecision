@@ -73,11 +73,11 @@ jobs:
           ls -la ./test_cpp_double_float_arithmetic.exe
           echo "execute ./test_cpp_double_float_arithmetic.exe"
           ./test_cpp_double_float_arithmetic.exe
-          echo "compile to ./test_cpp_double_constructors.exe"
+          echo "compile to ./test_cpp_double_float_constructors.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_constructors.cpp -o test_cpp_double_constructors.exe
-          echo "ls -la of ./test_cpp_double_constructors.exe"
-          ls -la ./test_cpp_double_constructors.exe
-          echo "execute ./test_cpp_double_constructors.exe"
-          ./test_cpp_double_constructors.exe
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_constructors.cpp -o test_cpp_double_float_constructors.exe
+          echo "ls -la of ./test_cpp_double_float_constructors.exe"
+          ls -la ./test_cpp_double_float_constructors.exe
+          echo "execute ./test_cpp_double_float_constructors.exe"
+          ./test_cpp_double_float_constructors.exe
