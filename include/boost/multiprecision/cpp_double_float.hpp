@@ -872,7 +872,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
   if (f < FloatingPointType(0) || os.flags() & std::ios::showpos)
       os << (f < FloatingPointType(0) ? "-" : "+");
 
-   int exp10, digits_printed = 0;
+   int exp10 = 0;
 
    if (f != FloatingPointType(0))
       exp10 = (int)std::floor(std::log10(fabs(f.first())));
@@ -965,7 +965,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
 
    // Remove trailing zeroes
    if (!is_set(std::ios::fixed) && !is_set(std::ios::scientific) && !is_set(std::ios::showpoint))
-      while (digits.back() == 0 && (digits.size() > std::size_t(1 + exp10) || exp10 < 0))
+      while (digits.back() == 0 && (std::ptrdiff_t(digits.size()) > std::ptrdiff_t(1 + exp10) || exp10 < 0))
          digits.pop_back();
 
    auto fill_zeroes = [](std::string& s, size_t pos, int n) {
@@ -1004,7 +1004,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
 
          fill_zeroes(str, str.size(), str_size - str.size() - 1);
 
-         BOOST_ASSERT(exp10 + 1 <= str.size());
+         BOOST_ASSERT(std::ptrdiff_t(exp10 + 1) <= std::ptrdiff_t(str.size()));
          str.insert(exp10 + 1, ".");
       }
  
