@@ -15,20 +15,35 @@
 #include <random>
 
 namespace test_cpp_double_float_io {
-double unif_rand()
+template <typename FloatingPointType,
+          typename std::enable_if<std::is_floating_point<FloatingPointType>::value, bool>::type = true>
+FloatingPointType uniform_real()
 {
-   //static std::random_device                     rd;
-   static std::mt19937                           gen;
-   static std::uniform_real_distribution<double> dis(0.0, 1.0);
+   //static std::random_device                                rd;
+   static std::mt19937                                      gen /*(rd())*/;
+   static std::uniform_real_distribution<FloatingPointType> dis(0.0, 1.0);
 
    return dis(gen);
 }
-double rand_double(int e = 3)
+
+template <typename FloatingPointType>
+boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> uniform_rand()
 {
-   if (unif_rand() > 0.5)
-      return std::pow(unif_rand(), e);
-   else
-      return 1. / std::pow(unif_rand(), e);
+   using float_type = FloatingPointType::float_type;
+   return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
+}
+
+int rand_in_range(int a, int b)
+{
+   return a + int(float(b - a) * uniform_real<float>());
+}
+
+template <typename FloatingPointType, typename std::enable_if<std::is_floating_point<FloatingPointType>::value>::type const* = nullptr>
+FloatingPointType log_rand()
+{
+   if (uniform_real<float>() < (1. / 100.))
+      return 0; // throw in a few zeroes
+   return std::ldexp(uniform_real<FloatingPointType>(), rand_in_range(std::numeric_limits<FloatingPointType>::min_exponent, std::numeric_limits<FloatingPointType>::max_exponent));
 }
 
 template <typename FloatingPointType>
@@ -38,21 +53,21 @@ void test()
 
    bool passed = true;
    int  i;
-   for (i = 0; i < 50000; ++i)
+   for (i = 0; i < 100; ++i)
    {
       std::stringstream ss1, ss2;
-      FloatingPointType d = (FloatingPointType)rand_double(1 + i / 10000);
+      FloatingPointType d = log_rand<FloatingPointType>();
       double_float_t d_ = d;
 
-      if (unif_rand() > 0.66 && std::log10(d) + 1 < std::numeric_limits<FloatingPointType>::digits10)
+      if (uniform_real<float>() > 0.66 && std::log10(d) + 1 < std::numeric_limits<FloatingPointType>::digits10)
          ss1.setf(std::ios::fixed);
-      else if (unif_rand() > 0.33)
+      else if (uniform_real<float>() > 0.33)
          ss1.setf(std::ios::scientific);
       else
          ss1.unsetf(std::ios::floatfield);
 
       auto conditionally_set = [&](std::stringstream& sstream, std::ios::fmtflags flags) {
-         if (unif_rand() > 0.5)
+         if (uniform_real<float>() > 0.5)
             sstream.setf(flags);
          else
             sstream.unsetf(flags);
@@ -64,7 +79,7 @@ void test()
 
       ss2.flags(ss1.flags());
 
-      int p = static_cast<int>(unif_rand() * std::numeric_limits<FloatingPointType>::digits10);
+      int p = static_cast<int>(uniform_real<float>() * std::numeric_limits<FloatingPointType>::digits10);
       if ((ss1.flags() & std::ios::fixed) && d > 0)
       {
          p = std::min(p, std::numeric_limits<FloatingPointType>::digits10 - (int)std::log10(d) - 1);
