@@ -629,8 +629,8 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
 operator>(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
    
    if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
@@ -651,8 +651,8 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
 operator>(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
    
    return static_cast<larger_type>(a) > static_cast<larger_type>(b);
@@ -670,8 +670,8 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
 operator<(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
    
    if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
@@ -692,8 +692,8 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
 operator<(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
    
    return static_cast<larger_type>(a) < static_cast<larger_type>(b);
@@ -711,8 +711,8 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
 operator>=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
    
    if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
@@ -733,8 +733,8 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
 operator>=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
    
    return static_cast<larger_type>(a) >= static_cast<larger_type>(b);
@@ -752,8 +752,8 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
 operator<=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
    
    if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
@@ -774,8 +774,8 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
 operator<=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
 
    return static_cast<larger_type>(a) <= static_cast<larger_type>(b);
@@ -793,8 +793,8 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
 operator==(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
    
    if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
@@ -815,8 +815,8 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
 operator==(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
    
    return static_cast<larger_type>(a) == static_cast<larger_type>(b);
@@ -834,10 +834,10 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
 operator!=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
-   
+
    if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
       if (a.is_negative()) // Check for negative values
          return true;
@@ -856,8 +856,8 @@ template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
 operator!=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
 {
-   typedef std::remove_reference<decltype(a)>::type first_type;
-   typedef std::remove_reference<decltype(b)>::type second_type;
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
    
    return static_cast<larger_type>(a) != static_cast<larger_type>(b);
