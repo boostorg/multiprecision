@@ -58,7 +58,7 @@ class cpp_double_float
    constexpr cpp_double_float(const cpp_double_float& a) : data(a.data) {}
 
    template <typename OtherFloatType, typename std::enable_if<!std::is_same<FloatingPointType, OtherFloatType>::value>::type const* = nullptr>
-   const cpp_double_float(const cpp_double_float<OtherFloatType>& a)
+   cpp_double_float(const cpp_double_float<OtherFloatType>& a)
      : data(std::make_pair(static_cast<float_type>(a.first()), static_cast<float_type>(a.second())))
    {
      normalize_pair(data);
@@ -673,12 +673,10 @@ operator<(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b
    using first_type  = typename std::remove_reference<decltype(a)>::type;
    using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
-   
-   if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
-      if (a.is_negative()) // Check for negative values
-         return true;
 
-   return larger_type(a) < larger_type(b);
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? true // Check for negative values
+                                 : larger_type(a) < larger_type(b);
 }
 
 template <typename FloatingPointType, typename ComparisionType>
@@ -714,12 +712,10 @@ operator>=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& 
    using first_type  = typename std::remove_reference<decltype(a)>::type;
    using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
-   
-   if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
-      if (a.is_negative()) // Check for negative values
-         return false;
 
-   return larger_type(a) >= larger_type(b);
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? false // Check for negative values
+                                 : larger_type(a) >= larger_type(b);
 }
 
 template <typename FloatingPointType, typename ComparisionType>
@@ -736,7 +732,7 @@ operator>=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<
    using first_type  = typename std::remove_reference<decltype(a)>::type;
    using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
-   
+
    return static_cast<larger_type>(a) >= static_cast<larger_type>(b);
 }
 
@@ -755,12 +751,10 @@ operator<=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& 
    using first_type  = typename std::remove_reference<decltype(a)>::type;
    using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
-   
-   if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
-      if (a.is_negative()) // Check for negative values
-         return true;
 
-   return larger_type(a) <= larger_type(b);
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? true // Check for negative values
+                                 : larger_type(a) <= larger_type(b);
 }
 
 template <typename FloatingPointType, typename ComparisionType>
@@ -796,12 +790,10 @@ operator==(const cpp_double_float<FloatingPointType>& a, const ComparisionType& 
    using first_type  = typename std::remove_reference<decltype(a)>::type;
    using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
-   
-   if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
-      if (a.is_negative()) // Check for negative values
-         return false;
 
-   return larger_type(a) == larger_type(b);
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? false // Check for negative values
+                                 : larger_type(a) == larger_type(b);
 }
 
 template <typename FloatingPointType, typename ComparisionType>
@@ -818,7 +810,7 @@ operator==(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<
    using first_type  = typename std::remove_reference<decltype(a)>::type;
    using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
-   
+
    return static_cast<larger_type>(a) == static_cast<larger_type>(b);
 }
 
@@ -838,11 +830,9 @@ operator!=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& 
    using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
 
-   if (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
-      if (a.is_negative()) // Check for negative values
-         return true;
-
-   return larger_type(a) != larger_type(b);
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? true // Check for negative values
+                                 : larger_type(a) != larger_type(b);
 }
 
 template <typename FloatingPointType, typename ComparisionType>
@@ -859,7 +849,7 @@ operator!=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<
    using first_type  = typename std::remove_reference<decltype(a)>::type;
    using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
-   
+
    return static_cast<larger_type>(a) != static_cast<larger_type>(b);
 }
 
