@@ -25,7 +25,7 @@
 namespace boost { namespace multiprecision { namespace backends {
 template <typename FloatingPointType>
 class cpp_double_float;
-}}} 
+}}}
 
 // Foward decleration for std::numeric_limits
 template <typename FloatingPointType>
@@ -68,18 +68,18 @@ class cpp_double_float
    template <typename FloatType,
              typename std::enable_if<(std::is_floating_point<FloatType>::value == true)
              && (sizeof(FloatType) < 2*sizeof(FloatingPointType))>::type const* = nullptr>
-   cpp_double_float(const FloatType& f) : data(std::make_pair(f, (float_type)0)) {}
+   constexpr cpp_double_float(const FloatType& f) : data(std::make_pair(f, (float_type)0)) {}
    template <typename FloatType,
              typename std::enable_if<(std::numeric_limits<FloatType>::is_iec559 == true)
              && (sizeof(FloatType) >= 2 * sizeof(FloatingPointType))>::type const* = nullptr>
-   cpp_double_float(const FloatType& f)
+   constexpr cpp_double_float(const FloatType& f)
        : data(std::make_pair(static_cast<float_type>(f),
                              static_cast<float_type>(f - (FloatType) static_cast<float_type>(f)))) {}
 
    // Constructors from integers
    template <typename IntegralType,
              typename std::enable_if<(std::is_integral<IntegralType>::value == true) && (std::numeric_limits<IntegralType>::digits <= std::numeric_limits<FloatingPointType>::digits)>::type const* = nullptr>
-   cpp_double_float(const IntegralType& f) : data(std::make_pair(static_cast<float_type>(f), (float_type)0)) {}
+   constexpr cpp_double_float(const IntegralType& f) : data(std::make_pair(static_cast<float_type>(f), (float_type)0)) {}
 
    // Constructors from integers which hold more information than *this can contain
    template <typename UnsignedIntegralType,
@@ -98,7 +98,6 @@ class cpp_double_float
          *this = -*this;
    }
 
-   
    constexpr cpp_double_float(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
    constexpr cpp_double_float(const std::pair<float_type, float_type>& p) : data(p) {}
 
@@ -106,6 +105,8 @@ class cpp_double_float
    {
       set_str(str);
    }
+
+   constexpr cpp_double_float(cpp_double_float&&) = default;
 
    ~cpp_double_float() = default;
 
@@ -125,7 +126,7 @@ class cpp_double_float
    operator long double() const { return (long double)data.first + (long double)data.second; }
 
    // Methods
-   cpp_double_float<float_type> negative() const { return cpp_double_float<float_type>(-data.first, -data.second); }
+   constexpr cpp_double_float<float_type> negative() const { return cpp_double_float<float_type>(-data.first, -data.second); }
    constexpr bool               is_negative() const { return data.first < 0; }
 
    // FIXME Merge set_str() to operator<<
@@ -150,22 +151,9 @@ class cpp_double_float
    static void normalize_pair(std::pair<float_type, float_type>& p, bool fast = true);
 
    // Operators
-   cpp_double_float& operator=(const cpp_double_float& a)
-   {
-      if(this != &a)
-      {
-        data = a.data;
-      }
+   cpp_double_float& operator=(const cpp_double_float&) = default;
 
-      return *this;
-   }
-
-   cpp_double_float& operator=(cpp_double_float&& a)
-   {
-      data = a.data;
-
-      return *this;
-   }
+   cpp_double_float& operator=(cpp_double_float&&) = default;
 
    cpp_double_float& operator+=(const cpp_double_float& a);
    cpp_double_float& operator-=(const cpp_double_float& a);
