@@ -203,8 +203,8 @@ inline cpp_double_float<FloatingPointType>::cpp_double_float(UnsignedIntegralTyp
    {
       // Mask the maximum number of bits that can be stored without
       // precision loss in a single FloatingPointType, then sum and shift
-      UnsignedIntegralType hi = u >> std::max(bit_index - MantissaBits, 0);
-      u &= ~(hi << std::max(bit_index - MantissaBits, 0));
+      UnsignedIntegralType hi = u >> (std::max)(bit_index - MantissaBits, 0);
+      u &= ~(hi << (std::max)(bit_index - MantissaBits, 0));
 
       *this += static_cast<FloatingPointType>(hi);  // sum
 
@@ -214,9 +214,9 @@ inline cpp_double_float<FloatingPointType>::cpp_double_float(UnsignedIntegralTyp
          break;
       else
       {  // shift
-        // FIXME replace with a single ldexp function once you implement it
-         data.first = std::ldexp(data.first, std::min(MantissaBits, bit_index));
-         data.second = std::ldexp(data.second, std::min(MantissaBits, bit_index));
+         // FIXME replace with a single ldexp function once you implement it
+         data.first  = std::ldexp(data.first,  (std::min)(MantissaBits, bit_index));
+         data.second = std::ldexp(data.second, (std::min)(MantissaBits, bit_index));
       }
    }
 }
@@ -285,10 +285,9 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
    constexpr int               SplitBits    = MantissaBits / 2 + 2;
    constexpr FloatingPointType Splitter     = FloatingPointType((1ULL << SplitBits) + 1);
    constexpr FloatingPointType SplitThreshold =
-       std::numeric_limits<FloatingPointType>::max() / Splitter;
+       (std::numeric_limits<FloatingPointType>::max)() / Splitter;
 
    FloatingPointType                               temp, hi, lo;
-   std::pair<FloatingPointType, FloatingPointType> out;
 
    // Handle if multiplication with the splitter would cause overflow
    if (a > SplitThreshold || a < -SplitThreshold)
@@ -899,9 +898,9 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    if (is_set(std::ios::fixed))
       p += exp10 + 1;
    else if (is_set(std::ios::scientific))
-      p = std::max(1, p + 1);
+      p = (std::max)(1, p + 1);
    else
-      p = std::max(p, 1);
+      p = (std::max)(p, 1);
 
    while (p-- > 0)
    {
@@ -1019,7 +1018,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
          str.pop_back();
    }
    // Scientific style
-   else if (is_set(std::ios::scientific) || (exp10 < -4 || (exp10 + 1 > std::max((int)os.precision(), 1))))
+   else if (is_set(std::ios::scientific) || (exp10 < -4 || (exp10 + 1 > (std::max)((int)os.precision(), 1))))
    {
       str_size = (size_t)os.precision() + 1;
       if (os.precision() == 0 || is_set(std::ios::scientific))
@@ -1044,7 +1043,8 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
       ss << str;
       ss << (os.flags() & std::ios::uppercase ? "E" : "e");
       ss << (exp10 < 0 ? "-" : "+");
-      ss.width(std::max(1 + (std::streamsize)std::log10(exp10), (std::streamsize)2));
+      using std::log10;
+      ss.width((std::max)(1 + (std::streamsize)log10(exp10), (std::streamsize)2));
       ss.fill('0');
       ss << fabs(exp10);
 
@@ -1131,8 +1131,8 @@ class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<Floa
    static constexpr int digits10     = 2 * std::numeric_limits<FloatingPointType>::digits10;
    static constexpr int max_digits10 = 2 * std::numeric_limits<FloatingPointType>::max_digits10;
 
-   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(min)() noexcept { return std::numeric_limits<FloatingPointType>::min(); }
-   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(max)() noexcept { return std::numeric_limits<FloatingPointType>::max(); }
+   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(min)() noexcept { return (std::numeric_limits<FloatingPointType>::min)(); }
+   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(max)() noexcept { return (std::numeric_limits<FloatingPointType>::max)(); }
    static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> lowest() noexcept { return std::numeric_limits<FloatingPointType>::lowest(); }
    static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> epsilon() noexcept { return std::numeric_limits<FloatingPointType>::epsilon(); }
    static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> round_error() noexcept { return std::numeric_limits<FloatingPointType>::round_error(); }
