@@ -336,6 +336,17 @@ void test_rational(const std::integral_constant<bool, false>&)
    ss << a;
    ss >> b;
    BOOST_CHECK_EQUAL(a, b);
+   //
+   // Conversion to integer, see https://github.com/boostorg/multiprecision/issues/342.
+   //
+   Real three(10, 3);
+   BOOST_CHECK_EQUAL(static_cast<std::uint16_t>(three), 3);
+   BOOST_CHECK_EQUAL(static_cast<std::uint32_t>(three), 3);
+   BOOST_CHECK_EQUAL(static_cast<std::uint64_t>(three), 3);
+   three = -three;
+   BOOST_CHECK_EQUAL(static_cast<std::int16_t>(three), -3);
+   BOOST_CHECK_EQUAL(static_cast<std::int32_t>(three), -3);
+   BOOST_CHECK_EQUAL(static_cast<std::int64_t>(three), -3);
 }
 
 template <class Real>
