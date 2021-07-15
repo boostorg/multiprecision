@@ -126,8 +126,8 @@ class cpp_double_float
    operator long double() const { return (long double)data.first + (long double)data.second; }
 
    // Methods
-   constexpr cpp_double_float<float_type> negative() const { return cpp_double_float<float_type>(-data.first, -data.second); }
-   constexpr bool               is_negative() const { return data.first < 0; }
+   constexpr cpp_double_float<float_type> negative()    const { return cpp_double_float<float_type>(-data.first, -data.second); }
+   constexpr bool                         is_negative() const { return data.first < 0; }
 
    // FIXME Merge set_str() to operator<<
    void set_str(std::string str);
@@ -269,13 +269,13 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
                  "double_float<> invoked with non-native floating-point unit");
 
    // TODO Replace bit shifts with constexpr funcs for better compaitibility
-   constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits;
+   constexpr int               MantissaBits = std::numeric_limits<FloatingPointType>::digits;
    constexpr int               SplitBits    = MantissaBits / 2 + 2;
    constexpr FloatingPointType Splitter     = FloatingPointType((1ULL << SplitBits) + 1);
    constexpr FloatingPointType SplitThreshold =
        (std::numeric_limits<FloatingPointType>::max)() / Splitter;
 
-   FloatingPointType                               temp, hi, lo;
+   FloatingPointType temp, hi, lo;
 
    // Handle if multiplication with the splitter would cause overflow
    if (a > SplitThreshold || a < -SplitThreshold)
@@ -315,6 +315,7 @@ cpp_double_float<FloatingPointType>::exact_product(const float_type& a, const fl
 // --
 
 // -- Double-float arithmetic
+// operator+ and operator+=
 // double_float<> + native-float
 template <typename FloatingPointType>
 inline cpp_double_float<FloatingPointType>
@@ -323,21 +324,6 @@ operator+(const cpp_double_float<FloatingPointType>& a, const FloatingPointType&
    using double_float_t = cpp_double_float<FloatingPointType>;
 
    auto s = double_float_t::exact_sum(a.first(), b);
-
-   s.second += a.second();
-   double_float_t::normalize_pair(s);
-
-   return double_float_t(s);
-}
-
-// double_float<> - native-float
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator-(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b)
-{
-   using double_float_t = cpp_double_float<FloatingPointType>;
-
-   auto s = double_float_t::exact_difference(a.first(), b);
 
    s.second += a.second();
    double_float_t::normalize_pair(s);
@@ -361,6 +347,22 @@ operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<F
    s.second += t.first;
    double_float_t::normalize_pair(s);
    s.second += t.second;
+   double_float_t::normalize_pair(s);
+
+   return double_float_t(s);
+}
+
+
+// double_float<> - native-float
+template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>
+operator-(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b)
+{
+   using double_float_t = cpp_double_float<FloatingPointType>;
+
+   auto s = double_float_t::exact_difference(a.first(), b);
+
+   s.second += a.second();
    double_float_t::normalize_pair(s);
 
    return double_float_t(s);
@@ -611,6 +613,11 @@ cpp_double_float<FloatingPointType>::operator--(int)
 }
 
 // -- Comparision Operators
+// Comparison operators work by determining the type containing more detail at
+// compile time, and then promoting the type with less detail to the type with
+// more detail, and then comparing. Some minor complications arise while
+// comparing an unsigned type to cpp_double_float<> that are handled as well
+
 // operator>
 template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
@@ -866,7 +873,22 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    else
       exp10 = 0;
 
-   auto f_prime = (f > FloatingPointType(0) ? f : -f) / cpp_double_float<FloatingPointType>::pow10(exp10);
+   auto f_prime = (f > FloatingPointType(0) ? f : -f);
+   if (exp10 < -300)
+   {
+      f_prime *= cpp_double_float<FloatingPointType>::pow10(300);
+      f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10 + 300);
+   }
+   else if (exp10 > 300)
+   {
+      //r = ldexp(r, -53);
+      f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
+      //r = ldexp(r, 53);
+   }
+   else
+   {
+      f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
+   }
 
    if (f_prime < FloatingPointType(1) && f_prime > FloatingPointType(0))
    {
@@ -892,10 +914,12 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
 
    while (p-- > 0)
    {
+
+      // FIXME Replace with std::floor function
       int digit = static_cast<int>(f_prime.first());
 
-      if (f_prime.first() == FloatingPointType(10) && f_prime.second() < 0)
-         digit = 9;
+      if (f_prime.second() < 0 && (f_prime.first() - (FloatingPointType)digit < -f_prime.second()))
+         digit -= 1;
 
       BOOST_ASSERT(digit >= 0 && digit <= 9);
 
