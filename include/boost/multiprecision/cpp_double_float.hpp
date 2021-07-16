@@ -216,7 +216,7 @@ template <typename FloatingPointType>
 std::pair<FloatingPointType, FloatingPointType>
 cpp_double_float<FloatingPointType>::fast_exact_sum(const float_type& a, const float_type& b)
 {
-   BOOST_ASSERT(std::fabs(a) >= std::fabs(b) || a == 0.0);
+   BOOST_ASSERT(std::fabs(a) >= std::fabs(b) || a == 0.0 || !std::isnormal(a));
 
    std::pair<float_type, float_type> out;
    out.first  = a + b;
@@ -270,22 +270,26 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
 
    // TODO Replace bit shifts with constexpr funcs for better compaitibility
    constexpr int               MantissaBits = std::numeric_limits<FloatingPointType>::digits;
-   constexpr int               SplitBits    = MantissaBits / 2 + 2;
+   constexpr int               SplitBits    = MantissaBits / 2 + 1;
    constexpr FloatingPointType Splitter     = FloatingPointType((1ULL << SplitBits) + 1);
    constexpr FloatingPointType SplitThreshold =
-       (std::numeric_limits<FloatingPointType>::max)() / Splitter;
+       (std::numeric_limits<FloatingPointType>::max)() / (Splitter*2);
 
    FloatingPointType temp, hi, lo;
 
    // Handle if multiplication with the splitter would cause overflow
    if (a > SplitThreshold || a < -SplitThreshold)
    {
-      FloatingPointType a_ = a / FloatingPointType(1ULL << (SplitBits + 1));
+      constexpr FloatingPointType Normalizer = FloatingPointType(1ULL << (SplitBits + 1));
+
+      FloatingPointType a_ = a / Normalizer;
+
       temp = Splitter * a_;
       hi   = temp - (temp - a_);
       lo   = a_ - hi;
-      hi *= Splitter;
-      lo *= Splitter;
+
+      hi *= Normalizer;
+      lo *= Normalizer;
    }
    else
    {
@@ -863,6 +867,12 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
       return os.flags() & flg;
    };
 
+   if (std::isinf(f.first()))
+   {
+      os << f.first();
+      return os;
+   }
+
   if (f < FloatingPointType(0) || os.flags() & std::ios::showpos)
       os << (f < FloatingPointType(0) ? "-" : "+");
 
@@ -1139,9 +1149,12 @@ class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<Floa
  public:
    static constexpr bool is_iec559 = false;
 
-   static constexpr int digits       = 2 * std::numeric_limits<FloatingPointType>::digits + 1;
-   static constexpr int digits10     = 2 * std::numeric_limits<FloatingPointType>::digits10;
+   static constexpr int digits       = 2 * std::numeric_limits<FloatingPointType>::digits - 2;
+   static constexpr int digits10     = 2 * std::numeric_limits<FloatingPointType>::digits10 - 1;
    static constexpr int max_digits10 = 2 * std::numeric_limits<FloatingPointType>::max_digits10;
+
+   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - std::numeric_limits<FloatingPointType>::digits;
+   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + std::numeric_limits<FloatingPointType>::digits;
 
    static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(min)() noexcept { return (std::numeric_limits<FloatingPointType>::min)(); }
    static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(max)() noexcept { return (std::numeric_limits<FloatingPointType>::max)(); }

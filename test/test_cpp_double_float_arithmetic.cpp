@@ -1,8 +1,12 @@
-#include <iomanip>
-#include <iostream>
-#include <random>
-#include <string>
-#include <vector>
+///////////////////////////////////////////////////////////////////////////////
+//  Copyright 2021 Fahad Syed.
+//  Copyright 2021 Christopher Kormanyos.
+//  Copyright 2021 Janek Kozicki.
+//  Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+// Test for correctness of arithmetic operators of cpp_double_float<>
 
 #include <boost/multiprecision/cpp_double_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
@@ -11,283 +15,169 @@
 #include <boost/multiprecision/float128.hpp>
 #endif
 
-// cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
-// g++ -Wall -Wextra -O3 -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test.exe
+#include <iomanip>
+#include <iostream>
+#include <random>
+#include <string>
+#include <vector>
 
 namespace test_arithmetic_cpp_double_float {
-
-std::mt19937                                                         engine_man;
-std::ranlux24_base                                                   engine_sgn;
-std::linear_congruential_engine<std::uint32_t, 48271, 0, 2147483647> engine_dec_pt;
-
-template <const std::size_t DigitsToGet>
-void get_random_fixed_string(std::string& str)
+template <typename FloatingPointType,
+          typename std::enable_if<std::is_floating_point<FloatingPointType>::value, bool>::type = true>
+FloatingPointType uniform_real()
 {
-   static std::uniform_int_distribution<unsigned>
-       dist_sgn(
-           0,
-           1);
+   static std::random_device                                rd;
+   static std::mt19937                                      gen (rd());
+   static std::uniform_real_distribution<FloatingPointType> dis(0.0, 1.0);
 
-   static std::uniform_int_distribution<unsigned>
-       dist_dec_pt(
-           1,
-           (int)(std::max)(std::ptrdiff_t(2), std::ptrdiff_t(std::ptrdiff_t(DigitsToGet) - 4)));
-
-   static std::uniform_int_distribution<unsigned>
-       dist_first(
-           1,
-           9);
-
-   static std::uniform_int_distribution<unsigned>
-       dist_following(
-           0,
-           9);
-
-   const bool is_neg = (dist_sgn(engine_sgn) != 0);
-
-   std::string::size_type len = static_cast<std::string::size_type>(DigitsToGet);
-
-   std::string::size_type pos = 0U;
-
-   if (is_neg)
-   {
-      ++len;
-
-      str.resize(len);
-
-      str.at(pos) = char('-');
-
-      ++pos;
-   }
-   else
-   {
-      str.resize(len);
-   }
-
-   str.at(pos) = static_cast<char>(dist_first(engine_man) + 0x30U);
-
-   ++pos;
-
-   const std::string::size_type pos_dec_pt = pos + std::string::size_type(dist_dec_pt(engine_dec_pt));
-
-   while (pos < str.length())
-   {
-      if (pos == pos_dec_pt)
-      {
-         ++len;
-
-         str.resize(len);
-
-         str.at(pos) = char('.');
-
-         ++pos;
-      }
-
-      str.at(pos) = static_cast<char>(dist_following(engine_man) + 0x30U);
-
-      ++pos;
-   }
+   return dis(gen);
 }
 
-const unsigned int ErrorThreshold = 1000U;
-template <typename FloatingPointType>
-int test_add(const unsigned count = 10000U)
+int rand_in_range(int a, int b)
 {
-   using naked_double_float_type = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
-   using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 + 2>, boost::multiprecision::et_off>;
+   return a + int(float(b - a) * uniform_real<float>());
+}
 
-   std::cout << "testing operator+...";
+template <typename FloatingPointType,
+          typename std::enable_if<std::is_floating_point<FloatingPointType>::value, bool>::type = true>
+FloatingPointType uniform_rand()
+{
+   return uniform_real<FloatingPointType>();
+}
+
+template <typename FloatingPointType>
+boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> uniform_rand()
+{
+   using float_type = FloatingPointType::float_type;
+   return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
+}
+
+template <typename NumericType, typename std::enable_if<std::is_integral<NumericType>::value>::type const* = nullptr>
+NumericType log_rand()
+{
+   return uniform_integral_number<NumericType>() >> int(uniform_real<float>() * float(std::numeric_limits<NumericType>::digits + 1));
+}
+
+template <typename FloatingPointType, typename std::enable_if<std::is_floating_point<FloatingPointType>::value>::type const* = nullptr>
+FloatingPointType log_rand()
+{
+   if (uniform_real<float>() < (1. / 100.))
+      return 0; // throw in a few zeroes
+   FloatingPointType ret = std::ldexp(uniform_real<FloatingPointType>(), rand_in_range(std::numeric_limits<FloatingPointType>::min_exponent, std::numeric_limits<FloatingPointType>::max_exponent));
+   return std::fmax(ret, std::numeric_limits<FloatingPointType>::epsilon());
+}
+
+template <typename FloatingPointType>
+boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> log_rand()
+{
+   boost::multiprecision::backends::cpp_double_float<FloatingPointType::float_type> a(uniform_rand<boost::multiprecision::backends::cpp_double_float<FloatingPointType::float_type> >() + FloatingPointType::float_type(1));
+   a *= log_rand<FloatingPointType::float_type>();
+   return a;
+}
+
+template <typename ConstructionType, typename FloatingPointType, typename std::enable_if<std::numeric_limits<FloatingPointType>::is_iec559>::type const* = nullptr>
+ConstructionType construct_from(FloatingPointType f) {
+   return ConstructionType(f);
+}
+
+template <typename ConstructionType, typename FloatingPointType, typename std::enable_if<!std::numeric_limits<FloatingPointType>::is_iec559>::type const* = nullptr>
+ConstructionType construct_from(FloatingPointType f)
+{
+   return ConstructionType(f.first()) + ConstructionType(f.second());
+}
+
+template <typename FloatingPointType>
+int test_op(char op, const unsigned count = 10000U)
+{
+   using naked_double_float_type = FloatingPointType;
+   using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 * 2 + 1>, boost::multiprecision::et_off>;
+
+   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<naked_double_float_type>::digits);
+   std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<naked_double_float_type>::digits << " bits)...";
    bool result_is_ok = true;
 
-  for(unsigned i = 0U; i < count; ++i)
-  {
-    std::string str_a;
-    std::string str_b;
+   for (unsigned i = 0U; i < count; ++i)
+   {
+      naked_double_float_type  df_a   = log_rand<naked_double_float_type>();
+      naked_double_float_type  df_b   = log_rand<naked_double_float_type>();
+      const control_float_type ctrl_a = construct_from<control_float_type, naked_double_float_type>(df_a);
+      const control_float_type ctrl_b = construct_from<control_float_type, naked_double_float_type>(df_b);
 
-    test_arithmetic_cpp_double_float::get_random_fixed_string<std::numeric_limits<naked_double_float_type>::digits10>(str_a);
-    test_arithmetic_cpp_double_float::get_random_fixed_string<std::numeric_limits<naked_double_float_type>::digits10>(str_b);
+      naked_double_float_type df_c;
+      control_float_type      ctrl_c;
 
-    const naked_double_float_type df_a  (str_a);
-    const naked_double_float_type df_b  (str_b);
+      switch (op)
+      {
+      case '+':
+         df_c   = df_a + df_b;
+         ctrl_c = ctrl_a + ctrl_b;
+         break;
+      case '-':
+         df_c   = df_a - df_b;
+         ctrl_c = ctrl_a - ctrl_b;
+         break;
+      case '*':
+         df_c   = df_a * df_b;
+         ctrl_c = ctrl_a * ctrl_b;
+         break;
+      case '/':
+         if (df_b == naked_double_float_type(0))
+            continue;
+         df_c   = df_a / df_b;
+         ctrl_c = ctrl_a / ctrl_b;
+         break;
+      default:
+         std::cerr << " internal error (unknown operator: " << op << ")" << std::endl;
+         return -1;
+      }
 
-    const control_float_type      ctrl_a(str_a);
-    const control_float_type      ctrl_b(str_b);
+      // if exponent of result is out of range, continue
+      int exp2;
+      boost::multiprecision::frexp(ctrl_c, &exp2);
+      if (exp2 > std::numeric_limits<naked_double_float_type>::max_exponent || exp2 < std::numeric_limits<naked_double_float_type>::min_exponent)
+         continue;
 
-    naked_double_float_type df_c    = df_a   + df_b;
-    control_float_type      ctrl_c  = ctrl_a + ctrl_b;
+      control_float_type ctrl_df_c = construct_from<control_float_type, naked_double_float_type>(df_c);
 
-    std::stringstream strm;
+      const auto delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
 
-    strm << std::setprecision(std::numeric_limits<naked_double_float_type>::digits10) << df_c;
+      if (delta > MaxError)
+      {
+         std::cerr << std::setprecision(std::numeric_limits<naked_double_float_type>::digits10 + 2);
+         std::cerr << " [FAILED] while performing '" << ctrl_a << "' " << op << " '" << ctrl_b << "'" << std::endl;
 
-    const std::string str_df_c = strm.str();
+         // uncomment for more debugging information (only for cpp_double_float<> type)
+         //std::cerr << "(df_a = " << df_a.get_raw_str() << ", df_b = " << df_b.get_raw_str() << ")" << std::endl;
+         //std::cerr << "expected: " << ctrl_c << std::endl;
+         //std::cerr << "actual  : " << ctrl_df_c << " (" << df_c.get_raw_str() << ")" << std::endl;
+         //std::cerr << "error   : " << delta << std::endl;
 
-    const bool b_ok =
-      (fabs(1 - fabs(ctrl_c / control_float_type(str_df_c))) < std::numeric_limits<control_float_type>::epsilon() * ErrorThreshold);
+         return -1;
+      }
+   }
 
-    if (!b_ok)
-    {
-       std::cerr << " [FAILED] while performing '" << str_a << "' + '" << str_b << "'" << std::endl;
-       return -1;
-    }
-  }
-
-  std::cout << " ok" << std::endl;
+  std::cout << " ok [" << count << " tests passed]" << std::endl;
   return 0;
 }
 
-template <typename FloatingPointType>
-int test_sub(const unsigned count = 10000U)
-{
-   using naked_double_float_type = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
-   using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 + 2>, boost::multiprecision::et_off>;
-
-   std::cout << "testing operator-...";
-   bool result_is_ok = true;
-
-   for (unsigned i = 0U; i < count; ++i)
-   {
-      std::string str_a;
-      std::string str_b;
-
-      test_arithmetic_cpp_double_float::get_random_fixed_string<std::numeric_limits<naked_double_float_type>::digits10>(str_a);
-      test_arithmetic_cpp_double_float::get_random_fixed_string<std::numeric_limits<naked_double_float_type>::digits10>(str_b);
-
-      const naked_double_float_type df_a(str_a);
-      const naked_double_float_type df_b(str_b);
-
-      const control_float_type ctrl_a(str_a);
-      const control_float_type ctrl_b(str_b);
-
-      naked_double_float_type df_c   = df_a - df_b;
-      control_float_type      ctrl_c = ctrl_a - ctrl_b;
-
-      std::stringstream strm;
-
-      strm << std::setprecision(std::numeric_limits<naked_double_float_type>::digits10) << df_c;
-
-      const std::string str_df_c = strm.str();
-
-      const bool b_ok =
-          (fabs(1 - fabs(ctrl_c / control_float_type(str_df_c))) < std::numeric_limits<control_float_type>::epsilon() * ErrorThreshold);
-
-      if (!b_ok)
-      {
-         std::cerr << " [FAILED] while performing '" << str_a << "' - '" << str_b << "'" << std::endl;
-         return -1;
-      }
-   }
-
-   std::cout << " ok" << std::endl;
-   return 0;
-}
-
-
-template <typename FloatingPointType>
-int test_mul(const unsigned count = 10000U)
-{
-   using naked_double_float_type = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
-   using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 + 2>, boost::multiprecision::et_off>;
-
-   std::cout << "testing operator*...";
-   bool result_is_ok = true;
-
-   for (unsigned i = 0U; i < count; ++i)
-   {
-      std::string str_a;
-      std::string str_b;
-
-      test_arithmetic_cpp_double_float::get_random_fixed_string<std::numeric_limits<naked_double_float_type>::digits10>(str_a);
-      test_arithmetic_cpp_double_float::get_random_fixed_string<std::numeric_limits<naked_double_float_type>::digits10>(str_b);
-
-      const naked_double_float_type df_a(str_a);
-      const naked_double_float_type df_b(str_b);
-
-      const control_float_type ctrl_a(str_a);
-      const control_float_type ctrl_b(str_b);
-
-      naked_double_float_type df_c   = df_a * df_b;
-      control_float_type      ctrl_c = ctrl_a * ctrl_b;
-
-      std::stringstream strm;
-
-      strm << std::setprecision(std::numeric_limits<naked_double_float_type>::digits10) << df_c;
-
-      const std::string str_df_c = strm.str();
-
-      const bool b_ok =
-          (fabs(1 - fabs(ctrl_c / control_float_type(str_df_c))) < std::numeric_limits<control_float_type>::epsilon() * ErrorThreshold);
-
-      if (!b_ok)
-      {
-         std::cerr << " [FAILED] while performing '" << str_a << "' * '" << str_b << "'" << std::endl;
-         return -1;
-      }
-   }
-
-   std::cout << " ok" << std::endl;
-   return 0;
-}
-
-
-template <typename FloatingPointType>
-int test_div(const unsigned count = 10000U)
-{
-   using naked_double_float_type = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
-   using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 + 2>, boost::multiprecision::et_off>;
-
-   std::cout << "testing operator/...";
-   bool result_is_ok = true;
-
-   for (unsigned i = 0U; i < count; ++i)
-   {
-      std::string str_a;
-      std::string str_b;
-
-      test_arithmetic_cpp_double_float::get_random_fixed_string<std::numeric_limits<naked_double_float_type>::digits10>(str_a);
-      test_arithmetic_cpp_double_float::get_random_fixed_string<std::numeric_limits<naked_double_float_type>::digits10>(str_b);
-
-      const naked_double_float_type df_a(str_a);
-      const naked_double_float_type df_b(str_b);
-
-      const control_float_type ctrl_a(str_a);
-      const control_float_type ctrl_b(str_b);
-
-      naked_double_float_type df_c   = df_a / df_b;
-      control_float_type      ctrl_c = ctrl_a / ctrl_b;
-
-      std::stringstream strm;
-
-      strm << std::setprecision(std::numeric_limits<naked_double_float_type>::digits10) << df_c;
-
-      const std::string str_df_c = strm.str();
-
-      const bool b_ok =
-          (fabs(1 - fabs(ctrl_c / control_float_type(str_df_c))) < std::numeric_limits<control_float_type>::epsilon() * ErrorThreshold);
-
-      if (!b_ok)
-      {
-         std::cerr << " [FAILED] while performing '" << str_a << "' / '" << str_b << "'" << std::endl;
-         return -1;
-      }
-   }
-
-   std::cout << " ok" << std::endl;
-   return 0;
-}
-
 template <typename T>
-bool test_basic()
+bool test_arithmetic()
 {
-   std::cout << "Testing basic arithmetic for cpp_double_float<" << typeid(T).name() << ">" << std::endl;
+   std::string type_name = typeid(T).name();
+   size_t      idx;
+   if ((idx = type_name.rfind(":")) != std::string::npos)
+      type_name = type_name.substr(idx + 1, type_name.size());
+
+   std::cout << "Testing correctness of arithmetic operators for " << type_name << std::endl;
 
    int e = 0;
-   e += test_add<T>();
-   e += test_sub<T>();
-   e += test_mul<T>();
-   e += test_div<T>();
+   e += test_op<T>('+');
+   e += test_op<T>('-');
+   e += test_op<T>('*');
+   e += test_op<T>('/');
 
    std::cout << std::endl;
+
    return e;
 }
 
@@ -296,6 +186,13 @@ bool test_basic()
 
 int main()
 {
-   test_arithmetic_cpp_double_float::test_basic<float>();
-   test_arithmetic_cpp_double_float::test_basic<double>();
+   int e = 0;
+   // uncomment to check if tests themselves are correct
+   //e += test_arithmetic_cpp_double_float::test_arithmetic<float>();
+   //e += test_arithmetic_cpp_double_float::test_arithmetic<double>();
+
+   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<float> >();
+   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double> >();
+
+   return e;
 }
