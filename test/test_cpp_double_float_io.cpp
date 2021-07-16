@@ -29,7 +29,7 @@ FloatingPointType uniform_real()
 template <typename FloatingPointType>
 boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> uniform_rand()
 {
-   using float_type = FloatingPointType::float_type;
+   using float_type = typename FloatingPointType::float_type;
    return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
 }
 
@@ -53,7 +53,7 @@ void test()
 
    bool passed = true;
    int  i;
-   for (i = 0; i < 100; ++i)
+   for (i = 0; i < 10000; ++i)
    {
       std::stringstream ss1, ss2;
       FloatingPointType d = log_rand<FloatingPointType>();

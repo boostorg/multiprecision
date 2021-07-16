@@ -48,14 +48,8 @@ FloatingPointType uniform_rand()
 template <typename FloatingPointType>
 boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> uniform_rand()
 {
-   using float_type = FloatingPointType::float_type;
+   using float_type = typename FloatingPointType::float_type;
    return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
-}
-
-template <typename NumericType, typename std::enable_if<std::is_integral<NumericType>::value>::type const* = nullptr>
-NumericType log_rand()
-{
-   return uniform_integral_number<NumericType>() >> int(uniform_real<float>() * float(std::numeric_limits<NumericType>::digits + 1));
 }
 
 template <typename FloatingPointType, typename std::enable_if<std::is_floating_point<FloatingPointType>::value>::type const* = nullptr>
@@ -70,8 +64,8 @@ FloatingPointType log_rand()
 template <typename FloatingPointType>
 boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> log_rand()
 {
-   boost::multiprecision::backends::cpp_double_float<FloatingPointType::float_type> a(uniform_rand<boost::multiprecision::backends::cpp_double_float<FloatingPointType::float_type> >() + FloatingPointType::float_type(1));
-   a *= log_rand<FloatingPointType::float_type>();
+   boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> a(uniform_rand<boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> >() + typename FloatingPointType::float_type(1));
+   a *= log_rand<typename FloatingPointType::float_type>();
    return a;
 }
 
