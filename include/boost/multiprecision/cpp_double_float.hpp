@@ -54,27 +54,29 @@ class cpp_double_float
    // Constructors
    cpp_double_float() { }
    
-   // Constructors from other cpp_double_float<> objects
+   // default constructor
    constexpr cpp_double_float(const cpp_double_float& a) : data(a.data) {}
-
-   template <typename OtherFloatType, typename std::enable_if<!std::is_same<FloatingPointType, OtherFloatType>::value>::type const* = nullptr>
-   cpp_double_float(const cpp_double_float<OtherFloatType>& a)
-     : data(std::make_pair(static_cast<float_type>(a.first()), static_cast<float_type>(a.second())))
-   {
-     normalize_pair(data);
-   }
 
    // Constructors from other floating-point types
    template <typename FloatType,
              typename std::enable_if<(std::is_floating_point<FloatType>::value == true)
-             && (sizeof(FloatType) < 2*sizeof(FloatingPointType))>::type const* = nullptr>
+             && (std::numeric_limits<FloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
    constexpr cpp_double_float(const FloatType& f) : data(std::make_pair(f, (float_type)0)) {}
    template <typename FloatType,
              typename std::enable_if<(std::numeric_limits<FloatType>::is_iec559 == true)
-             && (sizeof(FloatType) >= 2 * sizeof(FloatingPointType))>::type const* = nullptr>
+             && (std::numeric_limits<FloatType>::digits > std::numeric_limits<float_type>::digits)>::type const* = nullptr>
    constexpr cpp_double_float(const FloatType& f)
        : data(std::make_pair(static_cast<float_type>(f),
                              static_cast<float_type>(f - (FloatType) static_cast<float_type>(f)))) {}
+
+   // Constructor from other cpp_double_float<> objects
+   template <typename OtherFloatType, typename std::enable_if<!std::is_same<FloatingPointType, OtherFloatType>::value>::type const* = nullptr>
+   cpp_double_float(const cpp_double_float<OtherFloatType>& a)
+       : cpp_double_float(a.first())
+   {
+     // TODO Remove cast by overloading operator +=
+      *this += cpp_double_float(a.second());
+   }
 
    // Constructors from integers
    template <typename IntegralType,
@@ -884,21 +886,9 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
       exp10 = 0;
 
    auto f_prime = (f > FloatingPointType(0) ? f : -f);
-   if (exp10 < -300)
-   {
-      f_prime *= cpp_double_float<FloatingPointType>::pow10(300);
-      f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10 + 300);
-   }
-   else if (exp10 > 300)
-   {
-      //r = ldexp(r, -53);
-      f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
-      //r = ldexp(r, 53);
-   }
-   else
-   {
-      f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
-   }
+   f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
+   
+   // TODO Handle subnormal numbers
 
    if (f_prime < FloatingPointType(1) && f_prime > FloatingPointType(0))
    {
@@ -922,9 +912,9 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    else
       p = (std::max)(p, 1);
 
+   // TODO Maybe switch to fmod() based digit extraction for correct rounding?
    while (p-- > 0)
    {
-
       // FIXME Replace with std::floor function
       int digit = static_cast<int>(f_prime.first());
 
@@ -974,9 +964,9 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    // (1) greater than 0.5 (round-up)
    // (2) less than 0.5 (round-down)
    // (3) equal to 0.5 (round-to-even)
-   if (f_prime > FloatingPointType(5))
+   if (f_prime > 5)
       round_up();
-   else if (f_prime < FloatingPointType(5))  // do nothing. already correctly rounded
+   else if (f_prime < 5)  // do nothing. already correctly rounded
    {
       // TODO add some kind of an option for configurable rounding mode
    }
