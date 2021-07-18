@@ -17,6 +17,17 @@
 
 namespace test_cpp_double_constructors {
 
+namespace detail {
+
+template<typename T>
+constexpr T max(T a, T b)
+{
+  return ((a > b) ? a : b);
+}
+
+}
+
+
 template <typename FloatingPointType,
           typename std::enable_if<std::is_floating_point<FloatingPointType>::value, bool>::type = true>
 FloatingPointType uniform_real()
@@ -78,7 +89,7 @@ template <typename FloatingPointType, typename NumericType>
 int test_constructor()
 {
    using double_float_t     = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
-   using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<std::max(std::numeric_limits<double_float_t>::digits10, std::numeric_limits<NumericType>::digits10) * 2 + 1>, boost::multiprecision::et_off>;
+   using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<(detail::max)(std::numeric_limits<double_float_t>::digits10, std::numeric_limits<NumericType>::digits10) * 2 + 1>, boost::multiprecision::et_off>;
 
    std::cout << "Testing constructor for ";
    std::cout.width(30);

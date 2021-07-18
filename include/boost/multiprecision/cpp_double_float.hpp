@@ -1009,7 +1009,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
       }
       else  // Number >= 1
       {
-         str_size = 1 + os.precision();
+         str_size = std::size_t(1 + os.precision());
          if (is_set(std::ios::fixed))
             str_size += exp10 + 1;
 
