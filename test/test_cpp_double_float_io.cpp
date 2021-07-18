@@ -22,15 +22,18 @@
 
 namespace test_cpp_double_float_io {
 
-// TODO: this looks like a duplicate from test_cpp_double_float_comparision.cpp file.
-template<typename FloatingPointType> constexpr bool is_floating_point = std::is_floating_point<FloatingPointType>::value
+// FIXME: this looks like a duplicate from test_cpp_double_float_comparision.cpp file.
+template<typename FloatingPointType> struct is_floating_point {
+static const bool value;
+};
+template<typename FloatingPointType> const bool is_floating_point<FloatingPointType>::value = std::is_floating_point<FloatingPointType>::value
 #ifdef BOOST_MATH_USE_FLOAT128
 or std::is_same<FloatingPointType,boost::multiprecision::float128>::value
 #endif
 ;
 
 template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>, bool>::type = true>
+          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
 FloatingPointType uniform_real()
 {
    //static std::random_device                                rd;
@@ -52,7 +55,7 @@ int rand_in_range(int a, int b)
    return a + int(float(b - a) * uniform_real<float>());
 }
 
-template <typename FloatingPointType, typename std::enable_if<is_floating_point<FloatingPointType>>::type const* = nullptr>
+template <typename FloatingPointType, typename std::enable_if<is_floating_point<FloatingPointType>::value>::type const* = nullptr>
 FloatingPointType log_rand()
 {
    if (uniform_real<float>() < (1. / 100.))

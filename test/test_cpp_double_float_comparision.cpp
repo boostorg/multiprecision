@@ -25,15 +25,18 @@
 #include <iomanip>
 
 namespace test_cpp_double_comparision {
-// TODO: this looks like a duplicate from test_cpp_double_float_arithmetic.cpp file.
-template<typename FloatingPointType> constexpr bool is_floating_point = std::is_floating_point<FloatingPointType>::value
+// FIXME: this looks like a duplicate from test_cpp_double_float_comparision.cpp file.
+template<typename FloatingPointType> struct is_floating_point {
+static const bool value;
+};
+template<typename FloatingPointType> const bool is_floating_point<FloatingPointType>::value = std::is_floating_point<FloatingPointType>::value
 #ifdef BOOST_MATH_USE_FLOAT128
 or std::is_same<FloatingPointType,boost::multiprecision::float128>::value
 #endif
 ;
 
 template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>, bool>::type = true>
+          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
 FloatingPointType uniform_real()
 {
    //static std::random_device                                rd;
@@ -44,7 +47,7 @@ FloatingPointType uniform_real()
 }
 
 template <typename NumericType,
-          typename std::enable_if<std::is_integral<NumericType>::value && !is_floating_point<NumericType>, bool>::type = true>
+          typename std::enable_if<std::is_integral<NumericType>::value && !is_floating_point<NumericType>::value, bool>::type = true>
 NumericType uniform_integral_number()
 {
    NumericType out = 0;
@@ -61,14 +64,14 @@ int rand_in_range(int a, int b)
 }
 
 template <typename NumericType,
-          typename std::enable_if<std::is_integral<NumericType>::value && !is_floating_point<NumericType>, bool>::type = true>
+          typename std::enable_if<std::is_integral<NumericType>::value && !is_floating_point<NumericType>::value, bool>::type = true>
 NumericType uniform_rand()
 {
    return uniform_integral_number<NumericType>();
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>, bool>::type = true>
+          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
 FloatingPointType uniform_rand()
 {
    return uniform_real<FloatingPointType>();
@@ -88,7 +91,7 @@ NumericType log_rand()
    return uniform_integral_number<NumericType>() >> int(uniform_real<float>() * float(std::numeric_limits<NumericType>::digits+1));
 }
 
-template <typename FloatingPointType, typename std::enable_if<is_floating_point<FloatingPointType>>::type const* = nullptr>
+template <typename FloatingPointType, typename std::enable_if<is_floating_point<FloatingPointType>::value>::type const* = nullptr>
 FloatingPointType log_rand()
 {
    if (uniform_real<float>() < (1. / 100.))

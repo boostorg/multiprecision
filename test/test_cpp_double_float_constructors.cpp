@@ -35,15 +35,18 @@ constexpr T max(T a, T b)
 
 }
 
-// TODO: this looks like a duplicate from test_cpp_double_float_comparision.cpp file.
-template<typename FloatingPointType> constexpr bool is_floating_point = std::is_floating_point<FloatingPointType>::value
+// FIXME: this looks like a duplicate from test_cpp_double_float_comparision.cpp file.
+template<typename FloatingPointType> struct is_floating_point {
+static const bool value;
+};
+template<typename FloatingPointType> const bool is_floating_point<FloatingPointType>::value = std::is_floating_point<FloatingPointType>::value
 #ifdef BOOST_MATH_USE_FLOAT128
 or std::is_same<FloatingPointType,boost::multiprecision::float128>::value
 #endif
 ;
 
 template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>, bool>::type = true>
+          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
 FloatingPointType uniform_real()
 {
    static std::random_device                                rd;
@@ -67,14 +70,14 @@ NumericType uniform_integral_number()
 
 
 template <typename NumericType,
-          typename std::enable_if<std::is_integral<NumericType>::value && !is_floating_point<NumericType>, bool>::type = true>
+          typename std::enable_if<std::is_integral<NumericType>::value && !is_floating_point<NumericType>::value, bool>::type = true>
 NumericType get_rand()
 {
    return uniform_integral_number<NumericType>();
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>, bool>::type = true>
+          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
 FloatingPointType get_rand()
 {
    return uniform_real<FloatingPointType>();

@@ -26,14 +26,17 @@
 
 namespace test_arithmetic_cpp_double_float {
 // FIXME: this looks like a duplicate from test_cpp_double_float_comparision.cpp file.
-template<typename FloatingPointType> constexpr bool is_floating_point = std::is_floating_point<FloatingPointType>::value
+template<typename FloatingPointType> struct is_floating_point {
+static const bool value;
+};
+template<typename FloatingPointType> const bool is_floating_point<FloatingPointType>::value = std::is_floating_point<FloatingPointType>::value
 #ifdef BOOST_MATH_USE_FLOAT128
 or std::is_same<FloatingPointType,boost::multiprecision::float128>::value
 #endif
 ;
 
 template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>, bool>::type = true>
+          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
 FloatingPointType uniform_real()
 {
    static std::random_device                                rd;
@@ -49,7 +52,7 @@ int rand_in_range(int a, int b)
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>, bool>::type = true>
+          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
 FloatingPointType uniform_rand()
 {
    return uniform_real<FloatingPointType>();
@@ -62,7 +65,7 @@ boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::fl
    return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
 }
 
-template <typename FloatingPointType, typename std::enable_if<is_floating_point<FloatingPointType>>::type const* = nullptr>
+template <typename FloatingPointType, typename std::enable_if<is_floating_point<FloatingPointType>::value>::type const* = nullptr>
 FloatingPointType log_rand()
 {
    if (uniform_real<float>() < (1. / 100.))
