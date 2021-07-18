@@ -8,7 +8,15 @@
 //
 // Constructor tests for cpp_double_float<>
 
+
+
+#include <boost/config.hpp>
 #include <boost/multiprecision/cpp_double_float.hpp>
+
+#include <boost/random/uniform_real_distribution.hpp>
+#ifdef BOOST_MATH_USE_FLOAT128
+#include <boost/multiprecision/float128.hpp>
+#endif
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <iostream>
 #include <cstdlib>
@@ -17,13 +25,20 @@
 
 namespace test_cpp_double_constructors {
 
+// TODO: this looks like a duplicate from test_cpp_double_float_comparision.cpp file.
+template<typename FloatingPointType> constexpr bool is_floating_point = std::is_floating_point<FloatingPointType>::value
+#ifdef BOOST_MATH_USE_FLOAT128
+or std::is_same<FloatingPointType,boost::multiprecision::float128>::value
+#endif
+;
+
 template <typename FloatingPointType,
-          typename std::enable_if<std::is_floating_point<FloatingPointType>::value, bool>::type = true>
+          typename std::enable_if<is_floating_point<FloatingPointType>, bool>::type = true>
 FloatingPointType uniform_real()
 {
    static std::random_device                                rd;
    static std::mt19937                                      gen(rd());
-   static std::uniform_real_distribution<FloatingPointType> dis(0.0, 1.0);
+   static boost::random::uniform_real_distribution<FloatingPointType> dis(0.0, 1.0);
 
    return dis(gen);
 }
@@ -42,14 +57,14 @@ NumericType uniform_integral_number()
 
 
 template <typename NumericType,
-          typename std::enable_if<std::is_integral<NumericType>::value && !std::is_floating_point<NumericType>::value, bool>::type = true>
+          typename std::enable_if<std::is_integral<NumericType>::value && !is_floating_point<NumericType>, bool>::type = true>
 NumericType get_rand()
 {
    return uniform_integral_number<NumericType>();
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<std::is_floating_point<FloatingPointType>::value, bool>::type = true>
+          typename std::enable_if<is_floating_point<FloatingPointType>, bool>::type = true>
 FloatingPointType get_rand()
 {
    return uniform_real<FloatingPointType>();
@@ -142,9 +157,18 @@ int test_constructors()
    e += test_constructor<FloatingPointType, unsigned char>();
    e += test_constructor<FloatingPointType, float>();
    e += test_constructor<FloatingPointType, double>();
-   e += test_constructor<FloatingPointType, float>();
+   e += test_constructor<FloatingPointType, long double>();
+#ifdef BOOST_MATH_USE_FLOAT128
+// FIXME:
+// e += test_constructor<FloatingPointType, boost::multiprecision::float128>();
+#endif
    e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<float>>();
    e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<double>>();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<long double>>();
+#ifdef BOOST_MATH_USE_FLOAT128
+// FIXME:
+// e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128>>();
+#endif
 
    if (e == 0)
       std::cout << "PASSED all tests";
@@ -164,6 +188,11 @@ int main()
 
    e += test_cpp_double_constructors::test_constructors<float>();
    e += test_cpp_double_constructors::test_constructors<double>();
+   e += test_cpp_double_constructors::test_constructors<long double>();
+#ifdef BOOST_MATH_USE_FLOAT128
+// FIXME:
+// e += test_cpp_double_constructors::test_constructors<boost::multiprecision::float128>();
+#endif
 
    return e;
 }
