@@ -52,6 +52,7 @@ jobs:
           git submodule update --init libs/numeric/conversion
           git submodule update --init libs/predef
           git submodule update --init libs/preprocessor
+          git submodule update --init libs/random
           git submodule update --init libs/rational
           git submodule update --init libs/range
           git submodule update --init libs/smart_ptr
