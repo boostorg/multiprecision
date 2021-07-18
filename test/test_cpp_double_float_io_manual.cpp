@@ -9,7 +9,11 @@
 // Basic I/O tests for cpp_double_float<>
 // Note that the I/O of cpp_double_float<> is currently extremely underdeveloped
 
+#include <boost/config.hpp>
 #include <boost/multiprecision/cpp_double_float.hpp>
+#ifdef BOOST_MATH_USE_FLOAT128
+#include <boost/multiprecision/float128.hpp>
+#endif
 #include <iostream>
 #include <cstdlib>
 
@@ -110,6 +114,11 @@ int main()
 {
    test_basic_io_manual<double>();
    test_basic_io_manual<float>();
+   test_basic_io_manual<long double>();
+#ifdef BOOST_MATH_USE_FLOAT128
+// FIXME:
+// test_basic_io_manual<boost::multiprecision::float128>();
+#endif
 
    return 0;
 }
