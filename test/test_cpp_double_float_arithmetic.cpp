@@ -88,7 +88,6 @@ int test_op(char op, const unsigned count = 10000U)
 
    const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<naked_double_float_type>::digits);
    std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<naked_double_float_type>::digits << " bits)...";
-   bool result_is_ok = true;
 
    for (unsigned i = 0U; i < count; ++i)
    {
