@@ -54,27 +54,29 @@ class cpp_double_float
    // Constructors
    cpp_double_float() { }
    
-   // Constructors from other cpp_double_float<> objects
+   // default constructor
    constexpr cpp_double_float(const cpp_double_float& a) : data(a.data) {}
-
-   template <typename OtherFloatType, typename std::enable_if<!std::is_same<FloatingPointType, OtherFloatType>::value>::type const* = nullptr>
-   cpp_double_float(const cpp_double_float<OtherFloatType>& a)
-     : data(std::make_pair(static_cast<float_type>(a.first()), static_cast<float_type>(a.second())))
-   {
-     normalize_pair(data);
-   }
 
    // Constructors from other floating-point types
    template <typename FloatType,
              typename std::enable_if<(std::is_floating_point<FloatType>::value == true)
-             && (sizeof(FloatType) < 2*sizeof(FloatingPointType))>::type const* = nullptr>
+             && (std::numeric_limits<FloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
    constexpr cpp_double_float(const FloatType& f) : data(std::make_pair(f, (float_type)0)) {}
    template <typename FloatType,
              typename std::enable_if<(std::numeric_limits<FloatType>::is_iec559 == true)
-             && (sizeof(FloatType) >= 2 * sizeof(FloatingPointType))>::type const* = nullptr>
+             && (std::numeric_limits<FloatType>::digits > std::numeric_limits<float_type>::digits)>::type const* = nullptr>
    constexpr cpp_double_float(const FloatType& f)
        : data(std::make_pair(static_cast<float_type>(f),
                              static_cast<float_type>(f - (FloatType) static_cast<float_type>(f)))) {}
+
+   // Constructor from other cpp_double_float<> objects
+   template <typename OtherFloatType, typename std::enable_if<!std::is_same<FloatingPointType, OtherFloatType>::value>::type const* = nullptr>
+   cpp_double_float(const cpp_double_float<OtherFloatType>& a)
+       : cpp_double_float(a.first())
+   {
+     // TODO Remove cast by overloading operator +=
+      *this += cpp_double_float(a.second());
+   }
 
    // Constructors from integers
    template <typename IntegralType,
@@ -126,8 +128,8 @@ class cpp_double_float
    operator long double() const { return (long double)data.first + (long double)data.second; }
 
    // Methods
-   constexpr cpp_double_float<float_type> negative() const { return cpp_double_float<float_type>(-data.first, -data.second); }
-   constexpr bool               is_negative() const { return data.first < 0; }
+   constexpr cpp_double_float<float_type> negative()    const { return cpp_double_float<float_type>(-data.first, -data.second); }
+   constexpr bool                         is_negative() const { return data.first < 0; }
 
    // FIXME Merge set_str() to operator<<
    void set_str(std::string str);
@@ -216,7 +218,7 @@ template <typename FloatingPointType>
 std::pair<FloatingPointType, FloatingPointType>
 cpp_double_float<FloatingPointType>::fast_exact_sum(const float_type& a, const float_type& b)
 {
-   BOOST_ASSERT(std::fabs(a) >= std::fabs(b) || a == 0.0);
+   BOOST_ASSERT(std::fabs(a) >= std::fabs(b) || a == 0.0 || !std::isnormal(a));
 
    std::pair<float_type, float_type> out;
    out.first  = a + b;
@@ -269,23 +271,27 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
                  "double_float<> invoked with non-native floating-point unit");
 
    // TODO Replace bit shifts with constexpr funcs for better compaitibility
-   constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits;
-   constexpr int               SplitBits    = MantissaBits / 2 + 2;
+   constexpr int               MantissaBits = std::numeric_limits<FloatingPointType>::digits;
+   constexpr int               SplitBits    = MantissaBits / 2 + 1;
    constexpr FloatingPointType Splitter     = FloatingPointType((1ULL << SplitBits) + 1);
    constexpr FloatingPointType SplitThreshold =
-       (std::numeric_limits<FloatingPointType>::max)() / Splitter;
+       (std::numeric_limits<FloatingPointType>::max)() / (Splitter*2);
 
-   FloatingPointType                               temp, hi, lo;
+   FloatingPointType temp, hi, lo;
 
    // Handle if multiplication with the splitter would cause overflow
    if (a > SplitThreshold || a < -SplitThreshold)
    {
-      FloatingPointType a_ = a / FloatingPointType(1ULL << (SplitBits + 1));
+      constexpr FloatingPointType Normalizer = FloatingPointType(1ULL << (SplitBits + 1));
+
+      FloatingPointType a_ = a / Normalizer;
+
       temp = Splitter * a_;
       hi   = temp - (temp - a_);
       lo   = a_ - hi;
-      hi *= Splitter;
-      lo *= Splitter;
+
+      hi *= Normalizer;
+      lo *= Normalizer;
    }
    else
    {
@@ -315,6 +321,7 @@ cpp_double_float<FloatingPointType>::exact_product(const float_type& a, const fl
 // --
 
 // -- Double-float arithmetic
+// operator+ and operator+=
 // double_float<> + native-float
 template <typename FloatingPointType>
 inline cpp_double_float<FloatingPointType>
@@ -323,21 +330,6 @@ operator+(const cpp_double_float<FloatingPointType>& a, const FloatingPointType&
    using double_float_t = cpp_double_float<FloatingPointType>;
 
    auto s = double_float_t::exact_sum(a.first(), b);
-
-   s.second += a.second();
-   double_float_t::normalize_pair(s);
-
-   return double_float_t(s);
-}
-
-// double_float<> - native-float
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator-(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b)
-{
-   using double_float_t = cpp_double_float<FloatingPointType>;
-
-   auto s = double_float_t::exact_difference(a.first(), b);
 
    s.second += a.second();
    double_float_t::normalize_pair(s);
@@ -361,6 +353,22 @@ operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<F
    s.second += t.first;
    double_float_t::normalize_pair(s);
    s.second += t.second;
+   double_float_t::normalize_pair(s);
+
+   return double_float_t(s);
+}
+
+
+// double_float<> - native-float
+template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>
+operator-(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b)
+{
+   using double_float_t = cpp_double_float<FloatingPointType>;
+
+   auto s = double_float_t::exact_difference(a.first(), b);
+
+   s.second += a.second();
    double_float_t::normalize_pair(s);
 
    return double_float_t(s);
@@ -611,6 +619,11 @@ cpp_double_float<FloatingPointType>::operator--(int)
 }
 
 // -- Comparision Operators
+// Comparison operators work by determining the type containing more detail at
+// compile time, and then promoting the type with less detail to the type with
+// more detail, and then comparing. Some minor complications arise while
+// comparing an unsigned type to cpp_double_float<> that are handled as well
+
 // operator>
 template <typename FloatingPointType, typename ComparisionType>
 inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
@@ -856,6 +869,12 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
       return os.flags() & flg;
    };
 
+   if (std::isinf(f.first()))
+   {
+      os << f.first();
+      return os;
+   }
+
   if (f < FloatingPointType(0) || os.flags() & std::ios::showpos)
       os << (f < FloatingPointType(0) ? "-" : "+");
 
@@ -866,7 +885,10 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    else
       exp10 = 0;
 
-   auto f_prime = (f > FloatingPointType(0) ? f : -f) / cpp_double_float<FloatingPointType>::pow10(exp10);
+   auto f_prime = (f > FloatingPointType(0) ? f : -f);
+   f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
+   
+   // TODO Handle subnormal numbers
 
    if (f_prime < FloatingPointType(1) && f_prime > FloatingPointType(0))
    {
@@ -890,12 +912,14 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    else
       p = (std::max)(p, 1);
 
+   // TODO Maybe switch to fmod() based digit extraction for correct rounding?
    while (p-- > 0)
    {
+      // FIXME Replace with std::floor function
       int digit = static_cast<int>(f_prime.first());
 
-      if (f_prime.first() == FloatingPointType(10) && f_prime.second() < 0)
-         digit = 9;
+      if (f_prime.second() < 0 && (f_prime.first() - (FloatingPointType)digit < -f_prime.second()))
+         digit -= 1;
 
       BOOST_ASSERT(digit >= 0 && digit <= 9);
 
@@ -940,9 +964,9 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    // (1) greater than 0.5 (round-up)
    // (2) less than 0.5 (round-down)
    // (3) equal to 0.5 (round-to-even)
-   if (f_prime > FloatingPointType(5))
+   if (f_prime > 5)
       round_up();
-   else if (f_prime < FloatingPointType(5))  // do nothing. already correctly rounded
+   else if (f_prime < 5)  // do nothing. already correctly rounded
    {
       // TODO add some kind of an option for configurable rounding mode
    }
@@ -985,7 +1009,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
       }
       else  // Number >= 1
       {
-         str_size = 1 + os.precision();
+         str_size = std::size_t(1 + os.precision());
          if (is_set(std::ios::fixed))
             str_size += exp10 + 1;
 
@@ -1115,9 +1139,12 @@ class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<Floa
  public:
    static constexpr bool is_iec559 = false;
 
-   static constexpr int digits       = 2 * std::numeric_limits<FloatingPointType>::digits + 1;
-   static constexpr int digits10     = 2 * std::numeric_limits<FloatingPointType>::digits10;
+   static constexpr int digits       = 2 * std::numeric_limits<FloatingPointType>::digits - 2;
+   static constexpr int digits10     = 2 * std::numeric_limits<FloatingPointType>::digits10 - 1;
    static constexpr int max_digits10 = 2 * std::numeric_limits<FloatingPointType>::max_digits10;
+
+   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - std::numeric_limits<FloatingPointType>::digits;
+   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + std::numeric_limits<FloatingPointType>::digits;
 
    static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(min)() noexcept { return (std::numeric_limits<FloatingPointType>::min)(); }
    static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(max)() noexcept { return (std::numeric_limits<FloatingPointType>::max)(); }

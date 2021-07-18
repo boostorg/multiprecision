@@ -29,7 +29,7 @@ FloatingPointType uniform_real()
 template <typename FloatingPointType>
 boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> uniform_rand()
 {
-   using float_type = FloatingPointType::float_type;
+   using float_type = typename FloatingPointType::float_type;
    return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
 }
 
@@ -43,7 +43,7 @@ FloatingPointType log_rand()
 {
    if (uniform_real<float>() < (1. / 100.))
       return 0; // throw in a few zeroes
-   return std::ldexp(uniform_real<FloatingPointType>(), rand_in_range(std::numeric_limits<FloatingPointType>::min_exponent, std::numeric_limits<FloatingPointType>::max_exponent));
+   return std::ldexp(uniform_real<FloatingPointType>(), rand_in_range(std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >::min_exponent, std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >::max_exponent));
 }
 
 template <typename FloatingPointType>
@@ -53,7 +53,7 @@ void test()
 
    bool passed = true;
    int  i;
-   for (i = 0; i < 100; ++i)
+   for (i = 0; i < 10000; ++i)
    {
       std::stringstream ss1, ss2;
       FloatingPointType d = log_rand<FloatingPointType>();
@@ -93,8 +93,18 @@ void test()
 
       if (ss1.str() != ss2.str())
       {
+        // Skip known false negatives that arise at zero values
+         if (d == 0)
+         {
+           // Some implementations do not count the leading zero as a digit
+           // included in precision, while printing with specific precision
+           // using ios::showpoint flags
+            if (!(ss1.flags() & std::ios::fixed) && !(ss1.flags() & std::ios::scientific) && (ss1.flags() & std::ios::showpoint))
+               continue;
+         }
+
          std::cerr.precision(16);
-         std::cerr << "FAIL | d=" << std::scientific << d << ", p=" << p << ", ";
+         std::cerr << "FAIL | d=" << std::scientific << d << " (" << std::hexfloat << d << "), p=" << p << ", ";
          std::cerr << "scientific=" << bool(ss1.flags() & std::ios::scientific) << ", ";
          std::cerr << "fixed=" << bool(ss1.flags() & std::ios::fixed) << ", ";
          std::cerr << "showpoint=" << bool(ss1.flags() & std::ios::showpoint) << ", ";
