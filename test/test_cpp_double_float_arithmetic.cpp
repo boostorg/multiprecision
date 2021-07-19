@@ -17,7 +17,7 @@
 #ifdef BOOST_MATH_USE_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
-
+#include <boost/core/demangle.hpp>
 #include <iomanip>
 #include <iostream>
 #include <random>
@@ -171,12 +171,7 @@ int test_op(char op, const unsigned count = 10000U)
 template <typename T>
 bool test_arithmetic()
 {
-   std::string type_name = typeid(T).name();
-   size_t      idx;
-   if ((idx = type_name.rfind(":")) != std::string::npos)
-      type_name = type_name.substr(idx + 1, type_name.size());
-
-   std::cout << "Testing correctness of arithmetic operators for " << type_name << std::endl;
+   std::cout << "Testing correctness of arithmetic operators for " << boost::core::demangle(typeid(T).name()) << std::endl;
 
    int e = 0;
    e += test_op<T>('+');
