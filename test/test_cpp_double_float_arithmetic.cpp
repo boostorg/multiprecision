@@ -35,20 +35,21 @@ or std::is_same<FloatingPointType,boost::multiprecision::float128>::value
 #endif
 ;
 
-template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
-FloatingPointType uniform_real()
+template<typename FloatingPointType> 
+typename std::enable_if<(std::is_floating_point<FloatingPointType>::value == true), FloatingPointType>::type uniform_real()
 {
-   static std::random_device                                rd;
-   static std::mt19937                                      gen (rd());
-   static boost::random::uniform_real_distribution<FloatingPointType> dis(0.0, 1.0);
+   using distribution_type = boost::random::uniform_real_distribution<FloatingPointType>;
+
+   static std::random_device   rd;
+   static std::mt19937         gen (rd());
+   static distribution_type    dis(0.0, 1.0);
 
    return dis(gen);
 }
 
 int rand_in_range(int a, int b)
 {
-   return a + int(float(b - a) * uniform_real<float>());
+   return a + int(float(b - a) * test_arithmetic_cpp_double_float::uniform_real<float>());
 }
 
 template <typename FloatingPointType,
@@ -65,8 +66,8 @@ boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::fl
    return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
 }
 
-template <typename FloatingPointType, typename std::enable_if<is_floating_point<FloatingPointType>::value>::type const* = nullptr>
-FloatingPointType log_rand()
+template<typename FloatingPointType> 
+typename std::enable_if<(std::is_floating_point<FloatingPointType>::value == true), FloatingPointType>::type log_rand()
 {
    if (uniform_real<float>() < (1. / 100.))
       return 0; // throw in a few zeroes
@@ -96,7 +97,7 @@ ConstructionType construct_from(FloatingPointType f)
 }
 
 template <typename FloatingPointType>
-int test_op(char op, const unsigned count = 10000U)
+int test_op(char op, const unsigned count = 0x10000U)
 {
    using naked_double_float_type = FloatingPointType;
    using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 * 2 + 1>, boost::multiprecision::et_off>;
