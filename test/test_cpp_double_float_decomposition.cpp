@@ -89,6 +89,9 @@ std::cout << "norm        = " << norm        << ", ";
 std::cout << "ex          = " << ex          << ", ";
 std::cout << "pos         = " << pos         << ", ";
 std::cout << "bits.size() = " << bits.size() << std::endl;
+		for (auto c : bits)
+			std::cout << int(c);
+std::cout << std::endl;
 */
 			BOOST_ASSERT((ex <= 0) and (pos < int(bits.size())) and (pos >= 0));
 			bits[pos] = 1;
