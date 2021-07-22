@@ -880,22 +880,22 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
       return os;
    }
 
-  if (f < FloatingPointType(0) || os.flags() & std::ios::showpos)
-      os << (f < FloatingPointType(0) ? "-" : "+");
+  if (f < cpp_double_float<FloatingPointType>(0) || os.flags() & std::ios::showpos)
+      os << (f < cpp_double_float<FloatingPointType>(0) ? "-" : "+");
 
    int exp10 = 0;
 
-   if (f != FloatingPointType(0))
+   if (f != cpp_double_float<FloatingPointType>(0))
       exp10 = (int)floor(log10(fabs(f.first())));
    else
       exp10 = 0;
 
-   auto f_prime = (f > FloatingPointType(0) ? f : -f);
+   auto f_prime = (f > cpp_double_float<FloatingPointType>(0) ? f : -f);
    f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
    
    // TODO Handle subnormal numbers
 
-   if (f_prime < FloatingPointType(1) && f_prime > FloatingPointType(0))
+   if (f_prime < cpp_double_float<FloatingPointType>(1) && f_prime > cpp_double_float<FloatingPointType>(0))
    {
       f_prime *= FloatingPointType(10);
       exp10++;

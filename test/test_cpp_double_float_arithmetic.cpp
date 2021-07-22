@@ -152,7 +152,7 @@ int test_op(char op, const unsigned count = 10000U)
       if (delta > MaxError)
       {
          std::cerr << std::setprecision(std::numeric_limits<naked_double_float_type>::digits10 + 2);
-         std::cerr << " [FAILED] while performing '" << ctrl_a << "' " << op << " '" << ctrl_b << "'" << std::endl;
+         std::cerr << " [FAILED] while performing '" << std::setprecision(100000) << ctrl_a << "' " << op << " '" << ctrl_b << "', got incorrect result: " << (df_c) << std::endl;
 
          // uncomment for more debugging information (only for cpp_double_float<> type)
          //std::cerr << "(df_a = " << df_a.get_raw_str() << ", df_b = " << df_b.get_raw_str() << ")" << std::endl;
