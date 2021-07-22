@@ -1144,7 +1144,7 @@ class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<Floa
  public:
    static constexpr bool is_iec559 = false;
 
-   static constexpr int digits       = 2 * std::numeric_limits<FloatingPointType>::digits - 2;
+   static constexpr int digits       = 2 * std::numeric_limits<FloatingPointType>::digits - 2;// - 2; without -2 ?
    static constexpr int digits10     = 2 * std::numeric_limits<FloatingPointType>::digits10 - 1;
    static constexpr int max_digits10 = 2 * std::numeric_limits<FloatingPointType>::max_digits10;
 
