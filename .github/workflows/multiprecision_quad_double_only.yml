@@ -218,7 +218,7 @@ jobs:
           ls -la ./test_cpp_double_float_constructors.exe
           echo "execute ./test_cpp_double_float_constructors.exe"
           ./test_cpp_double_float_constructors.exe
-  gcc-clang-arith-with-float128:
+  gcc-arith-with-float128:
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -266,7 +266,7 @@ jobs:
           git submodule update --init libs/utility
           ./bootstrap.sh
           ./b2 headers
-      - name: gcc-clang-arith-with-float128
+      - name: gcc-arith-with-float128
         run: |
           echo "where am i (via pwd)"
           pwd
