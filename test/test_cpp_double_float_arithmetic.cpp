@@ -9,7 +9,7 @@
 // Test for correctness of arithmetic operators of cpp_double_float<>
 
 // cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
-// g++ -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_double_float.exe
+// g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_double_float.exe
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/cpp_double_float.hpp>
@@ -102,7 +102,7 @@ ConstructionType construct_from(FloatingPointType f)
 }
 
 template <typename FloatingPointType>
-int test_op(char op, const unsigned count = 1000000U)
+int test_op(char op, const unsigned count = 0x10000U)
 {
    using naked_double_float_type = FloatingPointType;
    using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 * 2 + 1>, boost::multiprecision::et_off>;
