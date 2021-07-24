@@ -220,7 +220,7 @@ cpp_double_float<FloatingPointType>::fast_exact_sum(const float_type& a, const f
 {
    using std::fabs;
    using std::isnormal;
-   BOOST_ASSERT(fabs(a) >= fabs(b) || a == 0.0 || !isnormal(a));
+   //BOOST_ASSERT(fabs(a) >= fabs(b) || a == 0.0 || !isnormal(a));
 
    std::pair<float_type, float_type> out;
    out.first  = a + b;

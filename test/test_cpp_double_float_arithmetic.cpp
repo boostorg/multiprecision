@@ -8,7 +8,8 @@
 //
 // Test for correctness of arithmetic operators of cpp_double_float<>
 
-
+// cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
+// g++ -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_double_float.exe
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/cpp_double_float.hpp>
