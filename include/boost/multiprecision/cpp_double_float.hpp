@@ -40,6 +40,24 @@ struct number_category<backends::cpp_double_float<FloatingPointType>>
 
 namespace backends {
 
+namespace detail {
+template <class T> struct is_arithmetic_or_float128 {
+static constexpr bool value = std::is_arithmetic<T>::value == true
+#ifdef BOOST_MATH_USE_FLOAT128
+             || std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true
+#endif
+             ;
+};
+
+template <class T> struct is_floating_point_or_float128 {
+static constexpr bool value = std::is_floating_point<T>::value == true
+#ifdef BOOST_MATH_USE_FLOAT128
+             || std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true
+#endif
+             ;
+};
+}
+
 /*
 * A cpp_double_float is represented by an unevaluated sum of two floating-point
 * units (say a0 and a1) which satisfy |a1| <= (1 / 2) * ulp(a0)
@@ -59,8 +77,8 @@ class cpp_double_float
 
    // Constructors from other floating-point types
    template <typename FloatType,
-             typename std::enable_if<(   (std::is_floating_point<FloatType>::value == true)
-                                      && (std::numeric_limits<FloatType>::digits <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+             typename std::enable_if<    (detail::is_floating_point_or_float128<FloatType>::value == true)
+                                      && (std::numeric_limits<FloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
    constexpr cpp_double_float(const FloatType& f) : data(std::make_pair(f, (float_type)0)) {}
 
    template <typename FloatType,
@@ -130,6 +148,9 @@ class cpp_double_float
    operator float             () const { return (float)data.first + (float)data.second; }
    operator double            () const { return (double)data.first + (double)data.second; }
    operator long double       () const { return (long double)data.first + (long double)data.second; }
+#ifdef BOOST_MATH_USE_FLOAT128
+   explicit operator boost::multiprecision::float128() const { return static_cast<boost::multiprecision::float128>(data.first) + static_cast<boost::multiprecision::float128>(data.second); }
+#endif
 
    // Methods
    constexpr cpp_double_float<float_type> negative()    const { return cpp_double_float<float_type>(-data.first, -data.second); }
@@ -581,7 +602,7 @@ cpp_double_float<FloatingPointType>::operator--(int)
 
 // operator>
 template <typename FloatingPointType, typename ComparisionType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator>(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
    using first_type  = typename std::remove_reference<decltype(a)>::type;
@@ -612,7 +633,7 @@ operator>(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<C
 }
 
 template <typename ComparisionType, typename FloatingPointType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator>(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
 {
    return b < a;
@@ -620,7 +641,7 @@ operator>(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b
 
 // operator<
 template <typename FloatingPointType, typename ComparisionType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator<(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
    using first_type  = typename std::remove_reference<decltype(a)>::type;
@@ -651,7 +672,7 @@ operator<(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<C
 }
 
 template <typename ComparisionType, typename FloatingPointType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator<(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
 {
    return b > a;
@@ -659,7 +680,7 @@ operator<(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b
 
 // operator>=
 template <typename FloatingPointType, typename ComparisionType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator>=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
    using first_type  = typename std::remove_reference<decltype(a)>::type;
@@ -690,7 +711,7 @@ operator>=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<
 }
 
 template <typename ComparisionType, typename FloatingPointType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator>=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
 {
    return b <= a;
@@ -698,7 +719,7 @@ operator>=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& 
 
 // operator <=
 template <typename FloatingPointType, typename ComparisionType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator<=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
    using first_type  = typename std::remove_reference<decltype(a)>::type;
@@ -729,7 +750,7 @@ operator<=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<
 }
 
 template <typename ComparisionType, typename FloatingPointType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator<=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
 {
    return b >= a;
@@ -737,7 +758,7 @@ operator<=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& 
 
 // operator ==
 template <typename FloatingPointType, typename ComparisionType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator==(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
    using first_type  = typename std::remove_reference<decltype(a)>::type;
@@ -768,7 +789,7 @@ operator==(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<
 }
 
 template <typename ComparisionType, typename FloatingPointType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator==(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
 {
    return b == a;
@@ -776,7 +797,7 @@ operator==(const ComparisionType& a, const cpp_double_float<FloatingPointType>& 
 
 // operator !=
 template <typename FloatingPointType, typename ComparisionType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator!=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
 {
    using first_type  = typename std::remove_reference<decltype(a)>::type;
@@ -807,7 +828,7 @@ operator!=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<
 }
 
 template <typename ComparisionType, typename FloatingPointType>
-inline constexpr typename std::enable_if<std::is_arithmetic<ComparisionType>::value, bool>::type
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
 operator!=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
 {
    return b != a;

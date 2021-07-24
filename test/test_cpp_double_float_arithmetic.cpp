@@ -15,12 +15,13 @@
 // g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DBOOST_MATH_USE_FLOAT128 test.cpp -o -lquadmath test_double_float.exe
 
 #include <boost/config.hpp>
-#include <boost/multiprecision/cpp_double_float.hpp>
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
+#include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MATH_USE_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
+#include <boost/multiprecision/cpp_double_float.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 #include <boost/core/demangle.hpp>
 #include <iomanip>
 #include <iostream>
@@ -31,11 +32,7 @@
 namespace test_arithmetic_cpp_double_float {
 
 template <typename FloatingPointType,
-          typename std::enable_if<(  std::is_floating_point<FloatingPointType>::value                       == true
-#ifdef BOOST_MATH_USE_FLOAT128
-                                   ||std::is_same<FloatingPointType,boost::multiprecision::float128>::value == true
-#endif
-                                  ), bool>::type = true>
+          typename std::enable_if<(  boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value == true), bool>::type = true>
 FloatingPointType uniform_real()
 {
    static std::random_device                                rd;
@@ -51,11 +48,7 @@ int rand_in_range(int a, int b)
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<(  std::is_floating_point<FloatingPointType>::value                       == true
-#ifdef BOOST_MATH_USE_FLOAT128
-                                   ||std::is_same<FloatingPointType,boost::multiprecision::float128>::value == true
-#endif
-                                  ), bool>::type = true>
+          typename std::enable_if<(  boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value == true), bool>::type = true>
 FloatingPointType uniform_rand()
 {
    return uniform_real<FloatingPointType>();
@@ -70,11 +63,7 @@ boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::fl
 
 
 template <typename FloatingPointType>
-typename std::enable_if<(  std::is_floating_point<FloatingPointType>::value                       == true
-#ifdef BOOST_MATH_USE_FLOAT128
-                         ||std::is_same<FloatingPointType,boost::multiprecision::float128>::value == true
-#endif
-                        ), FloatingPointType>::type
+typename std::enable_if<(  boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value == true), FloatingPointType>::type
 log_rand()
 {
    if (uniform_real<float>() < (1. / 100.))

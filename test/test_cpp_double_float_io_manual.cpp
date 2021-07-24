@@ -10,10 +10,11 @@
 // Note that the I/O of cpp_double_float<> is currently extremely underdeveloped
 
 #include <boost/config.hpp>
-#include <boost/multiprecision/cpp_double_float.hpp>
+#include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MATH_USE_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
+#include <boost/multiprecision/cpp_double_float.hpp>
 #include <iostream>
 #include <cstdlib>
 
