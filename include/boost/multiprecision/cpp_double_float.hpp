@@ -220,7 +220,7 @@ cpp_double_float<FloatingPointType>::fast_exact_sum(const float_type& a, const f
 {
    using std::fabs;
    using std::isnormal;
-   BOOST_ASSERT(fabs(a) >= fabs(b) || a == 0.0 || !isnormal(a));
+   //BOOST_ASSERT(fabs(a) >= fabs(b) || a == 0.0 || !isnormal(a));
 
    std::pair<float_type, float_type> out;
    out.first  = a + b;
@@ -880,22 +880,22 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
       return os;
    }
 
-  if (f < FloatingPointType(0) || os.flags() & std::ios::showpos)
-      os << (f < FloatingPointType(0) ? "-" : "+");
+  if (f < cpp_double_float<FloatingPointType>(0) || os.flags() & std::ios::showpos)
+      os << (f < cpp_double_float<FloatingPointType>(0) ? "-" : "+");
 
    int exp10 = 0;
 
-   if (f != FloatingPointType(0))
+   if (f != cpp_double_float<FloatingPointType>(0))
       exp10 = (int)floor(log10(fabs(f.first())));
    else
       exp10 = 0;
 
-   auto f_prime = (f > FloatingPointType(0) ? f : -f);
+   auto f_prime = (f > cpp_double_float<FloatingPointType>(0) ? f : -f);
    f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
    
    // TODO Handle subnormal numbers
 
-   if (f_prime < FloatingPointType(1) && f_prime > FloatingPointType(0))
+   if (f_prime < cpp_double_float<FloatingPointType>(1) && f_prime > cpp_double_float<FloatingPointType>(0))
    {
       f_prime *= FloatingPointType(10);
       exp10++;
@@ -1145,8 +1145,8 @@ class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<Floa
    static constexpr bool is_iec559 = false;
 
    static constexpr int digits       = 2 * std::numeric_limits<FloatingPointType>::digits - 2;
-   static constexpr int digits10     = 2 * std::numeric_limits<FloatingPointType>::digits10 - 1;
-   static constexpr int max_digits10 = 2 * std::numeric_limits<FloatingPointType>::max_digits10;
+   static constexpr int digits10     =  int(float(digits - 1) * 0.301F);
+   static constexpr int max_digits10 =  int(float(digits)     * 0.301F) + 2;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - std::numeric_limits<FloatingPointType>::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + std::numeric_limits<FloatingPointType>::digits;
