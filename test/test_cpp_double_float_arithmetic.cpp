@@ -102,7 +102,7 @@ ConstructionType construct_from(FloatingPointType f)
 }
 
 template <typename FloatingPointType>
-int test_op(char op, const unsigned count = 0x10000U)
+bool test_op(char op, const unsigned count = 0x10000U)
 {
    using naked_double_float_type = FloatingPointType;
    using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 * 2 + 1>, boost::multiprecision::et_off>;
@@ -142,7 +142,7 @@ int test_op(char op, const unsigned count = 0x10000U)
          break;
       default:
          std::cerr << " internal error (unknown operator: " << op << ")" << std::endl;
-         return -1;
+         return false;
       }
 
       // if exponent of result is out of range, continue
@@ -166,12 +166,13 @@ int test_op(char op, const unsigned count = 0x10000U)
          //std::cerr << "actual  : " << ctrl_df_c << " (" << df_c.get_raw_str() << ")" << std::endl;
          //std::cerr << "error   : " << delta << std::endl;
 
-         return -1;
+         return false;
       }
    }
 
   std::cout << " ok [" << count << " tests passed]" << std::endl;
-  return 0;
+
+  return true;
 }
 
 template <typename T>
@@ -179,19 +180,19 @@ bool test_arithmetic()
 {
    std::cout << "Testing correctness of arithmetic operators for " << boost::core::demangle(typeid(T).name()) << std::endl;
 
-   int e = 0;
-   e += test_op<T>('+');
-   e += test_op<T>('-');
-   e += test_op<T>('*');
-   e += test_op<T>('/');
+   bool result_is_ok = true;
+
+   result_is_ok &= test_op<T>('+');
+   result_is_ok &= test_op<T>('-');
+   result_is_ok &= test_op<T>('*');
+   result_is_ok &= test_op<T>('/');
 
    std::cout << std::endl;
 
-   return e;
+   return result_is_ok;
 }
 
 } // namespace test_arithmetic_cpp_double_float
-
 
 int main()
 {
