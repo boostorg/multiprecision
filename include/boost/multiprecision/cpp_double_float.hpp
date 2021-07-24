@@ -53,24 +53,27 @@ class cpp_double_float
 
    // Constructors
    cpp_double_float() { }
-   
+
    // default constructor
    constexpr cpp_double_float(const cpp_double_float& a) : data(a.data) {}
 
    // Constructors from other floating-point types
    template <typename FloatType,
-             typename std::enable_if<(std::is_floating_point<FloatType>::value == true)
-             && (std::numeric_limits<FloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
+             typename std::enable_if<(   (std::is_floating_point<FloatType>::value == true)
+                                      && (std::numeric_limits<FloatType>::digits <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_float(const FloatType& f) : data(std::make_pair(f, (float_type)0)) {}
+
    template <typename FloatType,
-             typename std::enable_if<(std::numeric_limits<FloatType>::is_iec559 == true)
-             && (std::numeric_limits<FloatType>::digits > std::numeric_limits<float_type>::digits)>::type const* = nullptr>
+             typename std::enable_if<(   (std::numeric_limits<FloatType>::is_iec559 == true)
+                                      && (std::numeric_limits<FloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_float(const FloatType& f)
        : data(std::make_pair(static_cast<float_type>(f),
                              static_cast<float_type>(f - (FloatType) static_cast<float_type>(f)))) {}
 
    // Constructor from other cpp_double_float<> objects
-   template <typename OtherFloatType, typename std::enable_if<!std::is_same<FloatingPointType, OtherFloatType>::value>::type const* = nullptr>
+   template <typename OtherFloatType,
+             typename std::enable_if<(   (std::is_floating_point<OtherFloatType>::value == true)
+                                      && (std::is_same<FloatingPointType, OtherFloatType>::value == false))>::type const* = nullptr>
    cpp_double_float(const cpp_double_float<OtherFloatType>& a)
        : cpp_double_float(a.first())
    {
@@ -80,20 +83,21 @@ class cpp_double_float
 
    // Constructors from integers
    template <typename IntegralType,
-             typename std::enable_if<(std::is_integral<IntegralType>::value == true) && (std::numeric_limits<IntegralType>::digits <= std::numeric_limits<FloatingPointType>::digits)>::type const* = nullptr>
+             typename std::enable_if<(   (std::is_integral<IntegralType>::value == true)
+                                      && (std::numeric_limits<IntegralType>::digits <= std::numeric_limits<FloatingPointType>::digits))>::type const* = nullptr>
    constexpr cpp_double_float(const IntegralType& f) : data(std::make_pair(static_cast<float_type>(f), (float_type)0)) {}
 
    // Constructors from integers which hold more information than *this can contain
    template <typename UnsignedIntegralType,
-             typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true)
-               && (std::is_unsigned<UnsignedIntegralType>::value == true)
-               && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+             typename std::enable_if<(    (std::is_integral<UnsignedIntegralType>::value == true)
+                                       && (std::is_unsigned<UnsignedIntegralType>::value == true)
+                                       && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    cpp_double_float(UnsignedIntegralType u);
 
    template <typename SignedIntegralType,
-             typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true)
-               && (std::is_signed<SignedIntegralType>::value == true)
-               && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+             typename std::enable_if<(   (std::is_integral<SignedIntegralType>::value == true)
+                                      && (std::is_signed<SignedIntegralType>::value == true)
+                                      && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    cpp_double_float(SignedIntegralType n) : cpp_double_float(static_cast<typename std::make_unsigned<SignedIntegralType>::type>(std::abs(n)))
    {
       if (n < 0)
@@ -113,19 +117,19 @@ class cpp_double_float
    ~cpp_double_float() = default;
 
    // Casts
-   operator signed char() const { return (signed char)data.first; }
-   operator signed short() const { return (signed short)data.first; }
-   operator signed int() const { return (signed int)data.first + (signed int)data.second; }
-   operator signed long() const { return (signed long)data.first + (signed long)data.second; }
-   operator signed long long() const { return (signed long long)data.first + (signed long long)data.second; }
-   operator unsigned char() const { return (unsigned char)data.first; }
-   operator unsigned short() const { return (unsigned short)data.first; }
-   operator unsigned int() const { return (unsigned int)((unsigned int)data.first + (signed int)data.second); }
-   operator unsigned long() const { return (unsigned long)((unsigned long)data.first + (signed long)data.second); }
+   operator   signed char     () const { return (signed char)data.first; }
+   operator   signed short    () const { return (signed short)data.first; }
+   operator   signed int      () const { return (signed int)data.first + (signed int)data.second; }
+   operator   signed long     () const { return (signed long)data.first + (signed long)data.second; }
+   operator   signed long long() const { return (signed long long)data.first + (signed long long)data.second; }
+   operator unsigned char     () const { return (unsigned char)data.first; }
+   operator unsigned short    () const { return (unsigned short)data.first; }
+   operator unsigned int      () const { return (unsigned int)((unsigned int)data.first + (signed int)data.second); }
+   operator unsigned long     () const { return (unsigned long)((unsigned long)data.first + (signed long)data.second); }
    operator unsigned long long() const { return (unsigned long long)((unsigned long long)data.first + (signed long long)data.second); }
-   operator float() const { return (float)data.first + (float)data.second; }
-   operator double() const { return (double)data.first + (double)data.second; }
-   operator long double() const { return (long double)data.first + (long double)data.second; }
+   operator float             () const { return (float)data.first + (float)data.second; }
+   operator double            () const { return (double)data.first + (double)data.second; }
+   operator long double       () const { return (long double)data.first + (long double)data.second; }
 
    // Methods
    constexpr cpp_double_float<float_type> negative()    const { return cpp_double_float<float_type>(-data.first, -data.second); }
@@ -142,23 +146,39 @@ class cpp_double_float
    const rep_type&  rep() const { return data; }
    const rep_type& crep() const { return data; }
 
-   // Helper functions
-   static std::pair<float_type, float_type> fast_exact_sum(const float_type& a, const float_type& b);
-   static std::pair<float_type, float_type> exact_sum(const float_type& a, const float_type& b);
-   static std::pair<float_type, float_type> exact_difference(const float_type& a, const float_type& b);
-   static std::pair<float_type, float_type> exact_product(const float_type& a, const float_type& b);
-
-   static std::pair<float_type, float_type> split(const float_type& a);
-
-   static void normalize_pair(std::pair<float_type, float_type>& p, bool fast = true);
-
    // Operators
    cpp_double_float& operator=(const cpp_double_float&) = default;
 
    cpp_double_float& operator=(cpp_double_float&&) = default;
 
-   cpp_double_float& operator+=(const cpp_double_float& a);
-   cpp_double_float& operator-=(const cpp_double_float& a);
+   cpp_double_float& operator+=(const cpp_double_float& other)
+   {
+      const rep_type t = exact_sum(second(), other.second());
+
+      data = exact_sum(first(),  other.first());
+
+      data.second += t.first;
+      normalize_pair(data);
+      data.second += t.second;
+      normalize_pair(data);
+
+      return *this;
+   }
+
+   cpp_double_float& operator-=(const cpp_double_float& other)
+   {
+      const rep_type t = exact_difference(second(), other.second());
+      data = exact_difference(first(), other.first());
+
+      data.second += t.first;
+      normalize_pair(data);
+
+      data.second += t.second;
+      normalize_pair(data);
+
+      return *this;
+   }
+
    cpp_double_float& operator*=(const cpp_double_float& a);
    cpp_double_float& operator/=(const cpp_double_float& a);
    cpp_double_float& operator+=(const float_type& a);
@@ -167,16 +187,26 @@ class cpp_double_float
    cpp_double_float& operator/=(const float_type& a);
    cpp_double_float  operator++(int);
    cpp_double_float  operator--(int);
-   cpp_double_float& operator++() { return *this += cpp_double_float<float_type>((double)1.); }
-   cpp_double_float& operator--() { return *this -= cpp_double_float<float_type>(1.); }
+   cpp_double_float& operator++() { return *this += cpp_double_float<float_type>(float_type(1.0F)); }
+   cpp_double_float& operator--() { return *this -= cpp_double_float<float_type>(float_type(1.0F)); }
    cpp_double_float  operator-() const { return negative(); }
 
-   // -- DEBUGGING
    std::string get_raw_str() const;
-   // --
+
+   // Helper functions
+   static std::pair<float_type, float_type> fast_exact_sum(const float_type& a, const float_type& b);
+   static std::pair<float_type, float_type> exact_sum(const float_type& a, const float_type& b);
+   static std::pair<float_type, float_type> exact_difference(const float_type& a, const float_type& b);
+   static std::pair<float_type, float_type> exact_product(const float_type& a, const float_type& b);
+
+   static void normalize_pair(std::pair<float_type, float_type>& p, bool fast = true);
+
    static cpp_double_float<float_type> pow10(int x);
+
  private:
    rep_type data;
+
+   static std::pair<float_type, float_type> split(const float_type& a);
 };
 
 // -- Special Constructors
@@ -345,21 +375,15 @@ template <typename FloatingPointType>
 inline cpp_double_float<FloatingPointType>
 operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b)
 {
-   using double_float_t = cpp_double_float<FloatingPointType>;
-
-   std::pair<FloatingPointType, FloatingPointType> s, t;
-
-   s = double_float_t::exact_sum(a.first(), b.first());
-   t = double_float_t::exact_sum(a.second(), b.second());
-
-   s.second += t.first;
-   double_float_t::normalize_pair(s);
-   s.second += t.second;
-   double_float_t::normalize_pair(s);
-
-   return double_float_t(s);
+   return cpp_double_float<FloatingPointType>(a) += b;
 }
 
+template <typename FloatingPointType>
+inline cpp_double_float<FloatingPointType>
+operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return cpp_double_float<FloatingPointType>(a) -= b;
+}
 
 // double_float<> - native-float
 template <typename FloatingPointType>
@@ -371,27 +395,6 @@ operator-(const cpp_double_float<FloatingPointType>& a, const FloatingPointType&
    auto s = double_float_t::exact_difference(a.first(), b);
 
    s.second += a.second();
-   double_float_t::normalize_pair(s);
-
-   return double_float_t(s);
-}
-
-// double_float<> - double_float<>
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b)
-{
-   using double_float_t = cpp_double_float<FloatingPointType>;
-
-   typename double_float_t::rep_type s, t;
-
-   s = double_float_t::exact_difference(a.first(), b.first());
-   t = double_float_t::exact_difference(a.second(), b.second());
-
-   s.second += t.first;
-   double_float_t::normalize_pair(s);
-
-   s.second += t.second;
    double_float_t::normalize_pair(s);
 
    return double_float_t(s);
@@ -535,23 +538,6 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
    }
 
    *this *= pow10(final_exponent);
-}
-
-// -- Overloaded operators
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>&
-cpp_double_float<FloatingPointType>::operator+=(const cpp_double_float<FloatingPointType>& a)
-{
-   *this = *this + a;
-   return *this;
-}
-
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>&
-cpp_double_float<FloatingPointType>::operator-=(const cpp_double_float<FloatingPointType>& a)
-{
-   *this = *this - a;
-   return *this;
 }
 
 template <typename FloatingPointType>
@@ -1139,27 +1125,33 @@ inline std::string cpp_double_float<FloatingPointType>::get_raw_str() const
 
 // Specialization of numeric_limits for cpp_double_float<>
 template <typename FloatingPointType>
-class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> > : public std::numeric_limits<FloatingPointType>
+class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>
+  : public std::numeric_limits<FloatingPointType>
 {
- public:
-   static constexpr bool is_iec559 = false;
+private:
+   using base_class_type = std::numeric_limits<FloatingPointType>;
 
-   static constexpr int digits       = 2 * std::numeric_limits<FloatingPointType>::digits - 2;
-   static constexpr int digits10     =  int(float(digits - 1) * 0.301F);
-   static constexpr int max_digits10 =  int(float(digits)     * 0.301F) + 2;
+   using self_type = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
 
-   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - std::numeric_limits<FloatingPointType>::digits;
-   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + std::numeric_limits<FloatingPointType>::digits;
+public:
+   static constexpr bool is_iec559   = false;
 
-   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(min)() noexcept { return (std::numeric_limits<FloatingPointType>::min)(); }
-   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType>(max)() noexcept { return (std::numeric_limits<FloatingPointType>::max)(); }
-   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> lowest() noexcept { return std::numeric_limits<FloatingPointType>::lowest(); }
-   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> epsilon() noexcept {return std::numeric_limits<FloatingPointType>::epsilon(); } // NOTE: doesn't construct from float128
-   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> round_error() noexcept { return std::numeric_limits<FloatingPointType>::round_error(); }
-   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> denorm_min() noexcept { return std::numeric_limits<FloatingPointType>::denorm_min(); }
-   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> infinity() noexcept { return std::numeric_limits<FloatingPointType>::infinity(); }
-   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> quiet_NaN() noexcept { return std::numeric_limits<FloatingPointType>::quiet_NaN(); }
-   static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> signaling_NaN() noexcept { return std::numeric_limits<FloatingPointType>::signaling_NaN(); }
+   static constexpr int digits       = (2 * base_class_type::digits) - 2;
+   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
+   static constexpr int max_digits10 = int(float(digits)     * 0.301F) + 2;
+
+   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
+   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
+
+   static constexpr self_type (min)         () noexcept { return self_type((base_class_type::min)()); }
+   static constexpr self_type (max)         () noexcept { return self_type((base_class_type::max)()); }
+   static constexpr self_type  lowest       () noexcept { return self_type( base_class_type::lowest()); }
+   static constexpr self_type  epsilon      () noexcept { return self_type( base_class_type::epsilon()); } // NOTE: doesn't construct from float128
+   static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }
+   static constexpr self_type  denorm_min   () noexcept { return self_type( base_class_type::denorm_min()); }
+   static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
+   static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
+   static constexpr self_type  signaling_NaN() noexcept { return self_type( base_class_type::signaling_NaN()); }
 };
 // TODO have explicit specializations for cpp_double_float< float/double >
 

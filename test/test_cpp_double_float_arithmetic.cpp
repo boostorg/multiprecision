@@ -11,6 +11,9 @@
 // cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
 // g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_double_float.exe
 
+// TBD: Handle interaction with Boost's wrap of libquadmath __float128.
+// g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DBOOST_MATH_USE_FLOAT128 test.cpp -o -lquadmath test_double_float.exe
+
 #include <boost/config.hpp>
 #include <boost/multiprecision/cpp_double_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
