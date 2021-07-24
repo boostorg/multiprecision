@@ -45,7 +45,7 @@ FloatingPointType uniform_real()
    static std::mt19937       gen(rd());
    static distribution_type  dis(0.0, 1.0);
 
-   if((seed_scaler % 0x200000UL) == 0U)
+   if((seed_scaler % 0x100000UL) == 0U)
    {
      gen.seed(static_cast<typename std::mt19937::result_type>(std::clock()));
    }
@@ -110,7 +110,7 @@ bool test_op(char op, const unsigned count = 0x20000U)
    using naked_double_float_type = FloatingPointType;
    using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 * 2 + 1>, boost::multiprecision::et_off>;
 
-   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<naked_double_float_type>::digits + 0);
+   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<naked_double_float_type>::digits + 1);
    std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<naked_double_float_type>::digits << " bits)...";
 
    for (unsigned i = 0U; i < count; ++i)
