@@ -11,12 +11,12 @@
 //       so please run test_cpp_double_float_constructors.cpp before this
 
 #include <boost/config.hpp>
-#include <boost/multiprecision/cpp_double_float.hpp>
-
-#include <boost/random/uniform_real_distribution.hpp>
+#include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MATH_USE_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
+#include <boost/multiprecision/cpp_double_float.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 #include <boost/core/demangle.hpp>
 #include <iostream>
 #include <cstdlib>
@@ -25,18 +25,8 @@
 #include <iomanip>
 
 namespace test_cpp_double_comparision {
-// FIXME: this looks like a duplicate from test_cpp_double_float_comparision.cpp file.
-template<typename FloatingPointType> struct is_floating_point {
-static const bool value;
-};
-template<typename FloatingPointType> const bool is_floating_point<FloatingPointType>::value = std::is_floating_point<FloatingPointType>::value
-#ifdef BOOST_MATH_USE_FLOAT128
-or std::is_same<FloatingPointType,boost::multiprecision::float128>::value
-#endif
-;
-
 template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
+          typename std::enable_if<boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value, bool>::type = true>
 FloatingPointType uniform_real()
 {
    //static std::random_device                                rd;
@@ -47,7 +37,7 @@ FloatingPointType uniform_real()
 }
 
 template <typename NumericType,
-          typename std::enable_if<std::is_integral<NumericType>::value && !is_floating_point<NumericType>::value, bool>::type = true>
+          typename std::enable_if<std::is_integral<NumericType>::value && !boost::multiprecision::backends::detail::is_floating_point_or_float128<NumericType>::value, bool>::type = true>
 NumericType uniform_integral_number()
 {
    NumericType out = 0;
@@ -64,14 +54,14 @@ int rand_in_range(int a, int b)
 }
 
 template <typename NumericType,
-          typename std::enable_if<std::is_integral<NumericType>::value && !is_floating_point<NumericType>::value, bool>::type = true>
+          typename std::enable_if<std::is_integral<NumericType>::value && !boost::multiprecision::backends::detail::is_floating_point_or_float128<NumericType>::value, bool>::type = true>
 NumericType uniform_rand()
 {
    return uniform_integral_number<NumericType>();
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
+          typename std::enable_if<boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value, bool>::type = true>
 FloatingPointType uniform_rand()
 {
    return uniform_real<FloatingPointType>();
@@ -91,12 +81,13 @@ NumericType log_rand()
    return uniform_integral_number<NumericType>() >> int(uniform_real<float>() * float(std::numeric_limits<NumericType>::digits+1));
 }
 
-template <typename FloatingPointType, typename std::enable_if<is_floating_point<FloatingPointType>::value>::type const* = nullptr>
+template <typename FloatingPointType, typename std::enable_if<boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value>::type const* = nullptr>
 FloatingPointType log_rand()
 {
    if (uniform_real<float>() < (1. / 100.))
       return 0; // throw in a few zeroes
-   return std::ldexp(uniform_real<FloatingPointType>(), rand_in_range(std::numeric_limits<FloatingPointType>::min_exponent, std::numeric_limits<FloatingPointType>::max_exponent));
+   using std::ldexp;
+   return ldexp(uniform_real<FloatingPointType>(), rand_in_range(std::numeric_limits<FloatingPointType>::min_exponent, std::numeric_limits<FloatingPointType>::max_exponent));
 }
 
 template <typename FloatingPointType>
@@ -111,7 +102,11 @@ template <typename FloatingPointType, typename ComparisionType>
 int test()
 {
    using double_float_t = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
-   using largest_type   = boost::multiprecision::backends::cpp_double_float<double>;
+#ifdef BOOST_MATH_USE_FLOAT128
+   using largest_type   = boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128>;
+#else
+   using largest_type   = boost::multiprecision::backends::cpp_double_float<long double>;
+#endif
 
    std::string type_name = typeid(ComparisionType).name();
    size_t      idx;
@@ -370,15 +365,13 @@ int test_comparison() {
    e += test_cpp_double_comparision::test<FloatingPointType, double>();
    e += test_cpp_double_comparision::test<FloatingPointType, long double>();
 #ifdef BOOST_MATH_USE_FLOAT128
-// FIXME:
-// e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::float128>();
+   e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::float128>();
 #endif
    e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::backends::cpp_double_float<float> >();
    e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::backends::cpp_double_float<double> >();
    e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::backends::cpp_double_float<long double> >();
 #ifdef BOOST_MATH_USE_FLOAT128
-// FIXME:
-// e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> >();
+   e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> >();
 #endif
    std::cout << std::endl;
    return e;
@@ -391,8 +384,7 @@ int main()
    e += test_comparison<double>();
    e += test_comparison<long double>();
 #ifdef BOOST_MATH_USE_FLOAT128
-// FIXME:
-// e += test_comparison<boost::multiprecision::float128>();
+   e += test_comparison<boost::multiprecision::float128>();
 #endif
 
    std::cout << (e == 0 ? "PASSED all tests" : "FAILED some test(s)") << std::endl;
