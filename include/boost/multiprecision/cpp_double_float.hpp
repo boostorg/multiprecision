@@ -151,6 +151,11 @@ class cpp_double_float
 
    cpp_double_float& operator=(cpp_double_float&&) = default;
 
+   cpp_double_float& operator+=(const float_type& a);
+   cpp_double_float& operator-=(const float_type& a);
+   cpp_double_float& operator*=(const float_type& a);
+   cpp_double_float& operator/=(const float_type& a);
+
    cpp_double_float& operator+=(const cpp_double_float& other)
    {
       const rep_type t = exact_sum(second(), other.second());
@@ -179,12 +184,39 @@ class cpp_double_float
       return *this;
    }
 
-   cpp_double_float& operator*=(const cpp_double_float& a);
-   cpp_double_float& operator/=(const cpp_double_float& a);
-   cpp_double_float& operator+=(const float_type& a);
-   cpp_double_float& operator-=(const float_type& a);
-   cpp_double_float& operator*=(const float_type& a);
-   cpp_double_float& operator/=(const float_type& a);
+   cpp_double_float& operator*=(const cpp_double_float& other)
+   {
+      rep_type p = exact_product(first(), other.first());
+
+      p.second += first() * other.second() + second() * other.first();
+
+      data = p;
+
+      return *this;
+   }
+
+   cpp_double_float& operator/=(const cpp_double_float& other)
+   {
+      rep_type p;
+
+      // First approximation
+      p.first = first() / other.first();
+      cpp_double_float r = *this - (other * p.first);
+
+      p.second = r.first() / other.first();
+      r -= other * p.second;
+
+      const FloatingPointType p_prime = r.first() / other.first();
+
+      normalize_pair(p);
+
+      data = p;
+
+      operator+=(p_prime);
+
+      return *this;
+   }
+
    cpp_double_float  operator++(int);
    cpp_double_float  operator--(int);
    cpp_double_float& operator++() { return *this += cpp_double_float<float_type>(float_type(1.0F)); }
@@ -371,19 +403,10 @@ operator+(const cpp_double_float<FloatingPointType>& a, const FloatingPointType&
 
 // double_float<> + double_float<>
 // Satisfies IEEE-754 bounds
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b)
-{
-   return cpp_double_float<FloatingPointType>(a) += b;
-}
-
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b)
-{
-   return cpp_double_float<FloatingPointType>(a) -= b;
-}
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) += b; }
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) -= b; }
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) *= b; }
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) /= b; }
 
 // double_float<> - native-float
 template <typename FloatingPointType>
@@ -409,21 +432,6 @@ operator*(const cpp_double_float<FloatingPointType>& a, const FloatingPointType&
 
    auto p = double_float_t::exact_product(a.first(), b);
    p.second += a.second() * b;
-
-   double_float_t::normalize_pair(p);
-
-   return double_float_t(p);
-}
-
-// double_float<> * double_float<>
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator*(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b)
-{
-   using double_float_t = cpp_double_float<FloatingPointType>;
-
-   auto p = double_float_t::exact_product(a.first(), b.first());
-   p.second += a.first() * b.second() + a.second() * b.first();
 
    double_float_t::normalize_pair(p);
 
@@ -459,31 +467,6 @@ operator/(const NumericType& a, const cpp_double_float<FloatingPointType>& b)
 {
    return cpp_double_float<FloatingPointType>(a) / b;
 }
-
-// double_float<> / double_float<>
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator/(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b)
-{
-   using double_float_t = cpp_double_float<FloatingPointType>;
-
-   std::pair<FloatingPointType, FloatingPointType> p;
-   FloatingPointType p_prime;
-   double_float_t r;
-
-   p.first = a.first() / b.first(); // First approximation
-   r       = a - b * p.first;
-
-   p.second = r.first() / b.first();
-   r -= b * p.second;
-
-   p_prime = r.first() / b.first();
-
-   double_float_t::normalize_pair(p);
-
-   return double_float_t(p) + p_prime;
-}
-// --
 
 // -- String Conversions
 // FIXME Merge set_str() to operator<<
@@ -538,22 +521,6 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
    }
 
    *this *= pow10(final_exponent);
-}
-
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>&
-cpp_double_float<FloatingPointType>::operator*=(const cpp_double_float<FloatingPointType>& a)
-{
-   *this = *this * a;
-   return *this;
-}
-
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>&
-cpp_double_float<FloatingPointType>::operator/=(const cpp_double_float<FloatingPointType>& a)
-{
-   *this = *this / a;
-   return *this;
 }
 
 template <typename FloatingPointType>
