@@ -366,7 +366,7 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
    constexpr int               MantissaBits   = std::numeric_limits<FloatingPointType>::digits;
    constexpr int               SplitBits      = MantissaBits / 2 + 1;
    constexpr FloatingPointType Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
-   constexpr FloatingPointType SplitThreshold = (std::numeric_limits<FloatingPointType>::max)() / (Splitter*2);
+   const     FloatingPointType SplitThreshold = (std::numeric_limits<FloatingPointType>::max)() / (Splitter*2);
 
    FloatingPointType temp, hi, lo;
 
