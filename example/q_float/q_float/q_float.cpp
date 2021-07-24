@@ -49,7 +49,9 @@ q_float::q_float(const double d)
     from_uint64(static_cast<INT64>(0.5 + dd / double_p10(n_exp - (std::numeric_limits<double>::digits10 - 1))));
 
     // Re-scale with the appropriate power of ten.
-    operator*=(qf::pow10(n_exp - (std::numeric_limits<double>::digits10 - 1)));
+    const q_float p10(qf::pow10(n_exp - (std::numeric_limits<double>::digits10 - 1)));
+
+    operator*=(p10);
 
     if(b_neg)
     {

@@ -23,7 +23,7 @@
       static const bool  is_bounded        = true;
       static const bool  is_modulo         = false;
       static const bool  is_iec559         = false;
-      static const INT32 digits            = 102;
+      static const INT32 digits            = 104;
       static const INT32 digits10          = static_cast<INT32>(float(digits) * 0.301029995663981195F);
       static const INT32 radix             = 2;
       static const INT32 round_style       = std::round_to_nearest;

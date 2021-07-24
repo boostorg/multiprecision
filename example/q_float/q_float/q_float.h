@@ -281,7 +281,7 @@
       // Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
       volatile double C  = hi / v.hi;
       double c  = split() * C;
-      double hc = c - C;
+      volatile double hc = c - C;
       double u  = split() * v.hi;
       hc = c - hc;
       const double tc = C - hc;
@@ -490,6 +490,9 @@
     static bool dump_digits(const q_float& x, std::string& str);
 
     void dump(void) const { dump(*this, std::cout); }
+
+    double rep_hi() const { return hi; }
+    double rep_lo() const { return lo; }
 
   private:
     double hi;

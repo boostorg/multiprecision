@@ -10,12 +10,13 @@
 
 
 #include <boost/config.hpp>
-#include <boost/multiprecision/cpp_double_float.hpp>
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
+#include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MATH_USE_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
+#include <boost/multiprecision/cpp_double_float.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 #include <boost/core/demangle.hpp>
 #include <iomanip>
 #include <iostream>

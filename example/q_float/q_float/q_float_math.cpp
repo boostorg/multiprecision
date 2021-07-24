@@ -71,8 +71,8 @@ q_float qf::pow2(const INT32 p)
 /// \func     q_float qf::pow10(const INT32 p)
 ///
 /// \brief    Compute 10 raised to the power of p for positive or negative p.
-///           Binary splitting of the power is used. The resulting computational
-///           complexity scales with log2(p). There is a simple check for overflow.
+///           The so-called ladder method is used. At the top of the subroutine,
+///           there is a simple check for overflow.
 /// ---------------------------------------------------------------------------
 q_float qf::pow10(const INT32 p)
 {
@@ -83,47 +83,38 @@ q_float qf::pow10(const INT32 p)
     throw qf::exception_nan();
     return std::numeric_limits<q_float>::quiet_NaN();
   }
-  
-  if(p < 0)
-  {
-    return qf::pow10(-p).inv();
-  }
-  else if(p == 0)
-  {
-    return qf::one();
-  }
-  else if(p == 1)
-  {
-    return qf::ten();
-  }
+
+  q_float result;
+
+  if     (p <  0) { result = qf::pow10(-p).inv(); }
+  else if(p == 0) { result = qf::one(); }
+  else if(p == 1) { result = qf::ten(); }
+  else if(p == 2) { result = q_float(100U); }
+  else if(p == 3) { result = q_float(1000U); }
+  else if(p == 4) { result = q_float(10000U); }
   else
   {
-    // Constant sequence pn[n] = p^1, p^2, p^4, p^8, ... with n = 1...8
-    static const q_float pn[] =
-    {
-      qf::ten(),
-      q_float(pn[ 0]) * pn[ 0],
-      q_float(pn[ 1]) * pn[ 1],
-      q_float(pn[ 2]) * pn[ 2],
-      q_float(pn[ 3]) * pn[ 3],
-      q_float(pn[ 4]) * pn[ 4],
-      q_float(pn[ 5]) * pn[ 5],
-      q_float(pn[ 6]) * pn[ 6],
-      q_float(pn[ 7]) * pn[ 7]
-    };
-  
-    q_float val(qf::one());
+    result = q_float(qf::one());
 
-    for(UINT32 i = 0; i < sizeof(pn) / sizeof(pn[0]); i++)
+    q_float y(qf::ten());
+
+    UINT32 p_local = (UINT32) p;
+
+    for(;;)
     {
-      if((static_cast<UINT32>(p) >> i) & 1)
+      if(std::uint_fast8_t(p_local & 1U) != 0U)
       {
-        val *= pn[i];
+        result *= y;
       }
-    }
 
-    return val;
+      p_local >>= 1U;
+
+      if  (p_local == 0U) { break; }
+      else                { y *= y; }
+    }
   }
+
+  return result;
 }
 
 /// ---------------------------------------------------------------------------
