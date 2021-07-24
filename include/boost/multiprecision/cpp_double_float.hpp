@@ -17,15 +17,18 @@
 #include <utility>
 #include <limits>
 #include <sstream>
+#include <tuple>
 #include <vector>
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/assert.hpp>
 
 namespace boost { namespace multiprecision { namespace backends {
+
 template <typename FloatingPointType>
 class cpp_double_float;
-}}}
+
+} } } // namespace boost::multiprecision::backends
 
 // Foward decleration for std::numeric_limits
 template <typename FloatingPointType>
@@ -34,9 +37,7 @@ class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<Floa
 namespace boost { namespace multiprecision {
 template<typename FloatingPointType>
 struct number_category<backends::cpp_double_float<FloatingPointType>>
-  : public std::integral_constant<int, number_kind_floating_point>
-{
-};
+  : public std::integral_constant<int, number_kind_floating_point> { };
 
 namespace backends {
 
@@ -50,6 +51,10 @@ class cpp_double_float
  public:
    using float_type = FloatingPointType;
    using rep_type   = std::pair<float_type, float_type>;
+
+  using   signed_types = std::tuple<  signed char,   signed short,   signed int,   signed long,   signed long long, std::intmax_t>;
+  using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long, std::uintmax_t>;
+  using float_types    = std::tuple<float, double, long double>;
 
    // Constructors
    cpp_double_float() { }
@@ -134,6 +139,8 @@ class cpp_double_float
    // Methods
    constexpr cpp_double_float<float_type> negative()    const { return cpp_double_float<float_type>(-data.first, -data.second); }
    constexpr bool                         is_negative() const { return data.first < 0; }
+
+   void negate() { -data.first = -data.first; data.second = -data.second; }
 
    // FIXME Merge set_str() to operator<<
    void set_str(std::string str);
@@ -335,11 +342,10 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
                  "double_float<> invoked with non-native floating-point unit");
 
    // TODO Replace bit shifts with constexpr funcs for better compaitibility
-   constexpr int               MantissaBits = std::numeric_limits<FloatingPointType>::digits;
-   constexpr int               SplitBits    = MantissaBits / 2 + 1;
-   constexpr FloatingPointType Splitter     = FloatingPointType((1ULL << SplitBits) + 1);
-   auto                        SplitThreshold =
-       (std::numeric_limits<FloatingPointType>::max)() / (Splitter*2);
+   constexpr int               MantissaBits   = std::numeric_limits<FloatingPointType>::digits;
+   constexpr int               SplitBits      = MantissaBits / 2 + 1;
+   constexpr FloatingPointType Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
+   constexpr FloatingPointType SplitThreshold = (std::numeric_limits<FloatingPointType>::max)() / (Splitter*2);
 
    FloatingPointType temp, hi, lo;
 
@@ -372,12 +378,18 @@ template <typename FloatingPointType>
 std::pair<FloatingPointType, FloatingPointType>
 cpp_double_float<FloatingPointType>::exact_product(const float_type& a, const float_type& b)
 {
-   std::pair<float_type, float_type> a_split = split(a);
-   std::pair<float_type, float_type> b_split = split(b);
+   const std::pair<float_type, float_type> a_split = split(a);
+   const std::pair<float_type, float_type> b_split = split(b);
+
    std::pair<float_type, float_type> p;
 
    p.first  = a * b;
-   p.second = ((a_split.first * b_split.first - p.first) + a_split.first * b_split.second + a_split.second * b_split.first) + a_split.second * b_split.second;
+   p.second = (
+                 ((a_split.first  * b_split.first) - p.first)
+               +  (a_split.first  * b_split.second)
+               +  (a_split.second * b_split.first)
+              )
+              + (a_split.second * b_split.second);
 
    return p;
 }
