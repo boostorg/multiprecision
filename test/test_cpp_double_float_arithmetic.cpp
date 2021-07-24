@@ -26,14 +26,15 @@
 
 namespace test_arithmetic_cpp_double_float {
 // FIXME: this looks like a duplicate from test_cpp_double_float_comparision.cpp file.
-template<typename FloatingPointType> struct is_floating_point {
-static const bool value;
-};
-template<typename FloatingPointType> const bool is_floating_point<FloatingPointType>::value = std::is_floating_point<FloatingPointType>::value
+template <typename FloatingPointType>
+struct is_floating_point
+{
+   static constexpr bool value = std::is_floating_point<FloatingPointType>::value
 #ifdef BOOST_MATH_USE_FLOAT128
-or std::is_same<FloatingPointType,boost::multiprecision::float128>::value
+                                 or std::is_same<FloatingPointType, boost::multiprecision::float128>::value
 #endif
-;
+       ;
+};
 
 template <typename FloatingPointType,
           typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
@@ -96,7 +97,7 @@ ConstructionType construct_from(FloatingPointType f)
 }
 
 template <typename FloatingPointType>
-int test_op(char op, const unsigned count = 10000U)
+int test_op(char op, const unsigned count = 10000000U)
 {
    using naked_double_float_type = FloatingPointType;
    using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 * 2 + 1>, boost::multiprecision::et_off>;
@@ -114,36 +115,46 @@ int test_op(char op, const unsigned count = 10000U)
       naked_double_float_type df_c;
       control_float_type      ctrl_c;
 
+      auto is_out_of_range = [&]() {
+         // if exponent of result is out of range
+         int exp2;
+         boost::multiprecision::frexp(ctrl_c, &exp2);
+         if (exp2 > std::numeric_limits<naked_double_float_type>::max_exponent || exp2 < std::numeric_limits<naked_double_float_type>::min_exponent)
+            return true;
+         return false;
+      };
       switch (op)
       {
       case '+':
-         df_c   = df_a + df_b;
          ctrl_c = ctrl_a + ctrl_b;
+         if (is_out_of_range())
+           continue;
+         df_c   = df_a + df_b;
          break;
       case '-':
-         df_c   = df_a - df_b;
          ctrl_c = ctrl_a - ctrl_b;
+         if (is_out_of_range())
+            continue;
+         df_c = df_a - df_b;
          break;
       case '*':
-         df_c   = df_a * df_b;
          ctrl_c = ctrl_a * ctrl_b;
+         if (is_out_of_range())
+            continue;
+         df_c = df_a * df_b;
          break;
       case '/':
          if (df_b == naked_double_float_type(0))
             continue;
-         df_c   = df_a / df_b;
          ctrl_c = ctrl_a / ctrl_b;
+         if (is_out_of_range())
+            continue;
+         df_c = df_a / df_b;
          break;
       default:
          std::cerr << " internal error (unknown operator: " << op << ")" << std::endl;
          return -1;
       }
-
-      // if exponent of result is out of range, continue
-      int exp2;
-      boost::multiprecision::frexp(ctrl_c, &exp2);
-      if (exp2 > std::numeric_limits<naked_double_float_type>::max_exponent || exp2 < std::numeric_limits<naked_double_float_type>::min_exponent)
-         continue;
 
       control_float_type ctrl_df_c = construct_from<control_float_type, naked_double_float_type>(df_c);
 
@@ -155,10 +166,10 @@ int test_op(char op, const unsigned count = 10000U)
          std::cerr << " [FAILED] while performing '" << std::setprecision(100000) << ctrl_a << "' " << op << " '" << ctrl_b << "', got incorrect result: " << (df_c) << std::endl;
 
          // uncomment for more debugging information (only for cpp_double_float<> type)
-         //std::cerr << "(df_a = " << df_a.get_raw_str() << ", df_b = " << df_b.get_raw_str() << ")" << std::endl;
-         //std::cerr << "expected: " << ctrl_c << std::endl;
-         //std::cerr << "actual  : " << ctrl_df_c << " (" << df_c.get_raw_str() << ")" << std::endl;
-         //std::cerr << "error   : " << delta << std::endl;
+         std::cerr << "(df_a = " << df_a.get_raw_str() << ", df_b = " << df_b.get_raw_str() << ")" << std::endl;
+         std::cerr << "expected: " << ctrl_c << std::endl;
+         std::cerr << "actual  : " << ctrl_df_c << " (" << df_c.get_raw_str() << ")" << std::endl;
+         std::cerr << "error   : " << delta << std::endl;
 
          return -1;
       }
@@ -191,12 +202,12 @@ int main()
 {
    int e = 0;
    // uncomment to check if tests themselves are correct
-   e += test_arithmetic_cpp_double_float::test_arithmetic<float>();
-   e += test_arithmetic_cpp_double_float::test_arithmetic<double>();
-   e += test_arithmetic_cpp_double_float::test_arithmetic<long double>();
-#ifdef BOOST_MATH_USE_FLOAT128
-   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::float128>();
-#endif
+//   e += test_arithmetic_cpp_double_float::test_arithmetic<float>();
+//   e += test_arithmetic_cpp_double_float::test_arithmetic<double>();
+//   e += test_arithmetic_cpp_double_float::test_arithmetic<long double>();
+//#ifdef BOOST_MATH_USE_FLOAT128
+//   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::float128>();
+//#endif
 
    e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<float> >();
    e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double> >();
