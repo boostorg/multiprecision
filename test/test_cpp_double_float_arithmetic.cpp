@@ -25,18 +25,13 @@
 #include <vector>
 
 namespace test_arithmetic_cpp_double_float {
-// FIXME: this looks like a duplicate from test_cpp_double_float_comparision.cpp file.
-template<typename FloatingPointType> struct is_floating_point {
-static const bool value;
-};
-template<typename FloatingPointType> const bool is_floating_point<FloatingPointType>::value = std::is_floating_point<FloatingPointType>::value
-#ifdef BOOST_MATH_USE_FLOAT128
-or std::is_same<FloatingPointType,boost::multiprecision::float128>::value
-#endif
-;
 
 template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
+          typename std::enable_if<(  std::is_floating_point<FloatingPointType>::value                       == true
+#ifdef BOOST_MATH_USE_FLOAT128
+                                   ||std::is_same<FloatingPointType,boost::multiprecision::float128>::value == true
+#endif
+                                  ), bool>::type = true>
 FloatingPointType uniform_real()
 {
    static std::random_device                                rd;
@@ -52,7 +47,11 @@ int rand_in_range(int a, int b)
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
+          typename std::enable_if<(  std::is_floating_point<FloatingPointType>::value                       == true
+#ifdef BOOST_MATH_USE_FLOAT128
+                                   ||std::is_same<FloatingPointType,boost::multiprecision::float128>::value == true
+#endif
+                                  ), bool>::type = true>
 FloatingPointType uniform_rand()
 {
    return uniform_real<FloatingPointType>();
@@ -65,8 +64,14 @@ boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::fl
    return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
 }
 
-template <typename FloatingPointType, typename std::enable_if<is_floating_point<FloatingPointType>::value>::type const* = nullptr>
-FloatingPointType log_rand()
+
+template <typename FloatingPointType>
+typename std::enable_if<(  std::is_floating_point<FloatingPointType>::value                       == true
+#ifdef BOOST_MATH_USE_FLOAT128
+                         ||std::is_same<FloatingPointType,boost::multiprecision::float128>::value == true
+#endif
+                        ), FloatingPointType>::type
+log_rand()
 {
    if (uniform_real<float>() < (1. / 100.))
       return 0; // throw in a few zeroes
@@ -96,12 +101,12 @@ ConstructionType construct_from(FloatingPointType f)
 }
 
 template <typename FloatingPointType>
-int test_op(char op, const unsigned count = 10000U)
+int test_op(char op, const unsigned count = 1000000U)
 {
    using naked_double_float_type = FloatingPointType;
    using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 * 2 + 1>, boost::multiprecision::et_off>;
 
-   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<naked_double_float_type>::digits);
+   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<naked_double_float_type>::digits + 1);
    std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<naked_double_float_type>::digits << " bits)...";
 
    for (unsigned i = 0U; i < count; ++i)
@@ -189,21 +194,22 @@ bool test_arithmetic()
 
 int main()
 {
-   int e = 0;
+   bool result_is_ok = true;
+
    // uncomment to check if tests themselves are correct
-   e += test_arithmetic_cpp_double_float::test_arithmetic<float>();
-   e += test_arithmetic_cpp_double_float::test_arithmetic<double>();
-   e += test_arithmetic_cpp_double_float::test_arithmetic<long double>();
+   //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<float>();
+   //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<double>();
+   //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<long double>();
 #ifdef BOOST_MATH_USE_FLOAT128
-   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::float128>();
+   //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::float128>();
 #endif
 
-   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<float> >();
-   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double> >();
-   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<long double> >();
+   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<float> >();
+   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double> >();
+   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<long double> >();
 #ifdef BOOST_MATH_USE_FLOAT128
-   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> >();
+   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> >();
 #endif
 
-   return e;
+   return (result_is_ok ? 0 : -1);
 }
