@@ -40,8 +40,8 @@ template <typename FloatingPointType,
           typename std::enable_if<is_floating_point<FloatingPointType>::value, bool>::type = true>
 FloatingPointType uniform_real()
 {
-   static std::random_device                                rd;
-   static std::mt19937                                      gen (rd());
+   //static std::random_device                                rd;
+   static std::mt19937                                      gen /*(rd())*/;
    static boost::random::uniform_real_distribution<FloatingPointType> dis(0.0, 1.0);
 
    return dis(gen);
@@ -63,7 +63,7 @@ template <typename FloatingPointType>
 boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> uniform_rand()
 {
    using float_type = typename FloatingPointType::float_type;
-   return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
+   return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_rand<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_rand<float_type>());
 }
 
 template <typename FloatingPointType, typename std::enable_if<is_floating_point<FloatingPointType>::value>::type const* = nullptr>
@@ -85,25 +85,26 @@ boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::fl
    return a;
 }
 
-template <typename ConstructionType, typename FloatingPointType, typename std::enable_if<std::numeric_limits<FloatingPointType>::is_iec559>::type const* = nullptr>
-ConstructionType construct_from(FloatingPointType f) {
+template <typename ConstructionType, typename ArithmeticType, typename std::enable_if<std::is_arithmetic<ArithmeticType>::value>::type const* = nullptr>
+ConstructionType construct_from(ArithmeticType f)
+{
    return ConstructionType(f);
 }
-
-template <typename ConstructionType, typename FloatingPointType, typename std::enable_if<!std::numeric_limits<FloatingPointType>::is_iec559>::type const* = nullptr>
-ConstructionType construct_from(FloatingPointType f)
+template <typename ConstructionType, typename DoubleFloatType, typename std::enable_if<!std::is_arithmetic<DoubleFloatType>::value>::type const* = nullptr>
+ConstructionType construct_from(DoubleFloatType f)
 {
-   return ConstructionType(f.first()) + ConstructionType(f.second());
+   return construct_from<ConstructionType, DoubleFloatType::float_type>(f.first()) + construct_from<ConstructionType, DoubleFloatType::float_type>(f.second());
 }
 
+
 template <typename FloatingPointType>
-int test_op(char op, const unsigned count = 10000000U)
+int test_op(char op, const unsigned count = 10000U)
 {
    using naked_double_float_type = FloatingPointType;
    using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 * 2 + 1>, boost::multiprecision::et_off>;
 
-   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<naked_double_float_type>::digits);
-   std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<naked_double_float_type>::digits << " bits)...";
+   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), 1-std::numeric_limits<naked_double_float_type>::digits);
+   std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<naked_double_float_type>::digits-1 << " bits)...";
 
    for (unsigned i = 0U; i < count; ++i)
    {
@@ -163,13 +164,14 @@ int test_op(char op, const unsigned count = 10000000U)
       if (delta > MaxError)
       {
          std::cerr << std::setprecision(std::numeric_limits<naked_double_float_type>::digits10 + 2);
-         std::cerr << " [FAILED] while performing '" << std::setprecision(100000) << ctrl_a << "' " << op << " '" << ctrl_b << "', got incorrect result: " << (df_c) << std::endl;
+         std::cerr << " [FAILED] while performing '" /*<< std::setprecision(100000)*/ << ctrl_a << "' " << op << " '" << ctrl_b << "', got incorrect result: " << (df_c) << std::endl;
 
          // uncomment for more debugging information (only for cpp_double_float<> type)
          std::cerr << "(df_a = " << df_a.get_raw_str() << ", df_b = " << df_b.get_raw_str() << ")" << std::endl;
          std::cerr << "expected: " << ctrl_c << std::endl;
          std::cerr << "actual  : " << ctrl_df_c << " (" << df_c.get_raw_str() << ")" << std::endl;
          std::cerr << "error   : " << delta << std::endl;
+         std::cerr << "MaxError: " << MaxError << std::endl;
 
          return -1;
       }
@@ -209,12 +211,14 @@ int main()
 //   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::float128>();
 //#endif
 
-   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<float> >();
-   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double> >();
-   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<long double> >();
+   //e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<float> >();
+   //e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double> >();
+   // e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<long double> >();
 #ifdef BOOST_MATH_USE_FLOAT128
    e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> >();
 #endif
 
+   e += test_arithmetic_cpp_double_float::test_arithmetic < boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<float>> >();
+   e += test_arithmetic_cpp_double_float::test_arithmetic < boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<double>> >();
    return e;
 }

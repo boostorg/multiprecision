@@ -148,7 +148,7 @@ class cpp_double_float
    static std::pair<float_type, float_type> exact_difference(const float_type& a, const float_type& b);
    static std::pair<float_type, float_type> exact_product(const float_type& a, const float_type& b);
 
-   static std::pair<float_type, float_type> split(const float_type& a);
+   //static std::pair<float_type, float_type> split(const float_type& a);
 
    static void normalize_pair(std::pair<float_type, float_type>& p, bool fast = true);
 
@@ -205,8 +205,9 @@ inline cpp_double_float<FloatingPointType>::cpp_double_float(UnsignedIntegralTyp
       else
       {  // shift
          // FIXME replace with a single ldexp function once you implement it
-         data.first  = std::ldexp(data.first,  (std::min)(MantissaBits, bit_index));
-         data.second = std::ldexp(data.second, (std::min)(MantissaBits, bit_index));
+         //data.first  = std::ldexp(data.first,  (std::min)(MantissaBits, bit_index));
+         //data.second = std::ldexp(data.second, (std::min)(MantissaBits, bit_index));
+         *this = std::ldexp(*this, (std::min)(MantissaBits, bit_index));
       }
    }
 }
@@ -220,7 +221,7 @@ cpp_double_float<FloatingPointType>::fast_exact_sum(const float_type& a, const f
 {
    using std::fabs;
    using std::isnormal;
-   BOOST_ASSERT(fabs(a) >= fabs(b) || a == 0.0 || !isnormal(a));
+   //BOOST_ASSERT(fabs(a) >= fabs(b) || a == 0.0 || !isnormal(a));
 
    std::pair<float_type, float_type> out;
    out.first  = a + b;
@@ -266,8 +267,8 @@ cpp_double_float<FloatingPointType>::normalize_pair(std::pair<float_type, float_
 
 // Split a floating point number in two (high and low) parts approximating the
 // upper-half and lower-half bits of the float
-template <typename FloatingPointType>
-std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<FloatingPointType>::split(const FloatingPointType& a)
+template <typename FloatingPointType, typename std::enable_if<std::numeric_limits<FloatingPointType>::is_iec559>::type const* = nullptr>
+inline std::pair<FloatingPointType, FloatingPointType> split(const FloatingPointType& a)
 {
    static_assert(std::numeric_limits<FloatingPointType>::is_iec559,
                  "double_float<> invoked with non-native floating-point unit");
@@ -303,6 +304,13 @@ std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<Floating
    }
 
    return std::make_pair(hi, lo);
+}
+
+template <typename FloatingPointType>
+std::pair<cpp_double_float<FloatingPointType>, cpp_double_float<FloatingPointType> >
+inline split(const cpp_double_float<FloatingPointType>& a)
+{
+   return std::make_pair(cpp_double_float<FloatingPointType>(a.first()), cpp_double_float<FloatingPointType>(a.second()));
 }
 
 // Exact product of two floating point numbers
@@ -450,7 +458,7 @@ operator/(const cpp_double_float<FloatingPointType>& a, const FloatingPointType&
    return double_float_t(p);
 }
 
-template <typename NumericType, typename FloatingPointType>
+template <typename NumericType, typename FloatingPointType, typename std::enable_if<std::is_arithmetic<NumericType>::value>::type const* = nullptr>
 inline cpp_double_float<FloatingPointType>
 operator/(const NumericType& a, const cpp_double_float<FloatingPointType>& b)
 {
@@ -874,7 +882,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    using std::isinf;
    using std::floor;
    using std::log10;
-   if (isinf(f.first()))
+   if (isinf((double)f.first()))  // FIXME: Remove cast to double
    {
       os << f.first();
       return os;
@@ -886,7 +894,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    int exp10 = 0;
 
    if (f != cpp_double_float<FloatingPointType>(0))
-      exp10 = (int)floor(log10(fabs(f.first())));
+      exp10 = (int)floor(log10(fabs((double)f.first()))); // FIXME: remove cast to double
    else
       exp10 = 0;
 
@@ -1133,6 +1141,7 @@ inline std::string cpp_double_float<FloatingPointType>::get_raw_str() const
    ss << std::hexfloat << data.first << " + " << std::hexfloat << data.second;
    return ss.str();
 }
+
 // --
 
 } } } // namespace boost::multiprecision::backends
@@ -1162,5 +1171,34 @@ class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<Floa
    static constexpr boost::multiprecision::backends::cpp_double_float<FloatingPointType> signaling_NaN() noexcept { return std::numeric_limits<FloatingPointType>::signaling_NaN(); }
 };
 // TODO have explicit specializations for cpp_double_float< float/double >
+
+namespace std {
+
+// -- Basic C-style Math functions
+template <typename FloatingPointType, typename std::enable_if<std::is_floating_point<FloatingPointType>::value>::type const* = nullptr>
+boost::multiprecision::backends::cpp_double_float<FloatingPointType>
+ldexp(const boost::multiprecision::backends::cpp_double_float<FloatingPointType>& x, int a)
+{
+   auto x_(x);
+
+   x_.rep().first  = std::ldexp(x.first(), a);
+   x_.rep().second = std::ldexp(x.second(), a);
+
+   return x_;
+}
+
+template <typename FloatingPointType>
+boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >
+ldexp(const boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >& x, int a)
+{
+   auto x_(x);
+
+   x_.rep().first  = ldexp(x.first(), a);
+   x_.rep().second = ldexp(x.second(), a);
+
+   return x_;
+}
+} // namespace std
+// --
 
 #endif // BOOST_MP_CPP_DOUBLE_FLOAT_2021_06_05_HPP

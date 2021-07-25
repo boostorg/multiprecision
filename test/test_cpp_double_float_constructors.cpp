@@ -12,6 +12,7 @@
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/cpp_double_float.hpp>
+#include <boost/core/demangle.hpp>
 
 #include <boost/random/uniform_real_distribution.hpp>
 #ifdef BOOST_MATH_USE_FLOAT128
@@ -94,11 +95,10 @@ ConstructionType construct_from(ArithmeticType f)
 {
    return ConstructionType(f);
 }
-
-template <typename ConstructionType, typename DoubleFloatType, typename std::enable_if<!std::is_arithmetic<DoubleFloatType>::value>::type const* = nullptr>
+template <typename ConstructionType, typename DoubleFloatType, typename std::enable_if<!std::is_arithmetic<DoubleFloatType>::value>::type const * = nullptr>
 ConstructionType construct_from(DoubleFloatType f)
 {
-   return ConstructionType(f.first()) + ConstructionType(f.second());
+   return construct_from<ConstructionType, DoubleFloatType::float_type>(f.first()) + construct_from<ConstructionType, DoubleFloatType::float_type>(f.second());
 }
 
 template <typename FloatingPointType, typename NumericType>
@@ -107,9 +107,11 @@ int test_constructor()
    using double_float_t     = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
    using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<(detail::max)(std::numeric_limits<double_float_t>::digits10, std::numeric_limits<NumericType>::digits10) * 2 + 1>, boost::multiprecision::et_off>;
 
+   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<double_float_t>::digits);
+
    std::cout << "Testing constructor for ";
    std::cout.width(30);
-   std::cout << typeid(NumericType).name() << "... ";
+   std::cout << boost::core::demangle(typeid(NumericType).name()) << "... ";
 
    int i;
    for (i = 0; i < 10000; ++i)
@@ -129,7 +131,6 @@ int test_constructor()
          return -1;
       }
 
-      const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<double_float_t>::digits);
       control_float_type       n_prime  = construct_from<control_float_type, NumericType>(n);
       control_float_type       d_prime  = construct_from<control_float_type, double_float_t>(d);
 
@@ -182,6 +183,10 @@ int test_constructors()
 // e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128>>();
 #endif
 
+   // FIXME Compilation error because of lacking get_rand() implementation
+   //e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<float> > >();
+   //e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<double> > >();
+
    if (e == 0)
       std::cout << "PASSED all tests";
    else
@@ -200,7 +205,9 @@ int main()
 
    e += test_cpp_double_constructors::test_constructors<float>();
    e += test_cpp_double_constructors::test_constructors<double>();
-   e += test_cpp_double_constructors::test_constructors<long double>();
+   //e += test_cpp_double_constructors::test_constructors<long double>();
+   e += test_cpp_double_constructors::test_constructors<boost::multiprecision::backends::cpp_double_float<float> >();
+   e += test_cpp_double_constructors::test_constructors<boost::multiprecision::backends::cpp_double_float<double> >();
 #ifdef BOOST_MATH_USE_FLOAT128
 // FIXME:
 // e += test_cpp_double_constructors::test_constructors<boost::multiprecision::float128>();

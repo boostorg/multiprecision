@@ -112,9 +112,9 @@ void test_basic_io_manual()
 
 int main()
 {
-   test_basic_io_manual<double>();
-   test_basic_io_manual<float>();
-   test_basic_io_manual<long double>();
+   test_basic_io_manual<boost::multiprecision::backends::cpp_double_float<double>>();
+   test_basic_io_manual < boost::multiprecision::backends::cpp_double_float<float>>();
+   //test_basic_io_manual < boost::multiprecision::backends::cpp_double_float<long double>>();
 #ifdef BOOST_MATH_USE_FLOAT128
 // FIXME:
 // test_basic_io_manual<boost::multiprecision::float128>();
