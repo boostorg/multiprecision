@@ -28,6 +28,11 @@ namespace boost { namespace multiprecision { namespace backends {
 template <typename FloatingPointType>
 class cpp_double_float;
 
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
+
 } } } // namespace boost::multiprecision::backends
 
 // Foward decleration for std::numeric_limits
@@ -35,6 +40,7 @@ template <typename FloatingPointType>
 class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >;
 
 namespace boost { namespace multiprecision {
+
 template<typename FloatingPointType>
 struct number_category<backends::cpp_double_float<FloatingPointType>>
   : public std::integral_constant<int, number_kind_floating_point> { };
@@ -42,27 +48,31 @@ struct number_category<backends::cpp_double_float<FloatingPointType>>
 namespace backends {
 
 namespace detail {
-template <class T> struct is_arithmetic_or_float128 {
-static constexpr bool value = std::is_arithmetic<T>::value == true
-#ifdef BOOST_MATH_USE_FLOAT128
-             || std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true
+
+template <class T> struct is_arithmetic_or_float128
+{
+   static constexpr bool value = (   (std::is_arithmetic<T>::value == true)
+#if defined(BOOST_MATH_USE_FLOAT128)
+                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
 #endif
-             ;
+                                 );
 };
 
-template <class T> struct is_floating_point_or_float128 {
-static constexpr bool value = std::is_floating_point<T>::value == true
-#ifdef BOOST_MATH_USE_FLOAT128
-             || std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true
+template <class T> struct is_floating_point_or_float128
+{
+   static constexpr bool value = (   (std::is_floating_point<T>::value == true)
+#if defined(BOOST_MATH_USE_FLOAT128)
+                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
 #endif
-             ;
+                                 );
 };
+
 }
 
-/*
-* A cpp_double_float is represented by an unevaluated sum of two floating-point
-* units (say a0 and a1) which satisfy |a1| <= (1 / 2) * ulp(a0)
-*/
+// A cpp_double_float is represented by an unevaluated sum of two floating-point
+// units (say a0 and a1) which satisfy |a1| <= (1 / 2) * ulp(a0).
+// The type of the floating-point constituents should adhere to IEEE754.
+
 template <typename FloatingPointType>
 class cpp_double_float
 {
@@ -115,7 +125,33 @@ class cpp_double_float
              typename std::enable_if<(    (std::is_integral<UnsignedIntegralType>::value == true)
                                        && (std::is_unsigned<UnsignedIntegralType>::value == true)
                                        && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   cpp_double_float(UnsignedIntegralType u);
+   cpp_double_float(UnsignedIntegralType u)
+   {
+      constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits - 1;
+
+      int bit_index = sizeof(UnsignedIntegralType) * 8;
+
+      for (;;)
+      {
+         // Mask the maximum number of bits that can be stored without
+         // precision loss in a single FloatingPointType, then sum and shift
+         UnsignedIntegralType hi = u >> (std::max)(bit_index - MantissaBits, 0);
+         u &= ~(hi << (std::max)(bit_index - MantissaBits, 0));
+
+         *this += static_cast<FloatingPointType>(hi);  // sum
+
+         bit_index -= MantissaBits;
+
+         if (bit_index < 0)
+            break;
+         else
+         {  // shift
+            // FIXME replace with a single ldexp function once you implement it
+            data.first  = std::ldexp(data.first,  (std::min)(MantissaBits, bit_index));
+            data.second = std::ldexp(data.second, (std::min)(MantissaBits, bit_index));
+         }
+      }
+   }
 
    template <typename SignedIntegralType,
              typename std::enable_if<(   (std::is_integral<SignedIntegralType>::value == true)
@@ -268,39 +304,6 @@ class cpp_double_float
 
    static std::pair<float_type, float_type> split(const float_type& a);
 };
-
-// -- Special Constructors
-template <typename FloatingPointType>
-template <typename UnsignedIntegralType,
-          typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<FloatingPointType>::digits))>::type const*>
-inline cpp_double_float<FloatingPointType>::cpp_double_float(UnsignedIntegralType u)
-{
-   constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits - 1;
-
-   int bit_index = sizeof(UnsignedIntegralType) * 8;
-
-   for (;;)
-   {
-      // Mask the maximum number of bits that can be stored without
-      // precision loss in a single FloatingPointType, then sum and shift
-      UnsignedIntegralType hi = u >> (std::max)(bit_index - MantissaBits, 0);
-      u &= ~(hi << (std::max)(bit_index - MantissaBits, 0));
-
-      *this += static_cast<FloatingPointType>(hi);  // sum
-
-      bit_index -= MantissaBits;
-
-      if (bit_index < 0)
-         break;
-      else
-      {  // shift
-         // FIXME replace with a single ldexp function once you implement it
-         data.first  = std::ldexp(data.first,  (std::min)(MantissaBits, bit_index));
-         data.second = std::ldexp(data.second, (std::min)(MantissaBits, bit_index));
-      }
-   }
-}
-// --
 
 // -- Arithmetic backends
 // Exact addition of two floating point numbers, given |a| > |b|
