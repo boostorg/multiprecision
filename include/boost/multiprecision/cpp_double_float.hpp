@@ -90,13 +90,13 @@ class cpp_double_float
   using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long, std::uintmax_t>;
   using float_types    = std::tuple<float, double, long double>;
 
-   // Constructors
+   // Default constructor.
    cpp_double_float() { }
 
-   // default constructor
-   constexpr cpp_double_float(const cpp_double_float& a) : data(a.data) {}
+   // Copy constructor.
+   constexpr cpp_double_float(const cpp_double_float&) = default;
 
-   // Constructors from other floating-point types
+   // Constructors from other floating-point types.
    template <typename FloatType,
              typename std::enable_if<    (detail::is_floating_point_or_float128<FloatType>::value == true)
                                       && (std::numeric_limits<FloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
@@ -109,15 +109,14 @@ class cpp_double_float
        : data(std::make_pair(static_cast<float_type>(f),
                              static_cast<float_type>(f - (FloatType) static_cast<float_type>(f)))) {}
 
-   // Constructor from other cpp_double_float<> objects
+   // Constructor from other cpp_double_float<> objects.
    template <typename OtherFloatType,
              typename std::enable_if<(   (std::is_floating_point<OtherFloatType>::value == true)
                                       && (std::is_same<FloatingPointType, OtherFloatType>::value == false))>::type const* = nullptr>
    cpp_double_float(const cpp_double_float<OtherFloatType>& a)
-       : cpp_double_float(a.first())
+      : cpp_double_float(a.first())
    {
-     // TODO Remove cast by overloading operator +=
-      *this += cpp_double_float(a.second());
+      *this += a.second();
    }
 
    // Constructors from integers
@@ -151,7 +150,8 @@ class cpp_double_float
          if (bit_index < 0)
             break;
          else
-         {  // shift
+         {
+            // shift
             // FIXME replace with a single ldexp function once you implement it
             data.first  = std::ldexp(data.first,  (std::min)(MantissaBits, bit_index));
             data.second = std::ldexp(data.second, (std::min)(MantissaBits, bit_index));
@@ -220,11 +220,20 @@ class cpp_double_float
    const rep_type&  rep() const { return data; }
    const rep_type& crep() const { return data; }
 
-   // Operators
+   // Retrieve debug string.
+   std::string get_raw_str() const
+   {
+      std::stringstream ss;
+      ss << std::hexfloat << data.first << " + " << std::hexfloat << data.second;
+      return ss.str();
+   }
+
+   // Assignment operators.
    cpp_double_float& operator=(const cpp_double_float&) = default;
 
    cpp_double_float& operator=(cpp_double_float&&) = default;
 
+   // Non-member add/sub/mul/div with constituent type.
    friend inline cpp_double_float operator+(const cpp_double_float& a, const float_type& b)
    {
       rep_type s = exact_sum(a.first(), b);
@@ -273,11 +282,13 @@ class cpp_double_float
       return cpp_double_float(p);
    }
 
+   // Unary add/sub/mul/div with constituent part.
    cpp_double_float& operator+=(const float_type& a) { *this = *this + a; return *this; }
    cpp_double_float& operator-=(const float_type& a) { *this = *this - a; return *this; }
    cpp_double_float& operator*=(const float_type& a) { *this = *this * a; return *this; }
    cpp_double_float& operator/=(const float_type& a) { *this = *this / a; return *this; }
 
+   // Unary add/sub/mul/div.
    cpp_double_float& operator+=(const cpp_double_float& other)
    {
       const rep_type t = exact_sum(second(), other.second());
@@ -345,8 +356,6 @@ class cpp_double_float
    cpp_double_float& operator--() { return *this -= cpp_double_float<float_type>(float_type(1.0F)); }
 
    cpp_double_float  operator-() const { return negative(); }
-
-   std::string get_raw_str() const;
 
    // Helper functions
    static cpp_double_float<float_type> pow10(int p)
@@ -1014,24 +1023,13 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_float<Floa
    f.set_str(str);
    return is;
 }
-// --
-
-// -- DEBUGGING
-template <typename FloatingPointType>
-inline std::string cpp_double_float<FloatingPointType>::get_raw_str() const
-{
-   std::stringstream ss;
-   ss << std::hexfloat << data.first << " + " << std::hexfloat << data.second;
-   return ss.str();
-}
-// --
 
 } } } // namespace boost::multiprecision::backends
 
 // Specialization of numeric_limits for cpp_double_float<>
 template <typename FloatingPointType>
 class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>
-  : public std::numeric_limits<FloatingPointType>
+   : public std::numeric_limits<FloatingPointType>
 {
 private:
    using base_class_type = std::numeric_limits<FloatingPointType>;
