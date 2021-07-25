@@ -227,7 +227,7 @@ class cpp_double_float
 
    friend inline cpp_double_float operator+(const cpp_double_float& a, const float_type& b)
    {
-      auto s = exact_sum(a.first(), b);
+      rep_type s = exact_sum(a.first(), b);
 
       s.second += a.second();
       normalize_pair(s);
@@ -237,7 +237,7 @@ class cpp_double_float
 
    friend inline cpp_double_float operator-(const cpp_double_float& a, const float_type& b)
    {
-      auto s = exact_difference(a.first(), b);
+      rep_type s = exact_difference(a.first(), b);
 
       s.second += a.second();
       normalize_pair(s);
@@ -247,7 +247,7 @@ class cpp_double_float
 
    friend inline cpp_double_float operator*(const cpp_double_float& a, const float_type& b)
    {
-      auto p = exact_product(a.first(), b);
+      rep_type p = exact_product(a.first(), b);
       p.second += a.second() * b;
 
       normalize_pair(p);
@@ -339,8 +339,8 @@ class cpp_double_float
       return *this;
    }
 
-   cpp_double_float  operator++(int) { auto t(*this); ++*this; return t; }
-   cpp_double_float  operator--(int) { auto t(*this); --*this; return t; }
+   cpp_double_float  operator++(int) { cpp_double_float t(*this); ++*this; return t; }
+   cpp_double_float  operator--(int) { cpp_double_float t(*this); --*this; return t; }
    cpp_double_float& operator++() { return *this += cpp_double_float<float_type>(float_type(1.0F)); }
    cpp_double_float& operator--() { return *this -= cpp_double_float<float_type>(float_type(1.0F)); }
 
@@ -392,45 +392,6 @@ class cpp_double_float
  private:
    rep_type data;
 
-   static rep_type fast_exact_sum(const float_type& a, const float_type& b)
-   {
-      // Exact addition of two floating point numbers, given |a| > |b|
-      using std::fabs;
-      using std::isnormal;
-
-      rep_type out;
-      out.first  = a + b;
-      out.second = b - (out.first - a);
-
-      return out;
-   }
-
-   static std::pair<float_type, float_type> exact_sum(const float_type& a, const float_type& b)
-   {
-      // Exact addition of two floating point numbers
-      rep_type out;
-
-      out.first    = a + b;
-      float_type v = out.first - a;
-      out.second   = (a - (out.first - v)) + (b - v);
-
-      return out;
-   }
-
-   static std::pair<float_type, float_type> exact_difference(const float_type& a, const float_type& b)
-   {
-      // Exact subtraction of two floating point numbers
-      rep_type out;
-
-      out.first    = a - b;
-      float_type v = out.first - a;
-      out.second   = (a - (out.first - v)) - (b + v);
-
-      return out;
-   }
-
-   static std::pair<float_type, float_type> exact_product(const float_type& a, const float_type& b);
-
    static rep_type split(const float_type& a)
    {
       // Split a floating point number in two (high and low) parts approximating the
@@ -451,7 +412,7 @@ class cpp_double_float
       {
          constexpr float_type Normalizer = float_type(1ULL << (SplitBits + 1));
 
-         float_type a_ = a / Normalizer;
+         const float_type a_ = a / Normalizer;
 
          temp = Splitter * a_;
          hi   = temp - (temp - a_);
@@ -469,32 +430,64 @@ class cpp_double_float
 
       return std::make_pair(hi, lo);
    }
+
+   static rep_type fast_exact_sum(const float_type& a, const float_type& b)
+   {
+      // Exact addition of two floating point numbers, given |a| > |b|
+      using std::fabs;
+      using std::isnormal;
+
+      rep_type out;
+      out.first  = a + b;
+      out.second = b - (out.first - a);
+
+      return out;
+   }
+
+   static rep_type exact_sum(const float_type& a, const float_type& b)
+   {
+      // Exact addition of two floating point numbers
+      rep_type out;
+
+      out.first    = a + b;
+      float_type v = out.first - a;
+      out.second   = (a - (out.first - v)) + (b - v);
+
+      return out;
+   }
+
+   static rep_type exact_difference(const float_type& a, const float_type& b)
+   {
+      // Exact subtraction of two floating point numbers
+      rep_type out;
+
+      out.first    = a - b;
+      float_type v = out.first - a;
+      out.second   = (a - (out.first - v)) - (b + v);
+
+      return out;
+   }
+
+   static rep_type exact_product(const float_type& a, const float_type& b)
+   {
+      // Exact product of two floating point numbers
+      const rep_type a_split = split(a);
+      const rep_type b_split = split(b);
+
+      const volatile float_type pf = a * b;
+
+      return std::make_pair
+      (
+         (const float_type&) pf,
+         (
+            ((a_split.first  * b_split.first) - (const float_type&) pf)
+          +  (a_split.first  * b_split.second)
+          +  (a_split.second * b_split.first)
+         )
+         + (a_split.second * b_split.second)
+      );
+   }
 };
-
-template<typename FloatingPointType>
-std::pair<FloatingPointType, FloatingPointType>
-cpp_double_float<FloatingPointType>::exact_product(const float_type& a, const float_type& b)
-{
-   // Exact product of two floating point numbers
-   const rep_type a_split = split(a);
-   const rep_type b_split = split(b);
-
-   rep_type p;
-
-   const float_type pf = a * b;
-
-   p.first  = pf;
-   p.second = (
-                 ((a_split.first  * b_split.first) - pf)
-               +  (a_split.first  * b_split.second)
-               +  (a_split.second * b_split.first)
-              )
-              + (a_split.second * b_split.second);
-
-   return p;
-}
-
-// --
 
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) += b; }
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) -= b; }
@@ -825,7 +818,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    else
       exp10 = 0;
 
-   auto f_prime = (f > cpp_double_float<FloatingPointType>(0) ? f : -f);
+   cpp_double_float<FloatingPointType> f_prime = (f > cpp_double_float<FloatingPointType>(0) ? f : -f);
    f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
    
    // TODO Handle subnormal numbers
