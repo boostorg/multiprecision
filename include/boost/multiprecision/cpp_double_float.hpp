@@ -383,19 +383,53 @@ class cpp_double_float
       return result;
    }
 
- private:
-   rep_type data;
-
-   static std::pair<float_type, float_type> fast_exact_sum  (const float_type& a, const float_type& b);
-   static std::pair<float_type, float_type> exact_sum       (const float_type& a, const float_type& b);
-   static std::pair<float_type, float_type> exact_difference(const float_type& a, const float_type& b);
-   static std::pair<float_type, float_type> exact_product   (const float_type& a, const float_type& b);
-
    static void normalize_pair(std::pair<float_type, float_type>& p, bool fast = true)
    {
       // Convert a pair of floats to standard form
       p = (fast ? fast_exact_sum(p.first, p.second) : exact_sum(p.first, p.second));
    }
+
+ private:
+   rep_type data;
+
+   static rep_type fast_exact_sum(const float_type& a, const float_type& b)
+   {
+      // Exact addition of two floating point numbers, given |a| > |b|
+      using std::fabs;
+      using std::isnormal;
+
+      rep_type out;
+      out.first  = a + b;
+      out.second = b - (out.first - a);
+
+      return out;
+   }
+
+   static std::pair<float_type, float_type> exact_sum(const float_type& a, const float_type& b)
+   {
+      // Exact addition of two floating point numbers
+      rep_type out;
+
+      out.first    = a + b;
+      float_type v = out.first - a;
+      out.second   = (a - (out.first - v)) + (b - v);
+
+      return out;
+   }
+
+   static std::pair<float_type, float_type> exact_difference(const float_type& a, const float_type& b)
+   {
+      // Exact subtraction of two floating point numbers
+      rep_type out;
+
+      out.first    = a - b;
+      float_type v = out.first - a;
+      out.second   = (a - (out.first - v)) - (b + v);
+
+      return out;
+   }
+
+   static std::pair<float_type, float_type> exact_product(const float_type& a, const float_type& b);
 
    static rep_type split(const float_type& a)
    {
@@ -437,63 +471,21 @@ class cpp_double_float
    }
 };
 
-// -- Arithmetic backends
-// Exact addition of two floating point numbers, given |a| > |b|
-template <typename FloatingPointType>
-std::pair<FloatingPointType, FloatingPointType>
-cpp_double_float<FloatingPointType>::fast_exact_sum(const float_type& a, const float_type& b)
-{
-   using std::fabs;
-   using std::isnormal;
-
-   std::pair<float_type, float_type> out;
-   out.first  = a + b;
-   out.second = b - (out.first - a);
-
-   return out;
-}
-
-// Exact addition of two floating point numbers
-template <typename FloatingPointType>
-std::pair<FloatingPointType, FloatingPointType>
-cpp_double_float<FloatingPointType>::exact_sum(const float_type& a, const float_type& b)
-{
-   std::pair<float_type, float_type> out;
-
-   out.first    = a + b;
-   float_type v = out.first - a;
-   out.second   = (a - (out.first - v)) + (b - v);
-
-   return out;
-}
-
-// Exact subtraction of two floating point numbers
-template <typename FloatingPointType>
-std::pair<FloatingPointType, FloatingPointType>
-cpp_double_float<FloatingPointType>::exact_difference(const float_type& a, const float_type& b)
-{
-   std::pair<float_type, float_type> out;
-
-   out.first    = a - b;
-   float_type v = out.first - a;
-   out.second   = (a - (out.first - v)) - (b + v);
-
-   return out;
-}
-
-// Exact product of two floating point numbers
-template <typename FloatingPointType>
+template<typename FloatingPointType>
 std::pair<FloatingPointType, FloatingPointType>
 cpp_double_float<FloatingPointType>::exact_product(const float_type& a, const float_type& b)
 {
-   const std::pair<float_type, float_type> a_split = split(a);
-   const std::pair<float_type, float_type> b_split = split(b);
+   // Exact product of two floating point numbers
+   const rep_type a_split = split(a);
+   const rep_type b_split = split(b);
 
-   std::pair<float_type, float_type> p;
+   rep_type p;
 
-   p.first  = a * b;
+   const float_type pf = a * b;
+
+   p.first  = pf;
    p.second = (
-                 ((a_split.first  * b_split.first) - p.first)
+                 ((a_split.first  * b_split.first) - pf)
                +  (a_split.first  * b_split.second)
                +  (a_split.second * b_split.first)
               )
