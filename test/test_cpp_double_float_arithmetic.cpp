@@ -14,6 +14,13 @@
 // TBD: Handle interaction with Boost's wrap of libquadmath __float128.
 // g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DBOOST_MATH_USE_FLOAT128 test.cpp -o -lquadmath test_double_float.exe
 
+#include <ctime>
+#include <iomanip>
+#include <iostream>
+#include <random>
+#include <string>
+#include <vector>
+
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MATH_USE_FLOAT128
@@ -23,11 +30,6 @@
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/core/demangle.hpp>
-#include <iomanip>
-#include <iostream>
-#include <random>
-#include <string>
-#include <vector>
 
 namespace test_arithmetic_cpp_double_float {
 
@@ -35,9 +37,18 @@ template <typename FloatingPointType,
           typename std::enable_if<(  boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value == true), bool>::type = true>
 FloatingPointType uniform_real()
 {
-   static std::random_device                                rd;
-   static std::mt19937                                      gen (rd());
-   static boost::random::uniform_real_distribution<FloatingPointType> dis(0.0, 1.0);
+   using distribution_type = boost::random::uniform_real_distribution<FloatingPointType>;
+
+   static unsigned long seed_scaler = 0U;
+
+   static std::random_device rd;
+   static std::mt19937       gen(rd());
+   static distribution_type  dis(0.0, 1.0);
+
+   if((seed_scaler % 0x100000UL) == 0U)
+   {
+     gen.seed(static_cast<typename std::mt19937::result_type>(std::clock()));
+   }
 
    return dis(gen);
 }
@@ -94,7 +105,7 @@ ConstructionType construct_from(FloatingPointType f)
 }
 
 template <typename FloatingPointType>
-bool test_op(char op, const unsigned count = 0x10000U)
+bool test_op(char op, const unsigned count = 0x20000U)
 {
    using naked_double_float_type = FloatingPointType;
    using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 * 2 + 1>, boost::multiprecision::et_off>;
