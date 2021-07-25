@@ -203,7 +203,11 @@ class cpp_double_float
    constexpr cpp_double_float<float_type> negative()    const { return cpp_double_float<float_type>(-data.first, -data.second); }
    constexpr bool                         is_negative() const { return data.first < 0; }
 
-   void negate() { -data.first = -data.first; data.second = -data.second; }
+   void negate()
+   {
+      data.first  = -data.first;
+      data.second = -data.second;
+   }
 
    // FIXME Merge set_str() to operator<<
    void set_str(std::string str);
@@ -335,26 +339,63 @@ class cpp_double_float
       return *this;
    }
 
-   cpp_double_float  operator++(int);
-   cpp_double_float  operator--(int);
+   cpp_double_float  operator++(int) { auto t(*this); ++*this; return t; }
+   cpp_double_float  operator--(int) { auto t(*this); --*this; return t; }
    cpp_double_float& operator++() { return *this += cpp_double_float<float_type>(float_type(1.0F)); }
    cpp_double_float& operator--() { return *this -= cpp_double_float<float_type>(float_type(1.0F)); }
+
    cpp_double_float  operator-() const { return negative(); }
 
    std::string get_raw_str() const;
 
    // Helper functions
-   static std::pair<float_type, float_type> fast_exact_sum(const float_type& a, const float_type& b);
-   static std::pair<float_type, float_type> exact_sum(const float_type& a, const float_type& b);
-   static std::pair<float_type, float_type> exact_difference(const float_type& a, const float_type& b);
-   static std::pair<float_type, float_type> exact_product(const float_type& a, const float_type& b);
+   static cpp_double_float<float_type> pow10(int p)
+   {
+      using local_float_type = cpp_double_float;
 
-   static void normalize_pair(std::pair<float_type, float_type>& p, bool fast = true);
+      local_float_type result;
 
-   static cpp_double_float<float_type> pow10(int x);
+      if      (p <  0) result = local_float_type(1U) / pow10(-p);
+      else if (p == 0) result = local_float_type(1U);
+      else if (p == 1) result = local_float_type(10U);
+      else if (p == 2) result = local_float_type(100U);
+      else if (p == 3) result = local_float_type(1000U);
+      else if (p == 4) result = local_float_type(10000U);
+      else
+      {
+         result = local_float_type(1U);
+
+         local_float_type y(10U);
+
+         std::uint32_t p_local = (std::uint32_t)p;
+
+         for (;;)
+         {
+            if (std::uint_fast8_t(p_local & 1U) != 0U) { result *= y; }
+
+            p_local >>= 1U;
+
+            if (p_local == 0U) { break; }
+            else               { y *= y; }
+         }
+      }
+
+      return result;
+   }
 
  private:
    rep_type data;
+
+   static std::pair<float_type, float_type> fast_exact_sum  (const float_type& a, const float_type& b);
+   static std::pair<float_type, float_type> exact_sum       (const float_type& a, const float_type& b);
+   static std::pair<float_type, float_type> exact_difference(const float_type& a, const float_type& b);
+   static std::pair<float_type, float_type> exact_product   (const float_type& a, const float_type& b);
+
+   static void normalize_pair(std::pair<float_type, float_type>& p, bool fast = true)
+   {
+      // Convert a pair of floats to standard form
+      p = (fast ? fast_exact_sum(p.first, p.second) : exact_sum(p.first, p.second));
+   }
 
    static rep_type split(const float_type& a)
    {
@@ -369,14 +410,14 @@ class cpp_double_float
       constexpr float_type Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
       const     float_type SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter*2);
 
-      FloatingPointType temp, hi, lo;
+      float_type temp, hi, lo;
 
       // Handle if multiplication with the splitter would cause overflow
       if (a > SplitThreshold || a < -SplitThreshold)
       {
          constexpr float_type Normalizer = float_type(1ULL << (SplitBits + 1));
 
-         FloatingPointType a_ = a / Normalizer;
+         float_type a_ = a / Normalizer;
 
          temp = Splitter * a_;
          hi   = temp - (temp - a_);
@@ -404,7 +445,6 @@ cpp_double_float<FloatingPointType>::fast_exact_sum(const float_type& a, const f
 {
    using std::fabs;
    using std::isnormal;
-   //BOOST_ASSERT(fabs(a) >= fabs(b) || a == 0.0 || !isnormal(a));
 
    std::pair<float_type, float_type> out;
    out.first  = a + b;
@@ -440,13 +480,6 @@ cpp_double_float<FloatingPointType>::exact_difference(const float_type& a, const
 
    return out;
 }
-   // Convert a pair of floats to standard form
-template <typename FloatingPointType>
-inline void
-cpp_double_float<FloatingPointType>::normalize_pair(std::pair<float_type, float_type>& p, bool fast)
-{
-   p = (fast ? fast_exact_sum(p.first, p.second) : exact_sum(p.first, p.second));
-}
 
 // Exact product of two floating point numbers
 template <typename FloatingPointType>
@@ -471,21 +504,10 @@ cpp_double_float<FloatingPointType>::exact_product(const float_type& a, const fl
 
 // --
 
-// -- Double-float arithmetic
-
-// double_float<> + double_float<>
-// Satisfies IEEE-754 bounds
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) += b; }
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) -= b; }
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) *= b; }
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) /= b; }
-
-template <typename NumericType, typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator/(const NumericType& a, const cpp_double_float<FloatingPointType>& b)
-{
-   return cpp_double_float<FloatingPointType>(a) / b;
-}
 
 // -- String Conversions
 // FIXME Merge set_str() to operator<<
@@ -517,7 +539,6 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
    while (std::isdigit(str[pos]))
       *this = *this * FloatingPointType(10) + FloatingPointType(str[pos++] - '0');
 
-   
    // Set the decimal number part
    if (str[pos] == '.')
    {
@@ -540,24 +561,6 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
    }
 
    *this *= pow10(final_exponent);
-}
-
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-cpp_double_float<FloatingPointType>::operator++(int)
-{
-   auto t(*this);
-   ++*this;
-   return t;
-}
-
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-cpp_double_float<FloatingPointType>::operator--(int)
-{
-   auto t(*this);
-   --*this;
-   return t;
 }
 
 // -- Comparision Operators
@@ -1025,43 +1028,6 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_float<Floa
    is >> str;
    f.set_str(str);
    return is;
-}
-// --
-
-// -- Misc helper functions
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType> cpp_double_float<FloatingPointType>::pow10(int p)
-{
-   using local_float_type = cpp_double_float<FloatingPointType>;
-
-   local_float_type result;
-
-   if (p < 0) result = local_float_type(1U) / pow10(-p);
-   else if (p == 0) result = local_float_type(1U);
-   else if (p == 1) result = local_float_type(10U);
-   else if (p == 2) result = local_float_type(100U);
-   else if (p == 3) result = local_float_type(1000U);
-   else if (p == 4) result = local_float_type(10000U);
-   else
-   {
-      result = local_float_type(1U);
-
-      local_float_type y(10U);
-
-      std::uint32_t p_local = (std::uint32_t)p;
-
-      for (;;)
-      {
-         if (std::uint_fast8_t(p_local & 1U) != 0U) result *= y;
-
-         p_local >>= 1U;
-
-         if (p_local == 0U) break;
-         else y *= y;
-      }
-   }
-
-   return result;
 }
 // --
 
