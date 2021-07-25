@@ -74,14 +74,6 @@ jobs:
           ls -la ./test_cpp_double_float_arithmetic.exe
           echo "execute ./test_cpp_double_float_arithmetic.exe"
           ./test_cpp_double_float_arithmetic.exe
-          echo "compile to ./test_cpp_double_float_constructors.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_constructors.cpp -o test_cpp_double_float_constructors.exe
-          echo "ls -la of ./test_cpp_double_float_constructors.exe"
-          ls -la ./test_cpp_double_float_constructors.exe
-          echo "execute ./test_cpp_double_float_constructors.exe"
-          ./test_cpp_double_float_constructors.exe
   gcc-clang-native-asan:
     runs-on: ubuntu-20.04
     defaults:
@@ -142,14 +134,6 @@ jobs:
           ls -la ./test_cpp_double_float_arithmetic.exe
           echo "execute ./test_cpp_double_float_arithmetic.exe"
           ./test_cpp_double_float_arithmetic.exe
-          echo "compile to ./test_cpp_double_float_constructors.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -fsanitize=address -fsanitize=leak -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_constructors.cpp -o test_cpp_double_float_constructors.exe
-          echo "ls -la of ./test_cpp_double_float_constructors.exe"
-          ls -la ./test_cpp_double_float_constructors.exe
-          echo "execute ./test_cpp_double_float_constructors.exe"
-          ./test_cpp_double_float_constructors.exe
   apple-gcc-clang-native:
     runs-on: macos-latest
     defaults:
@@ -206,74 +190,6 @@ jobs:
           echo "compiler version"
           ${{ matrix.compiler }} -v
           ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
-          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
-          ls -la ./test_cpp_double_float_arithmetic.exe
-          echo "execute ./test_cpp_double_float_arithmetic.exe"
-          ./test_cpp_double_float_arithmetic.exe
-          echo "compile to ./test_cpp_double_float_constructors.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_constructors.cpp -o test_cpp_double_float_constructors.exe
-          echo "ls -la of ./test_cpp_double_float_constructors.exe"
-          ls -la ./test_cpp_double_float_constructors.exe
-          echo "execute ./test_cpp_double_float_constructors.exe"
-          ./test_cpp_double_float_constructors.exe
-  gcc-arith-with-float128:
-    runs-on: ubuntu-20.04
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      fail-fast: false
-      matrix:
-        compiler: [ g++ ]
-        standard: [ gnu++11, gnu++14, gnu++17, gnu++2a ]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: '0'
-      - name: clone-submods-bootstrap-headers-boost-develop
-        run: |
-          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
-          cd ../boost-root
-          git submodule update --init tools
-          git submodule update --init libs/array
-          git submodule update --init libs/assert
-          git submodule update --init libs/concept_check
-          git submodule update --init libs/config
-          git submodule update --init libs/container
-          git submodule update --init libs/core
-          git submodule update --init libs/detail
-          git submodule update --init libs/exception
-          git submodule update --init libs/headers
-          git submodule update --init libs/integer
-          git submodule update --init libs/iterator
-          git submodule update --init libs/lexical_cast
-          git submodule update --init libs/math
-          git submodule update --init libs/move
-          git submodule update --init libs/mpl
-          git submodule update --init libs/multiprecision
-          git submodule update --init libs/numeric/conversion
-          git submodule update --init libs/predef
-          git submodule update --init libs/preprocessor
-          git submodule update --init libs/random
-          git submodule update --init libs/rational
-          git submodule update --init libs/range
-          git submodule update --init libs/smart_ptr
-          git submodule update --init libs/static_assert
-          git submodule update --init libs/throw_exception
-          git submodule update --init libs/type_traits
-          git submodule update --init libs/utility
-          ./bootstrap.sh
-          ./b2 headers
-      - name: gcc-arith-with-float128
-        run: |
-          echo "where am i (via pwd)"
-          pwd
-          echo "compile to ./test_cpp_double_float_arithmetic.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -lquadmath -o test_cpp_double_float_arithmetic.exe
           echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
           ls -la ./test_cpp_double_float_arithmetic.exe
           echo "execute ./test_cpp_double_float_arithmetic.exe"

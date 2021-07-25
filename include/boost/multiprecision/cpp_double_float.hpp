@@ -38,6 +38,19 @@ template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> 
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
 
+template<typename FloatingPointType> void eval_add     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+template<typename FloatingPointType> void eval_subtract(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+template<typename FloatingPointType> void eval_multiply(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+template<typename FloatingPointType> void eval_divide  (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+
+template<typename FloatingPointType> bool eval_eq(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
+template<typename FloatingPointType> bool eval_gt(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
+template<typename FloatingPointType> bool eval_lt(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
+
+template<typename FloatingPointType,
+         typename char_type,
+         typename traits_type>
+std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_float<FloatingPointType>& f);
 
 } } } // namespace boost::multiprecision::backends
 
@@ -55,7 +68,8 @@ namespace backends {
 
 namespace detail {
 
-template <class T> struct is_arithmetic_or_float128
+template <class T>
+struct is_arithmetic_or_float128
 {
    static constexpr bool value = (   (std::is_arithmetic<T>::value == true)
 #if defined(BOOST_MATH_USE_FLOAT128)
@@ -64,7 +78,8 @@ template <class T> struct is_arithmetic_or_float128
                                  );
 };
 
-template <class T> struct is_floating_point_or_float128
+template <class T>
+struct is_floating_point_or_float128
 {
    static constexpr bool value = (   (std::is_floating_point<T>::value == true)
 #if defined(BOOST_MATH_USE_FLOAT128)
@@ -86,9 +101,10 @@ class cpp_double_float
    using float_type = FloatingPointType;
    using rep_type   = std::pair<float_type, float_type>;
 
-  using   signed_types = std::tuple<  signed char,   signed short,   signed int,   signed long,   signed long long, std::intmax_t>;
-  using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long, std::uintmax_t>;
-  using float_types    = std::tuple<float, double, long double>;
+   using   signed_types = std::tuple<  signed char,   signed short,   signed int,   signed long,   signed long long, std::intmax_t>;
+   using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long, std::uintmax_t>;
+   using float_types    = std::tuple<float, double, long double>;
+   using exponent_type  = int;
 
    // Default constructor.
    cpp_double_float() { }
@@ -357,6 +373,29 @@ class cpp_double_float
 
    cpp_double_float  operator-() const { return negative(); }
 
+   std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
+   {
+      std::stringstream strm;
+
+      strm.flags    (format_flags);
+      strm.imbue    (strm.getloc());
+      strm.precision(number_of_digits);
+
+      strm << *this;
+
+      return strm.str();
+   }
+
+   void swap(cpp_double_float& other)
+   {
+      const float_type tmp_x = first();
+      const float_type tmp_y = second();
+
+      data = std::make_pair(other.first(), other.second());
+
+      other.data = std::make_pair(tmp_x, tmp_y);
+   }
+
    // Helper functions
    static cpp_double_float<float_type> pow10(int p)
    {
@@ -396,6 +435,17 @@ class cpp_double_float
    {
       // Convert a pair of floats to standard form
       p = (fast ? fast_exact_sum(p.first, p.second) : exact_sum(p.first, p.second));
+   }
+
+   int compare(const cpp_double_float& other) const
+   {
+      int n_result;
+
+      if     (eval_lt(*this, other)) { n_result = -1; }
+      else if(eval_gt(*this, other)) { n_result = +1; }
+      else                           { n_result =  0; }
+
+      return n_result;
    }
 
  private:
@@ -541,7 +591,7 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
 
       while (std::isdigit(str[pos]) && pos < str.size())
       {
-         *this += (str[pos] - '0') / pow10(pos - decimal_idx);
+         *this += cpp_double_float<FloatingPointType>(str[pos] - '0') / pow10((int) pos - (int) decimal_idx);
          pos++;
       }
    }
@@ -557,6 +607,7 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
    *this *= pow10(final_exponent);
 }
 
+#if 0
 // -- Comparision Operators
 // Comparison operators work by determining the type containing more detail at
 // compile time, and then promoting the type with less detail to the type with
@@ -591,7 +642,7 @@ operator>(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<C
    using first_type  = typename std::remove_reference<decltype(a)>::type;
    using second_type = typename std::remove_reference<decltype(b)>::type;
    using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
-   
+
    return static_cast<larger_type>(a) > static_cast<larger_type>(b);
 }
 
@@ -796,6 +847,7 @@ operator!=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& 
 {
    return b != a;
 }
+#endif
 // --
 
 // -- Input/Output Streaming
@@ -817,27 +869,28 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
       return os;
    }
 
-  if (f < cpp_double_float<FloatingPointType>(0) || os.flags() & std::ios::showpos)
-      os << (f < cpp_double_float<FloatingPointType>(0) ? "-" : "+");
+   if (eval_lt(f, cpp_double_float<FloatingPointType>(0)) || os.flags() & std::ios::showpos)
+      os << (eval_lt(f, cpp_double_float<FloatingPointType>(0)) ? "-" : "+");
 
    int exp10 = 0;
 
-   if (f != cpp_double_float<FloatingPointType>(0))
-      exp10 = (int)floor(log10(fabs(f.first())));
-   else
-      exp10 = 0;
 
-   cpp_double_float<FloatingPointType> f_prime = (f > cpp_double_float<FloatingPointType>(0) ? f : -f);
+   if (eval_eq(f, cpp_double_float<FloatingPointType>(0)))
+      exp10 = 0;
+   else
+      exp10 = (int)floor(log10(fabs(f.first())));
+
+   cpp_double_float<FloatingPointType> f_prime = (eval_gt(f, cpp_double_float<FloatingPointType>(0)) ? f : -f);
    f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
-   
+
    // TODO Handle subnormal numbers
 
-   if (f_prime < cpp_double_float<FloatingPointType>(1) && f_prime > cpp_double_float<FloatingPointType>(0))
+   if (eval_lt(f_prime, cpp_double_float<FloatingPointType>(1)) && eval_gt(f_prime, cpp_double_float<FloatingPointType>(0)))
    {
       f_prime *= FloatingPointType(10);
       exp10++;
    }
-   else if (f_prime >= 10)
+   else if (eval_gt(f_prime, cpp_double_float<FloatingPointType>(10)) || eval_eq(f_prime, cpp_double_float<FloatingPointType>(10)))
    {
       f_prime /= FloatingPointType(10);
       exp10--;
@@ -872,7 +925,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    }
 
    auto round_up = [&]() {
-      int i = digits.size() - 1;
+      int i = int(digits.size()) - 1;
       if (i > -1)
       {
          do
@@ -906,9 +959,9 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    // (1) greater than 0.5 (round-up)
    // (2) less than 0.5 (round-down)
    // (3) equal to 0.5 (round-to-even)
-   if (f_prime > 5)
+   if (eval_gt(f_prime, cpp_double_float<FloatingPointType>(5)))
       round_up();
-   else if (f_prime < 5)  // do nothing. already correctly rounded
+   else if (eval_lt(f_prime, cpp_double_float<FloatingPointType>(5)))  // do nothing. already correctly rounded
    {
       // TODO add some kind of an option for configurable rounding mode
    }
@@ -955,7 +1008,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
          if (is_set(std::ios::fixed))
             str_size += exp10 + 1;
 
-         fill_zeroes(str, str.size(), str_size - str.size() - 1);
+         fill_zeroes(str, str.size(), (int) str_size - (int) str.size() - 1);
 
          BOOST_ASSERT(std::ptrdiff_t(exp10 + 1) <= std::ptrdiff_t(str.size()));
          str.insert(exp10 + 1, ".");
@@ -980,7 +1033,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
 
       str.insert(1, ".");
       // Pad with zeroes
-      fill_zeroes(str, str.size(), str_size - str.size());
+      fill_zeroes(str, str.size(), (int) str_size - (int) str.size());
 
       // Remove trailing zeroes
       while (str.size() > str_size)
@@ -1024,17 +1077,29 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_float<Floa
    return is;
 }
 
+template<typename FloatingPointType> void eval_add     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result += x; }
+template<typename FloatingPointType> void eval_subtract(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result -= x; }
+template<typename FloatingPointType> void eval_multiply(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result *= x; }
+template<typename FloatingPointType> void eval_divide  (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result /= x; }
+
+template<typename FloatingPointType> bool eval_eq(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return a.first() == b.first() ? (a.second() == b.second() ? true : false) : false; }
+template<typename FloatingPointType> bool eval_gt(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return a.first() >  b.first() ? true : (a.first() == b.first()) ? (a.second() > b.second() ? true : false) : false; }
+template<typename FloatingPointType> bool eval_lt(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return a.first() <  b.first() ? true : (a.first() == b.first()) ? (a.second() < b.second() ? true : false) : false; }
+
 } } } // namespace boost::multiprecision::backends
 
 // Specialization of numeric_limits for cpp_double_float<>
-template <typename FloatingPointType>
-class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>
+template<typename FloatingPointType,
+         const boost::multiprecision::expression_template_option ExpressionTemplates>
+class std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>,
+                                                        ExpressionTemplates>>
    : public std::numeric_limits<FloatingPointType>
 {
 private:
    using base_class_type = std::numeric_limits<FloatingPointType>;
 
-   using self_type = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
+   using self_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>,
+                                                   ExpressionTemplates>;
 
 public:
    static constexpr bool is_iec559   = false;
