@@ -33,6 +33,12 @@ template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> 
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
 
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator-(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
+template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
+
+
 } } } // namespace boost::multiprecision::backends
 
 // Foward decleration for std::numeric_limits
@@ -215,10 +221,58 @@ class cpp_double_float
 
    cpp_double_float& operator=(cpp_double_float&&) = default;
 
-   cpp_double_float& operator+=(const float_type& a);
-   cpp_double_float& operator-=(const float_type& a);
-   cpp_double_float& operator*=(const float_type& a);
-   cpp_double_float& operator/=(const float_type& a);
+   friend inline cpp_double_float operator+(const cpp_double_float& a, const float_type& b)
+   {
+      auto s = exact_sum(a.first(), b);
+
+      s.second += a.second();
+      normalize_pair(s);
+
+      return cpp_double_float(s);
+   }
+
+   friend inline cpp_double_float operator-(const cpp_double_float& a, const float_type& b)
+   {
+      auto s = exact_difference(a.first(), b);
+
+      s.second += a.second();
+      normalize_pair(s);
+
+      return cpp_double_float(s);
+   }
+
+   friend inline cpp_double_float operator*(const cpp_double_float& a, const float_type& b)
+   {
+      auto p = exact_product(a.first(), b);
+      p.second += a.second() * b;
+
+      normalize_pair(p);
+
+      return cpp_double_float(p);
+   }
+
+   friend inline cpp_double_float operator/(const cpp_double_float& a, const float_type& b)
+   {
+      rep_type p, q, s;
+
+      p.first = a.first() / b;
+
+      q = exact_product(p.first, b);
+      s = exact_difference(a.first(), q.first);
+      s.second += a.second();
+      s.second -= q.second;
+
+      p.second = (s.first + s.second) / b;
+
+      normalize_pair(p);
+
+      return cpp_double_float(p);
+   }
+
+   cpp_double_float& operator+=(const float_type& a) { *this = *this + a; return *this; }
+   cpp_double_float& operator-=(const float_type& a) { *this = *this - a; return *this; }
+   cpp_double_float& operator*=(const float_type& a) { *this = *this * a; return *this; }
+   cpp_double_float& operator/=(const float_type& a) { *this = *this / a; return *this; }
 
    cpp_double_float& operator+=(const cpp_double_float& other)
    {
@@ -302,7 +356,44 @@ class cpp_double_float
  private:
    rep_type data;
 
-   static std::pair<float_type, float_type> split(const float_type& a);
+   static rep_type split(const float_type& a)
+   {
+      // Split a floating point number in two (high and low) parts approximating the
+      // upper-half and lower-half bits of the float
+      static_assert(std::numeric_limits<float_type>::is_iec559,
+                    "double_float<> invoked with non-native floating-point unit");
+
+      // TODO Replace bit shifts with constexpr funcs for better compaitibility
+      constexpr int        MantissaBits   = std::numeric_limits<float_type>::digits;
+      constexpr int        SplitBits      = MantissaBits / 2 + 1;
+      constexpr float_type Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
+      const     float_type SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter*2);
+
+      FloatingPointType temp, hi, lo;
+
+      // Handle if multiplication with the splitter would cause overflow
+      if (a > SplitThreshold || a < -SplitThreshold)
+      {
+         constexpr float_type Normalizer = float_type(1ULL << (SplitBits + 1));
+
+         FloatingPointType a_ = a / Normalizer;
+
+         temp = Splitter * a_;
+         hi   = temp - (temp - a_);
+         lo   = a_ - hi;
+
+         hi *= Normalizer;
+         lo *= Normalizer;
+      }
+      else
+      {
+         temp = Splitter * a;
+         hi   = temp - (temp - a);
+         lo   = a - hi;
+      }
+
+      return std::make_pair(hi, lo);
+   }
 };
 
 // -- Arithmetic backends
@@ -357,46 +448,6 @@ cpp_double_float<FloatingPointType>::normalize_pair(std::pair<float_type, float_
    p = (fast ? fast_exact_sum(p.first, p.second) : exact_sum(p.first, p.second));
 }
 
-// Split a floating point number in two (high and low) parts approximating the
-// upper-half and lower-half bits of the float
-template <typename FloatingPointType>
-std::pair<FloatingPointType, FloatingPointType> inline cpp_double_float<FloatingPointType>::split(const FloatingPointType& a)
-{
-   static_assert(std::numeric_limits<FloatingPointType>::is_iec559,
-                 "double_float<> invoked with non-native floating-point unit");
-
-   // TODO Replace bit shifts with constexpr funcs for better compaitibility
-   constexpr int               MantissaBits   = std::numeric_limits<FloatingPointType>::digits;
-   constexpr int               SplitBits      = MantissaBits / 2 + 1;
-   constexpr FloatingPointType Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
-   const     FloatingPointType SplitThreshold = (std::numeric_limits<FloatingPointType>::max)() / (Splitter*2);
-
-   FloatingPointType temp, hi, lo;
-
-   // Handle if multiplication with the splitter would cause overflow
-   if (a > SplitThreshold || a < -SplitThreshold)
-   {
-      constexpr FloatingPointType Normalizer = FloatingPointType(1ULL << (SplitBits + 1));
-
-      FloatingPointType a_ = a / Normalizer;
-
-      temp = Splitter * a_;
-      hi   = temp - (temp - a_);
-      lo   = a_ - hi;
-
-      hi *= Normalizer;
-      lo *= Normalizer;
-   }
-   else
-   {
-      temp = Splitter * a;
-      hi   = temp - (temp - a);
-      lo   = a - hi;
-   }
-
-   return std::make_pair(hi, lo);
-}
-
 // Exact product of two floating point numbers
 template <typename FloatingPointType>
 std::pair<FloatingPointType, FloatingPointType>
@@ -421,21 +472,6 @@ cpp_double_float<FloatingPointType>::exact_product(const float_type& a, const fl
 // --
 
 // -- Double-float arithmetic
-// operator+ and operator+=
-// double_float<> + native-float
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator+(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b)
-{
-   using double_float_t = cpp_double_float<FloatingPointType>;
-
-   auto s = double_float_t::exact_sum(a.first(), b);
-
-   s.second += a.second();
-   double_float_t::normalize_pair(s);
-
-   return double_float_t(s);
-}
 
 // double_float<> + double_float<>
 // Satisfies IEEE-754 bounds
@@ -443,59 +479,6 @@ template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> 
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) -= b; }
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) *= b; }
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) /= b; }
-
-// double_float<> - native-float
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator-(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b)
-{
-   using double_float_t = cpp_double_float<FloatingPointType>;
-
-   auto s = double_float_t::exact_difference(a.first(), b);
-
-   s.second += a.second();
-   double_float_t::normalize_pair(s);
-
-   return double_float_t(s);
-}
-
-// double_float<> * native-float
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator*(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b)
-{
-   using double_float_t = cpp_double_float<FloatingPointType>;
-
-   auto p = double_float_t::exact_product(a.first(), b);
-   p.second += a.second() * b;
-
-   double_float_t::normalize_pair(p);
-
-   return double_float_t(p);
-}
-
-// double_float<> / native-float
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>
-operator/(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b)
-{
-   using double_float_t = cpp_double_float<FloatingPointType>;
-   
-   std::pair<FloatingPointType, FloatingPointType> p, q, s;
-
-   p.first = a.first() / b;
-
-   q = double_float_t::exact_product(p.first, b);
-   s = double_float_t::exact_difference(a.first(), q.first);
-   s.second += a.second();
-   s.second -= q.second;
-
-   p.second = (s.first + s.second) / b;
-
-   double_float_t::normalize_pair(p);
-
-   return double_float_t(p);
-}
 
 template <typename NumericType, typename FloatingPointType>
 inline cpp_double_float<FloatingPointType>
@@ -557,38 +540,6 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
    }
 
    *this *= pow10(final_exponent);
-}
-
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>&
-cpp_double_float<FloatingPointType>::operator+=(const FloatingPointType& a)
-{
-   *this = *this + a;
-   return *this;
-}
-
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>&
-cpp_double_float<FloatingPointType>::operator-=(const FloatingPointType& a)
-{
-   *this = *this - a;
-   return *this;
-}
-
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>&
-cpp_double_float<FloatingPointType>::operator*=(const FloatingPointType& a)
-{
-   *this = *this * a;
-   return *this;
-}
-
-template <typename FloatingPointType>
-inline cpp_double_float<FloatingPointType>&
-cpp_double_float<FloatingPointType>::operator/=(const FloatingPointType& a)
-{
-   *this = *this / a;
-   return *this;
 }
 
 template <typename FloatingPointType>
