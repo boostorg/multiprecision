@@ -31,6 +31,16 @@
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/core/demangle.hpp>
 
+#if defined(__clang__)
+  #if defined __has_feature && __has_feature(thread_sanitizer)
+  #define CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH
+  #endif
+#elif defined(__GNUC__)
+  #if defined(__SANITIZE_THREAD__)
+  #define CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH
+  #endif
+#endif
+
 namespace local {
 
 template<typename ConstituentFloatType>
@@ -41,7 +51,7 @@ struct control
    static constexpr int max_digits10   = int(float(digits) * 0.301F) + 2;
    static constexpr int max_exponent10 = std::numeric_limits<ConstituentFloatType>::max_exponent10;
 
-   using double_float_type  = boost::multiprecision::backends::cpp_double_float<ConstituentFloatType>;
+   using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<ConstituentFloatType>, boost::multiprecision::et_off>;
    using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
 
    using random_engine_type = std::linear_congruential_engine<std::uint32_t, 48271, 0, 2147483647>;
@@ -164,8 +174,8 @@ bool test_op(char op, const unsigned count = 10000U)
       const double_float_type  df_a(str_a);
       const double_float_type  df_b(str_b);
 
-      const control_float_type ctrl_a = control_float_type(df_a.first()) + control_float_type(df_a.second());
-      const control_float_type ctrl_b = control_float_type(df_b.first()) + control_float_type(df_b.second());
+      const control_float_type ctrl_a = control_float_type(double_float_type::canonical_value(df_a).first()) + control_float_type(double_float_type::canonical_value(df_a).second());
+      const control_float_type ctrl_b = control_float_type(double_float_type::canonical_value(df_b).first()) + control_float_type(double_float_type::canonical_value(df_b).second());
 
       double_float_type  df_c;
       control_float_type ctrl_c;
@@ -198,7 +208,7 @@ bool test_op(char op, const unsigned count = 10000U)
          break;
       }
 
-      control_float_type ctrl_df_c = control_float_type(control_float_type(df_c.first()) + control_float_type(df_c.second()));
+      control_float_type ctrl_df_c = control_float_type(control_float_type(double_float_type::canonical_value(df_c).first()) + control_float_type(double_float_type::canonical_value(df_c).second()));
 
       const control_float_type delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
 
@@ -206,12 +216,6 @@ bool test_op(char op, const unsigned count = 10000U)
       {
          std::cerr << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
          std::cerr << " [FAILED] while performing '" << std::setprecision(100000) << ctrl_a << "' " << op << " '" << ctrl_b << "', got incorrect result: " << (df_c) << std::endl;
-
-         // uncomment for more debugging information (only for cpp_double_float<> type)
-         //std::cerr << "(df_a = " << df_a.get_raw_str() << ", df_b = " << df_b.get_raw_str() << ")" << std::endl;
-         //std::cerr << "expected: " << ctrl_c << std::endl;
-         //std::cerr << "actual  : " << ctrl_df_c << " (" << df_c.get_raw_str() << ")" << std::endl;
-         //std::cerr << "error   : " << delta << std::endl;
 
          return false;
       }
@@ -245,11 +249,23 @@ int main()
 {
    bool result_is_ok = true;
 
-   result_is_ok &= local::test_arithmetic<float> (1000000U);
-   result_is_ok &= local::test_arithmetic<double>(1000000U);
-   //result_is_ok &= local::test_arithmetic<long double>();
+   #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
+   constexpr unsigned int test_cases_built_in = 10000U;
+   #else
+   constexpr unsigned int test_cases_built_in = 1000000U;
+   #endif
+
+   #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
+   constexpr unsigned int test_cases_float128 = 500U;
+   #else
+   constexpr unsigned int test_cases_float128 = 10000U;
+   #endif
+
+   result_is_ok &= local::test_arithmetic<float>      (test_cases_built_in);
+   result_is_ok &= local::test_arithmetic<double>     (test_cases_built_in);
+   //result_is_ok &= local::test_arithmetic<long double>(test_cases_built_in);
 #ifdef BOOST_MATH_USE_FLOAT128
-   result_is_ok &= local::test_arithmetic<boost::multiprecision::float128>(20000U);
+   result_is_ok &= local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
 #endif
 
    return (result_is_ok ? 0 : -1);
