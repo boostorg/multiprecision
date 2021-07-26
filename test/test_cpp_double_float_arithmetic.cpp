@@ -32,11 +32,11 @@
 #include <boost/core/demangle.hpp>
 
 #if defined(__clang__)
-  #if defined __has_feature && __has_feature(thread_sanitizer)
+  #if defined __has_feature && (__has_feature(thread_sanitizer) || __has_feature(address_sanitizer))
   #define CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH
   #endif
 #elif defined(__GNUC__)
-  #if defined(__SANITIZE_THREAD__)
+  #if defined(__SANITIZE_THREAD__) || defined(__SANITIZE_ADDRESS__)
   #define CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH
   #endif
 #endif
