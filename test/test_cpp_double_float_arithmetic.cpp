@@ -11,8 +11,8 @@
 // cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
 // g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_double_float.exe
 
-// TBD: Handle interaction with Boost's wrap of libquadmath __float128.
-// g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DBOOST_MATH_USE_FLOAT128 test.cpp -o -lquadmath test_double_float.exe
+// Handle interaction with Boost's wrap of libquadmath __float128.
+// g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DBOOST_MATH_USE_FLOAT128 test.cpp -lquadmath -o test_double_float.exe
 
 #include <ctime>
 #include <iomanip>
@@ -31,136 +31,180 @@
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/core/demangle.hpp>
 
-namespace test_arithmetic_cpp_double_float {
+namespace local {
 
-template <typename FloatingPointType,
-          typename std::enable_if<(  boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value == true), bool>::type = true>
-FloatingPointType uniform_real()
+template<typename ConstituentFloatType>
+struct control
 {
-   using distribution_type = boost::random::uniform_real_distribution<FloatingPointType>;
+   static constexpr int digits         = (2 * std::numeric_limits<ConstituentFloatType>::digits) - 2;
+   static constexpr int digits10       = int(float(digits - 1) * 0.301F);
+   static constexpr int max_digits10   = int(float(digits) * 0.301F) + 2;
+   static constexpr int max_exponent10 = std::numeric_limits<ConstituentFloatType>::max_exponent10;
 
-   static unsigned long seed_scaler = 0U;
+   using double_float_type  = boost::multiprecision::backends::cpp_double_float<ConstituentFloatType>;
+   using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
 
-   static std::random_device rd;
-   static std::mt19937       gen(rd());
-   static distribution_type  dis(0.0, 1.0);
+   using random_engine_type = std::linear_congruential_engine<std::uint32_t, 48271, 0, 2147483647>;
 
-   if((seed_scaler % 0x100000UL) == 0U)
+   static std::mt19937       engine_man;
+   static std::ranlux24_base engine_sgn;
+   static random_engine_type engine_dec_pt;
+
+   template<const std::size_t DigitsToGet = digits10>
+   static void get_random_fixed_string(std::string& str, const bool is_unsigned = false)
    {
-     gen.seed(static_cast<typename std::mt19937::result_type>(std::clock()));
+      static std::uniform_int_distribution<unsigned>
+      dist_sgn
+      (
+         0,
+         1
+      );
+
+      static std::uniform_int_distribution<unsigned>
+      dist_first
+      (
+         1,
+         9
+      );
+
+      static std::uniform_int_distribution<unsigned>
+      dist_following
+      (
+         0,
+         9
+      );
+
+      const bool is_neg = ((is_unsigned == false) && (dist_sgn(engine_sgn) != 0));
+
+      // Use DigitsToGet + 2, where +2 represents the lenth of "0.".
+      std::string::size_type len = static_cast<std::string::size_type>(DigitsToGet + 2);
+
+      std::string::size_type pos = 0U;
+
+      if(is_neg)
+      {
+         ++len;
+
+         str.resize(len);
+
+         str.at(pos) = char('-');
+
+         ++pos;
+      }
+      else
+      {
+         str.resize(len);
+      }
+
+      str.at(pos) = static_cast<char>('0');
+      ++pos;
+
+      str.at(pos) = static_cast<char>('.');
+      ++pos;
+
+      str.at(pos) = static_cast<char>(dist_first(engine_man) + 0x30U);
+      ++pos;
+
+      while(pos < str.length())
+      {
+         str.at(pos) = static_cast<char>(dist_following(engine_man) + 0x30U);
+         ++pos;
+      }
+
+      const bool exp_is_neg = (dist_sgn(engine_sgn) != 0);
+
+      static std::uniform_int_distribution<unsigned>
+      dist_exp
+      (
+         0,
+         unsigned(float(max_exponent10) * 0.15F)
+      );
+
+      std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
+
+      {
+         std::stringstream strm;
+
+         strm << dist_exp(engine_man);
+
+         str_exp += strm.str();
+      }
+
+      str += str_exp;
    }
+};
 
-   return dis(gen);
-}
+template<typename ConstituentFloatType> constexpr int control<ConstituentFloatType>::digits;
+template<typename ConstituentFloatType> constexpr int control<ConstituentFloatType>::digits10;
+template<typename ConstituentFloatType> constexpr int control<ConstituentFloatType>::max_digits10;
+template<typename ConstituentFloatType> constexpr int control<ConstituentFloatType>::max_exponent10;
 
-int rand_in_range(int a, int b)
+template<typename ConstituentFloatType> std::mt19937       control<ConstituentFloatType>::engine_man(static_cast<typename std::mt19937::result_type>(std::clock()));
+template<typename ConstituentFloatType> std::ranlux24_base control<ConstituentFloatType>::engine_sgn(static_cast<typename std::ranlux24_base::result_type>(std::clock()));
+template<typename ConstituentFloatType> typename control<ConstituentFloatType>::random_engine_type control<ConstituentFloatType>::engine_dec_pt(static_cast<typename random_engine_type::result_type>(std::clock()));
+
+template <typename ConstituentFloatType>
+bool test_op(char op, const unsigned count = 10000U)
 {
-   return a + int(float(b - a) * uniform_real<float>());
-}
+   using float_type         = ConstituentFloatType;
+   using double_float_type  = typename control<float_type>::double_float_type;
+   using control_float_type = typename control<float_type>::control_float_type;
 
-template <typename FloatingPointType,
-          typename std::enable_if<(  boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value == true), bool>::type = true>
-FloatingPointType uniform_rand()
-{
-   return uniform_real<FloatingPointType>();
-}
-
-template <typename FloatingPointType>
-boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> uniform_rand()
-{
-   using float_type = typename FloatingPointType::float_type;
-   return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
-}
-
-
-template <typename FloatingPointType>
-typename std::enable_if<(  boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value == true), FloatingPointType>::type
-log_rand()
-{
-   if (uniform_real<float>() < (1. / 100.))
-      return 0; // throw in a few zeroes
-   using std::ldexp;
-   FloatingPointType ret = ldexp(uniform_real<FloatingPointType>(), rand_in_range(std::numeric_limits<FloatingPointType>::min_exponent, std::numeric_limits<FloatingPointType>::max_exponent));
-   using std::fmax;
-   return fmax(ret, std::numeric_limits<FloatingPointType>::epsilon());
-}
-
-template <typename FloatingPointType>
-boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> log_rand()
-{
-   boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> a(uniform_rand<boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> >() + typename FloatingPointType::float_type(1));
-   a *= log_rand<typename FloatingPointType::float_type>();
-   return a;
-}
-
-template <typename ConstructionType, typename FloatingPointType, typename std::enable_if<std::numeric_limits<FloatingPointType>::is_iec559>::type const* = nullptr>
-ConstructionType construct_from(FloatingPointType f) {
-   return ConstructionType(f);
-}
-
-template <typename ConstructionType, typename FloatingPointType, typename std::enable_if<!std::numeric_limits<FloatingPointType>::is_iec559>::type const* = nullptr>
-ConstructionType construct_from(FloatingPointType f)
-{
-   return ConstructionType(f.first()) + ConstructionType(f.second());
-}
-
-template <typename FloatingPointType>
-bool test_op(char op, const unsigned count = 0x20000U)
-{
-   using naked_double_float_type = FloatingPointType;
-   using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 * 2 + 1>, boost::multiprecision::et_off>;
-
-   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<naked_double_float_type>::digits + 1);
-   std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<naked_double_float_type>::digits << " bits)...";
+   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
+   std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<double_float_type>::digits << " bits)...";
 
    for (unsigned i = 0U; i < count; ++i)
    {
-      naked_double_float_type  df_a   = log_rand<naked_double_float_type>();
-      naked_double_float_type  df_b   = log_rand<naked_double_float_type>();
-      const control_float_type ctrl_a = construct_from<control_float_type, naked_double_float_type>(df_a);
-      const control_float_type ctrl_b = construct_from<control_float_type, naked_double_float_type>(df_b);
+      std::string str_a;
+      std::string str_b;
 
-      naked_double_float_type df_c;
-      control_float_type      ctrl_c;
+      control<float_type>::get_random_fixed_string(str_a);
+      control<float_type>::get_random_fixed_string(str_b);
+
+      const double_float_type  df_a(str_a);
+      const double_float_type  df_b(str_b);
+
+      const control_float_type ctrl_a = control_float_type(df_a.first()) + control_float_type(df_a.second());
+      const control_float_type ctrl_b = control_float_type(df_b.first()) + control_float_type(df_b.second());
+
+      double_float_type  df_c;
+      control_float_type ctrl_c;
 
       switch (op)
       {
+      default:
       case '+':
-         df_c   = df_a + df_b;
+         df_c   = df_a   + df_b;
          ctrl_c = ctrl_a + ctrl_b;
          break;
       case '-':
-         df_c   = df_a - df_b;
+         df_c   = df_a   - df_b;
          ctrl_c = ctrl_a - ctrl_b;
          break;
       case '*':
-         df_c   = df_a * df_b;
+         df_c   = df_a   * df_b;
          ctrl_c = ctrl_a * ctrl_b;
          break;
       case '/':
-         if (df_b == naked_double_float_type(0))
+         if (df_b != double_float_type(0))
+         {
+            df_c   = df_a   / df_b;
+            ctrl_c = ctrl_a / ctrl_b;
+         }
+         else
+         {
             continue;
-         df_c   = df_a / df_b;
-         ctrl_c = ctrl_a / ctrl_b;
+         }
          break;
-      default:
-         std::cerr << " internal error (unknown operator: " << op << ")" << std::endl;
-         return false;
       }
 
-      // if exponent of result is out of range, continue
-      int exp2;
-      boost::multiprecision::frexp(ctrl_c, &exp2);
-      if (exp2 > std::numeric_limits<naked_double_float_type>::max_exponent || exp2 < std::numeric_limits<naked_double_float_type>::min_exponent)
-         continue;
+      control_float_type ctrl_df_c = control_float_type(control_float_type(df_c.first()) + control_float_type(df_c.second()));
 
-      control_float_type ctrl_df_c = construct_from<control_float_type, naked_double_float_type>(df_c);
-
-      const auto delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
+      const control_float_type delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
 
       if (delta > MaxError)
       {
-         std::cerr << std::setprecision(std::numeric_limits<naked_double_float_type>::digits10 + 2);
+         std::cerr << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
          std::cerr << " [FAILED] while performing '" << std::setprecision(100000) << ctrl_a << "' " << op << " '" << ctrl_b << "', got incorrect result: " << (df_c) << std::endl;
 
          // uncomment for more debugging information (only for cpp_double_float<> type)
@@ -179,41 +223,33 @@ bool test_op(char op, const unsigned count = 0x20000U)
 }
 
 template <typename T>
-bool test_arithmetic()
+bool test_arithmetic(const unsigned count = 10000U)
 {
    std::cout << "Testing correctness of arithmetic operators for " << boost::core::demangle(typeid(T).name()) << std::endl;
 
    bool result_is_ok = true;
 
-   result_is_ok &= test_op<T>('+');
-   result_is_ok &= test_op<T>('-');
-   result_is_ok &= test_op<T>('*');
-   result_is_ok &= test_op<T>('/');
+   result_is_ok &= test_op<T>('+', count);
+   result_is_ok &= test_op<T>('-', count);
+   result_is_ok &= test_op<T>('*', count);
+   result_is_ok &= test_op<T>('/', count);
 
    std::cout << std::endl;
 
    return result_is_ok;
 }
 
-} // namespace test_arithmetic_cpp_double_float
+} // namespace local
 
 int main()
 {
    bool result_is_ok = true;
 
-   // uncomment to check if tests themselves are correct
-   //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<float>();
-   //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<double>();
-   //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<long double>();
+   result_is_ok &= local::test_arithmetic<float> (1000000U);
+   result_is_ok &= local::test_arithmetic<double>(1000000U);
+   //result_is_ok &= local::test_arithmetic<long double>();
 #ifdef BOOST_MATH_USE_FLOAT128
-   //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::float128>();
-#endif
-
-   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<float> >();
-   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double> >();
-   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<long double> >();
-#ifdef BOOST_MATH_USE_FLOAT128
-   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> >();
+   result_is_ok &= local::test_arithmetic<boost::multiprecision::float128>(20000U);
 #endif
 
    return (result_is_ok ? 0 : -1);

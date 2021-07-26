@@ -86,9 +86,9 @@ class cpp_double_float
    using float_type = FloatingPointType;
    using rep_type   = std::pair<float_type, float_type>;
 
-  using   signed_types = std::tuple<  signed char,   signed short,   signed int,   signed long,   signed long long, std::intmax_t>;
-  using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long, std::uintmax_t>;
-  using float_types    = std::tuple<float, double, long double>;
+   using   signed_types = std::tuple<  signed char,   signed short,   signed int,   signed long,   signed long long, std::intmax_t>;
+   using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long, std::uintmax_t>;
+   using float_types    = std::tuple<float, double, long double>;
 
    // Default constructor.
    cpp_double_float() { }
@@ -541,7 +541,7 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
 
       while (std::isdigit(str[pos]) && pos < str.size())
       {
-         *this += (str[pos] - '0') / pow10(pos - decimal_idx);
+         *this += cpp_double_float<FloatingPointType>(str[pos] - '0') / pow10((int) pos - (int) decimal_idx);
          pos++;
       }
    }
