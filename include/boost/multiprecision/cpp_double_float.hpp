@@ -38,34 +38,12 @@ template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> 
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
 
-template<typename FloatingPointType> inline bool operator< (const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
-template<typename FloatingPointType> inline bool operator<=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
-template<typename FloatingPointType> inline bool operator==(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
-template<typename FloatingPointType> inline bool operator!=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
-template<typename FloatingPointType> inline bool operator>=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
-template<typename FloatingPointType> inline bool operator> (const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
-
-template<typename FloatingPointType> void eval_add     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
-template<typename FloatingPointType> void eval_subtract(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
-template<typename FloatingPointType> void eval_multiply(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
-template<typename FloatingPointType> void eval_divide  (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
-
-template<typename FloatingPointType,
-         typename char_type,
-         typename traits_type>
-std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os,
-                                                       const cpp_double_float<FloatingPointType>& f);
 
 } } } // namespace boost::multiprecision::backends
 
-namespace std {
-
-// Foward declaration of std::numeric_limits
-template <typename FloatingPointType,
-          const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>;
-
-}
+// Foward decleration for std::numeric_limits
+template <typename FloatingPointType>
+class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >;
 
 namespace boost { namespace multiprecision {
 
@@ -111,7 +89,6 @@ class cpp_double_float
   using   signed_types = std::tuple<  signed char,   signed short,   signed int,   signed long,   signed long long, std::intmax_t>;
   using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long, std::uintmax_t>;
   using float_types    = std::tuple<float, double, long double>;
-  using exponent_type  = int;
 
    // Default constructor.
    cpp_double_float() { }
@@ -198,11 +175,6 @@ class cpp_double_float
    cpp_double_float(const std::string& str)
    {
       set_str(str);
-   }
-
-   cpp_double_float(const char* pstr)
-   {
-      set_str(std::string(pstr));
    }
 
    constexpr cpp_double_float(cpp_double_float&&) = default;
@@ -420,249 +392,10 @@ class cpp_double_float
       return result;
    }
 
-   static void normalize_pair(rep_type& p, bool fast = true)
+   static void normalize_pair(std::pair<float_type, float_type>& p, bool fast = true)
    {
       // Convert a pair of floats to standard form
       p = (fast ? fast_exact_sum(p.first, p.second) : exact_sum(p.first, p.second));
-   }
-
-   void swap(cpp_double_float& other)
-   {
-      rep_type tmp = data;
-
-      data = other.data;
-
-      other.data = tmp;
-   }
-
-   int compare(const cpp_double_float& other) const
-   {
-     // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
-     int n_result;
-
-     if     ((first() > other.first()) || ((first() == other.first()) && (second() > other.second()))) { n_result =  1; }
-     else if((first() < other.first()) || ((first() == other.first()) && (second() < other.second()))) { n_result = -1; }
-     else                                                                                              { n_result =  0; }
-
-     return n_result;
-   }
-
-   std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
-   {
-      std::stringstream strm;
-
-      strm.flags    (format_flags);
-      strm.imbue    (strm.getloc());
-      strm.precision(number_of_digits);
-
-      using std::fabs;
-      auto is_set = [&](std::ios::fmtflags flg) {
-         return strm.flags() & flg;
-      };
-
-      using std::isinf;
-      using std::floor;
-      using std::log10;
-      if (isinf(first()))
-      {
-         strm << first();
-         return strm.str();
-      }
-
-      if (*this < cpp_double_float<FloatingPointType>(0) || strm.flags() & std::ios::showpos)
-         strm << (*this < cpp_double_float<FloatingPointType>(0) ? "-" : "+");
-
-      int exp10 = 0;
-
-      if (*this != cpp_double_float<FloatingPointType>(0))
-         exp10 = (int)floor(log10(fabs(first())));
-      else
-         exp10 = 0;
-
-      cpp_double_float<FloatingPointType> f_prime = (*this > cpp_double_float<FloatingPointType>(0) ? *this : -*this);
-      f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
-
-      // TODO Handle subnormal numbers
-
-      if (f_prime < cpp_double_float<FloatingPointType>(1) && f_prime > cpp_double_float<FloatingPointType>(0))
-      {
-         f_prime *= FloatingPointType(10);
-         exp10++;
-      }
-      else if (f_prime >= cpp_double_float<FloatingPointType>(10))
-      {
-         f_prime /= FloatingPointType(10);
-         exp10--;
-      }
-
-      // Collect all the required digits to print (plus one digit for rounding)
-      std::vector<int> digits;
-
-      int p = (int)strm.precision();
-      if (is_set(std::ios::fixed))
-         p += exp10 + 1;
-      else if (is_set(std::ios::scientific))
-         p = (std::max)(1, p + 1);
-      else
-         p = (std::max)(p, 1);
-
-      // TODO Maybe switch to fmod() based digit extraction for correct rounding?
-      while (p-- > 0)
-      {
-         // FIXME Replace with std::floor function
-         int digit = static_cast<int>(f_prime.first());
-
-         if (f_prime.second() < 0 && (f_prime.first() - (FloatingPointType)digit < -f_prime.second()))
-            digit -= 1;
-
-         BOOST_ASSERT(digit >= 0 && digit <= 9);
-
-         digits.push_back(digit);
-
-         f_prime -= static_cast<FloatingPointType>(digit);
-         f_prime *= static_cast<FloatingPointType>(10);
-      }
-
-      auto round_up = [&]() {
-         int i = digits.size() - 1;
-         if (i > -1)
-         {
-            do
-            {
-               if (digits[i] == 9)
-                  digits[i--] = 0;
-               else
-               {
-                  digits[i--] += 1;
-                  break;
-               }
-            } while (i >= 0);
-
-            // Special case in which all of the collected digits are incorrectly
-            // rounded (e.g. 9.999 rounded to three significant figures = 10.0)
-            if (i == -1 && digits[0] == 0)
-            {
-               digits = {1};
-               exp10++;
-            }
-         }
-         else
-         {
-            digits.insert(digits.begin(), 1);
-            exp10++;
-         }
-      };
-
-      // Perform rounding (rounding mode = round-to-nearest, ties-to-even)
-      // Three possible cases: the remaining part of the number is
-      // (1) greater than 0.5 (round-up)
-      // (2) less than 0.5 (round-down)
-      // (3) equal to 0.5 (round-to-even)
-      if (f_prime > cpp_double_float<FloatingPointType>(5))
-         round_up();
-      else if (f_prime < cpp_double_float<FloatingPointType>(5))  // do nothing. already correctly rounded
-      {
-         // TODO add some kind of an option for configurable rounding mode
-      }
-      else if (digits.back() % 2 != 0)
-         // remaining part is exactly 0.5, so round-to-even
-         round_up();
-
-      // Remove trailing zeroes
-      if (!is_set(std::ios::fixed) && !is_set(std::ios::scientific) && !is_set(std::ios::showpoint))
-         while (digits.back() == 0 && (std::ptrdiff_t(digits.size()) > std::ptrdiff_t(1 + exp10) || exp10 < 0))
-            digits.pop_back();
-
-      auto fill_zeroes = [](std::string& s, size_t pos, int n) {
-         for (int i = 0; i < n; ++i)
-            s.insert(pos, "0");
-      };
-
-      // Print the required numbers to a string
-      std::string str = "";
-      size_t      str_size;
-
-      for (auto d : digits)
-         str.push_back(static_cast<char>(d + '0'));
-
-      // Fixed-point style
-      if (is_set(std::ios::fixed) || (exp10 >= -4 && (exp10 < strm.precision()) && !is_set(std::ios::scientific)))
-      {
-         if (exp10 + 1 <= 0) // Number < 1
-         {
-            str_size = (size_t)strm.precision() + 2;
-
-            if (!is_set(std::ios::fixed) && strm.precision() == 0)
-               str_size++;
-
-            str.insert(0, "0.");
-
-            fill_zeroes(str, 2, -(exp10 + 1));
-            if (!is_set(std::ios::fixed))
-               str_size += -(exp10 + 1);
-         }
-         else  // Number >= 1
-         {
-            str_size = std::size_t(1 + strm.precision());
-            if (is_set(std::ios::fixed))
-               str_size += exp10 + 1;
-
-            fill_zeroes(str, str.size(), str_size - str.size() - 1);
-
-            BOOST_ASSERT(std::ptrdiff_t(exp10 + 1) <= std::ptrdiff_t(str.size()));
-            str.insert(exp10 + 1, ".");
-         }
- 
-         while (str.size() > str_size)
-            str.pop_back();
-         while (str.size() < str_size)
-            str.push_back('0');
-         while (!is_set(std::ios::showpoint) && !is_set(std::ios::fixed) && str.back() == '0')
-            str.pop_back();
-
-         if (str.back() == '.' && !is_set(std::ios::showpoint))
-            str.pop_back();
-      }
-      // Scientific style
-      else if (is_set(std::ios::scientific) || (exp10 < -4 || (exp10 + 1 > (std::max)((int)strm.precision(), 1))))
-      {
-         str_size = (size_t)strm.precision() + 1;
-         if (strm.precision() == 0 || is_set(std::ios::scientific))
-            str_size++;
-
-         str.insert(1, ".");
-         // Pad with zeroes
-         fill_zeroes(str, str.size(), str_size - str.size());
-
-         // Remove trailing zeroes
-         while (str.size() > str_size)
-            str.pop_back();
-         while (!is_set(std::ios::scientific) && !is_set(std::ios::showpoint) && str.back() == '0')
-            str.pop_back();
-
-         // Remove unnecessary point
-         if (str.back() == '.' && !is_set(std::ios::showpoint))
-            str.pop_back();
-
-         std::stringstream ss;
-
-         ss << str;
-         ss << (strm.flags() & std::ios::uppercase ? "E" : "e");
-         ss << (exp10 < 0 ? "-" : "+");
-         using std::log10;
-         ss.width((std::max)(1 + (std::streamsize)log10(exp10), (std::streamsize)2));
-         ss.fill('0');
-         ss << fabs(exp10);
-
-         str = ss.str();
-      }
-      else if (exp10 == strm.precision())
-      {
-         if (strm.flags() & std::ios::showpoint)
-            str.push_back('.');
-      }
-
-      return strm.str();
    }
 
  private:
@@ -770,13 +503,6 @@ template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> 
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) *= b; }
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) /= b; }
 
-template<typename FloatingPointType> inline bool operator< (const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return (a.compare(b) <  0); }
-template<typename FloatingPointType> inline bool operator<=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return (a.compare(b) <= 0); }
-template<typename FloatingPointType> inline bool operator==(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return (a.compare(b) == 0); }
-template<typename FloatingPointType> inline bool operator!=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return (a.compare(b) != 0); }
-template<typename FloatingPointType> inline bool operator>=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return (a.compare(b) >= 0); }
-template<typename FloatingPointType> inline bool operator> (const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return (a.compare(b) >  0); }
-
 // -- String Conversions
 // FIXME Merge set_str() to operator<<
 template <typename FloatingPointType>
@@ -815,7 +541,7 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
 
       while (std::isdigit(str[pos]) && pos < str.size())
       {
-         *this += cpp_double_float<FloatingPointType>(str[pos] - '0') / pow10(pos - decimal_idx);
+         *this += (str[pos] - '0') / pow10(pos - decimal_idx);
          pos++;
       }
    }
@@ -837,14 +563,455 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
 // more detail, and then comparing. Some minor complications arise while
 // comparing an unsigned type to cpp_double_float<> that are handled as well
 
+// operator>
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator>(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? false // Check for negative values
+                                 : larger_type(a) > larger_type(b);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator>(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   return a.first() > b.first() ? true : a.first() == b.first() ? (a.second() > b.second() ? true : false) : false;
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator>(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+   
+   return static_cast<larger_type>(a) > static_cast<larger_type>(b);
+}
+
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator>(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return b < a;
+}
+
+// operator<
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator<(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? true // Check for negative values
+                                 : larger_type(a) < larger_type(b);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator<(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   return a.first() < b.first() ? true : (a.first() == b.first()) ? (a.second() < b.second() ? true : false) : false;
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator<(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+   
+   return static_cast<larger_type>(a) < static_cast<larger_type>(b);
+}
+
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator<(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return b > a;
+}
+
+// operator>=
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator>=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? false // Check for negative values
+                                 : larger_type(a) >= larger_type(b);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator>=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   return a.first() > b.first() ? true : (a.first() == b.first()) ? (a.second() >= b.second() ? true : false) : false;
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator>=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return static_cast<larger_type>(a) >= static_cast<larger_type>(b);
+}
+
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator>=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return b <= a;
+}
+
+// operator <=
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator<=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? true // Check for negative values
+                                 : larger_type(a) <= larger_type(b);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator<=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   return a.first() < b.first() ? true : (a.first() == b.first()) ? (a.second() <= b.second() ? true : false) : false;
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator<=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return static_cast<larger_type>(a) <= static_cast<larger_type>(b);
+}
+
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator<=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return b >= a;
+}
+
+// operator ==
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator==(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? false // Check for negative values
+                                 : larger_type(a) == larger_type(b);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator==(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   return a.first() == b.first() ? (a.second() == b.second() ? true : false) : false;
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator==(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return static_cast<larger_type>(a) == static_cast<larger_type>(b);
+}
+
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator==(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return b == a;
+}
+
+// operator !=
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator!=(const cpp_double_float<FloatingPointType>& a, const ComparisionType& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return (   (std::is_unsigned<ComparisionType>::value && std::is_same<larger_type, ComparisionType>::value)
+           && (a.is_negative())) ? true // Check for negative values
+                                 : larger_type(a) != larger_type(b);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator!=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   return a.first() != b.first() ? true : (a.second() != b.second() ? true : false);
+}
+
+template <typename FloatingPointType, typename ComparisionType>
+inline constexpr typename std::enable_if<!std::is_same<FloatingPointType, ComparisionType>::value, bool>::type
+operator!=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<ComparisionType>& b)
+{
+   using first_type  = typename std::remove_reference<decltype(a)>::type;
+   using second_type = typename std::remove_reference<decltype(b)>::type;
+   using larger_type = typename std::conditional<std::numeric_limits<first_type>::digits >= std::numeric_limits<second_type>::digits, first_type, second_type>::type;
+
+   return static_cast<larger_type>(a) != static_cast<larger_type>(b);
+}
+
+template <typename ComparisionType, typename FloatingPointType>
+inline constexpr typename std::enable_if<detail::is_arithmetic_or_float128<ComparisionType>::value, bool>::type
+operator!=(const ComparisionType& a, const cpp_double_float<FloatingPointType>& b)
+{
+   return b != a;
+}
+// --
+
 // -- Input/Output Streaming
 template <typename FloatingPointType, typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_float<FloatingPointType>& f)
 {
-   const std::string str_result = f.str(os.precision(), os.flags());
+  using std::fabs;
+   auto is_set = [&](std::ios::fmtflags flg) {
+      return os.flags() & flg;
+   };
 
-   return (os << str_result);
+   using std::isinf;
+   using std::floor;
+   using std::log10;
+   if (isinf(f.first()))
+   {
+      os << f.first();
+      return os;
+   }
+
+  if (f < cpp_double_float<FloatingPointType>(0) || os.flags() & std::ios::showpos)
+      os << (f < cpp_double_float<FloatingPointType>(0) ? "-" : "+");
+
+   int exp10 = 0;
+
+   if (f != cpp_double_float<FloatingPointType>(0))
+      exp10 = (int)floor(log10(fabs(f.first())));
+   else
+      exp10 = 0;
+
+   cpp_double_float<FloatingPointType> f_prime = (f > cpp_double_float<FloatingPointType>(0) ? f : -f);
+   f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
+   
+   // TODO Handle subnormal numbers
+
+   if (f_prime < cpp_double_float<FloatingPointType>(1) && f_prime > cpp_double_float<FloatingPointType>(0))
+   {
+      f_prime *= FloatingPointType(10);
+      exp10++;
+   }
+   else if (f_prime >= 10)
+   {
+      f_prime /= FloatingPointType(10);
+      exp10--;
+   }
+
+   // Collect all the required digits to print (plus one digit for rounding)
+   std::vector<int> digits;
+
+   int p = (int)os.precision();
+   if (is_set(std::ios::fixed))
+      p += exp10 + 1;
+   else if (is_set(std::ios::scientific))
+      p = (std::max)(1, p + 1);
+   else
+      p = (std::max)(p, 1);
+
+   // TODO Maybe switch to fmod() based digit extraction for correct rounding?
+   while (p-- > 0)
+   {
+      // FIXME Replace with std::floor function
+      int digit = static_cast<int>(f_prime.first());
+
+      if (f_prime.second() < 0 && (f_prime.first() - (FloatingPointType)digit < -f_prime.second()))
+         digit -= 1;
+
+      BOOST_ASSERT(digit >= 0 && digit <= 9);
+
+      digits.push_back(digit);
+
+      f_prime -= static_cast<FloatingPointType>(digit);
+      f_prime *= static_cast<FloatingPointType>(10);
+   }
+
+   auto round_up = [&]() {
+      int i = (int) digits.size() - 1;
+      if (i > -1)
+      {
+         do
+         {
+            if (digits[i] == 9)
+               digits[i--] = 0;
+            else
+            {
+               digits[i--] += 1;
+               break;
+            }
+         } while (i >= 0);
+
+         // Special case in which all of the collected digits are incorrectly
+         // rounded (e.g. 9.999 rounded to three significant figures = 10.0)
+         if (i == -1 && digits[0] == 0)
+         {
+            digits = {1};
+            exp10++;
+         }
+      }
+      else
+      {
+         digits.insert(digits.begin(), 1);
+         exp10++;
+      }
+   };
+
+   // Perform rounding (rounding mode = round-to-nearest, ties-to-even)
+   // Three possible cases: the remaining part of the number is
+   // (1) greater than 0.5 (round-up)
+   // (2) less than 0.5 (round-down)
+   // (3) equal to 0.5 (round-to-even)
+   if (f_prime > 5)
+      round_up();
+   else if (f_prime < 5)  // do nothing. already correctly rounded
+   {
+      // TODO add some kind of an option for configurable rounding mode
+   }
+   else if (digits.back() % 2 != 0)
+      // remaining part is exactly 0.5, so round-to-even
+      round_up();
+
+   // Remove trailing zeroes
+   if (!is_set(std::ios::fixed) && !is_set(std::ios::scientific) && !is_set(std::ios::showpoint))
+      while (digits.back() == 0 && (std::ptrdiff_t(digits.size()) > std::ptrdiff_t(1 + exp10) || exp10 < 0))
+         digits.pop_back();
+
+   auto fill_zeroes = [](std::string& s, size_t pos, int n) {
+      for (int i = 0; i < n; ++i)
+         s.insert(pos, "0");
+   };
+
+   // Print the required numbers to a string
+   std::string str = "";
+   size_t      str_size;
+
+   for (auto d : digits)
+      str.push_back(static_cast<char>(d + '0'));
+
+   // Fixed-point style
+   if (is_set(std::ios::fixed) || (exp10 >= -4 && (exp10 < os.precision()) && !is_set(std::ios::scientific)))
+   {
+      if (exp10 + 1 <= 0) // Number < 1
+      {
+         str_size = (size_t)os.precision() + 2;
+
+         if (!is_set(std::ios::fixed) && os.precision() == 0)
+            str_size++;
+
+         str.insert(0, "0.");
+
+         fill_zeroes(str, 2, -(exp10 + 1));
+         if (!is_set(std::ios::fixed))
+            str_size += -(exp10 + 1);
+      }
+      else  // Number >= 1
+      {
+         str_size = std::size_t(1 + os.precision());
+         if (is_set(std::ios::fixed))
+            str_size += exp10 + 1;
+
+         fill_zeroes(str, str.size(), (int) str_size - (int) str.size() - 1);
+
+         BOOST_ASSERT(std::ptrdiff_t(exp10 + 1) <= std::ptrdiff_t(str.size()));
+         str.insert(exp10 + 1, ".");
+      }
+ 
+      while (str.size() > str_size)
+         str.pop_back();
+      while (str.size() < str_size)
+         str.push_back('0');
+      while (!is_set(std::ios::showpoint) && !is_set(std::ios::fixed) && str.back() == '0')
+         str.pop_back();
+
+      if (str.back() == '.' && !is_set(std::ios::showpoint))
+         str.pop_back();
+   }
+   // Scientific style
+   else if (is_set(std::ios::scientific) || (exp10 < -4 || (exp10 + 1 > (std::max)((int)os.precision(), 1))))
+   {
+      str_size = (size_t)os.precision() + 1;
+      if (os.precision() == 0 || is_set(std::ios::scientific))
+         str_size++;
+
+      str.insert(1, ".");
+      // Pad with zeroes
+      fill_zeroes(str, str.size(), (int) str_size - (int) str.size());
+
+      // Remove trailing zeroes
+      while (str.size() > str_size)
+         str.pop_back();
+      while (!is_set(std::ios::scientific) && !is_set(std::ios::showpoint) && str.back() == '0')
+         str.pop_back();
+
+      // Remove unnecessary point
+      if (str.back() == '.' && !is_set(std::ios::showpoint))
+         str.pop_back();
+
+      std::stringstream ss;
+
+      ss << str;
+      ss << (os.flags() & std::ios::uppercase ? "E" : "e");
+      ss << (exp10 < 0 ? "-" : "+");
+      using std::log10;
+      ss.width((std::max)(1 + (std::streamsize)log10(exp10), (std::streamsize)2));
+      ss.fill('0');
+      ss << fabs(exp10);
+
+      str = ss.str();
+   }
+   else if (exp10 == os.precision())
+   {
+      if (os.flags() & std::ios::showpoint)
+         str.push_back('.');
+   }
+
+   os << str;
+   return os;
 }
 
 template <typename FloatingPointType, typename char_type, typename traits_type>
@@ -857,26 +1024,17 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_float<Floa
    return is;
 }
 
-template<typename FloatingPointType> void eval_add     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result += x; }
-template<typename FloatingPointType> void eval_subtract(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result -= x; }
-template<typename FloatingPointType> void eval_multiply(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result *= x; }
-template<typename FloatingPointType> void eval_divide  (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result /= x; }
-
 } } } // namespace boost::multiprecision::backends
 
-namespace std {
-
 // Specialization of numeric_limits for cpp_double_float<>
-template <typename FloatingPointType,
-          const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>
+template <typename FloatingPointType>
+class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>
    : public std::numeric_limits<FloatingPointType>
 {
 private:
    using base_class_type = std::numeric_limits<FloatingPointType>;
 
-   using self_type =
-      boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>;
+   using self_type = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
 
 public:
    static constexpr bool is_iec559   = false;
@@ -898,7 +1056,6 @@ public:
    static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
    static constexpr self_type  signaling_NaN() noexcept { return self_type( base_class_type::signaling_NaN()); }
 };
-
-}
+// TODO have explicit specializations for cpp_double_float< float/double >
 
 #endif // BOOST_MP_CPP_DOUBLE_FLOAT_2021_06_05_HPP
