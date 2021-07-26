@@ -40,6 +40,9 @@ class number
  public:
    using backend_type = Backend                                 ;
    using value_type = typename component_type<self_type>::type;
+
+   static constexpr expression_template_option et = ExpressionTemplates;
+
    BOOST_MP_FORCEINLINE constexpr number() noexcept(noexcept(Backend())) {}
    BOOST_MP_FORCEINLINE constexpr number(const number& e) noexcept(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(e.m_backend) {}
    template <class V>
@@ -61,13 +64,38 @@ class number
        : m_backend(canonical_value(v))
    {}
    template <class V>
-   BOOST_MP_FORCEINLINE constexpr number(const V& v, unsigned digits10, typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<V>::value || std::is_same<std::string, V>::value || std::is_convertible<V, const char*>::value) && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_complex) && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational)
+   BOOST_MP_FORCEINLINE constexpr number(const V& v, unsigned digits10, typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<V>::value || std::is_same<std::string, V>::value || std::is_convertible<V, const char*>::value) && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_complex) && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational && std::is_same<self_type, value_type>::value)
 #ifdef BOOST_HAS_FLOAT128
                                                                                                 && !std::is_same<V, __float128>::value
 #endif
                                                                                                           >::type* = 0)
        : m_backend(canonical_value(v), digits10)
    {}
+   //
+   // Conversions from unscoped enum's are implicit:
+   //
+   template <class V>
+   BOOST_MP_FORCEINLINE 
+#if !(defined(BOOST_MSVC) && (BOOST_MSVC <= 1900))
+      constexpr 
+#endif
+      number(const V& v, typename std::enable_if<
+      std::is_enum<V>::value && std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
+      : number(static_cast<typename std::underlying_type<V>::type>(v))
+   {}
+   //
+   // Conversions from scoped enum's are explicit:
+   //
+   template <class V>
+   BOOST_MP_FORCEINLINE explicit 
+#if !(defined(BOOST_MSVC) && (BOOST_MSVC <= 1900))
+       constexpr
+#endif
+       number(const V& v, typename std::enable_if<
+      std::is_enum<V>::value && !std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
+      : number(static_cast<typename std::underlying_type<V>::type>(v))
+   {}
+
    BOOST_MP_FORCEINLINE constexpr number(const number& e, unsigned digits10)
        noexcept(noexcept(Backend(std::declval<Backend const&>(), std::declval<unsigned>())))
        : m_backend(e.m_backend, digits10) {}
@@ -107,6 +135,16 @@ class number
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard_1(val);
       detail::scoped_default_precision<number<Other, ET> >                    precision_guard_2(val);
       using detail::generic_interconvert;
+      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+      {
+         if (precision_guard_1.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
+         {
+            self_type t;
+            generic_interconvert(t.backend(), val.backend(), number_category<Backend>(), number_category<Other>());
+            *this = std::move(t);
+            return;
+         }
+      }
       generic_interconvert(backend(), val.backend(), number_category<Backend>(), number_category<Other>());
    }
    template <class Other, expression_template_option ET>
@@ -116,19 +154,27 @@ class number
 
    template <class V, class U>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2,
-                                                        typename std::enable_if<(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value && !std::is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
+                                                        typename std::enable_if<(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value && !std::is_same<value_type, self_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2);
+      // Copy precision options from this type to component_type:
+      boost::multiprecision::detail::scoped_precision_options<value_type> scoped_opts(*this);
+      // precision guards:
+      detail::scoped_default_precision<self_type>  precision_guard(v1, v2, *this);
+      detail::scoped_default_precision<value_type> component_precision_guard(v1, v2, *this);
       assign_components(m_backend, canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)));
    }
    template <class V, class U>
    BOOST_MP_FORCEINLINE explicit BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2,
                                         typename std::enable_if<
-                                                                     (std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<typename component_type<self_type>::type, self_type>::value && !std::is_same<V, self_type>::value && !(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value)>::type* = 0)
+                                                                     (std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<value_type, self_type>::value && !std::is_same<V, self_type>::value && !(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2);
+      // Copy precision options from this type to component_type:
+      boost::multiprecision::detail::scoped_precision_options<value_type> scoped_opts(*this);
+      // precision guards:
+      detail::scoped_default_precision<self_type>  precision_guard(v1, v2, *this);
+      detail::scoped_default_precision<value_type> component_precision_guard(v1, v2, *this);
       assign_components(m_backend, canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)));
    }
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
@@ -161,13 +207,13 @@ class number
 
    template <class V, class U>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2, unsigned digits10,
-                                                        typename std::enable_if<(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value && !std::is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
+                                                        typename std::enable_if<(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value && !std::is_same<value_type, self_type>::value)>::type* = 0)
        : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)), digits10)
    {}
    template <class V, class U>
    BOOST_MP_FORCEINLINE explicit BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2, unsigned digits10,
-                                                                 typename std::enable_if<((std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<typename component_type<self_type>::type, self_type>::value) && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
-       : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)), digits10) {}
+                                                                 typename std::enable_if<((std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<value_type, self_type>::value) && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
+       : m_backend(detail::evaluate_if_expression(v1), detail::evaluate_if_expression(v2), digits10) {}
 
    template <class Other, expression_template_option ET>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const number<Other, ET>& v1, const number<Other, ET>& v2, typename std::enable_if<std::is_convertible<Other, Backend>::value>::type* = 0)
@@ -191,11 +237,14 @@ class number
       // optimised away, but we can't prevent instantiation of the dead code leading
       // to longer build and possibly link times.
       //
-      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      BOOST_IF_CONSTEXPR (std::is_same<self_type, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
-         number t(e);
-         return *this = std::move(t);
+         BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+            if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
+            {
+               number t(e);
+               return *this = std::move(t);
+            }
       }
       do_assign(e, tag_type());
       return *this;
@@ -214,14 +263,37 @@ class number
       // optimised away, but we can't prevent instantiation of the dead code leading
       // to longer build and possibly link times.
       //
-      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      BOOST_IF_CONSTEXPR(std::is_same<self_type, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
-         number t;
-         t.assign(e);
-         return *this = std::move(t);
+         BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
+            {
+               number t;
+               t.assign(e);
+               return *this = std::move(t);
+            }
       }
       do_assign(e, tag_type());
+      return *this;
+   }
+   BOOST_MP_CXX14_CONSTEXPR number& assign(const value_type& a, const value_type& b)
+   {
+      assign_components(backend(), a.backend(), b.backend());
+      return *this;
+   }
+   template <class V, class U>
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(std::is_convertible<V, value_type>::value&& std::is_convertible<U, value_type>::value && !std::is_same<value_type, self_type>::value), number&>::type 
+      assign(const V& v1, const U& v2, unsigned Digits)
+   {
+      self_type r(v1, v2, Digits);
+      boost::multiprecision::detail::scoped_source_precision<self_type> scope;
+      return *this = r;
+   }
+   BOOST_MP_CXX14_CONSTEXPR number& assign(const value_type & a, const value_type & b, unsigned Digits)
+   {
+      this->precision(Digits);
+      boost::multiprecision::detail::scoped_target_precision<self_type> scoped;
+      assign_components(backend(), canonical_value(detail::evaluate_if_expression(a)), canonical_value(detail::evaluate_if_expression(b)));
       return *this;
    }
 
@@ -247,11 +319,12 @@ class number
       m_backend = canonical_value(v);
       return *this;
    }
-   template <class V>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<Backend, ExpressionTemplates>& assign(const V& v, unsigned digits10)
+   template <class V, class U>
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<Backend, ExpressionTemplates>& assign(const V& v, const U& digits10_or_component)
        noexcept(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
    {
-      number t(v, digits10);
+      number t(v, digits10_or_component);
+      boost::multiprecision::detail::scoped_source_precision<self_type> scope;
       return *this = t;
    }
    template <class Other, expression_template_option ET>
@@ -262,8 +335,8 @@ class number
       // Attempt a generic interconvertion:
       //
       using detail::generic_interconvert;
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v);
-      detail::scoped_default_precision<number<Other, ET> >                    precision_guard2(v);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, v);
+      detail::scoped_default_precision<number<Other, ET> >                    precision_guard2(*this, v);
       //
       // If the current precision of *this differs from that of value v, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -274,7 +347,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(v);
          return *this = std::move(t);
@@ -338,7 +411,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(*this + val);
          return *this = std::move(t);
@@ -378,11 +451,14 @@ class number
       // optimised away, but we can't prevent instantiation of the dead code leading
       // to longer build and possibly link times.
       //
-      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      BOOST_IF_CONSTEXPR(std::is_same<self_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
-         number t(*this + e);
-         return *this = std::move(t);
+         BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
+            {
+               number t(*this + e);
+               return *this = std::move(t);
+            }
       }
       //
       // Fused multiply-add:
@@ -396,6 +472,23 @@ class number
    typename std::enable_if<std::is_convertible<V, self_type>::value, number<Backend, ExpressionTemplates>&>::type
       BOOST_MP_CXX14_CONSTEXPR operator+=(const V& v)
    {
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, v);
+      //
+      // If the current precision of *this differs from that of value v, then we
+      // create a temporary (which will have the correct precision thanks to precision_guard)
+      // and then move the result into *this.  In C++17 we add a leading "if constexpr"
+      // which causes this code to be eliminated in the common case that this type is
+      // not actually variable precision.  Pre C++17 this code should still be mostly
+      // optimised away, but we can't prevent instantiation of the dead code leading
+      // to longer build and possibly link times.
+      //
+      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
+         {
+            number t(*this + v);
+            return *this = std::move(t);
+         }
+
       using default_ops::eval_add;
       eval_add(m_backend, canonical_value(v));
       return *this;
@@ -414,7 +507,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(*this - val);
          return *this = std::move(t);
@@ -444,6 +537,23 @@ class number
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, self_type>::value, number<Backend, ExpressionTemplates>&>::type
    operator-=(const V& v)
    {
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, v);
+      //
+      // If the current precision of *this differs from that of value v, then we
+      // create a temporary (which will have the correct precision thanks to precision_guard)
+      // and then move the result into *this.  In C++17 we add a leading "if constexpr"
+      // which causes this code to be eliminated in the common case that this type is
+      // not actually variable precision.  Pre C++17 this code should still be mostly
+      // optimised away, but we can't prevent instantiation of the dead code leading
+      // to longer build and possibly link times.
+      //
+      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
+         {
+            number t(*this - v);
+            return *this = std::move(t);
+         }
+
       using default_ops::eval_subtract;
       eval_subtract(m_backend, canonical_value(v));
       return *this;
@@ -462,11 +572,14 @@ class number
       // optimised away, but we can't prevent instantiation of the dead code leading
       // to longer build and possibly link times.
       //
-      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      BOOST_IF_CONSTEXPR(std::is_same<self_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
-         number t(*this - e);
-         return *this = std::move(t);
+         BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
+            {
+               number t(*this - e);
+               return *this = std::move(t);
+            }
       }
       //
       // Fused multiply-subtract:
@@ -489,7 +602,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(*this * e);
          return *this = std::move(t);
@@ -520,6 +633,23 @@ class number
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, self_type>::value, number<Backend, ExpressionTemplates>&>::type
    operator*=(const V& v)
    {
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, v);
+      //
+      // If the current precision of *this differs from that of value v, then we
+      // create a temporary (which will have the correct precision thanks to precision_guard)
+      // and then move the result into *this.  In C++17 we add a leading "if constexpr"
+      // which causes this code to be eliminated in the common case that this type is
+      // not actually variable precision.  Pre C++17 this code should still be mostly
+      // optimised away, but we can't prevent instantiation of the dead code leading
+      // to longer build and possibly link times.
+      //
+      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
+         {
+            number t(*this + v);
+            return *this = std::move(t);
+         }
+
       using default_ops::eval_multiply;
       eval_multiply(m_backend, canonical_value(v));
       return *this;
@@ -539,7 +669,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(*this % e);
          return *this = std::move(t);
@@ -643,7 +773,7 @@ class number
       // to longer build and possibly link times.
       //
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of(*this))
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
       {
          number t(*this / e);
          return *this = std::move(t);
@@ -673,6 +803,23 @@ class number
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, self_type>::value, number<Backend, ExpressionTemplates>&>::type
    operator/=(const V& v)
    {
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, v);
+      //
+      // If the current precision of *this differs from that of value v, then we
+      // create a temporary (which will have the correct precision thanks to precision_guard)
+      // and then move the result into *this.  In C++17 we add a leading "if constexpr"
+      // which causes this code to be eliminated in the common case that this type is
+      // not actually variable precision.  Pre C++17 this code should still be mostly
+      // optimised away, but we can't prevent instantiation of the dead code leading
+      // to longer build and possibly link times.
+      //
+      BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+      if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
+         {
+            number t(*this + v);
+            return *this = std::move(t);
+         }
+
       using default_ops::eval_divide;
       eval_divide(m_backend, canonical_value(v));
       return *this;
@@ -844,7 +991,7 @@ class number
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1900) || (defined(__apple_build_version__) && BOOST_WORKAROUND(__clang_major__, < 9))
    template <class T>
 #else
-   template <class T, class = typename std::enable_if<!(std::is_constructible<T, self_type const&>::value || !std::is_default_constructible<T>::value || (!boost::multiprecision::detail::is_arithmetic<T>::value && !boost::multiprecision::detail::is_complex<T>::value)), T>::type>
+   template <class T, class = typename std::enable_if<std::is_enum<T>::value || !(std::is_constructible<T, self_type const&>::value || !std::is_default_constructible<T>::value || (!boost::multiprecision::detail::is_arithmetic<T>::value && !boost::multiprecision::detail::is_complex<T>::value)), T>::type>
 #endif
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
    {
@@ -864,6 +1011,15 @@ class number
    static BOOST_MP_CXX14_CONSTEXPR void default_precision(unsigned digits10)
    {
       Backend::default_precision(digits10);
+      Backend::thread_default_precision(digits10);
+   }
+   static BOOST_MP_CXX14_CONSTEXPR unsigned thread_default_precision() noexcept
+   {
+      return Backend::thread_default_precision();
+   }
+   static BOOST_MP_CXX14_CONSTEXPR void thread_default_precision(unsigned digits10)
+   {
+      Backend::thread_default_precision(digits10);
    }
    BOOST_MP_CXX14_CONSTEXPR unsigned precision() const noexcept
    {
@@ -872,6 +1028,25 @@ class number
    BOOST_MP_CXX14_CONSTEXPR void precision(unsigned digits10)
    {
       m_backend.precision(digits10);
+   }
+   //
+   // Variable precision options:
+   // 
+   static constexpr variable_precision_options default_variable_precision_options()noexcept
+   {
+      return Backend::default_variable_precision_options();
+   }
+   static constexpr variable_precision_options thread_default_variable_precision_options()noexcept
+   {
+      return Backend::thread_default_variable_precision_options();
+   }
+   static BOOST_MP_CXX14_CONSTEXPR void default_variable_precision_options(variable_precision_options opts)
+   {
+      Backend::default_variable_precision_options(opts);
+   }
+   static BOOST_MP_CXX14_CONSTEXPR void thread_default_variable_precision_options(variable_precision_options opts)
+   {
+      Backend::thread_default_variable_precision_options(opts);
    }
    //
    // Comparison:
@@ -1988,6 +2163,12 @@ inline std::ostream& operator<<(std::ostream& os, const number<Backend, Expressi
          s.insert(static_cast<std::string::size_type>(0), static_cast<std::string::size_type>(ss - s.size()), fill);
    }
    return os << s;
+}
+
+template <class Backend, expression_template_option ExpressionTemplates>
+std::string to_string(const number<Backend, ExpressionTemplates>& val)
+{
+  return val.str(6, std::ios_base::fixed|std::ios_base::showpoint);
 }
 
 namespace detail {

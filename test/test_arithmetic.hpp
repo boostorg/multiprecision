@@ -81,6 +81,42 @@ int normalize_compare_result(int r)
    return r > 0 ? 1 : r < 0 ? -1 : 0;
 }
 
+enum unscoped_enum
+{
+   one = 1,
+   two = 2,
+   three = 3,
+};
+
+enum struct scoped_enum
+{
+   four = 4,
+   five = 5,
+   six = 6,
+};
+
+template <class Real>
+typename std::enable_if<boost::multiprecision::is_number<Real>::value>::type test_enum_conversions()
+{
+   Real r1(one);
+   BOOST_CHECK_EQUAL(r1, 1);
+   Real r2(scoped_enum::four);
+   BOOST_CHECK_EQUAL(r2, 4);
+   r1 = two;
+   BOOST_CHECK_EQUAL(r1, 2);
+   r1.assign(scoped_enum::five);
+   BOOST_CHECK_EQUAL(r1, 5);
+
+   r1.assign(two);
+
+   BOOST_CHECK_EQUAL(static_cast<unscoped_enum>(r1), two);
+   BOOST_CHECK(static_cast<scoped_enum>(r2) == scoped_enum::four);
+}
+
+template <class Real>
+typename std::enable_if<!boost::multiprecision::is_number<Real>::value>::type test_enum_conversions() 
+{}
+
 template <class Real, class Val>
 typename std::enable_if<boost::multiprecision::number_category<Real>::value != boost::multiprecision::number_kind_complex>::type
 test_comparisons(Val a, Val b, const std::integral_constant<bool, true>&)
@@ -300,6 +336,17 @@ void test_rational(const std::integral_constant<bool, false>&)
    ss << a;
    ss >> b;
    BOOST_CHECK_EQUAL(a, b);
+   //
+   // Conversion to integer, see https://github.com/boostorg/multiprecision/issues/342.
+   //
+   Real three(10, 3);
+   BOOST_CHECK_EQUAL(static_cast<std::uint16_t>(three), 3);
+   BOOST_CHECK_EQUAL(static_cast<std::uint32_t>(three), 3);
+   BOOST_CHECK_EQUAL(static_cast<std::uint64_t>(three), 3);
+   three = -three;
+   BOOST_CHECK_EQUAL(static_cast<std::int16_t>(three), -3);
+   BOOST_CHECK_EQUAL(static_cast<std::int32_t>(three), -3);
+   BOOST_CHECK_EQUAL(static_cast<std::int64_t>(three), -3);
 }
 
 template <class Real>
@@ -2877,6 +2924,8 @@ void test()
    test_mixed<Real, std::complex<float> >(complex_tag);
    test_mixed<Real, std::complex<double> >(complex_tag);
    test_mixed<Real, std::complex<long double> >(complex_tag);
+
+   test_enum_conversions<Real>();
 
 #endif
 #ifndef MIXED_OPS_ONLY

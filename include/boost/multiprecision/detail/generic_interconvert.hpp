@@ -465,7 +465,7 @@ void generic_interconvert_float2rational(To& to, const From& from, const std::in
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_rational>& /*to_type*/, const std::integral_constant<int, number_kind_floating_point>& /*from_type*/)
 {
-   generic_interconvert_float2rational(to, from, std::integral_constant<int, std::numeric_limits<number<From> >::radix>());
+   generic_interconvert_float2rational(to, from, std::integral_constant<int, std::numeric_limits<number<From> >::is_specialized ? std::numeric_limits<number<From> >::radix : 2>());
 }
 
 template <class To, class From>
@@ -534,7 +534,7 @@ void generic_interconvert_float2int(To& to, const From& from, const std::integra
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_integer>& /*to_type*/, const std::integral_constant<int, number_kind_floating_point>& /*from_type*/)
 {
-   generic_interconvert_float2int(to, from, std::integral_constant<int, std::numeric_limits<number<From> >::radix>());
+   generic_interconvert_float2int(to, from, std::integral_constant<int, (std::numeric_limits<number<From> >::is_specialized ? std::numeric_limits<number<From> >::radix : 2)>());
 }
 
 template <class To, class From, class tag>
@@ -556,6 +556,7 @@ void generic_interconvert_complex_to_scalar(To& to, const From& from, const std:
    //
    // Get the real part and copy-construct the result from it:
    //
+   scoped_precision_options<component_number> scope(from);
    component_backend r;
    generic_interconvert_complex_to_scalar(r, from, std::integral_constant<bool, true>(), std::integral_constant<bool, true>());
    to = r;
@@ -564,13 +565,14 @@ template <class To, class From>
 void generic_interconvert_complex_to_scalar(To& to, const From& from, const std::integral_constant<bool, false>&, const std::integral_constant<bool, false>&)
 {
    using component_number = typename component_type<number<From> >::type;
-   using component_backend = typename component_number::backend_type     ;
+   using component_backend = typename component_number::backend_type;
    //
    // Get the real part and use a generic_interconvert to type To:
    //
+   scoped_precision_options<component_number> scope(from);
    component_backend r;
    generic_interconvert_complex_to_scalar(r, from, std::integral_constant<bool, true>(), std::integral_constant<bool, true>());
-   generic_interconvert(to, r, std::integral_constant<int, number_category<To>::value>(), std::integral_constant<int, number_category<To>::value>());
+   generic_interconvert(to, r, std::integral_constant<int, number_category<To>::value>(), std::integral_constant<int, number_category<component_backend>::value>());
 }
 
 template <class To, class From>
@@ -588,6 +590,64 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
    using component_backend = typename component_number::backend_type     ;
 
    generic_interconvert_complex_to_scalar(to, from, std::integral_constant<bool, std::is_same<component_backend, To>::value>(), std::integral_constant<bool, std::is_constructible<To, const component_backend&>::value>());
+}
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_rational>& /*to_type*/, const std::integral_constant<int, number_kind_complex>& /*from_type*/)
+{
+   using component_number = typename component_type<number<From> >::type;
+   using component_backend = typename component_number::backend_type     ;
+
+   generic_interconvert_complex_to_scalar(to, from, std::integral_constant<bool, std::is_same<component_backend, To>::value>(), std::integral_constant<bool, std::is_constructible<To, const component_backend&>::value>());
+}
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_complex>& /*to_type*/, const std::integral_constant<int, number_kind_integer>& /*from_type*/)
+{
+   using component_number = typename component_type<number<To> >::type;
+
+   scoped_source_precision<number<From> >     scope1;
+   scoped_precision_options<component_number> scope2(number<To>::thread_default_precision(), number<To>::thread_default_variable_precision_options());
+   (void)scope1;
+   (void)scope2;
+
+   number<From>     f(from);
+   component_number scalar(f);
+   number<To> result(scalar);
+   to = result.backend();
+}
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_complex>& /*to_type*/, const std::integral_constant<int, number_kind_rational>& /*from_type*/)
+{
+   using component_number = typename component_type<number<To> >::type;
+
+   scoped_source_precision<number<From> >     scope1;
+   scoped_precision_options<component_number> scope2(number<To>::thread_default_precision(), number<To>::thread_default_variable_precision_options());
+   (void)scope1;
+   (void)scope2;
+
+   number<From>     f(from);
+   component_number scalar(f);
+   number<To> result(scalar);
+   to = result.backend();
+}
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_complex>& /*to_type*/, const std::integral_constant<int, number_kind_floating_point>& /*from_type*/)
+{
+   using component_number = typename component_type<number<To> >::type;
+
+   scoped_source_precision<number<From> > scope1;
+   scoped_precision_options<component_number> scope2(number<To>::thread_default_precision(), number<To>::thread_default_variable_precision_options());
+   (void)scope1;
+   (void)scope2;
+
+   number<From> f(from);
+   component_number scalar(f);
+   number<To> result(scalar);
+   to = result.backend();
+}
+template <class To, class From, int Tag1, int Tag2>
+void generic_interconvert(To& to, const From& from, const std::integral_constant<int, Tag1>& /*to_type*/, const std::integral_constant<int, Tag2>& /*from_type*/)
+{
+   static_assert(sizeof(To) == 0, "Sorry, you asked for a conversion bewteen types that hasn't been implemented yet!!");
 }
 
 }

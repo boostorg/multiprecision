@@ -173,6 +173,21 @@ enum expression_template_option
    et_on  = 1
 };
 
+enum struct variable_precision_options : signed char
+{
+   assume_uniform_precision = -1,
+   preserve_target_precision = 0,
+   preserve_source_precision = 1,
+   preserve_component_precision = 2,
+   preserve_related_precision = 3,
+   preserve_all_precision = 4,
+};
+
+inline constexpr bool operator==(variable_precision_options a, variable_precision_options b)
+{
+   return static_cast<unsigned>(a) == static_cast<unsigned>(b);
+}
+
 template <class Backend>
 struct expression_template_default
 {
@@ -360,6 +375,13 @@ struct canonical_imp<Val, Backend, std::integral_constant<int, 3> >
 {
    using type = const char*;
 };
+template <class Val, class Backend>
+struct canonical_imp<Val, Backend, std::integral_constant<int, 4> >
+{
+   using underlying = typename std::underlying_type<Val>::type;
+   using tag = typename std::conditional<boost::multiprecision::detail::is_signed<Val>::value, std::integral_constant<int, 0>, std::integral_constant<int, 1>>::type;
+   using type = typename canonical_imp<underlying, Backend, tag>::type;
+};
 
 template <class Val, class Backend>
 struct canonical
@@ -376,7 +398,10 @@ struct canonical
                typename std::conditional<
                    (std::is_convertible<Val, const char*>::value || std::is_same<Val, std::string>::value),
                    std::integral_constant<int, 3>,
-                   std::integral_constant<int, 4> >::type>::type>::type>::type;
+                   typename std::conditional<
+                     std::is_enum<Val>::value,
+                     std::integral_constant<int, 4>,
+                     std::integral_constant<int, 5> >::type>::type>::type>::type>::type;
 
    using type = typename canonical_imp<Val, Backend, tag_type>::type;
 };

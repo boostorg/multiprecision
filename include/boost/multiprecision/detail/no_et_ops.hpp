@@ -52,7 +52,7 @@ namespace boost {
       BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >::value, number<B, et_off> >::type
          operator+(const number<B, et_off>& a, const V& b)
       {
-         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a);
+         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
          number<B, et_off>                                                    result;
          using default_ops::eval_add;
          eval_add(result.backend(), a.backend(), number<B, et_off>::canonical_value(b));
@@ -62,7 +62,7 @@ namespace boost {
       BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >::value && !is_equivalent_number_type<V, B>::value, number<B, et_off> >::type
          operator+(const V& a, const number<B, et_off>& b)
       {
-         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b);
+         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b, a);
          number<B, et_off>                                                    result;
          using default_ops::eval_add;
          eval_add(result.backend(), b.backend(), number<B, et_off>::canonical_value(a));
@@ -84,7 +84,7 @@ namespace boost {
       BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >::value, number<B, et_off> >::type
          operator-(const number<B, et_off>& a, const V& b)
       {
-         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a);
+         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
          number<B, et_off>                                                    result;
          using default_ops::eval_subtract;
          eval_subtract(result.backend(), a.backend(), number<B, et_off>::canonical_value(b));
@@ -94,7 +94,7 @@ namespace boost {
       BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >::value && !is_equivalent_number_type<V, B>::value, number<B, et_off> >::type
          operator-(const V& a, const number<B, et_off>& b)
       {
-         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b);
+         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b, a);
          number<B, et_off>                                                    result;
          using default_ops::eval_subtract;
          eval_subtract(result.backend(), number<B, et_off>::canonical_value(a), b.backend());
@@ -116,7 +116,7 @@ namespace boost {
       BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >::value, number<B, et_off> >::type
          operator*(const number<B, et_off>& a, const V& b)
       {
-         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a);
+         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
          number<B, et_off>                                                    result;
          using default_ops::eval_multiply;
          eval_multiply(result.backend(), a.backend(), number<B, et_off>::canonical_value(b));
@@ -126,7 +126,7 @@ namespace boost {
       BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >::value && !is_equivalent_number_type<V, B>::value, number<B, et_off> >::type
          operator*(const V& a, const number<B, et_off>& b)
       {
-         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b);
+         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b, a);
          number<B, et_off>                                                    result;
          using default_ops::eval_multiply;
          eval_multiply(result.backend(), b.backend(), number<B, et_off>::canonical_value(a));
@@ -148,7 +148,7 @@ namespace boost {
       BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >::value, number<B, et_off> >::type
          operator/(const number<B, et_off>& a, const V& b)
       {
-         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a);
+         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
          number<B, et_off>                                                    result;
          using default_ops::eval_divide;
          eval_divide(result.backend(), a.backend(), number<B, et_off>::canonical_value(b));
@@ -158,7 +158,7 @@ namespace boost {
       BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >::value && !is_equivalent_number_type<V, B>::value, number<B, et_off> >::type
          operator/(const V& a, const number<B, et_off>& b)
       {
-         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b);
+         detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b, a);
          number<B, et_off>                                                    result;
          using default_ops::eval_divide;
          eval_divide(result.backend(), number<B, et_off>::canonical_value(a), b.backend());

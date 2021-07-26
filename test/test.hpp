@@ -83,20 +83,20 @@ typename std::enable_if<!((boost::multiprecision::number_category<T>::value == b
    return (std::max)(abs(T((a - b) / a)), abs(T((a - b) / b))) / std::numeric_limits<T>::epsilon();
 }
 
-template <class T, class U>
-typename std::conditional<std::is_convertible<T, U>::value, U, T>::type
-relative_error(T a, U b)
-{
-   typedef typename std::conditional<std::is_convertible<T, U>::value, U, T>::type cast_type;
-   return relative_error<cast_type>(static_cast<cast_type>(a), static_cast<cast_type>(b));
-}
-
 template <class T>
 typename std::enable_if<boost::multiprecision::is_interval_number<T>::value, T>::type relative_error(T a, T b)
 {
    typename boost::multiprecision::component_type<T>::type am = median(a);
    typename boost::multiprecision::component_type<T>::type bm = median(b);
    return relative_error<typename boost::multiprecision::component_type<T>::type>(am, bm);
+}
+
+template <class T, class U>
+typename std::conditional<std::is_convertible<T, U>::value, U, T>::type
+relative_error(T a, U b)
+{
+   typedef typename std::conditional<std::is_convertible<T, U>::value, U, T>::type cast_type;
+   return relative_error<cast_type>(static_cast<cast_type>(a), static_cast<cast_type>(b));
 }
 
 enum
