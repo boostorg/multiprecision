@@ -239,14 +239,76 @@ bool test_op(char op, const unsigned count = 10000U)
                                            ;
       #endif
 
-      //const control_float_type ctrl_df_c = control_float_type(control_float_type(double_float_type::canonical_value(df_c).first()) + control_float_type(double_float_type::canonical_value(df_c).second()));
-
       const control_float_type delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
 
       if (delta > MaxError)
       {
          std::cerr << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
          std::cerr << " [FAILED] while performing '" << std::setprecision(100000) << ctrl_a << "' " << op << " '" << ctrl_b << "', got incorrect result: " << (df_c) << std::endl;
+
+         return false;
+      }
+   }
+
+  std::cout << " ok [" << count << " tests passed]" << std::endl;
+
+  return true;
+}
+
+template <typename ConstituentFloatType>
+bool test_sqrt(const unsigned count = 10000U)
+{
+   using float_type         = ConstituentFloatType;
+   using double_float_type  = typename control<float_type>::double_float_type;
+   using control_float_type = typename control<float_type>::control_float_type;
+
+   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
+   std::cout << "testing func sqrt (accuracy = " << std::numeric_limits<double_float_type>::digits << " bits)...";
+
+   for (unsigned i = 0U; i < count; ++i)
+   {
+      std::string str_a;
+
+      control<float_type>::get_random_fixed_string(str_a, true);
+
+      const double_float_type  df_a(str_a);
+
+      #if 0
+      const control_float_type ctrl_a =   control_float_type(double_float_type::canonical_value(df_a).crep().first.crep().first)
+                                        + control_float_type(double_float_type::canonical_value(df_a).crep().first.crep().second)
+                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second.crep().first)
+                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second.crep().second)
+                                        ;
+      #else
+      const control_float_type ctrl_a =   control_float_type(double_float_type::canonical_value(df_a).crep().first)
+                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second)
+                                        ;
+      #endif
+
+      double_float_type  df_c;
+      control_float_type ctrl_c;
+
+      df_c   = sqrt(df_a);
+      ctrl_c = sqrt(ctrl_a);
+
+      #if 0
+      const control_float_type ctrl_df_c =   control_float_type(double_float_type::canonical_value(df_c).crep().first.crep().first)
+                                           + control_float_type(double_float_type::canonical_value(df_c).crep().first.crep().second)
+                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second.crep().first)
+                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second.crep().second)
+                                           ;
+      #else
+      const control_float_type ctrl_df_c =   control_float_type(double_float_type::canonical_value(df_c).crep().first)
+                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second)
+                                           ;
+      #endif
+
+      const control_float_type delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
+
+      if (delta > MaxError)
+      {
+         std::cerr << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
+         std::cerr << " [FAILED] while performing '" << std::setprecision(100000) << ctrl_a << "' sqrt', got incorrect result: " << (df_c) << std::endl;
 
          return false;
       }
@@ -264,10 +326,11 @@ bool test_arithmetic(const unsigned count = 10000U)
 
    bool result_is_ok = true;
 
-   result_is_ok &= test_op<T>('+', count);
-   result_is_ok &= test_op<T>('-', count);
-   result_is_ok &= test_op<T>('*', count);
-   result_is_ok &= test_op<T>('/', count);
+   result_is_ok &= test_op  <T>('+', count);
+   result_is_ok &= test_op  <T>('-', count);
+   result_is_ok &= test_op  <T>('*', count);
+   result_is_ok &= test_op  <T>('/', count);
+   result_is_ok &= test_sqrt<T>(count);
 
    std::cout << std::endl;
 

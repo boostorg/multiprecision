@@ -691,6 +691,45 @@ void eval_ceil(cpp_double_float<FloatingPointType>& result, const cpp_double_flo
 template<typename FloatingPointType>
 void eval_sqrt(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& o)
 {
+  using local_float_type = typename cpp_double_float<FloatingPointType>::float_type;
+
+  using std::sqrt;
+
+  local_float_type c = sqrt(o.crep().first);
+
+  local_float_type p,q,hx,tx,u,uu,cc;
+  local_float_type t1;
+
+  constexpr int              MantissaBits   = std::numeric_limits<local_float_type>::digits;
+  constexpr int              SplitBits      = MantissaBits / 2 + 1;
+  constexpr local_float_type Splitter       = local_float_type((1ULL << SplitBits) + 1);
+
+  p = Splitter * c;
+  hx = (c-p);
+  hx = hx+p;
+  tx = c-hx;
+  p = hx*hx;
+  q = hx*tx;
+  q = q+q;
+
+  u = p+q;
+  uu = p-u;
+  uu = uu+q;
+  t1 = tx*tx;
+  uu = uu+t1;
+
+  cc = o.crep().first-u;
+  cc = cc-uu;
+  cc = cc+o.crep().second;
+  t1 = c+c;
+  cc = cc/t1;
+
+  hx = c+cc;
+  tx = c-hx;
+  tx = tx+cc;
+
+  result.rep().first  = hx;
+  result.rep().second = tx;
 }
 
 template<typename FloatingPointType>
