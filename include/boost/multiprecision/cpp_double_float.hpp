@@ -50,6 +50,10 @@ template<typename FloatingPointType> void eval_subtract(cpp_double_float<Floatin
 template<typename FloatingPointType> void eval_multiply(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 template<typename FloatingPointType> void eval_divide  (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 
+template<typename FloatingPointType> void eval_frexp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a, int* v);
+template<typename FloatingPointType> void eval_floor(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+template<typename FloatingPointType> void eval_ceil (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+
 template<typename FloatingPointType,
          typename char_type,
          typename traits_type>
@@ -235,10 +239,12 @@ class cpp_double_float
    {
       data.first  = -data.first;
       data.second = -data.second;
+
+      normalize_pair(data);
    }
 
    // FIXME Merge set_str() to operator<<
-   void set_str(std::string str);
+   void set_str(const std::string& str_in);
 
    // Getters/Setters
    constexpr const float_type& first () const { return data.first; }
@@ -461,8 +467,7 @@ class cpp_double_float
       };
 
       using std::isinf;
-      using std::floor;
-      using std::log10;
+
       if (isinf(first()))
       {
          strm << first();
@@ -474,8 +479,12 @@ class cpp_double_float
 
       int exp10 = 0;
 
+      using std::fabs;
+      using std::floor;
+      using std::log10;
+
       if (*this != cpp_double_float<FloatingPointType>(0))
-         exp10 = (int)floor(log10(fabs(first())));
+         exp10 = (int) floor(log10(fabs(first())));
       else
          exp10 = 0;
 
@@ -590,7 +599,7 @@ class cpp_double_float
       {
          if (exp10 + 1 <= 0) // Number < 1
          {
-            str_size = (size_t)strm.precision() + 2;
+            str_size = (std::size_t) (strm.precision() + 2);
 
             if (!is_set(std::ios::fixed) && strm.precision() == 0)
                str_size++;
@@ -612,7 +621,7 @@ class cpp_double_float
             BOOST_ASSERT(std::ptrdiff_t(exp10 + 1) <= std::ptrdiff_t(str.size()));
             str.insert(exp10 + 1, ".");
          }
- 
+
          while (str.size() > str_size)
             str.pop_back();
          while (str.size() < str_size)
@@ -780,8 +789,10 @@ template<typename FloatingPointType> inline bool operator> (const cpp_double_flo
 // -- String Conversions
 // FIXME Merge set_str() to operator<<
 template <typename FloatingPointType>
-inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
+inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str_in)
 {
+   std::string str(str_in);
+
    *this = 0;
 
    int final_exponent = 0;
@@ -805,7 +816,7 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
 
    // Set the whole number part
    while (std::isdigit(str[pos]))
-      *this = *this * FloatingPointType(10) + FloatingPointType(str[pos++] - '0');
+      *this = (*this * FloatingPointType(10.0L)) + FloatingPointType((int) (str[pos++] - '0'));
 
    // Set the decimal number part
    if (str[pos] == '.')
@@ -815,7 +826,7 @@ inline void cpp_double_float<FloatingPointType>::set_str(std::string str)
 
       while (std::isdigit(str[pos]) && pos < str.size())
       {
-         *this += cpp_double_float<FloatingPointType>(str[pos] - '0') / pow10((int) pos - (int) decimal_idx);
+         *this += cpp_double_float<FloatingPointType>((int) (str[pos] - '0')) / pow10((int) pos - (int) decimal_idx);
          pos++;
       }
    }
@@ -861,6 +872,47 @@ template<typename FloatingPointType> void eval_add     (cpp_double_float<Floatin
 template<typename FloatingPointType> void eval_subtract(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result -= x; }
 template<typename FloatingPointType> void eval_multiply(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result *= x; }
 template<typename FloatingPointType> void eval_divide  (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result /= x; }
+
+template<typename FloatingPointType> void eval_frexp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a, int* v)
+{
+   using std::frexp;
+   using std::ldexp;
+
+   result.first()  = frexp(a.first,    v);
+   result.second() = ldexp(a.second, -*v);
+}
+
+template<typename FloatingPointType>
+void eval_floor(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x)
+{
+   using double_float_type = cpp_double_float<FloatingPointType>;
+
+   using std::floor;
+
+   const typename double_float_type::float_type fhi = floor(x.first());
+
+   if(fhi != x.first())
+   {
+      result.fisrt()  = fhi;
+      result.second() = static_cast<typename double_float_type::float_type>(0.0F);
+   }
+   else
+   {
+      result.fisrt()  = fhi;
+      result.second() = floor(x.second());
+
+      double_float_type::normalize_pair(result.rep());
+   }
+}
+
+template<typename FloatingPointType>
+void eval_ceil(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x)
+{
+   // Compute -floor(-x);
+   eval_floor(result, -x);
+
+   result.negate();
+}
 
 } } } // namespace boost::multiprecision::backends
 
