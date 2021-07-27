@@ -249,10 +249,16 @@ class cpp_double_float
 
    std::size_t hash() const
    {
+      // Here we first convert to scientific string, then
+      // hash the charactgers in the scientific string.
+      // TBD: Is there a faster or more simple hash method?
+
+      const std::string str_to_hash = str(std::numeric_limits<cpp_double_float>::digits10, std::ios::scientific);
+
       std::size_t result = 0;
 
-      boost::multiprecision::detail::hash_combine(result, data.first);
-      boost::multiprecision::detail::hash_combine(result, data.second);
+      for (std::string::size_type i = 0U; i < str_to_hash.length(); ++i)
+         boost::multiprecision::detail::hash_combine(result, str_to_hash.at(i));
 
       return result;
    }
@@ -498,7 +504,7 @@ class cpp_double_float
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
    {
       if (number_of_digits == 0)
-         number_of_digits = std::numeric_limits<cpp_double_float>::digits10 + 3;
+         number_of_digits = std::numeric_limits<cpp_double_float>::digits10;
 
       const std::string my_str = boost::multiprecision::detail::convert_to_string(*this, number_of_digits, format_flags);
 
@@ -654,6 +660,18 @@ template<typename FloatingPointType> void eval_frexp(cpp_double_float<FloatingPo
 template<typename FloatingPointType>
 void eval_ldexp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a, int v)
 {
+   using std::ldexp;
+
+   typename cpp_double_float<FloatingPointType>::rep_type z =
+   std::make_pair
+   (
+      ldexp(a.crep().first,  v),
+      ldexp(a.crep().second, v)
+   );
+
+   cpp_double_float<FloatingPointType>::normalize_pair(z);
+
+   result.rep() = z;
 }
 
 template<typename FloatingPointType>
