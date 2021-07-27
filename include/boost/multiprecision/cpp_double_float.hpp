@@ -394,11 +394,12 @@ class cpp_double_float
 
    cpp_double_float& operator*=(const cpp_double_float& other)
    {
-      rep_type p = exact_product(first(), other.first());
+      rep_type tmp = exact_product(data.first, other.data.first);
 
-      p.second += first() * other.second() + second() * other.first();
+      tmp.second += (  data.first  * other.data.second
+                     + data.second * other.data.first);
 
-      data = p;
+      data = tmp;
 
       return *this;
    }

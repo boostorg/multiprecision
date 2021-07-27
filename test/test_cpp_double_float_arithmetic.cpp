@@ -1,3 +1,5 @@
+#if 1
+
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2021 Fahad Syed.
 //  Copyright 2021 Christopher Kormanyos.
@@ -52,7 +54,7 @@ struct control
    static constexpr int max_exponent10 = std::numeric_limits<ConstituentFloatType>::max_exponent10;
 
    using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<ConstituentFloatType>, boost::multiprecision::et_off>;
-   using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
+   using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<max_digits10>, boost::multiprecision::et_off>;
 
    using random_engine_type = std::linear_congruential_engine<std::uint32_t, 48271, 0, 2147483647>;
 
@@ -127,7 +129,7 @@ struct control
       dist_exp
       (
          0,
-         unsigned(float(max_exponent10) * 0.15F)
+         unsigned(float(max_exponent10) * 0.30F)
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
@@ -174,8 +176,25 @@ bool test_op(char op, const unsigned count = 10000U)
       const double_float_type  df_a(str_a);
       const double_float_type  df_b(str_b);
 
-      const control_float_type ctrl_a = control_float_type(double_float_type::canonical_value(df_a).first()) + control_float_type(double_float_type::canonical_value(df_a).second());
-      const control_float_type ctrl_b = control_float_type(double_float_type::canonical_value(df_b).first()) + control_float_type(double_float_type::canonical_value(df_b).second());
+      #if 0
+      const control_float_type ctrl_a =   control_float_type(double_float_type::canonical_value(df_a).crep().first.crep().first)
+                                        + control_float_type(double_float_type::canonical_value(df_a).crep().first.crep().second)
+                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second.crep().first)
+                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second.crep().second)
+                                        ;
+      const control_float_type ctrl_b =   control_float_type(double_float_type::canonical_value(df_b).crep().first.crep().first)
+                                        + control_float_type(double_float_type::canonical_value(df_b).crep().first.crep().second)
+                                        + control_float_type(double_float_type::canonical_value(df_b).crep().second.crep().first)
+                                        + control_float_type(double_float_type::canonical_value(df_b).crep().second.crep().second)
+                                        ;
+      #else
+      const control_float_type ctrl_a =   control_float_type(double_float_type::canonical_value(df_a).crep().first)
+                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second)
+                                        ;
+      const control_float_type ctrl_b =   control_float_type(double_float_type::canonical_value(df_b).crep().first)
+                                        + control_float_type(double_float_type::canonical_value(df_b).crep().second)
+                                        ;
+      #endif
 
       double_float_type  df_c;
       control_float_type ctrl_c;
@@ -208,7 +227,19 @@ bool test_op(char op, const unsigned count = 10000U)
          break;
       }
 
-      control_float_type ctrl_df_c = control_float_type(control_float_type(double_float_type::canonical_value(df_c).first()) + control_float_type(double_float_type::canonical_value(df_c).second()));
+      #if 0
+      const control_float_type ctrl_df_c =   control_float_type(double_float_type::canonical_value(df_c).crep().first.crep().first)
+                                           + control_float_type(double_float_type::canonical_value(df_c).crep().first.crep().second)
+                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second.crep().first)
+                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second.crep().second)
+                                           ;
+      #else
+      const control_float_type ctrl_df_c =   control_float_type(double_float_type::canonical_value(df_c).crep().first)
+                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second)
+                                           ;
+      #endif
+
+      //const control_float_type ctrl_df_c = control_float_type(control_float_type(double_float_type::canonical_value(df_c).first()) + control_float_type(double_float_type::canonical_value(df_c).second()));
 
       const control_float_type delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
 
@@ -256,17 +287,46 @@ int main()
    #endif
 
    #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-   constexpr unsigned int test_cases_float128 = 500U;
+   constexpr unsigned int test_cases_float128 = 1000U;
    #else
-   constexpr unsigned int test_cases_float128 = 10000U;
+   constexpr unsigned int test_cases_float128 = 20000U;
    #endif
 
    result_is_ok &= local::test_arithmetic<float>      (test_cases_built_in);
    result_is_ok &= local::test_arithmetic<double>     (test_cases_built_in);
    //result_is_ok &= local::test_arithmetic<long double>(test_cases_built_in);
+   //result_is_ok &= local::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double>>     (test_cases_built_in);
 #ifdef BOOST_MATH_USE_FLOAT128
    result_is_ok &= local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
 #endif
 
    return (result_is_ok ? 0 : -1);
 }
+
+#else
+
+///////////////////////////////////////////////////////////////
+//  Copyright 2012 John Maddock. Distributed under the Boost
+//  Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+
+#ifdef _MSC_VER
+#define _SCL_SECURE_NO_WARNINGS
+#endif
+
+#include <boost/multiprecision/cpp_double_float.hpp>
+
+#include "test_arithmetic.hpp"
+
+// cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
+// g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/boost/modular_boost/boost/libs/multiprecision/test -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_arithmetic.exe
+
+int main()
+{
+   using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double>, boost::multiprecision::et_off>;
+
+   test<double_float_type>();
+   return boost::report_errors();
+}
+
+#endif
