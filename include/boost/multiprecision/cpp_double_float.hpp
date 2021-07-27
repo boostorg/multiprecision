@@ -20,8 +20,11 @@
 #include <tuple>
 #include <vector>
 
-#include <boost/multiprecision/number.hpp>
 #include <boost/assert.hpp>
+#include <boost/functional/hash_fwd.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/detail/float_string_cvt.hpp>
+#include <boost/type_traits/common_type.hpp>
 
 namespace boost { namespace multiprecision { namespace backends {
 
@@ -50,15 +53,29 @@ template<typename FloatingPointType> void eval_subtract(cpp_double_float<Floatin
 template<typename FloatingPointType> void eval_multiply(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 template<typename FloatingPointType> void eval_divide  (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 
-template<typename FloatingPointType> void eval_frexp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a, int* v);
-template<typename FloatingPointType> void eval_floor(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
-template<typename FloatingPointType> void eval_ceil (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+template<typename FloatingPointType> void eval_frexp     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a, int* v);
+template<typename FloatingPointType> void eval_ldexp     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a, int v);
+template<typename FloatingPointType> void eval_floor     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+template<typename FloatingPointType> void eval_ceil      (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+template<typename FloatingPointType> void eval_sqrt      (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& o);
+template<typename FloatingPointType> int  eval_fpclassify(const cpp_double_float<FloatingPointType>& o);
+
+template<typename FloatingPointType,
+         typename R>
+typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_to(R* result, const cpp_double_float<FloatingPointType>& backend);
+
+template<typename FloatingPointType,
+         typename R>
+typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_to(R* result, const cpp_double_float<FloatingPointType>& backend);
 
 template<typename FloatingPointType,
          typename char_type,
          typename traits_type>
 std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os,
                                                        const cpp_double_float<FloatingPointType>& f);
+
+template<typename FloatingPointType>
+std::size_t hash_value(const cpp_double_float<FloatingPointType>& a);
 
 } } } // namespace boost::multiprecision::backends
 
@@ -98,6 +115,19 @@ template <class T> struct is_floating_point_or_float128
 #endif
                                  );
 };
+
+template<typename R>
+typename std::enable_if<boost::is_unsigned<R>::value == false, R>::type minus_max()
+{
+   return boost::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
+}
+
+template<typename R>
+typename std::enable_if<boost::is_unsigned<R>::value == true, R>::type minus_max()
+{
+   return 0;
+}
+
 
 }
 
@@ -201,12 +231,12 @@ class cpp_double_float
 
    cpp_double_float(const std::string& str)
    {
-      set_str(str);
+      boost::multiprecision::detail::convert_from_string(*this, str.c_str());
    }
 
    cpp_double_float(const char* pstr)
    {
-      set_str(std::string(pstr));
+      boost::multiprecision::detail::convert_from_string(*this, pstr);
    }
 
    constexpr cpp_double_float(cpp_double_float&&) = default;
@@ -242,9 +272,6 @@ class cpp_double_float
 
       normalize_pair(data);
    }
-
-   // FIXME Merge set_str() to operator<<
-   void set_str(const std::string& str_in);
 
    // Getters/Setters
    constexpr const float_type& first () const { return data.first; }
@@ -786,68 +813,6 @@ template<typename FloatingPointType> inline bool operator!=(const cpp_double_flo
 template<typename FloatingPointType> inline bool operator>=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return (a.compare(b) >= 0); }
 template<typename FloatingPointType> inline bool operator> (const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return (a.compare(b) >  0); }
 
-// -- String Conversions
-// FIXME Merge set_str() to operator<<
-template <typename FloatingPointType>
-inline void cpp_double_float<FloatingPointType>::set_str(const std::string& str_in)
-{
-   std::string str(str_in);
-
-   *this = 0;
-
-   int final_exponent = 0;
-   std::string::size_type pos;
-   if ((pos = str.find('e')) != std::string::npos || (pos = str.find('E')) != std::string::npos)
-   {
-      std::stringstream ss;
-      ss << str.data() + pos + 1 << std::endl;
-      ss >> final_exponent;
-      str = str.substr(0, pos);
-   }
-
-   pos = 0;
-   while (!std::isdigit(str[pos]) && pos < str.size())
-      if (str[pos] == '.')
-         break;
-      else pos++;
-
-   if (pos == str.size())
-      return;
-
-   // Set the whole number part
-   while (std::isdigit(str[pos]))
-      *this = (*this * FloatingPointType(10.0L)) + FloatingPointType((int) (str[pos++] - '0'));
-
-   // Set the decimal number part
-   if (str[pos] == '.')
-   {
-      std::string::size_type decimal_idx = pos;
-      pos++;
-
-      while (std::isdigit(str[pos]) && pos < str.size())
-      {
-         *this += cpp_double_float<FloatingPointType>((int) (str[pos] - '0')) / pow10((int) pos - (int) decimal_idx);
-         pos++;
-      }
-   }
-
-   // Get the sign
-   for (char c : str) {
-      if (c == '-')
-         *this = -*this;
-      if ((c <= '9' && c >= '0') || c == '.')
-         break;
-   }
-
-   *this *= pow10(final_exponent);
-}
-
-// -- Comparision Operators
-// Comparison operators work by determining the type containing more detail at
-// compile time, and then promoting the type with less detail to the type with
-// more detail, and then comparing. Some minor complications arise while
-// comparing an unsigned type to cpp_double_float<> that are handled as well
-
 // -- Input/Output Streaming
 template <typename FloatingPointType, typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
@@ -864,7 +829,7 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_float<Floa
 {
    std::string str;
    is >> str;
-   f.set_str(str);
+   boost::multiprecision::detail::convert_from_string(f, str.c_str());
    return is;
 }
 
@@ -878,8 +843,13 @@ template<typename FloatingPointType> void eval_frexp(cpp_double_float<FloatingPo
    using std::frexp;
    using std::ldexp;
 
-   result.first()  = frexp(a.first,    v);
-   result.second() = ldexp(a.second, -*v);
+   result.rep().first  = frexp(a.rep().first,    v);
+   result.rep().second = ldexp(a.rep().second, -*v);
+}
+
+template<typename FloatingPointType>
+void eval_ldexp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a, int v)
+{
 }
 
 template<typename FloatingPointType>
@@ -889,17 +859,17 @@ void eval_floor(cpp_double_float<FloatingPointType>& result, const cpp_double_fl
 
    using std::floor;
 
-   const typename double_float_type::float_type fhi = floor(x.first());
+   const typename double_float_type::float_type fhi = floor(x.rep().first);
 
    if(fhi != x.first())
    {
-      result.fisrt()  = fhi;
-      result.second() = static_cast<typename double_float_type::float_type>(0.0F);
+      result.rep().first  = fhi;
+      result.rep().second = static_cast<typename double_float_type::float_type>(0.0F);
    }
    else
    {
-      result.fisrt()  = fhi;
-      result.second() = floor(x.second());
+      result.rep().first  = fhi;
+      result.rep().second = floor(x.rep().second);
 
       double_float_type::normalize_pair(result.rep());
    }
@@ -912,6 +882,63 @@ void eval_ceil(cpp_double_float<FloatingPointType>& result, const cpp_double_flo
    eval_floor(result, -x);
 
    result.negate();
+}
+
+template<typename FloatingPointType>
+void eval_sqrt(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& o)
+{
+}
+
+template<typename FloatingPointType>
+inline int eval_fpclassify(const cpp_double_float<FloatingPointType>& o)
+{
+   // TBD: Is int the proper return value?
+   using std::fpclassify;
+   using boost::math::fpclassify;
+
+   return (int) (fpclassify)(o.crep().first);
+}
+
+template<typename FloatingPointType,
+         typename R>
+typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_to(R* result, const cpp_double_float<FloatingPointType>& backend)
+{
+   // TBD: Does boost::common_type have a C++ 11 replacement?
+   using c_type = typename boost::common_type<R, FloatingPointType>::type;
+
+   BOOST_CONSTEXPR const c_type my_max = static_cast<c_type>((std::numeric_limits<R>::max)());
+   BOOST_CONSTEXPR const c_type my_min = static_cast<c_type>((std::numeric_limits<R>::min)());
+   c_type                       ct     = std::fabs(backend.crep().first);
+
+   (void) my_min;
+
+   if (ct > my_max)
+      if (!std::is_unsigned<R>::value)
+         *result = backend.crep().first >= 0 ? (std::numeric_limits<R>::max)() : detail::minus_max<R>();
+      else
+         *result = (std::numeric_limits<R>::max)();
+   else
+   {
+      *result  = static_cast<R>(backend.crep().first);
+      *result += static_cast<R>(backend.crep().second);
+   }
+}
+
+template<typename FloatingPointType,
+         typename R>
+typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_to(R* result, const cpp_double_float<FloatingPointType>& backend)
+{
+   *result  = R(backend.crep().first);
+   *result += R(backend.crep().second);
+}
+
+template<typename FloatingPointType>
+std::size_t hash_value(const cpp_double_float<FloatingPointType>& a)
+{
+   boost::hash<FloatingPointType> hasher;
+   std::size_t         result = hasher(a.rep().first);
+   boost::hash_combine(result, hasher(a.rep().second));
+   return result;
 }
 
 } } } // namespace boost::multiprecision::backends
