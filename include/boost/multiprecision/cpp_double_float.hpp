@@ -693,13 +693,9 @@ void eval_sqrt(cpp_double_float<FloatingPointType>& result, const cpp_double_flo
 }
 
 template<typename FloatingPointType>
-inline int eval_fpclassify(const cpp_double_float<FloatingPointType>& o)
+int eval_fpclassify(const cpp_double_float<FloatingPointType>& o)
 {
-   // TBD: Is int the proper return value?
-   using std::fpclassify;
-   using boost::math::fpclassify;
-
-   return (int) (fpclassify)(o.crep().first);
+   return (int) (boost::math::fpclassify)(o.crep().first);
 }
 
 template<typename FloatingPointType,
