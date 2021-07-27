@@ -21,9 +21,9 @@
 #include <vector>
 
 #include <boost/assert.hpp>
-#include <boost/functional/hash_fwd.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/type_traits/common_type.hpp>
 
 namespace boost { namespace multiprecision { namespace backends {
@@ -81,7 +81,11 @@ std::size_t hash_value(const cpp_double_float<FloatingPointType>& a);
 
 namespace std {
 
-// Foward declaration of std::numeric_limits
+// Foward declarations of various specializations of std::numeric_limits
+
+template <typename FloatingPointType>
+class numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>;
+
 template <typename FloatingPointType,
           const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>;
@@ -242,6 +246,16 @@ class cpp_double_float
    constexpr cpp_double_float(cpp_double_float&&) = default;
 
    ~cpp_double_float() = default;
+
+   std::size_t hash() const
+   {
+      std::size_t result = 0;
+
+      boost::multiprecision::detail::hash_combine(result, data.first);
+      boost::multiprecision::detail::hash_combine(result, data.second);
+
+      return result;
+   }
 
    // Casts
    operator   signed char     () const { return (signed char)data.first; }
@@ -482,223 +496,12 @@ class cpp_double_float
 
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
    {
-      std::stringstream strm;
+      if (number_of_digits == 0)
+         number_of_digits = std::numeric_limits<cpp_double_float>::digits10 + 3;
 
-      strm.flags    (format_flags);
-      strm.imbue    (strm.getloc());
-      strm.precision(number_of_digits);
+      const std::string my_str = boost::multiprecision::detail::convert_to_string(*this, number_of_digits, format_flags);
 
-      using std::fabs;
-      auto is_set = [&](std::ios::fmtflags flg) {
-         return strm.flags() & flg;
-      };
-
-      using std::isinf;
-
-      if (isinf(first()))
-      {
-         strm << first();
-         return strm.str();
-      }
-
-      if (*this < cpp_double_float<FloatingPointType>(0) || strm.flags() & std::ios::showpos)
-         strm << (*this < cpp_double_float<FloatingPointType>(0) ? "-" : "+");
-
-      int exp10 = 0;
-
-      using std::fabs;
-      using std::floor;
-      using std::log10;
-
-      if (*this != cpp_double_float<FloatingPointType>(0))
-         exp10 = (int) floor(log10(fabs(first())));
-      else
-         exp10 = 0;
-
-      cpp_double_float<FloatingPointType> f_prime = (*this > cpp_double_float<FloatingPointType>(0) ? *this : -*this);
-      f_prime /= cpp_double_float<FloatingPointType>::pow10(exp10);
-
-      // TODO Handle subnormal numbers
-
-      if (f_prime < cpp_double_float<FloatingPointType>(1) && f_prime > cpp_double_float<FloatingPointType>(0))
-      {
-         f_prime *= FloatingPointType(10);
-         exp10++;
-      }
-      else if (f_prime >= cpp_double_float<FloatingPointType>(10))
-      {
-         f_prime /= FloatingPointType(10);
-         exp10--;
-      }
-
-      // Collect all the required digits to print (plus one digit for rounding)
-      std::vector<int> digits;
-
-      int p = (int)strm.precision();
-      if (is_set(std::ios::fixed))
-         p += exp10 + 1;
-      else if (is_set(std::ios::scientific))
-         p = (std::max)(1, p + 1);
-      else
-         p = (std::max)(p, 1);
-
-      // TODO Maybe switch to fmod() based digit extraction for correct rounding?
-      while (p-- > 0)
-      {
-         // FIXME Replace with std::floor function
-         int digit = static_cast<int>(f_prime.first());
-
-         if (f_prime.second() < 0 && (f_prime.first() - (FloatingPointType)digit < -f_prime.second()))
-            digit -= 1;
-
-         BOOST_ASSERT(digit >= 0 && digit <= 9);
-
-         digits.push_back(digit);
-
-         f_prime -= static_cast<FloatingPointType>(digit);
-         f_prime *= static_cast<FloatingPointType>(10);
-      }
-
-      auto round_up = [&]() {
-         int i = (int) digits.size() - 1;
-         if (i > -1)
-         {
-            do
-            {
-               if (digits[i] == 9)
-                  digits[i--] = 0;
-               else
-               {
-                  digits[i--] += 1;
-                  break;
-               }
-            } while (i >= 0);
-
-            // Special case in which all of the collected digits are incorrectly
-            // rounded (e.g. 9.999 rounded to three significant figures = 10.0)
-            if (i == -1 && digits[0] == 0)
-            {
-               digits = {1};
-               exp10++;
-            }
-         }
-         else
-         {
-            digits.insert(digits.begin(), 1);
-            exp10++;
-         }
-      };
-
-      // Perform rounding (rounding mode = round-to-nearest, ties-to-even)
-      // Three possible cases: the remaining part of the number is
-      // (1) greater than 0.5 (round-up)
-      // (2) less than 0.5 (round-down)
-      // (3) equal to 0.5 (round-to-even)
-      if (f_prime > cpp_double_float<FloatingPointType>(5))
-         round_up();
-      else if (f_prime < cpp_double_float<FloatingPointType>(5))  // do nothing. already correctly rounded
-      {
-         // TODO add some kind of an option for configurable rounding mode
-      }
-      else if (digits.back() % 2 != 0)
-         // remaining part is exactly 0.5, so round-to-even
-         round_up();
-
-      // Remove trailing zeroes
-      if (!is_set(std::ios::fixed) && !is_set(std::ios::scientific) && !is_set(std::ios::showpoint))
-         while (digits.back() == 0 && (std::ptrdiff_t(digits.size()) > std::ptrdiff_t(1 + exp10) || exp10 < 0))
-            digits.pop_back();
-
-      auto fill_zeroes = [](std::string& s, size_t pos, int n) {
-         for (int i = 0; i < n; ++i)
-            s.insert(pos, "0");
-      };
-
-      // Print the required numbers to a string
-      std::string str = "";
-      size_t      str_size;
-
-      for (auto d : digits)
-         str.push_back(static_cast<char>(d + '0'));
-
-      // Fixed-point style
-      if (is_set(std::ios::fixed) || (exp10 >= -4 && (exp10 < strm.precision()) && !is_set(std::ios::scientific)))
-      {
-         if (exp10 + 1 <= 0) // Number < 1
-         {
-            str_size = (std::size_t) (strm.precision() + 2);
-
-            if (!is_set(std::ios::fixed) && strm.precision() == 0)
-               str_size++;
-
-            str.insert(0, "0.");
-
-            fill_zeroes(str, 2, -(exp10 + 1));
-            if (!is_set(std::ios::fixed))
-               str_size += -(exp10 + 1);
-         }
-         else  // Number >= 1
-         {
-            str_size = std::size_t(1 + strm.precision());
-            if (is_set(std::ios::fixed))
-               str_size += exp10 + 1;
-
-            fill_zeroes(str, str.size(), (int) str_size - (int) str.size() - 1);
-
-            BOOST_ASSERT(std::ptrdiff_t(exp10 + 1) <= std::ptrdiff_t(str.size()));
-            str.insert(exp10 + 1, ".");
-         }
-
-         while (str.size() > str_size)
-            str.pop_back();
-         while (str.size() < str_size)
-            str.push_back('0');
-         while (!is_set(std::ios::showpoint) && !is_set(std::ios::fixed) && str.back() == '0')
-            str.pop_back();
-
-         if (str.back() == '.' && !is_set(std::ios::showpoint))
-            str.pop_back();
-      }
-      // Scientific style
-      else if (is_set(std::ios::scientific) || (exp10 < -4 || (exp10 + 1 > (std::max)((int)strm.precision(), 1))))
-      {
-         str_size = (size_t)strm.precision() + 1;
-         if (strm.precision() == 0 || is_set(std::ios::scientific))
-            str_size++;
-
-         str.insert(1, ".");
-         // Pad with zeroes
-         fill_zeroes(str, str.size(), (int) str_size - (int) str.size());
-
-         // Remove trailing zeroes
-         while (str.size() > str_size)
-            str.pop_back();
-         while (!is_set(std::ios::scientific) && !is_set(std::ios::showpoint) && str.back() == '0')
-            str.pop_back();
-
-         // Remove unnecessary point
-         if (str.back() == '.' && !is_set(std::ios::showpoint))
-            str.pop_back();
-
-         std::stringstream ss;
-
-         ss << str;
-         ss << (strm.flags() & std::ios::uppercase ? "E" : "e");
-         ss << (exp10 < 0 ? "-" : "+");
-         using std::log10;
-         ss.width((std::max)(1 + (std::streamsize)log10(exp10), (std::streamsize)2));
-         ss.fill('0');
-         ss << fabs(exp10);
-
-         str = ss.str();
-      }
-      else if (exp10 == strm.precision())
-      {
-         if (strm.flags() & std::ios::showpoint)
-            str.push_back('.');
-      }
-
-      return strm.str();
+      return my_str;
    }
 
  private:
@@ -906,15 +709,17 @@ typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_t
    // TBD: Does boost::common_type have a C++ 11 replacement?
    using c_type = typename boost::common_type<R, FloatingPointType>::type;
 
+   using std::fabs;
+
    BOOST_CONSTEXPR const c_type my_max = static_cast<c_type>((std::numeric_limits<R>::max)());
    BOOST_CONSTEXPR const c_type my_min = static_cast<c_type>((std::numeric_limits<R>::min)());
-   c_type                       ct     = std::fabs(backend.crep().first);
+   c_type                       ct     = fabs(backend.crep().first);
 
    (void) my_min;
 
    if (ct > my_max)
       if (!std::is_unsigned<R>::value)
-         *result = backend.crep().first >= 0 ? (std::numeric_limits<R>::max)() : detail::minus_max<R>();
+         *result = backend.crep().first >= typename cpp_double_float<FloatingPointType>::float_type(0U) ? (std::numeric_limits<R>::max)() : detail::minus_max<R>();
       else
          *result = (std::numeric_limits<R>::max)();
    else
@@ -935,10 +740,7 @@ typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_
 template<typename FloatingPointType>
 std::size_t hash_value(const cpp_double_float<FloatingPointType>& a)
 {
-   boost::hash<FloatingPointType> hasher;
-   std::size_t         result = hasher(a.rep().first);
-   boost::hash_combine(result, hasher(a.rep().second));
-   return result;
+   return a.hash();
 }
 
 } } } // namespace boost::multiprecision::backends
@@ -946,6 +748,37 @@ std::size_t hash_value(const cpp_double_float<FloatingPointType>& a)
 namespace std {
 
 // Specialization of numeric_limits for cpp_double_float<>
+template <typename FloatingPointType>
+class numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>
+  : public std::numeric_limits<FloatingPointType>
+{
+private:
+   using base_class_type = std::numeric_limits<FloatingPointType>;
+
+   using self_type = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
+
+public:
+   static constexpr bool is_iec559   = false;
+
+   static constexpr int digits       = (2 * base_class_type::digits) - 2;
+   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
+   static constexpr int max_digits10 = int(float(digits)     * 0.301F) + 2;
+
+   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
+   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
+
+   static constexpr self_type (min)         () noexcept { return self_type((base_class_type::min)()); }
+   static constexpr self_type (max)         () noexcept { return self_type((base_class_type::max)()); }
+   static constexpr self_type  lowest       () noexcept { return self_type( base_class_type::lowest()); }
+   static constexpr self_type  epsilon      () noexcept { return self_type( base_class_type::epsilon()); } // NOTE: doesn't construct from float128
+   static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }
+   static constexpr self_type  denorm_min   () noexcept { return self_type( base_class_type::denorm_min()); }
+   static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
+   static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
+   static constexpr self_type  signaling_NaN() noexcept { return self_type( base_class_type::signaling_NaN()); }
+};
+
+// Specialization of numeric_limits for boost::multiprecision::number<cpp_double_float<>>
 template <typename FloatingPointType,
           const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>
