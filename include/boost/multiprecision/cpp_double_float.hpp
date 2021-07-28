@@ -879,6 +879,19 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
       return os.flags() & flg;
    };
 
+   // --
+   if (is_set(std::ios::hexfloat))
+   {
+      std::stringstream ss;
+      ss.flags(os.flags());
+
+      ss << f.first() << " + " << f.second();
+      
+      os << ss.str();
+      return os;
+   }
+   // --
+
    using std::isinf;
    using std::floor;
    using std::log10;

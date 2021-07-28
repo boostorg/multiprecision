@@ -103,9 +103,10 @@ int test_op(char op, const unsigned count = 10000U)
    using naked_double_float_type = FloatingPointType;
    using control_float_type      = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<naked_double_float_type>::digits10 * 2 + 1>, boost::multiprecision::et_off>;
 
-   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), 1-std::numeric_limits<naked_double_float_type>::digits);
-   std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<naked_double_float_type>::digits-1 << " bits)...";
+   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<naked_double_float_type>::digits);
+   std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<naked_double_float_type>::digits << " bits)...";
 
+   int tests_passed = 0;
    for (unsigned i = 0U; i < count; ++i)
    {
       naked_double_float_type  df_a   = log_rand<naked_double_float_type>();
@@ -164,10 +165,12 @@ int test_op(char op, const unsigned count = 10000U)
       if (delta > MaxError)
       {
          std::cerr << std::setprecision(std::numeric_limits<naked_double_float_type>::digits10 + 2);
-         std::cerr << " [FAILED] while performing '" /*<< std::setprecision(100000)*/ << ctrl_a << "' " << op << " '" << ctrl_b << "', got incorrect result: " << (df_c) << std::endl;
+         std::cerr << " [FAILED] while performing '" /*<< std::setprecision(100000)*/ << ctrl_a << "' " << op << " '" << ctrl_b << std::endl;
 
          // uncomment for more debugging information (only for cpp_double_float<> type)
-         std::cerr << "(df_a = " << df_a.get_raw_str() << ", df_b = " << df_b.get_raw_str() << ")" << std::endl;
+         std::cerr << "a       : " << df_a.get_raw_str() << std::endl;
+
+         std::cerr << "b       : " << df_b.get_raw_str() << std::endl;
          std::cerr << "expected: " << ctrl_c << std::endl;
          std::cerr << "actual  : " << ctrl_df_c << " (" << df_c.get_raw_str() << ")" << std::endl;
          std::cerr << "error   : " << delta << std::endl;
@@ -175,9 +178,11 @@ int test_op(char op, const unsigned count = 10000U)
 
          return -1;
       }
+
+      tests_passed++;
    }
 
-  std::cout << " ok [" << count << " tests passed]" << std::endl;
+  std::cout << " ok [" << tests_passed << " tests passed]" << std::endl;
   return 0;
 }
 
@@ -217,8 +222,7 @@ int main()
 #ifdef BOOST_MATH_USE_FLOAT128
    e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> >();
 #endif
-
-   e += test_arithmetic_cpp_double_float::test_arithmetic < boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<float>> >();
-   e += test_arithmetic_cpp_double_float::test_arithmetic < boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<double>> >();
+   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<double> > >();
+   e += test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<float> > >();
    return e;
 }
