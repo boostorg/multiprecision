@@ -514,7 +514,7 @@ class cpp_double_float
 
    static void normalize_pair(rep_type& p, bool fast = true)
    {
-      BOOST_ASSERT(std::isfinite(p.first));
+      //BOOST_ASSERT(std::isfinite(p.first));
       // Convert a pair of floats to standard form
       p = (fast ? fast_exact_sum(p.first, p.second) : exact_sum(p.first, p.second));
    }
