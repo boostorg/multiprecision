@@ -359,6 +359,10 @@ class cpp_double_float
    friend inline cpp_double_float operator*(const cpp_double_float& a, const float_type& b)
    {
       rep_type p = exact_product(a.first(), b);
+
+      if (!std::isfinite(p.first))
+         return cpp_double_float(p);
+
       p.second += a.second() * b;
 
       normalize_pair(p);
@@ -397,6 +401,9 @@ class cpp_double_float
 
       data = exact_sum(first(),  other.first());
 
+      if (!std::isfinite(first()))
+         return *this;
+
       data.second += t.first;
       normalize_pair(data);
       data.second += t.second;
@@ -409,6 +416,9 @@ class cpp_double_float
    {
       const rep_type t = exact_difference(second(), other.second());
       data = exact_difference(first(), other.first());
+
+      if (!std::isfinite(first()))
+         return *this;
 
       data.second += t.first;
       normalize_pair(data);
@@ -437,6 +447,13 @@ class cpp_double_float
 
       // First approximation
       p.first = first() / other.first();
+
+      if (std::isfinite(p.first))
+      {
+         data = p;
+         return *this;
+      }
+
       cpp_double_float r = *this - (other * p.first);
 
       p.second = r.first() / other.first();
@@ -497,6 +514,7 @@ class cpp_double_float
 
    static void normalize_pair(rep_type& p, bool fast = true)
    {
+      BOOST_ASSERT(std::isfinite(p.first));
       // Convert a pair of floats to standard form
       p = (fast ? fast_exact_sum(p.first, p.second) : exact_sum(p.first, p.second));
    }
