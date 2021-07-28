@@ -74,14 +74,14 @@ jobs:
           ls -la ./test_arithmetic_df.exe
           echo "execute ./test_arithmetic_df.exe"
           ./test_arithmetic_df.exe
-          echo "compile to ./test_arithmetic_cpp_double_float.exe"
+          echo "compile to ./test_cpp_double_float_arithmetic.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_arithmetic_cpp_double_float.cpp -o test_arithmetic_cpp_double_float.exe
-          echo "ls -la of ./test_arithmetic_cpp_double_float.exe"
-          ls -la ./test_arithmetic_cpp_double_float.exe
-          echo "execute ./test_arithmetic_cpp_double_float.exe"
-          ./test_arithmetic_cpp_double_float.exe
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
+          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
+          ls -la ./test_cpp_double_float_arithmetic.exe
+          echo "execute ./test_cpp_double_float_arithmetic.exe"
+          ./test_cpp_double_float_arithmetic.exe
           echo "compile to ./test_cpp_double_float_constructors.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
@@ -150,16 +150,14 @@ jobs:
           ls -la ./test_arithmetic_df.exe
           echo "execute ./test_arithmetic_df.exe"
           ./test_arithmetic_df.exe
-          echo "execute ./test_arithmetic_df.exe"
-          ./test_arithmetic_df.exe
-          echo "compile to ./test_arithmetic_cpp_double_float.exe"
+          echo "compile to ./test_cpp_double_float_arithmetic.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_arithmetic_cpp_double_float.cpp -o test_arithmetic_cpp_double_float.exe
-          echo "ls -la of ./test_arithmetic_cpp_double_float.exe"
-          ls -la ./test_arithmetic_cpp_double_float.exe
-          echo "execute ./test_arithmetic_cpp_double_float.exe"
-          ./test_arithmetic_cpp_double_float.exe
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
+          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
+          ls -la ./test_cpp_double_float_arithmetic.exe
+          echo "execute ./test_cpp_double_float_arithmetic.exe"
+          ./test_cpp_double_float_arithmetic.exe
           echo "compile to ./test_cpp_double_float_constructors.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
@@ -227,16 +225,14 @@ jobs:
           ls -la ./test_arithmetic_df.exe
           echo "execute ./test_arithmetic_df.exe"
           ./test_arithmetic_df.exe
-          echo "execute ./test_arithmetic_df.exe"
-          ./test_arithmetic_df.exe
-          echo "compile to ./test_arithmetic_cpp_double_float.exe"
+          echo "compile to ./test_cpp_double_float_arithmetic.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_arithmetic_cpp_double_float.cpp -o test_arithmetic_cpp_double_float.exe
-          echo "ls -la of ./test_arithmetic_cpp_double_float.exe"
-          ls -la ./test_arithmetic_cpp_double_float.exe
-          echo "execute ./test_arithmetic_cpp_double_float.exe"
-          ./test_arithmetic_cpp_double_float.exe
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
+          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
+          ls -la ./test_cpp_double_float_arithmetic.exe
+          echo "execute ./test_cpp_double_float_arithmetic.exe"
+          ./test_cpp_double_float_arithmetic.exe
           echo "compile to ./test_cpp_double_float_constructors.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
@@ -306,13 +302,11 @@ jobs:
           ls -la ./test_arithmetic_df.exe
           echo "execute ./test_arithmetic_df.exe"
           ./test_arithmetic_df.exe
-          echo "execute ./test_arithmetic_df.exe"
-          ./test_arithmetic_df.exe
-          echo "compile to ./test_arithmetic_cpp_double_float.exe"
+          echo "compile to ./test_cpp_double_float_arithmetic.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_arithmetic_cpp_double_float.cpp -o test_arithmetic_cpp_double_float.exe
-          echo "ls -la of ./test_arithmetic_cpp_double_float.exe"
-          ls -la ./test_arithmetic_cpp_double_float.exe
-          echo "execute ./test_arithmetic_cpp_double_float.exe"
-          ./test_arithmetic_cpp_double_float.exe
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -lquadmath -o test_cpp_double_float_arithmetic.exe
+          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
+          ls -la ./test_cpp_double_float_arithmetic.exe
+          echo "execute ./test_cpp_double_float_arithmetic.exe"
+          ./test_cpp_double_float_arithmetic.exe
