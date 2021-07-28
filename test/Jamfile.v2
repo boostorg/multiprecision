@@ -695,6 +695,7 @@ test-suite conversions :
               : # input files
               : # requirements
               <define>TEST_MPFR
+               [ check-target-builds ../config//is_ci_sanitizer_run "Sanitizer CI run" : <build>no : ]
                [ check-target-builds ../config//has_mpfr : : <build>no ]
                release # Otherwise [ runtime is slow
               ]

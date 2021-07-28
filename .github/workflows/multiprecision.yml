@@ -199,7 +199,7 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 define=BOOST_CI_ASAN_BUILD cxxflags=-fsanitize=address linkflags=-fsanitize=address toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 define=BOOST_CI_ASAN_BUILD define=BOOST_CI_SANITIZER_BUILD cxxflags=-fsanitize=address linkflags=-fsanitize=address toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
   ubuntu-focal-UBSAN:
     runs-on: ubuntu-20.04
@@ -261,7 +261,7 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 define=BOOST_CI_UBSAN_BUILD cxxflags=-fsanitize=undefined linkflags=-fsanitize=undefined toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 define=BOOST_CI_UBSAN_BUILD define=BOOST_CI_SANITIZER_BUILD cxxflags=-fsanitize=undefined linkflags=-fsanitize=undefined toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
   ubuntu-bionic:
     runs-on: ubuntu-18.04
