@@ -66,6 +66,14 @@ jobs:
         run: |
           echo "where am i (via pwd)"
           pwd
+          echo "compile to ./test_arithmetic_df.exe"
+          echo "compiler version"
+          ${{ matrix.compiler }} -v
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_arithmetic_df.cpp -o test_arithmetic_df.exe
+          echo "ls -la of ./test_arithmetic_df.exe"
+          ls -la ./test_arithmetic_df.exe
+          echo "execute ./test_arithmetic_df.exe"
+          ./test_arithmetic_df.exe
           echo "compile to ./test_cpp_double_float_arithmetic.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
@@ -134,10 +142,18 @@ jobs:
         run: |
           echo "where am i (via pwd)"
           pwd
+          echo "compile to ./test_arithmetic_df.exe"
+          echo "compiler version"
+          ${{ matrix.compiler }} -v
+          ${{ matrix.compiler }} -finline-functions -fsanitize=address -fsanitize=leak -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_arithmetic_df.cpp -o test_arithmetic_df.exe
+          echo "ls -la of ./test_arithmetic_df.exe"
+          ls -la ./test_arithmetic_df.exe
+          echo "execute ./test_arithmetic_df.exe"
+          ./test_arithmetic_df.exe
           echo "compile to ./test_cpp_double_float_arithmetic.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -fsanitize=address -fsanitize=leak -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
           echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
           ls -la ./test_cpp_double_float_arithmetic.exe
           echo "execute ./test_cpp_double_float_arithmetic.exe"
@@ -177,7 +193,6 @@ jobs:
           git submodule update --init libs/core
           git submodule update --init libs/detail
           git submodule update --init libs/exception
-          git submodule update --init libs/functional
           git submodule update --init libs/integer
           git submodule update --init libs/io
           git submodule update --init libs/iterator
@@ -202,6 +217,14 @@ jobs:
         run: |
           echo "where am i (via pwd)"
           pwd
+          echo "compile to ./test_arithmetic_df.exe"
+          echo "compiler version"
+          ${{ matrix.compiler }} -v
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_arithmetic_df.cpp -o test_arithmetic_df.exe
+          echo "ls -la of ./test_arithmetic_df.exe"
+          ls -la ./test_arithmetic_df.exe
+          echo "execute ./test_arithmetic_df.exe"
+          ./test_arithmetic_df.exe
           echo "compile to ./test_cpp_double_float_arithmetic.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
@@ -245,6 +268,7 @@ jobs:
           git submodule update --init libs/core
           git submodule update --init libs/detail
           git submodule update --init libs/exception
+          git submodule update --init libs/functional
           git submodule update --init libs/headers
           git submodule update --init libs/integer
           git submodule update --init libs/iterator
@@ -270,6 +294,14 @@ jobs:
         run: |
           echo "where am i (via pwd)"
           pwd
+          echo "compile to ./test_arithmetic_df.exe"
+          echo "compiler version"
+          ${{ matrix.compiler }} -v
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_arithmetic_df.cpp -lquadmath -o test_arithmetic_df.exe
+          echo "ls -la of ./test_arithmetic_df.exe"
+          ls -la ./test_arithmetic_df.exe
+          echo "execute ./test_arithmetic_df.exe"
+          ./test_arithmetic_df.exe
           echo "compile to ./test_cpp_double_float_arithmetic.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
