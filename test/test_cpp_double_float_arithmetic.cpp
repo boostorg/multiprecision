@@ -355,10 +355,10 @@ int main()
    constexpr unsigned int test_cases_float128 = 20000U;
    #endif
 
-   result_is_ok &= local::test_arithmetic<float>      (test_cases_built_in);
-   result_is_ok &= local::test_arithmetic<double>     (test_cases_built_in);
+   result_is_ok &= local::test_arithmetic<float>(test_cases_built_in);
+   result_is_ok &= local::test_arithmetic<double>(test_cases_built_in);
    //result_is_ok &= local::test_arithmetic<long double>(test_cases_built_in);
-   //result_is_ok &= local::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double>>     (test_cases_built_in);
+   //result_is_ok &= local::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double>>(test_cases_built_in);
 #ifdef BOOST_MATH_USE_FLOAT128
    result_is_ok &= local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
 #endif

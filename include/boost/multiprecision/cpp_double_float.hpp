@@ -77,7 +77,28 @@ std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_t
 template<typename FloatingPointType>
 std::size_t hash_value(const cpp_double_float<FloatingPointType>& a);
 
+// BEGIN: These are only needed for cascading the cpp_double_float type.
+template<typename FloatingPointType>
+cpp_double_float<FloatingPointType> fabs(const cpp_double_float<FloatingPointType>& a);
+
+template<typename FloatingPointType>
+cpp_double_float<FloatingPointType> frexp(const cpp_double_float<FloatingPointType>& a, int* v);
+
+template<typename FloatingPointType>
+cpp_double_float<FloatingPointType> ldexp(const cpp_double_float<FloatingPointType>& a, int v);
+
+template<typename FloatingPointType>
+cpp_double_float<FloatingPointType> floor(const cpp_double_float<FloatingPointType>& x);
+// END: These are only needed for cascading the cpp_double_float type.
+
 } } } // namespace boost::multiprecision::backends
+
+namespace boost { namespace math {
+
+template<typename FloatingPointType>
+int fpclassify(const boost::multiprecision::backends::cpp_double_float<FloatingPointType>& o);
+
+} }
 
 namespace std {
 
@@ -177,7 +198,7 @@ class cpp_double_float
    cpp_double_float(const cpp_double_float<OtherFloatType>& a)
       : cpp_double_float(a.first())
    {
-      *this += a.second();
+      *this += cpp_double_float(a.second());
    }
 
    // Constructors from integers
@@ -518,21 +539,21 @@ class cpp_double_float
    {
       // Split a floating point number in two (high and low) parts approximating the
       // upper-half and lower-half bits of the float
-      static_assert(std::numeric_limits<float_type>::is_iec559,
-                    "double_float<> invoked with non-native floating-point unit");
+      //static_assert(std::numeric_limits<float_type>::is_iec559,
+      //              "double_float<> invoked with non-native floating-point unit");
 
       // TODO Replace bit shifts with constexpr funcs for better compaitibility
       constexpr int        MantissaBits   = std::numeric_limits<float_type>::digits;
       constexpr int        SplitBits      = MantissaBits / 2 + 1;
-      constexpr float_type Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
-      const     float_type SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter*2);
+      const     float_type Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
+      const     float_type SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter * float_type(2U));
 
       float_type temp, hi, lo;
 
       // Handle if multiplication with the splitter would cause overflow
       if (a > SplitThreshold || a < -SplitThreshold)
       {
-         constexpr float_type Normalizer = float_type(1ULL << (SplitBits + 1));
+         const float_type Normalizer = float_type(1ULL << (SplitBits + 1));
 
          const float_type a_ = a / Normalizer;
 
@@ -718,9 +739,9 @@ void eval_sqrt(cpp_double_float<FloatingPointType>& result, const cpp_double_flo
   local_float_type p,q,hx,tx,u,uu,cc;
   local_float_type t1;
 
-  constexpr int              MantissaBits   = std::numeric_limits<local_float_type>::digits;
-  constexpr int              SplitBits      = MantissaBits / 2 + 1;
-  constexpr local_float_type Splitter       = local_float_type((1ULL << SplitBits) + 1);
+  constexpr int              MantissaBits = std::numeric_limits<local_float_type>::digits;
+  constexpr int              SplitBits    = MantissaBits / 2 + 1;
+  constexpr local_float_type Splitter     = local_float_type((1ULL << SplitBits) + 1);
 
   p = Splitter * c;
   hx = (c-p);
@@ -791,6 +812,87 @@ typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_
    *result += R(backend.crep().second);
 }
 
+// BEGIN: These are only needed for cascading the cpp_double_float type.
+template<typename FloatingPointType>
+cpp_double_float<FloatingPointType> fabs(const cpp_double_float<FloatingPointType>& a)
+{
+   cpp_double_float<FloatingPointType> b(a);
+
+   if(b.is_negative())
+   {
+     b.negate();
+   }
+
+   return b;
+}
+
+template<typename FloatingPointType>
+cpp_double_float<FloatingPointType> frexp(const cpp_double_float<FloatingPointType>& a, int* v)
+{
+   using double_float_type = cpp_double_float<FloatingPointType>;
+
+   double_float_type result;
+
+   using std::frexp;
+   using std::ldexp;
+
+   result.rep().first  = frexp(a.rep().first,    v);
+   result.rep().second = ldexp(a.rep().second, -*v);
+
+   return result;
+}
+
+template<typename FloatingPointType>
+cpp_double_float<FloatingPointType> ldexp(const cpp_double_float<FloatingPointType>& a, int v)
+{
+   using double_float_type = cpp_double_float<FloatingPointType>;
+
+   double_float_type result;
+
+   using std::ldexp;
+
+   typename cpp_double_float<FloatingPointType>::rep_type z =
+   std::make_pair
+   (
+      ldexp(a.crep().first,  v),
+      ldexp(a.crep().second, v)
+   );
+
+   double_float_type::normalize_pair(z);
+
+   result.rep() = z;
+
+   return result;
+}
+
+template<typename FloatingPointType>
+cpp_double_float<FloatingPointType> floor(const cpp_double_float<FloatingPointType>& x)
+{
+   using double_float_type = cpp_double_float<FloatingPointType>;
+
+   double_float_type result;
+
+   using std::floor;
+
+   const typename double_float_type::float_type fhi = floor(x.rep().first);
+
+   if(fhi != x.first())
+   {
+      result.rep().first  = fhi;
+      result.rep().second = static_cast<typename double_float_type::float_type>(0.0F);
+   }
+   else
+   {
+      result.rep().first  = fhi;
+      result.rep().second = floor(x.rep().second);
+
+      double_float_type::normalize_pair(result.rep());
+   }
+
+   return result;
+}
+// END: These are only needed for cascading the cpp_double_float type.
+
 template<typename FloatingPointType>
 std::size_t hash_value(const cpp_double_float<FloatingPointType>& a)
 {
@@ -798,6 +900,19 @@ std::size_t hash_value(const cpp_double_float<FloatingPointType>& a)
 }
 
 } } } // namespace boost::multiprecision::backends
+
+namespace boost { namespace math {
+
+template<typename FloatingPointType>
+int fpclassify(const boost::multiprecision::backends::cpp_double_float<FloatingPointType>& o)
+{
+   using std::fpclassify;
+
+   return (int) (fpclassify)(o.crep().first);
+}
+
+} }
+
 
 namespace std {
 
