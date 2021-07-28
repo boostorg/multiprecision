@@ -54,7 +54,7 @@ struct control
    static constexpr int max_exponent10 = std::numeric_limits<ConstituentFloatType>::max_exponent10;
 
    using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<ConstituentFloatType>, boost::multiprecision::et_off>;
-   using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<max_digits10>, boost::multiprecision::et_off>;
+   using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
 
    using random_engine_type = std::linear_congruential_engine<std::uint32_t, 48271, 0, 2147483647>;
 
@@ -129,7 +129,7 @@ struct control
       dist_exp
       (
          0,
-         unsigned(float(max_exponent10) * 0.30F)
+         unsigned(float(max_exponent10) * 0.15F)
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
@@ -358,9 +358,10 @@ int main()
    result_is_ok &= local::test_arithmetic<float>(test_cases_built_in);
    result_is_ok &= local::test_arithmetic<double>(test_cases_built_in);
    //result_is_ok &= local::test_arithmetic<long double>(test_cases_built_in);
-   //result_is_ok &= local::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double>>(test_cases_built_in);
 #ifdef BOOST_MATH_USE_FLOAT128
    result_is_ok &= local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
+#else
+   (void) test_cases_float128;
 #endif
 
    return (result_is_ok ? 0 : -1);
