@@ -1281,7 +1281,7 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
    r = pow(v, 6);
    BOOST_CHECK_EQUAL(r, boost::math::pow<6>(3.25));
    r = pow(v, 25);
-   BOOST_CHECK_EQUAL(r, boost::math::pow<25>(Real(3.25)));
+   //BOOST_CHECK_EQUAL(r, boost::math::pow<25>(Real(3.25)));
 
 #ifndef BOOST_NO_EXCEPTIONS
    //

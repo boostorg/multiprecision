@@ -360,7 +360,9 @@ class cpp_double_float
    {
       rep_type p = exact_product(a.first(), b);
 
-      if (!std::isfinite(p.first))
+      using std::isfinite;
+
+      if (!isfinite(p.first))
          return cpp_double_float(p);
 
       p.second += a.second() * b;
@@ -401,7 +403,9 @@ class cpp_double_float
 
       data = exact_sum(first(),  other.first());
 
-      if (!std::isfinite(first()))
+      using std::isfinite;
+
+      if (!isfinite(first()))
          return *this;
 
       data.second += t.first;
@@ -417,7 +421,9 @@ class cpp_double_float
       const rep_type t = exact_difference(second(), other.second());
       data = exact_difference(first(), other.first());
 
-      if (!std::isfinite(first()))
+      using std::isfinite;
+
+      if (!isfinite(first()))
          return *this;
 
       data.second += t.first;
@@ -448,7 +454,9 @@ class cpp_double_float
       // First approximation
       p.first = first() / other.first();
 
-      if (!std::isfinite(p.first))
+      using std::isfinite;
+
+      if (!isfinite(p.first))
       {
          data = p;
          return *this;

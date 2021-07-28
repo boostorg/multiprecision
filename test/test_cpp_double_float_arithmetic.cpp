@@ -1,5 +1,3 @@
-#if 0
-
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2021 Fahad Syed.
 //  Copyright 2021 Christopher Kormanyos.
@@ -366,32 +364,3 @@ int main()
 
    return (result_is_ok ? 0 : -1);
 }
-
-#else
-
-///////////////////////////////////////////////////////////////
-//  Copyright 2012 John Maddock. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
-
-#ifdef _MSC_VER
-#define _SCL_SECURE_NO_WARNINGS
-#endif
-
-#include <boost/multiprecision/cpp_double_float.hpp>
-
-#include "test_arithmetic.hpp"
-
-// cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
-// g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/boost/modular_boost/boost/libs/multiprecision/test -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_arithmetic.exe
-
-int main()
-{
-   using double_float_type =
-     boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double>, boost::multiprecision::et_off>;
-
-   test<double_float_type>();
-   return boost::report_errors();
-}
-
-#endif
