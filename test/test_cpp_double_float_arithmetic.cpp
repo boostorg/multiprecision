@@ -93,7 +93,7 @@ ConstructionType construct_from(ArithmeticType f)
 template <typename ConstructionType, typename DoubleFloatType, typename std::enable_if<!std::is_arithmetic<DoubleFloatType>::value>::type const* = nullptr>
 ConstructionType construct_from(DoubleFloatType f)
 {
-   return construct_from<ConstructionType, DoubleFloatType::float_type>(f.first()) + construct_from<ConstructionType, DoubleFloatType::float_type>(f.second());
+   return construct_from<ConstructionType, typename DoubleFloatType::float_type>(f.first()) + construct_from<ConstructionType, typename DoubleFloatType::float_type>(f.second());
 }
 
 

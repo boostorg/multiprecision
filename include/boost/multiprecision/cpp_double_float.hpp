@@ -18,6 +18,7 @@
 #include <limits>
 #include <sstream>
 #include <vector>
+#include <ios>
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/assert.hpp>
@@ -37,6 +38,14 @@ struct number_category<backends::cpp_double_float<FloatingPointType>>
   : public std::integral_constant<int, number_kind_floating_point>
 {
 };
+
+template <typename FloatingPointType, typename std::enable_if<std::is_floating_point<FloatingPointType>::value>::type const* = nullptr>
+backends::cpp_double_float<FloatingPointType>
+ldexp(const backends::cpp_double_float<FloatingPointType>& x, int a);
+
+template <typename FloatingPointType>
+backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >
+ldexp(const backends::cpp_double_float<backends::cpp_double_float<FloatingPointType> >& x, int a);
 
 namespace backends {
 
@@ -207,7 +216,7 @@ inline cpp_double_float<FloatingPointType>::cpp_double_float(UnsignedIntegralTyp
          // FIXME replace with a single ldexp function once you implement it
          //data.first  = std::ldexp(data.first,  (std::min)(MantissaBits, bit_index));
          //data.second = std::ldexp(data.second, (std::min)(MantissaBits, bit_index));
-         *this = std::ldexp(*this, (std::min)(MantissaBits, bit_index));
+         *this = boost::multiprecision::ldexp(*this, (std::min)(MantissaBits, bit_index));
       }
    }
 }
@@ -880,7 +889,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_floa
    };
 
    // --
-   if (is_set(std::ios::hexfloat))
+   if (is_set(std::ios::fixed) && is_set(std::ios::scientific))
    {
       std::stringstream ss;
       ss.flags(os.flags());
@@ -1185,12 +1194,13 @@ class std::numeric_limits<boost::multiprecision::backends::cpp_double_float<Floa
 };
 // TODO have explicit specializations for cpp_double_float< float/double >
 
-namespace std {
+namespace boost {
+namespace multiprecision {
 
 // -- Basic C-style Math functions
-template <typename FloatingPointType, typename std::enable_if<std::is_floating_point<FloatingPointType>::value>::type const* = nullptr>
-boost::multiprecision::backends::cpp_double_float<FloatingPointType>
-ldexp(const boost::multiprecision::backends::cpp_double_float<FloatingPointType>& x, int a)
+template <typename FloatingPointType, typename std::enable_if<std::is_floating_point<FloatingPointType>::value>::type const*>
+backends::cpp_double_float<FloatingPointType>
+ldexp(const backends::cpp_double_float<FloatingPointType>& x, int a)
 {
    auto x_(x);
 
@@ -1201,8 +1211,8 @@ ldexp(const boost::multiprecision::backends::cpp_double_float<FloatingPointType>
 }
 
 template <typename FloatingPointType>
-boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >
-ldexp(const boost::multiprecision::backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >& x, int a)
+backends::cpp_double_float<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >
+ldexp(const backends::cpp_double_float<backends::cpp_double_float<FloatingPointType> >& x, int a)
 {
    auto x_(x);
 
@@ -1211,7 +1221,8 @@ ldexp(const boost::multiprecision::backends::cpp_double_float<boost::multiprecis
 
    return x_;
 }
-} // namespace std
+} // namespace multiprecision
+} // namespace boost
 // --
 
 #endif // BOOST_MP_CPP_DOUBLE_FLOAT_2021_06_05_HPP
