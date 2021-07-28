@@ -387,7 +387,8 @@ int main()
 
 int main()
 {
-   using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double>, boost::multiprecision::et_off>;
+   using double_float_type =
+     boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double>, boost::multiprecision::et_off>;
 
    test<double_float_type>();
    return boost::report_errors();

@@ -198,7 +198,7 @@ class cpp_double_float
    cpp_double_float(const cpp_double_float<OtherFloatType>& a)
       : cpp_double_float(a.first())
    {
-      *this += cpp_double_float(a.second());
+      *this += a.second();
    }
 
    // Constructors from integers
@@ -448,7 +448,7 @@ class cpp_double_float
       // First approximation
       p.first = first() / other.first();
 
-      if (std::isfinite(p.first))
+      if (!std::isfinite(p.first))
       {
          data = p;
          return *this;
@@ -563,15 +563,15 @@ class cpp_double_float
       // TODO Replace bit shifts with constexpr funcs for better compaitibility
       constexpr int        MantissaBits   = std::numeric_limits<float_type>::digits;
       constexpr int        SplitBits      = MantissaBits / 2 + 1;
-      const     float_type Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
-      const     float_type SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter * float_type(2U));
+      constexpr float_type Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
+      const     float_type SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter*2);
 
       float_type temp, hi, lo;
 
       // Handle if multiplication with the splitter would cause overflow
       if (a > SplitThreshold || a < -SplitThreshold)
       {
-         const float_type Normalizer = float_type(1ULL << (SplitBits + 1));
+         constexpr float_type Normalizer = float_type(1ULL << (SplitBits + 1));
 
          const float_type a_ = a / Normalizer;
 
