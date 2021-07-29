@@ -2,9 +2,9 @@
 //  Copyright 2021 Fahad Syed.
 //  Copyright 2021 Christopher Kormanyos.
 //  Copyright 2021 Janek Kozicki.
-//  Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
 //
 
 #ifndef BOOST_MP_CPP_DOUBLE_FLOAT_2021_06_05_HPP
@@ -231,13 +231,8 @@ class cpp_double_float
 
          if (bit_index < 0)
             break;
-         else
-         {
-            // shift
-            // FIXME replace with a single ldexp function once you implement it
-            data.first  = std::ldexp(data.first,  (std::min)(MantissaBits, bit_index));
-            data.second = std::ldexp(data.second, (std::min)(MantissaBits, bit_index));
-         }
+         else // shift
+            eval_ldexp(*this, *this, (std::min)(MantissaBits, bit_index));
       }
    }
 
@@ -520,10 +515,10 @@ class cpp_double_float
       return result;
    }
 
+   // Converts a pair of floats to standard form
    static void normalize_pair(rep_type& p, bool fast = true)
    {
       //BOOST_ASSERT(std::isfinite(p.first));
-      // Convert a pair of floats to standard form
       p = (fast ? fast_exact_sum(p.first, p.second) : exact_sum(p.first, p.second));
    }
 
@@ -568,7 +563,7 @@ class cpp_double_float
       //static_assert(std::numeric_limits<float_type>::is_iec559,
       //              "double_float<> invoked with non-native floating-point unit");
 
-      // TODO Replace bit shifts with constexpr funcs for better compaitibility
+      // TODO Replace bit shifts with constexpr funcs or ldexpr for better compaitibility
       constexpr int        MantissaBits   = std::numeric_limits<float_type>::digits;
       constexpr int        SplitBits      = MantissaBits / 2 + 1;
       constexpr float_type Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
@@ -838,87 +833,6 @@ typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_
    *result += R(backend.crep().second);
 }
 
-// BEGIN: These are only needed for cascading the cpp_double_float type.
-template<typename FloatingPointType>
-cpp_double_float<FloatingPointType> fabs(const cpp_double_float<FloatingPointType>& a)
-{
-   cpp_double_float<FloatingPointType> b(a);
-
-   if(b.is_negative())
-   {
-     b.negate();
-   }
-
-   return b;
-}
-
-template<typename FloatingPointType>
-cpp_double_float<FloatingPointType> frexp(const cpp_double_float<FloatingPointType>& a, int* v)
-{
-   using double_float_type = cpp_double_float<FloatingPointType>;
-
-   double_float_type result;
-
-   using std::frexp;
-   using std::ldexp;
-
-   result.rep().first  = frexp(a.rep().first,    v);
-   result.rep().second = ldexp(a.rep().second, -*v);
-
-   return result;
-}
-
-template<typename FloatingPointType>
-cpp_double_float<FloatingPointType> ldexp(const cpp_double_float<FloatingPointType>& a, int v)
-{
-   using double_float_type = cpp_double_float<FloatingPointType>;
-
-   double_float_type result;
-
-   using std::ldexp;
-
-   typename cpp_double_float<FloatingPointType>::rep_type z =
-   std::make_pair
-   (
-      ldexp(a.crep().first,  v),
-      ldexp(a.crep().second, v)
-   );
-
-   double_float_type::normalize_pair(z);
-
-   result.rep() = z;
-
-   return result;
-}
-
-template<typename FloatingPointType>
-cpp_double_float<FloatingPointType> floor(const cpp_double_float<FloatingPointType>& x)
-{
-   using double_float_type = cpp_double_float<FloatingPointType>;
-
-   double_float_type result;
-
-   using std::floor;
-
-   const typename double_float_type::float_type fhi = floor(x.rep().first);
-
-   if(fhi != x.first())
-   {
-      result.rep().first  = fhi;
-      result.rep().second = static_cast<typename double_float_type::float_type>(0.0F);
-   }
-   else
-   {
-      result.rep().first  = fhi;
-      result.rep().second = floor(x.rep().second);
-
-      double_float_type::normalize_pair(result.rep());
-   }
-
-   return result;
-}
-// END: These are only needed for cascading the cpp_double_float type.
-
 template<typename FloatingPointType>
 std::size_t hash_value(const cpp_double_float<FloatingPointType>& a)
 {
@@ -955,19 +869,19 @@ private:
 public:
    static constexpr bool is_iec559   = false;
 
-   static constexpr int digits       = (2 * base_class_type::digits) - 2;
+   static constexpr int digits       = 2 * (base_class_type::digits - 1);
    static constexpr int digits10     = int(float(digits - 1) * 0.301F);
    static constexpr int max_digits10 = int(float(digits)     * 0.301F) + 2;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
 
-   static constexpr self_type (min)         () noexcept { return self_type((base_class_type::min)()); }
-   static constexpr self_type (max)         () noexcept { return self_type((base_class_type::max)()); }
-   static constexpr self_type  lowest       () noexcept { return self_type( base_class_type::lowest()); }
-   static constexpr self_type  epsilon      () noexcept { return self_type( base_class_type::epsilon()); } // NOTE: doesn't construct from float128
-   static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }
-   static constexpr self_type  denorm_min   () noexcept { return self_type( base_class_type::denorm_min()); }
+   static constexpr self_type (min)         () noexcept { return self_type((base_class_type::min)()); } // FIXME
+   static constexpr self_type (max)         () noexcept { return self_type((base_class_type::max)()); } // FIXME
+   static constexpr self_type  lowest       () noexcept { return self_type( base_class_type::lowest()); } // FIXME
+   static constexpr self_type  epsilon      () noexcept { return self_type( base_class_type::epsilon()); } // FIXME | NOTE: doesn't construct from float128
+   static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }  // FIXME
+   static constexpr self_type  denorm_min   () noexcept { return self_type( base_class_type::denorm_min()); } // FIXME
    static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
    static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
    static constexpr self_type  signaling_NaN() noexcept { return self_type( base_class_type::signaling_NaN()); }
@@ -995,12 +909,12 @@ public:
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
 
-   static constexpr self_type (min)         () noexcept { return self_type((base_class_type::min)()); }
-   static constexpr self_type (max)         () noexcept { return self_type((base_class_type::max)()); }
-   static constexpr self_type  lowest       () noexcept { return self_type( base_class_type::lowest()); }
-   static constexpr self_type  epsilon      () noexcept { return self_type( base_class_type::epsilon()); } // NOTE: doesn't construct from float128
-   static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }
-   static constexpr self_type  denorm_min   () noexcept { return self_type( base_class_type::denorm_min()); }
+   static constexpr self_type (min)         () noexcept { return self_type((base_class_type::min)()); } // FIXME
+   static constexpr self_type (max)         () noexcept { return self_type((base_class_type::max)()); } // FIXME
+   static constexpr self_type  lowest       () noexcept { return self_type( base_class_type::lowest()); } // FIXME
+   static constexpr self_type  epsilon      () noexcept { return self_type( base_class_type::epsilon()); } // FIXME | NOTE: doesn't construct from float128
+   static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }  // FIXME
+   static constexpr self_type  denorm_min   () noexcept { return self_type( base_class_type::denorm_min()); } // FIXME
    static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
    static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
    static constexpr self_type  signaling_NaN() noexcept { return self_type( base_class_type::signaling_NaN()); }
