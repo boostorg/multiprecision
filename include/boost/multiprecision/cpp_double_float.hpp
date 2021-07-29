@@ -486,7 +486,7 @@ class cpp_double_float
    cpp_double_float  operator-() const { return negative(); }
 
    // Helper functions
-   static cpp_double_float<float_type> pow10(int p)
+   static cpp_double_float pow10(int p)
    {
       using local_float_type = cpp_double_float;
 
@@ -518,6 +518,13 @@ class cpp_double_float
       }
 
       return result;
+   }
+
+   static const cpp_double_float& my_value_eps()
+   {
+      static const cpp_double_float val = pow10(1 - std::numeric_limits<cpp_double_float>::digits10);
+
+      return val;
    }
 
    static void normalize_pair(rep_type& p, bool fast = true)
@@ -965,7 +972,7 @@ public:
    static constexpr self_type (min)         () noexcept { return self_type((base_class_type::min)()); }
    static constexpr self_type (max)         () noexcept { return self_type((base_class_type::max)()); }
    static constexpr self_type  lowest       () noexcept { return self_type( base_class_type::lowest()); }
-   static constexpr self_type  epsilon      () noexcept { return self_type( base_class_type::epsilon()); } // NOTE: doesn't construct from float128
+   static constexpr self_type  epsilon      () noexcept { return self_type( self_type::my_value_eps()); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }
    static constexpr self_type  denorm_min   () noexcept { return self_type( base_class_type::denorm_min()); }
    static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
@@ -998,7 +1005,7 @@ public:
    static constexpr self_type (min)         () noexcept { return self_type((base_class_type::min)()); }
    static constexpr self_type (max)         () noexcept { return self_type((base_class_type::max)()); }
    static constexpr self_type  lowest       () noexcept { return self_type( base_class_type::lowest()); }
-   static constexpr self_type  epsilon      () noexcept { return self_type( base_class_type::epsilon()); } // NOTE: doesn't construct from float128
+   static constexpr self_type  epsilon      () noexcept { return self_type( boost::multiprecision::backends::cpp_double_float<FloatingPointType>::my_value_eps()); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }
    static constexpr self_type  denorm_min   () noexcept { return self_type( base_class_type::denorm_min()); }
    static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
