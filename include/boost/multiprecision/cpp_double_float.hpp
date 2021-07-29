@@ -928,13 +928,13 @@ public:
    //static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }  // FIXME
    //static constexpr self_type  denorm_min   () noexcept { return self_type( base_class_type::denorm_min()); } // FIXME
 
-   static constexpr self_type (min)         () noexcept { return self_type( boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
-   static constexpr self_type (max)         () noexcept { return self_type( std::ldexp(base_class_type::max(), -base_class_type::digits)); }
-   static constexpr self_type  lowest       () noexcept { return self_type(-max()); }
-   static constexpr self_type  epsilon      () noexcept { return self_type( boost::multiprecision::ldexp(self_type(1), -digits)); }
+   static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), -min_exponent)); }
+   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp(base_class_type::max(), -base_class_type::digits)); }
+   static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
+   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), -digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
-   static constexpr self_type  denorm_min   () noexcept { return self_type( min()); }
-   
+   static const     self_type  denorm_min   () noexcept { return self_type( (min)()); }
+
    static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
    static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
    static constexpr self_type  signaling_NaN() noexcept { return self_type( base_class_type::signaling_NaN()); }

@@ -8,8 +8,6 @@
 // "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 
-#define TEST_CPP_DOUBLE_FLOAT
-
 #ifdef _MSC_VER
 #define _SCL_SECURE_NO_WARNINGS
 #endif
@@ -52,7 +50,7 @@
 #ifdef TEST_CPP_DEC_FLOAT
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
-#ifdef TEST_FLOAT128
+#if defined(TEST_FLOAT128) || (defined(TEST_CPP_DOUBLE_FLOAT) && defined(BOOST_MATH_USE_FLOAT128))
 #include <boost/multiprecision/float128.hpp>
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
@@ -196,6 +194,8 @@ void test()
    BOOST_CHECK((boost::math::isfinite)(sqrt((std::numeric_limits<T>::min)())));
 }
 
+// g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/test -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DTEST_CPP_DOUBLE_FLOAT -DBOOST_MATH_USE_FLOAT128 test.cpp -lquadmath -o test_sqrt.exe
+
 int main()
 {
 #ifdef TEST_BACKEND
@@ -244,6 +244,9 @@ int main()
 #ifdef TEST_CPP_DOUBLE_FLOAT
    test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<float> > >();
    test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double> > >();
+   #if defined(BOOST_MATH_USE_FLOAT128)
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> > >();
+   #endif
 #endif
    return boost::report_errors();
 }
