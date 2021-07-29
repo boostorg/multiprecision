@@ -1374,7 +1374,7 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
       BOOST_CHECK_LT(v - r, 0);
       BOOST_CHECK((boost::math::isinf)(r * v));
       BOOST_CHECK((boost::math::isinf)(v * r));
-      //BOOST_CHECK((boost::math::isinf)(r / v));
+      BOOST_CHECK((boost::math::isinf)(r / v));
       //BOOST_CHECK_EQUAL(v / r, 0);
       Real t = v;
       BOOST_CHECK((boost::math::isinf)(t += r));
