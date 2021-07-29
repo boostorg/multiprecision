@@ -309,7 +309,7 @@ jobs:
           echo "ls -la of ./test_arithmetic_df.exe"
           ls -la ./test_arithmetic_df.exe
           echo "execute ./test_arithmetic_df.exe"
-          ./test_sqrt.exe
+          ./test_arithmetic_df.exe
           echo "compile to ./test_sqrt.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
