@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2002 - 2011.
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright Christopher Kormanyos 2002 - 2011, 2021.
+//  Copyright 2011 -2021 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 //
@@ -50,13 +50,16 @@
 #ifdef TEST_CPP_DEC_FLOAT
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
-#if defined(TEST_FLOAT128) || (defined(TEST_CPP_DOUBLE_FLOAT) && defined(BOOST_MATH_USE_FLOAT128))
+#ifdef TEST_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
+#if defined(BOOST_MATH_USE_FLOAT128)
+#include <boost/multiprecision/float128.hpp>
+#endif
 #include <boost/multiprecision/cpp_double_float.hpp>
 #endif
 
@@ -234,7 +237,7 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<1000> > >();
 #endif
 #endif
-#ifdef TEST_FLOAT128
+#if defined(TEST_FLOAT128) && !defined(TEST_CPP_DOUBLE_FLOAT)
    test<boost::multiprecision::float128>();
 #endif
 #ifdef TEST_CPP_BIN_FLOAT

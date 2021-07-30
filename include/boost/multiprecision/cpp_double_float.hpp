@@ -53,6 +53,7 @@ template<typename FloatingPointType> void eval_subtract(cpp_double_float<Floatin
 template<typename FloatingPointType> void eval_multiply(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 template<typename FloatingPointType> void eval_divide  (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 
+template<typename FloatingPointType> void eval_fabs      (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a);
 template<typename FloatingPointType> void eval_frexp     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a, int* v);
 template<typename FloatingPointType> void eval_ldexp     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a, int v);
 template<typename FloatingPointType> void eval_floor     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
@@ -77,19 +78,8 @@ std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_t
 template<typename FloatingPointType>
 std::size_t hash_value(const cpp_double_float<FloatingPointType>& a);
 
-// BEGIN: These are only needed for cascading the cpp_double_float type.
 template<typename FloatingPointType>
 cpp_double_float<FloatingPointType> fabs(const cpp_double_float<FloatingPointType>& a);
-
-template<typename FloatingPointType>
-cpp_double_float<FloatingPointType> frexp(const cpp_double_float<FloatingPointType>& a, int* v);
-
-template<typename FloatingPointType>
-cpp_double_float<FloatingPointType> ldexp(const cpp_double_float<FloatingPointType>& a, int v);
-
-template<typename FloatingPointType>
-cpp_double_float<FloatingPointType> floor(const cpp_double_float<FloatingPointType>& x);
-// END: These are only needed for cascading the cpp_double_float type.
 
 } } } // namespace boost::multiprecision::backends
 
@@ -298,15 +288,14 @@ class cpp_double_float
 #endif
 
    // Methods
-   constexpr cpp_double_float<float_type> negative()    const { return cpp_double_float<float_type>(-data.first, -data.second); }
-   constexpr bool                         is_negative() const { return data.first < 0; }
+   constexpr bool is_neg() const { return (data.first < 0); }
+
+   bool is_zero() const  { return (compare(cpp_double_float(0U)) == 0); }
 
    void negate()
    {
       data.first  = -data.first;
       data.second = -data.second;
-
-      normalize_pair(data);
    }
 
    // Getters/Setters
@@ -478,28 +467,28 @@ class cpp_double_float
    cpp_double_float& operator++() { return *this += cpp_double_float<float_type>(float_type(1.0F)); }
    cpp_double_float& operator--() { return *this -= cpp_double_float<float_type>(float_type(1.0F)); }
 
-   cpp_double_float  operator-() const { return negative(); }
+   cpp_double_float  operator-() const { cpp_double_float v(*this); v.negate(); return v; }
 
    // Helper functions
-   static cpp_double_float pow10(int p)
+   static cpp_double_float pown(int p)
    {
       using local_float_type = cpp_double_float;
 
       local_float_type result;
 
-      if      (p <  0) result = local_float_type(1U) / pow10(-p);
+      if      (p <  0) result = local_float_type(1U) / pown(-p);
       else if (p == 0) result = local_float_type(1U);
-      else if (p == 1) result = local_float_type(10U);
-      else if (p == 2) result = local_float_type(100U);
-      else if (p == 3) result = local_float_type(1000U);
-      else if (p == 4) result = local_float_type(10000U);
+      else if (p == 1) result = local_float_type(unsigned(p));
+      else if (p == 2) result = local_float_type(unsigned(p) * unsigned(p));
+      else if (p == 3) result = local_float_type((unsigned(p) * unsigned(p)) * unsigned(p));
+      else if (p == 4) result = local_float_type((unsigned(p) * unsigned(p)) * (unsigned(p) * unsigned(p)));
       else
       {
          result = local_float_type(1U);
 
-         local_float_type y(10U);
+         local_float_type y(unsigned(p));
 
-         std::uint32_t p_local = (std::uint32_t)p;
+         std::uint32_t p_local = (std::uint32_t) p;
 
          for (;;)
          {
@@ -536,9 +525,26 @@ class cpp_double_float
      // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
      int n_result;
 
-     if     ((first() > other.first()) || ((first() == other.first()) && (second() > other.second()))) { n_result =  1; }
-     else if((first() < other.first()) || ((first() == other.first()) && (second() < other.second()))) { n_result = -1; }
-     else                                                                                              { n_result =  0; }
+     if(first() > other.first())
+     {
+       n_result = 1;
+     }
+     else if(first() < other.first())
+     {
+       n_result = -1;
+     }
+     else if(second() > other.second())
+     {
+       n_result = 1;
+     }
+     else if(second() < other.second())
+     {
+       n_result = -1;
+     }
+     else
+     {
+       n_result = 0;
+     }
 
      return n_result;
    }
@@ -651,6 +657,10 @@ class cpp_double_float
          + (a_split.second * b_split.second)
       );
    }
+
+   int  order10  () const { using std::log10; return static_cast<int>(log10(first()) + float_type(0.5F) * float_type(is_zero() ? 0 : (is_neg() ? -1 : 1))); }
+   bool small_arg() const { return (order10() < (-std::numeric_limits<cpp_double_float>::digits10 / 6)); }
+   bool near_one () const { return cpp_double_float(fabs(cpp_double_float(1U) - *this)).small_arg(); }
 };
 
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) += b; }
@@ -689,6 +699,20 @@ template<typename FloatingPointType> void eval_add     (cpp_double_float<Floatin
 template<typename FloatingPointType> void eval_subtract(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result -= x; }
 template<typename FloatingPointType> void eval_multiply(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result *= x; }
 template<typename FloatingPointType> void eval_divide  (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x) { result /= x; }
+
+template<typename FloatingPointType> void eval_fabs(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a)
+{
+   if(a.is_neg())
+   {
+      result.rep().first  = -a.rep().first;
+      result.rep().second = -a.rep().second;
+   }
+   else
+   {
+      result.rep().first  = a.rep().first;
+      result.rep().second = a.rep().second;
+   }
+}
 
 template<typename FloatingPointType> void eval_frexp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a, int* v)
 {
@@ -831,6 +855,18 @@ typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_
 {
    *result  = R(backend.crep().first);
    *result += R(backend.crep().second);
+}
+
+template<typename FloatingPointType>
+cpp_double_float<FloatingPointType> fabs(const cpp_double_float<FloatingPointType>& a)
+{
+   using double_float_type = cpp_double_float<FloatingPointType>;
+
+   double_float_type result;
+
+   eval_fabs(result, a);
+
+   return result;
 }
 
 template<typename FloatingPointType>
