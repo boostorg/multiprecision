@@ -197,8 +197,6 @@ void test()
    BOOST_CHECK((boost::math::isfinite)(sqrt((std::numeric_limits<T>::min)())));
 }
 
-// g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/test -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DTEST_CPP_DOUBLE_FLOAT -DBOOST_MATH_USE_FLOAT128 test.cpp -lquadmath -o test_sqrt.exe
-
 int main()
 {
 #ifdef TEST_BACKEND
