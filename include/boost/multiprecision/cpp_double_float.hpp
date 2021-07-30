@@ -58,8 +58,10 @@ template<typename FloatingPointType> void eval_frexp     (cpp_double_float<Float
 template<typename FloatingPointType> void eval_ldexp     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a, int v);
 template<typename FloatingPointType> void eval_floor     (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 template<typename FloatingPointType> void eval_ceil      (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
-template<typename FloatingPointType> void eval_sqrt      (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& o);
 template<typename FloatingPointType> int  eval_fpclassify(const cpp_double_float<FloatingPointType>& o);
+template<typename FloatingPointType> void eval_sqrt      (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& o);
+template<typename FloatingPointType> void eval_exp       (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+template<typename FloatingPointType> void eval_log       (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 
 template<typename FloatingPointType,
          typename R>
@@ -290,7 +292,8 @@ class cpp_double_float
    // Methods
    constexpr bool is_neg() const { return (data.first < 0); }
 
-   bool is_zero() const  { return (compare(cpp_double_float(0U)) == 0); }
+   bool is_zero() const { return (compare(cpp_double_float(0U)) == 0); }
+   bool is_one () const { return (compare(cpp_double_float(1U)) == 0); }
 
    void negate()
    {
@@ -470,23 +473,22 @@ class cpp_double_float
    cpp_double_float  operator-() const { cpp_double_float v(*this); v.negate(); return v; }
 
    // Helper functions
-   static cpp_double_float pown(int p)
+   static cpp_double_float pown(const cpp_double_float& x, int p)
    {
       using local_float_type = cpp_double_float;
 
       local_float_type result;
 
-      if      (p <  0) result = local_float_type(1U) / pown(-p);
+      if      (p <  0) result = pown(local_float_type(1U) / x, -p);
       else if (p == 0) result = local_float_type(1U);
-      else if (p == 1) result = local_float_type(unsigned(p));
-      else if (p == 2) result = local_float_type(unsigned(p) * unsigned(p));
-      else if (p == 3) result = local_float_type((unsigned(p) * unsigned(p)) * unsigned(p));
-      else if (p == 4) result = local_float_type((unsigned(p) * unsigned(p)) * (unsigned(p) * unsigned(p)));
+      else if (p == 1) result = x;
+      else if (p == 2) result = local_float_type(x * x);
+      else if (p == 3) result = local_float_type((x * x) * x);
       else
       {
          result = local_float_type(1U);
 
-         local_float_type y(unsigned(p));
+         local_float_type y(x);
 
          std::uint32_t p_local = (std::uint32_t) p;
 
@@ -520,33 +522,13 @@ class cpp_double_float
       other.data = tmp;
    }
 
-   int compare(const cpp_double_float& other) const
+   constexpr int compare(const cpp_double_float& other) const
    {
      // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
-     int n_result;
-
-     if(first() > other.first())
-     {
-       n_result = 1;
-     }
-     else if(first() < other.first())
-     {
-       n_result = -1;
-     }
-     else if(second() > other.second())
-     {
-       n_result = 1;
-     }
-     else if(second() < other.second())
-     {
-       n_result = -1;
-     }
-     else
-     {
-       n_result = 0;
-     }
-
-     return n_result;
+     return (first () > other.first ()) ?  1 :
+            (first () < other.first ()) ? -1 :
+            (second() > other.second()) ?  1 :
+            (second() < other.second()) ? -1 : 0;
    }
 
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
@@ -661,6 +643,9 @@ class cpp_double_float
    int  order10  () const { using std::log10; return static_cast<int>(log10(first()) + float_type(0.5F) * float_type(is_zero() ? 0 : (is_neg() ? -1 : 1))); }
    bool small_arg() const { return (order10() < (-std::numeric_limits<cpp_double_float>::digits10 / 6)); }
    bool near_one () const { return cpp_double_float(fabs(cpp_double_float(1U) - *this)).small_arg(); }
+
+   template<typename OtherFloatingPointType>
+   friend void eval_exp(cpp_double_float<OtherFloatingPointType>& result, const cpp_double_float<OtherFloatingPointType>& x);
 };
 
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) += b; }
@@ -773,53 +758,188 @@ void eval_ceil(cpp_double_float<FloatingPointType>& result, const cpp_double_flo
 }
 
 template<typename FloatingPointType>
-void eval_sqrt(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& o)
-{
-  using local_float_type = typename cpp_double_float<FloatingPointType>::float_type;
-
-  using std::sqrt;
-
-  local_float_type c = sqrt(o.crep().first);
-
-  local_float_type p,q,hx,tx,u,uu,cc;
-  local_float_type t1;
-
-  constexpr int              MantissaBits = std::numeric_limits<local_float_type>::digits;
-  constexpr int              SplitBits    = MantissaBits / 2 + 1;
-  constexpr local_float_type Splitter     = local_float_type((1ULL << SplitBits) + 1);
-
-  p = Splitter * c;
-  hx = (c-p);
-  hx = hx+p;
-  tx = c-hx;
-  p = hx*hx;
-  q = hx*tx;
-  q = q+q;
-
-  u = p+q;
-  uu = p-u;
-  uu = uu+q;
-  t1 = tx*tx;
-  uu = uu+t1;
-
-  cc = o.crep().first-u;
-  cc = cc-uu;
-  cc = cc+o.crep().second;
-  t1 = c+c;
-  cc = cc/t1;
-
-  hx = c+cc;
-  tx = c-hx;
-  tx = tx+cc;
-
-  result.rep().first  = hx;
-  result.rep().second = tx;
-}
-
-template<typename FloatingPointType>
 int eval_fpclassify(const cpp_double_float<FloatingPointType>& o)
 {
    return (int) (boost::math::fpclassify)(o.crep().first);
+}
+
+template<typename FloatingPointType>
+void eval_sqrt(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& o)
+{
+   using local_float_type = typename cpp_double_float<FloatingPointType>::float_type;
+
+   using std::sqrt;
+
+   local_float_type c = sqrt(o.crep().first);
+
+   local_float_type p,q,hx,tx,u,uu,cc;
+   local_float_type t1;
+
+   constexpr int              MantissaBits = std::numeric_limits<local_float_type>::digits;
+   constexpr int              SplitBits    = MantissaBits / 2 + 1;
+   constexpr local_float_type Splitter     = local_float_type((1ULL << SplitBits) + 1);
+
+   p = Splitter * c;
+   hx = (c-p);
+   hx = hx+p;
+   tx = c-hx;
+   p = hx*hx;
+   q = hx*tx;
+   q = q+q;
+
+   u = p+q;
+   uu = p-u;
+   uu = uu+q;
+   t1 = tx*tx;
+   uu = uu+t1;
+
+   cc = o.crep().first-u;
+   cc = cc-uu;
+   cc = cc+o.crep().second;
+   t1 = c+c;
+   cc = cc/t1;
+
+   hx = c+cc;
+   tx = c-hx;
+   tx = tx+cc;
+
+   result.rep().first  = hx;
+   result.rep().second = tx;
+}
+
+template<typename FloatingPointType>
+void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x)
+{
+   if(eval_fpclassify(x) != (int) FP_NORMAL)
+   {
+      result = x;
+   }
+   else
+   {
+      using double_float_type = cpp_double_float<FloatingPointType>;
+      using local_float_type  = typename cpp_double_float<FloatingPointType>::float_type;
+
+      // Get a local copy of the argument and force it to be positive.
+      const bool b_neg = x.is_neg();
+
+      double_float_type xx;
+
+      eval_fabs(xx, x);
+
+      // Check the range of the input. Will it overflow?
+      using std::log;
+
+      static const local_float_type max_exp_input = log((std::numeric_limits<local_float_type>::max)());
+      static const local_float_type min_exp_input = log((std::numeric_limits<local_float_type>::min)());
+
+      if(xx.is_zero() || xx.crep().first < min_exp_input)
+      {
+         result = double_float_type(1U);
+      }
+      else if(xx.crep().first > max_exp_input)
+      {
+         result = double_float_type(std::numeric_limits<local_float_type>::quiet_NaN());
+      }
+      else if(xx.is_one())
+      {
+         static const double_float_type constant_e         (std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
+         static const double_float_type constant_one_over_e(std::string("0.36787944117144232159552377016146086744581113103176783450783680169746149574489980335714727434591964375"));
+
+         result = ((b_neg == false) ? constant_e : constant_one_over_e);
+      }
+      else
+      {
+         // Use an argument reduction algorithm for exp() in classic MPFUN-style.
+         static const double_float_type constant_ln2         (std::string("0.69314718055994530941723212145817656807550013436025525412068000949339362196969471560586332699641868754"));
+         static const double_float_type constant_one_over_ln2(std::string("1.4426950408889634073599246810018921374266459541529859341354494069311092191811850798855266228935063445"));
+
+         double_float_type nf;
+
+         eval_floor(nf, xx * constant_one_over_ln2);
+
+         // Prepare the scaled variables.
+         static const int p2        = 256;
+         const bool b_scale         = xx.order10() > -4;
+         const double_float_type r  = b_scale ? (xx - nf * constant_ln2) / double_float_type(p2) : xx;
+         const double_float_type r2 = r * r;
+         const double_float_type r4 = r2 * r2;
+
+         // Use a Pade approximation of Order[6].
+         // Pade[Exp[r], {r, 0, 6, 6}]
+         // FullSimplify[%]
+
+         static const double_float_type n84  (  84);
+         static const double_float_type n240 ( 240);
+         static const double_float_type n7920(7920);
+  
+         static const double_float_type n665280(665280);
+         static const double_float_type n332640(332640);
+         static const double_float_type n75600 ( 75600);
+         static const double_float_type n10080 ( 10080);
+         static const double_float_type n840   (   840);
+         static const double_float_type n42    (    42);
+
+         result = double_float_type(1U) +   (n84 * r * (n7920 + n240 * r2 + r4))
+                                          / (n665280 + r * (-n332640 + r * (n75600 + r * (-n10080 + r * (n840 + (-n42 + r) * r)))));
+
+         // Rescale the result.
+         if(b_scale)
+         {
+            result *= result;
+            result *= result;
+            result *= result;
+            result *= result;
+            result *= result;
+            result *= result;
+            result *= result;
+            result *= result;
+
+            const int n = (int) nf;
+
+            if(n > 0)
+            {
+               result *= double_float_type::pown(double_float_type(2U), n);
+            }
+         }
+
+         if(b_neg)
+         {
+            result = double_float_type(1U) / result;
+         }
+      }
+   }
+}
+
+template<typename FloatingPointType>
+void eval_log(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x)
+{
+   using double_float_type = cpp_double_float<FloatingPointType>;
+
+   if(eval_fpclassify(x) != (int) FP_NORMAL)
+   {
+      result = x;
+   }
+   else if(x.is_neg())
+   {
+      result = std::numeric_limits<double_float_type>::quiet_NaN();
+   }
+   else if(x.is_one())
+   {
+      result = double_float_type(0U);
+   }
+   else
+   {
+      using std::log;
+
+      // Get initial estimate using the standard math function log.
+      const double_float_type s(log(x.crep().first));
+            double_float_type E;
+
+      eval_exp(E, s);
+
+      // Do one single step of Newton-Raphson iteration
+      result = s + (x - E) / E;
+   }
 }
 
 template<typename FloatingPointType,
