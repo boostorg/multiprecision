@@ -179,6 +179,7 @@ class cpp_quad_float
  public:
    using float_type = FloatingPointType;
    using rep_type   = std::tuple<float_type, float_type, float_type, float_type>;
+   using arithmetic = detail::exact_arithmetic<float_type>;
 
    using signed_types   = std::tuple<signed char, signed short, signed int, signed long, signed long long, std::intmax_t>;
    using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long, std::uintmax_t>;

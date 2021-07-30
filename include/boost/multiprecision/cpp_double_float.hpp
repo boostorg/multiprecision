@@ -227,6 +227,18 @@ struct exact_arithmetic
       return out;
    }
 
+   static void sum(float_pair& p, float_type& e)
+   {
+      using std::tie;
+
+      float_pair t;
+      float_type t_;
+
+      t                = sum(p.first, p.second);
+      tie(p.first, t_) = sum(e, t.first);
+      tie(p.second, e) = sum(t.second, t_);
+   }
+
    static float_pair difference(const float_type& a, const float_type& b)
    {
       // Exact subtraction of two floating point numbers
@@ -293,6 +305,63 @@ struct exact_arithmetic
       }
 
       t = s;
+   }
+
+   static void normalize(float_tuple& t, float_type e)
+   {
+     using std::tie;
+     using std::get;
+
+      float_tuple s(0, 0, 0, 0);
+
+      tie(get<0>(s), e)         = fast_sum(get<3>(t), e);
+      tie(get<0>(s), get<3>(t)) = fast_sum(get<2>(t), get<0>(s));
+      tie(get<0>(s), get<2>(t)) = fast_sum(get<1>(t), get<0>(s));
+      tie(get<0>(t), get<1>(t)) = fast_sum(get<0>(t), get<0>(s));
+
+      tie(get<0>(s), get<1>(s)) = std::make_tuple(get<0>(t), get<1>(t));
+
+      if (get<1>(s) != 0)
+      {
+         tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<2>(t));
+         if (get<2>(s) != 0)
+         {
+            tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), get<3>(t));
+            if (get<3>(s) != 0)
+               get<3>(s) += e;
+               else tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
+         }
+         else
+         {
+            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
+            if (get<2>(s) != 0)
+               tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
+            else
+               tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
+         }
+      }
+      else
+      {
+         tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<2>(t));
+         if (get<1>(s) != 0)
+         {
+            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
+            if (get<2>(s) != 0)
+               tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
+            else
+               tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
+         }
+         else
+         {
+            tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<3>(t));
+            if (get<1>(s) != 0)
+               tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
+            else
+               tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), e);
+         }
+      }
+
+      t  = s;
    }
 };
 
