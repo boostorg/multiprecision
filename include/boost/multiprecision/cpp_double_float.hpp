@@ -896,7 +896,9 @@ void eval_exp_pade_series(cpp_double_float<FloatingPointType>& result, const cpp
 template<typename FloatingPointType>
 void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x)
 {
-   if(eval_fpclassify(x) != (int) FP_NORMAL)
+   const bool x_is_zero = x.is_zero();
+
+   if((eval_fpclassify(x) != (int) FP_NORMAL) && (x_is_zero == false))
    {
       result = x;
    }
@@ -918,7 +920,7 @@ void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
       static const local_float_type max_exp_input = log((std::numeric_limits<local_float_type>::max)());
       static const local_float_type min_exp_input = log((std::numeric_limits<local_float_type>::min)());
 
-      if(xx.is_zero() || xx.crep().first < min_exp_input)
+      if(x_is_zero || xx.crep().first < min_exp_input)
       {
          result = double_float_type(1U);
       }
