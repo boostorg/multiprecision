@@ -90,6 +90,14 @@ jobs:
           ls -la ./test_exp.exe
           echo "execute ./test_exp.exe"
           ./test_exp.exe
+          echo "compile to ./test_log.exe"
+          echo "compiler version"
+          ${{ matrix.compiler }} -v
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -I./include -I../boost-root test/test_log.cpp -o test_log.exe
+          echo "ls -la of ./test_log.exe"
+          ls -la ./test_log.exe
+          echo "execute ./test_log.exe"
+          ./test_log.exe
           echo "compile to ./test_cpp_double_float_arithmetic.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
@@ -342,6 +350,14 @@ jobs:
           ls -la ./test_exp.exe
           echo "execute ./test_exp.exe"
           ./test_exp.exe
+          echo "compile to ./test_log.exe"
+          echo "compiler version"
+          ${{ matrix.compiler }} -v
+          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_log.cpp -lquadmath -o test_log.exe
+          echo "ls -la of ./test_log.exe"
+          ls -la ./test_log.exe
+          echo "execute ./test_log.exe"
+          ./test_log.exe
           echo "compile to ./test_cpp_double_float_arithmetic.exe"
           echo "compiler version"
           ${{ matrix.compiler }} -v
