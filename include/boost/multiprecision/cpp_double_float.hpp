@@ -170,7 +170,7 @@ class cpp_double_float
    cpp_double_float() { }
 
    // Copy constructor.
-   constexpr cpp_double_float(const cpp_double_float&) = default;
+   constexpr cpp_double_float(const cpp_double_float& other) : data(other.data) { }
 
    // Constructors from other floating-point types.
    template <typename FloatType,
@@ -179,7 +179,7 @@ class cpp_double_float
    constexpr cpp_double_float(const FloatType& f) : data(std::make_pair(f, (float_type)0)) {}
 
    template <typename FloatType,
-             typename std::enable_if<(   (std::numeric_limits<FloatType>::is_iec559 == true)
+             typename std::enable_if<(   (detail::is_floating_point_or_float128<FloatType>::value == true)
                                       && (std::numeric_limits<FloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_float(const FloatType& f)
        : data(std::make_pair(static_cast<float_type>(f),
@@ -187,11 +187,12 @@ class cpp_double_float
 
    // Constructor from other cpp_double_float<> objects.
    template <typename OtherFloatType,
-             typename std::enable_if<(   (std::is_floating_point<OtherFloatType>::value == true)
+             typename std::enable_if<(   (detail::is_floating_point_or_float128<OtherFloatType>::value == true)
                                       && (std::is_same<FloatingPointType, OtherFloatType>::value == false))>::type const* = nullptr>
    cpp_double_float(const cpp_double_float<OtherFloatType>& a)
       : cpp_double_float(a.first())
    {
+      // TBD: Maybe specialize this constructor for cases either wider or less wide.
       *this += a.second();
    }
 
@@ -240,8 +241,8 @@ class cpp_double_float
          *this = -*this;
    }
 
-   constexpr cpp_double_float(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
-   constexpr cpp_double_float(const std::pair<float_type, float_type>& p) : data(p) {}
+   constexpr cpp_double_float(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) { }
+   constexpr cpp_double_float(const std::pair<float_type, float_type>& p) : data(p) { }
 
    cpp_double_float(const std::string& str)
    {
@@ -253,9 +254,9 @@ class cpp_double_float
       boost::multiprecision::detail::convert_from_string(*this, pstr);
    }
 
-   constexpr cpp_double_float(cpp_double_float&&) = default;
+   constexpr cpp_double_float(cpp_double_float&& other) : data(other.data) { }
 
-   ~cpp_double_float() = default;
+   ~cpp_double_float() { }
 
    std::size_t hash() const
    {
@@ -272,24 +273,6 @@ class cpp_double_float
 
       return result;
    }
-
-   // Casts
-   operator   signed char     () const { return (signed char)data.first; }
-   operator   signed short    () const { return (signed short)data.first; }
-   operator   signed int      () const { return (signed int)data.first + (signed int)data.second; }
-   operator   signed long     () const { return (signed long)data.first + (signed long)data.second; }
-   operator   signed long long() const { return (signed long long)data.first + (signed long long)data.second; }
-   operator unsigned char     () const { return (unsigned char)data.first; }
-   operator unsigned short    () const { return (unsigned short)data.first; }
-   operator unsigned int      () const { return (unsigned int)((unsigned int)data.first + (signed int)data.second); }
-   operator unsigned long     () const { return (unsigned long)((unsigned long)data.first + (signed long)data.second); }
-   operator unsigned long long() const { return (unsigned long long)((unsigned long long)data.first + (signed long long)data.second); }
-   operator float             () const { return (float)data.first + (float)data.second; }
-   operator double            () const { return (double)data.first + (double)data.second; }
-   operator long double       () const { return (long double)data.first + (long double)data.second; }
-#ifdef BOOST_MATH_USE_FLOAT128
-   explicit operator boost::multiprecision::float128() const { return static_cast<boost::multiprecision::float128>(data.first) + static_cast<boost::multiprecision::float128>(data.second); }
-#endif
 
    // Methods
    constexpr bool is_neg() const { return (data.first < 0); }
@@ -320,9 +303,22 @@ class cpp_double_float
    }
 
    // Assignment operators.
-   cpp_double_float& operator=(const cpp_double_float&) = default;
+   cpp_double_float& operator=(const cpp_double_float& other)
+   {
+      if(this != &other)
+      {
+         data = other.data;
+      }
 
-   cpp_double_float& operator=(cpp_double_float&&) = default;
+      return *this;
+   }
+
+   cpp_double_float& operator=(cpp_double_float&& other)
+   {
+     data = other.data;
+
+     return *this;
+   }
 
    // Non-member add/sub/mul/div with constituent type.
    friend inline cpp_double_float operator+(const cpp_double_float& a, const float_type& b)
@@ -973,7 +969,9 @@ void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
             result *= result;
             result *= result;
 
-            const int n = (int) nf;
+            int n;
+
+            eval_convert_to(&n, nf);
 
             if(n > 0)
             {
