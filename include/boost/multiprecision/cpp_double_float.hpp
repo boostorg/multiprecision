@@ -1110,14 +1110,6 @@ public:
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
 
-   //static constexpr self_type (min)         () noexcept { return self_type((base_class_type::min)()); } // FIXME
-   //static constexpr self_type (max)         () noexcept { return self_type((base_class_type::max)()); } // FIXME
-   //static constexpr self_type  lowest       () noexcept { return self_type( base_class_type::lowest()); } // FIXME
-   //static constexpr self_type  epsilon      () noexcept { return boost::multiprecision::ldexp(self_type(1), -digits); } // FIXME
-   //static constexpr self_type  epsilon() noexcept { return self_type(self_type::my_value_eps()); }
-   //static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }  // FIXME
-   //static constexpr self_type  denorm_min   () noexcept { return self_type( base_class_type::denorm_min()); } // FIXME
-
    // TODO Are these values rigorous?
    static constexpr self_type (min)         () noexcept { return self_type( boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
    static constexpr self_type (max)         () noexcept { return self_type( boost::multiprecision::ldexp(base_class_type::max, -base_class_type::digits)); }
@@ -1153,13 +1145,6 @@ public:
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
-
-   //static constexpr self_type (min)         () noexcept { return self_type((base_class_type::min)()); } // FIXME
-   //static constexpr self_type (max)         () noexcept { return self_type((base_class_type::max)()); } // FIXME
-   //static constexpr self_type  lowest       () noexcept { return self_type( base_class_type::lowest()); } // FIXME
-   //static constexpr self_type  epsilon() noexcept { return self_type(boost::multiprecision::backends::cpp_double_float<FloatingPointType>::my_value_eps()); }
-   //static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }  // FIXME
-   //static constexpr self_type  denorm_min   () noexcept { return self_type( base_class_type::denorm_min()); } // FIXME
 
    static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), -min_exponent)); }
    static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp(base_class_type::max(), -base_class_type::digits)); }
