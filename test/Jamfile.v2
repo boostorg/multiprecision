@@ -119,6 +119,13 @@ test-suite df_qf_tests :
    [ run test_log.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
    [ run test_sin.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
    [ run test_cos.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
+   [ run test_tan.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
+   [ run test_asin.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
+   [ run test_acos.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
+   [ run test_atan.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
+   [ run test_sinh.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
+   [ run test_cosh.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
+   [ run test_tanh.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
 
 ;
 
