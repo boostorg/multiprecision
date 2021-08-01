@@ -14,7 +14,7 @@ on:
       - '**'
   pull_request:
 jobs:
-  gcc-clang-native:
+  ubuntu-focal:
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -23,386 +23,56 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [ g++, clang++ ]
-        standard: [ c++11, c++14, c++17, c++2a ]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: '0'
-      - name: clone-submods-bootstrap-headers-boost-develop
-        run: |
-          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
-          cd ../boost-root
-          git submodule update --init tools
-          git submodule update --init libs/array
-          git submodule update --init libs/assert
-          git submodule update --init libs/concept_check
-          git submodule update --init libs/config
-          git submodule update --init libs/container
-          git submodule update --init libs/core
-          git submodule update --init libs/detail
-          git submodule update --init libs/exception
-          git submodule update --init libs/headers
-          git submodule update --init libs/integer
-          git submodule update --init libs/iterator
-          git submodule update --init libs/lexical_cast
-          git submodule update --init libs/math
-          git submodule update --init libs/move
-          git submodule update --init libs/mpl
-          git submodule update --init libs/multiprecision
-          git submodule update --init libs/numeric/conversion
-          git submodule update --init libs/predef
-          git submodule update --init libs/preprocessor
-          git submodule update --init libs/random
-          git submodule update --init libs/rational
-          git submodule update --init libs/range
-          git submodule update --init libs/smart_ptr
-          git submodule update --init libs/static_assert
-          git submodule update --init libs/throw_exception
-          git submodule update --init libs/type_traits
-          git submodule update --init libs/utility
-          ./bootstrap.sh
-          ./b2 headers
-      - name: gcc-clang-native
-        run: |
-          echo "where am i (via pwd)"
-          pwd
-          echo "compile to ./test_arithmetic_df.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_arithmetic_df.cpp -o test_arithmetic_df.exe
-          echo "ls -la of ./test_arithmetic_df.exe"
-          ls -la ./test_arithmetic_df.exe
-          echo "execute ./test_arithmetic_df.exe"
-          ./test_arithmetic_df.exe
-          echo "compile to ./test_sqrt.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -I./include -I../boost-root test/test_sqrt.cpp -o test_sqrt.exe
-          echo "ls -la of ./test_sqrt.exe"
-          ls -la ./test_sqrt.exe
-          echo "execute ./test_sqrt.exe"
-          ./test_sqrt.exe
-          echo "compile to ./test_exp.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -I./include -I../boost-root test/test_exp.cpp -o test_exp.exe
-          echo "ls -la of ./test_exp.exe"
-          ls -la ./test_exp.exe
-          echo "execute ./test_exp.exe"
-          ./test_exp.exe
-          echo "compile to ./test_sin.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -I./include -I../boost-root test/test_sin.cpp -o test_sin.exe
-          echo "ls -la of ./test_sin.exe"
-          ls -la ./test_sin.exe
-          echo "execute ./test_sin.exe"
-          ./test_sin.exe
-          echo "compile to ./test_cos.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -I./include -I../boost-root test/test_cos.cpp -o test_cos.exe
-          echo "ls -la of ./test_cos.exe"
-          ls -la ./test_cos.exe
-          echo "execute ./test_cos.exe"
-          ./test_cos.exe
-          echo "compile to ./test_log.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -I./include -I../boost-root test/test_log.cpp -o test_log.exe
-          echo "ls -la of ./test_log.exe"
-          ls -la ./test_log.exe
-          echo "execute ./test_log.exe"
-          ./test_log.exe
-          echo "compile to ./test_cpp_double_float_arithmetic.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
-          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
-          ls -la ./test_cpp_double_float_arithmetic.exe
-          echo "execute ./test_cpp_double_float_arithmetic.exe"
-          ./test_cpp_double_float_arithmetic.exe
-          echo "compile to ./test_cpp_double_float_gamma_bessel.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_gamma_bessel.cpp -o test_cpp_double_float_gamma_bessel.exe
-          echo "ls -la of ./test_cpp_double_float_gamma_bessel.exe"
-          ls -la ./test_cpp_double_float_gamma_bessel.exe
-          echo "execute ./test_cpp_double_float_gamma_bessel.exe"
-          ./test_cpp_double_float_gamma_bessel.exe
-          echo "compile to ./test_cpp_double_float_constructors.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_constructors.cpp -o test_cpp_double_float_constructors.exe
-          echo "ls -la of ./test_cpp_double_float_constructors.exe"
-          ls -la ./test_cpp_double_float_constructors.exe
-          echo "execute ./test_cpp_double_float_constructors.exe"
-          ./test_cpp_double_float_constructors.exe
-  gcc-clang-native-asan:
-    runs-on: ubuntu-20.04
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      fail-fast: false
-      matrix:
-        compiler: [ g++, clang++ ]
-        standard: [ c++11, c++14, c++17, c++2a ]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: '0'
-      - name: clone-submods-bootstrap-headers-boost-develop
-        run: |
-          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
-          cd ../boost-root
-          git submodule update --init tools
-          git submodule update --init libs/array
-          git submodule update --init libs/assert
-          git submodule update --init libs/concept_check
-          git submodule update --init libs/config
-          git submodule update --init libs/container
-          git submodule update --init libs/core
-          git submodule update --init libs/detail
-          git submodule update --init libs/exception
-          git submodule update --init libs/headers
-          git submodule update --init libs/integer
-          git submodule update --init libs/iterator
-          git submodule update --init libs/lexical_cast
-          git submodule update --init libs/math
-          git submodule update --init libs/move
-          git submodule update --init libs/mpl
-          git submodule update --init libs/multiprecision
-          git submodule update --init libs/numeric/conversion
-          git submodule update --init libs/predef
-          git submodule update --init libs/preprocessor
-          git submodule update --init libs/random
-          git submodule update --init libs/rational
-          git submodule update --init libs/range
-          git submodule update --init libs/smart_ptr
-          git submodule update --init libs/static_assert
-          git submodule update --init libs/throw_exception
-          git submodule update --init libs/type_traits
-          git submodule update --init libs/utility
-          ./bootstrap.sh
-          ./b2 headers
-      - name: gcc-clang-native-asan
-        run: |
-          echo "where am i (via pwd)"
-          pwd
-          echo "compile to ./test_arithmetic_df.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -fsanitize=address -fsanitize=leak -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_arithmetic_df.cpp -o test_arithmetic_df.exe
-          echo "ls -la of ./test_arithmetic_df.exe"
-          ls -la ./test_arithmetic_df.exe
-          echo "execute ./test_arithmetic_df.exe"
-          ./test_arithmetic_df.exe
-          echo "compile to ./test_cpp_double_float_arithmetic.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
-          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
-          ls -la ./test_cpp_double_float_arithmetic.exe
-          echo "execute ./test_cpp_double_float_arithmetic.exe"
-          ./test_cpp_double_float_arithmetic.exe
-          echo "compile to ./test_cpp_double_float_constructors.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -fsanitize=address -fsanitize=leak -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_constructors.cpp -o test_cpp_double_float_constructors.exe
-          echo "ls -la of ./test_cpp_double_float_constructors.exe"
-          ls -la ./test_cpp_double_float_constructors.exe
-          echo "execute ./test_cpp_double_float_constructors.exe"
-          ./test_cpp_double_float_constructors.exe
-  apple-gcc-clang-native:
-    runs-on: macos-latest
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      fail-fast: false
-      matrix:
-        standard: [ c++11, c++14, c++17, c++2a ]
-        compiler: [ g++, clang++ ]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: '0'
-      - name: clone-submods-bootstrap-headers-boost-develop
-        run: |
-          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
-          cd ../boost-root
-          git submodule update --init tools
-          git submodule update --init libs/array
-          git submodule update --init libs/assert
-          git submodule update --init libs/concept_check
-          git submodule update --init libs/container
-          git submodule update --init libs/config
-          git submodule update --init libs/core
-          git submodule update --init libs/detail
-          git submodule update --init libs/exception
-          git submodule update --init libs/integer
-          git submodule update --init libs/io
-          git submodule update --init libs/iterator
-          git submodule update --init libs/lexical_cast
-          git submodule update --init libs/math
-          git submodule update --init libs/move
-          git submodule update --init libs/mpl
-          git submodule update --init libs/multiprecision
-          git submodule update --init libs/numeric/conversion
-          git submodule update --init libs/predef
-          git submodule update --init libs/preprocessor
-          git submodule update --init libs/random
-          git submodule update --init libs/range
-          git submodule update --init libs/rational
-          git submodule update --init libs/static_assert
-          git submodule update --init libs/throw_exception
-          git submodule update --init libs/type_traits
-          git submodule update --init libs/utility
-          ./bootstrap.sh
-          ./b2 headers
-      - name: apple-gcc-clang-native
-        run: |
-          echo "where am i (via pwd)"
-          pwd
-          echo "compile to ./test_arithmetic_df.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_arithmetic_df.cpp -o test_arithmetic_df.exe
-          echo "ls -la of ./test_arithmetic_df.exe"
-          ls -la ./test_arithmetic_df.exe
-          echo "execute ./test_arithmetic_df.exe"
-          ./test_arithmetic_df.exe
-          echo "compile to ./test_cpp_double_float_arithmetic.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
-          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
-          ls -la ./test_cpp_double_float_arithmetic.exe
-          echo "execute ./test_cpp_double_float_arithmetic.exe"
-          ./test_cpp_double_float_arithmetic.exe
-          echo "compile to ./test_cpp_double_float_constructors.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_constructors.cpp -o test_cpp_double_float_constructors.exe
-          echo "ls -la of ./test_cpp_double_float_constructors.exe"
-          ls -la ./test_cpp_double_float_constructors.exe
-          echo "execute ./test_cpp_double_float_constructors.exe"
-          ./test_cpp_double_float_constructors.exe
-  gcc-arith-with-float128:
-    runs-on: ubuntu-20.04
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      fail-fast: false
-      matrix:
-        compiler: [ g++ ]
         standard: [ gnu++11, gnu++14, gnu++17, gnu++2a ]
+        suite: [ df_qf_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: '0'
-      - name: clone-submods-bootstrap-headers-boost-develop
-        run: |
-          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
-          cd ../boost-root
-          git submodule update --init tools
-          git submodule update --init libs/array
-          git submodule update --init libs/assert
-          git submodule update --init libs/concept_check
-          git submodule update --init libs/config
-          git submodule update --init libs/container
-          git submodule update --init libs/core
-          git submodule update --init libs/detail
-          git submodule update --init libs/exception
-          git submodule update --init libs/functional
-          git submodule update --init libs/headers
-          git submodule update --init libs/integer
-          git submodule update --init libs/iterator
-          git submodule update --init libs/lexical_cast
-          git submodule update --init libs/math
-          git submodule update --init libs/move
-          git submodule update --init libs/mpl
-          git submodule update --init libs/multiprecision
-          git submodule update --init libs/numeric/conversion
-          git submodule update --init libs/predef
-          git submodule update --init libs/preprocessor
-          git submodule update --init libs/random
-          git submodule update --init libs/rational
-          git submodule update --init libs/range
-          git submodule update --init libs/smart_ptr
-          git submodule update --init libs/static_assert
-          git submodule update --init libs/throw_exception
-          git submodule update --init libs/type_traits
-          git submodule update --init libs/utility
-          ./bootstrap.sh
-          ./b2 headers
-      - name: gcc-arith-with-float128
-        run: |
-          echo "where am i (via pwd)"
-          pwd
-          echo "compile to ./test_arithmetic_df.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_arithmetic_df.cpp -lquadmath -o test_arithmetic_df.exe
-          echo "ls -la of ./test_arithmetic_df.exe"
-          ls -la ./test_arithmetic_df.exe
-          echo "execute ./test_arithmetic_df.exe"
-          ./test_arithmetic_df.exe
-          echo "compile to ./test_sqrt.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_sqrt.cpp -lquadmath -o test_sqrt.exe
-          echo "ls -la of ./test_sqrt.exe"
-          ls -la ./test_sqrt.exe
-          echo "execute ./test_sqrt.exe"
-          ./test_sqrt.exe
-          echo "compile to ./test_exp.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_exp.cpp -lquadmath -o test_exp.exe
-          echo "ls -la of ./test_exp.exe"
-          ls -la ./test_exp.exe
-          echo "execute ./test_exp.exe"
-          ./test_exp.exe
-          echo "compile to ./test_sin.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_sin.cpp -lquadmath -o test_sin.exe
-          echo "ls -la of ./test_sin.exe"
-          ls -la ./test_sin.exe
-          echo "execute ./test_sin.exe"
-          ./test_sin.exe
-          echo "compile to ./test_cos.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_cos.cpp -lquadmath -o test_cos.exe
-          echo "ls -la of ./test_cos.exe"
-          ls -la ./test_cos.exe
-          echo "execute ./test_cos.exe"
-          ./test_cos.exe
-          echo "compile to ./test_log.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DTEST_CPP_DOUBLE_FLOAT -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_log.cpp -lquadmath -o test_log.exe
-          echo "ls -la of ./test_log.exe"
-          ls -la ./test_log.exe
-          echo "execute ./test_log.exe"
-          ./test_log.exe
-          echo "compile to ./test_cpp_double_float_arithmetic.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -lquadmath -o test_cpp_double_float_arithmetic.exe
-          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
-          ls -la ./test_cpp_double_float_arithmetic.exe
-          echo "execute ./test_cpp_double_float_arithmetic.exe"
-          ./test_cpp_double_float_arithmetic.exe
-          echo "compile to ./test_cpp_double_float_gamma_bessel.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -DBOOST_MATH_USE_FLOAT128 -I./include -I../boost-root test/test_cpp_double_float_gamma_bessel.cpp -lquadmath -o test_cpp_double_float_gamma_bessel.exe
-          echo "ls -la of ./test_cpp_double_float_gamma_bessel.exe"
-          ls -la ./test_cpp_double_float_gamma_bessel.exe
-          echo "execute ./test_cpp_double_float_gamma_bessel.exe"
-          ./test_cpp_double_float_gamma_bessel.exe
+      - name: Set TOOLSET
+        run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
+      - name: Add repository
+        continue-on-error: true
+        id: addrepo
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo
+        continue-on-error: true
+        id: retry1
+        if: steps.addrepo.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo 2
+        continue-on-error: true
+        id: retry2
+        if: steps.retry1.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Install packages
+        run: echo no packages to install at the moment
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: cp -r $GITHUB_WORKSPACE/* libs/multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: ./bootstrap.sh
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: ./b2 headers
+        working-directory: ../boost-root
+      - name: Generate user config
+        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: ./config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        working-directory: ../boost-root/libs/multiprecision/test

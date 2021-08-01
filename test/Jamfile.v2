@@ -110,6 +110,12 @@ else
 
 lib no_eh_support : no_eh_test_support.cpp ;
 
+test-suite df_qf_tests :
+
+   [ run test_exp.cpp quadmath no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
+
+;
+
 test-suite arithmetic_tests :
 
    [ run test_arithmetic_backend_concept.cpp no_eh_support ]
