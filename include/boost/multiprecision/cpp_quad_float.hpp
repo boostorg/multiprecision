@@ -19,6 +19,7 @@
 #include <sstream>
 #include <tuple>
 #include <vector>
+#include <array>
 
 #include <boost/assert.hpp>
 #include <boost/multiprecision/number.hpp>
@@ -133,41 +134,41 @@ struct number_category<backends::cpp_quad_float<FloatingPointType> >
 
 namespace backends {
 
-namespace detail {
-
-template <class T>
-struct is_arithmetic_or_float128
-{
-   static constexpr bool value = ((std::is_arithmetic<T>::value == true)
-#if defined(BOOST_MATH_USE_FLOAT128)
-                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
-#endif
-   );
-};
-
-template <class T>
-struct is_floating_point_or_float128
-{
-   static constexpr bool value = ((std::is_floating_point<T>::value == true)
-#if defined(BOOST_MATH_USE_FLOAT128)
-                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
-#endif
-   );
-};
-
-template <typename R>
-typename std::enable_if<boost::is_unsigned<R>::value == false, R>::type minus_max()
-{
-   return boost::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
-}
-
-template <typename R>
-typename std::enable_if<boost::is_unsigned<R>::value == true, R>::type minus_max()
-{
-   return 0;
-}
-
-} // namespace detail
+//namespace detail {
+//
+//template <class T>
+//struct is_arithmetic_or_float128
+//{
+//   static constexpr bool value = ((std::is_arithmetic<T>::value == true)
+//#if defined(BOOST_MATH_USE_FLOAT128)
+//                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
+//#endif
+//   );
+//};
+//
+//template <class T>
+//struct is_floating_point_or_float128
+//{
+//   static constexpr bool value = ((std::is_floating_point<T>::value == true)
+//#if defined(BOOST_MATH_USE_FLOAT128)
+//                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
+//#endif
+//   );
+//};
+//
+//template <typename R>
+//typename std::enable_if<boost::is_unsigned<R>::value == false, R>::type minus_max()
+//{
+//   return boost::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
+//}
+//
+//template <typename R>
+//typename std::enable_if<boost::is_unsigned<R>::value == true, R>::type minus_max()
+//{
+//   return 0;
+//}
+//
+//} // namespace detail
 
 // A cpp_quad_float is represented by an unevaluated sum of two floating-point
 // units (say a0 and a1) which satisfy |a1| <= (1 / 2) * ulp(a0).
@@ -179,6 +180,7 @@ class cpp_quad_float
  public:
    using float_type = FloatingPointType;
    using rep_type   = std::tuple<float_type, float_type, float_type, float_type>;
+   using float_pair = typename detail::exact_arithmetic<float_type>::float_pair;
    using arithmetic = detail::exact_arithmetic<float_type>;
 
    using signed_types   = std::tuple<signed char, signed short, signed int, signed long, signed long long, std::intmax_t>;
@@ -196,6 +198,8 @@ class cpp_quad_float
    template <typename FloatType,
              typename std::enable_if<(detail::is_floating_point_or_float128<FloatType>::value == true) && (std::numeric_limits<FloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
    constexpr cpp_quad_float(const FloatType& f) : data(std::make_tuple(f, (float_type)0, (float_type)0, (float_type)0)) {}
+
+   constexpr cpp_quad_float(const rep_type& r) : data(r) {}
 
    //template <typename FloatType,
    //          typename std::enable_if<((std::numeric_limits<FloatType>::is_iec559 == true) && (std::numeric_limits<FloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
@@ -359,6 +363,83 @@ class cpp_quad_float
    // Unary add/sub/mul/div.
    cpp_quad_float& operator+=(const cpp_quad_float& other)
    {
+      using std::array;
+      using std::fabs;
+      using std::get;
+      using std::tie;
+
+      float_pair u, v;
+      int        i, j, k;
+      i = j = k = 0;
+
+      array<float_type, 4> a = {get<0>(this->data), get<1>(this->data), get<2>(this->data), get<3>(this->data)};
+      array<float_type, 4> b = {get<0>(other.data), get<1>(other.data), get<2>(other.data), get<3>(other.data)};
+      array<float_type, 4> s = {};
+
+      if (fabs(a[i]) > fabs(b[j]))
+         v.first = a[i++];
+      else
+         v.first = b[j++];
+      if (fabs(a[i]) > fabs(b[j]))
+         v.second = a[i++];
+      else
+         v.second = b[j++];
+
+      arithmetic::normalize(v);
+
+      while (k < 4)
+      {
+         if (i >= 4 && j >= 4)
+         {
+            s[k] = v.first;
+            if (k < 3)
+               s[++k] = v.second;
+            break;
+         }
+
+         if (i >= 4)
+            u.second = b[j++];
+         else if (j >= 4)
+            u.second = a[i++];
+         else if (fabs(a[i]) > fabs(b[j]))
+            u.second = a[i++];
+         else
+            u.second = b[j++];
+
+         tie(u.first, v.second) = arithmetic::sum(v.second, u.second);
+
+         // TODO try fast normalize (remove the second argument)
+         arithmetic::normalize(std::make_pair(u.first, v.first), false);
+         std::swap(u.first, v.first);
+
+         // TODO can the conditions be simplified further?
+         if (v.first == 0 || v.second == 0)
+         {
+            if (v.second == 0)
+            {
+               v.second = v.first;
+               v.first  = u.first;
+            }
+            else
+               v.first = u.first;
+
+            u.first = 0;
+         }
+
+         if (u.first != 0)
+            s[k++] = u.first;
+      }
+
+      // Add the rest
+      for (k = i; k < 4; k++)
+         s[3] += a[k];
+      for (k = j; k < 4; k++)
+         s[3] += b[k];
+
+      data = std::make_tuple(s[0], s[1], s[2], s[3]);
+      arithmetic::normalize(data);
+
+      return *this;
    }
 
    cpp_quad_float& operator-=(const cpp_quad_float& other)
@@ -461,6 +542,20 @@ class cpp_quad_float
       const std::string my_str = boost::multiprecision::detail::convert_to_string(*this, number_of_digits, format_flags);
 
       return my_str;
+   }
+
+   // Debugging
+   std::string raw_str() const
+   {
+      using std::get;
+
+      std::stringstream ss;
+
+      ss << std::hexfloat;
+      ss << get<0>(data) << " + " << get<1>(data) << " + " << get<2>(data) << " + " << get<3>(data);
+      ss << std::endl;
+
+      return ss.str();
    }
 
  private:
@@ -603,4 +698,4 @@ int fpclassify(const boost::multiprecision::backends::cpp_quad_float<FloatingPoi
 
 }} // namespace boost::math
 
-#endif // BOOST_MP_cpp_quad_float_2021_06_05_HPP
+#endif // BOOST_MP_CPP_QUAD_FLOAT_2021_07_29_HPP
