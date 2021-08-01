@@ -29,6 +29,7 @@ namespace backends {
 template <typename T> int sign(T val) { return (T(0) < val) - (val < T(0)); }
 
 // FIXME: very rudimentary pow implementation.
+// FIXME: replace with native one.
 template <typename Rr>
 inline cpp_double_float<Rr> pow(const cpp_double_float<Rr>& a, int exp)
 {
@@ -49,6 +50,7 @@ inline cpp_double_float<Rr> pow(const cpp_double_float<Rr>& a, int exp)
 }
 
 // FIXME: very rudimentary frexp implementation.
+// FIXME: replace with native one.
 template <typename Rr, typename Exp>
 inline cpp_double_float<Rr> frexp(const cpp_double_float<Rr>& a, Exp* b)
 {
@@ -129,16 +131,16 @@ std::cout << std::endl;
    }
    void short_print()
    {
-      std::cout << "exp : " << std::setw(3) << exp << " bits : " << (sig==1?"+":"-") << bit_str() << std::endl;
+      std::cout << "exp : " << std::setw(3) << exp << ", bits : " << (sig==1?"+":"-") << bit_str() << std::endl;
    }
    int short_print_shifted(int max_exp=0)
    {
       std::string st = bit_str();
       auto len = st.size();
       if(max_exp == 0) {
-         std::cout << "exp : " << std::setw(3) << exp << " bits : " <<                               (sig==1?"+":"-") << bit_str() << std::endl;
+         std::cout << "exp : " << std::setw(3) << exp << ", bits : " <<                               (sig==1?"+":"-") << bit_str() << std::endl;
       } else {
-         std::cout << "exp : " << std::setw(3) << exp << " bits : " << std::setw(max_exp - exp+1) << (sig==1?"+":"-") << bit_str() << std::endl;
+         std::cout << "exp : " << std::setw(3) << exp << ", bits : " << std::setw(max_exp - exp+1) << (sig==1?"+":"-") << bit_str() << std::endl;
       }
       return exp;
    }
@@ -147,29 +149,11 @@ std::cout << std::endl;
 template <typename Rr> void print_number(const Rr& arg)
 {
    std::cout << std::setprecision(std::numeric_limits<Rr>::digits10 + 3);
-// std::cout << "original number = " << std::setprecision(100000) << arg << std::endl;
    std::cout << "original bits   = ";
    DecomposedReal d(arg);
    d.short_print();
    auto rebuilt = d.rebuild<Rr>();
    auto diff = (arg - rebuilt);
-
-/*
-   std::cout << "arg             = " << arg << std::endl;
-   std::cout << "d.rebuild<Rr>() = " << rebuilt << std::endl;
-   std::cout << "raw arg         = " << arg.get_raw_str() << std::endl;
-   std::cout << "raw rebuilt     = " << rebuilt.get_raw_str() << std::endl;
-
-   std::cout << "diff            = " << std::setprecision(1000) << diff << std::endl;
-   std::cout << "raw diff        = " << diff.get_raw_str() << std::endl;
-
-   std::cout << "** argument components **" << std::endl;
-   std::cout << "arg.first       = "             ;   DecomposedReal(arg.crep().first).short_print();
-   std::cout << "arg.second      = "             ;   DecomposedReal(arg.crep().second).short_print();
-   std::cout << "** rebuilt  components **" << std::endl;
-   std::cout << "rebuilt.first   = "             ;   DecomposedReal(rebuilt.crep().first).short_print();
-   std::cout << "rebuilt.second  = "             ;   DecomposedReal(rebuilt.crep().second).short_print();
-*/
 
    std::cout << "Argument" << std::endl;
    std::cout << "arg.first       = "             ;   auto ex1 = DecomposedReal(arg.crep().first).short_print_shifted();
@@ -202,18 +186,9 @@ void try_number(std::string str) {
    auto z=boost::multiprecision::backends::cpp_double_float<R>(str);
    std::cout << "With type " << boost::core::demangle(typeid(decltype(z)).name()) << std::endl << std::endl;
 
-// z.set_str(str);
-
    int  ex = 0;
-//   auto z2 = frexp(z,&ex);
-/*
-   std::cout << "exponent = " << ex << std::endl;
-   std::cout << "number   = " << z2 << std::endl;
-   std::cout << "trying to rebuild the number:\n";
-*/
    //if(isfinite(z) and isfinite(z2)) { // ← FIXME
       print_number(z);
-//    print_number(z2);
    //}
 }
 
@@ -232,9 +207,9 @@ void test() {
 
 int main()
 {
-//test<float>();
-  test<double>();
-//test<long double>();
-//test<boost::multiprecision::float128>();
+// test<float>();
+   test<double>();
+// test<long double>();
+// test<boost::multiprecision::float128>();
 }
 
