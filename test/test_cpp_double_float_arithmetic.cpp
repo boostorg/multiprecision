@@ -316,20 +316,20 @@ int main()
    bool result_is_ok = true;
 
    #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-   constexpr unsigned int test_cases_built_in = 10000U;
+   constexpr unsigned int test_cases_built_in = 5000U;
    #else
-   constexpr unsigned int test_cases_built_in = 1000000U;
+   constexpr unsigned int test_cases_built_in = 50000U;
    #endif
 
    #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
    constexpr unsigned int test_cases_float128 = 1000U;
    #else
-   constexpr unsigned int test_cases_float128 = 20000U;
+   constexpr unsigned int test_cases_float128 = 10000U;
    #endif
 
-   result_is_ok &= local::test_arithmetic<float>(test_cases_built_in / 4);
-   result_is_ok &= local::test_arithmetic<double>(test_cases_built_in * 2);
-   result_is_ok &= local::test_arithmetic<long double>(test_cases_built_in * 5);
+   result_is_ok &= local::test_arithmetic<float>(test_cases_built_in);
+   result_is_ok &= local::test_arithmetic<double>(test_cases_built_in);
+   result_is_ok &= local::test_arithmetic<long double>(test_cases_built_in);
 #ifdef BOOST_MATH_USE_FLOAT128
    result_is_ok &= local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
 #else

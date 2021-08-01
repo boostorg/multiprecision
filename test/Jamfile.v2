@@ -129,6 +129,17 @@ test-suite df_qf_tests :
 
 ;
 
+test-suite df_qf_quadmath_tests :
+
+   [ run test_arithmetic_df.cpp no_eh_support quadmath : : : <define>BOOST_MATH_USE_FLOAT128 release : ]
+   [ run test_cpp_double_float_arithmetic.cpp quadmath no_eh_support : : : <define>BOOST_MATH_USE_FLOAT128 release : ]
+   [ run test_sqrt.cpp no_eh_support quadmath : : : <define>TEST_CPP_DOUBLE_FLOAT <define>BOOST_MATH_USE_FLOAT128 release : ]
+   [ run test_exp.cpp no_eh_support quadmath : : : <define>TEST_CPP_DOUBLE_FLOAT <define>BOOST_MATH_USE_FLOAT128 release : ]
+   [ run test_log.cpp no_eh_support quadmath : : : <define>TEST_CPP_DOUBLE_FLOAT <define>BOOST_MATH_USE_FLOAT128 release : ]
+   [ run test_sin.cpp no_eh_support quadmath : : : <define>TEST_CPP_DOUBLE_FLOAT <define>BOOST_MATH_USE_FLOAT128 release : ]
+
+;
+
 test-suite arithmetic_tests :
 
    [ run test_arithmetic_backend_concept.cpp no_eh_support ]
