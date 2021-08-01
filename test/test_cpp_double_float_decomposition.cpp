@@ -73,6 +73,7 @@ private:
 public:
 	template <typename Rr> DecomposedReal(Rr x)
 	{
+		using std::frexp;
 		int ex   = 0;
 		Rr  norm = frexp(x > Rr(0) ? x : -x, &ex);
 		sig      = sign(x);
@@ -106,6 +107,7 @@ std::cout << std::endl;
 		int i   = 0;
 		for (auto c : bits) {
 			if (c != 0) {
+				using std::pow;
 				ret += pow(static_cast<Rr>(2), /*static_cast<Rr>*/(exp - i));
 			}
 			++i;
@@ -116,10 +118,29 @@ std::cout << std::endl;
 	{
 		std::cout << "sign : " << sig << std::endl;
 		std::cout << "exp  : " << exp << std::endl;
-		std::cout << "bits : ";
+		std::cout << "bits : " << bit_str() << std::endl;
+		std::cout << "reconstructed number: " << rebuild<Rr>() << "\n\n";
+	}
+	std::string bit_str() {
+		std::stringstream s{};
 		for (auto c : bits)
-			std::cout << int(c);
-		std::cout << "\nreconstructed number: " << rebuild<Rr>() << "\n\n";
+			s << int(c);
+		return s.str();
+	}
+	template <typename Rr = double> void short_print()
+	{
+		std::cout << "exp : " << std::setw(4) << exp << " bits : " << (sig==1?"+":"-") << bit_str() << std::endl;
+	}
+	template <typename Rr = double> int short_print_shifted(int max_exp=0)
+	{
+		std::string st = bit_str();
+		auto len = st.size();
+		if(max_exp == 0) {
+			std::cout << "exp : " << std::setw(4) << exp << " bits : " <<                               (sig==1?"+":"-") << bit_str() << std::endl;
+		} else {
+			std::cout << "exp : " << std::setw(4) << exp << " bits : " << std::setw(max_exp - exp+1) << (sig==1?"+":"-") << bit_str() << std::endl;
+		}
+		return exp;
 	}
 };
 
@@ -136,14 +157,27 @@ template <typename Rr> void print_number(const Rr& arg)
 	std::cout << "raw rebuilt     = " << rebuilt.get_raw_str() << std::endl;
 	auto diff = (arg - rebuilt);
 
-	std::cout << "diff            = " << std::setprecision(1000) << diff << "\n";
-	std::cout << "raw diff        = " << diff.get_raw_str() << "\n";
+	std::cout << "diff            = " << std::setprecision(1000) << diff << std::endl;
+	std::cout << "raw diff        = " << diff.get_raw_str() << std::endl;
+
+	std::cout << "** argument components **" << std::endl;
+	std::cout << "arg.first       = "             ;   DecomposedReal(arg.crep().first).short_print();
+	std::cout << "arg.second      = "             ;   DecomposedReal(arg.crep().second).short_print();
+	std::cout << "** rebuilt  components **" << std::endl;
+	std::cout << "rebuilt.first   = "             ;   DecomposedReal(rebuilt.crep().first).short_print();
+	std::cout << "rebuilt.second  = "             ;   DecomposedReal(rebuilt.crep().second).short_print();
+	std::cout << "** argument components shifted by exp **" << std::endl;
+	std::cout << "arg.first       = "             ;   auto ex1 = DecomposedReal(arg.crep().first).short_print_shifted();
+	std::cout << "arg.second      = "             ;              DecomposedReal(arg.crep().second).short_print_shifted(ex1);
+	std::cout << "** rebuilt  components shifted by exp **" << std::endl;
+	std::cout << "rebuilt.first   = "             ;   auto ex2 = DecomposedReal(rebuilt.crep().first).short_print_shifted();
+	std::cout << "rebuilt.second  = "             ;              DecomposedReal(rebuilt.crep().second).short_print_shifted(ex2);
 
 	std::string diff_name = boost::core::demangle(typeid(decltype(diff   )).name());
 	std::string arg_name  = boost::core::demangle(typeid(decltype(arg    )).name());
         std::string rebu_name = boost::core::demangle(typeid(decltype(rebuilt)).name());
 
-	std::cout << "Work Type       = " << arg_name << "\n";
+	std::cout << "Work Type       = " << arg_name << std::endl;
 
 	// The diff == 0; which means that arg == rebuilt;
 	BOOST_ASSERT(diff     == decltype(diff)(0));
