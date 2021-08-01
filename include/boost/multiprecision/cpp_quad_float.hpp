@@ -134,44 +134,8 @@ struct number_category<backends::cpp_quad_float<FloatingPointType> >
 
 namespace backends {
 
-//namespace detail {
-//
-//template <class T>
-//struct is_arithmetic_or_float128
-//{
-//   static constexpr bool value = ((std::is_arithmetic<T>::value == true)
-//#if defined(BOOST_MATH_USE_FLOAT128)
-//                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
-//#endif
-//   );
-//};
-//
-//template <class T>
-//struct is_floating_point_or_float128
-//{
-//   static constexpr bool value = ((std::is_floating_point<T>::value == true)
-//#if defined(BOOST_MATH_USE_FLOAT128)
-//                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
-//#endif
-//   );
-//};
-//
-//template <typename R>
-//typename std::enable_if<boost::is_unsigned<R>::value == false, R>::type minus_max()
-//{
-//   return boost::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
-//}
-//
-//template <typename R>
-//typename std::enable_if<boost::is_unsigned<R>::value == true, R>::type minus_max()
-//{
-//   return 0;
-//}
-//
-//} // namespace detail
-
-// A cpp_quad_float is represented by an unevaluated sum of two floating-point
-// units (say a0 and a1) which satisfy |a1| <= (1 / 2) * ulp(a0).
+// A cpp_quad_float is represented by an unevaluated sum of four floating-point
+// units (say a[0...n]) which satisfy |a[i+1]| <= (1 / 2) * ulp(a[i]).
 // The type of the floating-point constituents should adhere to IEEE754.
 
 template <typename FloatingPointType>
@@ -289,8 +253,13 @@ class cpp_quad_float
 //#endif
 
    // Methods
-   //constexpr cpp_quad_float<float_type> negative() const { return cpp_quad_float<float_type>(-data.first, -data.second); }
-   //constexpr bool                         is_negative() const { return data.first < 0; }
+   constexpr cpp_quad_float<float_type> negative() const
+   {
+     using std::get;
+     return cpp_quad_float<float_type>(std::make_tuple(-get<0>(data), -get<1>(data), -get<2>(data), -get<3>(data)));
+   }
+
+   constexpr bool                       is_negative() const { return data.first < 0; }
 
    //void negate()
    //{
@@ -408,9 +377,8 @@ class cpp_quad_float
 
          tie(u.first, v.second) = arithmetic::sum(v.second, u.second);
 
-         // TODO try fast normalize (remove the second argument)
-         arithmetic::normalize(std::make_pair(u.first, v.first), false);
-         std::swap(u.first, v.first);
+         // TODO try fast_sum
+         tie(u.first, v.first) = arithmetic::sum(u.first, v.first);
 
          // TODO can the conditions be simplified further?
          if (v.first == 0 || v.second == 0)
@@ -444,6 +412,8 @@ class cpp_quad_float
 
    cpp_quad_float& operator-=(const cpp_quad_float& other)
    {
+      *this += -other;
+      return *this;
    }
 
    cpp_quad_float& operator*=(const cpp_quad_float& other)
