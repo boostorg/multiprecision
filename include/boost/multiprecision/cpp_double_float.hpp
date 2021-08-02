@@ -34,6 +34,28 @@ namespace boost { namespace multiprecision { namespace backends {
 template <typename FloatingPointType>
 class cpp_double_float;
 
+namespace detail {
+
+template <class T> struct is_arithmetic_or_float128
+{
+   static constexpr bool value = (   (std::is_arithmetic<T>::value == true)
+#if defined(BOOST_MATH_USE_FLOAT128)
+                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
+#endif
+                                 );
+};
+
+template <class T> struct is_floating_point_or_float128
+{
+   static constexpr bool value = (   (std::is_floating_point<T>::value == true)
+#if defined(BOOST_MATH_USE_FLOAT128)
+                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
+#endif
+                                 );
+};
+
+}
+
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
@@ -63,7 +85,22 @@ template<typename FloatingPointType> void eval_floor     (cpp_double_float<Float
 template<typename FloatingPointType> void eval_ceil      (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 template<typename FloatingPointType> int  eval_fpclassify(const cpp_double_float<FloatingPointType>& o);
 template<typename FloatingPointType> void eval_sqrt      (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& o);
-template<typename FloatingPointType> void eval_exp       (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+
+template<typename FloatingPointType,
+         typename std::enable_if<(   (detail::is_floating_point_or_float128<FloatingPointType>::value == true)
+                                  && (std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 <= 15))>::type const* = nullptr>
+void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+
+template<typename FloatingPointType,
+         typename std::enable_if<(   (detail::is_floating_point_or_float128<FloatingPointType>::value == true)
+                                  && ((std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 > 15) && (std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 <= 37)))>::type const* = nullptr>
+void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+
+template<typename FloatingPointType,
+         typename std::enable_if<(   (detail::is_floating_point_or_float128<FloatingPointType>::value == true)
+                                  && (std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 > 37))>::type const* = nullptr>
+void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
+
 template<typename FloatingPointType> void eval_log       (cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 
 template<typename FloatingPointType,
@@ -117,24 +154,6 @@ struct number_category<backends::cpp_double_float<FloatingPointType>>
 namespace backends {
 
 namespace detail {
-
-template <class T> struct is_arithmetic_or_float128
-{
-   static constexpr bool value = (   (std::is_arithmetic<T>::value == true)
-#if defined(BOOST_MATH_USE_FLOAT128)
-                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
-#endif
-                                 );
-};
-
-template <class T> struct is_floating_point_or_float128
-{
-   static constexpr bool value = (   (std::is_floating_point<T>::value == true)
-#if defined(BOOST_MATH_USE_FLOAT128)
-                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
-#endif
-                                 );
-};
 
 template<typename R>
 typename std::enable_if<boost::is_unsigned<R>::value == false, R>::type minus_max()
@@ -754,6 +773,21 @@ class cpp_double_float
 
  private:
    rep_type data;
+
+   template<typename OtherFloatingPointType,
+            typename std::enable_if<(   (detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true)
+                                     && (std::numeric_limits<cpp_double_float<OtherFloatingPointType>>::digits10 <= 15))>::type const*>
+   friend void eval_exp(cpp_double_float<OtherFloatingPointType>& result, const cpp_double_float<OtherFloatingPointType>& x);
+
+   template<typename OtherFloatingPointType,
+            typename std::enable_if<(   (detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true)
+                                     && ((std::numeric_limits<cpp_double_float<OtherFloatingPointType>>::digits10 > 15) && (std::numeric_limits<cpp_double_float<OtherFloatingPointType>>::digits10 <= 37)))>::type const*>
+   friend void eval_exp(cpp_double_float<OtherFloatingPointType>& result, const cpp_double_float<OtherFloatingPointType>& x);
+
+   template<typename OtherFloatingPointType,
+            typename std::enable_if<(   (detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true)
+                                     && (std::numeric_limits<cpp_double_float<OtherFloatingPointType>>::digits10 > 37))>::type const*>
+   friend void eval_exp(cpp_double_float<OtherFloatingPointType>& result, const cpp_double_float<OtherFloatingPointType>& x);
 };
 
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) += b; }
@@ -911,93 +945,128 @@ void eval_sqrt(cpp_double_float<FloatingPointType>& result, const cpp_double_flo
    result.rep().second = tx;
 }
 
-namespace detail { namespace transcendental {
-
 template<typename FloatingPointType,
          typename std::enable_if<(   (detail::is_floating_point_or_float128<FloatingPointType>::value == true)
-                                  && (std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 <= 15))>::type const* = nullptr>
-void eval_exp_pade_series(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& r)
+                                  && (std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 <= 15))>::type const*>
+void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x)
 {
-   // PadeApproximant[Exp[r], {r, 0, 3, 3}]
-   // FullSimplify[%]
+   const bool x_is_zero = x.is_zero();
 
-   using double_float_type = cpp_double_float<FloatingPointType>;
+   if((eval_fpclassify(x) != (int) FP_NORMAL) && (x_is_zero == false))
+   {
+      result = x;
+   }
+   else
+   {
+      using double_float_type = cpp_double_float<FloatingPointType>;
+      using local_float_type  = typename cpp_double_float<FloatingPointType>::float_type;
 
-   static const double_float_type n24(24U);
-   static const double_float_type n10(10U);
+      // Get a local copy of the argument and force it to be positive.
+      const bool b_neg = x.is_neg();
 
-   static const double_float_type n120(120U);
-   static const double_float_type n60 ( 60U);
-   static const double_float_type n12 ( 12U);
+      double_float_type xx;
 
-   const double_float_type r2 = r * r;
+      eval_fabs(xx, x);
 
-   result = double_float_type(-1) - (n24 * (n10 + r2)) / (-n120 + r * (n60 + (-n12 + r) * r));
+      // Check the range of the input. Will it overflow?
+      using std::log;
+
+      static const local_float_type max_exp_input = log((std::numeric_limits<local_float_type>::max)());
+      static const local_float_type min_exp_input = log((std::numeric_limits<local_float_type>::min)());
+
+      if(x_is_zero || xx.crep().first < min_exp_input)
+      {
+         result = double_float_type(1U);
+      }
+      else if(xx.crep().first > max_exp_input)
+      {
+         result = double_float_type(std::numeric_limits<local_float_type>::quiet_NaN());
+      }
+      else if(xx.is_one())
+      {
+         static const double_float_type constant_e1         (std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
+         static const double_float_type constant_one_over_e1(std::string("0.36787944117144232159552377016146086744581113103176783450783680169746149574489980335714727434591964375"));
+
+         result = ((b_neg == false) ? constant_e1 : constant_one_over_e1);
+      }
+      else
+      {
+         // Use an argument reduction algorithm for exp() in classic MPFUN-style.
+         static const double_float_type constant_ln2         (std::string("0.69314718055994530941723212145817656807550013436025525412068000949339362196969471560586332699641868754"));
+         static const double_float_type constant_one_over_ln2(std::string("1.4426950408889634073599246810018921374266459541529859341354494069311092191811850798855266228935063445"));
+
+         double_float_type nf;
+
+         eval_floor(nf, xx * constant_one_over_ln2);
+
+         // Prepare the scaled variables.
+         const bool b_scale = (xx.order02() > -1);
+
+         double_float_type r;
+
+         if(b_scale)
+         {
+           eval_ldexp(r, xx - (nf * constant_ln2), -2);
+         }
+         else
+         {
+           r = xx;
+         }
+
+         // PadeApproximant[Exp[x] - 1, {x, 0, {6, 6}}]
+         // FullSimplify[%]
+         //   (84 x (7920 + 240 x^2 + x^4))
+         // / (665280 + x (-332640 + x (75600 + x (-10080 + x (840 + (-42 + x) x)))))
+
+         static const double_float_type n84  (  84);
+         static const double_float_type n240 ( 240);
+         static const double_float_type n7920(7920);
+
+         static const double_float_type n665280(665280);
+         static const double_float_type n332640(332640);
+         static const double_float_type n75600 ( 75600);
+         static const double_float_type n10080 ( 10080);
+         static const double_float_type n840   (   840);
+         static const double_float_type n42    (    42);
+
+         const double_float_type r2 = r * r;
+
+         result = double_float_type(1U) +   ((n84 * r) * (n7920 + r2 * (n240 + r2)))
+                                          / (n665280 + r * (-n332640 + r * (n75600 + r * (-n10080 + r * (n840 + (-n42 + r) * r)))));
+
+         // Use the small-argument Pade approximation having coefficients shown above.
+         const double_float_type top = (n84 * r * (n7920 + (n240 + r2) * r2));
+         const double_float_type bot = (n665280 + r * (-n332640 + r * (n75600 + r * (-n10080 + r * (n840 + (-n42 + r) * r)))));
+
+         result  = double_float_type(1U) + (top / bot);
+
+         // Rescale the result.
+         if(b_scale)
+         {
+            result *= result;
+            result *= result;
+
+            int n;
+
+            eval_convert_to(&n, nf);
+
+            if(n > 0)
+            {
+               eval_ldexp(result, double_float_type(result), n);
+            }
+         }
+
+         if(b_neg)
+         {
+            result = double_float_type(1U) / result;
+         }
+      }
+   }
 }
 
 template<typename FloatingPointType,
          typename std::enable_if<(   (detail::is_floating_point_or_float128<FloatingPointType>::value == true)
-                                  && ((std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 > 15) && (std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 <= 37)))>::type const* = nullptr>
-void eval_exp_pade_series(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& r)
-{
-   // PadeApproximant[Exp[r], {r, 0, 6, 6}]
-   // FullSimplify[%]
-
-   using double_float_type = cpp_double_float<FloatingPointType>;
-
-   static const double_float_type n84  (  84);
-   static const double_float_type n240 ( 240);
-   static const double_float_type n7920(7920);
-
-   static const double_float_type n665280(665280);
-   static const double_float_type n332640(332640);
-   static const double_float_type n75600 ( 75600);
-   static const double_float_type n10080 ( 10080);
-   static const double_float_type n840   (   840);
-   static const double_float_type n42    (    42);
-
-   const double_float_type r2 = r * r;
-
-   result = double_float_type(1U) +   ((n84 * r) * (n7920 + r2 * (n240 + r2)))
-                                    / (n665280 + r * (-n332640 + r * (n75600 + r * (-n10080 + r * (n840 + (-n42 + r) * r)))));
-}
-
-template<typename FloatingPointType,
-         typename std::enable_if<(   (detail::is_floating_point_or_float128<FloatingPointType>::value == true)
-                                  && (std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 > 37))>::type const* = nullptr>
-void eval_exp_pade_series(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& r)
-{
-   // PadeApproximant[Exp[r], {r, 0, 10, 10}]
-   // FullSimplify[%]
-
-   using double_float_type = cpp_double_float<FloatingPointType>;
-
-   static const double_float_type n3047466240(3047466240ULL);
-   static const double_float_type n106928640 (106928640UL);
-   static const double_float_type n825552    (825552UL);
-   static const double_float_type n1872      (1872U);
-
-   static const double_float_type n670442572800(670442572800ULL);
-   static const double_float_type n335221286400(335221286400ULL);
-   static const double_float_type n79394515200 (79394515200ULL);
-   static const double_float_type n11762150400 (11762150400ULL);
-   static const double_float_type n1210809600  (1210809600ULL);
-   static const double_float_type n90810720    (90810720UL);
-   static const double_float_type n5045040     (5045040UL);
-   static const double_float_type n205920      (205920UL);
-   static const double_float_type n5940        (5940U);
-   static const double_float_type n110         (110U);
-   static const double_float_type n220         (220U);
-
-   const double_float_type r2 = r  * r;
-
-   result = double_float_type(1U) +   ((n220 * r) * (n3047466240 + r2 * (n106928640 + r2 * (n825552 + r2 * (n1872 + r2)))))
-                                    / (n670442572800 + r * (-n335221286400 + r * (n79394515200 + r * (-n11762150400 + r * ( n1210809600 + r * (-n90810720 + r * ( n5045040 + r * (-n205920 + r * ( n5940 + (-n110 + r) * r)))))))));
-}
-
-} }
-
-template<typename FloatingPointType>
+                                  && ((std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 > 15) && (std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 <= 37)))>::type const*>
 void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x)
 {
    const bool x_is_zero = x.is_zero();
@@ -1063,7 +1132,26 @@ void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
            r = xx;
          }
 
-         detail::transcendental::eval_exp_pade_series(result, r);
+         // PadeApproximant[Exp[r], {r, 0, 6, 6}]
+         // FullSimplify[%]
+
+         static const double_float_type n84  (  84);
+         static const double_float_type n240 ( 240);
+         static const double_float_type n7920(7920);
+
+         static const double_float_type n665280(665280);
+         static const double_float_type n332640(332640);
+         static const double_float_type n75600 ( 75600);
+         static const double_float_type n10080 ( 10080);
+         static const double_float_type n840   (   840);
+         static const double_float_type n42    (    42);
+
+         const double_float_type r2 = r * r;
+
+         const double_float_type top = (n84 * r) * (n7920 + r2 * (n240 + r2));
+         const double_float_type bot = n665280 + r * (-n332640 + r * (n75600 + r * (-n10080 + r * (n840 + (-n42 + r) * r))));
+
+         result = double_float_type(1U) + (top / bot);
 
          // Rescale the result.
          if(b_scale)
@@ -1072,6 +1160,125 @@ void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
             result *= result;
             result *= result;
             result *= result;
+            result *= result;
+            result *= result;
+            result *= result;
+            result *= result;
+
+            int n;
+
+            eval_convert_to(&n, nf);
+
+            if(n > 0)
+            {
+               eval_ldexp(result, double_float_type(result), n);
+            }
+         }
+
+         if(b_neg)
+         {
+            result = double_float_type(1U) / result;
+         }
+      }
+   }
+}
+
+template<typename FloatingPointType,
+         typename std::enable_if<(   (detail::is_floating_point_or_float128<FloatingPointType>::value == true)
+                                  && (std::numeric_limits<cpp_double_float<FloatingPointType>>::digits10 > 37))>::type const*>
+void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x)
+{
+   const bool x_is_zero = x.is_zero();
+
+   if((eval_fpclassify(x) != (int) FP_NORMAL) && (x_is_zero == false))
+   {
+      result = x;
+   }
+   else
+   {
+      using double_float_type = cpp_double_float<FloatingPointType>;
+      using local_float_type  = typename cpp_double_float<FloatingPointType>::float_type;
+
+      // Get a local copy of the argument and force it to be positive.
+      const bool b_neg = x.is_neg();
+
+      double_float_type xx;
+
+      eval_fabs(xx, x);
+
+      // Check the range of the input. Will it overflow?
+      using std::log;
+
+      static const local_float_type max_exp_input = log((std::numeric_limits<local_float_type>::max)());
+      static const local_float_type min_exp_input = log((std::numeric_limits<local_float_type>::min)());
+
+      if(x_is_zero || xx.crep().first < min_exp_input)
+      {
+         result = double_float_type(1U);
+      }
+      else if(xx.crep().first > max_exp_input)
+      {
+         result = double_float_type(std::numeric_limits<local_float_type>::quiet_NaN());
+      }
+      else if(xx.is_one())
+      {
+         static const double_float_type constant_e1         (std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
+         static const double_float_type constant_one_over_e1(std::string("0.36787944117144232159552377016146086744581113103176783450783680169746149574489980335714727434591964375"));
+
+         result = ((b_neg == false) ? constant_e1 : constant_one_over_e1);
+      }
+      else
+      {
+         // Use an argument reduction algorithm for exp() in classic MPFUN-style.
+         static const double_float_type constant_ln2         (std::string("0.69314718055994530941723212145817656807550013436025525412068000949339362196969471560586332699641868754"));
+         static const double_float_type constant_one_over_ln2(std::string("1.4426950408889634073599246810018921374266459541529859341354494069311092191811850798855266228935063445"));
+
+         double_float_type nf;
+
+         eval_floor(nf, xx * constant_one_over_ln2);
+
+         // Prepare the scaled variables.
+         const bool b_scale = (xx.order02() > -4);
+
+         double_float_type xh;
+
+         if(b_scale)
+         {
+           eval_ldexp(xh, xx - (nf * constant_ln2), -4);
+         }
+         else
+         {
+           xh = xx;
+         }
+
+         double_float_type x_pow_n_div_n_fact(xh);
+
+         result = double_float_type(1U) + x_pow_n_div_n_fact;
+         double_float_type dummy;
+
+         // Series expansion of hypergeometric_0f0(; ; x).
+         // For this high(er) digit count, a scaled argument with subsequent
+         // Taylor series expansion is actually more precise than Pade approximation.
+         for(unsigned n = 2U; n < 64U; ++n)
+         {
+           x_pow_n_div_n_fact *= xh;
+           x_pow_n_div_n_fact /= typename double_float_type::float_type(n);
+
+           int n_tol;
+
+           eval_frexp(dummy, x_pow_n_div_n_fact, &n_tol);
+
+           if((n > 4U) && (n_tol < -(std::numeric_limits<double_float_type>::digits - 6)))
+           {
+             break;
+           }
+
+           result += x_pow_n_div_n_fact;
+         }
+
+         // Rescale the result.
+         if(b_scale)
+         {
             result *= result;
             result *= result;
             result *= result;
@@ -1219,12 +1426,12 @@ public:
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
 
    // TODO Are these values rigorous?
-   static constexpr self_type (min)         () noexcept { return self_type( boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
-   static constexpr self_type (max)         () noexcept { return self_type( boost::multiprecision::ldexp(base_class_type::max, -base_class_type::digits)); }
-   static constexpr self_type  lowest       () noexcept { return self_type(-max()); }
-   static constexpr self_type  epsilon      () noexcept { return self_type( boost::multiprecision::ldexp(self_type(1), -digits)); }
+   static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), -min_exponent)); }
+   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp(base_class_type::max, -base_class_type::digits)); }
+   static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
+   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), -digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
-   static constexpr self_type  denorm_min   () noexcept { return self_type( min()); }
+   static constexpr self_type  denorm_min   () noexcept { return self_type( (min)()); }
    
    static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
    static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
@@ -1240,8 +1447,10 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
 private:
    using base_class_type = std::numeric_limits<FloatingPointType>;
 
+   using inner_self_type = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
+
    using self_type =
-      boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>;
+      boost::multiprecision::number<inner_self_type, ExpressionTemplatesOption>;
 
 public:
    static constexpr bool is_iec559                     = false;
@@ -1254,8 +1463,8 @@ public:
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
 
-   static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), -min_exponent)); }
-   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp(base_class_type::max(), -base_class_type::digits)); }
+   static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename inner_self_type::float_type(1), -min_exponent)); }
+   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp((base_class_type::max)(), -base_class_type::digits)); }
    static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
    static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), -digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
