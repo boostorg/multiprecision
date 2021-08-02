@@ -113,6 +113,7 @@ lib no_eh_support : no_eh_test_support.cpp ;
 test-suite df_qf_tests :
 
    [ run test_arithmetic_df.cpp no_eh_support : : : release : ]
+   [ run test_cpp_double_float_decomposition.cpp no_eh_support : : : release : ]
    [ run test_cpp_double_float_arithmetic.cpp no_eh_support : : : release : ]
    [ run test_sqrt.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
    [ run test_exp.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
