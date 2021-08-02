@@ -42,6 +42,9 @@ inline cpp_double_float<Rr> frexp(const cpp_double_float<Rr>& a, Exp* b)
    return ret;
 }
 
+template <typename Rr> void print_double_number(const std::string& prefix, const Rr& arg) {};
+template <typename Rr> void print_double_number(const std::string& prefix, const boost::multiprecision::backends::cpp_double_float<Rr>& arg);
+
 class DecomposedReal {
 private:
    int                        sig;
@@ -77,6 +80,7 @@ std::cout << std::endl;
          bits[pos] = 1;
          norm -= static_cast<Rr>(0.5);
          norm = frexp(norm, &ex);
+         print_double_number("norm",norm);
       };
    }
    template <typename Rr> Rr rebuild()
@@ -122,29 +126,32 @@ std::cout << std::endl;
    }
 };
 
+template <typename Rr> void print_double_number(const std::string& prefix, const boost::multiprecision::backends::cpp_double_float<Rr>& arg) {
+   std::cout << std::left << std::setw(15) << prefix+".first "  << " = " << std::right; auto ex1 = DecomposedReal(arg.crep().first).short_print_shifted();
+   if(arg.crep().second != 0) {
+      std::cout << std::left << std::setw(15) << prefix+".second " << " = " << std::right;            DecomposedReal(arg.crep().second).short_print_shifted(ex1);
+   }
+}
+
 template <typename Rr> void print_number(const Rr& arg)
 {
    std::cout << std::setprecision(std::numeric_limits<Rr>::digits10 + 3);
-   std::cout << "original bits   = ";
+   std::cout << std::endl;
    DecomposedReal d(arg);
-   d.short_print();
+   std::cout << std::endl;
+
    auto rebuilt = d.rebuild<Rr>();
    auto diff = (arg - rebuilt);
 
-   std::cout << "Argument" << std::endl;
-   std::cout << "arg.first       = "             ;   auto ex1 = DecomposedReal(arg.crep().first).short_print_shifted();
-   std::cout << "arg.second      = "             ;              DecomposedReal(arg.crep().second).short_print_shifted(ex1);
-   std::cout << "Rebuilt" << std::endl;
-   std::cout << "rebuilt.first   = "             ;   auto ex2 = DecomposedReal(rebuilt.crep().first).short_print_shifted();
-   std::cout << "rebuilt.second  = "             ;              DecomposedReal(rebuilt.crep().second).short_print_shifted(ex2);
+   std::cout << "original bits   = "; d.short_print();
+
+   print_double_number("arg",arg);
+   print_double_number("rebuilt",rebuilt);
 
    std::string diff_name = boost::core::demangle(typeid(decltype(diff   )).name());
    std::string arg_name  = boost::core::demangle(typeid(decltype(arg    )).name());
    std::string rebu_name = boost::core::demangle(typeid(decltype(rebuilt)).name());
 
-   std::cout << "Work Type       = " << arg_name << std::endl;
-
-   // The diff == 0; which means that arg == rebuilt;
    BOOST_ASSERT(diff     == decltype(diff)(0));
    BOOST_ASSERT(arg_name == rebu_name        );
    BOOST_ASSERT(arg_name == diff_name        );
