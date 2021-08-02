@@ -259,7 +259,9 @@ int main()
    errors += test<double_float<float>>();
    errors += test<double_float<double>>();
    errors += test<double_float<long double>>();
+#ifdef BOOST_MATH_USE_FLOAT128
    errors += test<double_float<boost::multiprecision::float128>>();
+#endif
    std::cout << "Total number of errors : " << errors << std::endl;
 
    return (errors != 0);
