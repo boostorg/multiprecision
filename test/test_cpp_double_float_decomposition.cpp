@@ -70,15 +70,17 @@ public:
          bits[pos] = 1;
          norm -= static_cast<Rr>(0.5);
          norm = frexp(norm, &ex);
-/* Prints while decomposing the number, nice for debugging double float because it prints all the components.
- * for quad flaot simply write another specialization of print_compound_number
+
+// Prints while decomposing the number, nice for debugging double float because it prints all the components.
+// for quad flaot simply write another specialization of print_compound_number
+
          print_compound_number("norm",norm);
-*/
+
       };
    }
-   DecomposedReal(const std::string& bit_string, int exp_arg, int sig_arg, int size)
+   DecomposedReal(const std::string& bit_string, int exp_arg, int sig_arg)
    {
-      bits.resize(size , 0);
+      bits.resize(bit_string.size() , 0);
       for(size_t i = 0 ; i < std::min(bits.size() , bit_string.size()) ; ++i ) {
          bits[i] = bit_string[i] - '0';
       }
@@ -169,14 +171,13 @@ template <typename Rr> int print_number(const Rr& arg)
 }}}
 //////////////////////////////
 
-template<typename R> boost::multiprecision::backends::cpp_double_float<R> fromBits(const std::string& bit_string, int exp_arg, int sig_arg) {
-   boost::multiprecision::backends::DecomposedReal r(bit_string, exp_arg, sig_arg, std::numeric_limits<boost::multiprecision::backends::cpp_double_float<R>>::digits);
-   return r.rebuild<boost::multiprecision::backends::cpp_double_float<R>>();
+template<typename R> R fromBits(const std::string& bit_string, int exp_arg, int sig_arg) {
+   return boost::multiprecision::backends::DecomposedReal(bit_string, exp_arg, sig_arg).rebuild<R>();
 }
 
 template<typename R, typename Arg>
 int try_number(Arg str) {
-   auto z = boost::multiprecision::backends::cpp_double_float<R>(str);
+   auto z = R(str);
    std::cout  << std::endl << std::setprecision(100000) << "Testing number  : " << str << std::endl;
    std::cout << "With type " << boost::core::demangle(typeid(decltype(z)).name()) << std::endl;
 
@@ -184,7 +185,7 @@ int try_number(Arg str) {
    try {
       errors += print_number(z);
    } catch(const LoopError&) {
-      std::cout << "** ERROR in deconposition **" << std::endl;
+      std::cout << "** ERROR in decomposition **" << std::endl;
       errors++;
    }
    return errors;
@@ -194,19 +195,18 @@ template<typename R>
 int test() {
    int errors = 0;
 
-/* FIXME: Infinite loop somewhere
-   errors += try_number<R>(fromBits<R>("11111111100011011111111110001100000011111111111111111000111000001111111111110000000000011111111110000000001111111110000001111", 1407 , 1 ));
-   errors += try_number<R>("7.07095004791213209137407618364459278413421454874042247410492385622373956879713960311588804604245728321440648803023224236513586176837484939909893244653903501e+423");
-*/
+// FIXME: Infinite loop somewhere
+// errors += try_number<R>(fromBits<R>("11111111100011011111111110001100000011111111111111111000111000001111111111110000000000011111111110000000001111111110000001111", 1407 , 1 ));
+// errors += try_number<R>("7.07095004791213209137407618364459278413421454874042247410492385622373956879713960311588804604245728321440648803023224236513586176837484939909893244653903501e+423");
+// errors += try_number<R>("5.0395749966458598419365441242084052981209828021829231181382593274122924204e+423");
+
    errors += try_number<R>(fromBits<R>("11111111100011011111111110001100000011111111111111111000111000001111111111110000000000011111111110000000001111111110000001111", 65 , 1 ));
    errors += try_number<R>("73658621713667056515.99902391387240466018304640982705677743069827556610107421875");
 
+   errors += try_number<R>(fromBits<R>("101111111111010", -1 , 1 ));
    errors += try_number<R>("0.74981689453125");
+   errors += try_number<R>(fromBits<R>("11111100001010000010111000010111011110110001001100001100110101011010000011101001010100111100001110111101010001101010111111101101010111111100110000000000110000000001110110100110010111110011101111011100100001011001000101010111001000110101001110000111100001000101011000011101111011001101100010110101001100110111111000001010010001011100011110100001011001001111101110101010100111000000010111011001100001100001110101010001100001110001000110011110010011000111101101001010111011110101011000010000100010001111", -4 , 1 ));
    errors += try_number<R>("0.1231235123554");
-
-/* FIXME: Infinite loop somewhere
-   errors += try_number<R>("5.0395749966458598419365441242084052981209828021829231181382593274122924204e+423");
-*/
 
 // A series od edge cases. Both are the same number. One is in binary form other is in decimal form.
    std::cout << std::endl << "→→ for float, put '1' in sensitive places:" << std::endl;
@@ -228,14 +228,19 @@ int test() {
    return errors;
 }
 
+template<class R> using double_float = boost::multiprecision::backends::cpp_double_float<R>;
 int main()
 {
    int errors = 0;
-   errors += test<float>();
-   errors += test<double>();
-   errors += test<long double>();
-   errors += test<boost::multiprecision::float128>();
 
+// NOTE: for extended debugging, try this change in numeric_limits     ↓↓↓↓↓↓↓
+//   static constexpr int digits       = 2 * (base_class_type::digits /* -1 */);
+// Interesting stuff for double_float<float> and "→→ for float …" case.
+
+   errors += test<double_float<float>>();
+   errors += test<double_float<double>>();
+   errors += test<double_float<long double>>();
+   errors += test<double_float<boost::multiprecision::float128>>();
    std::cout << "Total number of errors : " << errors << std::endl;
 
    return (errors != 0);
