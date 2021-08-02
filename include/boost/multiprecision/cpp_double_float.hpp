@@ -34,40 +34,6 @@ namespace boost { namespace multiprecision { namespace backends {
 template <typename FloatingPointType>
 class cpp_double_float;
 
-namespace detail {
-
-template <class T> struct is_arithmetic_or_float128
-{
-   static constexpr bool value = (   (std::is_arithmetic<T>::value == true)
-#if defined(BOOST_MATH_USE_FLOAT128)
-                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
-#endif
-                                 );
-};
-
-template <class T> struct is_floating_point_or_float128
-{
-   static constexpr bool value = (   (std::is_floating_point<T>::value == true)
-#if defined(BOOST_MATH_USE_FLOAT128)
-                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
-#endif
-                                 );
-};
-
-template<typename R>
-typename std::enable_if<boost::is_unsigned<R>::value == false, R>::type minus_max()
-{
-   return boost::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
-}
-
-template<typename R>
-typename std::enable_if<boost::is_unsigned<R>::value == true, R>::type minus_max()
-{
-   return 0;
-}
-
-}
-
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator-(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
@@ -150,6 +116,252 @@ struct number_category<backends::cpp_double_float<FloatingPointType>>
 
 namespace backends {
 
+namespace detail {
+
+template <class T> struct is_arithmetic_or_float128
+{
+   static constexpr bool value = (   (std::is_arithmetic<T>::value == true)
+#if defined(BOOST_MATH_USE_FLOAT128)
+                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
+#endif
+                                 );
+};
+
+template <class T> struct is_floating_point_or_float128
+{
+   static constexpr bool value = (   (std::is_floating_point<T>::value == true)
+#if defined(BOOST_MATH_USE_FLOAT128)
+                                  || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
+#endif
+                                 );
+};
+
+template<typename R>
+typename std::enable_if<boost::is_unsigned<R>::value == false, R>::type minus_max()
+{
+   return boost::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
+}
+
+template<typename R>
+typename std::enable_if<boost::is_unsigned<R>::value == true, R>::type minus_max()
+{
+   return 0;
+}
+
+// exact_arithmetic<> implements extended precision techniques that are used in
+// cpp_double_float and cpp_quad_float
+template <typename FloatingPointType>
+struct exact_arithmetic
+{
+   static_assert(detail::is_floating_point_or_float128<FloatingPointType>::value == true, "exact_arithmetic<> invoked with unknown floating-point type");
+   using float_type  = FloatingPointType;
+   using float_pair  = std::pair<float_type, float_type>;
+   using float_tuple = std::tuple<float_type, float_type, float_type, float_type>;
+
+   static float_pair split(const float_type& a)
+   {
+      // Split a floating point number in two (high and low) parts approximating the
+      // upper-half and lower-half bits of the float
+      //static_assert(std::numeric_limits<float_type>::is_iec559,
+      //              "double_float<> invoked with non-native floating-point unit");
+
+      // TODO Replace bit shifts with constexpr funcs or ldexp for better compaitibility
+      constexpr int        MantissaBits   = std::numeric_limits<float_type>::digits;
+      constexpr int        SplitBits      = MantissaBits / 2 + 1;
+      constexpr float_type Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
+      const float_type     SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter * 2);
+
+      float_type temp, hi, lo;
+
+      // Handle if multiplication with the splitter would cause overflow
+      if (a > SplitThreshold || a < -SplitThreshold)
+      {
+         constexpr float_type Normalizer = float_type(1ULL << (SplitBits + 1));
+
+         const float_type a_ = a / Normalizer;
+
+         temp = Splitter * a_;
+         hi   = temp - (temp - a_);
+         lo   = a_ - hi;
+
+         hi *= Normalizer;
+         lo *= Normalizer;
+      }
+      else
+      {
+         temp = Splitter * a;
+         hi   = temp - (temp - a);
+         lo   = a - hi;
+      }
+
+      return std::make_pair(hi, lo);
+   }
+
+   static float_pair fast_sum(const float_type& a, const float_type& b)
+   {
+      // Exact addition of two floating point numbers, given |a| > |b|
+      using std::fabs;
+      using std::isnormal;
+
+      float_pair out;
+      out.first  = a + b;
+      out.second = b - (out.first - a);
+
+      return out;
+   }
+
+   static float_pair sum(const float_type& a, const float_type& b)
+   {
+      // Exact addition of two floating point numbers
+      float_pair out;
+
+      out.first    = a + b;
+      float_type v = out.first - a;
+      out.second   = (a - (out.first - v)) + (b - v);
+
+      return out;
+   }
+
+   static void sum(float_pair& p, float_type& e)
+   {
+      using std::tie;
+
+      float_pair t;
+      float_type t_;
+
+      t                = sum(p.first, p.second);
+      tie(p.first, t_) = sum(e, t.first);
+      tie(p.second, e) = sum(t.second, t_);
+   }
+
+   static float_pair difference(const float_type& a, const float_type& b)
+   {
+      // Exact subtraction of two floating point numbers
+      float_pair out;
+
+      out.first    = a - b;
+      float_type v = out.first - a;
+      out.second   = (a - (out.first - v)) - (b + v);
+
+      return out;
+   }
+
+   static float_pair product(const float_type& a, const float_type& b)
+   {
+      // Exact product of two floating point numbers
+      const float_pair a_split = split(a);
+      const float_pair b_split = split(b);
+
+      const volatile float_type pf = a * b;
+
+      return std::make_pair(
+          (const float_type&)pf,
+          (
+              ((a_split.first * b_split.first) - (const float_type&)pf) + (a_split.first * b_split.second) + (a_split.second * b_split.first)) +
+              (a_split.second * b_split.second));
+   }
+
+   static void normalize(float_pair& p, bool fast = true)
+   {
+      // Converts a pair of floats to standard form
+      //BOOST_ASSERT(std::isfinite(p.first));
+      p = (fast ? fast_sum(p.first, p.second) : sum(p.first, p.second));
+   }
+
+   static void normalize(float_tuple& t)
+   {
+      using std::get;
+      using std::tie;
+
+      float_tuple s(0, 0, 0, 0);
+
+      tie(get<0>(s), get<3>(t)) = fast_sum(get<2>(t), get<3>(t));
+      tie(get<0>(s), get<2>(t)) = fast_sum(get<1>(t), get<0>(s));
+      tie(get<0>(t), get<1>(t)) = fast_sum(get<0>(t), get<0>(s));
+
+      tie(get<0>(s), get<1>(s)) = std::make_tuple(get<0>(t), get<1>(t));
+
+      if (get<1>(s) != 0)
+      {
+         tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<2>(t));
+
+         if (get<2>(s) != 0)
+            tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), get<3>(t));
+         else
+            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
+      }
+      else
+      {
+         tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<2>(t));
+         if (get<1>(s) != 0)
+            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
+         else
+            tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<3>(t));
+      }
+
+      t = s;
+   }
+
+   static void normalize(float_tuple& t, float_type e)
+   {
+     using std::tie;
+     using std::get;
+
+      float_tuple s(0, 0, 0, 0);
+
+      tie(get<0>(s), e)         = fast_sum(get<3>(t), e);
+      tie(get<0>(s), get<3>(t)) = fast_sum(get<2>(t), get<0>(s));
+      tie(get<0>(s), get<2>(t)) = fast_sum(get<1>(t), get<0>(s));
+      tie(get<0>(t), get<1>(t)) = fast_sum(get<0>(t), get<0>(s));
+
+      tie(get<0>(s), get<1>(s)) = std::make_tuple(get<0>(t), get<1>(t));
+
+      if (get<1>(s) != 0)
+      {
+         tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<2>(t));
+         if (get<2>(s) != 0)
+         {
+            tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), get<3>(t));
+            if (get<3>(s) != 0)
+               get<3>(s) += e;
+               else tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
+         }
+         else
+         {
+            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
+            if (get<2>(s) != 0)
+               tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
+            else
+               tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
+         }
+      }
+      else
+      {
+         tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<2>(t));
+         if (get<1>(s) != 0)
+         {
+            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
+            if (get<2>(s) != 0)
+               tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
+            else
+               tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
+         }
+         else
+         {
+            tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<3>(t));
+            if (get<1>(s) != 0)
+               tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
+            else
+               tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), e);
+         }
+      }
+
+      t  = s;
+   }
+};
+
+} // namespace detail
+
 // A cpp_double_float is represented by an unevaluated sum of two floating-point
 // units (say a0 and a1) which satisfy |a1| <= (1 / 2) * ulp(a0).
 // The type of the floating-point constituents should adhere to IEEE754.
@@ -160,6 +372,7 @@ class cpp_double_float
  public:
    using float_type = FloatingPointType;
    using rep_type   = std::pair<float_type, float_type>;
+   using arithmetic = detail::exact_arithmetic<float_type>;
 
   using   signed_types = std::tuple<  signed char,   signed short,   signed int,   signed long,   signed long long, std::intmax_t>;
   using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long, std::uintmax_t>;
@@ -284,6 +497,8 @@ class cpp_double_float
    {
       data.first  = -data.first;
       data.second = -data.second;
+
+      arithmetic::normalize(data);
    }
 
    // Getters/Setters
@@ -323,27 +538,27 @@ class cpp_double_float
    // Non-member add/sub/mul/div with constituent type.
    friend inline cpp_double_float operator+(const cpp_double_float& a, const float_type& b)
    {
-      rep_type s = exact_sum(a.first(), b);
+      rep_type s = arithmetic::sum(a.first(), b);
 
       s.second += a.second();
-      normalize_pair(s);
+      arithmetic::normalize(s);
 
       return cpp_double_float(s);
    }
 
    friend inline cpp_double_float operator-(const cpp_double_float& a, const float_type& b)
    {
-      rep_type s = exact_difference(a.first(), b);
+      rep_type s = arithmetic::difference(a.first(), b);
 
       s.second += a.second();
-      normalize_pair(s);
+      arithmetic::normalize(s);
 
       return cpp_double_float(s);
    }
 
    friend inline cpp_double_float operator*(const cpp_double_float& a, const float_type& b)
    {
-      rep_type p = exact_product(a.first(), b);
+      rep_type p = arithmetic::product(a.first(), b);
 
       using std::isfinite;
 
@@ -352,7 +567,7 @@ class cpp_double_float
 
       p.second += a.second() * b;
 
-      normalize_pair(p);
+      arithmetic::normalize(p);
 
       return cpp_double_float(p);
    }
@@ -363,14 +578,14 @@ class cpp_double_float
 
       p.first = a.first() / b;
 
-      q = exact_product(p.first, b);
-      s = exact_difference(a.first(), q.first);
+      q = arithmetic::product(p.first, b);
+      s = arithmetic::difference(a.first(), q.first);
       s.second += a.second();
       s.second -= q.second;
 
       p.second = (s.first + s.second) / b;
 
-      normalize_pair(p);
+      arithmetic::normalize(p);
 
       return cpp_double_float(p);
    }
@@ -384,9 +599,9 @@ class cpp_double_float
    // Unary add/sub/mul/div.
    cpp_double_float& operator+=(const cpp_double_float& other)
    {
-      const rep_type t = exact_sum(second(), other.second());
+      const rep_type t = arithmetic::sum(second(), other.second());
 
-      data = exact_sum(first(),  other.first());
+      data = arithmetic::sum(first(),  other.first());
 
       using std::isfinite;
 
@@ -394,17 +609,17 @@ class cpp_double_float
          return *this;
 
       data.second += t.first;
-      normalize_pair(data);
+      arithmetic::normalize(data);
       data.second += t.second;
-      normalize_pair(data);
+      arithmetic::normalize(data);
 
       return *this;
    }
 
    cpp_double_float& operator-=(const cpp_double_float& other)
    {
-      const rep_type t = exact_difference(second(), other.second());
-      data = exact_difference(first(), other.first());
+      const rep_type t = arithmetic::difference(second(), other.second());
+      data = arithmetic::difference(first(), other.first());
 
       using std::isfinite;
 
@@ -412,17 +627,17 @@ class cpp_double_float
          return *this;
 
       data.second += t.first;
-      normalize_pair(data);
+      arithmetic::normalize(data);
 
       data.second += t.second;
-      normalize_pair(data);
+      arithmetic::normalize(data);
 
       return *this;
    }
 
    cpp_double_float& operator*=(const cpp_double_float& other)
    {
-      rep_type tmp = exact_product(data.first, other.data.first);
+      rep_type tmp = arithmetic::product(data.first, other.data.first);
 
       tmp.second += (  data.first  * other.data.second
                      + data.second * other.data.first);
@@ -454,7 +669,7 @@ class cpp_double_float
 
       const FloatingPointType p_prime = r.first() / other.first();
 
-      normalize_pair(p);
+      arithmetic::normalize(p);
 
       data = p;
 
@@ -504,13 +719,6 @@ class cpp_double_float
       return result;
    }
 
-   static void normalize_pair(rep_type& p, bool fast = true)
-   {
-      // Converts a pair of floats to standard form
-      //BOOST_ASSERT(std::isfinite(p.first));
-      p = (fast ? fast_exact_sum(p.first, p.second) : exact_sum(p.first, p.second));
-   }
-
    void swap(cpp_double_float& other)
    {
       rep_type tmp = data;
@@ -546,102 +754,6 @@ class cpp_double_float
 
  private:
    rep_type data;
-
-   static rep_type split(const float_type& a)
-   {
-      // Split a floating point number in two (high and low) parts approximating the
-      // upper-half and lower-half bits of the float
-      //static_assert(std::numeric_limits<float_type>::is_iec559,
-      //              "double_float<> invoked with non-native floating-point unit");
-
-      // TODO Replace bit shifts with constexpr funcs or ldexpr for better compaitibility
-      constexpr int        MantissaBits   = std::numeric_limits<float_type>::digits;
-      constexpr int        SplitBits      = MantissaBits / 2 + 1;
-      constexpr float_type Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
-      const     float_type SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter*2);
-
-      float_type temp, hi, lo;
-
-      // Handle if multiplication with the splitter would cause overflow
-      if (a > SplitThreshold || a < -SplitThreshold)
-      {
-         constexpr float_type Normalizer = float_type(1ULL << (SplitBits + 1));
-
-         const float_type a_ = a / Normalizer;
-
-         temp = Splitter * a_;
-         hi   = temp - (temp - a_);
-         lo   = a_ - hi;
-
-         hi *= Normalizer;
-         lo *= Normalizer;
-      }
-      else
-      {
-         temp = Splitter * a;
-         hi   = temp - (temp - a);
-         lo   = a - hi;
-      }
-
-      return std::make_pair(hi, lo);
-   }
-
-   static rep_type fast_exact_sum(const float_type& a, const float_type& b)
-   {
-      // Exact addition of two floating point numbers, given |a| > |b|
-      using std::fabs;
-      using std::isnormal;
-
-      rep_type out;
-      out.first  = a + b;
-      out.second = b - (out.first - a);
-
-      return out;
-   }
-
-   static rep_type exact_sum(const float_type& a, const float_type& b)
-   {
-      // Exact addition of two floating point numbers
-      rep_type out;
-
-      out.first    = a + b;
-      float_type v = out.first - a;
-      out.second   = (a - (out.first - v)) + (b - v);
-
-      return out;
-   }
-
-   static rep_type exact_difference(const float_type& a, const float_type& b)
-   {
-      // Exact subtraction of two floating point numbers
-      rep_type out;
-
-      out.first    = a - b;
-      float_type v = out.first - a;
-      out.second   = (a - (out.first - v)) - (b + v);
-
-      return out;
-   }
-
-   static rep_type exact_product(const float_type& a, const float_type& b)
-   {
-      // Exact product of two floating point numbers
-      const rep_type a_split = split(a);
-      const rep_type b_split = split(b);
-
-      const volatile float_type pf = a * b;
-
-      return std::make_pair
-      (
-         (const float_type&) pf,
-         (
-            ((a_split.first  * b_split.first) - (const float_type&) pf)
-          +  (a_split.first  * b_split.second)
-          +  (a_split.second * b_split.first)
-         )
-         + (a_split.second * b_split.second)
-      );
-   }
 };
 
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b) { return cpp_double_float<FloatingPointType>(a) += b; }
@@ -683,15 +795,11 @@ template<typename FloatingPointType> void eval_divide  (cpp_double_float<Floatin
 
 template<typename FloatingPointType> void eval_fabs(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& a)
 {
+   result = a;
+
    if(a.is_neg())
    {
-      result.rep().first  = -a.rep().first;
-      result.rep().second = -a.rep().second;
-   }
-   else
-   {
-      result.rep().first  = a.rep().first;
-      result.rep().second = a.rep().second;
+      result.negate();
    }
 }
 
@@ -716,7 +824,7 @@ void eval_ldexp(cpp_double_float<FloatingPointType>& result, const cpp_double_fl
       ldexp(a.crep().second, v)
    );
 
-   cpp_double_float<FloatingPointType>::normalize_pair(z);
+   cpp_double_float<FloatingPointType>::arithmetic::normalize(z);
 
    result.rep() = z;
 }
@@ -740,7 +848,7 @@ void eval_floor(cpp_double_float<FloatingPointType>& result, const cpp_double_fl
       result.rep().first  = fhi;
       result.rep().second = floor(x.rep().second);
 
-      double_float_type::normalize_pair(result.rep());
+      double_float_type::arithmetic::normalize(result.rep());
    }
 }
 

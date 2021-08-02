@@ -58,7 +58,6 @@ struct control
 
    static std::mt19937       engine_man;
    static std::ranlux24_base engine_sgn;
-   static random_engine_type engine_dec_pt;
 
    template<const std::size_t DigitsToGet = digits10>
    static void get_random_fixed_string(std::string& str, const bool is_unsigned = false)
@@ -127,7 +126,7 @@ struct control
       dist_exp
       (
          0,
-         unsigned(float(max_exponent10) * 0.15F)
+         std::numeric_limits<ConstituentFloatType>::digits10 < 10 ? 15 : 85
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
@@ -151,7 +150,6 @@ template<typename ConstituentFloatType> constexpr int control<ConstituentFloatTy
 
 template<typename ConstituentFloatType> std::mt19937       control<ConstituentFloatType>::engine_man(static_cast<typename std::mt19937::result_type>(std::clock()));
 template<typename ConstituentFloatType> std::ranlux24_base control<ConstituentFloatType>::engine_sgn(static_cast<typename std::ranlux24_base::result_type>(std::clock()));
-template<typename ConstituentFloatType> typename control<ConstituentFloatType>::random_engine_type control<ConstituentFloatType>::engine_dec_pt(static_cast<typename random_engine_type::result_type>(std::clock()));
 
 template <typename ConstituentFloatType>
 bool test_op(char op, const unsigned count = 10000U)
@@ -160,7 +158,7 @@ bool test_op(char op, const unsigned count = 10000U)
    using double_float_type  = typename control<float_type>::double_float_type;
    using control_float_type = typename control<float_type>::control_float_type;
 
-   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
+   const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
    std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<double_float_type>::digits << " bits)...";
 
    for (unsigned i = 0U; i < count; ++i)
@@ -174,25 +172,12 @@ bool test_op(char op, const unsigned count = 10000U)
       const double_float_type  df_a(str_a);
       const double_float_type  df_b(str_b);
 
-      #if 0
-      const control_float_type ctrl_a =   control_float_type(double_float_type::canonical_value(df_a).crep().first.crep().first)
-                                        + control_float_type(double_float_type::canonical_value(df_a).crep().first.crep().second)
-                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second.crep().first)
-                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second.crep().second)
-                                        ;
-      const control_float_type ctrl_b =   control_float_type(double_float_type::canonical_value(df_b).crep().first.crep().first)
-                                        + control_float_type(double_float_type::canonical_value(df_b).crep().first.crep().second)
-                                        + control_float_type(double_float_type::canonical_value(df_b).crep().second.crep().first)
-                                        + control_float_type(double_float_type::canonical_value(df_b).crep().second.crep().second)
-                                        ;
-      #else
       const control_float_type ctrl_a =   control_float_type(double_float_type::canonical_value(df_a).crep().first)
                                         + control_float_type(double_float_type::canonical_value(df_a).crep().second)
                                         ;
       const control_float_type ctrl_b =   control_float_type(double_float_type::canonical_value(df_b).crep().first)
                                         + control_float_type(double_float_type::canonical_value(df_b).crep().second)
                                         ;
-      #endif
 
       double_float_type  df_c;
       control_float_type ctrl_c;
@@ -225,24 +210,28 @@ bool test_op(char op, const unsigned count = 10000U)
          break;
       }
 
-      #if 0
-      const control_float_type ctrl_df_c =   control_float_type(double_float_type::canonical_value(df_c).crep().first.crep().first)
-                                           + control_float_type(double_float_type::canonical_value(df_c).crep().first.crep().second)
-                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second.crep().first)
-                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second.crep().second)
-                                           ;
-      #else
       const control_float_type ctrl_df_c =   control_float_type(double_float_type::canonical_value(df_c).crep().first)
                                            + control_float_type(double_float_type::canonical_value(df_c).crep().second)
                                            ;
-      #endif
 
       const control_float_type delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
 
       if (delta > MaxError)
       {
-         std::cerr << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
-         std::cerr << " [FAILED] while performing '" << std::setprecision(100000) << ctrl_a << "' " << op << " '" << ctrl_b << "', got incorrect result: " << (df_c) << std::endl;
+         std::cout << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
+         std::cout << " [FAILED] while performing '"
+                   << std::setprecision(std::numeric_limits<double_float_type>::max_digits10)
+                   << df_a
+                   << "' "
+                   << op
+                   << " '"
+                   << df_b
+                   << std::endl
+                   << "got incorrect result: "
+                   << df_c
+                   << ", correct result is: "
+                   << ctrl_df_c
+                   << std::endl;
 
          return false;
       }
@@ -260,7 +249,8 @@ bool test_sqrt(const unsigned count = 10000U)
    using double_float_type  = typename control<float_type>::double_float_type;
    using control_float_type = typename control<float_type>::control_float_type;
 
-   const control_float_type MaxError = boost::multiprecision::ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
+   const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
+
    std::cout << "testing func sqrt (accuracy = " << std::numeric_limits<double_float_type>::digits << " bits)...";
 
    for (unsigned i = 0U; i < count; ++i)
@@ -271,17 +261,9 @@ bool test_sqrt(const unsigned count = 10000U)
 
       const double_float_type  df_a(str_a);
 
-      #if 0
-      const control_float_type ctrl_a =   control_float_type(double_float_type::canonical_value(df_a).crep().first.crep().first)
-                                        + control_float_type(double_float_type::canonical_value(df_a).crep().first.crep().second)
-                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second.crep().first)
-                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second.crep().second)
-                                        ;
-      #else
       const control_float_type ctrl_a =   control_float_type(double_float_type::canonical_value(df_a).crep().first)
                                         + control_float_type(double_float_type::canonical_value(df_a).crep().second)
                                         ;
-      #endif
 
       double_float_type  df_c;
       control_float_type ctrl_c;
@@ -289,24 +271,16 @@ bool test_sqrt(const unsigned count = 10000U)
       df_c   = sqrt(df_a);
       ctrl_c = sqrt(ctrl_a);
 
-      #if 0
-      const control_float_type ctrl_df_c =   control_float_type(double_float_type::canonical_value(df_c).crep().first.crep().first)
-                                           + control_float_type(double_float_type::canonical_value(df_c).crep().first.crep().second)
-                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second.crep().first)
-                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second.crep().second)
-                                           ;
-      #else
       const control_float_type ctrl_df_c =   control_float_type(double_float_type::canonical_value(df_c).crep().first)
                                            + control_float_type(double_float_type::canonical_value(df_c).crep().second)
                                            ;
-      #endif
 
       const control_float_type delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
 
       if (delta > MaxError)
       {
          std::cerr << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
-         std::cerr << " [FAILED] while performing '" << std::setprecision(100000) << ctrl_a << "' sqrt', got incorrect result: " << (df_c) << std::endl;
+         std::cerr << " [FAILED] while performing '" << std::setprecision(std::numeric_limits<double_float_type>::max_digits10) << ctrl_a << "' sqrt', got incorrect result: " << (df_c) << std::endl;
 
          return false;
       }
@@ -342,20 +316,20 @@ int main()
    bool result_is_ok = true;
 
    #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-   constexpr unsigned int test_cases_built_in = 10000U;
+   constexpr unsigned int test_cases_built_in = 5000U;
    #else
-   constexpr unsigned int test_cases_built_in = 1000000U;
+   constexpr unsigned int test_cases_built_in = 50000U;
    #endif
 
    #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
    constexpr unsigned int test_cases_float128 = 1000U;
    #else
-   constexpr unsigned int test_cases_float128 = 20000U;
+   constexpr unsigned int test_cases_float128 = 10000U;
    #endif
 
    result_is_ok &= local::test_arithmetic<float>(test_cases_built_in);
    result_is_ok &= local::test_arithmetic<double>(test_cases_built_in);
-   //result_is_ok &= local::test_arithmetic<long double>(test_cases_built_in);
+   result_is_ok &= local::test_arithmetic<long double>(test_cases_built_in);
 #ifdef BOOST_MATH_USE_FLOAT128
    result_is_ok &= local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
 #else
