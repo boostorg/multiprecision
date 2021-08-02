@@ -28,41 +28,17 @@ namespace boost { namespace multiprecision {
 namespace backends {
 template <typename T> int sign(T val) { return (T(0) < val) - (val < T(0)); }
 
-// FIXME: very rudimentary pow implementation.
-// FIXME: replace with native one.
 template <typename Rr>
 inline cpp_double_float<Rr> pow(const cpp_double_float<Rr>& a, int exp)
 {
-   cpp_double_float<Rr> ret{1};
-   bool positive = true;
-   if(exp < 0 ) {
-      exp      = -exp;
-      positive = false;
-   }
-   if(exp == 0)
-      return 1;
-   if(a == decltype(a)(0))
-      return 0;
-   while(exp-- > 0) {
-      ret*= a;
-   }
-   return positive ? ret : cpp_double_float<Rr>(1)/ret;
+   return a.pown(a,exp);
 }
 
-// FIXME: very rudimentary frexp implementation.
-// FIXME: replace with native one.
 template <typename Rr, typename Exp>
 inline cpp_double_float<Rr> frexp(const cpp_double_float<Rr>& a, Exp* b)
 {
-   using std::frexp;
-   using std::pow;
-   Exp c=0;
-   Rr second = frexp(a.crep().second, &c);
-   Rr first  = frexp(a.crep().first , b);
-   auto ret = cpp_double_float<Rr>(std::make_pair(first, second * pow(Rr(2.0), c - *b )));
-//std::cout << "frexp ret = " << std::setprecision(10000) << ret << " exponent = " << *b << std::endl;
-   BOOST_ASSERT((ret >= decltype(ret)(0.5)) or (ret <= decltype(ret)(-0.5)) or ((ret == decltype(ret)(0)) and (*b == 0)));
-   BOOST_ASSERT((ret <  decltype(ret)(1  )) or (ret >  decltype(ret)(-1  )) or ((ret == decltype(ret)(0)) and (*b == 0)));
+   cpp_double_float<Rr> ret(0);
+   eval_frexp(ret, a, b);
    return ret;
 }
 
@@ -164,7 +140,7 @@ template <typename Rr> void print_number(const Rr& arg)
 
    std::string diff_name = boost::core::demangle(typeid(decltype(diff   )).name());
    std::string arg_name  = boost::core::demangle(typeid(decltype(arg    )).name());
-        std::string rebu_name = boost::core::demangle(typeid(decltype(rebuilt)).name());
+   std::string rebu_name = boost::core::demangle(typeid(decltype(rebuilt)).name());
 
    std::cout << "Work Type       = " << arg_name << std::endl;
 
