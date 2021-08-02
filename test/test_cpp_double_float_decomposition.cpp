@@ -74,7 +74,7 @@ public:
 // Prints while decomposing the number, nice for debugging double float because it prints all the components.
 // for quad flaot simply write another specialization of print_compound_number
 
-         print_compound_number("norm",norm);
+//       print_compound_number("norm",norm);
 
       };
    }
