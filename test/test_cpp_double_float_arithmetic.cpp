@@ -49,7 +49,6 @@ struct control
    static constexpr int digits         = (2 * std::numeric_limits<ConstituentFloatType>::digits) - 2;
    static constexpr int digits10       = int(float(digits - 1) * 0.301F);
    static constexpr int max_digits10   = int(float(digits) * 0.301F) + 2;
-   static constexpr int max_exponent10 = std::numeric_limits<ConstituentFloatType>::max_exponent10;
 
    using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<ConstituentFloatType>, boost::multiprecision::et_off>;
    using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
@@ -126,7 +125,7 @@ struct control
       dist_exp
       (
          0,
-         std::numeric_limits<ConstituentFloatType>::digits10 < 10 ? 15 : 85
+         std::numeric_limits<ConstituentFloatType>::digits10 < 10 ? 13 : 85
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
@@ -146,7 +145,6 @@ struct control
 template<typename ConstituentFloatType> constexpr int control<ConstituentFloatType>::digits;
 template<typename ConstituentFloatType> constexpr int control<ConstituentFloatType>::digits10;
 template<typename ConstituentFloatType> constexpr int control<ConstituentFloatType>::max_digits10;
-template<typename ConstituentFloatType> constexpr int control<ConstituentFloatType>::max_exponent10;
 
 template<typename ConstituentFloatType> std::mt19937       control<ConstituentFloatType>::engine_man(static_cast<typename std::mt19937::result_type>(std::clock()));
 template<typename ConstituentFloatType> std::ranlux24_base control<ConstituentFloatType>::engine_sgn(static_cast<typename std::ranlux24_base::result_type>(std::clock()));
@@ -161,7 +159,9 @@ bool test_op(char op, const unsigned count = 10000U)
    const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
    std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<double_float_type>::digits << " bits)...";
 
-   for (unsigned i = 0U; i < count; ++i)
+   bool result_is_ok = true;
+
+   for (unsigned i = 0U; ((i < count) && result_is_ok); ++i)
    {
       std::string str_a;
       std::string str_b;
@@ -216,7 +216,13 @@ bool test_op(char op, const unsigned count = 10000U)
 
       const control_float_type delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
 
-      if (delta > MaxError)
+      const bool tol_is_not_ok = (delta > MaxError);
+
+      const bool is_finite_is_ok = (isfinite(df_a) && isfinite(df_b) && isfinite(df_c));
+
+      const bool b_ok = (is_finite_is_ok && (tol_is_not_ok == false));
+
+      if (tol_is_not_ok)
       {
          std::cout << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
          std::cout << " [FAILED] while performing '"
@@ -232,9 +238,9 @@ bool test_op(char op, const unsigned count = 10000U)
                    << ", correct result is: "
                    << ctrl_df_c
                    << std::endl;
-
-         return false;
       }
+
+      result_is_ok &= b_ok;
    }
 
   std::cout << " ok [" << count << " tests passed]" << std::endl;
@@ -253,7 +259,9 @@ bool test_sqrt(const unsigned count = 10000U)
 
    std::cout << "testing func sqrt (accuracy = " << std::numeric_limits<double_float_type>::digits << " bits)...";
 
-   for (unsigned i = 0U; i < count; ++i)
+   bool result_is_ok = true;
+
+   for (unsigned i = 0U; ((i < count) && result_is_ok); ++i)
    {
       std::string str_a;
 
@@ -277,18 +285,24 @@ bool test_sqrt(const unsigned count = 10000U)
 
       const control_float_type delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
 
-      if (delta > MaxError)
-      {
-         std::cerr << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
-         std::cerr << " [FAILED] while performing '" << std::setprecision(std::numeric_limits<double_float_type>::max_digits10) << ctrl_a << "' sqrt', got incorrect result: " << (df_c) << std::endl;
+      const bool tol_is_not_ok = (delta > MaxError);
 
-         return false;
+      const bool is_finite_is_ok = (isfinite(df_a) && isfinite(df_c));
+
+      const bool b_ok = (is_finite_is_ok && (tol_is_not_ok == false));
+
+      if (tol_is_not_ok)
+      {
+         std::cout << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
+         std::cout << " [FAILED] while performing '" << std::setprecision(std::numeric_limits<double_float_type>::max_digits10) << ctrl_a << "' sqrt', got incorrect result: " << (df_c) << std::endl;
       }
+
+      result_is_ok &= b_ok;
    }
 
-  std::cout << " ok [" << count << " tests passed]" << std::endl;
+   std::cout << " ok [" << count << " tests passed]" << std::endl;
 
-  return true;
+   return true;
 }
 
 template <typename T>
@@ -318,13 +332,13 @@ int main()
    #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
    constexpr unsigned int test_cases_built_in = 5000U;
    #else
-   constexpr unsigned int test_cases_built_in = 50000U;
+   constexpr unsigned int test_cases_built_in = 100000U;
    #endif
 
    #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
    constexpr unsigned int test_cases_float128 = 1000U;
    #else
-   constexpr unsigned int test_cases_float128 = 10000U;
+   constexpr unsigned int test_cases_float128 = 20000U;
    #endif
 
    result_is_ok &= local::test_arithmetic<float>(test_cases_built_in);
