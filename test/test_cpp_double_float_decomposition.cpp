@@ -128,6 +128,7 @@ public:
       if(skip_exp) {
          std::cout << "exp : " << std::setw(3) << exp << ", bits : "  << std::right <<                               (sig==1?"+":"-") << bit_str() << std::endl;
       } else {
+      // The std::setw makes sure that the bits are printed in properly shifted form - in columns aligned with the first part.
          std::cout << "exp : " << std::setw(3) << exp << ", bits : "  << std::right << std::setw(max_exp - exp+1) << (sig==1?"+":"-") << bit_str() << std::endl;
       }
       return exp;
@@ -164,8 +165,9 @@ template <typename Rr> int print_number(const Rr& arg)
    // FIXME : but this check fails !
    errors += int(arg      != rebuilt          );
 
-   if(errors != 0)
+   if(errors != 0) {
       std::cout << "** ERROR in verification **" << std::endl;
+   }
    return errors;
 };
 }}}
@@ -195,7 +197,7 @@ template<typename R>
 int test() {
    int errors = 0;
 
-// FIXME: Infinite loop somewhere
+// FIXME: Infinite loop somewhere. Lockup. Most likely due to mishandling infinities.
 // errors += try_number<R>(fromBits<R>("11111111100011011111111110001100000011111111111111111000111000001111111111110000000000011111111110000000001111111110000001111", 1407 , 1 ));
 // errors += try_number<R>("7.07095004791213209137407618364459278413421454874042247410492385622373956879713960311588804604245728321440648803023224236513586176837484939909893244653903501e+423");
 // errors += try_number<R>("5.0395749966458598419365441242084052981209828021829231181382593274122924204e+423");
@@ -224,6 +226,23 @@ int test() {
    std::cout << std::endl << "→→ for float128, put '1' in sensitive places:" << std::endl;
    errors += try_number<R>(fromBits<R>("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001", 0 , 1 ));
    errors += try_number<R>("1.000000000000000000000000000000000288889491658085377958396691387739116326746000669415157944667127073181392521417643788955012265195294587906700478146794987008");
+
+// A series od edge cases. Both are the same number. One is in binary form other is in decimal form.
+   std::cout << std::endl << "→→ for float, put '1' in sensitive places:" << std::endl;
+   errors += try_number<R>(fromBits<R>("100000000000000000000001100000000000000000000111", 0 , 1 ));
+   errors += try_number<R>("1.00000017881398406416337820701301097869873046875");
+
+   std::cout << std::endl << "→→ for double, put '1' in sensitive places:" << std::endl;
+   errors += try_number<R>(fromBits<R>("1000000000000000000000000000000000000000000000000000110000000000000000000000000000000000000000000000000111", 0 , 1 ));
+   errors += try_number<R>("1.000000000000000333066907387547134690412517523578527565623655609487741013907680098782293498516082763671875");
+
+   std::cout << std::endl << "→→ for long double, put '1' in sensitive places:" << std::endl;
+   errors += try_number<R>(fromBits<R>("10000000000000000000000000000000000000000000000000000000000000011000000000000000000000000000000000000000000000000000000000000111", 0 , 1 ));
+   errors += try_number<R>("1.0000000000000000001626303258728256651422602224092713194927729663027785987236532944870230632528063097197446040809154510498046875");
+
+   std::cout << std::endl << "→→ for float128, put '1' in sensitive places:" << std::endl;
+   errors += try_number<R>(fromBits<R>("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111", 0 , 1 ));
+   errors += try_number<R>("1.000000000000000000000000000000000288889491658085377958396691387739227602930521292056729896724973502366793548361006522685085856367062115346903347027564905997");
 
    return errors;
 }
