@@ -227,16 +227,15 @@ struct exact_arithmetic
       return out;
    }
 
-   static void sum(float_pair& p, float_type& e)
-   {
+   static void three_sum(float_type& a, float_type& b, float_type& c) {
       using std::tie;
+      using std::get;
 
-      float_pair t;
-      float_type t_;
+      std::tuple<float_type, float_type, float_type> t;
 
-      t                = sum(p.first, p.second);
-      tie(p.first, t_) = sum(e, t.first);
-      tie(p.second, e) = sum(t.second, t_);
+      tie(get<0>(t), get<1>(t)) = sum(a        , b);
+      tie(a        , get<2>(t)) = sum(c        , get<0>(t));
+      tie(b        , c        ) = sum(get<1>(t), get<2>(t));
    }
 
    static float_pair difference(const float_type& a, const float_type& b)

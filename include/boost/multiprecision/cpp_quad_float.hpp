@@ -299,9 +299,11 @@ class cpp_quad_float
    //{
    //}
 
-   //friend inline cpp_quad_float operator*(const cpp_quad_float& a, const float_type& b)
-   //{
-   //}
+   friend inline cpp_quad_float operator*(const cpp_quad_float& a, const float_type& b)
+   {
+     // FIXME
+      return a * cpp_quad_float(b);
+   }
 
    //friend inline cpp_quad_float operator/(const cpp_quad_float& a, const float_type& b)
    //{
@@ -418,10 +420,96 @@ class cpp_quad_float
 
    cpp_quad_float& operator*=(const cpp_quad_float& other)
    {
+     using std::get;
+     using std::tie;
+
+      std::array<float_pair, 10> p;
+      float_pair r, t, s;
+      float_type s_;
+
+      p[0] = arithmetic::product(get<0>(this->data), get<0>(other.data));
+
+      p[1] = arithmetic::product(get<0>(this->data), get<1>(other.data));
+      p[2] = arithmetic::product(get<1>(this->data), get<0>(other.data));
+
+      p[3] = arithmetic::product(get<0>(this->data), get<2>(other.data));
+      p[4] = arithmetic::product(get<1>(this->data), get<1>(other.data));
+      p[5] = arithmetic::product(get<2>(this->data), get<0>(other.data));
+
+      arithmetic::three_sum(p[1].first, p[2].first , p[0].second);
+      arithmetic::three_sum(p[2].first, p[1].second, p[2].second);
+      arithmetic::three_sum(p[3].first, p[4].first , p[5].first );
+
+      tie(s.first , t.first ) = arithmetic::sum(p[2].first , p[3].first);
+      tie(s.second, t.second) = arithmetic::sum(p[1].second, p[4].first);
+
+      s_ = p[2].second + p[5].first;
+
+      tie(s.second, t.first) = arithmetic::sum(s.second, t.first);
+
+      s_ += t.first + t.second;
+
+      p[6] = arithmetic::product(get<0>(this->data), get<3>(other.data));
+      p[7] = arithmetic::product(get<1>(this->data), get<2>(other.data));
+      p[8] = arithmetic::product(get<2>(this->data), get<1>(other.data));
+      p[9] = arithmetic::product(get<3>(this->data), get<0>(other.data));
+
+      tie(p[0].second, p[3].second) = arithmetic::sum(p[0].second, p[3].second);
+      tie(p[4].second, p[5].second) = arithmetic::sum(p[4].second, p[5].second);
+      tie(p[6].first , p[7].first ) = arithmetic::sum(p[6].first , p[7].first);
+      tie(p[8].first , p[9].first ) = arithmetic::sum(p[8].first , p[9].first);
+
+      t = arithmetic::sum(p[0].second, p[4].second);
+      t.second += p[3].second + p[5].second;
+
+      r = arithmetic::sum(p[6].first, p[8].first);
+      r.second += p[7].first + p[9].first;
+
+      tie(p[3].second, p[4].second) = arithmetic::sum(t.first, r.first);
+      p[4].second += t.second + r.second;
+
+      t = arithmetic::sum(p[3].second, s.second);
+      t.second += p[4].second;
+
+      t.second += get<1>(this->data) * get<3>(other.data);
+      t.second += get<2>(this->data) * get<2>(other.data);
+      t.second += get<3>(this->data) * get<1>(other.data);
+      
+      t.second += p[6].second;
+      t.second += p[7].second;
+      t.second += p[8].second;
+      t.second += p[9].second;
+
+      t.second += s_;
+
+      data = std::make_tuple(p[0].first, p[1].first, s.first, t.first);
+      arithmetic::normalize(data, t.second);
+
+      return *this;
    }
 
    cpp_quad_float& operator/=(const cpp_quad_float& other)
    {
+     using std::get;
+      rep_type q;
+      cpp_quad_float r(*this);
+
+      get<0>(q) = get<0>(this->data) / get<0>(other.data);
+      r -= other * get<0>(q);
+
+      get<1>(q) = get<0>(r.data) / get<0>(other.data);
+      r -= other * get<1>(q);
+
+      get<2>(q) = get<0>(r.data) / get<0>(other.data);
+      r -= other * get<2>(q);
+
+      get<3>(q) = get<0>(r.data) / get<0>(other.data);
+      r -= other * get<3>(q);
+
+      arithmetic::normalize(q, get<0>(r.data) / get<0>(other.data));
+      
+      data = q;
+      return *this;
    }
 
    cpp_quad_float operator++(int)
