@@ -65,8 +65,13 @@ public:
       exp      = ex - 1;
       ex       = 0;
       int pos  = 0;
-      bits.resize(std::numeric_limits<Rr>::digits, 0);
-      while (norm != Rr(0)) {
+
+      // allow extra room for guard bits https://github.com/BoostGSoC21/multiprecision/commit/766899bb2b05e8f47832d58b99d166913fb496d1#commitcomment-54355724
+      // let's allow one byte extra.
+      int guard_bits = boost::multiprecision::backends::detail::is_floating_point_or_float128<Rr>::value ? 0 : 8;
+      bits.resize(std::numeric_limits<Rr>::digits + guard_bits, 0);
+
+      while ((norm != Rr(0)) && ((pos - ex) < bits.size())) {
          pos -= ex;
          if(!((ex <= 0) && (pos < int(bits.size())) && (pos >= 0))) throw LoopError{};
          bits[pos] = 1;
@@ -163,6 +168,11 @@ template <typename Rr> int print_number(const Rr& arg)
    int errors = 0;
    DecomposedReal d(arg);
    auto rebuilt = d.rebuild<Rr>();
+
+   // FIXME: should these normalize calls be here, ot at the end of some functions inside cpp_double_float.hpp ?
+   Rr::arithmetic::normalize(rebuilt.rep());
+   Rr::arithmetic::extra_normalize(rebuilt.rep());
+
    auto diff = (arg - rebuilt);
 
    static_assert(std::is_same<decltype(diff   ), Rr >::value,"");
@@ -182,6 +192,16 @@ template <typename Rr> int print_number(const Rr& arg)
       errors++;
       std::cout << "** ERROR in rebuilt **" << std::endl;
    }
+   if (arg > rebuilt)
+   {
+      errors++;
+      std::cout << "** ERROR in operator > **" << std::endl;
+   }
+   if (arg < rebuilt)
+   {
+      errors++;
+      std::cout << "** ERROR in operator < **" << std::endl;
+   }
    return errors;
 };
 }}}
@@ -199,10 +219,14 @@ int try_number(Arg str) {
 
    int errors = 0;
    try {
+      // FIXME: should these normalize calls be here, ot at the end of some functions inside cpp_double_float.hpp ?
+      R::arithmetic::normalize(z.rep());
+      R::arithmetic::extra_normalize(z.rep());
+
       errors += print_number(z);
    } catch(const LoopError&) {
       std::cout << "** ERROR in decomposition **" << std::endl;
-      //errors++;
+      errors++;
    }
    return errors;
 }
@@ -210,6 +234,9 @@ int try_number(Arg str) {
 template<typename R>
 int test() {
    int errors = 0;
+
+// FIXME: the numbers picked here are sort of hand-crafted to pick the worst scenarios.
+// but a loop on some random numbers could be also useful.
 
 // FIXME: Infinite loop somewhere. Lockup. Most likely due to mishandling infinities.
 // errors += try_number<R>(fromBits<R>("11111111100011011111111110001100000011111111111111111000111000001111111111110000000000011111111110000000001111111110000001111", 1407 , 1 ));
@@ -228,6 +255,30 @@ int test() {
    std::cout << std::endl << "→→ for float, put '1' in sensitive places:" << std::endl;
    errors += try_number<R>(fromBits<R>("100000000000000000000001100000000000000000000001", 0 , 1 ));
    errors += try_number<R>("1.00000017881394143159923260100185871124267578125");
+
+   std::cout << std::endl << "→→ for float, put '1' at 45 sensitive place:" << std::endl;
+   errors += try_number<R>(fromBits<R>("10000000000000000000000000000000000000000000100000", 0 , 1 ));
+   errors += try_number<R>("1.00000000000005684341886080801486968994140625");
+
+   std::cout << std::endl << "→→ for float, put '1' at 46 sensitive place:" << std::endl;
+   errors += try_number<R>(fromBits<R>("100000000000000000000000000000000000000000000100000", 0 , 1 ));
+   errors += try_number<R>("1.000000000000028421709430404007434844970703125");
+
+   std::cout << std::endl << "→→ for float, put '1' at 47 sensitive place:" << std::endl;
+   errors += try_number<R>(fromBits<R>("1000000000000000000000000000000000000000000000100000", 0 , 1 ));
+   errors += try_number<R>("1.0000000000000142108547152020037174224853515625");
+
+   std::cout << std::endl << "→→ for float, put '1' at 48 sensitive place:" << std::endl;
+   errors += try_number<R>(fromBits<R>("10000000000000000000000000000000000000000000000100000", 0 , 1 ));
+   errors += try_number<R>("1.00000000000000710542735760100185871124267578125");
+
+   std::cout << std::endl << "→→ for float, put '1' at 49 sensitive place:" << std::endl;
+   errors += try_number<R>(fromBits<R>("100000000000000000000000000000000000000000000000100000", 0 , 1 ));
+   errors += try_number<R>("1.000000000000003552713678800500929355621337890625");
+
+   std::cout << std::endl << "→→ for float, put '1' at 50 sensitive place:" << std::endl;
+   errors += try_number<R>(fromBits<R>("1000000000000000000000000000000000000000000000000100000", 0 , 1 ));
+   errors += try_number<R>("1.0000000000000017763568394002504646778106689453125");
 
    std::cout << std::endl << "→→ for double, put '1' in sensitive places:" << std::endl;
    errors += try_number<R>(fromBits<R>("1000000000000000000000000000000000000000000000000000110000000000000000000000000000000000000000000000000001", 0 , 1 ));
@@ -277,10 +328,18 @@ int main()
 #ifdef BOOST_MATH_USE_FLOAT128
    errors += test<double_float<boost::multiprecision::float128>>();
 #endif
-/* No pow, no frexp yet...
+
+/* // FIXME: No pow, no frexp yet...
+   // soon we should be able to test quad_float also :)
+
    errors += test<quad_float<float>>();
+   errors += test<quad_float<double>>();
+   errors += test<quad_float<long double>>();
+#ifdef BOOST_MATH_USE_FLOAT128
+   errors += test<quad_float<boost::multiprecision::float128>>();
+#endif
 */
-   std::cout << "Total number of errors : " << errors << std::endl;
+   std::cout << "Total number of errors : " << errors << std::endl << std::endl;
    
    boost::multiprecision::backends::cpp_quad_float<double> a(std::make_tuple(0x1.921fb54442d18p+1, 0x1.1a62633145c07p-53, -0x1.f1976b7ed8fbcp-109, 0x1.3b8d3f60d850cp-163));
    boost::multiprecision::backends::cpp_quad_float<double> e(std::make_tuple(0x1.5bf0a8b0ad9b2p+1, -0x1.e86a384b7f304p-53, 0x1.45fe0602f06dbp-107, 0x1.d8cc5979789dep-162));
@@ -288,7 +347,9 @@ int main()
    boost::multiprecision::backends::print_compound_number("a",a);
    boost::multiprecision::backends::print_compound_number("e",e);
    boost::multiprecision::backends::print_compound_number("a-e",ae);
-   std::cin.get();
+
+// std::cin.get(); // In the pipeline I comment it, so we can watch the pipeline. But okay to uncomment locally.
+
    return (errors != 0);
 }
 

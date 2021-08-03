@@ -285,6 +285,28 @@ struct exact_arithmetic
       // Converts a pair of floats to standard form
       //BOOST_ASSERT(std::isfinite(p.first));
       p = (fast ? fast_sum(p.first, p.second) : sum(p.first, p.second));
+
+      // TODO: discuss ?
+      // will it help somewhere else? In some mathematical functions? I'm not sure.
+      // Maybe it's only for this special case which I constructed to work exactly with bits. / Janek
+      //extra_normalize(p);
+   }
+
+   static void extra_normalize(float_pair& p, bool fast = true)
+   {
+      // TODO: discuss ?
+      // If exponent of the second component is farther away than digits represented by this type
+      // then means that these "dangling" bits should be zero.
+      int e1 = 0;
+      int e2 = 0;
+      using std::frexp;
+      frexp(p.first, &e1);
+      frexp(p.second, &e2);
+      if((e1 - e2) > std::numeric_limits<cpp_double_float<float_type>>::digits) {
+         p.second = 0;
+      }
+      // ... maybe even better would be to zero all the bits further away than cpp_double_float<float_type>>::digits away
+      // not only when entire p.second is too far.
    }
 
    static void normalize(float_tuple& t)
