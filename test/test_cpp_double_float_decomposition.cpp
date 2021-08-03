@@ -47,8 +47,23 @@ inline cpp_double_float<Rr> frexp(const cpp_double_float<Rr>& a, Exp* b)
 }
 
 template <typename Rr> void print_compound_number(const std::string& prefix, const Rr& arg) {};
-template <typename Rr> void print_compound_number(const std::string& prefix, const boost::multiprecision::backends::cpp_double_float<Rr>& arg);
-template <typename Rr> void print_compound_number(const std::string& prefix, const boost::multiprecision::backends::cpp_quad_float<Rr>& arg);
+template <typename Rr> void print_compound_number(const std::string& prefix, const cpp_double_float<Rr>& arg);
+template <typename Rr> void print_compound_number(const std::string& prefix, const cpp_quad_float<Rr>& arg);
+
+template<typename R>
+struct guard_bits {
+   static constexpr auto value = 0;
+};
+
+template<typename R>
+struct guard_bits<cpp_double_float<R>> {
+   static constexpr auto value = 2;
+};
+
+template<typename R>
+struct guard_bits<cpp_quad_float<R>> {
+   static constexpr auto value = 4;
+};
 
 class DecomposedReal {
 private:
@@ -68,8 +83,8 @@ public:
       int pos  = 0;
 
       // allow extra room for guard bits https://github.com/BoostGSoC21/multiprecision/commit/766899bb2b05e8f47832d58b99d166913fb496d1#commitcomment-54355724
-      int guard_bits = boost::multiprecision::backends::detail::is_floating_point_or_float128<Rr>::value ? 0 : 2; // TODO: will that be 4 for quad_float ?
-      bits.resize(std::numeric_limits<Rr>::digits + guard_bits, 0);
+      int guard = guard_bits<Rr>::value;
+      bits.resize(std::numeric_limits<Rr>::digits + guard, 0);
 
       while ((norm != Rr(0)) && ((pos - ex) < bits.size())) {
          pos -= ex;
