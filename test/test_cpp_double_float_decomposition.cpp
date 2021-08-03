@@ -68,8 +68,7 @@ public:
       int pos  = 0;
 
       // allow extra room for guard bits https://github.com/BoostGSoC21/multiprecision/commit/766899bb2b05e8f47832d58b99d166913fb496d1#commitcomment-54355724
-      // let's allow one byte extra.
-      int guard_bits = boost::multiprecision::backends::detail::is_floating_point_or_float128<Rr>::value ? 0 : 8;
+      int guard_bits = boost::multiprecision::backends::detail::is_floating_point_or_float128<Rr>::value ? 0 : 2; // TODO: will that be 4 for quad_float ?
       bits.resize(std::numeric_limits<Rr>::digits + guard_bits, 0);
 
       while ((norm != Rr(0)) && ((pos - ex) < bits.size())) {
