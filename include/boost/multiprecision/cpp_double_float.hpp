@@ -769,7 +769,8 @@ class cpp_double_float
       other.data = tmp;
    }
 
-   constexpr int compare(const cpp_double_float& other) const
+/* comment out temporarily:
+   constexpr */ int compare(const cpp_double_float& other) const
    {
       cpp_double_float diff = *this - other;
       return (diff.first() > 0)  ?   1 :

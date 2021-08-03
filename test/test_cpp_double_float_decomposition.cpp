@@ -340,13 +340,15 @@ int main()
 #endif
 */
    std::cout << "Total number of errors : " << errors << std::endl << std::endl;
-   
+
+#if __cplusplus >= 201700
    boost::multiprecision::backends::cpp_quad_float<double> a(std::make_tuple(0x1.921fb54442d18p+1, 0x1.1a62633145c07p-53, -0x1.f1976b7ed8fbcp-109, 0x1.3b8d3f60d850cp-163));
    boost::multiprecision::backends::cpp_quad_float<double> e(std::make_tuple(0x1.5bf0a8b0ad9b2p+1, -0x1.e86a384b7f304p-53, 0x1.45fe0602f06dbp-107, 0x1.d8cc5979789dep-162));
    auto ae = a-e;
    boost::multiprecision::backends::print_compound_number("a",a);
    boost::multiprecision::backends::print_compound_number("e",e);
    boost::multiprecision::backends::print_compound_number("a-e",ae);
+#endif
 
 // std::cin.get(); // In the pipeline I comment it, so we can watch the pipeline. But okay to uncomment locally.
 
