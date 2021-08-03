@@ -292,7 +292,7 @@ struct exact_arithmetic
       //extra_normalize(p);
    }
 
-   static void extra_normalize(float_pair& p, bool fast = true)
+   static void extra_normalize(float_pair& p)
    {
       // TODO: discuss ?
       // If exponent of the second component is farther away than digits represented by this type

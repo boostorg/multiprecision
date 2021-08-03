@@ -243,16 +243,33 @@ int try_number(R& prev_number, Arg str) {
       //    std::abs(boost::math::float_distance(z , prev_number); but that does not compile.
       // So I calculate ULP manually.
       R   str_to_bin_error = z - prev_number;
-      int exp              = 0;
-      str_to_bin_error    = frexp(str_to_bin_error , &exp);
+      int exp1             = 0;
+      int exp2             = 0;
+      frexp(z , &exp1);
+      str_to_bin_error     = frexp(str_to_bin_error , &exp2);
 
+      std::cout << "→→→ " << str_to_bin_error  << " , exp1 =  " << exp1 << " , exp2 = " << exp2 << std::endl;
       // 1 ULP will be either 0.5 or 0. :
-      if(! (str_to_bin_error == R(-0.5) || str_to_bin_error == R(0.5) || str_to_bin_error == R(0.0)))
+      if( !(
+            ((
+                  str_to_bin_error == R(-0.5)
+               || str_to_bin_error == R( 0.5)
+            ) && (
+                  // when (exp1 - exp2) are equal to digits, then it's 1 ULP error. When (exp1 - exp2) is then it becomes 0.5 ULP error, then 0.25 ULP error and even smaller, which is good for *this* test.
+                  // FIXME: but actually it is a proof of problems with extra_normalize(…) !  The difference between two numbers smaller than 1 ULP is technically impossible in a floating point number.
+                  (exp1 - exp2) >= std::numeric_limits<R>::digits
+            )) || (
+                  exp2 == 0
+               && str_to_bin_error == R( 0.0)
+            )
+           )
+      )
       // FIXME, this isn't working yet:
+      // FIXME, boost::math::float_distance #include <boost/math/special_functions/next.hpp> should be working.
       //if(std::abs(boost::math::float_distance(z , prev_number)) > 1)
       {
          errors++;
-         std::cout << "** ERROR between string ↔ binary **" << str_to_bin_error << std::endl;
+         std::cout << "** ERROR between string ↔ binary **" << str_to_bin_error  << ", exp1 =" << exp1 << ", exp2 =" << exp2 << std::endl;
       }
    }
 
@@ -271,9 +288,11 @@ int test() {
 // but a loop on some random numbers could be also useful.
 
 // FIXME: Infinite loop somewhere. Lockup. Most likely due to mishandling infinities.
-// errors += try_number<R>(fromBits<R>("11111111100011011111111110001100000011111111111111111000111000001111111111110000000000011111111110000000001111111110000001111", 1407 , 1 ));
-// errors += try_number<R>("7.07095004791213209137407618364459278413421454874042247410492385622373956879713960311588804604245728321440648803023224236513586176837484939909893244653903501e+423");
-// errors += try_number<R>("5.0395749966458598419365441242084052981209828021829231181382593274122924204e+423");
+// errors += try_number<R>(ref,fromBits<R>("11111111100011011111111110001100000011111111111111111000111000001111111111110000000000011111111110000000001111111110000001111", 1407 , 1 ));
+// errors += try_number<R>(ref,"7.07095004791213209137407618364459278413421454874042247410492385622373956879713960311588804604245728321440648803023224236513586176837484939909893244653903501e+423");
+
+// errors += try_number<R>(ref,fromBits<R>("10110110001000110100010000000011110011010001011100000010110110001000011011111110111001101101001111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111101000000110101011111110001100101110100101110000110111000000111111101111011100110000110110000000100101100011011111001110001001100010010110000010110011000010010110101110100101000111001000000110000111011111110101111011101100000110100011000111010101101001111", 1407 , 1 ));
+// errors += try_number<R>(ref,"5.0395749966458598419365441242084052981209828021829231181382593274122924204e+423");
 
    errors += try_number<R>(ref,fromBits<R>("11111111100011011111111110001100000011111111111111111000111000001111111111110000000000011111111110000000001111111110000001111", 65 , 1 ));
    errors += try_number<R>(ref,"73658621713667056515.99902391387240466018304640982705677743069827556610107421875");
