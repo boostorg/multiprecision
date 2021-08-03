@@ -249,25 +249,12 @@ int try_number(R& prev_number, Arg str) {
       str_to_bin_error     = frexp(str_to_bin_error , &exp2);
 
       std::cout << "→→→ " << str_to_bin_error  << " , exp1 =  " << exp1 << " , exp2 = " << exp2 << std::endl;
-      if(str_to_bin_error != R(0))
-         std::cout << "ULP error is : " << pow(2.0,-((exp1 - exp2) - std::numeric_limits<R>::digits))  << std::endl;
-      // 1 ULP will be either 0.5 or 0. :
-      if( !(
-            ((
-                  str_to_bin_error == R(-0.5)
-               || str_to_bin_error == R( 0.5)
-            ) && (
-                  // when (exp1 - exp2) are equal to digits, then it's 1 ULP error. When (exp1 - exp2) is then it becomes 0.5 ULP error, then 0.25 ULP error and even smaller, which is good for *this* test.
-                  // FIXME: but actually it is a proof of problems with extra_normalize(…) !  The difference between two numbers smaller than 1 ULP is technically impossible in a floating point number.
-                  (exp1 - exp2) >= std::numeric_limits<R>::digits
-            )) || (
-                  exp2 == 0
-               && str_to_bin_error == R( 0.0)
-            )
-           )
-      )
-      // FIXME, this isn't working yet:
-      // FIXME, boost::math::float_distance #include <boost/math/special_functions/next.hpp> should be working.
+      double ulp_error = 0;
+      if(str_to_bin_error != R(0)) {
+         ulp_error = pow(2.0,-((exp1 - exp2) - std::numeric_limits<R>::digits));
+         std::cout << "ULP error is : " << ulp_error  << std::endl;
+      }
+      if( ulp_error > 2)
       //if(std::abs(boost::math::float_distance(z , prev_number)) > 1)
       {
          errors++;

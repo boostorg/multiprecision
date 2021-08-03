@@ -28,6 +28,7 @@
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/type_traits/common_type.hpp>
+#include <boost/multiprecision/traits/max_digits10.hpp>
 
 namespace boost { namespace multiprecision { namespace backends {
 
@@ -302,7 +303,9 @@ struct exact_arithmetic
       using std::frexp;
       frexp(p.first, &e1);
       frexp(p.second, &e2);
-      if((e1 - e2) > std::numeric_limits<cpp_double_float<float_type>>::digits) {
+      // Interesting: when we set   digits = 2 * <digits of underlying type>
+      // then this extra normalize, to work with DecomposedReal guard_bits needs ↓ the - 2 here.
+      if((e1 - e2) > std::numeric_limits<cpp_double_float<float_type>>::digits - 2) {
          p.second = 0;
       }
       // ... maybe even better would be to zero all the bits further away than cpp_double_float<float_type>>::digits away
@@ -1446,9 +1449,9 @@ public:
    static constexpr bool is_iec559   = false;
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
-   static constexpr int digits       = 2 * (base_class_type::digits - 1);
-   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
-   static constexpr int max_digits10 = int(float(digits)     * 0.301F) + 2;
+   static constexpr int digits       = 2 * base_class_type::digits;
+   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
+   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
@@ -1484,9 +1487,9 @@ public:
    static constexpr bool is_iec559                     = false;
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
-   static constexpr int digits       = (2 * base_class_type::digits) - 2;
-   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
-   static constexpr int max_digits10 = int(float(digits)     * 0.301F) + 2;
+   static constexpr int digits       = 2 * base_class_type::digits;
+   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
+   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
