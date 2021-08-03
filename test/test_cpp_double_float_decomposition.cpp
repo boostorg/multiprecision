@@ -51,18 +51,24 @@ template <typename Rr> void print_compound_number(const std::string& prefix, con
 template <typename Rr> void print_compound_number(const std::string& prefix, const cpp_quad_float<Rr>& arg);
 
 template<typename R>
-struct guard_bits {
-   static constexpr auto value = 0;
+struct double_or_quad_traits {
+   static constexpr auto guard_bits                = 0;
+   static constexpr auto double_or_quad_multiplier = 1;
+   using underlying_type                           = R;
 };
 
 template<typename R>
-struct guard_bits<cpp_double_float<R>> {
-   static constexpr auto value = 2;
+struct double_or_quad_traits<cpp_double_float<R>> {
+   static constexpr auto guard_bits                = 3;
+   static constexpr auto double_or_quad_multiplier = 2;
+   using underlying_type                           = R;
 };
 
 template<typename R>
-struct guard_bits<cpp_quad_float<R>> {
-   static constexpr auto value = 4;
+struct double_or_quad_traits<cpp_quad_float<R>> {
+   static constexpr auto guard_bits                = 4;
+   static constexpr auto double_or_quad_multiplier = 4;
+   using underlying_type                           = R;
 };
 
 class DecomposedReal {
@@ -83,7 +89,7 @@ public:
       int pos  = 0;
 
       // allow extra room for guard bits https://github.com/BoostGSoC21/multiprecision/commit/766899bb2b05e8f47832d58b99d166913fb496d1#commitcomment-54355724
-      int guard = guard_bits<Rr>::value;
+      int guard = double_or_quad_traits<Rr>::guard_bits;
       bits.resize(std::numeric_limits<Rr>::digits + guard, 0);
 
       while ((norm != Rr(0)) && ((pos - ex) < bits.size())) {
@@ -178,6 +184,23 @@ template <typename Rr> void print_compound_number(const std::string& prefix, con
    }
 }
 
+void sometimes_print_bit_positions(int digs, int mult)
+{
+   static int sometimes = 0;
+   if(sometimes++ % 2 == 0) {
+      std::cout << std::setw(40) << " "; // these spaces are synchronised with short_print_shifted(…) and short_print(…)
+      for(int i = 0 ; i < mult ; i++) {
+         std::cout << std::setw(digs) << digs*(i+1);
+      }
+      std::cout << std::endl;
+      std::cout << std::setw(40) << " "; // these spaces are synchronised with short_print_shifted(…) and short_print(…)
+      for(int i = 0 ; i < mult ; i++) {
+         std::cout << std::setw(digs) << "|";
+      }
+      std::cout << std::endl;
+   }
+}
+
 template <typename Rr> int print_number(const Rr& arg)
 {
    int errors = 0;
@@ -193,6 +216,7 @@ template <typename Rr> int print_number(const Rr& arg)
    static_assert(std::is_same<decltype(diff   ), Rr >::value,"");
    static_assert(std::is_same<decltype(rebuilt), Rr >::value,"");
 
+   sometimes_print_bit_positions(std::numeric_limits<typename double_or_quad_traits<Rr>::underlying_type>::digits , double_or_quad_traits<Rr>::double_or_quad_multiplier);
    std::cout << "original bits   = "; d.short_print();
    print_compound_number("arg",arg);
    print_compound_number("rebuilt",rebuilt);
@@ -346,10 +370,46 @@ int test() {
    errors += try_number<R>(ref,fromBits<R>("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001", 0 , 1 ));
    errors += try_number<R>(ref,"1.000000000000000000000000000000000288889491658085377958396691387739116326746000669415157944667127073181392521417643788955012265195294587906700478146794987008");
 
-// A series od edge cases. Both are the same number. One is in binary form other is in decimal form.
+// These are a bunch of very nasty cases for float
    std::cout << std::endl << "→→ for float, put '1' in sensitive places:" << std::endl;
+   errors += try_number<R>(ref,fromBits<R>("1000000000000000000000011000000000000000000001", 0 , 1 ));
+   errors += try_number<R>(ref,"1.000000178813962747881305404007434844970703125");
+   errors += try_number<R>(ref,fromBits<R>("10000000000000000000000110000000000000000000011", 0 , 1 ));
+   errors += try_number<R>(ref,"1.0000001788139769587360206060111522674560546875");
    errors += try_number<R>(ref,fromBits<R>("100000000000000000000001100000000000000000000111", 0 , 1 ));
    errors += try_number<R>(ref,"1.00000017881398406416337820701301097869873046875");
+   errors += try_number<R>(ref,fromBits<R>("1000000000000000000000011000000000000000000001111", 0 , 1 ));
+   errors += try_number<R>(ref,"1.000000178813987616877057007513940334320068359375");
+   errors += try_number<R>(ref,fromBits<R>("10000000000000000000000110000000000000000000011111", 0 , 1 ));
+   errors += try_number<R>(ref,"1.0000001788139893932338964077644050121307373046875");
+   errors += try_number<R>(ref,fromBits<R>("100000000000000000000001100000000000000000000111111", 0 , 1 ));
+   errors += try_number<R>(ref,"1.00000017881399028141231610788963735103607177734375");
+
+   errors += try_number<R>(ref,fromBits<R>("1000000000000000000000010000000000000000000001", 0 , 1 ));
+   errors += try_number<R>(ref,"1.000000119209317972490680404007434844970703125");
+   errors += try_number<R>(ref,fromBits<R>("10000000000000000000000100000000000000000000011", 0 , 1 ));
+   errors += try_number<R>(ref,"1.0000001192093321833453956060111522674560546875");
+   errors += try_number<R>(ref,fromBits<R>("100000000000000000000001000000000000000000000111", 0 , 1 ));
+   errors += try_number<R>(ref,"1.00000011920933928877275320701301097869873046875");
+   errors += try_number<R>(ref,fromBits<R>("1000000000000000000000010000000000000000000001111", 0 , 1 ));
+   errors += try_number<R>(ref,"1.000000119209342841486432007513940334320068359375");
+   errors += try_number<R>(ref,fromBits<R>("10000000000000000000000100000000000000000000011111", 0 , 1 ));
+   errors += try_number<R>(ref,"1.0000001192093446178432714077644050121307373046875");
+   errors += try_number<R>(ref,fromBits<R>("100000000000000000000001000000000000000000000111111", 0 , 1 ));
+   errors += try_number<R>(ref,"1.00000011920934550602169110788963735103607177734375");
+
+   errors += try_number<R>(ref,fromBits<R>("1000000000000000000000010000000000000000000001", 0 , 1 ));
+   errors += try_number<R>(ref,"1.000000119209317972490680404007434844970703125");
+   errors += try_number<R>(ref,fromBits<R>("10000000000000000000000100000000000000000000001", 0 , 1 ));
+   errors += try_number<R>(ref,"1.0000001192093037616359652020037174224853515625");
+   errors += try_number<R>(ref,fromBits<R>("100000000000000000000001000000000000000000000001", 0 , 1 ));
+   errors += try_number<R>(ref,"1.00000011920929665620860760100185871124267578125");
+   errors += try_number<R>(ref,fromBits<R>("1000000000000000000000010000000000000000000000001", 0 , 1 ));
+   errors += try_number<R>(ref,"1.000000119209293103494928800500929355621337890625");
+   errors += try_number<R>(ref,fromBits<R>("10000000000000000000000100000000000000000000000001", 0 , 1 ));
+   errors += try_number<R>(ref,"1.0000001192092913271380894002504646778106689453125");
+   errors += try_number<R>(ref,fromBits<R>("100000000000000000000001000000000000000000000000001", 0 , 1 ));
+   errors += try_number<R>(ref,"1.00000011920929043895966970012523233890533447265625");
 
    std::cout << std::endl << "→→ for double, put '1' in sensitive places:" << std::endl;
    errors += try_number<R>(ref,fromBits<R>("1000000000000000000000000000000000000000000000000000110000000000000000000000000000000000000000000000000111", 0 , 1 ));

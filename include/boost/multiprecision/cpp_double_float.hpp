@@ -310,6 +310,8 @@ struct exact_arithmetic
       }
       // ... maybe even better would be to zero all the bits further away than cpp_double_float<float_type>>::digits away
       // not only when entire p.second is too far.
+      // FIXME - currently I have no idea how to implement this efficiently. But for debugging maybe even the super slow (with frexp, ldexp) implementation will help in edge cases...
+      // best would be doing & operation on a bitmask..... But can we make sure that would work on all architectures?
    }
 
    static void normalize(float_tuple& t)
