@@ -363,6 +363,11 @@ int test() {
    errors += try_number<R>(ref,fromBits<R>("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111", 0 , 1 ));
    errors += try_number<R>(ref,"1.000000000000000000000000000000000288889491658085377958396691387739227602930521292056729896724973502366793548361006522685085856367062115346903347027564905997");
 
+   std::cout << " For this type " << boost::core::demangle(typeid(R).name()) << std::endl;
+   std::cout << " digits       = " << std::numeric_limits<R>::digits       << std::endl;
+   std::cout << " digits10     = " << std::numeric_limits<R>::digits10     << std::endl;
+   std::cout << " max_digits10 = " << std::numeric_limits<R>::max_digits10 << std::endl;
+
    return errors;
 }
 
