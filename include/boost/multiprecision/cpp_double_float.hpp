@@ -749,11 +749,16 @@ class cpp_double_float
 
    constexpr int compare(const cpp_double_float& other) const
    {
+      cpp_double_float diff = *this - other;
+      return (diff.first() > 0)  ?   1 :
+             (diff.first() < 0)  ?  -1 :
+             (diff.second() > 0) ?  1 :
+             (diff.second() < 0) ? -1 : 0;
      // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
-     return (first () > other.first ()) ?  1 :
-            (first () < other.first ()) ? -1 :
-            (second() > other.second()) ?  1 :
-            (second() < other.second()) ? -1 : 0;
+     //return (first () > other.first ()) ?  1 :
+     //       (first () < other.first ()) ? -1 :
+     //       (second() > other.second()) ?  1 :
+     //       (second() < other.second()) ? -1 : 0;
    }
 
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
