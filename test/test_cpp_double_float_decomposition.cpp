@@ -249,6 +249,8 @@ int try_number(R& prev_number, Arg str) {
       str_to_bin_error     = frexp(str_to_bin_error , &exp2);
 
       std::cout << "→→→ " << str_to_bin_error  << " , exp1 =  " << exp1 << " , exp2 = " << exp2 << std::endl;
+      if(str_to_bin_error != R(0))
+         std::cout << "ULP error is : " << pow(2.0,-((exp1 - exp2) - std::numeric_limits<R>::digits))  << std::endl;
       // 1 ULP will be either 0.5 or 0. :
       if( !(
             ((
