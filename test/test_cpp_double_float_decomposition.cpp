@@ -141,17 +141,17 @@ public:
    }
    void short_print()
    {
-      std::cout << "exp : " << std::setw(3) << exp << ", bits : " << (sig==1?"+":"-") << bit_str() << std::endl;
+      std::cout << "exp : " << std::setw(6) << exp << ", bits : " << (sig==1?"+":"-") << bit_str() << std::endl;
    }
    int short_print_shifted(int max_exp = 0, bool skip_exp = true)
    {
       std::string st = bit_str();
       auto len = st.size();
       if(skip_exp) {
-         std::cout << "exp : " << std::setw(3) << exp << ", bits : "  << std::right <<                               (sig==1?"+":"-") << bit_str() << std::endl;
+         std::cout << "exp : " << std::setw(6) << exp << ", bits : "  << std::right <<                               (sig==1?"+":"-") << bit_str() << std::endl;
       } else {
       // The std::setw makes sure that the bits are printed in properly shifted form - in columns aligned with the first part.
-         std::cout << "exp : " << std::setw(3) << exp << ", bits : "  << std::right << std::setw(max_exp - exp+1) << (sig==1?"+":"-") << bit_str() << std::endl;
+         std::cout << "exp : " << std::setw(6) << exp << ", bits : "  << std::right << std::setw(max_exp - exp+1) << (sig==1?"+":"-") << bit_str() << std::endl;
       }
       return exp;
    }
