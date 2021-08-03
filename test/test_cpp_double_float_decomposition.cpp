@@ -15,6 +15,7 @@
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_double_float.hpp>
+#include <boost/multiprecision/cpp_quad_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/core/demangle.hpp>
@@ -46,6 +47,7 @@ inline cpp_double_float<Rr> frexp(const cpp_double_float<Rr>& a, Exp* b)
 
 template <typename Rr> void print_compound_number(const std::string& prefix, const Rr& arg) {};
 template <typename Rr> void print_compound_number(const std::string& prefix, const boost::multiprecision::backends::cpp_double_float<Rr>& arg);
+template <typename Rr> void print_compound_number(const std::string& prefix, const boost::multiprecision::backends::cpp_quad_float<Rr>& arg);
 
 class DecomposedReal {
 private:
@@ -139,6 +141,20 @@ template <typename Rr> void print_compound_number(const std::string& prefix, con
    std::cout    << std::left << std::setw(15) << prefix+".first "  << " = " << std::right; auto ex1 = DecomposedReal(arg.crep().first).short_print_shifted();
    if(arg.crep().second != 0) {
       std::cout << std::left << std::setw(15) << prefix+".second " << " = " << std::right;            DecomposedReal(arg.crep().second).short_print_shifted(ex1,false);
+   }
+}
+
+// not tested
+template <typename Rr> void print_compound_number(const std::string& prefix, const boost::multiprecision::backends::cpp_quad_float<Rr>& arg) {
+   std::cout    << std::left << std::setw(15) << prefix+".first "  << " = " << std::right; auto ex1 = DecomposedReal(get<0>(arg.crep())).short_print_shifted();
+   if(get<1>(arg.crep()) != 0) {
+      std::cout << std::left << std::setw(15) << prefix+".second " << " = " << std::right;            DecomposedReal(get<1>(arg.crep())).short_print_shifted(ex1,false);
+   }
+   if(get<2>(arg.crep()) != 0) {
+      std::cout << std::left << std::setw(15) << prefix+".third  " << " = " << std::right;            DecomposedReal(get<2>(arg.crep())).short_print_shifted(ex1,false);
+   }
+   if(get<3>(arg.crep()) != 0) {
+      std::cout << std::left << std::setw(15) << prefix+".fourth " << " = " << std::right;            DecomposedReal(get<3>(arg.crep())).short_print_shifted(ex1,false);
    }
 }
 
@@ -246,6 +262,7 @@ int test() {
 }
 
 template<class R> using double_float = boost::multiprecision::backends::cpp_double_float<R>;
+template<class R> using quad_float   = boost::multiprecision::backends::cpp_quad_float<R>;
 int main()
 {
    int errors = 0;
@@ -260,8 +277,17 @@ int main()
 #ifdef BOOST_MATH_USE_FLOAT128
    errors += test<double_float<boost::multiprecision::float128>>();
 #endif
+/* No pow, no frexp yet...
+   errors += test<quad_float<float>>();
+*/
    std::cout << "Total number of errors : " << errors << std::endl;
    
+   boost::multiprecision::backends::cpp_quad_float<double> a(std::make_tuple(0x1.921fb54442d18p+1, 0x1.1a62633145c07p-53, -0x1.f1976b7ed8fbcp-109, 0x1.3b8d3f60d850cp-163));
+   boost::multiprecision::backends::cpp_quad_float<double> e(std::make_tuple(0x1.5bf0a8b0ad9b2p+1, -0x1.e86a384b7f304p-53, 0x1.45fe0602f06dbp-107, 0x1.d8cc5979789dep-162));
+   auto ae = a-e;
+   boost::multiprecision::backends::print_compound_number("a",a);
+   boost::multiprecision::backends::print_compound_number("e",e);
+   boost::multiprecision::backends::print_compound_number("a-e",ae);
    std::cin.get();
    return (errors != 0);
 }
