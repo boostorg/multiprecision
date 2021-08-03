@@ -145,29 +145,17 @@ template <typename Rr> void print_compound_number(const std::string& prefix, con
 template <typename Rr> int print_number(const Rr& arg)
 {
    int errors = 0;
-
    DecomposedReal d(arg);
    auto rebuilt = d.rebuild<Rr>();
    auto diff = (arg - rebuilt);
 
-   std::cout << "original bits   = "; d.short_print();
+   static_assert(std::is_same<decltype(diff   ), Rr >::value,"");
+   static_assert(std::is_same<decltype(rebuilt), Rr >::value,"");
 
+   std::cout << "original bits   = "; d.short_print();
    print_compound_number("arg",arg);
    print_compound_number("rebuilt",rebuilt);
 
-   std::string diff_name = boost::core::demangle(typeid(decltype(diff   )).name());
-   std::string arg_name  = boost::core::demangle(typeid(decltype(arg    )).name());
-   std::string rebu_name = boost::core::demangle(typeid(decltype(rebuilt)).name());
-
-   //errors += int(diff     != decltype(diff)(0));
-   errors += int(arg_name != rebu_name        );
-   errors += int(arg_name != diff_name        );
-   //// FIXME : but this check fails !
-   //errors += int(arg      != rebuilt          );
-
-   if(errors != 0) {
-      std::cout << "** ERROR in verification **" << std::endl;
-   }
    if (diff != decltype(diff)(0))
    {
       errors++;
@@ -178,7 +166,6 @@ template <typename Rr> int print_number(const Rr& arg)
       errors++;
       std::cout << "** ERROR in rebuilt **" << std::endl;
    }
-
    return errors;
 };
 }}}
