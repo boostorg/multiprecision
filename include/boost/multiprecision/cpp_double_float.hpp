@@ -777,16 +777,11 @@ class cpp_double_float
 /* comment out temporarily:
    constexpr */ int compare(const cpp_double_float& other) const
    {
-      cpp_double_float diff = *this - other;
-      return (diff.first() > 0)  ?   1 :
-             (diff.first() < 0)  ?  -1 :
-             (diff.second() > 0) ?  1 :
-             (diff.second() < 0) ? -1 : 0;
      // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
-     //return (first () > other.first ()) ?  1 :
-     //       (first () < other.first ()) ? -1 :
-     //       (second() > other.second()) ?  1 :
-     //       (second() < other.second()) ? -1 : 0;
+     return (first () > other.first ()) ?  1 :
+            (first () < other.first ()) ? -1 :
+            (second() > other.second()) ?  1 :
+            (second() < other.second()) ? -1 : 0;
    }
 
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
@@ -1452,8 +1447,8 @@ public:
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
    static constexpr int digits       = 2 * base_class_type::digits;
-   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
-   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
+   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits - 2>::value;
+   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits - 2>::value;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
@@ -1490,8 +1485,8 @@ public:
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
    static constexpr int digits       = 2 * base_class_type::digits;
-   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
-   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
+   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits - 2>::value;
+   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits - 2>::value;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
