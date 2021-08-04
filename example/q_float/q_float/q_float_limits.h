@@ -16,30 +16,32 @@
     public:
 
       // Implement all of the "usual" members for floating point types.
-      static const bool  is_specialized    = true;
-      static const bool  is_signed         = true;
-      static const bool  is_integer        = false;
-      static const bool  is_exact          = false;
-      static const bool  is_bounded        = true;
-      static const bool  is_modulo         = false;
-      static const bool  is_iec559         = false;
-      static const INT32 digits            = 104;
-      static const INT32 digits10          = static_cast<INT32>(float(digits) * 0.301029995663981195F);
-      static const INT32 radix             = 2;
-      static const INT32 round_style       = std::round_to_nearest;
-      static const bool  has_infinity      = true;
-      static const bool  has_quiet_NaN     = true;
-      static const bool  has_signaling_NaN = false;
-      static const INT32 has_denorm        = std::denorm_absent;
-      static const bool  has_denorm_loss   = false;
-      static const bool  traps             = false;
-      static const bool  tinyness_before   = false;
+      static constexpr bool                    is_specialized    = true;
+      static constexpr bool                    is_signed         = true;
+      static constexpr bool                    is_integer        = false;
+      static constexpr bool                    is_exact          = false;
+      static constexpr bool                    is_bounded        = true;
+      static constexpr bool                    is_modulo         = false;
+      static constexpr bool                    is_iec559         = false;
+      static constexpr int                     digits            = 2 * (std::numeric_limits<double>::digits - 1);
+      static constexpr int                     digits10          = (int) (float(digits - 1) * 0.301F);
+      static constexpr int                     max_digits10      = (int) float(digits * 0.301F) + 2;
+      static constexpr int                     radix             = 2;
+      static constexpr std::float_round_style  round_style       = std::round_to_nearest;
+      static constexpr bool                    has_infinity      = true;
+      static constexpr bool                    has_quiet_NaN     = true;
+      static constexpr bool                    has_signaling_NaN = false;
+      static constexpr std::float_denorm_style has_denorm        = std::denorm_absent;
+      static constexpr bool                    has_denorm_loss   = false;
+      static constexpr bool                    traps             = false;
+      static constexpr bool                    tinyness_before   = false;
 
-      static const INT32 max_exponent10    = q_float::max_exponent10;
-      static const INT32 min_exponent10    = q_float::min_exponent10;
-      static const INT32 max_exponent      = q_float::max_exponent;
-      static const INT32 min_exponent      = q_float::min_exponent;
+      static constexpr int                     max_exponent10    = q_float::max_exponent10;
+      static constexpr int                     min_exponent10    = q_float::min_exponent10;
+      static constexpr int                     max_exponent      = q_float::max_exponent;
+      static constexpr int                     min_exponent      = q_float::min_exponent;
 
+      // TBD: Can there be better constexpr correctness here?
       static const q_float& (min)(void) throw()         { return q_float::minimum(); }
       static const q_float& (max)(void) throw()         { return q_float::maximum(); }
       static const q_float& epsilon(void) throw()       { return q_float::epsilon(); }
