@@ -41,45 +41,56 @@
   #endif
 #endif
 
-namespace local {
-
-template<typename ConstituentFloatType>
-struct control
+namespace local
 {
-   static constexpr int digits         = (2 * std::numeric_limits<ConstituentFloatType>::digits) - 2;
-   static constexpr int digits10       = int(float(digits - 1) * 0.301F);
-   static constexpr int max_digits10   = int(float(digits) * 0.301F) + 2;
+  std::mt19937       engine_man;
+  std::ranlux24_base engine_sgn;
 
-   using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<ConstituentFloatType>, boost::multiprecision::et_off>;
-   using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
+  template<typename FloatingPointConstituentType>
+  struct control
+  {
+    using float_type = FloatingPointConstituentType;
 
-   using random_engine_type = std::linear_congruential_engine<std::uint32_t, 48271, 0, 2147483647>;
+    static constexpr int digits   = 2 * (std::numeric_limits<float_type>::digits - 1);
+    static constexpr int digits10 = (int) (float(digits - 1) * 0.301F);
 
-   static std::mt19937       engine_man;
-   static std::ranlux24_base engine_sgn;
+    static unsigned seed_prescaler;
 
-   template<const std::size_t DigitsToGet = digits10>
-   static void get_random_fixed_string(std::string& str, const bool is_unsigned = false)
-   {
+    using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<float_type>, boost::multiprecision::et_off>;
+    using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
+
+    template<const std::size_t DigitsToGet = digits10>
+    static void get_random_fixed_string(std::string& str, const bool is_unsigned = false)
+    {
+      if((seed_prescaler % 0x8000U) == 0U)
+      {
+        const std::clock_t seed_time_stamp = std::clock();
+
+        engine_man.seed(static_cast<typename std::mt19937::result_type>      (seed_time_stamp));
+        engine_sgn.seed(static_cast<typename std::ranlux24_base::result_type>(seed_time_stamp));
+      }
+
+      ++seed_prescaler;
+
       static std::uniform_int_distribution<unsigned>
       dist_sgn
       (
-         0,
-         1
+        0,
+        1
       );
 
       static std::uniform_int_distribution<unsigned>
       dist_first
       (
-         1,
-         9
+        1,
+        9
       );
 
       static std::uniform_int_distribution<unsigned>
       dist_following
       (
-         0,
-         9
+        0,
+        9
       );
 
       const bool is_neg = ((is_unsigned == false) && (dist_sgn(engine_sgn) != 0));
@@ -91,17 +102,17 @@ struct control
 
       if(is_neg)
       {
-         ++len;
+        ++len;
 
-         str.resize(len);
+        str.resize(len);
 
-         str.at(pos) = char('-');
+        str.at(pos) = char('-');
 
-         ++pos;
+        ++pos;
       }
       else
       {
-         str.resize(len);
+        str.resize(len);
       }
 
       str.at(pos) = static_cast<char>('0');
@@ -115,8 +126,8 @@ struct control
 
       while(pos < str.length())
       {
-         str.at(pos) = static_cast<char>(dist_following(engine_man) + 0x30U);
-         ++pos;
+          str.at(pos) = static_cast<char>(dist_following(engine_man) + 0x30U);
+          ++pos;
       }
 
       const bool exp_is_neg = (dist_sgn(engine_sgn) != 0);
@@ -124,231 +135,252 @@ struct control
       static std::uniform_int_distribution<unsigned>
       dist_exp
       (
-         0,
-         std::numeric_limits<ConstituentFloatType>::digits10 < 10 ? 13 : 85
+        0,
+        std::numeric_limits<float_type>::digits10 < 10 ? 13 : 85
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
 
       {
-         std::stringstream strm;
+        std::stringstream strm;
 
-         strm << dist_exp(engine_man);
+        strm << dist_exp(engine_man);
 
-         str_exp += strm.str();
+        str_exp += strm.str();
       }
 
       str += str_exp;
-   }
-};
+    }
 
-template<typename ConstituentFloatType> constexpr int control<ConstituentFloatType>::digits;
-template<typename ConstituentFloatType> constexpr int control<ConstituentFloatType>::digits10;
-template<typename ConstituentFloatType> constexpr int control<ConstituentFloatType>::max_digits10;
+    template<typename ConstructionType>
+    static ConstructionType construct_from(const double_float_type& f)
+    {
+      return   ConstructionType(double_float_type::canonical_value(f).crep().first)
+             + ConstructionType(double_float_type::canonical_value(f).crep().second);
+    }
 
-template<typename ConstituentFloatType> std::mt19937       control<ConstituentFloatType>::engine_man(static_cast<typename std::mt19937::result_type>(std::clock()));
-template<typename ConstituentFloatType> std::ranlux24_base control<ConstituentFloatType>::engine_sgn(static_cast<typename std::ranlux24_base::result_type>(std::clock()));
+    static bool test_add__(const std::uint32_t count)
+    {
+      bool result_is_ok = true;
 
-template <typename ConstituentFloatType>
-bool test_op(char op, const unsigned count = 10000U)
-{
-   using float_type         = ConstituentFloatType;
-   using double_float_type  = typename control<float_type>::double_float_type;
-   using control_float_type = typename control<float_type>::control_float_type;
+      const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 0);
 
-   const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
-   std::cout << "testing operator" << op << " (accuracy = " << std::numeric_limits<double_float_type>::digits << " bits)...";
-
-   bool result_is_ok = true;
-
-   for (unsigned i = 0U; ((i < count) && result_is_ok); ++i)
-   {
-      std::string str_a;
-      std::string str_b;
-
-      control<float_type>::get_random_fixed_string(str_a);
-      control<float_type>::get_random_fixed_string(str_b);
-
-      const double_float_type  df_a(str_a);
-      const double_float_type  df_b(str_b);
-
-      const control_float_type ctrl_a =   control_float_type(double_float_type::canonical_value(df_a).crep().first)
-                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second)
-                                        ;
-      const control_float_type ctrl_b =   control_float_type(double_float_type::canonical_value(df_b).crep().first)
-                                        + control_float_type(double_float_type::canonical_value(df_b).crep().second)
-                                        ;
-
-      double_float_type  df_c;
-      control_float_type ctrl_c;
-
-      switch (op)
+      for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
-      default:
-      case '+':
-         df_c   = df_a   + df_b;
-         ctrl_c = ctrl_a + ctrl_b;
-         break;
-      case '-':
-         df_c   = df_a   - df_b;
-         ctrl_c = ctrl_a - ctrl_b;
-         break;
-      case '*':
-         df_c   = df_a   * df_b;
-         ctrl_c = ctrl_a * ctrl_b;
-         break;
-      case '/':
-         if (df_b != double_float_type(0))
-         {
-            df_c   = df_a   / df_b;
-            ctrl_c = ctrl_a / ctrl_b;
-         }
-         else
-         {
-            continue;
-         }
-         break;
+        std::string str_a;
+        std::string str_b;
+
+        control<float_type>::get_random_fixed_string<digits10 + 4>(str_a);
+        control<float_type>::get_random_fixed_string<digits10 + 4>(str_b);
+
+        const double_float_type  df_a(str_a);
+        const double_float_type  df_b(str_b);
+
+        const control_float_type ctrl_a = construct_from<control_float_type>(df_a);
+        const control_float_type ctrl_b = construct_from<control_float_type>(df_b);
+
+        double_float_type  df_c    = df_a   + df_b;
+        control_float_type ctrl_c  = ctrl_a + ctrl_b;
+
+        const control_float_type delta = fabs(1 - fabs(ctrl_c / construct_from<control_float_type>(df_c)));
+
+        const bool b_ok = (delta < MaxError);
+
+        result_is_ok &= b_ok;
       }
 
-      const control_float_type ctrl_df_c =   control_float_type(double_float_type::canonical_value(df_c).crep().first)
-                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second)
-                                           ;
+      return result_is_ok;
+    }
 
-      const control_float_type delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
+    static bool test_sub__(const std::uint32_t count)
+    {
+      bool result_is_ok = true;
 
-      const bool tol_is_not_ok = (delta > MaxError);
+      const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 0);
 
-      const bool is_finite_is_ok = (isfinite(df_a) && isfinite(df_b) && isfinite(df_c));
-
-      const bool b_ok = (is_finite_is_ok && (tol_is_not_ok == false));
-
-      if (tol_is_not_ok)
+      for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
-         std::cout << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
-         std::cout << " [FAILED] while performing '"
-                   << std::setprecision(std::numeric_limits<double_float_type>::max_digits10)
-                   << df_a
-                   << "' "
-                   << op
-                   << " '"
-                   << df_b
-                   << std::endl
-                   << "got incorrect result: "
-                   << df_c
-                   << ", correct result is: "
-                   << ctrl_df_c
-                   << std::endl;
+        std::string str_a;
+        std::string str_b;
+
+        control<float_type>::get_random_fixed_string<digits10 + 4>(str_a);
+        control<float_type>::get_random_fixed_string<digits10 + 4>(str_b);
+
+        const double_float_type  df_a(str_a);
+        const double_float_type  df_b(str_b);
+
+        const control_float_type ctrl_a = construct_from<control_float_type>(df_a);
+        const control_float_type ctrl_b = construct_from<control_float_type>(df_b);
+
+        double_float_type  df_c   = df_a   - df_b;
+        control_float_type ctrl_c = ctrl_a - ctrl_b;
+
+        const control_float_type delta = fabs(1 - fabs(ctrl_c / construct_from<control_float_type>(df_c)));
+
+        const bool b_ok = (delta < MaxError);
+
+        result_is_ok &= b_ok;
       }
 
-      result_is_ok &= b_ok;
-   }
+      return result_is_ok;
+    }
 
-  std::cout << " ok [" << count << " tests passed]" << std::endl;
+    static bool test_mul__(const std::uint32_t count)
+    {
+      bool result_is_ok = true;
 
-  return true;
-}
+      const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
 
-template <typename ConstituentFloatType>
-bool test_sqrt(const unsigned count = 10000U)
-{
-   using float_type         = ConstituentFloatType;
-   using double_float_type  = typename control<float_type>::double_float_type;
-   using control_float_type = typename control<float_type>::control_float_type;
-
-   const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
-
-   std::cout << "testing func sqrt (accuracy = " << std::numeric_limits<double_float_type>::digits << " bits)...";
-
-   bool result_is_ok = true;
-
-   for (unsigned i = 0U; ((i < count) && result_is_ok); ++i)
-   {
-      std::string str_a;
-
-      control<float_type>::get_random_fixed_string(str_a, true);
-
-      const double_float_type  df_a(str_a);
-
-      const control_float_type ctrl_a =   control_float_type(double_float_type::canonical_value(df_a).crep().first)
-                                        + control_float_type(double_float_type::canonical_value(df_a).crep().second)
-                                        ;
-
-      double_float_type  df_c;
-      control_float_type ctrl_c;
-
-      df_c   = sqrt(df_a);
-      ctrl_c = sqrt(ctrl_a);
-
-      const control_float_type ctrl_df_c =   control_float_type(double_float_type::canonical_value(df_c).crep().first)
-                                           + control_float_type(double_float_type::canonical_value(df_c).crep().second)
-                                           ;
-
-      const control_float_type delta = fabs(1 - fabs(ctrl_c / ctrl_df_c));
-
-      const bool tol_is_not_ok = (delta > MaxError);
-
-      const bool is_finite_is_ok = (isfinite(df_a) && isfinite(df_c));
-
-      const bool b_ok = (is_finite_is_ok && (tol_is_not_ok == false));
-
-      if (tol_is_not_ok)
+      for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
-         std::cout << std::setprecision(std::numeric_limits<double_float_type>::digits10 + 2);
-         std::cout << " [FAILED] while performing '" << std::setprecision(std::numeric_limits<double_float_type>::max_digits10) << ctrl_a << "' sqrt', got incorrect result: " << (df_c) << std::endl;
+        std::string str_a;
+        std::string str_b;
+
+        control<float_type>::get_random_fixed_string<digits10 + 4>(str_a);
+        control<float_type>::get_random_fixed_string<digits10 + 4>(str_b);
+
+        const double_float_type df_a(str_a);
+        const double_float_type df_b(str_b);
+
+        const control_float_type ctrl_a = construct_from<control_float_type>(df_a);
+        const control_float_type ctrl_b = construct_from<control_float_type>(df_b);
+
+        double_float_type  df_c   = df_a   * df_b;
+        control_float_type ctrl_c = ctrl_a * ctrl_b;
+
+        const control_float_type delta = fabs(1 - fabs(ctrl_c / construct_from<control_float_type>(df_c)));
+
+        const bool b_ok = (delta < MaxError);
+
+        result_is_ok &= b_ok;
       }
 
-      result_is_ok &= b_ok;
-   }
+      return result_is_ok;
+    }
 
-   std::cout << " ok [" << count << " tests passed]" << std::endl;
+    static bool test_div__(const std::uint32_t count)
+    {
+      bool result_is_ok = true;
 
-   return true;
+      const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
+
+      for(std::uint32_t i = 0U;((i < count) && result_is_ok); ++i)
+      {
+        std::string str_a;
+        std::string str_b;
+
+        control<float_type>::get_random_fixed_string<digits10 + 4>(str_a);
+        control<float_type>::get_random_fixed_string<digits10 + 4>(str_b);
+
+        const double_float_type  df_a  (str_a);
+        const double_float_type  df_b  (str_b);
+
+        const control_float_type ctrl_a = construct_from<control_float_type>(df_a);
+        const control_float_type ctrl_b = construct_from<control_float_type>(df_b);
+
+        const double_float_type  df_c   = df_a   / df_b;
+        const control_float_type ctrl_c = ctrl_a / ctrl_b;
+
+        const control_float_type delta = fabs(1 - fabs(ctrl_c / construct_from<control_float_type>(df_c)));
+
+        const bool b_ok = (delta < MaxError);
+
+        result_is_ok &= b_ok;
+      }
+
+      return result_is_ok;
+    }
+
+    static bool test_sqrt_(const std::uint32_t count)
+    {
+      bool result_is_ok = true;
+
+      const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 1);
+
+      for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
+      {
+        std::string str_a;
+        std::string str_b;
+
+        control<float_type>::get_random_fixed_string<digits10 + 4>(str_a, true);
+
+        const double_float_type  df_a(str_a);
+
+        const control_float_type ctrl_a = construct_from<control_float_type>(df_a);
+
+        double_float_type  df_c   = sqrt(df_a);
+        control_float_type ctrl_c = sqrt(ctrl_a);
+
+        const control_float_type delta = fabs(1 - fabs(ctrl_c / construct_from<control_float_type>(df_c)));
+
+        const bool b_ok = (delta < MaxError);
+
+        result_is_ok &= b_ok;
+      }
+
+      return result_is_ok;
+    }
+  };
+
+  template<typename FloatingPointConstituentType> unsigned control<FloatingPointConstituentType>::seed_prescaler;
+
+  template<typename FloatingPointConstituentType>
+  bool test_arithmetic(const std::uint32_t count)
+  {
+    using float_type = FloatingPointConstituentType;
+
+    std::cout << "Testing " << count << " arithmetic cases." << std::endl;
+
+    const bool result_add___is_ok = control<float_type>::test_add__(count); std::cout << "result_add___is_ok: " << std::boolalpha << result_add___is_ok << std::endl;
+    const bool result_sub___is_ok = control<float_type>::test_sub__(count); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
+    const bool result_mul___is_ok = control<float_type>::test_mul__(count); std::cout << "result_mul___is_ok: " << std::boolalpha << result_mul___is_ok << std::endl;
+    const bool result_div___is_ok = control<float_type>::test_div__(count); std::cout << "result_div___is_ok: " << std::boolalpha << result_div___is_ok << std::endl;
+    const bool result_sqrt__is_ok = control<float_type>::test_sqrt_(count); std::cout << "result_sqrt__is_ok: " << std::boolalpha << result_sqrt__is_ok << std::endl;
+
+    const bool result_all_is_ok = (   result_add___is_ok
+                                   && result_sub___is_ok
+                                   && result_mul___is_ok
+                                   && result_div___is_ok
+                                   && result_sqrt__is_ok);
+
+    return result_all_is_ok;
+  }
 }
-
-template <typename T>
-bool test_arithmetic(const unsigned count = 10000U)
-{
-   std::cout << "Testing correctness of arithmetic operators for " << boost::core::demangle(typeid(T).name()) << std::endl;
-
-   bool result_is_ok = true;
-
-   result_is_ok &= test_op  <T>('+', count);
-   result_is_ok &= test_op  <T>('-', count);
-   result_is_ok &= test_op  <T>('*', count);
-   result_is_ok &= test_op  <T>('/', count);
-   result_is_ok &= test_sqrt<T>(count);
-
-   std::cout << std::endl;
-
-   return result_is_ok;
-}
-
-} // namespace local
 
 int main()
 {
-   bool result_is_ok = true;
+  #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
+  constexpr unsigned int test_cases_built_in = 5000U;
+  #else
+  constexpr unsigned int test_cases_built_in = 100000U;
+  #endif
 
-   #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-   constexpr unsigned int test_cases_built_in = 5000U;
-   #else
-   constexpr unsigned int test_cases_built_in = 100000U;
-   #endif
+  #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
+  constexpr unsigned int test_cases_float128 = 1000U;
+  #else
+  constexpr unsigned int test_cases_float128 = 20000U;
+  #endif
 
-   #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-   constexpr unsigned int test_cases_float128 = 1000U;
-   #else
-   constexpr unsigned int test_cases_float128 = 20000U;
-   #endif
+  const bool result_flt__is_ok = local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt__is_ok: " << std::boolalpha << result_flt__is_ok << std::endl;
+  const bool result_dbl__is_ok = local::test_arithmetic<double>     (test_cases_built_in); std::cout << "result_dbl__is_ok: " << std::boolalpha << result_dbl__is_ok << std::endl;
+  const bool result_ldbl_is_ok = local::test_arithmetic<long double>(test_cases_built_in); std::cout << "result_ldbl_is_ok: " << std::boolalpha << result_ldbl_is_ok << std::endl;
 
-   result_is_ok &= local::test_arithmetic<float>(test_cases_built_in);
-   result_is_ok &= local::test_arithmetic<double>(test_cases_built_in);
-   result_is_ok &= local::test_arithmetic<long double>(test_cases_built_in);
 #ifdef BOOST_MATH_USE_FLOAT128
-   result_is_ok &= local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
+  const bool result_f128_is_ok = local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
+                                                                                           std::cout << "result_ldbl_is_ok: " << std::boolalpha << result_f128_is_ok << std::endl;
 #else
    (void) test_cases_float128;
 #endif
 
-   return (result_is_ok ? 0 : -1);
+  const bool result_is_ok =
+  (
+      result_flt__is_ok
+   && result_dbl__is_ok
+   && result_ldbl_is_ok
+#ifdef BOOST_MATH_USE_FLOAT128
+   && result_f128_is_ok
+#endif
+  );
+
+  return (result_is_ok ? 0 : -1);
 }
