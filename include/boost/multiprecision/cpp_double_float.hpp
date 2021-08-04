@@ -1447,8 +1447,8 @@ public:
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
    static constexpr int digits       = 2 * base_class_type::digits;
-   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits - 2>::value;
-   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits - 2>::value;
+   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
+   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
@@ -1457,7 +1457,7 @@ public:
    static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), -min_exponent)); }
    static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp(base_class_type::max, -base_class_type::digits)); }
    static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
-   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), -digits)); }
+   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), 1 - digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
    static constexpr self_type  denorm_min   () noexcept { return self_type( (min)()); }
    
@@ -1485,8 +1485,8 @@ public:
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
    static constexpr int digits       = 2 * base_class_type::digits;
-   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits - 2>::value;
-   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits - 2>::value;
+   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
+   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
@@ -1494,7 +1494,7 @@ public:
    static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename inner_self_type::float_type(1), -min_exponent)); }
    static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp((base_class_type::max)(), -base_class_type::digits)); }
    static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
-   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), -digits)); }
+   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), 1 - digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
    static const     self_type  denorm_min   () noexcept { return self_type( (min)()); }
 
