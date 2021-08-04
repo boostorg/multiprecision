@@ -196,6 +196,7 @@ void q_float::from_uint64(const UINT64 u)
   if(uhi)
   {
     static const q_float value_0x100000000 = q_float(static_cast<UINT32>(0xFFFFFFFF)) + one();
+
     operator*=(value_0x100000000);
   }
 
@@ -357,7 +358,7 @@ q_float& q_float::ceil(void)
 /// ---------------------------------------------------------------------------
 int q_float::compare(const q_float& v) const
 {
-  if(hi > v.hi) 
+  if(hi > v.hi)
   {
     return 1;
   }

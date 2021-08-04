@@ -281,6 +281,7 @@
       <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</BrowseInformation>
       <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BrowseInformation>
     </ClCompile>
+    <ClCompile Include="test_spot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="q_float\q_float_qf.h" />
