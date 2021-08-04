@@ -1457,7 +1457,7 @@ public:
    static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), -min_exponent)); }
    static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp(base_class_type::max, -base_class_type::digits)); }
    static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
-   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), 1 - digits)); }
+   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), 4 - digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
    static constexpr self_type  denorm_min   () noexcept { return self_type( (min)()); }
    
@@ -1494,7 +1494,7 @@ public:
    static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename inner_self_type::float_type(1), -min_exponent)); }
    static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp((base_class_type::max)(), -base_class_type::digits)); }
    static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
-   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), 1 - digits)); }
+   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), 4 - digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
    static const     self_type  denorm_min   () noexcept { return self_type( (min)()); }
 
