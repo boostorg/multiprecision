@@ -420,14 +420,10 @@ class cpp_double_float
    using rep_type   = std::pair<float_type, float_type>;
    using arithmetic = detail::exact_arithmetic<float_type>;
 
-   using   signed_types = std::tuple<  signed char,   signed short,   signed int,   signed long,   signed long long, std::intmax_t>;
-   using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long, std::uintmax_t>;
-   using float_types    = std::tuple<float, double, long double>;
-   using exponent_type  = int;
-
-   static constexpr int my_digits       = 2 * std::numeric_limits<float_type>::digits;
-   static constexpr int my_max_exponent = std::numeric_limits<float_type>::max_exponent - std::numeric_limits<float_type>::digits;
-   static constexpr int my_min_exponent = std::numeric_limits<float_type>::min_exponent + std::numeric_limits<float_type>::digits;
+  using   signed_types = std::tuple<  signed char,   signed short,   signed int,   signed long,   signed long long, std::intmax_t>;
+  using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long, std::uintmax_t>;
+  using float_types    = std::tuple<float, double, long double>;
+  using exponent_type  = int;
 
    // Default constructor.
    cpp_double_float() { }
@@ -778,7 +774,8 @@ class cpp_double_float
       other.data = tmp;
    }
 
-   constexpr int compare(const cpp_double_float& other) const
+/* comment out temporarily:
+   constexpr */ int compare(const cpp_double_float& other) const
    {
      // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
      return (first () > other.first ()) ?  1 :
@@ -801,50 +798,6 @@ class cpp_double_float
    int  order10  () const { return (int) (float(order02()) * 0.301F); }
    bool small_arg() const { return (order10() < (-std::numeric_limits<cpp_double_float>::digits10 / 6)); }
    bool near_one () const { return cpp_double_float(fabs(cpp_double_float(1U) - *this)).small_arg(); }
-
-   static const cpp_double_float& my_value_min()
-   {
-      // TBD: Need to constexp-ify this subroutine to adhere to C++11 constexpr-ness.
-      // TBD: This value probably needs to be corrected.
-      static const cpp_double_float val =
-      []()
-      {
-         cpp_double_float result;
-
-         eval_ldexp(result, cpp_double_float(1), my_min_exponent);
-
-         return result;
-      }();
-
-      return val;
-   }
-
-   static const cpp_double_float& my_value_max()
-   {
-      // TBD: Need to constexp-ify this subroutine to adhere to C++11 constexpr-ness.
-      // TBD: This value probably needs to be corrected.
-      static const cpp_double_float val =
-      []()
-      {
-         cpp_double_float result;
-
-         eval_ldexp(result, cpp_double_float(1), my_max_exponent);
-
-         return result;
-      }();
-
-      return val;
-   }
-
-   static const cpp_double_float& my_value_eps()
-   {
-      // TBD: Need to constexp-ify this subroutine to adhere to C++11 constexpr-ness.
-      using std::ldexp;
-
-      static const cpp_double_float val(ldexp(float_type(1), 4 - my_digits));
-
-      return val;
-   }
 
  private:
    rep_type data;
@@ -1493,21 +1446,21 @@ public:
    static constexpr bool is_iec559   = false;
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
-   static constexpr int digits       = self_type::my_digits;
+   static constexpr int digits       = 2 * base_class_type::digits;
    static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
    static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
-   static constexpr int max_exponent = self_type::my_max_exponent;
-   static constexpr int min_exponent = self_type::my_min_exponent;
+   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
+   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
 
    // TODO Are these values rigorous?
-   static constexpr self_type (min)         () noexcept { return self_type::my_value_min(); }
-   static constexpr self_type (max)         () noexcept { return self_type::my_value_max(); }
-   static constexpr self_type  lowest       () noexcept { return self_type(-(max)()); }
-   static constexpr self_type  epsilon      () noexcept { return self_type::my_value_eps(); }
-   static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); }
+   static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), -min_exponent)); }
+   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp(base_class_type::max, -base_class_type::digits)); }
+   static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
+   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), 4 - digits)); }
+   static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
    static constexpr self_type  denorm_min   () noexcept { return self_type( (min)()); }
-
+   
    static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
    static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
    static constexpr self_type  signaling_NaN() noexcept { return self_type( base_class_type::signaling_NaN()); }
@@ -1531,19 +1484,19 @@ public:
    static constexpr bool is_iec559                     = false;
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
-   static constexpr int digits       = inner_self_type::my_digits;
+   static constexpr int digits       = 2 * base_class_type::digits;
    static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
    static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
-   static constexpr int max_exponent = inner_self_type::my_max_exponent;
-   static constexpr int min_exponent = inner_self_type::my_min_exponent;
+   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
+   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
 
-   static constexpr self_type (min)         () noexcept { return self_type(inner_self_type::my_value_min()); }
-   static constexpr self_type (max)         () noexcept { return self_type(inner_self_type::my_value_max()); }
-   static constexpr self_type  lowest       () noexcept { return self_type(-(max)()); }
-   static constexpr self_type  epsilon      () noexcept { return self_type(inner_self_type::my_value_eps()); }
+   static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename inner_self_type::float_type(1), -min_exponent)); }
+   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp((base_class_type::max)(), -base_class_type::digits)); }
+   static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
+   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), 4 - digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
-   static constexpr self_type  denorm_min   () noexcept { return self_type( (min)()); }
+   static const     self_type  denorm_min   () noexcept { return self_type( (min)()); }
 
    static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
    static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
