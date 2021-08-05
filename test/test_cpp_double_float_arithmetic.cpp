@@ -29,6 +29,7 @@
 #include <boost/multiprecision/cpp_double_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
+#include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/core/demangle.hpp>
 
 #if defined(__clang__)
@@ -51,13 +52,18 @@ namespace local
   {
     using float_type = FloatingPointConstituentType;
 
-    static constexpr int digits   = 2 * (std::numeric_limits<float_type>::digits - 1);
-    static constexpr int digits10 = (int) (float(digits - 1) * 0.301F);
+    static constexpr int digits       = 2 * std::numeric_limits<float_type>::digits;
+    static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
+    static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
     static unsigned seed_prescaler;
 
     using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<float_type>, boost::multiprecision::et_off>;
     using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
+
+    static_assert( digits       == std::numeric_limits<double_float_type>::digits       , "" );
+    static_assert( digits10     == std::numeric_limits<double_float_type>::digits10     , "" );
+    static_assert( max_digits10 == std::numeric_limits<double_float_type>::max_digits10 , "" );
 
     template<const std::size_t DigitsToGet = digits10>
     static void get_random_fixed_string(std::string& str, const bool is_unsigned = false)
@@ -178,7 +184,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 0);
+      const control_float_type MaxError = ldexp(control_float_type(1), 2 - std::numeric_limits<double_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -211,7 +217,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 0);
+      const control_float_type MaxError = ldexp(control_float_type(1), 2 - std::numeric_limits<double_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -244,7 +250,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
+      const control_float_type MaxError = ldexp(control_float_type(1), 4 - std::numeric_limits<double_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -277,7 +283,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 2);
+      const control_float_type MaxError = ldexp(control_float_type(1), 3 - std::numeric_limits<double_float_type>::digits);
 
       for(std::uint32_t i = 0U;((i < count) && result_is_ok); ++i)
       {
@@ -310,7 +316,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), -std::numeric_limits<double_float_type>::digits + 1);
+      const control_float_type MaxError = ldexp(control_float_type(1), 3 - std::numeric_limits<double_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
