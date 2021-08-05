@@ -141,7 +141,7 @@ public:
       int guard = double_or_quad_traits<Rr>::guard_bits;
       bits.resize(std::numeric_limits<Rr>::digits + guard, 0);
 
-      while ((norm != Rr(0)) && ((pos - ex) < bits.size())) {
+      while ((norm != Rr(0)) && ((pos - ex) < (int) bits.size())) {
          pos -= ex;
          if(!((ex <= 0) && (pos < int(bits.size())) && (pos >= 0))) throw LoopError{};
          bits[pos] = 1;

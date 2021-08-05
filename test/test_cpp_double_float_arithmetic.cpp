@@ -161,7 +161,7 @@ namespace local
         0,
           ((std::numeric_limits<local_exp10_float_type>::max_exponent10 > 1000) ? 1183
         : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >  200) ?   83
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?   13 : 1)))
+        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?   11 : 1)))
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
