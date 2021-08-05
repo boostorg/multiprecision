@@ -159,9 +159,9 @@ namespace local
       dist_exp
       (
         0,
-          ((std::numeric_limits<local_exp10_float_type>::max_exponent10 > 1000) ? 1183
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >  200) ?   83
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?   11 : 1)))
+          ((std::numeric_limits<local_exp10_float_type>::max_exponent10 > 1000) ? 1185
+        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >  200) ?   85
+        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?   13 : 1)))
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
@@ -188,7 +188,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 2 - std::numeric_limits<double_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 3 - std::numeric_limits<double_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
