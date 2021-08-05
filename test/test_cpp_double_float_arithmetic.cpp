@@ -381,9 +381,9 @@ int main()
   #endif
 
   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL << 15U);
+  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL << 14U);
   #else
-  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL << 12U);
+  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL << 10U);
   #endif
 
   const bool result_flt___is_ok = local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;

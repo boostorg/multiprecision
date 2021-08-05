@@ -378,15 +378,15 @@ namespace local
 int main()
 {
   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 16U);
+  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 15U);
   #else
-  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 13U);
+  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 11U);
   #endif
 
   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
   constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL << 10U);
   #else
-  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL <<  7U);
+  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL <<  6U);
   #endif
 
   const bool result_flt___is_ok = true;//local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
