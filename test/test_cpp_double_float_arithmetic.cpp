@@ -152,12 +152,15 @@ namespace local
       // and base these on the actual range of the exponent10 member of limits.
       // The use of the digits member here is a strange workaround that
       // still needs to be investigated on GCC's 10-bit x86 long double.
+      using local_exp10_float_type =
+        typename std::conditional<std::is_same<long double, float_type>::value, double, float_type>::type;
+
       static std::uniform_int_distribution<unsigned>
       dist_exp
       (
         0,
-          ((std::numeric_limits<float_type>::digits10 < 10) ? 13
-        : ((std::numeric_limits<float_type>::digits10 < 20) ? 85 : 1035))
+        (unsigned) (  float( std::numeric_limits<local_exp10_float_type>::max_exponent10)
+                    * float((std::numeric_limits<local_exp10_float_type>::max_exponent10 < 100) ? 0.3F : 0.4F))
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
@@ -373,7 +376,7 @@ int main()
   #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
   constexpr unsigned int test_cases_built_in = 5000U;
   #else
-  constexpr unsigned int test_cases_built_in = 100000U;
+  constexpr unsigned int test_cases_built_in = 2ULL << 16U;
   #endif
 
   #if defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
