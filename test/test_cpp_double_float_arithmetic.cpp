@@ -153,14 +153,14 @@ namespace local
       // The use of the digits member here is a strange workaround that
       // still needs to be investigated on GCC's 10-bit x86 long double.
       using local_exp10_float_type =
-         typename std::conditional<std::is_same<float_type, long double>::value, double, float_type>::type;
+         typename std::conditional<(std::is_same<float_type, long double>::value == true), double, float_type>::type;
 
       static std::uniform_int_distribution<unsigned>
       dist_exp
       (
         0,
-          ((std::numeric_limits<local_exp10_float_type>::max_exponent10 > 1000) ? 1333
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >  200) ?  103
+          ((std::numeric_limits<local_exp10_float_type>::max_exponent10 > 1000) ? 1183
+        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >  200) ?   83
         : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?   13 : 1)))
       );
 
