@@ -242,6 +242,18 @@ struct exact_arithmetic
       return out;
    }
 
+   static void three_sum(float_type& a, float_type& b, float_type& c)
+   {
+      using std::tie;
+      using std::get;
+
+      std::tuple<float_type, float_type, float_type> t;
+
+      tie(get<0>(t), get<1>(t)) = sum(a        , b);
+      tie(a        , get<2>(t)) = sum(c        , get<0>(t));
+      tie(b        , c        ) = sum(get<1>(t), get<2>(t));
+   }
+
    static void sum(float_pair& p, float_type& e)
    {
       using std::tie;
@@ -319,7 +331,7 @@ struct exact_arithmetic
       using std::get;
       using std::tie;
 
-      float_tuple s(0, 0, 0, 0);
+      float_tuple s(float_type(0.0F), float_type(0.0F), float_type(0.0F), float_type(0.0F));
 
       tie(get<0>(s), get<3>(t)) = fast_sum(get<2>(t), get<3>(t));
       tie(get<0>(s), get<2>(t)) = fast_sum(get<1>(t), get<0>(s));
@@ -350,10 +362,10 @@ struct exact_arithmetic
 
    static void normalize(float_tuple& t, float_type e)
    {
-     using std::tie;
-     using std::get;
+      using std::tie;
+      using std::get;
 
-      float_tuple s(0, 0, 0, 0);
+      float_tuple s(float_type(0.0F), float_type(0.0F), float_type(0.0F), float_type(0.0F));
 
       tie(get<0>(s), e)         = fast_sum(get<3>(t), e);
       tie(get<0>(s), get<3>(t)) = fast_sum(get<2>(t), get<0>(s));
