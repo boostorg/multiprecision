@@ -62,7 +62,17 @@ namespace local
     template<const std::size_t DigitsToGet = digits10>
     static void get_random_fixed_string(std::string& str, const bool is_unsigned = false)
     {
-      if((seed_prescaler % 0x8000U) == 0U)
+      // This string generator creates strings of the form
+      // 0.458279387.... E+5
+      // -0.7182937534953.... E-126
+      // etc., where the string can be either positive only
+      // (positive only via setting is_unsigned to true)
+      // or mixed positive/negative.
+
+      // Re-seed the random engine each approx. 65k calls
+      // of this string generator.
+
+      if((seed_prescaler % 0x10000U) == 0U)
       {
         const std::clock_t seed_time_stamp = std::clock();
 
@@ -132,11 +142,16 @@ namespace local
 
       const bool exp_is_neg = (dist_sgn(engine_sgn) != 0);
 
+      // TBD: Use even more extreme base-10 exponents if desired/possible
+      // and base these on the actual range of the exponent10 member of limits.
+      // The use of the digits member here is a strange workaround that
+      // still needs to be investigated on GCC's 10-bit x86 long double.
       static std::uniform_int_distribution<unsigned>
       dist_exp
       (
         0,
-        std::numeric_limits<float_type>::digits10 < 10 ? 13 : 85
+          ((std::numeric_limits<float_type>::digits10 < 10) ? 13
+        : ((std::numeric_limits<float_type>::digits10 < 20) ? 85 : 1035))
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
