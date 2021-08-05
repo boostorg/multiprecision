@@ -159,47 +159,77 @@ class cpp_quad_float
    constexpr cpp_quad_float(const cpp_quad_float&) = default;
 
    // Constructors from other floating-point types.
-   template <typename FloatType,
-             typename std::enable_if<(detail::is_floating_point_or_float128<FloatType>::value == true) && (std::numeric_limits<FloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
-   constexpr cpp_quad_float(const FloatType& f) : data(std::make_tuple(f, (float_type)0, (float_type)0, (float_type)0)) {}
+   template <typename OtherFloatType,
+             typename std::enable_if<(detail::is_floating_point_or_float128<OtherFloatType>::value == true) && (std::numeric_limits<OtherFloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
+   constexpr cpp_quad_float(const OtherFloatType& f) : data(std::make_tuple(f, (float_type)0, (float_type)0, (float_type)0)) {}
 
    constexpr cpp_quad_float(const rep_type& r) : data(r) {}
 
-   //template <typename FloatType,
-   //          typename std::enable_if<((std::numeric_limits<FloatType>::is_iec559 == true) && (std::numeric_limits<FloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   //constexpr cpp_quad_float(const FloatType& f)
-   //    : data(std::make_pair(static_cast<float_type>(f),
-   //                          static_cast<float_type>(f - (FloatType) static_cast<float_type>(f)))) {}
+   template <typename OtherFloatType,
+             typename std::enable_if<((std::numeric_limits<OtherFloatType>::is_iec559 == true) && (std::numeric_limits<OtherFloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   cpp_quad_float(const OtherFloatType& f)
+   {
+      using std::get;
+      get<0>(data) = static_cast<float_type>(f);
+      get<1>(data) = static_cast<float_type>(f - (OtherFloatType)get<0>(data));
+      get<2>(data) = static_cast<float_type>(f - (OtherFloatType)get<1>(data) - (OtherFloatType)get<0>(data));
+      get<3>(data) = static_cast<float_type>(f - (OtherFloatType)get<2>(data) - (OtherFloatType)get<1>(data) - (OtherFloatType)get<0>(data));
+   }
 
    // Constructor from other cpp_quad_float<> objects.
-   //template <typename OtherFloatType,
-   //          typename std::enable_if<((std::is_floating_point<OtherFloatType>::value == true) && (std::is_same<FloatingPointType, OtherFloatType>::value == false))>::type const* = nullptr>
-   //cpp_quad_float(const cpp_quad_float<OtherFloatType>& a)
-   //    : cpp_quad_float(a.first())
-   //{
-   //   *this += a.second();
-   //}
+   template <typename OtherFloatType,
+             typename std::enable_if<((std::is_floating_point<OtherFloatType>::value == true) && (std::is_same<FloatingPointType, OtherFloatType>::value == false))>::type const* = nullptr>
+   cpp_quad_float(const cpp_quad_float<OtherFloatType>& a)
+   {
+      using std::get;
+      using precise_type = std::conditional_t<(std::numeric_limits<OtherFloatType>::digits > std::numeric_limits<float_type>::digits), cpp_quad_float, float_type>;
+      *this += (precise_type)get<0>(a.rep());
+      *this += (precise_type)get<1>(a.rep());
+      *this += (precise_type)get<2>(a.rep());
+      *this += (precise_type)get<3>(a.rep());
+      //data = rep_type((float_type)get<0>(a.rep()), (float_type)get<1>(a.rep()), (float_type)get<2>(a.rep()), (float_type)get<3>(a.rep()));
+      //arithmetic::normalize(data);
+   }
 
-   // Constructors from integers
-   //template <typename IntegralType,
-   //          typename std::enable_if<((std::is_integral<IntegralType>::value == true) && (std::numeric_limits<IntegralType>::digits <= std::numeric_limits<FloatingPointType>::digits))>::type const* = nullptr>
-   //constexpr cpp_quad_float(const IntegralType& f) : data(std::make_pair(static_cast<float_type>(f), (float_type)0)) {}
+   // Constructors from integers which can be easily fit into underlying floating-point type
+   template <typename IntegralType,
+             typename std::enable_if<((std::is_integral<IntegralType>::value == true) && (std::numeric_limits<IntegralType>::digits <= std::numeric_limits<FloatingPointType>::digits))>::type const* = nullptr>
+   constexpr cpp_quad_float(const IntegralType& f) : data(std::make_tuple(static_cast<float_type>(f), (float_type)0, (float_type)0, (float_type)0)) {}
 
    // Constructors from integers which hold more information than *this can contain
-   //template <typename UnsignedIntegralType,
-   //          typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   //cpp_quad_float(UnsignedIntegralType u)
+   template <typename UnsignedIntegralType,
+             typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   cpp_quad_float(UnsignedIntegralType u)
+   {
+      constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits - 1;
 
-   //template <typename SignedIntegralType,
-   //          typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true) && (std::is_signed<SignedIntegralType>::value == true) && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   //cpp_quad_float(SignedIntegralType n) : cpp_quad_float(static_cast<typename std::make_unsigned<SignedIntegralType>::type>(std::abs(n)))
-   //{
-   //   if (n < 0)
-   //      *this = -*this;
-   //}
+      int bit_index = sizeof(UnsignedIntegralType) * 8;
 
-   //constexpr cpp_quad_float(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
-   //constexpr cpp_quad_float(const std::pair<float_type, float_type>& p) : data(p) {}
+      for (;;)
+      {
+         // Mask the maximum number of bits that can be stored without
+         // precision loss in a single FloatingPointType, then sum and shift
+         UnsignedIntegralType hi = u >> (std::max)(bit_index - MantissaBits, 0);
+         u &= ~(hi << (std::max)(bit_index - MantissaBits, 0));
+
+         *this += static_cast<FloatingPointType>(hi); // sum
+
+         bit_index -= MantissaBits;
+
+         if (bit_index < 0)
+            break;
+         else // shift
+            eval_ldexp(*this, *this, (std::min)(MantissaBits, bit_index));
+      }
+   }
+
+   template <typename SignedIntegralType,
+             typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true) && (std::is_signed<SignedIntegralType>::value == true) && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   cpp_quad_float(SignedIntegralType n) : cpp_quad_float(static_cast<typename std::make_unsigned<SignedIntegralType>::type>(std::abs(n)))
+   {
+      if (n < 0)
+         *this = -*this;
+   }
 
    cpp_quad_float(const std::string& str)
    {
@@ -232,25 +262,31 @@ class cpp_quad_float
    }
 
    // Casts
-//   operator signed char() const { return (signed char)data.first; }
-//   operator signed short() const { return (signed short)data.first; }
-//   operator signed int() const { return (signed int)data.first + (signed int)data.second; }
-//   operator signed long() const { return (signed long)data.first + (signed long)data.second; }
-//   operator signed long long() const { return (signed long long)data.first + (signed long long)data.second; }
-//   operator unsigned char() const { return (unsigned char)data.first; }
-//   operator unsigned short() const { return (unsigned short)data.first; }
-//   operator unsigned int() const { return (unsigned int)((unsigned int)data.first + (signed int)data.second); }
-//   operator unsigned long() const { return (unsigned long)((unsigned long)data.first + (signed long)data.second); }
-//   operator unsigned long long() const { return (unsigned long long)((unsigned long long)data.first + (signed long long)data.second); }
-//   operator float() const { return (float)data.first + (float)data.second; }
-//   operator double() const { return (double)data.first + (double)data.second; }
-//   operator long double() const { return (long double)data.first + (long double)data.second; }
-//#ifdef BOOST_MATH_USE_FLOAT128
-//   explicit operator boost::multiprecision::float128() const
-//   {
-//      return static_cast<boost::multiprecision::float128>(data.first) + static_cast<boost::multiprecision::float128>(data.second);
-//   }
-//#endif
+   // TODO Avoid unneccassary additions
+   operator signed char() const { return (signed char)std::get<0>(data); }
+   operator signed short() const { return (signed short)std::get<0>(data); }
+   operator signed int() const  { return (signed int )std::get<0>(data) + (signed int )std::get<1>(data) + (signed int )std::get<2>(data) + (signed int )std::get<3>(data); }
+   operator signed long() const { return (signed long)std::get<0>(data) + (signed long)std::get<1>(data) + (signed long)std::get<2>(data) + (signed long)std::get<3>(data); }
+   operator signed long long() const { return (signed long long)std::get<0>(data) + (signed long long)std::get<1>(data) + (signed long long)std::get<2>(data) + (signed long long)std::get<3>(data); }
+   
+   operator unsigned char() const { return (unsigned char)std::get<0>(data); }
+   operator unsigned short() const { return (unsigned short)std::get<0>(data); }
+   operator unsigned int() const { return (unsigned int)std::get<0>(data) + (unsigned int)std::get<1>(data) + (unsigned int)std::get<2>(data) + (unsigned int)std::get<3>(data); }
+   operator unsigned long() const { return (unsigned long)static_cast<signed long>(*this); }
+   operator unsigned long long() const { return (unsigned long long)static_cast<signed long long>(*this); }
+   
+   operator float() const { return (float)std::get<0>(data) + (float)std::get<1>(data) + (float)std::get<2>(data) + (float)std::get<3>(data); }
+   operator double() const { return (double)std::get<0>(data) + (double)std::get<1>(data) + (double)std::get<2>(data) + (double)std::get<3>(data); }
+   operator long double() const { return (long double)std::get<0>(data) + (long double)std::get<1>(data) + (long double)std::get<2>(data) + (long double)std::get<3>(data); }
+#ifdef BOOST_MATH_USE_FLOAT128
+   explicit operator boost::multiprecision::float128() const
+   {
+      return static_cast<boost::multiprecision::float128>(std::get<0>(data)) +
+             static_cast<boost::multiprecision::float128>(std::get<1>(data)) + 
+             static_cast<boost::multiprecision::float128>(std::get<2>(data)) + 
+             static_cast<boost::multiprecision::float128>(std::get<3>(data));
+   }
+#endif
 
    // Methods
    constexpr cpp_quad_float<float_type> negative() const
@@ -259,31 +295,16 @@ class cpp_quad_float
      return cpp_quad_float<float_type>(std::make_tuple(-get<0>(data), -get<1>(data), -get<2>(data), -get<3>(data)));
    }
 
-   constexpr bool                       is_negative() const { return data.first < 0; }
+   constexpr bool is_negative() const { return data.first < 0; }
 
-   //void negate()
-   //{
-   //   data.first  = -data.first;
-   //   data.second = -data.second;
-
-   //   normalize_pair(data);
-   //}
-
-   // Getters/Setters
-   //constexpr const float_type& first() const { return data.first; }
-   //constexpr const float_type& second() const { return data.second; }
+   void negate()
+   {
+      *this = -*this;
+   }
 
    rep_type&       rep() { return data; }
    const rep_type& rep() const { return data; }
    const rep_type& crep() const { return data; }
-
-   // Retrieve debug string.
-   //std::string get_raw_str() const
-   //{
-   //   std::stringstream ss;
-   //   ss << std::hexfloat << data.first << " + " << std::hexfloat << data.second;
-   //   return ss.str();
-   //}
 
    // Assignment operators.
    cpp_quad_float& operator=(const cpp_quad_float&) = default;
@@ -291,45 +312,17 @@ class cpp_quad_float
    cpp_quad_float& operator=(cpp_quad_float&&) = default;
 
    // Non-member add/sub/mul/div with constituent type.
-   //friend inline cpp_quad_float operator+(const cpp_quad_float& a, const float_type& b)
-   //{
-   //}
-
-   //friend inline cpp_quad_float operator-(const cpp_quad_float& a, const float_type& b)
-   //{
-   //}
-
-   friend inline cpp_quad_float operator*(const cpp_quad_float& a, const float_type& b)
-   {
-     // FIXME
-      return a * cpp_quad_float(b);
-   }
-
-   //friend inline cpp_quad_float operator/(const cpp_quad_float& a, const float_type& b)
-   //{
-   //}
+   // TODO Make specializations for these operators
+   friend inline cpp_quad_float operator+(const cpp_quad_float& a, const float_type& b) { return a + cpp_quad_float(b); }
+   friend inline cpp_quad_float operator-(const cpp_quad_float& a, const float_type& b) { return a - cpp_quad_float(b); }
+   friend inline cpp_quad_float operator*(const cpp_quad_float& a, const float_type& b) { return a * cpp_quad_float(b); }
+   friend inline cpp_quad_float operator/(const cpp_quad_float& a, const float_type& b) { return a / cpp_quad_float(b); }
 
    // Unary add/sub/mul/div with constituent part.
-   cpp_quad_float& operator+=(const float_type& a)
-   {
-      *this = *this + a;
-      return *this;
-   }
-   cpp_quad_float& operator-=(const float_type& a)
-   {
-      *this = *this - a;
-      return *this;
-   }
-   cpp_quad_float& operator*=(const float_type& a)
-   {
-      *this = *this * a;
-      return *this;
-   }
-   cpp_quad_float& operator/=(const float_type& a)
-   {
-      *this = *this / a;
-      return *this;
-   }
+   cpp_quad_float& operator+=(const float_type& a) { *this = *this + a; return *this; }
+   cpp_quad_float& operator-=(const float_type& a) { *this = *this - a; return *this; }
+   cpp_quad_float& operator*=(const float_type& a) { *this = *this * a; return *this; }
+   cpp_quad_float& operator/=(const float_type& a) { *this = *this / a; return *this; }
 
    // Unary add/sub/mul/div.
    cpp_quad_float& operator+=(const cpp_quad_float& other)
@@ -341,6 +334,7 @@ class cpp_quad_float
 
       float_pair u, v;
       int        i, j, k;
+
       i = j = k = 0;
 
       array<float_type, 4> a = {get<0>(this->data), get<1>(this->data), get<2>(this->data), get<3>(this->data)};
@@ -490,12 +484,13 @@ class cpp_quad_float
 
    cpp_quad_float& operator/=(const cpp_quad_float& other)
    {
-     using std::get;
-      rep_type q;
-      cpp_quad_float r(*this);
+      using std::get;
+
+      rep_type       q;
+      cpp_quad_float r;
 
       get<0>(q) = get<0>(this->data) / get<0>(other.data);
-      r -= other * get<0>(q);
+      r = *this - (other * get<0>(q));
 
       get<1>(q) = get<0>(r.data) / get<0>(other.data);
       r -= other * get<1>(q);
@@ -507,7 +502,6 @@ class cpp_quad_float
       r -= other * get<3>(q);
 
       arithmetic::normalize(q, get<0>(r.data) / get<0>(other.data));
-      
       data = q;
       return *this;
    }
@@ -518,16 +512,18 @@ class cpp_quad_float
       ++*this;
       return t;
    }
+
    cpp_quad_float operator--(int)
    {
       cpp_quad_float t(*this);
       --*this;
       return t;
    }
+
    cpp_quad_float& operator++() { return *this += cpp_quad_float<float_type>(float_type(1.0F)); }
    cpp_quad_float& operator--() { return *this -= cpp_quad_float<float_type>(float_type(1.0F)); }
 
-   cpp_quad_float operator-() const { return negative(); }
+   cpp_quad_float  operator-() const { return negative(); }
 
    // Helper functions
    static cpp_quad_float<float_type> pow10(int p)
@@ -582,24 +578,36 @@ class cpp_quad_float
    void swap(cpp_quad_float& other)
    {
       rep_type tmp = data;
-
       data = other.data;
-
       other.data = tmp;
    }
 
-   //int compare(const cpp_quad_float& other) const
-   //{
-   //}
-
-   std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
+   // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
+   int compare(const cpp_quad_float& other) const
    {
-      if (number_of_digits == 0)
-         number_of_digits = std::numeric_limits<cpp_quad_float>::digits10;
+      using std::get;
+      int n_result;
 
-      const std::string my_str = boost::multiprecision::detail::convert_to_string(*this, number_of_digits, format_flags);
+      if ((get<0>(this->data) > get<0>(other.data) ||
+           (get<0>(this->data) == get<0>(other.data) && (get<1>(this->data) > get<1>(other.data) ||
+                             (get<1>(this->data) == get<1>(other.data) && (get<2>(this->data) > get<2>(other.data) ||
+                                               (get<2>(this->data) == get<2>(other.data) && get<3>(this->data) > get<3>(other.data))))))))
+      {
+         n_result = 1;
+      }
+      else if ((get<0>(this->data) < get<0>(other.data) ||
+                (get<0>(this->data) == get<0>(other.data) && (get<1>(this->data) < get<1>(other.data) ||
+                                  (get<1>(this->data) == get<1>(other.data) && (get<2>(this->data) < get<2>(other.data) ||
+                                                    (get<2>(this->data) == get<2>(other.data) && get<3>(this->data) < get<3>(other.data))))))))
+      {
+         n_result = -1;
+      }
+      else
+      {
+         n_result = 0;
+      }
 
-      return my_str;
+      return n_result;
    }
 
    // Debugging
@@ -611,9 +619,20 @@ class cpp_quad_float
 
       ss << std::hexfloat;
       ss << get<0>(data) << " + " << get<1>(data) << " + " << get<2>(data) << " + " << get<3>(data);
-      ss << std::endl;
 
       return ss.str();
+   }
+
+   std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
+   {
+     // FIXME
+      return raw_str();
+      //if (number_of_digits == 0)
+      //   number_of_digits = std::numeric_limits<cpp_quad_float>::digits10;
+
+      //const std::string my_str = boost::multiprecision::detail::convert_to_string(*this, number_of_digits, format_flags);
+
+      //return my_str;
    }
 
  private:
@@ -680,6 +699,19 @@ void eval_frexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<
 template <typename FloatingPointType>
 void eval_ldexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& a, int v)
 {
+   using std::ldexp;
+   using std::get;
+
+   typename cpp_quad_float<FloatingPointType>::rep_type z =
+       std::make_tuple(
+           ldexp(get<0>(a.crep()), v),
+           ldexp(get<1>(a.crep()), v),
+           ldexp(get<2>(a.crep()), v),
+           ldexp(get<3>(a.crep()), v));
+
+   cpp_double_float<FloatingPointType>::arithmetic::normalize(z);
+
+   result.rep() = z;
 }
 
 template <typename FloatingPointType>
@@ -755,5 +787,78 @@ int fpclassify(const boost::multiprecision::backends::cpp_quad_float<FloatingPoi
 }
 
 }} // namespace boost::math
+
+namespace std {
+
+// Specialization of numeric_limits for cpp_quad_float<>
+template <typename FloatingPointType>
+class numeric_limits<boost::multiprecision::backends::cpp_quad_float<FloatingPointType> >
+    : public std::numeric_limits<FloatingPointType>
+{
+ private:
+   using base_class_type = std::numeric_limits<FloatingPointType>;
+
+   using self_type = boost::multiprecision::backends::cpp_quad_float<FloatingPointType>;
+
+ public:
+   static constexpr bool is_iec559                     = false;
+   static constexpr std::float_denorm_style has_denorm = std::denorm_absent;  // TODO Discuss (verify denormal arithmetic is done correctly) 
+
+   static constexpr int digits       = 4 * (base_class_type::digits);
+   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
+   static constexpr int max_digits10 = int(float(digits) * 0.301F) + 2;
+
+   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - 3 * base_class_type::digits;
+   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + 3 * base_class_type::digits;
+
+   // TODO Are these values rigorous?
+   static constexpr           self_type(min)() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
+   static constexpr           self_type(max)() noexcept { return self_type(boost::multiprecision::ldexp(base_class_type::max, -base_class_type::digits)); }
+   static constexpr self_type lowest() noexcept { return self_type(-max()); }
+   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -digits)); }
+   static constexpr self_type round_error() noexcept { return self_type(base_class_type::round_error()); }
+   static constexpr self_type denorm_min() noexcept { return self_type(min()); }
+
+   static constexpr self_type infinity() noexcept { return self_type(base_class_type::infinity()); }
+   static constexpr self_type quiet_NaN() noexcept { return self_type(base_class_type::quiet_NaN()); }
+   static constexpr self_type signaling_NaN() noexcept { return self_type(base_class_type::signaling_NaN()); }
+};
+
+// Specialization of numeric_limits for boost::multiprecision::number<cpp_quad_float<>>
+template <typename FloatingPointType,
+          const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >
+    : public std::numeric_limits<FloatingPointType>
+{
+ private:
+   using base_class_type = std::numeric_limits<FloatingPointType>;
+
+   using self_type =
+       boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption>;
+
+ public:
+   static constexpr bool is_iec559                     = false;
+   static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+
+   static constexpr int digits       = 4 * (base_class_type::digits);
+   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
+   static constexpr int max_digits10 = int(float(digits) * 0.301F) + 2;
+
+   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - 3 * base_class_type::digits;
+   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + 3 * base_class_type::digits;
+
+   static constexpr           self_type(min)() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
+   static constexpr           self_type(max)() noexcept { return self_type(std::ldexp(base_class_type::max(), -base_class_type::digits)); }
+   static constexpr self_type lowest() noexcept { return self_type(-max()); }
+   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -digits)); }
+   static constexpr self_type round_error() noexcept { return self_type(base_class_type::round_error()); }
+   static constexpr self_type denorm_min() noexcept { return self_type(min()); }
+
+   static constexpr self_type infinity() noexcept { return self_type(base_class_type::infinity()); }
+   static constexpr self_type quiet_NaN() noexcept { return self_type(base_class_type::quiet_NaN()); }
+   static constexpr self_type signaling_NaN() noexcept { return self_type(base_class_type::signaling_NaN()); }
+};
+
+} // namespace std
 
 #endif // BOOST_MP_CPP_QUAD_FLOAT_2021_07_29_HPP

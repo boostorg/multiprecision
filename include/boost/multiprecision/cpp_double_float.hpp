@@ -277,7 +277,7 @@ struct exact_arithmetic
       using std::get;
       using std::tie;
 
-      float_tuple s(0, 0, 0, 0);
+      float_tuple s((float_type)0, (float_type)0, (float_type)0, (float_type)0);
 
       tie(get<0>(s), get<3>(t)) = fast_sum(get<2>(t), get<3>(t));
       tie(get<0>(s), get<2>(t)) = fast_sum(get<1>(t), get<0>(s));
@@ -311,7 +311,7 @@ struct exact_arithmetic
      using std::tie;
      using std::get;
 
-      float_tuple s(0, 0, 0, 0);
+      float_tuple s((float_type)0, (float_type)0, (float_type)0, (float_type)0);
 
       tie(get<0>(s), e)         = fast_sum(get<3>(t), e);
       tie(get<0>(s), get<3>(t)) = fast_sum(get<2>(t), get<0>(s));
@@ -390,17 +390,17 @@ class cpp_double_float
    constexpr cpp_double_float(const cpp_double_float&) = default;
 
    // Constructors from other floating-point types.
-   template <typename FloatType,
-             typename std::enable_if<    (detail::is_floating_point_or_float128<FloatType>::value == true)
-                                      && (std::numeric_limits<FloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
-   constexpr cpp_double_float(const FloatType& f) : data(std::make_pair(f, (float_type)0)) {}
+   template <typename OtherFloatType,
+             typename std::enable_if<    (detail::is_floating_point_or_float128<OtherFloatType>::value == true)
+                                      && (std::numeric_limits<OtherFloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
+   constexpr cpp_double_float(const OtherFloatType& f) : data(std::make_pair(f, (float_type)0)) {}
 
-   template <typename FloatType,
-             typename std::enable_if<(   (std::numeric_limits<FloatType>::is_iec559 == true)
-                                      && (std::numeric_limits<FloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   constexpr cpp_double_float(const FloatType& f)
+   template <typename OtherFloatType,
+             typename std::enable_if<(   (std::numeric_limits<OtherFloatType>::is_iec559 == true)
+                                      && (std::numeric_limits<OtherFloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   constexpr cpp_double_float(const OtherFloatType& f)
        : data(std::make_pair(static_cast<float_type>(f),
-                             static_cast<float_type>(f - (FloatType) static_cast<float_type>(f)))) {}
+                             static_cast<float_type>(f - (OtherFloatType) static_cast<float_type>(f)))) {}
 
    // Constructor from other cpp_double_float<> objects.
    template <typename OtherFloatType,
@@ -819,6 +819,7 @@ void eval_ldexp(cpp_double_float<FloatingPointType>& result, const cpp_double_fl
       ldexp(a.crep().second, v)
    );
 
+   // TODO is this neccessary?
    cpp_double_float<FloatingPointType>::arithmetic::normalize(z);
 
    result.rep() = z;
