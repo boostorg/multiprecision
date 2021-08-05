@@ -141,7 +141,7 @@ public:
       int guard = double_or_quad_traits<Rr>::guard_bits;
       bits.resize(std::numeric_limits<Rr>::digits + guard, 0);
 
-      while ((norm != Rr(0)) && ((pos - ex) < bits.size())) {
+      while ((norm != Rr(0)) && ((pos - ex) < (int) bits.size())) {
          pos -= ex;
          if(!((ex <= 0) && (pos < int(bits.size())) && (pos >= 0))) throw LoopError{};
          bits[pos] = 1;
@@ -202,7 +202,10 @@ public:
    int short_print_shifted(int max_exp = 0, bool skip_exp = true)
    {
       std::string st = bit_str();
-      auto len = st.size();
+
+      const auto len = st.size();
+      (void) len;
+
       if(skip_exp) {
          std::cout << "exp : " << std::setw(6) << exp << ", bits : "  << std::right <<                               (sig==1?"+":"-") << bit_str() << std::endl;
       } else {
@@ -401,4 +404,3 @@ int main()
 
    return (errors != 0);
 }
-

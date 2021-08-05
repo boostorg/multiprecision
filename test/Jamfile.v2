@@ -115,6 +115,7 @@ test-suite df_qf_tests :
    [ run test_arithmetic_df.cpp no_eh_support : : : release : ]
    [ run test_cpp_double_float_decomposition.cpp no_eh_support : : : release : ]
    [ run test_cpp_double_float_arithmetic.cpp no_eh_support : : : release : ]
+   [ run test_cpp_quad_float_arithmetic.cpp no_eh_support : : : release : ]
    [ run test_sqrt.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
    [ run test_exp.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
    [ run test_log.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
@@ -132,6 +133,7 @@ test-suite df_qf_tests :
 
 test-suite df_qf_quadmath_tests :
 
+   [ run test_cpp_quad_float_arithmetic.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_QUAD_FLOAT <define>BOOST_MATH_USE_FLOAT128 : <build>no ] ]
    [ run test_arithmetic_df.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>BOOST_MATH_USE_FLOAT128 : <build>no ] ]
    [ run test_sqrt.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT <define>BOOST_MATH_USE_FLOAT128 : <build>no ] ]
    [ run test_exp.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT <define>BOOST_MATH_USE_FLOAT128 : <build>no ] ]
