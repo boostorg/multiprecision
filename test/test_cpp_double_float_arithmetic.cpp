@@ -152,12 +152,16 @@ namespace local
       // and base these on the actual range of the exponent10 member of limits.
       // The use of the digits member here is a strange workaround that
       // still needs to be investigated on GCC's 10-bit x86 long double.
+      using local_exp10_float_type =
+         typename std::conditional<std::is_same<float_type, long double>::value, double, float_type>::type;
+
       static std::uniform_int_distribution<unsigned>
       dist_exp
       (
         0,
-          ((std::numeric_limits<float_type>::digits10 < 10) ? 13
-        : ((std::numeric_limits<float_type>::digits10 < 20) ? 85 : 1035))
+          ((std::numeric_limits<local_exp10_float_type>::max_exponent10 > 1000) ? 1333
+        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >  200) ?  103
+        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?   13 : 1)))
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
@@ -371,7 +375,7 @@ namespace local
 int main()
 {
   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 17U);
+  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 18U);
   #else
   constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 14U);
   #endif
@@ -382,24 +386,24 @@ int main()
   constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL << 12U);
   #endif
 
-  const bool result_flt__is_ok = local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt__is_ok: " << std::boolalpha << result_flt__is_ok << std::endl;
-  const bool result_dbl__is_ok = local::test_arithmetic<double>     (test_cases_built_in); std::cout << "result_dbl__is_ok: " << std::boolalpha << result_dbl__is_ok << std::endl;
-  const bool result_ldbl_is_ok = local::test_arithmetic<long double>(test_cases_built_in); std::cout << "result_ldbl_is_ok: " << std::boolalpha << result_ldbl_is_ok << std::endl;
+  const bool result_flt___is_ok = local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
+  const bool result_dbl___is_ok = local::test_arithmetic<double>     (test_cases_built_in); std::cout << "result_dbl___is_ok: " << std::boolalpha << result_dbl___is_ok << std::endl;
+  const bool result_ldbl__is_ok = local::test_arithmetic<long double>(test_cases_built_in); std::cout << "result_ldbl__is_ok: " << std::boolalpha << result_ldbl__is_ok << std::endl;
 
 #ifdef BOOST_MATH_USE_FLOAT128
-  const bool result_f128_is_ok = local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
-                                                                                           std::cout << "result_ldbl_is_ok: " << std::boolalpha << result_f128_is_ok << std::endl;
+  const bool result_f128__is_ok = local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
+                                                                                            std::cout << "result_f128__is_ok: " << std::boolalpha << result_f128__is_ok << std::endl;
 #else
    (void) test_cases_float128;
 #endif
 
   const bool result_is_ok =
   (
-      result_flt__is_ok
-   && result_dbl__is_ok
-   && result_ldbl_is_ok
+      result_flt___is_ok
+   && result_dbl___is_ok
+   && result_ldbl__is_ok
 #ifdef BOOST_MATH_USE_FLOAT128
-   && result_f128_is_ok
+   && result_f128__is_ok
 #endif
   );
 
