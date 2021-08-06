@@ -116,6 +116,11 @@ test-suite df_qf_tests :
    [ run test_cpp_double_float_decomposition.cpp no_eh_support : : : release : ]
    [ run test_cpp_double_float_arithmetic.cpp no_eh_support : : : release : ]
    [ run test_cpp_quad_float_arithmetic.cpp no_eh_support : : : release : ]
+
+;
+
+test-suite df_qf_funcs :
+
    [ run test_sqrt.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
    [ run test_exp.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
    [ run test_log.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]

@@ -680,31 +680,39 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_quad_float<Floati
 }
 
 template <typename FloatingPointType>
-void eval_add(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result += x; }
+void eval_add     (cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result += x; }
 template <typename FloatingPointType>
 void eval_subtract(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result -= x; }
 template <typename FloatingPointType>
 void eval_multiply(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result *= x; }
 template <typename FloatingPointType>
-void eval_divide(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result /= x; }
+void eval_divide  (cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result /= x; }
 
 template <typename FloatingPointType>
 void eval_frexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& a, int* v)
 {
+   using std::frexp;
+   using std::ldexp;
+
+   std::get<0>(result.crep()) = std::frexp(std::get<0>(a.crep()),   v);
+   std::get<1>(result.crep()) = std::ldexp(std::get<1>(a.crep()), -*v);
+   std::get<2>(result.crep()) = std::ldexp(std::get<2>(a.crep()), -*v);
+   std::get<3>(result.crep()) = std::ldexp(std::get<3>(a.crep()), -*v);
 }
 
 template <typename FloatingPointType>
 void eval_ldexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& a, int v)
 {
    using std::ldexp;
-   using std::get;
 
    typename cpp_quad_float<FloatingPointType>::rep_type z =
-       std::make_tuple(
-           ldexp(get<0>(a.crep()), v),
-           ldexp(get<1>(a.crep()), v),
-           ldexp(get<2>(a.crep()), v),
-           ldexp(get<3>(a.crep()), v));
+   std::make_tuple
+   (
+      ldexp(std::get<0>(a.crep()), v),
+      ldexp(std::get<1>(a.crep()), v),
+      ldexp(std::get<2>(a.crep()), v),
+      ldexp(std::get<3>(a.crep()), v)
+   );
 
    cpp_double_float<FloatingPointType>::arithmetic::normalize(z);
 
