@@ -119,6 +119,7 @@ test-suite df_qf_tests :
 
    [ run test_sqrt.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_sqrt ]
    [ run test_exp.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_exp ]
+   [ run test_pow.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_pow ]
    [ run test_log.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_log ]
    [ run test_sin.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_sin ]
    [ run test_cos.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_cos ]

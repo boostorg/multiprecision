@@ -730,14 +730,42 @@ void eval_ceil(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<F
 }
 
 template <typename FloatingPointType>
-void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& o)
+void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
 {
+   using double_float_type = cpp_double_float<FloatingPointType>;
+   using quad_float_type   = cpp_quad_float  <FloatingPointType>;
+
+   if(eval_fpclassify(x) != (int) FP_NORMAL)
+   {
+      result = x;
+   }
+   else if(std::get<0>(x.crep()) < typename quad_float_type::float_type(0.0F))
+   {
+      result = std::numeric_limits<quad_float_type>::quiet_NaN();
+   }
+   else
+   {
+      // Get initial estimate using the double-float function eval_sqrt.
+      double_float_type r(std::get<0>(x.crep()), std::get<1>(x.crep()));
+
+      eval_sqrt(r, double_float_type(r));
+
+      quad_float_type rq;
+
+      std::get<0>(rq.rep()) = r.crep().first;
+      std::get<1>(rq.rep()) = r.crep().second;
+      std::get<2>(rq.rep()) = typename quad_float_type::float_type(0.0F);
+      std::get<3>(rq.rep()) = typename quad_float_type::float_type(0.0F);
+
+      // Do one single step of Newton-Raphson iteration
+      result = (rq + (x / rq)) / quad_float_type(2U);
+   }
 }
 
 template <typename FloatingPointType>
 int eval_fpclassify(const cpp_quad_float<FloatingPointType>& o)
 {
-   return (int)(boost::math::fpclassify)(o.crep().first);
+   return (int)(boost::math::fpclassify)(std::get<0>(o.crep()));
 }
 
 template <typename FloatingPointType,
@@ -788,7 +816,7 @@ int fpclassify(const boost::multiprecision::backends::cpp_quad_float<FloatingPoi
 {
    using std::fpclassify;
 
-   return (int)(fpclassify)(o.crep().first);
+   return (int)(fpclassify)(std::get<0>(o.crep()));
 }
 
 }} // namespace boost::math
@@ -820,7 +848,7 @@ class numeric_limits<boost::multiprecision::backends::cpp_quad_float<FloatingPoi
    static constexpr           self_type(min)() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
    static constexpr           self_type(max)() noexcept { return self_type(boost::multiprecision::ldexp(base_class_type::max, -base_class_type::digits)); }
    static constexpr self_type lowest() noexcept { return self_type(-max()); }
-   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -digits)); }
+   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), 6 - digits)); }
    static constexpr self_type round_error() noexcept { return self_type(base_class_type::round_error()); }
    static constexpr self_type denorm_min() noexcept { return self_type(min()); }
 
@@ -855,7 +883,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    static constexpr           self_type(min)() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
    static constexpr           self_type(max)() noexcept { return self_type(std::ldexp(base_class_type::max(), -base_class_type::digits)); }
    static constexpr self_type lowest() noexcept { return self_type(-max()); }
-   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -digits)); }
+   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), 6 - digits)); }
    static constexpr self_type round_error() noexcept { return self_type(base_class_type::round_error()); }
    static constexpr self_type denorm_min() noexcept { return self_type(min()); }
 
