@@ -680,31 +680,39 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_quad_float<Floati
 }
 
 template <typename FloatingPointType>
-void eval_add(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result += x; }
+void eval_add     (cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result += x; }
 template <typename FloatingPointType>
 void eval_subtract(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result -= x; }
 template <typename FloatingPointType>
 void eval_multiply(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result *= x; }
 template <typename FloatingPointType>
-void eval_divide(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result /= x; }
+void eval_divide  (cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result /= x; }
 
 template <typename FloatingPointType>
 void eval_frexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& a, int* v)
 {
+   using std::frexp;
+   using std::ldexp;
+
+   std::get<0>(result.crep()) = std::frexp(std::get<0>(a.crep()),   v);
+   std::get<1>(result.crep()) = std::ldexp(std::get<1>(a.crep()), -*v);
+   std::get<2>(result.crep()) = std::ldexp(std::get<2>(a.crep()), -*v);
+   std::get<3>(result.crep()) = std::ldexp(std::get<3>(a.crep()), -*v);
 }
 
 template <typename FloatingPointType>
 void eval_ldexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& a, int v)
 {
    using std::ldexp;
-   using std::get;
 
    typename cpp_quad_float<FloatingPointType>::rep_type z =
-       std::make_tuple(
-           ldexp(get<0>(a.crep()), v),
-           ldexp(get<1>(a.crep()), v),
-           ldexp(get<2>(a.crep()), v),
-           ldexp(get<3>(a.crep()), v));
+   std::make_tuple
+   (
+      ldexp(std::get<0>(a.crep()), v),
+      ldexp(std::get<1>(a.crep()), v),
+      ldexp(std::get<2>(a.crep()), v),
+      ldexp(std::get<3>(a.crep()), v)
+   );
 
    cpp_double_float<FloatingPointType>::arithmetic::normalize(z);
 
@@ -722,14 +730,42 @@ void eval_ceil(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<F
 }
 
 template <typename FloatingPointType>
-void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& o)
+void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
 {
+   using double_float_type = cpp_double_float<FloatingPointType>;
+   using quad_float_type   = cpp_quad_float  <FloatingPointType>;
+
+   if(eval_fpclassify(x) != (int) FP_NORMAL)
+   {
+      result = x;
+   }
+   else if(std::get<0>(x.crep()) < typename quad_float_type::float_type(0.0F))
+   {
+      result = std::numeric_limits<quad_float_type>::quiet_NaN();
+   }
+   else
+   {
+      // Get initial estimate using the double-float function eval_sqrt.
+      double_float_type r(std::get<0>(x.crep()), std::get<1>(x.crep()));
+
+      eval_sqrt(r, double_float_type(r));
+
+      quad_float_type rq;
+
+      std::get<0>(rq.rep()) = r.crep().first;
+      std::get<1>(rq.rep()) = r.crep().second;
+      std::get<2>(rq.rep()) = typename quad_float_type::float_type(0.0F);
+      std::get<3>(rq.rep()) = typename quad_float_type::float_type(0.0F);
+
+      // Do one single step of Newton-Raphson iteration
+      result = (rq + (x / rq)) / quad_float_type(2U);
+   }
 }
 
 template <typename FloatingPointType>
 int eval_fpclassify(const cpp_quad_float<FloatingPointType>& o)
 {
-   return (int)(boost::math::fpclassify)(o.crep().first);
+   return (int)(boost::math::fpclassify)(std::get<0>(o.crep()));
 }
 
 template <typename FloatingPointType,
@@ -743,13 +779,13 @@ typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_t
 
    BOOST_CONSTEXPR const c_type my_max = static_cast<c_type>((std::numeric_limits<R>::max)());
    BOOST_CONSTEXPR const c_type my_min = static_cast<c_type>((std::numeric_limits<R>::min)());
-   c_type                       ct     = fabs(backend.crep().first);
+   c_type                       ct     = fabs(std::get<0>(backend.crep()));
 
    (void)my_min;
 
    if (ct > my_max)
       if (!std::is_unsigned<R>::value)
-         *result = backend.crep().first >= typename cpp_quad_float<FloatingPointType>::float_type(0U) ? (std::numeric_limits<R>::max)() : detail::minus_max<R>();
+         *result = std::get<0>(backend.crep()) >= typename cpp_quad_float<FloatingPointType>::float_type(0U) ? (std::numeric_limits<R>::max)() : detail::minus_max<R>();
       else
          *result = (std::numeric_limits<R>::max)();
    else
@@ -780,7 +816,7 @@ int fpclassify(const boost::multiprecision::backends::cpp_quad_float<FloatingPoi
 {
    using std::fpclassify;
 
-   return (int)(fpclassify)(o.crep().first);
+   return (int)(fpclassify)(std::get<0>(o.crep()));
 }
 
 }} // namespace boost::math
@@ -812,7 +848,7 @@ class numeric_limits<boost::multiprecision::backends::cpp_quad_float<FloatingPoi
    static constexpr           self_type(min)() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
    static constexpr           self_type(max)() noexcept { return self_type(boost::multiprecision::ldexp(base_class_type::max, -base_class_type::digits)); }
    static constexpr self_type lowest() noexcept { return self_type(-max()); }
-   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -digits)); }
+   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), 6 - digits)); }
    static constexpr self_type round_error() noexcept { return self_type(base_class_type::round_error()); }
    static constexpr self_type denorm_min() noexcept { return self_type(min()); }
 
@@ -847,7 +883,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    static constexpr           self_type(min)() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
    static constexpr           self_type(max)() noexcept { return self_type(std::ldexp(base_class_type::max(), -base_class_type::digits)); }
    static constexpr self_type lowest() noexcept { return self_type(-max()); }
-   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -digits)); }
+   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), 6 - digits)); }
    static constexpr self_type round_error() noexcept { return self_type(base_class_type::round_error()); }
    static constexpr self_type denorm_min() noexcept { return self_type(min()); }
 
