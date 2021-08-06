@@ -363,7 +363,7 @@ namespace local
     const bool result_sub___is_ok = control<float_type>::test_sub__(count); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
     const bool result_mul___is_ok = control<float_type>::test_mul__(count); std::cout << "result_mul___is_ok: " << std::boolalpha << result_mul___is_ok << std::endl;
     const bool result_div___is_ok = control<float_type>::test_div__(count); std::cout << "result_div___is_ok: " << std::boolalpha << result_div___is_ok << std::endl;
-    const bool result_sqrt__is_ok = true;//control<float_type>::test_sqrt_(count); std::cout << "result_sqrt__is_ok: " << std::boolalpha << result_sqrt__is_ok << std::endl;
+    const bool result_sqrt__is_ok = control<float_type>::test_sqrt_(count); std::cout << "result_sqrt__is_ok: " << std::boolalpha << result_sqrt__is_ok << std::endl;
 
     const bool result_all_is_ok = (   result_add___is_ok
                                    && result_sub___is_ok
