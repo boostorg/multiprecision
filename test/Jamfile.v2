@@ -117,6 +117,8 @@ test-suite df_qf_tests :
    [ run test_cpp_double_float_arithmetic.cpp    no_eh_support : : : release : test_cpp_double_float_arithmetic ]
    [ run test_cpp_quad_float_arithmetic.cpp      no_eh_support : : : release : test_cpp_quad_float_arithmetic ]
 
+   [ run ../example/cpp_quad_float_vs_bin_float_timed_mul.cpp no_eh_support : : : release : cpp_quad_float_vs_bin_float_timed_mul ]
+
    [ run test_sqrt.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_sqrt_df ]
    [ run test_exp.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_exp ]
    [ run test_pow.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_pow ]
