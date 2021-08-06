@@ -712,7 +712,9 @@ void eval_ldexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<
 {
    using std::ldexp;
 
-   typename cpp_quad_float<FloatingPointType>::rep_type z =
+   using quad_float_type = cpp_quad_float<FloatingPointType>;
+
+   typename quad_float_type::rep_type z =
    std::make_tuple
    (
       ldexp(std::get<0>(a.crep()), v),
@@ -721,7 +723,7 @@ void eval_ldexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<
       ldexp(std::get<3>(a.crep()), v)
    );
 
-   cpp_double_float<FloatingPointType>::arithmetic::normalize(z);
+   quad_float_type::arithmetic::normalize(z);
 
    result.rep() = z;
 }
@@ -729,17 +731,38 @@ void eval_ldexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<
 template <typename FloatingPointType>
 void eval_floor(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
 {
-   using quad_float_type = cpp_quad_float<FloatingPointType>;
+   using local_float_type = typename cpp_quad_float<FloatingPointType>::float_type;
 
-   using std::floor;
-   using std::get;
+   using double_float_type = cpp_double_float<local_float_type>;
+   using quad_float_type   = cpp_quad_float  <local_float_type>;
 
-   const typename quad_float_type::float_type fhi = floor(get<0>(x.crep()));
+   double_float_type fhi;
 
-   result = quad_float_type(fhi);
+   const double_float_type xhi(std::get<0>(x.crep()), std::get<1>(x.crep()));
 
-   if (fhi == get<0>(x.crep()))
-      get<0>(result.rep()) = quad_float_type::arithmetic::fast_sum(fhi, get<1>(x.crep())).first;
+   eval_floor(fhi, xhi);
+
+   std::get<0>(result.rep()) = fhi.crep().first;
+   std::get<1>(result.rep()) = fhi.crep().second;
+
+   if(fhi != xhi)
+   {
+      std::get<2>(result.rep()) = static_cast<local_float_type>(0.0F);
+      std::get<3>(result.rep()) = static_cast<local_float_type>(0.0F);
+   }
+   else
+   {
+      double_float_type flo;
+
+      const double_float_type xlo(std::get<2>(x.crep()), std::get<3>(x.crep()));
+
+      eval_floor(flo, xlo);
+
+      std::get<2>(result.rep()) = flo.crep().first;
+      std::get<3>(result.rep()) = flo.crep().second;
+
+      quad_float_type::arithmetic::normalize(result.rep());
+   }
 }
 
 template <typename FloatingPointType>
@@ -812,14 +835,14 @@ typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_t
          *result = (std::numeric_limits<R>::max)();
    else
    {
-      *result = std::get<0>(backend.crep());
+      *result = (R) std::get<0>(backend.crep());
 
       if (std::numeric_limits<decltype(*result)>::digits >     std::numeric_limits<FloatingPointType>::digits)
-         *result += std::get<1>(backend.crep());
+         *result += (R) std::get<1>(backend.crep());
       if (std::numeric_limits<decltype(*result)>::digits > 2 * std::numeric_limits<FloatingPointType>::digits)
-         *result += std::get<2>(backend.crep());
+         *result += (R) std::get<2>(backend.crep());
       if (std::numeric_limits<decltype(*result)>::digits > 3 * std::numeric_limits<FloatingPointType>::digits)
-         *result += std::get<3>(backend.crep());
+         *result += (R) std::get<3>(backend.crep());
    }
 }
 
@@ -827,13 +850,13 @@ template <typename FloatingPointType,
           typename R>
 typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_to(R* result, const cpp_quad_float<FloatingPointType>& backend)
 {
-   *result = std::get<0>(backend.crep());
+   *result = (R) std::get<0>(backend.crep());
    if (std::numeric_limits<decltype(*result)>::digits > std::numeric_limits<FloatingPointType>::digits)
-      *result += std::get<1>(backend.crep());
+      *result += (R) std::get<1>(backend.crep());
    if (std::numeric_limits<decltype(*result)>::digits > 2 * std::numeric_limits<FloatingPointType>::digits)
-      *result += std::get<2>(backend.crep());
+      *result += (R) std::get<2>(backend.crep());
    if (std::numeric_limits<decltype(*result)>::digits > 3 * std::numeric_limits<FloatingPointType>::digits)
-      *result += std::get<3>(backend.crep());
+      *result += (R) std::get<3>(backend.crep());
 }
 
 template <typename FloatingPointType>
