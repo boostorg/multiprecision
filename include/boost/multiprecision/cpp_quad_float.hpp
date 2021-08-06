@@ -263,26 +263,33 @@ class cpp_quad_float
       return result;
    }
 
-   // Casts
-//   operator signed char() const { return (signed char)data.first; }
-//   operator signed short() const { return (signed short)data.first; }
-//   operator signed int() const { return (signed int)data.first + (signed int)data.second; }
-//   operator signed long() const { return (signed long)data.first + (signed long)data.second; }
-//   operator signed long long() const { return (signed long long)data.first + (signed long long)data.second; }
-//   operator unsigned char() const { return (unsigned char)data.first; }
-//   operator unsigned short() const { return (unsigned short)data.first; }
-//   operator unsigned int() const { return (unsigned int)((unsigned int)data.first + (signed int)data.second); }
-//   operator unsigned long() const { return (unsigned long)((unsigned long)data.first + (signed long)data.second); }
-//   operator unsigned long long() const { return (unsigned long long)((unsigned long long)data.first + (signed long long)data.second); }
-//   operator float() const { return (float)data.first + (float)data.second; }
-//   operator double() const { return (double)data.first + (double)data.second; }
-//   operator long double() const { return (long double)data.first + (long double)data.second; }
-//#ifdef BOOST_MATH_USE_FLOAT128
-//   explicit operator boost::multiprecision::float128() const
-//   {
-//      return static_cast<boost::multiprecision::float128>(data.first) + static_cast<boost::multiprecision::float128>(data.second);
-//   }
-//#endif
+// Casts
+   // TODO Avoid unneccassary additions
+   operator signed char() const { return (signed char)std::get<0>(data); }
+   operator signed short() const { return (signed short)std::get<0>(data); }
+   operator signed int() const { return (signed int)std::get<0>(data) + (signed int)std::get<1>(data) + (signed int)std::get<2>(data) + (signed int)std::get<3>(data); }
+   operator signed long() const { return (signed long)std::get<0>(data) + (signed long)std::get<1>(data) + (signed long)std::get<2>(data) + (signed long)std::get<3>(data); }
+   operator signed long long() const { return (signed long long)std::get<0>(data) + (signed long long)std::get<1>(data) + (signed long long)std::get<2>(data) + (signed long long)std::get<3>(data); }
+
+   operator unsigned char() const { return (unsigned char)std::get<0>(data); }
+   operator unsigned short() const { return (unsigned short)std::get<0>(data); }
+   operator unsigned int() const { return (unsigned int)std::get<0>(data) + (unsigned int)std::get<1>(data) + (unsigned int)std::get<2>(data) + (unsigned int)std::get<3>(data); }
+   operator unsigned long() const { return (unsigned long)static_cast<signed long>(*this); }
+   operator unsigned long long() const { return (unsigned long long)static_cast<signed long long>(*this); }
+
+   operator float() const { return (float)std::get<0>(data) + (float)std::get<1>(data) + (float)std::get<2>(data) + (float)std::get<3>(data); }
+   operator double() const { return (double)std::get<0>(data) + (double)std::get<1>(data) + (double)std::get<2>(data) + (double)std::get<3>(data); }
+   operator long double() const { return (long double)std::get<0>(data) + (long double)std::get<1>(data) + (long double)std::get<2>(data) + (long double)std::get<3>(data); }
+#ifdef BOOST_MATH_USE_FLOAT128
+   explicit operator boost::multiprecision::float128() const
+   {
+      return static_cast<boost::multiprecision::float128>(std::get<0>(data)) +
+             static_cast<boost::multiprecision::float128>(std::get<1>(data)) +
+             static_cast<boost::multiprecision::float128>(std::get<2>(data)) +
+             static_cast<boost::multiprecision::float128>(std::get<3>(data));
+   }
+#endif
+
 
    // Methods
    constexpr cpp_quad_float<float_type> negative() const
@@ -623,13 +630,13 @@ class cpp_quad_float
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
    {
      // FIXME
-      return raw_str();
-      //if (number_of_digits == 0)
-      //   number_of_digits = std::numeric_limits<cpp_quad_float>::digits10;
+      //return raw_str();
+      if (number_of_digits == 0)
+         number_of_digits = std::numeric_limits<cpp_quad_float>::digits10;
 
-      //const std::string my_str = boost::multiprecision::detail::convert_to_string(*this, number_of_digits, format_flags);
+      const std::string my_str = boost::multiprecision::detail::convert_to_string(*this, number_of_digits, format_flags);
 
-      //return my_str;
+      return my_str;
    }
 
  private:
@@ -694,10 +701,10 @@ void eval_frexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<
    using std::frexp;
    using std::ldexp;
 
-   std::get<0>(result.crep()) = std::frexp(std::get<0>(a.crep()),   v);
-   std::get<1>(result.crep()) = std::ldexp(std::get<1>(a.crep()), -*v);
-   std::get<2>(result.crep()) = std::ldexp(std::get<2>(a.crep()), -*v);
-   std::get<3>(result.crep()) = std::ldexp(std::get<3>(a.crep()), -*v);
+   std::get<0>(result.rep()) = std::frexp(std::get<0>(a.crep()),   v);
+   std::get<1>(result.rep()) = std::ldexp(std::get<1>(a.crep()), -*v);
+   std::get<2>(result.rep()) = std::ldexp(std::get<2>(a.crep()), -*v);
+   std::get<3>(result.rep()) = std::ldexp(std::get<3>(a.crep()), -*v);
 }
 
 template <typename FloatingPointType>
@@ -722,11 +729,26 @@ void eval_ldexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<
 template <typename FloatingPointType>
 void eval_floor(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
 {
+   using quad_float_type = cpp_quad_float<FloatingPointType>;
+
+   using std::floor;
+   using std::get;
+
+   const typename quad_float_type::float_type fhi = floor(get<0>(x.crep()));
+
+   result = quad_float_type(fhi);
+
+   if (fhi == get<0>(x.crep()))
+      get<0>(result.rep()) = quad_float_type::arithmetic::fast_sum(fhi, get<1>(x.crep())).first;
 }
 
 template <typename FloatingPointType>
 void eval_ceil(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
 {
+   // Compute -floor(-x);
+   eval_floor(result, -x);
+
+   result.negate();
 }
 
 template <typename FloatingPointType>
@@ -790,7 +812,14 @@ typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_t
          *result = (std::numeric_limits<R>::max)();
    else
    {
-     // TODO
+      *result = std::get<0>(backend.crep());
+
+      if (std::numeric_limits<decltype(*result)>::digits >     std::numeric_limits<FloatingPointType>::digits)
+         *result += std::get<1>(backend.crep());
+      if (std::numeric_limits<decltype(*result)>::digits > 2 * std::numeric_limits<FloatingPointType>::digits)
+         *result += std::get<2>(backend.crep());
+      if (std::numeric_limits<decltype(*result)>::digits > 3 * std::numeric_limits<FloatingPointType>::digits)
+         *result += std::get<3>(backend.crep());
    }
 }
 
@@ -798,6 +827,13 @@ template <typename FloatingPointType,
           typename R>
 typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_to(R* result, const cpp_quad_float<FloatingPointType>& backend)
 {
+   *result = std::get<0>(backend.crep());
+   if (std::numeric_limits<decltype(*result)>::digits > std::numeric_limits<FloatingPointType>::digits)
+      *result += std::get<1>(backend.crep());
+   if (std::numeric_limits<decltype(*result)>::digits > 2 * std::numeric_limits<FloatingPointType>::digits)
+      *result += std::get<2>(backend.crep());
+   if (std::numeric_limits<decltype(*result)>::digits > 3 * std::numeric_limits<FloatingPointType>::digits)
+      *result += std::get<3>(backend.crep());
 }
 
 template <typename FloatingPointType>
