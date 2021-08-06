@@ -13,8 +13,10 @@ on:
     branches:
       - '**'
   pull_request:
+  schedule:
+    - cron: '0 2 * * *' # run at 2 AM UTC
 jobs:
-  gcc-clang-native:
+  ubuntu-focal-df_qf_tests:
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -24,65 +26,59 @@ jobs:
       matrix:
         compiler: [ g++, clang++ ]
         standard: [ c++11, c++14, c++17, c++2a ]
+        suite: [ df_qf_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: '0'
-      - name: clone-submods-bootstrap-headers-boost-develop
-        run: |
-          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
-          cd ../boost-root
-          git submodule update --init tools
-          git submodule update --init libs/array
-          git submodule update --init libs/assert
-          git submodule update --init libs/concept_check
-          git submodule update --init libs/config
-          git submodule update --init libs/container
-          git submodule update --init libs/core
-          git submodule update --init libs/detail
-          git submodule update --init libs/exception
-          git submodule update --init libs/headers
-          git submodule update --init libs/integer
-          git submodule update --init libs/iterator
-          git submodule update --init libs/lexical_cast
-          git submodule update --init libs/math
-          git submodule update --init libs/move
-          git submodule update --init libs/mpl
-          git submodule update --init libs/multiprecision
-          git submodule update --init libs/numeric/conversion
-          git submodule update --init libs/predef
-          git submodule update --init libs/preprocessor
-          git submodule update --init libs/random
-          git submodule update --init libs/rational
-          git submodule update --init libs/range
-          git submodule update --init libs/smart_ptr
-          git submodule update --init libs/static_assert
-          git submodule update --init libs/throw_exception
-          git submodule update --init libs/type_traits
-          git submodule update --init libs/utility
-          ./bootstrap.sh
-          ./b2 headers
-      - name: gcc-clang-native
-        run: |
-          echo "where am i (via pwd)"
-          pwd
-          echo "compile to ./test_cpp_double_float_arithmetic.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
-          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
-          ls -la ./test_cpp_double_float_arithmetic.exe
-          echo "execute ./test_cpp_double_float_arithmetic.exe"
-          ./test_cpp_double_float_arithmetic.exe
-          echo "compile to ./test_cpp_double_float_constructors.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_constructors.cpp -o test_cpp_double_float_constructors.exe
-          echo "ls -la of ./test_cpp_double_float_constructors.exe"
-          ls -la ./test_cpp_double_float_constructors.exe
-          echo "execute ./test_cpp_double_float_constructors.exe"
-          ./test_cpp_double_float_constructors.exe
-  gcc-clang-native-asan:
+      - name: Set TOOLSET
+        run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
+      - name: Add repository
+        continue-on-error: true
+        id: addrepo
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo
+        continue-on-error: true
+        id: retry1
+        if: steps.addrepo.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo 2
+        continue-on-error: true
+        id: retry2
+        if: steps.retry1.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Install packages
+        run: echo no packages to install at the moment
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: cp -r $GITHUB_WORKSPACE/* libs/multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: ./bootstrap.sh
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: ./b2 headers
+        working-directory: ../boost-root
+      - name: Generate user config
+        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: ./config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        working-directory: ../boost-root/libs/multiprecision/test
+  ubuntu-focal-df_qf_quadmath_tests:
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -90,131 +86,243 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ g++, clang++ ]
-        standard: [ c++11, c++14, c++17, c++2a ]
+        compiler: [ g++ ]
+        standard: [ gnu++11, gnu++14, gnu++17, gnu++2a ]
+        suite: [ df_qf_quadmath_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: '0'
-      - name: clone-submods-bootstrap-headers-boost-develop
-        run: |
-          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
-          cd ../boost-root
-          git submodule update --init tools
-          git submodule update --init libs/array
-          git submodule update --init libs/assert
-          git submodule update --init libs/concept_check
-          git submodule update --init libs/config
-          git submodule update --init libs/container
-          git submodule update --init libs/core
-          git submodule update --init libs/detail
-          git submodule update --init libs/exception
-          git submodule update --init libs/headers
-          git submodule update --init libs/integer
-          git submodule update --init libs/iterator
-          git submodule update --init libs/lexical_cast
-          git submodule update --init libs/math
-          git submodule update --init libs/move
-          git submodule update --init libs/mpl
-          git submodule update --init libs/multiprecision
-          git submodule update --init libs/numeric/conversion
-          git submodule update --init libs/predef
-          git submodule update --init libs/preprocessor
-          git submodule update --init libs/random
-          git submodule update --init libs/rational
-          git submodule update --init libs/range
-          git submodule update --init libs/smart_ptr
-          git submodule update --init libs/static_assert
-          git submodule update --init libs/throw_exception
-          git submodule update --init libs/type_traits
-          git submodule update --init libs/utility
-          ./bootstrap.sh
-          ./b2 headers
-      - name: gcc-clang-native-asan
-        run: |
-          echo "where am i (via pwd)"
-          pwd
-          echo "compile to ./test_cpp_double_float_arithmetic.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -fsanitize=address -fsanitize=leak -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
-          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
-          ls -la ./test_cpp_double_float_arithmetic.exe
-          echo "execute ./test_cpp_double_float_arithmetic.exe"
-          ./test_cpp_double_float_arithmetic.exe
-          echo "compile to ./test_cpp_double_float_constructors.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -fsanitize=address -fsanitize=leak -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_constructors.cpp -o test_cpp_double_float_constructors.exe
-          echo "ls -la of ./test_cpp_double_float_constructors.exe"
-          ls -la ./test_cpp_double_float_constructors.exe
-          echo "execute ./test_cpp_double_float_constructors.exe"
-          ./test_cpp_double_float_constructors.exe
-  apple-gcc-clang-native:
+      - name: Set TOOLSET
+        run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
+      - name: Add repository
+        continue-on-error: true
+        id: addrepo
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo
+        continue-on-error: true
+        id: retry1
+        if: steps.addrepo.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo 2
+        continue-on-error: true
+        id: retry2
+        if: steps.retry1.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Install packages
+        run: echo no packages to install at the moment
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: cp -r $GITHUB_WORKSPACE/* libs/multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: ./bootstrap.sh
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: ./b2 headers
+        working-directory: ../boost-root
+      - name: Generate user config
+        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: ./config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        working-directory: ../boost-root/libs/multiprecision/test
+  ubuntu-bionic-df_qf_tests:
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [ g++-6, g++-7, g++-8, clang++-6.0, clang++-7, clang++-8 ]
+        standard: [ c++11, c++14, c++17 ]
+        suite: [ df_qf_tests ]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Set TOOLSET
+        run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
+      - name: Add repository
+        continue-on-error: true
+        id: addrepo
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo
+        continue-on-error: true
+        id: retry1
+        if: steps.addrepo.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo 2
+        continue-on-error: true
+        id: retry2
+        if: steps.retry1.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Install packages
+        run: sudo apt install g++-6 g++-7 g++-8 clang-6.0 clang-7 clang-8
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: cp -r $GITHUB_WORKSPACE/* libs/multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: ./bootstrap.sh
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: ./b2 headers
+        working-directory: ../boost-root
+      - name: Generate user config
+        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: ./config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        working-directory: ../boost-root/libs/multiprecision/test
+  windows_msvc_14_0-df_qf_tests:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: cmd
+    env:
+      ARGS: toolset=${{ matrix.toolset }} address-model=64 cxxstd=${{ matrix.standard }}
+    strategy:
+      fail-fast: false
+      matrix:
+        toolset: [ msvc-14.0 ]
+        standard: [ 14, 17 ]
+        suite: [ df_qf_tests ]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: xcopy /s /e /q %GITHUB_WORKSPACE% libs\multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: bootstrap
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: b2 headers
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ..\..\..\b2 config_info_travis_install %ARGS%
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
+        working-directory: ../boost-root/libs/multiprecision/test
+  windows_msvc_14_2-df_qf_tests:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: cmd
+    env:
+      ARGS: toolset=${{ matrix.toolset }} address-model=64 cxxstd=${{ matrix.standard }}
+    strategy:
+      fail-fast: false
+      matrix:
+        toolset: [ msvc-14.2 ]
+        standard: [ 14, 17, 20 ]
+        suite: [ df_qf_tests ]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: xcopy /s /e /q %GITHUB_WORKSPACE% libs\multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: bootstrap
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: b2 headers
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ..\..\..\b2 config_info_travis_install %ARGS%
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
+        working-directory: ../boost-root/libs/multiprecision/test
+  macos-df_qf_tests:
     runs-on: macos-latest
-    defaults:
-      run:
-        shell: bash
     strategy:
       fail-fast: false
       matrix:
-        standard: [ c++11, c++14, c++17, c++2a ]
-        compiler: [ g++, clang++ ]
+        toolset: [ clang ]
+        standard: [ 11, 14, 17, 2a ]
+        suite: [ df_qf_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: '0'
-      - name: clone-submods-bootstrap-headers-boost-develop
-        run: |
-          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
-          cd ../boost-root
-          git submodule update --init tools
-          git submodule update --init libs/array
-          git submodule update --init libs/assert
-          git submodule update --init libs/concept_check
-          git submodule update --init libs/container
-          git submodule update --init libs/config
-          git submodule update --init libs/core
-          git submodule update --init libs/detail
-          git submodule update --init libs/exception
-          git submodule update --init libs/functional
-          git submodule update --init libs/integer
-          git submodule update --init libs/io
-          git submodule update --init libs/iterator
-          git submodule update --init libs/lexical_cast
-          git submodule update --init libs/math
-          git submodule update --init libs/move
-          git submodule update --init libs/mpl
-          git submodule update --init libs/multiprecision
-          git submodule update --init libs/numeric/conversion
-          git submodule update --init libs/predef
-          git submodule update --init libs/preprocessor
-          git submodule update --init libs/random
-          git submodule update --init libs/range
-          git submodule update --init libs/rational
-          git submodule update --init libs/static_assert
-          git submodule update --init libs/throw_exception
-          git submodule update --init libs/type_traits
-          git submodule update --init libs/utility
-          ./bootstrap.sh
-          ./b2 headers
-      - name: apple-gcc-clang-native
-        run: |
-          echo "where am i (via pwd)"
-          pwd
-          echo "compile to ./test_cpp_double_float_arithmetic.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_arithmetic.cpp -o test_cpp_double_float_arithmetic.exe
-          echo "ls -la of ./test_cpp_double_float_arithmetic.exe"
-          ls -la ./test_cpp_double_float_arithmetic.exe
-          echo "execute ./test_cpp_double_float_arithmetic.exe"
-          ./test_cpp_double_float_arithmetic.exe
-          echo "compile to ./test_cpp_double_float_constructors.exe"
-          echo "compiler version"
-          ${{ matrix.compiler }} -v
-          ${{ matrix.compiler }} -finline-functions -m64 -O3 -Wall -Wextra -std=${{ matrix.standard }} -I./include -I../boost-root test/test_cpp_double_float_constructors.cpp -o test_cpp_double_float_constructors.exe
-          echo "ls -la of ./test_cpp_double_float_constructors.exe"
-          ls -la ./test_cpp_double_float_constructors.exe
-          echo "execute ./test_cpp_double_float_constructors.exe"
-          ./test_cpp_double_float_constructors.exe
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: cp -r $GITHUB_WORKSPACE/* libs/multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: ./bootstrap.sh
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: ./b2 headers
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ../../../b2 config_info_travis_install toolset=${{ matrix.toolset }} cxxstd=${{ matrix.standard }}
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: ./config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ../../../b2 -j2 toolset=${{ matrix.toolset }} cxxstd=${{ matrix.standard }} ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        working-directory: ../boost-root/libs/multiprecision/test

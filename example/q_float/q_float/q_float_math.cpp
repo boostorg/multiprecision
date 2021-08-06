@@ -71,8 +71,8 @@ q_float qf::pow2(const INT32 p)
 /// \func     q_float qf::pow10(const INT32 p)
 ///
 /// \brief    Compute 10 raised to the power of p for positive or negative p.
-///           Binary splitting of the power is used. The resulting computational
-///           complexity scales with log2(p). There is a simple check for overflow.
+///           The so-called ladder method is used. At the top of the subroutine,
+///           there is a simple check for overflow.
 /// ---------------------------------------------------------------------------
 q_float qf::pow10(const INT32 p)
 {
@@ -83,47 +83,38 @@ q_float qf::pow10(const INT32 p)
     throw qf::exception_nan();
     return std::numeric_limits<q_float>::quiet_NaN();
   }
-  
-  if(p < 0)
-  {
-    return qf::pow10(-p).inv();
-  }
-  else if(p == 0)
-  {
-    return qf::one();
-  }
-  else if(p == 1)
-  {
-    return qf::ten();
-  }
+
+  q_float result;
+
+  if     (p <  0) { result = qf::pow10(-p).inv(); }
+  else if(p == 0) { result = qf::one(); }
+  else if(p == 1) { result = qf::ten(); }
+  else if(p == 2) { result = q_float(100U); }
+  else if(p == 3) { result = q_float(1000U); }
+  else if(p == 4) { result = q_float(10000U); }
   else
   {
-    // Constant sequence pn[n] = p^1, p^2, p^4, p^8, ... with n = 1...8
-    static const q_float pn[] =
-    {
-      qf::ten(),
-      q_float(pn[ 0]) * pn[ 0],
-      q_float(pn[ 1]) * pn[ 1],
-      q_float(pn[ 2]) * pn[ 2],
-      q_float(pn[ 3]) * pn[ 3],
-      q_float(pn[ 4]) * pn[ 4],
-      q_float(pn[ 5]) * pn[ 5],
-      q_float(pn[ 6]) * pn[ 6],
-      q_float(pn[ 7]) * pn[ 7]
-    };
-  
-    q_float val(qf::one());
+    result = q_float(qf::one());
 
-    for(UINT32 i = 0; i < sizeof(pn) / sizeof(pn[0]); i++)
+    q_float y(qf::ten());
+
+    UINT32 p_local = (UINT32) p;
+
+    for(;;)
     {
-      if((static_cast<UINT32>(p) >> i) & 1)
+      if(std::uint_fast8_t(p_local & 1U) != 0U)
       {
-        val *= pn[i];
+        result *= y;
       }
-    }
 
-    return val;
+      p_local >>= 1U;
+
+      if  (p_local == 0U) { break; }
+      else                { y *= y; }
+    }
   }
+
+  return result;
 }
 
 /// ---------------------------------------------------------------------------
@@ -233,10 +224,10 @@ q_float qf::exp(const q_float& x)
     return (!b_neg ? e() : one_over_e);
   }
 
-  // Use the MPFUN algorithm for exp.
+  // Use an argument reduction algorithm for exp() in classic MPFUN-style.
   static const q_float one_over_ln2 = q_float(ln2()).inv();
   const q_float nf = qf::floor(xx * one_over_ln2);
-  
+
   // Prepare the scaled variables.
   static const INT32 p2 = 256;
   const bool b_scale    = xx.order() > -4;
@@ -244,14 +235,9 @@ q_float qf::exp(const q_float& x)
   const q_float r2      = r * r;
   const q_float r4      = r2 * r2;
 
-  // Use a Pade approximation of Order[6] computed from Mathematica.
-  // 1) In[1]:= << Calculus `Pade`
-  // 2) In[2]:= Pade[Exp[r], {r, 0, 6, 6}]
-  // 3) Out[2]= ..... [Mathematica output]
-  // 4) FullSimplify[%]
-  // 5) Out[3]= ..... [Mathematica output]
-
-  // The Mathematica output can be read from the equation below.
+  // Use a Pade approximation of Order[6].
+  // Pade[Exp[r], {r, 0, 6, 6}]
+  // FullSimplify[%]
 
   static const q_float n84  (  84);
   static const q_float n240 ( 240);
@@ -263,7 +249,7 @@ q_float qf::exp(const q_float& x)
   static const q_float n10080 ( 10080);
   static const q_float n840   (   840);
   static const q_float n42    (    42);
-  
+
   xx = qf::one() +   (n84 * r * (n7920 + n240 * r2 + r4))
                    / (n665280 + r * (-n332640 + r * (n75600 + r * (-n10080 + r * (n840 + (-n42 + r) * r)))));
 
@@ -273,7 +259,7 @@ q_float qf::exp(const q_float& x)
     xx  = qf::pown(xx, p2);
     xx *= qf::pow2(static_cast<INT32>(qf::to_int64(nf)));
   }
-  
+
   return !b_neg ? xx : xx.inv();
 }
 
@@ -326,8 +312,10 @@ q_float qf::log(const q_float& x)
   }
   else
   {
+    using std::log;
+
     // Get initial estimate using the standard math function log.
-    const q_float s(::log(qf::to_double(x)));
+    const q_float s(log(qf::to_double(x)));
     const q_float E = qf::exp(s);
 
     // Do one single step of Newton-Raphson iteration
@@ -356,6 +344,7 @@ void qf::sincos(const q_float& x, q_float* p_sin, q_float* p_cos)
   // The argument xx will be reduced to 0 <= xx <= pi/2.
   bool b_negate_sin = false;
   bool b_negate_cos = false;
+
   if(x.is_neg())
   {
     xx = -xx;
@@ -559,7 +548,7 @@ q_float qf::asin(const q_float& x)
   qf::sincos(value, &s, &c);
   value -= (s - xx) / c;
 
-  return !b_neg ? value : -value;
+  return ((b_neg == false) ? value : -value);
 }
 
 /// ---------------------------------------------------------------------------
@@ -593,7 +582,7 @@ q_float qf::atan(const q_float& x)
 
   const bool b_neg = x.is_neg();
   
-  q_float xx(!b_neg ? x : -x);
+  q_float xx((b_neg == false) ? x : -x);
   
   // Get initial estimate using standard math function atan.
   q_float value(std::atan(qf::to_double(xx)));
@@ -603,7 +592,7 @@ q_float qf::atan(const q_float& x)
   qf::sincos(value, &s, &c);
   value += c * (xx * c - s);
 
-  return !b_neg ? value : -value;
+  return ((b_neg == false) ? value : -value);
 }
 
 /// ---------------------------------------------------------------------------

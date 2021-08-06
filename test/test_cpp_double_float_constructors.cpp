@@ -28,20 +28,20 @@ namespace test_cpp_double_constructors {
 
 namespace detail {
 
-template <typename T>
+template<typename T>
 constexpr T max(T a, T b)
 {
-   return ((a > b) ? a : b);
+  return ((a > b) ? a : b);
 }
 
-} // namespace detail
+}
 
 template <typename FloatingPointType,
           typename std::enable_if<boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value, bool>::type = true>
 FloatingPointType uniform_real()
 {
-   static std::random_device                                          rd;
-   static std::mt19937                                                gen(rd());
+   static std::random_device                                rd;
+   static std::mt19937                                      gen(rd());
    static boost::random::uniform_real_distribution<FloatingPointType> dis(0.0, 1.0);
 
    return dis(gen);
@@ -58,6 +58,7 @@ NumericType uniform_integral_number()
 
    return out;
 }
+
 
 template <typename NumericType,
           typename std::enable_if<std::is_integral<NumericType>::value, bool>::type = true>
@@ -89,7 +90,8 @@ ConstructionType construct_from(ArithmeticType f)
 template <typename ConstructionType, typename DoubleFloatType, typename std::enable_if<!(std::is_arithmetic<DoubleFloatType>::value || boost::multiprecision::backends::detail::is_floating_point_or_float128<DoubleFloatType>::value)>::type const* = nullptr>
 ConstructionType construct_from(DoubleFloatType f)
 {
-   static_assert(std::is_same<boost::multiprecision::backends::cpp_double_float<typename DoubleFloatType::float_type>, typename std::decay<DoubleFloatType>::type>::value, "Only double float should come here");
+   static_assert(std::is_same< boost::multiprecision::backends::cpp_double_float<typename DoubleFloatType::float_type>
+                 , typename std::decay<DoubleFloatType>::type>::value, "Only double float should come here");
    return ConstructionType(f.first()) + ConstructionType(f.second());
 }
 
@@ -111,7 +113,7 @@ int test_constructor()
       double_float_t d(n);
 
       typename double_float_t::rep_type rep(d.rep());
-      double_float_t::arithmetic::normalize(rep);
+      double_float_t::normalize_pair(rep);
 
       // Check if representation of the cpp_double_float is not normalized
       if (rep != d.rep())
@@ -127,10 +129,10 @@ int test_constructor()
 
       using boost::multiprecision::fabs;
 
-      if (fabs(1 - fabs(n_prime / d_prime)) > MaxError)
+      if (fabs(1- fabs(n_prime / d_prime)) > MaxError)
       {
-         std::cerr << "[FAILED] exceeded acceptable error (n = " << n << ")" << std::endl;
-         return -1;
+            std::cerr << "[FAILED] exceeded acceptable error (n = " << n << ")" << std::endl;
+            return -1;
       }
    }
 
@@ -165,11 +167,11 @@ int test_constructors()
 #ifdef BOOST_MATH_USE_FLOAT128
    e += test_constructor<FloatingPointType, boost::multiprecision::float128>();
 #endif
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<float> >();
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<double> >();
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<long double> >();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<float>>();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<double>>();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<long double>>();
 #ifdef BOOST_MATH_USE_FLOAT128
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> >();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128>>();
 #endif
 
    if (e == 0)
@@ -190,7 +192,7 @@ int main()
 
    e += test_cpp_double_constructors::test_constructors<float>();
    e += test_cpp_double_constructors::test_constructors<double>();
-   //e += test_cpp_double_constructors::test_constructors<long double>();
+   e += test_cpp_double_constructors::test_constructors<long double>();
 #ifdef BOOST_MATH_USE_FLOAT128
    e += test_cpp_double_constructors::test_constructors<boost::multiprecision::float128>();
 #endif

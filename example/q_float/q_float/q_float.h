@@ -81,13 +81,13 @@
   }
 
   // Define the function sgn() for double if needed.
-  inline INT32 sgn(double x) { return x > 0.0 ? 1 : (x < 0.0) ? -1 : 0; }
+  inline int sgn(double x) { return ((x > 0.0) ? 1 : ((x < 0.0) ? -1 : 0)); }
 
   class q_float
   {
   public:
     // Constructors
-    q_float() : hi(), lo() { }
+    q_float() { }
     q_float(const q_float& q) : hi(q.hi), lo(q.lo) { }
     q_float(q_float&& q) : hi(q.hi), lo(q.lo) { }
 
@@ -281,7 +281,7 @@
       // Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
       volatile double C  = hi / v.hi;
       double c  = split() * C;
-      double hc = c - C;
+      volatile double hc = c - C;
       double u  = split() * v.hi;
       hc = c - hc;
       const double tc = C - hc;
@@ -453,10 +453,10 @@
     bool  large_arg(void) const;
     bool  near_one (void) const;
 
-    static const INT32 max_exponent10 = std::numeric_limits<double>::max_exponent10 - (std::numeric_limits<double>::digits10 + 1);
-    static const INT32 min_exponent10 = -max_exponent10;
-    static const INT32 max_exponent   = static_cast<INT32>(static_cast<INT64>((max_exponent10 / 0.301029995663981195) + 0.5));
-    static const INT32 min_exponent   = static_cast<INT32>(static_cast<INT64>((min_exponent10 / 0.301029995663981195) - 0.5));
+    static constexpr int max_exponent10 = std::numeric_limits<double>::max_exponent10 - (std::numeric_limits<double>::digits10 + 1);
+    static constexpr int min_exponent10 = -max_exponent10;
+    static constexpr int max_exponent   = static_cast<int>(static_cast<INT64>((max_exponent10 / 0.301029995663981195) + 0.5));
+    static constexpr int min_exponent   = static_cast<int>(static_cast<INT64>((min_exponent10 / 0.301029995663981195) - 0.5));
 
     // Special values.
     static const q_float& quiet_NaN(void);
@@ -490,6 +490,9 @@
     static bool dump_digits(const q_float& x, std::string& str);
 
     void dump(void) const { dump(*this, std::cout); }
+
+    double rep_hi() const { return hi; }
+    double rep_lo() const { return lo; }
 
   private:
     double hi;

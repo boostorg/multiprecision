@@ -49,7 +49,9 @@ q_float::q_float(const double d)
     from_uint64(static_cast<INT64>(0.5 + dd / double_p10(n_exp - (std::numeric_limits<double>::digits10 - 1))));
 
     // Re-scale with the appropriate power of ten.
-    operator*=(qf::pow10(n_exp - (std::numeric_limits<double>::digits10 - 1)));
+    const q_float p10(qf::pow10(n_exp - (std::numeric_limits<double>::digits10 - 1)));
+
+    operator*=(p10);
 
     if(b_neg)
     {
@@ -194,6 +196,7 @@ void q_float::from_uint64(const UINT64 u)
   if(uhi)
   {
     static const q_float value_0x100000000 = q_float(static_cast<UINT32>(0xFFFFFFFF)) + one();
+
     operator*=(value_0x100000000);
   }
 
@@ -355,7 +358,7 @@ q_float& q_float::ceil(void)
 /// ---------------------------------------------------------------------------
 int q_float::compare(const q_float& v) const
 {
-  if(hi > v.hi) 
+  if(hi > v.hi)
   {
     return 1;
   }
