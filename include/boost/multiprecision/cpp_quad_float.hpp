@@ -779,13 +779,13 @@ typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_t
 
    BOOST_CONSTEXPR const c_type my_max = static_cast<c_type>((std::numeric_limits<R>::max)());
    BOOST_CONSTEXPR const c_type my_min = static_cast<c_type>((std::numeric_limits<R>::min)());
-   c_type                       ct     = fabs(backend.crep().first);
+   c_type                       ct     = fabs(std::get<0>(backend.crep()));
 
    (void)my_min;
 
    if (ct > my_max)
       if (!std::is_unsigned<R>::value)
-         *result = backend.crep().first >= typename cpp_quad_float<FloatingPointType>::float_type(0U) ? (std::numeric_limits<R>::max)() : detail::minus_max<R>();
+         *result = std::get<0>(backend.crep()) >= typename cpp_quad_float<FloatingPointType>::float_type(0U) ? (std::numeric_limits<R>::max)() : detail::minus_max<R>();
       else
          *result = (std::numeric_limits<R>::max)();
    else
