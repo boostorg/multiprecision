@@ -26,7 +26,7 @@ jobs:
       matrix:
         compiler: [ g++, clang++ ]
         standard: [ c++11, c++14, c++17, c++2a ]
-        suite: [ df_qf_tests, df_qf_funcs ]
+        suite: [ df_qf_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -150,7 +150,7 @@ jobs:
       matrix:
         compiler: [ g++-6, g++-7, g++-8, clang++-6.0, clang++-7, clang++-8 ]
         standard: [ c++11, c++14, c++17 ]
-        suite: [ df_qf_tests, df_qf_funcs ]
+        suite: [ df_qf_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -214,7 +214,7 @@ jobs:
       matrix:
         toolset: [ msvc-14.0 ]
         standard: [ 14, 17 ]
-        suite: [ df_qf_tests, df_qf_funcs ]
+        suite: [ df_qf_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -257,7 +257,7 @@ jobs:
       matrix:
         toolset: [ msvc-14.2 ]
         standard: [ 14, 17, 20 ]
-        suite: [ df_qf_tests, df_qf_funcs ]
+        suite: [ df_qf_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -295,7 +295,7 @@ jobs:
       matrix:
         toolset: [ clang ]
         standard: [ 11, 14, 17, 2a ]
-        suite: [ df_qf_tests, df_qf_funcs ]
+        suite: [ df_qf_tests ]
     steps:
       - uses: actions/checkout@v2
         with:

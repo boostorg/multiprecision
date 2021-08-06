@@ -112,27 +112,23 @@ lib no_eh_support : no_eh_test_support.cpp ;
 
 test-suite df_qf_tests :
 
-   [ run test_arithmetic_df.cpp no_eh_support : : : release : ]
-   [ run test_cpp_double_float_decomposition.cpp no_eh_support : : : release : ]
-   [ run test_cpp_double_float_arithmetic.cpp no_eh_support : : : release : ]
-   [ run test_cpp_quad_float_arithmetic.cpp no_eh_support : : : release : ]
+   [ run test_arithmetic_df.cpp                  no_eh_support : : : release : test_arithmetic_df ]
+   [ run test_cpp_double_float_decomposition.cpp no_eh_support : : : release : test_cpp_double_float_decomposition ]
+   [ run test_cpp_double_float_arithmetic.cpp    no_eh_support : : : release : test_cpp_double_float_arithmetic ]
+   [ run test_cpp_quad_float_arithmetic.cpp      no_eh_support : : : release : test_cpp_quad_float_arithmetic ]
 
-;
-
-test-suite df_qf_funcs :
-
-   [ run test_sqrt.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
-   [ run test_exp.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
-   [ run test_log.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
-   [ run test_sin.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
-   [ run test_cos.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
-   [ run test_tan.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
-   [ run test_asin.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
-   [ run test_acos.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
-   [ run test_atan.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
-   [ run test_sinh.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
-   [ run test_cosh.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
-   [ run test_tanh.cpp no_eh_support : : : <define>TEST_CPP_DOUBLE_FLOAT release : ]
+   [ run test_sqrt.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_sqrt ]
+   [ run test_exp.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_exp ]
+   [ run test_log.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_log ]
+   [ run test_sin.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_sin ]
+   [ run test_cos.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_cos ]
+   [ run test_tan.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_tan ]
+   [ run test_asin.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_asin ]
+   [ run test_acos.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_acos ]
+   [ run test_atan.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_atan ]
+   [ run test_sinh.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_sinh ]
+   [ run test_cosh.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_cosh ]
+   [ run test_tanh.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_tanh ]
 
 ;
 
