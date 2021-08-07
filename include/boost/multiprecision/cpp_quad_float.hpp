@@ -366,34 +366,6 @@ class cpp_quad_float
       return result;
    }
 
-// Casts
-   // TODO Avoid unneccassary additions
-   operator signed char() const { return (signed char)std::get<0>(data); }
-   operator signed short() const { return (signed short)std::get<0>(data); }
-   operator signed int() const { return (signed int)std::get<0>(data) + (signed int)std::get<1>(data) + (signed int)std::get<2>(data) + (signed int)std::get<3>(data); }
-   operator signed long() const { return (signed long)std::get<0>(data) + (signed long)std::get<1>(data) + (signed long)std::get<2>(data) + (signed long)std::get<3>(data); }
-   operator signed long long() const { return (signed long long)std::get<0>(data) + (signed long long)std::get<1>(data) + (signed long long)std::get<2>(data) + (signed long long)std::get<3>(data); }
-
-   operator unsigned char() const { return (unsigned char)std::get<0>(data); }
-   operator unsigned short() const { return (unsigned short)std::get<0>(data); }
-   operator unsigned int() const { return (unsigned int)std::get<0>(data) + (unsigned int)std::get<1>(data) + (unsigned int)std::get<2>(data) + (unsigned int)std::get<3>(data); }
-   operator unsigned long() const { return (unsigned long)static_cast<signed long>(*this); }
-   operator unsigned long long() const { return (unsigned long long)static_cast<signed long long>(*this); }
-
-   operator float() const { return (float)std::get<0>(data) + (float)std::get<1>(data) + (float)std::get<2>(data) + (float)std::get<3>(data); }
-   operator double() const { return (double)std::get<0>(data) + (double)std::get<1>(data) + (double)std::get<2>(data) + (double)std::get<3>(data); }
-   operator long double() const { return (long double)std::get<0>(data) + (long double)std::get<1>(data) + (long double)std::get<2>(data) + (long double)std::get<3>(data); }
-#ifdef BOOST_MATH_USE_FLOAT128
-   explicit operator boost::multiprecision::float128() const
-   {
-      return static_cast<boost::multiprecision::float128>(std::get<0>(data)) +
-             static_cast<boost::multiprecision::float128>(std::get<1>(data)) +
-             static_cast<boost::multiprecision::float128>(std::get<2>(data)) +
-             static_cast<boost::multiprecision::float128>(std::get<3>(data));
-   }
-#endif
-
-
    // Methods
    constexpr cpp_quad_float<float_type> negative() const
    {
@@ -542,7 +514,6 @@ class cpp_quad_float
       float_type s_;
 
       p[0] = arithmetic::product(get<0>(this->data), get<0>(other.data));
-
 
       p[1] = arithmetic::product(get<0>(this->data), get<1>(other.data));
       p[2] = arithmetic::product(get<1>(this->data), get<0>(other.data));
