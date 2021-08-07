@@ -61,9 +61,9 @@ namespace local
     using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<float_type>, boost::multiprecision::et_off>;
     using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
 
-    //static_assert( digits       == std::numeric_limits<double_float_type>::digits       , "" );
-    //static_assert( digits10     == std::numeric_limits<double_float_type>::digits10     , "" );
-    //static_assert( max_digits10 == std::numeric_limits<double_float_type>::max_digits10 , "" );
+    static_assert( digits       == std::numeric_limits<double_float_type>::digits       , "" );
+    static_assert( digits10     == std::numeric_limits<double_float_type>::digits10     , "" );
+    static_assert( max_digits10 == std::numeric_limits<double_float_type>::max_digits10 , "" );
 
     template<const std::size_t DigitsToGet = digits10>
     static void get_random_fixed_string(std::string& str, const bool is_unsigned = false)
@@ -75,16 +75,16 @@ namespace local
       // (positive only via setting is_unsigned to true)
       // or mixed positive/negative.
 
-      // Re-seed the random engine each approx. 65k calls
+      // Re-seed the random engine each approx. 16k calls
       // of this string generator.
 
-      //if((seed_prescaler % 0x10000U) == 0U)
-      //{
-      //  const std::clock_t seed_time_stamp = std::clock();
+      if((seed_prescaler % 0x4000U) == 0U)
+      {
+        const std::clock_t seed_time_stamp = std::clock();
 
-      //  engine_man.seed(static_cast<typename std::mt19937::result_type>      (seed_time_stamp));
-      //  engine_sgn.seed(static_cast<typename std::ranlux24_base::result_type>(seed_time_stamp));
-      //}
+        engine_man.seed(static_cast<typename std::mt19937::result_type>      (seed_time_stamp));
+        engine_sgn.seed(static_cast<typename std::ranlux24_base::result_type>(seed_time_stamp));
+      }
 
       ++seed_prescaler;
 
@@ -161,7 +161,7 @@ namespace local
         0,
           ((std::numeric_limits<local_exp10_float_type>::max_exponent10 > 1000) ? 1183
         : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >  200) ?   83
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?   13 : 1)))
+        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?    7 : 1)))
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
@@ -378,9 +378,9 @@ namespace local
 int main()
 {
   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 15U);
+  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 16U);
   #else
-  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 11U);
+  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 12U);
   #endif
 
   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
