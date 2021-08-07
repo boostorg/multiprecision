@@ -129,7 +129,7 @@ cpp_double_float<FloatingPointType> fabs(const cpp_double_float<FloatingPointTyp
 namespace boost { namespace math {
 
 template<typename FloatingPointType>
-int fpclassify(const boost::multiprecision::backends::cpp_double_float<FloatingPointType>& o);
+int (fpclassify)(const boost::multiprecision::backends::cpp_double_float<FloatingPointType>& o);
 
 } }
 
@@ -594,58 +594,70 @@ class cpp_double_float
    }
 
    // Non-member add/sub/mul/div with constituent type.
-   friend inline cpp_double_float operator+(const cpp_double_float& a, const float_type& b)
+   template<typename OtherFloatingPointType>
+   friend inline cpp_double_float<OtherFloatingPointType> operator+(const cpp_double_float<OtherFloatingPointType>& a, const OtherFloatingPointType& b)
    {
-      rep_type s = arithmetic::sum(a.first(), b);
+      using other_cpp_double_float_type = cpp_double_float<OtherFloatingPointType>;
+
+      typename other_cpp_double_float_type::rep_type s = other_cpp_double_float_type::arithmetic::sum(a.first(), b);
 
       s.second += a.second();
-      arithmetic::normalize(s);
+      other_cpp_double_float_type::arithmetic::normalize(s);
 
-      return cpp_double_float(s);
+      return other_cpp_double_float_type(s);
    }
 
-   friend inline cpp_double_float operator-(const cpp_double_float& a, const float_type& b)
+   template<typename OtherFloatingPointType>
+   friend inline cpp_double_float<OtherFloatingPointType> operator-(const cpp_double_float<OtherFloatingPointType>& a, const OtherFloatingPointType& b)
    {
-      rep_type s = arithmetic::difference(a.first(), b);
+      using other_cpp_double_float_type = cpp_double_float<OtherFloatingPointType>;
+
+      typename other_cpp_double_float_type::rep_type s = other_cpp_double_float_type::arithmetic::difference(a.first(), b);
 
       s.second += a.second();
-      arithmetic::normalize(s);
+      other_cpp_double_float_type::arithmetic::normalize(s);
 
-      return cpp_double_float(s);
+      return other_cpp_double_float_type(s);
    }
 
-   friend inline cpp_double_float operator*(const cpp_double_float& a, const float_type& b)
+   template<typename OtherFloatingPointType>
+   friend inline cpp_double_float<OtherFloatingPointType> operator*(const cpp_double_float<OtherFloatingPointType>& a, const OtherFloatingPointType& b)
    {
-      rep_type p = arithmetic::product(a.first(), b);
+      using other_cpp_double_float_type = cpp_double_float<OtherFloatingPointType>;
+
+      typename other_cpp_double_float_type::rep_type p = other_cpp_double_float_type::arithmetic::product(a.first(), b);
 
       using std::isfinite;
 
-      if (!isfinite(p.first))
-         return cpp_double_float(p);
+      if (!(isfinite)(p.first))
+         return other_cpp_double_float_type(p);
 
       p.second += a.second() * b;
 
-      arithmetic::normalize(p);
+      other_cpp_double_float_type::arithmetic::normalize(p);
 
-      return cpp_double_float(p);
+      return other_cpp_double_float_type(p);
    }
 
-   friend inline cpp_double_float operator/(const cpp_double_float& a, const float_type& b)
+   template<typename OtherFloatingPointType>
+   friend inline cpp_double_float<OtherFloatingPointType> operator/(const cpp_double_float<OtherFloatingPointType>& a, const OtherFloatingPointType& b)
    {
-      rep_type p, q, s;
+      using other_cpp_double_float_type = cpp_double_float<OtherFloatingPointType>;
+
+      typename other_cpp_double_float_type::rep_type p, q, s;
 
       p.first = a.first() / b;
 
-      q = arithmetic::product(p.first, b);
-      s = arithmetic::difference(a.first(), q.first);
+      q = other_cpp_double_float_type::arithmetic::product(p.first, b);
+      s = other_cpp_double_float_type::arithmetic::difference(a.first(), q.first);
       s.second += a.second();
       s.second -= q.second;
 
       p.second = (s.first + s.second) / b;
 
-      arithmetic::normalize(p);
+      other_cpp_double_float_type::arithmetic::normalize(p);
 
-      return cpp_double_float(p);
+      return other_cpp_double_float_type(p);
    }
 
    // Unary add/sub/mul/div with constituent part.
@@ -663,7 +675,7 @@ class cpp_double_float
 
       using std::isfinite;
 
-      if (!isfinite(first()))
+      if (!(isfinite)(first()))
          return *this;
 
       data.second += t.first;
@@ -681,7 +693,7 @@ class cpp_double_float
 
       using std::isfinite;
 
-      if (!isfinite(first()))
+      if (!(isfinite)(first()))
          return *this;
 
       data.second += t.first;
@@ -714,7 +726,7 @@ class cpp_double_float
 
       using std::isfinite;
 
-      if (!isfinite(p.first))
+      if (!(isfinite)(p.first))
       {
          data = p;
          return *this;
@@ -1432,7 +1444,7 @@ std::size_t hash_value(const cpp_double_float<FloatingPointType>& a)
 namespace boost { namespace math {
 
 template<typename FloatingPointType>
-int fpclassify(const boost::multiprecision::backends::cpp_double_float<FloatingPointType>& o)
+int (fpclassify)(const boost::multiprecision::backends::cpp_double_float<FloatingPointType>& o)
 {
    using std::fpclassify;
 
