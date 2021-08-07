@@ -78,13 +78,13 @@ namespace local
       // Re-seed the random engine each approx. 65k calls
       // of this string generator.
 
-      if((seed_prescaler % 0x10000U) == 0U)
-      {
-        const std::clock_t seed_time_stamp = std::clock();
+      //if((seed_prescaler % 0x10000U) == 0U)
+      //{
+      //  const std::clock_t seed_time_stamp = std::clock();
 
-        engine_man.seed(static_cast<typename std::mt19937::result_type>      (seed_time_stamp));
-        engine_sgn.seed(static_cast<typename std::ranlux24_base::result_type>(seed_time_stamp));
-      }
+      //  engine_man.seed(static_cast<typename std::mt19937::result_type>      (seed_time_stamp));
+      //  engine_sgn.seed(static_cast<typename std::ranlux24_base::result_type>(seed_time_stamp));
+      //}
 
       ++seed_prescaler;
 
@@ -357,7 +357,7 @@ namespace local
   {
     using float_type = FloatingPointConstituentType;
 
-    std::cout << "Testing " << count << " arithmetic cases." << std::endl;
+    std::cout << "Testing " << count << " arithmetic cases for constituent float type = " << typeid(FloatingPointConstituentType).name() << "..." << std::endl;
 
     const bool result_add___is_ok = control<float_type>::test_add__(count); std::cout << "result_add___is_ok: " << std::boolalpha << result_add___is_ok << std::endl;
     const bool result_sub___is_ok = control<float_type>::test_sub__(count); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
@@ -389,7 +389,7 @@ int main()
   constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL <<  6U);
   #endif
 
-  const bool result_flt___is_ok = true;//local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
+  const bool result_flt___is_ok = local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
   const bool result_dbl___is_ok = local::test_arithmetic<double>     (test_cases_built_in); std::cout << "result_dbl___is_ok: " << std::boolalpha << result_dbl___is_ok << std::endl;
   const bool result_ldbl__is_ok = local::test_arithmetic<long double>(test_cases_built_in); std::cout << "result_ldbl__is_ok: " << std::boolalpha << result_ldbl__is_ok << std::endl;
 

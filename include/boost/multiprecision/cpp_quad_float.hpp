@@ -233,14 +233,116 @@ class cpp_quad_float
          *this = -*this;
    }
 
-   cpp_quad_float(const std::string& str)
+   cpp_quad_float(const char* p)
    {
-      boost::multiprecision::detail::convert_from_string(*this, str.c_str());
+      using ui_type = typename std::tuple_element<0, typename unsigned_types>::type;
+      if (!p || (*p == 0))
+         return;
+
+      bool                    is_neg       = false;
+      bool                    is_neg_expon = false;
+      constexpr const ui_type ten          = ui_type(10);
+      typename exponent_type  expon        = 0;
+      int                     digits_seen  = 0;
+      using                   limits       = std::numeric_limits<cpp_quad_float>;
+      constexpr const int max_digits       = limits::is_specialized ? limits::max_digits10 + 1 : INT_MAX;
+
+      if (*p == '+')
+         ++p;
+      else if (*p == '-')
+      {
+         is_neg = true;
+         ++p;
+      }
+      if ((std::strcmp(p, "nan") == 0) || (std::strcmp(p, "NaN") == 0) || (std::strcmp(p, "NAN") == 0))
+      {
+         *this /= 0;
+         if (is_neg)
+            negate();
+         return;
+      }
+      if ((std::strcmp(p, "inf") == 0) || (std::strcmp(p, "Inf") == 0) || (std::strcmp(p, "INF") == 0))
+      {
+         *this = ui_type(1);
+         *this /= ui_type(0);
+         if (is_neg)
+            negate();
+         return;
+      }
+      //
+      // Grab all the leading digits before the decimal point:
+      //
+      while (std::isdigit(*p))
+      {
+         *this *= ten;
+         *this += ui_type(*p - '0');
+         ++p;
+         ++digits_seen;
+      }
+      if (*p == '.')
+      {
+         //
+         // Grab everything after the point, stop when we've seen
+         // enough digits, even if there are actually more available:
+         //
+         ++p;
+         while (std::isdigit(*p))
+         {
+            *this *= ten;
+            *this += ui_type(*p - '0');
+            ++p;
+            --expon;
+            if (++digits_seen > max_digits)
+               break;
+         }
+         while (std::isdigit(*p))
+            ++p;
+      }
+      //
+      // Parse the exponent:
+      //
+      if ((*p == 'e') || (*p == 'E'))
+      {
+         ++p;
+         if (*p == '+')
+            ++p;
+         else if (*p == '-')
+         {
+            is_neg_expon = true;
+            ++p;
+         }
+         typename exponent_type e2 = 0;
+         while (std::isdigit(*p))
+         {
+            e2 *= 10;
+            e2 += (*p - '0');
+            ++p;
+         }
+         if (is_neg_expon)
+            e2 = -e2;
+         expon += e2;
+      }
+      if (expon)
+      {
+         // Scale by 10^expon, note that 10^expon can be
+         // outside the range of our number type
+        while (expon-- > 0)
+            *this *= ten;
+        while (expon++ < 0)
+           *this /= ten;
+      }
+      if (is_neg)
+         negate();
+      if (*p)
+      {
+         // Unexpected input in string:
+         BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected characters in string being interpreted as a cpp_quad_float"));
+      }
    }
 
-   cpp_quad_float(const char* pstr)
+   
+   cpp_quad_float(const std::string& str) : cpp_quad_float(str.c_str())
    {
-      boost::multiprecision::detail::convert_from_string(*this, pstr);
    }
 
    constexpr cpp_quad_float(cpp_quad_float&&) = default;
