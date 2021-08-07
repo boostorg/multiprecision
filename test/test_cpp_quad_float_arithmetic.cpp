@@ -14,12 +14,10 @@
 // Handle interaction with Boost's wrap of libquadmath __float128.
 // g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DBOOST_MATH_USE_FLOAT128 test.cpp -lquadmath -o test_double_float.exe
 
-#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <random>
 #include <string>
-#include <vector>
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
