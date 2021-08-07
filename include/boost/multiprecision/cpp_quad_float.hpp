@@ -235,17 +235,18 @@ class cpp_quad_float
 
    cpp_quad_float(const char* p)
    {
-      using ui_type = typename std::tuple_element<0, typename unsigned_types>::type;
+      using ui_type = typename std::tuple_element<0, unsigned_types>::type;
+
       if (!p || (*p == 0))
          return;
 
-      bool                    is_neg       = false;
-      bool                    is_neg_expon = false;
-      constexpr const ui_type ten          = ui_type(10);
-      typename exponent_type  expon        = 0;
-      int                     digits_seen  = 0;
-      using                   limits       = std::numeric_limits<cpp_quad_float>;
-      constexpr const int max_digits       = limits::is_specialized ? limits::max_digits10 + 1 : INT_MAX;
+      bool                 is_neg            = false;
+      bool                 is_neg_expon      = false;
+      const cpp_quad_float my_ten            = ui_type(10);
+      exponent_type        expon             = 0;
+      int                  digits_seen       = 0;
+      using                local_limits_type = std::numeric_limits<cpp_quad_float>;
+      constexpr int        max_digits        = ((local_limits_type::is_specialized == true) ? local_limits_type::max_digits10 + 1 : INT_MAX);
 
       if (*p == '+')
          ++p;
@@ -256,15 +257,15 @@ class cpp_quad_float
       }
       if ((std::strcmp(p, "nan") == 0) || (std::strcmp(p, "NaN") == 0) || (std::strcmp(p, "NAN") == 0))
       {
-         *this /= 0;
+         *this /= cpp_quad_float(0U);
          if (is_neg)
             negate();
          return;
       }
       if ((std::strcmp(p, "inf") == 0) || (std::strcmp(p, "Inf") == 0) || (std::strcmp(p, "INF") == 0))
       {
-         *this = ui_type(1);
-         *this /= ui_type(0);
+         *this  = cpp_quad_float(1);
+         *this /= cpp_quad_float(0);
          if (is_neg)
             negate();
          return;
@@ -274,8 +275,8 @@ class cpp_quad_float
       //
       while (std::isdigit(*p))
       {
-         *this *= ten;
-         *this += ui_type(*p - '0');
+         *this *= my_ten;
+         *this += cpp_quad_float(ui_type(*p - '0'));
          ++p;
          ++digits_seen;
       }
@@ -288,8 +289,8 @@ class cpp_quad_float
          ++p;
          while (std::isdigit(*p))
          {
-            *this *= ten;
-            *this += ui_type(*p - '0');
+            *this *= my_ten;
+            *this += cpp_quad_float(ui_type(*p - '0'));
             ++p;
             --expon;
             if (++digits_seen > max_digits)
@@ -311,7 +312,7 @@ class cpp_quad_float
             is_neg_expon = true;
             ++p;
          }
-         typename exponent_type e2 = 0;
+         exponent_type e2 = 0;
          while (std::isdigit(*p))
          {
             e2 *= 10;
@@ -327,9 +328,9 @@ class cpp_quad_float
          // Scale by 10^expon, note that 10^expon can be
          // outside the range of our number type
         while (expon-- > 0)
-            *this *= ten;
+            *this *= my_ten;
         while (expon++ < 0)
-           *this /= ten;
+           *this /= my_ten;
       }
       if (is_neg)
          negate();
