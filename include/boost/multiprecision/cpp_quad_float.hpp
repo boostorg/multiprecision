@@ -327,10 +327,17 @@ class cpp_quad_float
       {
          // Scale by 10^expon, note that 10^expon can be
          // outside the range of our number type
-        while (expon-- > 0)
-            *this *= my_ten;
-        while (expon++ < 0)
-           *this /= my_ten;
+         if (expon > local_limits_type::min_exponent10 + 2)
+         {
+            *this *= pow10(expon);
+         }
+         else
+         {
+            while (expon-- > 0)
+               *this *= my_ten;
+            while (expon++ < 0)
+               *this /= my_ten;
+         }
       }
       if (is_neg)
          negate();
@@ -777,7 +784,7 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_quad_float<Floati
 {
    std::string str;
    is >> str;
-   boost::multiprecision::detail::convert_from_string(f, str.c_str());
+   f = cpp_quad_float(str);
    return is;
 }
 
