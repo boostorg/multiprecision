@@ -62,10 +62,10 @@ template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> 
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
 template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
 
-template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
-template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator-(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
-template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
-template<typename FloatingPointType> inline cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
+template<typename FloatingPointType> cpp_double_float<FloatingPointType> operator+(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
+template<typename FloatingPointType> cpp_double_float<FloatingPointType> operator-(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
+template<typename FloatingPointType> cpp_double_float<FloatingPointType> operator*(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
+template<typename FloatingPointType> cpp_double_float<FloatingPointType> operator/(const cpp_double_float<FloatingPointType>& a, const FloatingPointType& b);
 
 template<typename FloatingPointType> inline bool operator< (const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
 template<typename FloatingPointType> inline bool operator<=(const cpp_double_float<FloatingPointType>& a, const cpp_double_float<FloatingPointType>& b);
@@ -594,10 +594,9 @@ class cpp_double_float
    }
 
    // Non-member add/sub/mul/div with constituent type.
-   template<typename OtherFloatingPointType>
-   friend inline cpp_double_float<OtherFloatingPointType> operator+(const cpp_double_float<OtherFloatingPointType>& a, const OtherFloatingPointType& b)
+   friend cpp_double_float operator+(const cpp_double_float& a, const float_type& b)
    {
-      using other_cpp_double_float_type = cpp_double_float<OtherFloatingPointType>;
+      using other_cpp_double_float_type = cpp_double_float<float_type>;
 
       typename other_cpp_double_float_type::rep_type s = other_cpp_double_float_type::arithmetic::sum(a.first(), b);
 
@@ -607,10 +606,9 @@ class cpp_double_float
       return other_cpp_double_float_type(s);
    }
 
-   template<typename OtherFloatingPointType>
-   friend inline cpp_double_float<OtherFloatingPointType> operator-(const cpp_double_float<OtherFloatingPointType>& a, const OtherFloatingPointType& b)
+   friend cpp_double_float operator-(const cpp_double_float& a, const float_type& b)
    {
-      using other_cpp_double_float_type = cpp_double_float<OtherFloatingPointType>;
+      using other_cpp_double_float_type = cpp_double_float<float_type>;
 
       typename other_cpp_double_float_type::rep_type s = other_cpp_double_float_type::arithmetic::difference(a.first(), b);
 
@@ -620,16 +618,15 @@ class cpp_double_float
       return other_cpp_double_float_type(s);
    }
 
-   template<typename OtherFloatingPointType>
-   friend inline cpp_double_float<OtherFloatingPointType> operator*(const cpp_double_float<OtherFloatingPointType>& a, const OtherFloatingPointType& b)
+   friend cpp_double_float operator*(const cpp_double_float& a, const float_type& b)
    {
-      using other_cpp_double_float_type = cpp_double_float<OtherFloatingPointType>;
+      using other_cpp_double_float_type = cpp_double_float<float_type>;
 
       typename other_cpp_double_float_type::rep_type p = other_cpp_double_float_type::arithmetic::product(a.first(), b);
 
       using std::isfinite;
 
-      if (!(isfinite)(p.first))
+      if ((isfinite)(p.first) == false)
          return other_cpp_double_float_type(p);
 
       p.second += a.second() * b;
@@ -639,10 +636,9 @@ class cpp_double_float
       return other_cpp_double_float_type(p);
    }
 
-   template<typename OtherFloatingPointType>
-   friend inline cpp_double_float<OtherFloatingPointType> operator/(const cpp_double_float<OtherFloatingPointType>& a, const OtherFloatingPointType& b)
+   friend cpp_double_float operator/(const cpp_double_float& a, const float_type& b)
    {
-      using other_cpp_double_float_type = cpp_double_float<OtherFloatingPointType>;
+      using other_cpp_double_float_type = cpp_double_float<float_type>;
 
       typename other_cpp_double_float_type::rep_type p, q, s;
 
@@ -675,7 +671,7 @@ class cpp_double_float
 
       using std::isfinite;
 
-      if (!(isfinite)(first()))
+      if ((isfinite)(first()) == false)
          return *this;
 
       data.second += t.first;
@@ -693,7 +689,7 @@ class cpp_double_float
 
       using std::isfinite;
 
-      if (!(isfinite)(first()))
+      if ((isfinite)(first()) == false)
          return *this;
 
       data.second += t.first;
@@ -726,7 +722,7 @@ class cpp_double_float
 
       using std::isfinite;
 
-      if (!(isfinite)(p.first))
+      if ((isfinite)(p.first) == false)
       {
          data = p;
          return *this;
@@ -798,8 +794,7 @@ class cpp_double_float
       other.data = tmp;
    }
 
-/* comment out temporarily:
-   constexpr */ int compare(const cpp_double_float& other) const
+   int compare(const cpp_double_float& other) const
    {
      // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
      return (first () > other.first ()) ?  1 :
