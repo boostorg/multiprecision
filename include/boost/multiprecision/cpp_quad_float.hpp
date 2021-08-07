@@ -652,10 +652,8 @@ class cpp_quad_float
 
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
    {
-     // FIXME
-      //return raw_str();
       if (number_of_digits == 0)
-         number_of_digits = std::numeric_limits<cpp_quad_float>::digits10;
+         number_of_digits = std::numeric_limits<cpp_quad_float>::digits10 - 1;
 
       const std::string my_str = boost::multiprecision::detail::convert_to_string(*this, number_of_digits, format_flags);
 
@@ -920,7 +918,7 @@ class numeric_limits<boost::multiprecision::backends::cpp_quad_float<FloatingPoi
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;  // TODO Discuss (verify denormal arithmetic is done correctly) 
 
    static constexpr int digits       = 4 * (base_class_type::digits);
-   static constexpr int digits10     = int(float(digits - 1) * 0.301F) - 1;
+   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
    static constexpr int max_digits10 = int(float(digits) * 0.301F) + 2;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - 3 * base_class_type::digits;
@@ -958,7 +956,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
    static constexpr int digits       = 4 * (base_class_type::digits);
-   static constexpr int digits10     = int(float(digits - 1) * 0.301F) - 1;
+   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
    static constexpr int max_digits10 = int(float(digits) * 0.301F) + 2;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - 3 * base_class_type::digits;
