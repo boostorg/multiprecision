@@ -148,20 +148,23 @@ namespace local
 
       const bool exp_is_neg = (dist_sgn(engine_sgn) != 0);
 
-      // TBD: Use even more extreme base-10 exponents if desired/possible
-      // and base these on the actual range of the exponent10 member of limits.
-      // The use of the digits member here is a strange workaround that
-      // still needs to be investigated on GCC's 10-bit x86 long double.
       using local_exp10_float_type =
          typename std::conditional<(std::is_same<float_type, long double>::value == true), double, float_type>::type;
+
+      constexpr int exp2_upper_limit = 
+      (
+             -std::numeric_limits<local_exp10_float_type>::min_exponent
+       - (2 * std::numeric_limits<local_exp10_float_type>::digits)
+       - 1
+      ) / 2;
+
+      constexpr int exp10_upper_limit = (int) (float(exp2_upper_limit) * 0.2F);
 
       static std::uniform_int_distribution<unsigned>
       dist_exp
       (
         0,
-          ((std::numeric_limits<local_exp10_float_type>::max_exponent10 > 1000) ? 1185
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >  200) ?   85
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?   13 : 1)))
+        (unsigned) (std::max)(0, exp10_upper_limit)
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
