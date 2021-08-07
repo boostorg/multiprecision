@@ -61,9 +61,9 @@ namespace local
     using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<float_type>, boost::multiprecision::et_off>;
     using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
 
-    //static_assert( digits       == std::numeric_limits<double_float_type>::digits       , "" );
-    //static_assert( digits10     == std::numeric_limits<double_float_type>::digits10     , "" );
-    //static_assert( max_digits10 == std::numeric_limits<double_float_type>::max_digits10 , "" );
+    static_assert( digits       == std::numeric_limits<double_float_type>::digits       , "Error in digit parameters" );
+    static_assert( digits10     == std::numeric_limits<double_float_type>::digits10     , "Error in digit parameters" );
+    static_assert( max_digits10 == std::numeric_limits<double_float_type>::max_digits10 , "Error in digit parameters" );
 
     template<const std::size_t DigitsToGet = digits10>
     static void get_random_fixed_string(std::string& str, const bool is_unsigned = false)
@@ -75,10 +75,10 @@ namespace local
       // (positive only via setting is_unsigned to true)
       // or mixed positive/negative.
 
-      // Re-seed the random engine each approx. 65k calls
+      // Re-seed the random engine each approx. 16k calls
       // of this string generator.
 
-      if((seed_prescaler % 0x10000U) == 0U)
+      if((seed_prescaler % 0x4000U) == 0U)
       {
         const std::clock_t seed_time_stamp = std::clock();
 
@@ -161,7 +161,7 @@ namespace local
         0,
           ((std::numeric_limits<local_exp10_float_type>::max_exponent10 > 1000) ? 1183
         : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >  200) ?   83
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?   13 : 1)))
+        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?    4 : 1)))
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
@@ -257,7 +257,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 10 - std::numeric_limits<double_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 6 - std::numeric_limits<double_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -290,7 +290,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 10 - std::numeric_limits<double_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 6 - std::numeric_limits<double_float_type>::digits);
 
       for(std::uint32_t i = 0U;((i < count) && result_is_ok); ++i)
       {
@@ -357,7 +357,7 @@ namespace local
   {
     using float_type = FloatingPointConstituentType;
 
-    std::cout << "Testing " << count << " arithmetic cases." << std::endl;
+    std::cout << "Testing " << count << " arithmetic cases for constituent float type = " << typeid(FloatingPointConstituentType).name() << "..." << std::endl;
 
     const bool result_add___is_ok = control<float_type>::test_add__(count); std::cout << "result_add___is_ok: " << std::boolalpha << result_add___is_ok << std::endl;
     const bool result_sub___is_ok = control<float_type>::test_sub__(count); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
@@ -384,12 +384,12 @@ int main()
   #endif
 
   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL << 10U);
+  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL <<  9U);
   #else
-  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL <<  6U);
+  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL <<  5U);
   #endif
 
-  const bool result_flt___is_ok = true;//local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
+  const bool result_flt___is_ok = local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
   const bool result_dbl___is_ok = local::test_arithmetic<double>     (test_cases_built_in); std::cout << "result_dbl___is_ok: " << std::boolalpha << result_dbl___is_ok << std::endl;
   const bool result_ldbl__is_ok = local::test_arithmetic<long double>(test_cases_built_in); std::cout << "result_ldbl__is_ok: " << std::boolalpha << result_ldbl__is_ok << std::endl;
 
