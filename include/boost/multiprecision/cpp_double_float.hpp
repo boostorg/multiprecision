@@ -625,6 +625,7 @@ class cpp_double_float
       typename other_cpp_double_float_type::rep_type p = other_cpp_double_float_type::arithmetic::product(a.first(), b);
 
       using std::isfinite;
+      using boost::multiprecision::isfinite;
 
       if ((isfinite)(p.first) == false)
          return other_cpp_double_float_type(p);
@@ -670,6 +671,7 @@ class cpp_double_float
       data = arithmetic::sum(first(),  other.first());
 
       using std::isfinite;
+      using boost::multiprecision::isfinite;
 
       if ((isfinite)(first()) == false)
          return *this;
@@ -688,6 +690,7 @@ class cpp_double_float
       data = arithmetic::difference(first(), other.first());
 
       using std::isfinite;
+      using boost::multiprecision::isfinite;
 
       if ((isfinite)(first()) == false)
          return *this;
@@ -721,6 +724,7 @@ class cpp_double_float
       p.first = first() / other.first();
 
       using std::isfinite;
+      using boost::multiprecision::isfinite;
 
       if ((isfinite)(p.first) == false)
       {
