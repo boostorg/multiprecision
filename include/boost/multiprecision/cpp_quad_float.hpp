@@ -333,7 +333,14 @@ class cpp_quad_float
       using std::array;
       using std::fabs;
       using std::get;
+      using std::isfinite;
       using std::tie;
+
+      if (!isfinite(get<0>(this->data)) || !isfinite(get<0>(other.data)))
+      {
+         data = (rep_type)std::make_tuple(get<0>(this->data) + get<0>(other.data), 0.0F, 0.0F, 0.0F);
+         return *this;
+      }
 
       float_pair u, v;
       int        i, j, k;
@@ -417,14 +424,22 @@ class cpp_quad_float
 
    cpp_quad_float& operator*=(const cpp_quad_float& other)
    {
-     using std::get;
-     using std::tie;
+      using std::get;
+      using std::isfinite;
+      using std::tie;
+
+      if (!isfinite(get<0>(this->data)) || !isfinite(get<0>(other.data)))
+      {
+         data = (rep_type)std::make_tuple(get<0>(this->data) * get<0>(other.data), 0.0F, 0.0F, 0.0F);
+         return *this;
+      }
 
       std::array<float_pair, 10> p;
       float_pair r, t, s;
       float_type s_;
 
       p[0] = arithmetic::product(get<0>(this->data), get<0>(other.data));
+
 
       p[1] = arithmetic::product(get<0>(this->data), get<1>(other.data));
       p[2] = arithmetic::product(get<1>(this->data), get<0>(other.data));
@@ -488,11 +503,19 @@ class cpp_quad_float
    cpp_quad_float& operator/=(const cpp_quad_float& other)
    {
       using std::get;
+      using std::isfinite;
 
       rep_type       q;
       cpp_quad_float r;
 
       get<0>(q) = get<0>(this->data) / get<0>(other.data);
+
+      if (!isfinite(get<0>(q)))
+      {
+         data = q;
+         return *this;
+      }
+
       r = *this - (other * get<0>(q));
 
       get<1>(q) = get<0>(r.data) / get<0>(other.data);
