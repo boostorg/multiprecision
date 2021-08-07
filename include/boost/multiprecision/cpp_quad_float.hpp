@@ -897,11 +897,13 @@ class numeric_limits<boost::multiprecision::backends::cpp_quad_float<FloatingPoi
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;  // TODO Discuss (verify denormal arithmetic is done correctly) 
 
    static constexpr int digits       = 4 * (base_class_type::digits);
-   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
+   static constexpr int digits10     = int(float(digits - 1) * 0.301F) - 1;
    static constexpr int max_digits10 = int(float(digits) * 0.301F) + 2;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - 3 * base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + 3 * base_class_type::digits;
+   static constexpr int max_exponent10 = int(float(max_exponent) * 0.301F);
+   static constexpr int min_exponent10 = int(float(min_exponent) * 0.301F);
 
    // TODO Are these values rigorous?
    static constexpr           self_type(min)() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
@@ -933,11 +935,13 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
    static constexpr int digits       = 4 * (base_class_type::digits);
-   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
+   static constexpr int digits10     = int(float(digits - 1) * 0.301F) - 1;
    static constexpr int max_digits10 = int(float(digits) * 0.301F) + 2;
 
    static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - 3 * base_class_type::digits;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + 3 * base_class_type::digits;
+   static constexpr int max_exponent10 = int(float(max_exponent) * 0.301F);
+   static constexpr int min_exponent10 = int(float(min_exponent) * 0.301F);
 
    static constexpr           self_type(min)() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
    static constexpr           self_type(max)() noexcept { return self_type(std::ldexp(base_class_type::max(), -base_class_type::digits)); }
