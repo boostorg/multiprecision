@@ -167,12 +167,15 @@ typename std::enable_if<boost::is_unsigned<R>::value == true, R>::type minus_max
    return 0;
 }
 
-// exact_arithmetic<> implements extended precision techniques that are used in
-// cpp_double_float and cpp_quad_float
 template <typename FloatingPointType>
 struct exact_arithmetic
 {
-   static_assert(detail::is_floating_point_or_float128<FloatingPointType>::value == true, "exact_arithmetic<> invoked with unknown floating-point type");
+   // The exact_arithmetic<> struct implements extended precision
+   // techniques that are used in cpp_double_float and cpp_quad_float.
+
+   static_assert(detail::is_floating_point_or_float128<FloatingPointType>::value == true,
+                 "Error: exact_arithmetic<> invoked with unknown floating-point type");
+
    using float_type  = FloatingPointType;
    using float_pair  = std::pair<float_type, float_type>;
    using float_tuple = std::tuple<float_type, float_type, float_type, float_type>;
@@ -181,14 +184,15 @@ struct exact_arithmetic
    {
       // Split a floating point number in two (high and low) parts approximating the
       // upper-half and lower-half bits of the float
-      //static_assert(std::numeric_limits<float_type>::is_iec559,
-      //              "double_float<> invoked with non-native floating-point unit");
+
+      static_assert(detail::is_floating_point_or_float128<FloatingPointType>::value == true,
+                    "Error: exact_arithmetic<>::split invoked with unknown floating-point type");
 
       // TODO Replace bit shifts with constexpr funcs or ldexp for better compaitibility
       constexpr int        MantissaBits   = std::numeric_limits<float_type>::digits;
       constexpr int        SplitBits      = MantissaBits / 2 + 1;
       constexpr float_type Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
-      const float_type     SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter * 2);
+      const     float_type SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter * 2);
 
       float_type temp, hi, lo;
 
