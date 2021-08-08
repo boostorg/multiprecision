@@ -208,13 +208,17 @@ void test()
             BOOST_CHECK_LE(exp(bug_case), (std::numeric_limits<T>::min)());
          }
       }
-      #if 0
+      // TBD: What's wrong here with double/quad-float?
+      // Do we have the wrong values of min/max in limits?
+      // Or do the little fractional parts in the arguments of the test cases
+      // need to be adapted?
+      #if !defined(TEST_CPP_DOUBLE_FLOAT)
       bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
       for (unsigned i = 0; i < 20; ++i, bug_case /= 1.05)
       {
          BOOST_CHECK_GE(exp(bug_case), (std::numeric_limits<T>::min)());
       }
-      #endif
+      #endif // !defined(TEST_CPP_DOUBLE_FLOAT)
    }
 }
 
@@ -263,6 +267,7 @@ int main()
 #ifdef TEST_CPP_DOUBLE_FLOAT
    test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<float> > >();
    test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double> > >();
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<long double> > >();
    #if defined(BOOST_MATH_USE_FLOAT128)
    test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> > >();
    #endif

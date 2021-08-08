@@ -1175,13 +1175,13 @@ void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
          eval_floor(nf, xx * constant_one_over_ln2);
 
          // Prepare the scaled variables.
-         const bool b_scale = (xx.order02() > -5);
+         const bool b_scale = (xx.order02() > -4);
 
          double_float_type r;
 
          if(b_scale)
          {
-           eval_ldexp(r, xx - (nf * constant_ln2), -5);
+           eval_ldexp(r, xx - (nf * constant_ln2), -4);
          }
          else
          {
@@ -1215,7 +1215,6 @@ void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
          // Rescale the result.
          if(b_scale)
          {
-            result *= result;
             result *= result;
             result *= result;
             result *= result;
@@ -1474,15 +1473,23 @@ private:
    using self_type = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
 
 public:
-   static constexpr bool is_iec559   = false;
-   static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+   static constexpr bool                    is_specialized = true;
+   static constexpr bool                    is_signed      = true;
+   static constexpr bool                    is_integer     = false;
+   static constexpr bool                    is_exact       = false;
+   static constexpr bool                    is_bounded     = true;
+   static constexpr bool                    is_modulo      = false;
+   static constexpr bool                    is_iec559      = false;
+   static constexpr std::float_denorm_style has_denorm     = std::denorm_absent;
 
    static constexpr int digits       = 2 * base_class_type::digits;
    static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
    static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
-   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
-   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
+   static constexpr int max_exponent   = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
+   static constexpr int min_exponent   = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
+   static constexpr int max_exponent10 = (int) (float(max_exponent) * 0.301F);
+   static constexpr int min_exponent10 = (int) (float(min_exponent) * 0.301F);
 
    // TODO Are these values rigorous?
    static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), min_exponent)); }
@@ -1512,15 +1519,23 @@ private:
       boost::multiprecision::number<inner_self_type, ExpressionTemplatesOption>;
 
 public:
-   static constexpr bool is_iec559                     = false;
-   static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+   static constexpr bool                    is_specialized = true;
+   static constexpr bool                    is_signed      = true;
+   static constexpr bool                    is_integer     = false;
+   static constexpr bool                    is_exact       = false;
+   static constexpr bool                    is_bounded     = true;
+   static constexpr bool                    is_modulo      = false;
+   static constexpr bool                    is_iec559      = false;
+   static constexpr std::float_denorm_style has_denorm     = std::denorm_absent;
 
    static constexpr int digits       = 2 * base_class_type::digits;
    static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
    static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
-   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
-   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
+   static constexpr int max_exponent   = std::numeric_limits<FloatingPointType>::max_exponent - base_class_type::digits;
+   static constexpr int min_exponent   = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
+   static constexpr int max_exponent10 = (int) (float(max_exponent) * 0.301F);
+   static constexpr int min_exponent10 = (int) (float(min_exponent) * 0.301F);
 
    static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename inner_self_type::float_type(1), min_exponent)); }
    static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp((base_class_type::max)(), -base_class_type::digits)); }
@@ -1535,5 +1550,38 @@ public:
 };
 
 }
+
+template <typename FloatingPointType> constexpr bool                    std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::is_specialized;
+template <typename FloatingPointType> constexpr bool                    std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::is_signed;
+template <typename FloatingPointType> constexpr bool                    std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::is_integer;
+template <typename FloatingPointType> constexpr bool                    std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::is_exact;
+template <typename FloatingPointType> constexpr bool                    std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::is_bounded;
+template <typename FloatingPointType> constexpr bool                    std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::is_modulo;
+template <typename FloatingPointType> constexpr bool                    std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::is_iec559;
+template <typename FloatingPointType> constexpr std::float_denorm_style std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::has_denorm;
+template <typename FloatingPointType> constexpr int                     std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::digits;
+template <typename FloatingPointType> constexpr int                     std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::digits10;
+template <typename FloatingPointType> constexpr int                     std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::max_digits10;
+template <typename FloatingPointType> constexpr int                     std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::max_exponent;
+template <typename FloatingPointType> constexpr int                     std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::min_exponent;
+template <typename FloatingPointType> constexpr int                     std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::max_exponent10;
+template <typename FloatingPointType> constexpr int                     std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>::min_exponent10;
+
+
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::is_specialized;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::is_signed;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::is_integer;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::is_exact;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::is_bounded;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::is_modulo;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::is_iec559;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr std::float_denorm_style std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::has_denorm;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::digits;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::digits10;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::max_digits10;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::max_exponent;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::min_exponent;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::max_exponent10;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption> constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>, ExpressionTemplatesOption>>::min_exponent10;
 
 #endif // BOOST_MP_CPP_DOUBLE_FLOAT_2021_06_05_HPP
