@@ -10,6 +10,8 @@
 #ifndef BOOST_MP_CPP_DOUBLE_FLOAT_2021_06_05_HPP
 #define BOOST_MP_CPP_DOUBLE_FLOAT_2021_06_05_HPP
 
+#include <boost/config.hpp>
+
 #include <limits>
 #include <sstream>
 #include <string>
@@ -17,16 +19,15 @@
 #include <type_traits>
 #include <utility>
 
-#include <boost/config.hpp>
 #include <boost/assert.hpp>
-#include <boost/multiprecision/detail/float_string_cvt.hpp>
-#include <boost/multiprecision/detail/hash.hpp>
 #if defined(BOOST_MATH_USE_FLOAT128)
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/traits/max_digits10.hpp>
+#include <boost/multiprecision/detail/float_string_cvt.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 #include <boost/type_traits/common_type.hpp>
+#include <boost/multiprecision/traits/max_digits10.hpp>
 
 namespace boost { namespace multiprecision { namespace backends {
 
