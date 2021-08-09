@@ -233,124 +233,14 @@ class cpp_quad_float
          *this = -*this;
    }
 
-   cpp_quad_float(const char* p)
+   cpp_quad_float(const std::string& str)
    {
-      using ui_type = typename std::tuple_element<0, unsigned_types>::type;
-
-      if (!p || (*p == 0))
-         return;
-
-      bool                 is_neg            = false;
-      bool                 is_neg_expon      = false;
-      const cpp_quad_float my_ten            = ui_type(10);
-      exponent_type        expon             = 0;
-      int                  digits_seen       = 0;
-      using                local_limits_type = std::numeric_limits<cpp_quad_float>;
-      constexpr int        max_digits        = ((local_limits_type::is_specialized == true) ? local_limits_type::max_digits10 + 1 : INT_MAX);
-
-      if (*p == '+')
-         ++p;
-      else if (*p == '-')
-      {
-         is_neg = true;
-         ++p;
-      }
-      if ((std::strcmp(p, "nan") == 0) || (std::strcmp(p, "NaN") == 0) || (std::strcmp(p, "NAN") == 0))
-      {
-         *this /= cpp_quad_float(0U);
-         if (is_neg)
-            negate();
-         return;
-      }
-      if ((std::strcmp(p, "inf") == 0) || (std::strcmp(p, "Inf") == 0) || (std::strcmp(p, "INF") == 0))
-      {
-         *this  = cpp_quad_float(1);
-         *this /= cpp_quad_float(0);
-         if (is_neg)
-            negate();
-         return;
-      }
-      //
-      // Grab all the leading digits before the decimal point:
-      //
-      while (std::isdigit(*p))
-      {
-         *this *= my_ten;
-         *this += cpp_quad_float(ui_type(*p - '0'));
-         ++p;
-         ++digits_seen;
-      }
-      if (*p == '.')
-      {
-         //
-         // Grab everything after the point, stop when we've seen
-         // enough digits, even if there are actually more available:
-         //
-         ++p;
-         while (std::isdigit(*p))
-         {
-            *this *= my_ten;
-            *this += cpp_quad_float(ui_type(*p - '0'));
-            ++p;
-            --expon;
-            if (++digits_seen > max_digits)
-               break;
-         }
-         while (std::isdigit(*p))
-            ++p;
-      }
-      //
-      // Parse the exponent:
-      //
-      if ((*p == 'e') || (*p == 'E'))
-      {
-         ++p;
-         if (*p == '+')
-            ++p;
-         else if (*p == '-')
-         {
-            is_neg_expon = true;
-            ++p;
-         }
-         exponent_type e2 = 0;
-         while (std::isdigit(*p))
-         {
-            e2 *= 10;
-            e2 += (*p - '0');
-            ++p;
-         }
-         if (is_neg_expon)
-            e2 = -e2;
-         expon += e2;
-      }
-      if (expon)
-      {
-         // Scale by 10^expon, note that 10^expon can be
-         // outside the range of our number type
-         if (expon > local_limits_type::min_exponent10 + 2)
-         {
-            *this *= pow10(expon);
-         }
-         else
-         {
-            while (expon-- > 0)
-               *this *= my_ten;
-            while (expon++ < 0)
-               *this /= my_ten;
-         }
-      }
-      if (is_neg)
-         negate();
-      if (*p)
-      {
-         // Unexpected input in string:
-         BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected characters in string being interpreted as a cpp_quad_float"));
-      }
+      boost::multiprecision::detail::convert_from_string(*this, str.c_str());
    }
 
-   
-   cpp_quad_float(const std::string& str) : cpp_quad_float(str.c_str())
+   cpp_quad_float(const char* pstr)
    {
+      boost::multiprecision::detail::convert_from_string(*this, pstr);
    }
 
    constexpr cpp_quad_float(cpp_quad_float&&) = default;
@@ -784,7 +674,7 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_quad_float<Floati
 {
    std::string str;
    is >> str;
-   f = cpp_quad_float(str);
+   f = cpp_quad_float<FloatingPointType>(str);
    return is;
 }
 
@@ -803,10 +693,10 @@ void eval_frexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<
    using std::frexp;
    using std::ldexp;
 
-   std::get<0>(result.rep()) = std::frexp(std::get<0>(a.crep()),   v);
-   std::get<1>(result.rep()) = std::ldexp(std::get<1>(a.crep()), -*v);
-   std::get<2>(result.rep()) = std::ldexp(std::get<2>(a.crep()), -*v);
-   std::get<3>(result.rep()) = std::ldexp(std::get<3>(a.crep()), -*v);
+   std::get<0>(result.rep()) = frexp(std::get<0>(a.crep()),   v);
+   std::get<1>(result.rep()) = ldexp(std::get<1>(a.crep()), -*v);
+   std::get<2>(result.rep()) = ldexp(std::get<2>(a.crep()), -*v);
+   std::get<3>(result.rep()) = ldexp(std::get<3>(a.crep()), -*v);
 }
 
 template <typename FloatingPointType>
@@ -986,77 +876,75 @@ namespace std {
 
 // Specialization of numeric_limits for cpp_quad_float<>
 template <typename FloatingPointType>
-class numeric_limits<boost::multiprecision::backends::cpp_quad_float<FloatingPointType> >
-    : public std::numeric_limits<FloatingPointType>
+class numeric_limits<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>>
+  : public std::numeric_limits<FloatingPointType>
 {
- private:
+private:
    using base_class_type = std::numeric_limits<FloatingPointType>;
 
    using self_type = boost::multiprecision::backends::cpp_quad_float<FloatingPointType>;
 
- public:
-   static constexpr bool is_iec559                     = false;
-   static constexpr std::float_denorm_style has_denorm = std::denorm_absent;  // TODO Discuss (verify denormal arithmetic is done correctly) 
+public:
+   static constexpr bool is_iec559   = false;
+   static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
-   static constexpr int digits       = 4 * (base_class_type::digits);
-   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
-   static constexpr int max_digits10 = int(float(digits) * 0.301F) + 2;
+   static constexpr int digits       = 4 * base_class_type::digits;
+   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
+   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
-   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - 3 * base_class_type::digits;
-   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + 3 * base_class_type::digits;
-   static constexpr int max_exponent10 = int(float(max_exponent) * 0.301F);
-   static constexpr int min_exponent10 = int(float(min_exponent) * 0.301F);
+   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - (3 * base_class_type::digits);
+   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + (3 * base_class_type::digits);
 
    // TODO Are these values rigorous?
-   static constexpr           self_type(min)() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
-   static constexpr           self_type(max)() noexcept { return self_type(boost::multiprecision::ldexp(base_class_type::max, -base_class_type::digits)); }
-   static constexpr self_type lowest() noexcept { return self_type(-max()); }
-   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), 6 - digits)); }
-   static constexpr self_type round_error() noexcept { return self_type(base_class_type::round_error()); }
-   static constexpr self_type denorm_min() noexcept { return self_type(min()); }
-
-   static constexpr self_type infinity() noexcept { return self_type(base_class_type::infinity()); }
-   static constexpr self_type quiet_NaN() noexcept { return self_type(base_class_type::quiet_NaN()); }
-   static constexpr self_type signaling_NaN() noexcept { return self_type(base_class_type::signaling_NaN()); }
+   static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), -min_exponent)); }
+   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp(base_class_type::max, -base_class_type::digits)); }
+   static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
+   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), 6 - digits)); }
+   static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
+   static constexpr self_type  denorm_min   () noexcept { return self_type( (min)()); }
+   
+   static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
+   static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
+   static constexpr self_type  signaling_NaN() noexcept { return self_type( base_class_type::signaling_NaN()); }
 };
 
 // Specialization of numeric_limits for boost::multiprecision::number<cpp_quad_float<>>
 template <typename FloatingPointType,
           const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >
-    : public std::numeric_limits<FloatingPointType>
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption>>
+   : public std::numeric_limits<FloatingPointType>
 {
- private:
+private:
    using base_class_type = std::numeric_limits<FloatingPointType>;
 
-   using self_type =
-       boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption>;
+   using inner_self_type = boost::multiprecision::backends::cpp_quad_float<FloatingPointType>;
 
- public:
+   using self_type =
+      boost::multiprecision::number<inner_self_type, ExpressionTemplatesOption>;
+
+public:
    static constexpr bool is_iec559                     = false;
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
-   static constexpr int digits       = 4 * (base_class_type::digits);
-   static constexpr int digits10     = int(float(digits - 1) * 0.301F);
-   static constexpr int max_digits10 = int(float(digits) * 0.301F) + 2;
+   static constexpr int digits       = 4 * base_class_type::digits;
+   static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
+   static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
-   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - 3 * base_class_type::digits;
-   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + 3 * base_class_type::digits;
-   static constexpr int max_exponent10 = int(float(max_exponent) * 0.301F);
-   static constexpr int min_exponent10 = int(float(min_exponent) * 0.301F);
+   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - (3 * base_class_type::digits);
+   static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + (3 * base_class_type::digits);
 
-   static constexpr           self_type(min)() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), -min_exponent)); }
-   static constexpr           self_type(max)() noexcept { return self_type(std::ldexp(base_class_type::max(), -base_class_type::digits)); }
-   static constexpr self_type lowest() noexcept { return self_type(-max()); }
-   static constexpr self_type epsilon() noexcept { return self_type(boost::multiprecision::ldexp(self_type(1), 6 - digits)); }
-   static constexpr self_type round_error() noexcept { return self_type(base_class_type::round_error()); }
-   static constexpr self_type denorm_min() noexcept { return self_type(min()); }
+   static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename inner_self_type::float_type(1), -min_exponent)); }
+   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp((base_class_type::max)(), -base_class_type::digits)); }
+   static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
+   static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), 6 - digits)); }
+   static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
+   static const     self_type  denorm_min   () noexcept { return self_type( (min)()); }
 
-   static constexpr self_type infinity() noexcept { return self_type(base_class_type::infinity()); }
-   static constexpr self_type quiet_NaN() noexcept { return self_type(base_class_type::quiet_NaN()); }
-   static constexpr self_type signaling_NaN() noexcept { return self_type(base_class_type::signaling_NaN()); }
+   static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
+   static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
+   static constexpr self_type  signaling_NaN() noexcept { return self_type( base_class_type::signaling_NaN()); }
 };
 
-} // namespace std
+}
 
 #endif // BOOST_MP_CPP_QUAD_FLOAT_2021_07_29_HPP

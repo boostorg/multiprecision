@@ -14,12 +14,10 @@
 // Handle interaction with Boost's wrap of libquadmath __float128.
 // g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DBOOST_MATH_USE_FLOAT128 test.cpp -lquadmath -o test_double_float.exe
 
-#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <random>
 #include <string>
-#include <vector>
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
@@ -28,8 +26,6 @@
 #endif
 #include <boost/multiprecision/cpp_double_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
-#include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/core/demangle.hpp>
 
 #if defined(__clang__)
@@ -75,7 +71,7 @@ namespace local
       // (positive only via setting is_unsigned to true)
       // or mixed positive/negative.
 
-      // Re-seed the random engine each approx. 65k calls
+      // Re-seed the random engine each approx. 64k calls
       // of this string generator.
 
       if((seed_prescaler % 0x10000U) == 0U)
@@ -148,20 +144,25 @@ namespace local
 
       const bool exp_is_neg = (dist_sgn(engine_sgn) != 0);
 
-      // TBD: Use even more extreme base-10 exponents if desired/possible
-      // and base these on the actual range of the exponent10 member of limits.
-      // The use of the digits member here is a strange workaround that
-      // still needs to be investigated on GCC's 10-bit x86 long double.
+      // Set exponent-10 range.
       using local_exp10_float_type =
          typename std::conditional<(std::is_same<float_type, long double>::value == true), double, float_type>::type;
+
+      constexpr int exp02_upper_limit =
+      (
+             -std::numeric_limits<local_exp10_float_type>::min_exponent
+       - (4 * std::numeric_limits<local_exp10_float_type>::digits)
+       - 1
+      ) / 2;
+
+      constexpr unsigned exp10_upper_limit =
+        ((exp02_upper_limit > 0) ? (unsigned) (float(exp02_upper_limit) * 0.2F) : 0U);
 
       static std::uniform_int_distribution<unsigned>
       dist_exp
       (
-        0,
-          ((std::numeric_limits<local_exp10_float_type>::max_exponent10 > 1000) ? 1185
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >  200) ?   85
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?   13 : 1)))
+        0U,
+        exp10_upper_limit
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
@@ -354,7 +355,12 @@ namespace local
   {
     using float_type = FloatingPointConstituentType;
 
-    std::cout << "Testing " << count << " arithmetic cases." << std::endl;
+    std::cout << "Testing "
+              << count
+              << " arithmetic cases for type = "
+              << boost::core::demangle(typeid(typename control<float_type>::double_float_type).name())
+              << " ..."
+              << std::endl;
 
     const bool result_add___is_ok = control<float_type>::test_add__(count); std::cout << "result_add___is_ok: " << std::boolalpha << result_add___is_ok << std::endl;
     const bool result_sub___is_ok = control<float_type>::test_sub__(count); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
