@@ -862,7 +862,19 @@ class cpp_double_float
       #endif
 
       // TBD: Need a better value here.
-      return cpp_double_float(ldexp(float_type(1), 4 - my_digits));
+      return []() -> cpp_double_float
+      {
+        cpp_double_float result;
+
+        eval_ldexp(result, cpp_double_float(1), 4 - my_digits);
+
+        return result;
+      }();
+   }
+
+   static constexpr cpp_double_float my_value_nan() noexcept
+   {
+     return cpp_double_float(std::numeric_limits<float_type>::quiet_NaN());
    }
 
  private:
@@ -1423,7 +1435,7 @@ void eval_log(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
    }
    else if(x.is_neg())
    {
-      result = std::numeric_limits<double_float_type>::quiet_NaN();
+      result = double_float_type::my_value_nan();
    }
    else if(x.is_one())
    {

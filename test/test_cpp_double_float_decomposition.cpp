@@ -26,6 +26,21 @@
 #include <string>
 #include <vector>
 
+namespace std {
+
+// This is a little bit backwards now.
+// Since the inner, naked cpp_double_float<T> type no longer
+// has its own specializations specialization of numeric_limits,
+// this is patched here.
+
+template <typename FloatingPointType>
+class numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>
+   : public std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType>>>
+{
+};
+
+}
+
 // Reference data comes in a tuple of four elements:
 // 0. string  : binary representation of the number to be tested
 // 1. int     : binary exponent, a power of two.
@@ -246,7 +261,7 @@ void sometimes_print_bit_positions(int digs, int mult)
          std::cout << std::setw(digs) << digs*(i+1);
       }
       std::cout << std::endl;
-      std::cout << std::setw(40) << " "; // these spaces are synchronised with short_print_shifted(…) and short_print(…)
+      std::cout << std::setw(40) << " "; // these spaces are synchronised with short_print_shifted(...) and short_print(...)
       for(int i = 0 ; i < mult ; i++) {
          std::cout << std::setw(digs) << "|";
       }
@@ -316,7 +331,7 @@ int try_number(R& ref, Arg str, bool verbose) {
 
    int errors = 0;
    try {
-      // FIXME: should these normalize calls be here, ot at the end of some functions inside cpp_double_float.hpp ?
+      // FIXME: should these normalize calls be here, or at the end of some functions inside cpp_double_float.hpp ?
       R::arithmetic::normalize(z.rep());
       R::arithmetic::extra_normalize(z.rep());
 
@@ -338,7 +353,7 @@ int try_number(R& ref, Arg str, bool verbose) {
       str_to_bin_error     = frexp(str_to_bin_error , &exp2);
 
       if(verbose) {
-         std::cout << "→→→ " << str_to_bin_error  << " , exp1 =  " << exp1 << " , exp2 = " << exp2 << std::endl;
+         std::cout << "-->" << str_to_bin_error  << " , exp1 =  " << exp1 << " , exp2 = " << exp2 << std::endl;
       }
       double ulp_error = 0;
       if(str_to_bin_error != R(0)) {
@@ -351,7 +366,7 @@ int try_number(R& ref, Arg str, bool verbose) {
 /* TODO */ //if(std::abs(boost::math::float_distance(z , ref)) > 2)
       {
          errors++;
-         std::cout << "** ERROR between string ↔ binary **" << str_to_bin_error  << ", exp1 =" << exp1 << ", exp2 =" << exp2 << std::endl;
+         std::cout << "** ERROR between string <--> binary **" << str_to_bin_error  << ", exp1 =" << exp1 << ", exp2 =" << exp2 << std::endl;
       }
    }
 
