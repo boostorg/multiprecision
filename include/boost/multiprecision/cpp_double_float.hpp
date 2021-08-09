@@ -1497,12 +1497,12 @@ public:
 
    // TODO Are these values rigorous?
    static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), min_exponent)); }
-   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( std::make_pair((base_class_type::max)(), ldexp((base_class_type::max)(), -(base_class_type::digits+1)))); }
+   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( self_type::arithmetic::fast_sum((base_class_type::max)() * (1.0F - 1.5F * std::sqrt(base_class_type::epsilon())), ldexp((base_class_type::max)(), -(base_class_type::digits+1)))); }
    static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
    static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), 4 - digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
    static constexpr self_type  denorm_min   () noexcept { return self_type( (min)()); }
-   
+
    static constexpr self_type  infinity     () noexcept { return self_type( base_class_type::infinity()); }
    static constexpr self_type  quiet_NaN    () noexcept { return self_type( base_class_type::quiet_NaN()); }
    static constexpr self_type  signaling_NaN() noexcept { return self_type( base_class_type::signaling_NaN()); }
@@ -1540,9 +1540,9 @@ public:
    static constexpr int min_exponent   = std::numeric_limits<FloatingPointType>::min_exponent + base_class_type::digits;
    static constexpr int max_exponent10 = (int) (float(max_exponent) * 0.301F);
    static constexpr int min_exponent10 = (int) (float(min_exponent) * 0.301F);
-
+   
    static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename inner_self_type::float_type(1), min_exponent)); }
-   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( std::make_pair((base_class_type::max)(), ldexp((base_class_type::max)(), -(base_class_type::digits+1)))); }
+   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( inner_self_type::arithmetic::fast_sum((base_class_type::max)() * (1.0F - 1.5F * std::sqrt(base_class_type::epsilon())), ldexp((base_class_type::max)(), -(base_class_type::digits+1)))); }
    static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
    static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), 4 - digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
