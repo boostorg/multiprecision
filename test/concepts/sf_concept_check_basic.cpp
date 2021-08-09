@@ -88,13 +88,13 @@ void test_extra(T)
    boost::math::expm1(v1);
    boost::math::cbrt(v1);
    boost::math::sqrt1pm1(v1);
-   //boost::math::powm1(v1, v2);
+   boost::math::powm1(v1, v2);
    boost::math::hypot(v1, v2);
    boost::math::sinc_pi(v1);
    boost::math::sinhc_pi(v1);
-   //boost::math::asinh(v1);
-   //boost::math::acosh(v1);
-   //boost::math::atanh(v1);
+   boost::math::asinh(v1);
+   boost::math::acosh(v1);
+   boost::math::atanh(v1);
    boost::math::sin_pi(v1);
    boost::math::cos_pi(v1);
    boost::math::trunc(v1);
@@ -119,10 +119,10 @@ void test_extra(T)
    boost::math::float_prior(v1);
    boost::math::float_distance(v1, v1);
    // Misc functions that don't fit elsewhere:
-   //boost::math::expint(v1);
-   //boost::math::expint(i);
-   //boost::math::expint(i, v2);
-   //boost::math::expint(i, i);
+   boost::math::expint(v1);
+   boost::math::expint(i);
+   boost::math::expint(i, v2);
+   boost::math::expint(i, i);
    boost::math::zeta(v1);
    boost::math::zeta(i);
    boost::math::owens_t(v1, v2);
