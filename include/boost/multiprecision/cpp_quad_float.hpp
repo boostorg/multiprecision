@@ -930,11 +930,11 @@ public:
    static constexpr int digits10     = boost::multiprecision::detail::calc_digits10<digits>::value;
    static constexpr int max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
 
-   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent - (3 * base_class_type::digits);
+   static constexpr int max_exponent = std::numeric_limits<FloatingPointType>::max_exponent;
    static constexpr int min_exponent = std::numeric_limits<FloatingPointType>::min_exponent + (3 * base_class_type::digits);
-
-   static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename inner_self_type::float_type(1), -min_exponent)); }
-   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( ldexp((base_class_type::max)(), -base_class_type::digits)); }
+   
+   static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename inner_self_type::float_type(1), min_exponent)); }
+   static const     self_type (max)         () noexcept { using std::ldexp; using std::sqrt; using boost::multiprecision::ldexp; using boost::multiprecision::sqrt; return self_type( inner_self_type::arithmetic::four_sum((base_class_type::max)() * (1.0F - 1.5F * std::sqrt(base_class_type::epsilon())), ldexp((base_class_type::max)(), -1 * (base_class_type::digits+1)), ldexp((base_class_type::max)(), -2 * (base_class_type::digits + 1)), ldexp((base_class_type::max)(), -3 * (base_class_type::digits + 1)))); }
    static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
    static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), 6 - digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 

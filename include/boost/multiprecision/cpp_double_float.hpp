@@ -363,6 +363,12 @@ struct exact_arithmetic
       t = s;
    }
 
+   static float_tuple four_sum(float_type a, float_type b, float_type c, float_type d) {
+      float_tuple out = std::make_tuple(a, b, c, d);
+      normalize(out);
+      return out;
+   }
+
    static void normalize(float_tuple& t, float_type e)
    {
       using std::tie;
@@ -1497,7 +1503,7 @@ public:
 
    // TODO Are these values rigorous?
    static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), min_exponent)); }
-   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( self_type::arithmetic::fast_sum((base_class_type::max)() * (1.0F - 1.5F * std::sqrt(base_class_type::epsilon())), ldexp((base_class_type::max)(), -(base_class_type::digits+1)))); }
+   static const     self_type (max)         () noexcept { using std::ldexp; using std::sqrt; using boost::multiprecision::ldexp; using boost::multiprecision::sqrt; return self_type( self_type::arithmetic::fast_sum((base_class_type::max)() * (1.0F - 1.5F * std::sqrt(base_class_type::epsilon())), ldexp((base_class_type::max)(), -(base_class_type::digits+1)))); }
    static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
    static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(typename self_type::float_type(1), 4 - digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
@@ -1542,7 +1548,7 @@ public:
    static constexpr int min_exponent10 = (int) (float(min_exponent) * 0.301F);
    
    static const     self_type (min)         () noexcept { using std::ldexp; return self_type( ldexp(typename inner_self_type::float_type(1), min_exponent)); }
-   static const     self_type (max)         () noexcept { using std::ldexp; return self_type( inner_self_type::arithmetic::fast_sum((base_class_type::max)() * (1.0F - 1.5F * std::sqrt(base_class_type::epsilon())), ldexp((base_class_type::max)(), -(base_class_type::digits+1)))); }
+   static const     self_type (max)         () noexcept { using std::ldexp; using std::sqrt; using boost::multiprecision::ldexp; using boost::multiprecision::sqrt; return self_type( inner_self_type::arithmetic::fast_sum((base_class_type::max)() * (1.0F - 1.5F * std::sqrt(base_class_type::epsilon())), ldexp((base_class_type::max)(), -(base_class_type::digits+1)))); }
    static const     self_type  lowest       () noexcept { return self_type(-(max)()); }
    static const     self_type  epsilon      () noexcept { using std::ldexp; return self_type( ldexp(self_type(1), 4 - digits)); }
    static constexpr self_type  round_error  () noexcept { return self_type( base_class_type::round_error()); } 
