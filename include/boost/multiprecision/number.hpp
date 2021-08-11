@@ -2275,6 +2275,17 @@ inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const number<Backend, Exp
    return hash_value(val.backend());
 }
 
+namespace detail {
+
+BOOST_MP_FORCEINLINE bool istream_peek(std::istream& is, char& c, bool have_hex)
+{
+   int i = is.peek();
+   c = static_cast<char>(i);
+   return (EOF != i) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F')));
+}
+
+} // namespace detail
+
 } // namespace multiprecision
 
 template <class T>
@@ -2290,7 +2301,7 @@ inline std::istream& operator>>(std::istream& is, rational<multiprecision::numbe
    bool                                                 hex_format = (is.flags() & std::ios_base::hex) == std::ios_base::hex;
    bool                                                 oct_format = (is.flags() & std::ios_base::oct) == std::ios_base::oct;
 
-   while ((EOF != (c = static_cast<char>(is.peek()))) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
+   while (multiprecision::detail::istream_peek(is, c, have_hex))
    {
       if (c == 'x' || c == 'X')
          have_hex = true;
@@ -2306,7 +2317,7 @@ inline std::istream& operator>>(std::istream& is, rational<multiprecision::numbe
    if (c == '/')
    {
       is.get();
-      while ((EOF != (c = static_cast<char>(is.peek()))) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
+      while (multiprecision::detail::istream_peek(is, c, have_hex))
       {
          if (c == 'x' || c == 'X')
             have_hex = true;
