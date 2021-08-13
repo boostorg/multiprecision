@@ -212,7 +212,7 @@ void test()
       // Do we have the wrong values of min/max in limits?
       // Or do the little fractional parts in the arguments of the test cases
       // need to be adapted?
-      #if defined(TEST_CPP_DOUBLE_FLOAT)
+      #if !defined(TEST_CPP_DOUBLE_FLOAT)
       bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
       for (unsigned i = 0; i < 20; ++i, bug_case /= 1.05)
       {
