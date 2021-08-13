@@ -647,7 +647,16 @@ class cpp_quad_float
       using boost::multiprecision::ldexp;
       using boost::multiprecision::sqrt;
 #endif
-      return cpp_quad_float(arithmetic::four_sum((std::numeric_limits<float_type>::max)() * (1.0F - 1.5F * sqrt(std::numeric_limits<float_type>::epsilon())), ldexp((std::numeric_limits<float_type>::max)(), -1 * (std::numeric_limits<float_type>::digits + 1)), ldexp((std::numeric_limits<float_type>::max)(), -2 * (std::numeric_limits<float_type>::digits + 1)), ldexp((std::numeric_limits<float_type>::max)(), -3 * (std::numeric_limits<float_type>::digits + 1))));
+      return cpp_quad_float
+      (
+        arithmetic::four_sum
+        (
+        (std::numeric_limits<float_type>::max)() * (1.0F - 1.5F * sqrt(std::numeric_limits<float_type>::epsilon())),
+        ldexp((std::numeric_limits<float_type>::max)(), -1 * (std::numeric_limits<float_type>::digits + 1)),
+        ldexp((std::numeric_limits<float_type>::max)(), -2 * (std::numeric_limits<float_type>::digits + 1)),
+        ldexp((std::numeric_limits<float_type>::max)(), -3 * (std::numeric_limits<float_type>::digits + 1))
+        )
+      );
    }
 
    static cpp_quad_float my_value_min() noexcept
@@ -657,7 +666,7 @@ class cpp_quad_float
       using boost::multiprecision::ldexp;
 #endif
 
-      return cpp_quad_float(ldexp(float_type(1), my_min_exponent));
+      return cpp_quad_float(ldexp(float_type(1), std::numeric_limits<float_type>::min_exponent));
    }
 
    static cpp_quad_float my_value_eps() noexcept
