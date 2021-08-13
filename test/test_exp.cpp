@@ -17,7 +17,7 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT) && !defined(TEST_CPP_QUAD_FLOAT)
 #define TEST_MPF_50
 //#  define TEST_MPF
 #define TEST_BACKEND
@@ -26,6 +26,7 @@
 #define TEST_FLOAT128
 #define TEST_CPP_BIN_FLOAT
 #define TEST_CPP_DOUBLE_FLOAT
+#define TEST_CPP_QUAD_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -63,13 +64,19 @@
 #endif
 #include <boost/multiprecision/cpp_double_float.hpp>
 #endif
+#ifdef TEST_CPP_QUAD_FLOAT
+#if defined(BOOST_MATH_USE_FLOAT128)
+#include <boost/multiprecision/float128.hpp>
+#endif
+#include <boost/multiprecision/cpp_quad_float.hpp>
+#endif
 
 template <class T>
 void test()
 {
    std::cout << "Testing type " << typeid(T).name() << std::endl;
    unsigned max_err = 0;
-#if !defined(TEST_CPP_DOUBLE_FLOAT)
+#if !defined(TEST_CPP_DOUBLE_FLOAT) && !defined(TEST_CPP_QUAD_FLOAT) // exponent range in tabulated data is too large for these types.
    static const boost::array<const char*, 51u> data =
        {{
            "1.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
@@ -153,7 +160,7 @@ void test()
    BOOST_TEST(max_err < 5000);
 #endif
 
-#endif // !defined(TEST_CPP_DOUBLE_FLOAT)
+#endif // !defined(TEST_CPP_DOUBLE_FLOAT) && !defined(TEST_CPP_QUAD_FLOAT)
 
    static const boost::array<boost::array<T, 2>, 12> exact_data =
        {{
@@ -212,7 +219,7 @@ void test()
       // Do we have the wrong values of min/max in limits?
       // Or do the little fractional parts in the arguments of the test cases
       // need to be adapted?
-      #if !defined(TEST_CPP_DOUBLE_FLOAT)
+      #if !defined(TEST_CPP_DOUBLE_FLOAT) && !defined(TEST_CPP_QUAD_FLOAT)
       bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
       for (unsigned i = 0; i < 20; ++i, bug_case /= 1.05)
       {
@@ -270,6 +277,14 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<long double> > >();
    #if defined(BOOST_MATH_USE_FLOAT128)
    test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> > >();
+   #endif
+#endif
+#ifdef TEST_CPP_QUAD_FLOAT
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<float> > >();
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<double> > >();
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<long double> > >();
+   #if defined(BOOST_MATH_USE_FLOAT128)
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<boost::multiprecision::float128> > >();
    #endif
 #endif
    return boost::report_errors();
