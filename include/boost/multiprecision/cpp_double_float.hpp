@@ -904,8 +904,10 @@ class cpp_double_float
    static cpp_double_float my_value_max() noexcept
    {
       using std::ldexp;
+      using std::sqrt;
 #if defined(BOOST_MATH_USE_FLOAT128)
       using boost::multiprecision::ldexp;
+      using boost::multiprecision::sqrt;
 #endif
 
       return cpp_double_float(arithmetic::fast_sum((std::numeric_limits<float_type>::max)() * (1.0F - 1.5F * sqrt(std::numeric_limits<float_type>::epsilon())), ldexp((std::numeric_limits<float_type>::max)(), -(std::numeric_limits<float_type>::digits + 1))));
