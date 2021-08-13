@@ -292,6 +292,13 @@ struct exact_arithmetic
       tie(p.second, e) = sum(t.second, t_);
    }
 
+   static float_tuple four_sum(float_type a, float_type b, float_type c, float_type d)
+   {
+      float_tuple out = std::make_tuple(a, b, c, d);
+      normalize(out);
+      return out;
+   }
+
    static float_pair difference(const float_type& a, const float_type& b)
    {
       // Exact subtraction of two floating point numbers
