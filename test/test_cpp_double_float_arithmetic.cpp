@@ -57,9 +57,9 @@ namespace local
     using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<float_type>, boost::multiprecision::et_off>;
     using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
 
-    static_assert( digits       == std::numeric_limits<double_float_type>::digits       , "" );
-    static_assert( digits10     == std::numeric_limits<double_float_type>::digits10     , "" );
-    static_assert( max_digits10 == std::numeric_limits<double_float_type>::max_digits10 , "" );
+    static_assert( digits       == std::numeric_limits<double_float_type>::digits       , "Error in digit parameters" );
+    static_assert( digits10     == std::numeric_limits<double_float_type>::digits10     , "Error in digit parameters" );
+    static_assert( max_digits10 == std::numeric_limits<double_float_type>::max_digits10 , "Error in digit parameters" );
 
     template<const std::size_t DigitsToGet = digits10>
     static void get_random_fixed_string(std::string& str, const bool is_unsigned = false)
