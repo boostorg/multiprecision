@@ -9,17 +9,15 @@
 // Test for correctness of arithmetic operators of cpp_double_float<>
 
 // cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
-// g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_double_float.exe
+// g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_quad_float.exe
 
 // Handle interaction with Boost's wrap of libquadmath __float128.
-// g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DBOOST_MATH_USE_FLOAT128 test.cpp -lquadmath -o test_double_float.exe
+// g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DBOOST_MATH_USE_FLOAT128 test.cpp -lquadmath -o test_quad_float.exe
 
-#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <random>
 #include <string>
-#include <vector>
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
@@ -28,8 +26,6 @@
 #endif
 #include <boost/multiprecision/cpp_quad_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
-#include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/core/demangle.hpp>
 
 #if defined(__clang__)
@@ -58,12 +54,12 @@ namespace local
 
     static unsigned seed_prescaler;
 
-    using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<float_type>, boost::multiprecision::et_off>;
-    using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
+    using quad_float_type    = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<float_type>, boost::multiprecision::et_off>;
+    using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<quad_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
 
-    //static_assert( digits       == std::numeric_limits<double_float_type>::digits       , "" );
-    //static_assert( digits10     == std::numeric_limits<double_float_type>::digits10     , "" );
-    //static_assert( max_digits10 == std::numeric_limits<double_float_type>::max_digits10 , "" );
+    static_assert( digits       == std::numeric_limits<quad_float_type>::digits       , "Error in digit parameters" );
+    static_assert( digits10     == std::numeric_limits<quad_float_type>::digits10     , "Error in digit parameters" );
+    static_assert( max_digits10 == std::numeric_limits<quad_float_type>::max_digits10 , "Error in digit parameters" );
 
     template<const std::size_t DigitsToGet = digits10>
     static void get_random_fixed_string(std::string& str, const bool is_unsigned = false)
@@ -75,10 +71,10 @@ namespace local
       // (positive only via setting is_unsigned to true)
       // or mixed positive/negative.
 
-      // Re-seed the random engine each approx. 65k calls
+      // Re-seed the random engine each approx. 16k calls
       // of this string generator.
 
-      if((seed_prescaler % 0x10000U) == 0U)
+      if((seed_prescaler % 0x4000U) == 0U)
       {
         const std::clock_t seed_time_stamp = std::clock();
 
@@ -148,20 +144,25 @@ namespace local
 
       const bool exp_is_neg = (dist_sgn(engine_sgn) != 0);
 
-      // TBD: Use even more extreme base-10 exponents if desired/possible
-      // and base these on the actual range of the exponent10 member of limits.
-      // The use of the digits member here is a strange workaround that
-      // still needs to be investigated on GCC's 10-bit x86 long double.
+      // Set exponent-10 range.
       using local_exp10_float_type =
          typename std::conditional<(std::is_same<float_type, long double>::value == true), double, float_type>::type;
+
+      constexpr int exp02_upper_limit =
+      (
+             -std::numeric_limits<local_exp10_float_type>::min_exponent
+       - (4 * std::numeric_limits<local_exp10_float_type>::digits)
+       - 1
+      ) / 2;
+
+      constexpr unsigned exp10_upper_limit =
+        ((exp02_upper_limit > 0) ? (unsigned) (float(exp02_upper_limit) * 0.2F) : 0U);
 
       static std::uniform_int_distribution<unsigned>
       dist_exp
       (
-        0,
-          ((std::numeric_limits<local_exp10_float_type>::max_exponent10 > 1000) ? 1183
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >  200) ?   83
-        : ((std::numeric_limits<local_exp10_float_type>::max_exponent10 >   20) ?   13 : 1)))
+        0U,
+        exp10_upper_limit
       );
 
       std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
@@ -178,12 +179,12 @@ namespace local
     }
 
     template<typename ConstructionType>
-    static ConstructionType construct_from(const double_float_type& f)
+    static ConstructionType construct_from(const quad_float_type& f)
     {
-      return   ConstructionType(std::get<0>(double_float_type::canonical_value(f).crep()))
-             + ConstructionType(std::get<1>(double_float_type::canonical_value(f).crep()))
-             + ConstructionType(std::get<2>(double_float_type::canonical_value(f).crep()))
-             + ConstructionType(std::get<3>(double_float_type::canonical_value(f).crep()))
+      return   ConstructionType(std::get<0>(quad_float_type::canonical_value(f).crep()))
+             + ConstructionType(std::get<1>(quad_float_type::canonical_value(f).crep()))
+             + ConstructionType(std::get<2>(quad_float_type::canonical_value(f).crep()))
+             + ConstructionType(std::get<3>(quad_float_type::canonical_value(f).crep()))
              ;
     }
 
@@ -191,7 +192,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 4 - std::numeric_limits<double_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 4 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -201,13 +202,13 @@ namespace local
         control<float_type>::get_random_fixed_string<digits10 + 4>(str_a);
         control<float_type>::get_random_fixed_string<digits10 + 4>(str_b);
 
-        const double_float_type  df_a(str_a);
-        const double_float_type  df_b(str_b);
+        const quad_float_type  df_a(str_a);
+        const quad_float_type  df_b(str_b);
 
         const control_float_type ctrl_a = construct_from<control_float_type>(df_a);
         const control_float_type ctrl_b = construct_from<control_float_type>(df_b);
 
-        double_float_type  df_c    = df_a   + df_b;
+        quad_float_type  df_c    = df_a   + df_b;
         control_float_type ctrl_c  = ctrl_a + ctrl_b;
 
         const control_float_type delta = fabs(1 - fabs(ctrl_c / construct_from<control_float_type>(df_c)));
@@ -224,7 +225,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 4 - std::numeric_limits<double_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 4 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -234,13 +235,13 @@ namespace local
         control<float_type>::get_random_fixed_string<digits10 + 4>(str_a);
         control<float_type>::get_random_fixed_string<digits10 + 4>(str_b);
 
-        const double_float_type  df_a(str_a);
-        const double_float_type  df_b(str_b);
+        const quad_float_type  df_a(str_a);
+        const quad_float_type  df_b(str_b);
 
         const control_float_type ctrl_a = construct_from<control_float_type>(df_a);
         const control_float_type ctrl_b = construct_from<control_float_type>(df_b);
 
-        double_float_type  df_c   = df_a   - df_b;
+        quad_float_type  df_c   = df_a   - df_b;
         control_float_type ctrl_c = ctrl_a - ctrl_b;
 
         const control_float_type delta = fabs(1 - fabs(ctrl_c / construct_from<control_float_type>(df_c)));
@@ -257,7 +258,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 10 - std::numeric_limits<double_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 6 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -267,13 +268,13 @@ namespace local
         control<float_type>::get_random_fixed_string<digits10 + 4>(str_a);
         control<float_type>::get_random_fixed_string<digits10 + 4>(str_b);
 
-        const double_float_type df_a(str_a);
-        const double_float_type df_b(str_b);
+        const quad_float_type df_a(str_a);
+        const quad_float_type df_b(str_b);
 
         const control_float_type ctrl_a = construct_from<control_float_type>(df_a);
         const control_float_type ctrl_b = construct_from<control_float_type>(df_b);
 
-        double_float_type  df_c   = df_a   * df_b;
+        quad_float_type  df_c   = df_a   * df_b;
         control_float_type ctrl_c = ctrl_a * ctrl_b;
 
         const control_float_type delta = fabs(1 - fabs(ctrl_c / construct_from<control_float_type>(df_c)));
@@ -290,7 +291,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 10 - std::numeric_limits<double_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 6 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U;((i < count) && result_is_ok); ++i)
       {
@@ -300,13 +301,13 @@ namespace local
         control<float_type>::get_random_fixed_string<digits10 + 4>(str_a);
         control<float_type>::get_random_fixed_string<digits10 + 4>(str_b);
 
-        const double_float_type  df_a  (str_a);
-        const double_float_type  df_b  (str_b);
+        const quad_float_type  df_a  (str_a);
+        const quad_float_type  df_b  (str_b);
 
         const control_float_type ctrl_a = construct_from<control_float_type>(df_a);
         const control_float_type ctrl_b = construct_from<control_float_type>(df_b);
 
-        const double_float_type  df_c   = df_a   / df_b;
+        const quad_float_type  df_c   = df_a   / df_b;
         const control_float_type ctrl_c = ctrl_a / ctrl_b;
 
         const control_float_type delta = fabs(1 - fabs(ctrl_c / construct_from<control_float_type>(df_c)));
@@ -323,7 +324,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 6 - std::numeric_limits<double_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 6 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -332,11 +333,11 @@ namespace local
 
         control<float_type>::get_random_fixed_string<digits10 + 4>(str_a, true);
 
-        const double_float_type  df_a(str_a);
+        const quad_float_type  df_a(str_a);
 
         const control_float_type ctrl_a = construct_from<control_float_type>(df_a);
 
-        double_float_type  df_c   = sqrt(df_a);
+        quad_float_type  df_c   = sqrt(df_a);
         control_float_type ctrl_c = sqrt(ctrl_a);
 
         const control_float_type delta = fabs(1 - fabs(ctrl_c / construct_from<control_float_type>(df_c)));
@@ -357,7 +358,12 @@ namespace local
   {
     using float_type = FloatingPointConstituentType;
 
-    std::cout << "Testing " << count << " arithmetic cases." << std::endl;
+    std::cout << "Testing "
+              << count
+              << " arithmetic cases for type = "
+              << boost::core::demangle(typeid(typename control<float_type>::quad_float_type).name())
+              << " ..."
+              << std::endl;
 
     const bool result_add___is_ok = control<float_type>::test_add__(count); std::cout << "result_add___is_ok: " << std::boolalpha << result_add___is_ok << std::endl;
     const bool result_sub___is_ok = control<float_type>::test_sub__(count); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
@@ -384,12 +390,12 @@ int main()
   #endif
 
   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL << 10U);
+  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL <<  9U);
   #else
-  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL <<  6U);
+  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL <<  5U);
   #endif
 
-  const bool result_flt___is_ok = true;//local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
+  const bool result_flt___is_ok = local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
   const bool result_dbl___is_ok = local::test_arithmetic<double>     (test_cases_built_in); std::cout << "result_dbl___is_ok: " << std::boolalpha << result_dbl___is_ok << std::endl;
   const bool result_ldbl__is_ok = local::test_arithmetic<long double>(test_cases_built_in); std::cout << "result_ldbl__is_ok: " << std::boolalpha << result_ldbl__is_ok << std::endl;
 
