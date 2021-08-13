@@ -26,6 +26,21 @@
 #include <string>
 #include <vector>
 
+namespace std {
+
+// This is a little bit backwards now.
+// Since the inner, naked cpp_double_float<T> type no longer
+// has its own specializations specialization of numeric_limits,
+// this is patched here.
+
+template <typename FloatingPointType>
+class numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >
+    : public std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType> > >
+{
+};
+
+} // namespace std
+
 // Reference data comes in a tuple of four elements:
 // 0. string  : binary representation of the number to be tested
 // 1. int     : binary exponent, a power of two.
