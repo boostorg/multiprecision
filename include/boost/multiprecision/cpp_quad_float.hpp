@@ -331,7 +331,9 @@ class cpp_quad_float
       using std::isfinite;
       using std::tie;
 
+      #if defined(BOOST_MATH_USE_FLOAT128)
       using boost::multiprecision::isfinite;
+      #endif
 
       if (!(isfinite)(get<0>(this->data)) || !(isfinite)(get<0>(other.data)))
       {
@@ -425,7 +427,9 @@ class cpp_quad_float
       using std::isfinite;
       using std::tie;
 
+      #if defined(BOOST_MATH_USE_FLOAT128)
       using boost::multiprecision::isfinite;
+      #endif
 
       if (!(isfinite)(get<0>(this->data)) || !(isfinite)(get<0>(other.data)))
       {
@@ -503,7 +507,9 @@ class cpp_quad_float
       using std::get;
       using std::isfinite;
 
+      #if defined(BOOST_MATH_USE_FLOAT128)
       using boost::multiprecision::isfinite;
+      #endif
 
       rep_type       q;
       cpp_quad_float r;
@@ -680,10 +686,10 @@ class cpp_quad_float
       (
         arithmetic::four_sum
         (
-        (std::numeric_limits<float_type>::max)() * (1.0F - 1.5F * sqrt(std::numeric_limits<float_type>::epsilon())),
-        ldexp((std::numeric_limits<float_type>::max)(), -1 * (std::numeric_limits<float_type>::digits + 1)),
-        ldexp((std::numeric_limits<float_type>::max)(), -2 * (std::numeric_limits<float_type>::digits + 1)),
-        ldexp((std::numeric_limits<float_type>::max)(), -3 * (std::numeric_limits<float_type>::digits + 1))
+           (std::numeric_limits<float_type>::max)() * (float_type(1.0F) - float_type(1.5F) * sqrt(std::numeric_limits<float_type>::epsilon())),
+           ldexp((std::numeric_limits<float_type>::max)(), -1 * (std::numeric_limits<float_type>::digits + 1)),
+           ldexp((std::numeric_limits<float_type>::max)(), -2 * (std::numeric_limits<float_type>::digits + 1)),
+           ldexp((std::numeric_limits<float_type>::max)(), -3 * (std::numeric_limits<float_type>::digits + 1))
         )
       );
    }
@@ -946,16 +952,16 @@ void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<Fl
       }
       else if (xx.is_one())
       {
-         static const quad_float_type constant_e1(std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
-         static const quad_float_type constant_one_over_e1(std::string("0.36787944117144232159552377016146086744581113103176783450783680169746149574489980335714727434591964375"));
+         static const quad_float_type constant_e1         (std::string("2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741359662904357290033429526059563073813232862794349076323382988075319525101901"));
+         static const quad_float_type constant_one_over_e1(std::string("0.367879441171442321595523770161460867445811131031767834507836801697461495744899803357147274345919643746627325276843995208246975792790129008626653589494098783092194367377338115048638991125145616344987720"));
 
          result = ((b_neg == false) ? constant_e1 : constant_one_over_e1);
       }
       else
       {
          // Use an argument reduction algorithm for exp() in classic MPFUN-style.
-         static const quad_float_type constant_ln2(std::string("0.69314718055994530941723212145817656807550013436025525412068000949339362196969471560586332699641868754"));
-         static const quad_float_type constant_one_over_ln2(std::string("1.4426950408889634073599246810018921374266459541529859341354494069311092191811850798855266228935063445"));
+         static const quad_float_type constant_ln2         (std::string("0.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863326996418687542001481020570685733685520235758130557032670751635075961930727570828371435190307038623891673471123350"));
+         static const quad_float_type constant_one_over_ln2(std::string("1.44269504088896340735992468100189213742664595415298593413544940693110921918118507988552662289350634449699751830965254425559310168716835964272066215822347933627453736988471849363070138766353201553389432"));
 
          quad_float_type nf;
 
@@ -1066,16 +1072,16 @@ void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<Fl
       }
       else if (xx.is_one())
       {
-         static const quad_float_type constant_e1(std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
-         static const quad_float_type constant_one_over_e1(std::string("0.36787944117144232159552377016146086744581113103176783450783680169746149574489980335714727434591964375"));
+         static const quad_float_type constant_e1         (std::string("2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741359662904357290033429526059563073813232862794349076323382988075319525101901"));
+         static const quad_float_type constant_one_over_e1(std::string("0.367879441171442321595523770161460867445811131031767834507836801697461495744899803357147274345919643746627325276843995208246975792790129008626653589494098783092194367377338115048638991125145616344987720"));
 
          result = ((b_neg == false) ? constant_e1 : constant_one_over_e1);
       }
       else
       {
          // Use an argument reduction algorithm for exp() in classic MPFUN-style.
-         static const quad_float_type constant_ln2(std::string("0.69314718055994530941723212145817656807550013436025525412068000949339362196969471560586332699641868754"));
-         static const quad_float_type constant_one_over_ln2(std::string("1.4426950408889634073599246810018921374266459541529859341354494069311092191811850798855266228935063445"));
+         static const quad_float_type constant_ln2         (std::string("0.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863326996418687542001481020570685733685520235758130557032670751635075961930727570828371435190307038623891673471123350"));
+         static const quad_float_type constant_one_over_ln2(std::string("1.44269504088896340735992468100189213742664595415298593413544940693110921918118507988552662289350634449699751830965254425559310168716835964272066215822347933627453736988471849363070138766353201553389432"));
 
          quad_float_type nf;
 
@@ -1098,7 +1104,6 @@ void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<Fl
          quad_float_type x_pow_n_div_n_fact(xh);
 
          result = quad_float_type(1U) + x_pow_n_div_n_fact;
-         quad_float_type dummy;
 
          // Series expansion of hypergeometric_0f0(; ; x).
          // For this high(er) digit count, a scaled argument with subsequent
@@ -1106,11 +1111,14 @@ void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<Fl
          for (unsigned n = 2U; n < 64U; ++n)
          {
             x_pow_n_div_n_fact *= xh;
-            x_pow_n_div_n_fact /= local_float_type(n);
+            x_pow_n_div_n_fact /= quad_float_type(n);
 
             int n_tol;
 
-            eval_frexp(dummy, x_pow_n_div_n_fact, &n_tol);
+            {
+               quad_float_type dummy;
+               eval_frexp(dummy, x_pow_n_div_n_fact, &n_tol);
+            }
 
             if ((n > 4U) && (n_tol < -(quad_float_type::my_digits - 6)))
             {
