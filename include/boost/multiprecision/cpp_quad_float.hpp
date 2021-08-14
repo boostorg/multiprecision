@@ -709,7 +709,7 @@ class cpp_quad_float
       return []() -> cpp_quad_float {
          cpp_quad_float result;
 
-         eval_ldexp(result, cpp_quad_float(1), 1 - my_digits);
+         eval_ldexp(result, cpp_quad_float(1), 6 - my_digits);
 
          return result;
       }();
