@@ -145,8 +145,8 @@ namespace local
       static std::uniform_int_distribution<signed>
       dist_exp
       (
-        std::numeric_limits<quad_float_type>::min_exponent10 / 2 + 1,
-        std::numeric_limits<quad_float_type>::max_exponent10 / 2 - 1
+        std::numeric_limits<quad_float_type>::min_exponent10 * 0.9F / 2 + 1,
+        std::numeric_limits<quad_float_type>::max_exponent10 * 0.9F / 2 - 1
       );
 
       std::string str_exp = "E";
@@ -348,7 +348,7 @@ namespace local
               << boost::core::demangle(typeid(typename control<float_type>::quad_float_type).name())
               << " ..."
               << std::endl;
-
+    
     const bool result_add___is_ok = control<float_type>::test_add__(count); std::cout << "result_add___is_ok: " << std::boolalpha << result_add___is_ok << std::endl;
     const bool result_sub___is_ok = control<float_type>::test_sub__(count); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
     const bool result_mul___is_ok = control<float_type>::test_mul__(count); std::cout << "result_mul___is_ok: " << std::boolalpha << result_mul___is_ok << std::endl;
