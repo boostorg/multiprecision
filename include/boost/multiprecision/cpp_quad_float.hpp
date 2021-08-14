@@ -830,6 +830,11 @@ template <typename FloatingPointType>
 void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
 {
    using quad_float_type   = cpp_quad_float  <FloatingPointType>;
+   using std::sqrt;
+
+#if defined(BOOST_MATH_USE_FLOAT128)
+   using boost::multiprecision::sqrt;
+#endif
 
    if(eval_fpclassify(x) != (int) FP_NORMAL)
    {
@@ -841,7 +846,7 @@ void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<F
    }
    else
    {
-      result = (1.0F / std::sqrt(std::get<0>(x.crep())));
+      result = (1.0F / sqrt(std::get<0>(x.crep())));
 
       quad_float_type h = x * 0.5F;
 
