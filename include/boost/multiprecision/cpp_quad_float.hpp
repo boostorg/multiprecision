@@ -709,7 +709,7 @@ class cpp_quad_float
       return []() -> cpp_quad_float {
          cpp_quad_float result;
 
-         eval_ldexp(result, cpp_quad_float(1), 6 - my_digits);
+         eval_ldexp(result, cpp_quad_float(1), 1 - my_digits);
 
          return result;
       }();
@@ -876,8 +876,12 @@ void eval_ceil(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<F
 template <typename FloatingPointType>
 void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
 {
-   using double_float_type = cpp_double_float<FloatingPointType>;
    using quad_float_type   = cpp_quad_float  <FloatingPointType>;
+   using std::sqrt;
+
+#if defined(BOOST_MATH_USE_FLOAT128)
+   using boost::multiprecision::sqrt;
+#endif
 
    if(eval_fpclassify(x) != (int) FP_NORMAL)
    {
@@ -889,20 +893,15 @@ void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<F
    }
    else
    {
-      // Get initial estimate using the double-float function eval_sqrt.
-      double_float_type r(std::get<0>(x.crep()), std::get<1>(x.crep()));
+      result = (1.0F / sqrt(std::get<0>(x.crep())));
 
-      eval_sqrt(r, double_float_type(r));
+      quad_float_type h = x * 0.5F;
 
-      quad_float_type rq;
+      result += ((quad_float_type(0.5F) - h * result * result) * result);
+      result += ((quad_float_type(0.5F) - h * result * result) * result);
+      result += ((quad_float_type(0.5F) - h * result * result) * result);
 
-      std::get<0>(rq.rep()) = r.crep().first;
-      std::get<1>(rq.rep()) = r.crep().second;
-      std::get<2>(rq.rep()) = typename quad_float_type::float_type(0.0F);
-      std::get<3>(rq.rep()) = typename quad_float_type::float_type(0.0F);
-
-      // Do one single step of Newton-Raphson iteration
-      result = (rq + (x / rq)) / quad_float_type(2U);
+      result *= x;
    }
 }
 

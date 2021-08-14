@@ -142,30 +142,14 @@ namespace local
           ++pos;
       }
 
-      const bool exp_is_neg = (dist_sgn(engine_sgn) != 0);
-
-      // Set exponent-10 range.
-      using local_exp10_float_type =
-         typename std::conditional<(std::is_same<float_type, long double>::value == true), double, float_type>::type;
-
-      constexpr int exp02_upper_limit =
-      (
-             -std::numeric_limits<local_exp10_float_type>::min_exponent
-       - (4 * std::numeric_limits<local_exp10_float_type>::digits)
-       - 1
-      ) / 2;
-
-      constexpr unsigned exp10_upper_limit =
-        ((exp02_upper_limit > 0) ? (unsigned) (float(exp02_upper_limit) * 0.2F) : 0U);
-
-      static std::uniform_int_distribution<unsigned>
+      static std::uniform_int_distribution<signed>
       dist_exp
       (
-        0U,
-        exp10_upper_limit
+        std::numeric_limits<quad_float_type>::min_exponent10 * 0.9F / 2 + 1,
+        std::numeric_limits<quad_float_type>::max_exponent10 * 0.9F / 2 - 1
       );
 
-      std::string str_exp = ((exp_is_neg == false) ? "E+" :  "E-");
+      std::string str_exp = "E";
 
       {
         std::stringstream strm;
@@ -192,7 +176,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 4 - std::numeric_limits<quad_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 1 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -225,7 +209,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 4 - std::numeric_limits<quad_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 1 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -258,7 +242,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 6 - std::numeric_limits<quad_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 1 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -291,7 +275,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 6 - std::numeric_limits<quad_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 1 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U;((i < count) && result_is_ok); ++i)
       {
@@ -324,7 +308,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 6 - std::numeric_limits<quad_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 1 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -364,7 +348,7 @@ namespace local
               << boost::core::demangle(typeid(typename control<float_type>::quad_float_type).name())
               << " ..."
               << std::endl;
-
+    
     const bool result_add___is_ok = control<float_type>::test_add__(count); std::cout << "result_add___is_ok: " << std::boolalpha << result_add___is_ok << std::endl;
     const bool result_sub___is_ok = control<float_type>::test_sub__(count); std::cout << "result_sub___is_ok: " << std::boolalpha << result_sub___is_ok << std::endl;
     const bool result_mul___is_ok = control<float_type>::test_mul__(count); std::cout << "result_mul___is_ok: " << std::boolalpha << result_mul___is_ok << std::endl;
@@ -386,7 +370,7 @@ int main()
   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
   constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 15U);
   #else
-  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 11U);
+  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 17U);
   #endif
 
   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
@@ -395,7 +379,7 @@ int main()
   constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL <<  5U);
   #endif
 
-  const bool result_flt___is_ok = local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
+//  const bool result_flt___is_ok = local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
   const bool result_dbl___is_ok = local::test_arithmetic<double>     (test_cases_built_in); std::cout << "result_dbl___is_ok: " << std::boolalpha << result_dbl___is_ok << std::endl;
   const bool result_ldbl__is_ok = local::test_arithmetic<long double>(test_cases_built_in); std::cout << "result_ldbl__is_ok: " << std::boolalpha << result_ldbl__is_ok << std::endl;
 
@@ -408,9 +392,9 @@ int main()
 
   const bool result_is_ok =
   (
-      result_flt___is_ok
-   && result_dbl___is_ok
-   && result_ldbl__is_ok
+//      result_flt___is_ok &&
+      result_dbl___is_ok &&
+      result_ldbl__is_ok
 #ifdef BOOST_MATH_USE_FLOAT128
    && result_f128__is_ok
 #endif
