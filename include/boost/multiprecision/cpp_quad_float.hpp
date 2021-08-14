@@ -331,6 +331,8 @@ class cpp_quad_float
       using std::isfinite;
       using std::tie;
 
+      using boost::multiprecision::isfinite;
+
       if (!(isfinite)(get<0>(this->data)) || !(isfinite)(get<0>(other.data)))
       {
          data = (rep_type)std::make_tuple(get<0>(this->data) + get<0>(other.data), 0.0F, 0.0F, 0.0F);
@@ -423,6 +425,8 @@ class cpp_quad_float
       using std::isfinite;
       using std::tie;
 
+      using boost::multiprecision::isfinite;
+
       if (!(isfinite)(get<0>(this->data)) || !(isfinite)(get<0>(other.data)))
       {
          data = (rep_type)std::make_tuple(get<0>(this->data) * get<0>(other.data), 0.0F, 0.0F, 0.0F);
@@ -480,7 +484,7 @@ class cpp_quad_float
       t.second += get<1>(this->data) * get<3>(other.data);
       t.second += get<2>(this->data) * get<2>(other.data);
       t.second += get<3>(this->data) * get<1>(other.data);
-      
+
       t.second += p[6].second;
       t.second += p[7].second;
       t.second += p[8].second;
@@ -498,6 +502,8 @@ class cpp_quad_float
    {
       using std::get;
       using std::isfinite;
+
+      using boost::multiprecision::isfinite;
 
       rep_type       q;
       cpp_quad_float r;
