@@ -829,7 +829,6 @@ void eval_ceil(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<F
 template <typename FloatingPointType>
 void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
 {
-   using double_float_type = cpp_double_float<FloatingPointType>;
    using quad_float_type   = cpp_quad_float  <FloatingPointType>;
 
    if(eval_fpclassify(x) != (int) FP_NORMAL)
