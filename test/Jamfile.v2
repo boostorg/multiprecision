@@ -139,6 +139,8 @@ test-suite df_qf_tests :
 
    [ compile concepts/sf_concept_check_basic.cpp     :     <define>TEST_CPP_DOUBLE_FLOAT <debug-symbols>off <optimization>space : sf_concept_check_basic_df ]
    [ compile concepts/sf_concept_check_bessel.cpp    :     <define>TEST_CPP_DOUBLE_FLOAT <debug-symbols>off <optimization>space : sf_concept_check_bessel_df ]
+   [ compile concepts/sf_concept_check_basic.cpp     :     <define>TEST_CPP_QUAD_FLOAT <debug-symbols>off <optimization>space : sf_concept_check_basic_qf ]
+   [ compile concepts/sf_concept_check_bessel.cpp    :     <define>TEST_CPP_QUAD_FLOAT <debug-symbols>off <optimization>space : sf_concept_check_bessel_qf ]
 
 ;
 

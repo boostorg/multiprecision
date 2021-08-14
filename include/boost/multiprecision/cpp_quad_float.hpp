@@ -119,7 +119,7 @@ std::size_t hash_value(const cpp_quad_float<FloatingPointType>& a);
 namespace boost { namespace math {
 
 template <typename FloatingPointType>
-int fpclassify(const boost::multiprecision::backends::cpp_quad_float<FloatingPointType>& o);
+int (fpclassify)(const boost::multiprecision::backends::cpp_quad_float<FloatingPointType>& o);
 
 }} // namespace boost::math
 
@@ -331,7 +331,7 @@ class cpp_quad_float
       using std::isfinite;
       using std::tie;
 
-      if (!isfinite(get<0>(this->data)) || !isfinite(get<0>(other.data)))
+      if (!(isfinite)(get<0>(this->data)) || !(isfinite)(get<0>(other.data)))
       {
          data = (rep_type)std::make_tuple(get<0>(this->data) + get<0>(other.data), 0.0F, 0.0F, 0.0F);
          return *this;
@@ -423,7 +423,7 @@ class cpp_quad_float
       using std::isfinite;
       using std::tie;
 
-      if (!isfinite(get<0>(this->data)) || !isfinite(get<0>(other.data)))
+      if (!(isfinite)(get<0>(this->data)) || !(isfinite)(get<0>(other.data)))
       {
          data = (rep_type)std::make_tuple(get<0>(this->data) * get<0>(other.data), 0.0F, 0.0F, 0.0F);
          return *this;
@@ -504,7 +504,7 @@ class cpp_quad_float
 
       get<0>(q) = get<0>(this->data) / get<0>(other.data);
 
-      if (!isfinite(get<0>(q)))
+      if (!(isfinite)(get<0>(q)))
       {
          data = q;
          return *this;
@@ -1205,9 +1205,9 @@ std::size_t hash_value(const cpp_quad_float<FloatingPointType>& a)
 namespace boost { namespace math {
 
 template <typename FloatingPointType>
-int fpclassify(const boost::multiprecision::backends::cpp_quad_float<FloatingPointType>& o)
+int (fpclassify)(const boost::multiprecision::backends::cpp_quad_float<FloatingPointType>& o)
 {
-   using std::fpclassify;
+   using (std::fpclassify);
 
    return (int)(fpclassify)(std::get<0>(o.crep()));
 }
