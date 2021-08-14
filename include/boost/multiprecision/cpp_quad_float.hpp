@@ -1207,7 +1207,7 @@ namespace boost { namespace math {
 template <typename FloatingPointType>
 int (fpclassify)(const boost::multiprecision::backends::cpp_quad_float<FloatingPointType>& o)
 {
-   using (std::fpclassify);
+   using std::fpclassify;
 
    return (int)(fpclassify)(std::get<0>(o.crep()));
 }
