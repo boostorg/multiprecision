@@ -114,15 +114,15 @@ template <typename FloatingPointType>
 void eval_sqrt(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& o);
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && (std::numeric_limits<FloatingPointType>::digits10 < 8))>::type const* = nullptr>
+          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const* = nullptr>
 void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 >= 8) && (std::numeric_limits<FloatingPointType>::digits10 <= 18)))>::type const* = nullptr>
+          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const* = nullptr>
 void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && (std::numeric_limits<FloatingPointType>::digits10 > 18))>::type const* = nullptr>
+          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const* = nullptr>
 void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x);
 
 template <typename FloatingPointType>
@@ -956,15 +956,15 @@ class cpp_double_float
    rep_type data;
 
    template <typename OtherFloatingPointType,
-             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true) && (std::numeric_limits<OtherFloatingPointType>::digits10 < 8))>::type const*>
+             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const*>
    friend void eval_exp(cpp_double_float<OtherFloatingPointType>& result, const cpp_double_float<OtherFloatingPointType>& x);
 
    template <typename OtherFloatingPointType,
-             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true) && ((std::numeric_limits<OtherFloatingPointType>::digits10 >= 8) && (std::numeric_limits<OtherFloatingPointType>::digits10 <= 18)))>::type const*>
+             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true) && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
    friend void eval_exp(cpp_double_float<OtherFloatingPointType>& result, const cpp_double_float<OtherFloatingPointType>& x);
 
    template <typename OtherFloatingPointType,
-             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true) && (std::numeric_limits<OtherFloatingPointType>::digits10 > 18))>::type const*>
+             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const*>
    friend void eval_exp(cpp_double_float<OtherFloatingPointType>& result, const cpp_double_float<OtherFloatingPointType>& x);
 };
 
@@ -1153,7 +1153,7 @@ void eval_sqrt(cpp_double_float<FloatingPointType>& result, const cpp_double_flo
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && (std::numeric_limits<FloatingPointType>::digits10 < 8))>::type const*>
+          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const*>
 void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x)
 {
    const bool x_is_zero = x.is_zero();
@@ -1165,7 +1165,7 @@ void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
    else
    {
       using double_float_type = cpp_double_float<FloatingPointType>;
-      using local_float_type  = typename cpp_double_float<FloatingPointType>::float_type;
+      using local_float_type  = typename double_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
       const bool b_neg = x.is_neg();
@@ -1273,7 +1273,7 @@ void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 >= 8) && (std::numeric_limits<FloatingPointType>::digits10 <= 18)))>::type const*>
+          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
 void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x)
 {
    const bool x_is_zero = x.is_zero();
@@ -1285,7 +1285,7 @@ void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
    else
    {
       using double_float_type = cpp_double_float<FloatingPointType>;
-      using local_float_type  = typename cpp_double_float<FloatingPointType>::float_type;
+      using local_float_type  = typename double_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
       const bool b_neg = x.is_neg();
@@ -1393,7 +1393,7 @@ void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && (std::numeric_limits<FloatingPointType>::digits10 > 18))>::type const*>
+          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const*>
 void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_float<FloatingPointType>& x)
 {
    const bool x_is_zero = x.is_zero();
@@ -1405,7 +1405,7 @@ void eval_exp(cpp_double_float<FloatingPointType>& result, const cpp_double_floa
    else
    {
       using double_float_type = cpp_double_float<FloatingPointType>;
-      using local_float_type  = typename cpp_double_float<FloatingPointType>::float_type;
+      using local_float_type  = typename double_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
       const bool b_neg = x.is_neg();

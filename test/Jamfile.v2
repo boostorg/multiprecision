@@ -134,6 +134,8 @@ test-suite df_qf_tests :
    [ run test_cosh.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_cosh ]
    [ run test_tanh.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_tanh ]
    [ run test_sqrt.cpp          no_eh_support : : : release <define>TEST_CPP_QUAD_FLOAT   : test_sqrt_qf ]
+   [ run test_exp.cpp           no_eh_support : : : release <define>TEST_CPP_QUAD_FLOAT   : test_exp_qf ]
+   [ run test_sin.cpp           no_eh_support : : : release <define>TEST_CPP_QUAD_FLOAT   : test_sin_qf ]
 
    [ compile concepts/sf_concept_check_basic.cpp     :     <define>TEST_CPP_DOUBLE_FLOAT <debug-symbols>off <optimization>space : sf_concept_check_basic_df ]
    [ compile concepts/sf_concept_check_bessel.cpp    :     <define>TEST_CPP_DOUBLE_FLOAT <debug-symbols>off <optimization>space : sf_concept_check_bessel_df ]
