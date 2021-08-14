@@ -192,7 +192,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 0 - std::numeric_limits<quad_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 1 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -225,7 +225,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 0 - std::numeric_limits<quad_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 1 - std::numeric_limits<quad_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
