@@ -85,14 +85,8 @@ template <typename FloatingPointType>
 void eval_ceil(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x);
 template <typename FloatingPointType>
 void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& o);
-
-template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 4) <= 36))>::type const* = nullptr>
-void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x);
-
-template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 4) > 36))>::type const* = nullptr>
-void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x);
+template <typename FloatingPointType>
+void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& o);
 
 template <typename FloatingPointType>
 int eval_fpclassify(const cpp_quad_float<FloatingPointType>& o);
@@ -728,14 +722,6 @@ class cpp_quad_float
 
  private:
    rep_type data;
-
-   template <typename OtherFloatingPointType,
-             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true) && ((std::numeric_limits<OtherFloatingPointType>::digits10 * 4) <= 36))>::type const*>
-   friend void eval_exp(cpp_quad_float<OtherFloatingPointType>& result, const cpp_quad_float<OtherFloatingPointType>& x);
-
-   template <typename OtherFloatingPointType,
-             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true) && ((std::numeric_limits<OtherFloatingPointType>::digits10 * 4) > 36))>::type const*>
-   friend void eval_exp(cpp_quad_float<OtherFloatingPointType>& result, const cpp_quad_float<OtherFloatingPointType>& x);
 };
 
 template <typename FloatingPointType>
@@ -911,128 +897,7 @@ void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<F
    }
 }
 
-template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 4) <= 36))>::type const*>
-void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
-{
-   const bool x_is_zero = x.is_zero();
-
-   if ((eval_fpclassify(x) != (int)FP_NORMAL) && (x_is_zero == false))
-   {
-      result = x;
-   }
-   else
-   {
-      using quad_float_type  = cpp_quad_float<FloatingPointType>;
-      using local_float_type = typename quad_float_type::float_type;
-
-      // Get a local copy of the argument and force it to be positive.
-      const bool b_neg = x.is_neg();
-
-      quad_float_type xx;
-
-      eval_fabs(xx, x);
-
-      // Check the range of the input.
-      // Will the result of exponentiation overflow/underflow?
-      static const local_float_type max_exp_input = []() -> local_float_type { using std::log; const local_float_type e_max = std::get<0>(quad_float_type::my_value_max().crep()); return log(e_max); }();
-      static const local_float_type min_exp_input = []() -> local_float_type { using std::log; const local_float_type e_min = std::get<0>(quad_float_type::my_value_min().crep()); return log(e_min); }();
-
-      if (x_is_zero)
-      {
-         result = quad_float_type(1U);
-      }
-      else if (std::get<0>(x.crep()) < min_exp_input)
-      {
-         result = quad_float_type(0U);
-      }
-      else if (std::get<0>(x.crep()) > max_exp_input)
-      {
-         result = quad_float_type(std::numeric_limits<local_float_type>::infinity());
-      }
-      else if (xx.is_one())
-      {
-         static const quad_float_type constant_e1         (std::string("2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741359662904357290033429526059563073813232862794349076323382988075319525101901"));
-         static const quad_float_type constant_one_over_e1(std::string("0.367879441171442321595523770161460867445811131031767834507836801697461495744899803357147274345919643746627325276843995208246975792790129008626653589494098783092194367377338115048638991125145616344987720"));
-
-         result = ((b_neg == false) ? constant_e1 : constant_one_over_e1);
-      }
-      else
-      {
-         // Use an argument reduction algorithm for exp() in classic MPFUN-style.
-         static const quad_float_type constant_ln2         (std::string("0.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863326996418687542001481020570685733685520235758130557032670751635075961930727570828371435190307038623891673471123350"));
-         static const quad_float_type constant_one_over_ln2(std::string("1.44269504088896340735992468100189213742664595415298593413544940693110921918118507988552662289350634449699751830965254425559310168716835964272066215822347933627453736988471849363070138766353201553389432"));
-
-         quad_float_type nf;
-
-         eval_floor(nf, xx * constant_one_over_ln2);
-
-         // Prepare the scaled variables.
-         const bool b_scale = (xx.order02() > -4);
-
-         quad_float_type r;
-
-         if (b_scale)
-         {
-            eval_ldexp(r, xx - (nf * constant_ln2), -4);
-         }
-         else
-         {
-            r = xx;
-         }
-
-         // PadeApproximant[Exp[r], {r, 0, 8, 8}]
-         // FullSimplify[%]
-
-         static const quad_float_type n144(144U);
-         static const quad_float_type n3603600(3603600UL);
-         static const quad_float_type n120120(120120UL);
-         static const quad_float_type n770(770U);
-
-         static const quad_float_type n518918400(518918400UL);
-         static const quad_float_type n259459200(259459200UL);
-         static const quad_float_type n60540480(60540480UL);
-         static const quad_float_type n8648640(8648640UL);
-         static const quad_float_type n831600(831600UL);
-         static const quad_float_type n55440(55440U);
-         static const quad_float_type n2520(2520U);
-         static const quad_float_type n72(72U);
-
-         const quad_float_type r2 = r * r;
-
-         const quad_float_type top = (n144 * r) * (n3603600 + r2 * (n120120 + r2 * (n770 + r2)));
-         const quad_float_type bot = (n518918400 + r * (-n259459200 + r * (n60540480 + r * (-n8648640 + r * (n831600 + r * (-n55440 + r * (n2520 + r * (-n72 + r))))))));
-
-         result = quad_float_type(1U) + (top / bot);
-
-         // Rescale the result.
-         if (b_scale)
-         {
-            result *= result;
-            result *= result;
-            result *= result;
-            result *= result;
-
-            int n;
-
-            eval_convert_to(&n, nf);
-
-            if (n > 0)
-            {
-               eval_ldexp(result, quad_float_type(result), n);
-            }
-         }
-
-         if (b_neg)
-         {
-            result = quad_float_type(1U) / result;
-         }
-      }
-   }
-}
-
-template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 4) > 36))>::type const*>
+template <typename FloatingPointType>
 void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
 {
    const bool x_is_zero = x.is_zero();
