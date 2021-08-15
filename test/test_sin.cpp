@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2002 - 2011.
+//  Copyright Christopher Kormanyos 2002 - 2011, 2021.
 //  Copyright 2011 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
@@ -16,7 +16,7 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT) && !defined(TEST_CPP_QUAD_FLOAT)
 #define TEST_MPF_50
 #define TEST_MPFR_50
 #define TEST_MPFI_50
@@ -25,6 +25,7 @@
 #define TEST_FLOAT128
 #define TEST_CPP_BIN_FLOAT
 #define TEST_CPP_DOUBLE_FLOAT
+#define TEST_CPP_QUAD_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -61,6 +62,12 @@
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_double_float.hpp>
+#endif
+#ifdef TEST_CPP_QUAD_FLOAT
+#if defined(BOOST_MATH_USE_FLOAT128)
+#include <boost/multiprecision/float128.hpp>
+#endif
+#include <boost/multiprecision/cpp_quad_float.hpp>
 #endif
 
 template <class T>
@@ -379,8 +386,16 @@ int main()
 #ifdef TEST_CPP_DOUBLE_FLOAT
    test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<float> > >();
    test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double> > >();
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<long double> > >();
    #if defined(BOOST_MATH_USE_FLOAT128)
    test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> > >();
+   #endif
+#endif
+#ifdef TEST_CPP_QUAD_FLOAT
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<double> > >();
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<long double> > >();
+   #if defined(BOOST_MATH_USE_FLOAT128)
+   //test<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<boost::multiprecision::float128> > >();
    #endif
 #endif
    return boost::report_errors();

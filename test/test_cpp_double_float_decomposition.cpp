@@ -26,6 +26,27 @@
 #include <string>
 #include <vector>
 
+namespace std {
+
+// Since there are no longer inner specializations of
+// numeric_limits for standalone cpp_double_float<T>
+// and cpp_quad_float<T> template types, we provide our own
+// local specializations patched here.
+
+template <typename FloatingPointType>
+class numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >
+    : public std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType> > >
+{
+};
+
+template <typename FloatingPointType>
+class numeric_limits<boost::multiprecision::backends::cpp_quad_float<FloatingPointType> >
+    : public std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType> > >
+{
+};
+
+} // namespace std
+
 // Reference data comes in a tuple of four elements:
 // 0. string  : binary representation of the number to be tested
 // 1. int     : binary exponent, a power of two.
@@ -338,7 +359,7 @@ int try_number(R& ref, Arg str, bool verbose) {
       str_to_bin_error     = frexp(str_to_bin_error , &exp2);
 
       if(verbose) {
-         std::cout << "→→→ " << str_to_bin_error  << " , exp1 =  " << exp1 << " , exp2 = " << exp2 << std::endl;
+         std::cout << "--> " << str_to_bin_error  << " , exp1 =  " << exp1 << " , exp2 = " << exp2 << std::endl;
       }
       double ulp_error = 0;
       if(str_to_bin_error != R(0)) {
@@ -351,7 +372,7 @@ int try_number(R& ref, Arg str, bool verbose) {
 /* TODO */ //if(std::abs(boost::math::float_distance(z , ref)) > 2)
       {
          errors++;
-         std::cout << "** ERROR between string ↔ binary **" << str_to_bin_error  << ", exp1 =" << exp1 << ", exp2 =" << exp2 << std::endl;
+         std::cout << "** ERROR between string <--> binary **" << str_to_bin_error  << ", exp1 =" << exp1 << ", exp2 =" << exp2 << std::endl;
       }
    }
 
@@ -390,8 +411,8 @@ int main()
    errors += test<double_float<boost::multiprecision::float128>>();
 #endif
 
-/*
 // TODO: soon we should be able to test quad_float also :)
+/*
    errors += test<quad_float<float>>();
    errors += test<quad_float<double>>();
    errors += test<quad_float<long double>>();
