@@ -69,36 +69,36 @@ void represent_tgamma_half()
 int main()
 {
    {
-      using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<double>, boost::multiprecision::et_off>;
-      using dec_float_type    = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<double_float_type>::digits10>, boost::multiprecision::et_off>;
+      using quad_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<double>, boost::multiprecision::et_off>;
+      using dec_float_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<quad_float_type>::digits10>, boost::multiprecision::et_off>;
 
-      represent_tgamma_half<double_float_type>();
+      represent_tgamma_half<quad_float_type>();
       represent_tgamma_half<dec_float_type>();
 
-      represent_cyl_bessel_j<double_float_type>();
+      represent_cyl_bessel_j<quad_float_type>();
       represent_cyl_bessel_j<dec_float_type>();
    }
 
    {
-      using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<long double>, boost::multiprecision::et_off>;
-      using dec_float_type    = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<double_float_type>::digits10>, boost::multiprecision::et_off>;
+      using quad_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<long double>, boost::multiprecision::et_off>;
+      using dec_float_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<quad_float_type>::digits10>, boost::multiprecision::et_off>;
 
-      represent_tgamma_half<double_float_type>();
+      represent_tgamma_half<quad_float_type>();
       represent_tgamma_half<dec_float_type>();
 
-      represent_cyl_bessel_j<double_float_type>();
+      represent_cyl_bessel_j<quad_float_type>();
       represent_cyl_bessel_j<dec_float_type>();
    }
 
    #if defined(BOOST_MATH_USE_FLOAT128)
    {
-      using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<boost::multiprecision::float128>, boost::multiprecision::et_off>;
-      using dec_float_type    = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<double_float_type>::digits10>, boost::multiprecision::et_off>;
+      using quad_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<boost::multiprecision::float128>, boost::multiprecision::et_off>;
+      using dec_float_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<quad_float_type>::digits10>, boost::multiprecision::et_off>;
 
-      represent_tgamma_half<double_float_type>();
+      represent_tgamma_half<quad_float_type>();
       represent_tgamma_half<dec_float_type>();
 
-      represent_cyl_bessel_j<double_float_type>();
+      represent_cyl_bessel_j<quad_float_type>();
       represent_cyl_bessel_j<dec_float_type>();
    }
    #endif
