@@ -919,19 +919,18 @@ void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<Fl
       eval_fabs(xx, x);
 
       // Check the range of the input.
-      // Will the result of exponentiation overflow/underflow?
-      static const local_float_type max_exp_input = []() -> local_float_type { using std::log; const local_float_type e_max = std::get<0>(quad_float_type::my_value_max().crep()); return log(e_max); }();
-      static const local_float_type min_exp_input = []() -> local_float_type { using std::log; const local_float_type e_min = std::get<0>(quad_float_type::my_value_min().crep()); return log(e_min); }();
+
+      using std::log;
 
       if (x_is_zero)
       {
          result = quad_float_type(1U);
       }
-      else if (std::get<0>(x.crep()) < min_exp_input)
+      else if (std::get<0>(x.crep()) < log(std::get<0>(quad_float_type::my_value_min().crep())))
       {
          result = quad_float_type(0U);
       }
-      else if (std::get<0>(xx.crep()) > max_exp_input)
+      else if (std::get<0>(x.crep()) > log(std::get<0>(quad_float_type::my_value_max().crep())))
       {
          result = quad_float_type(std::numeric_limits<local_float_type>::infinity());
       }
@@ -957,7 +956,7 @@ void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<Fl
 
          quad_float_type xh;
 
-         if (b_scale)
+         if(b_scale)
          {
             eval_ldexp(xh, xx - (nf * constant_ln2), -4);
          }
@@ -976,7 +975,7 @@ void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<Fl
          for (unsigned n = 2U; n < 64U; ++n)
          {
             x_pow_n_div_n_fact *= xh;
-            x_pow_n_div_n_fact /= quad_float_type(n);
+            x_pow_n_div_n_fact /= local_float_type(n);
 
             int n_tol;
 
@@ -985,7 +984,7 @@ void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<Fl
                eval_frexp(dummy, x_pow_n_div_n_fact, &n_tol);
             }
 
-            if ((n > 4U) && (n_tol < -(quad_float_type::my_digits - 6)))
+            if ((n > 3U) && (n_tol < -(quad_float_type::my_digits - 6)))
             {
                break;
             }
