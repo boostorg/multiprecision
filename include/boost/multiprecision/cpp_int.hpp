@@ -2247,12 +2247,24 @@ using uint128_t = number<cpp_int_backend<128, 128, unsigned_magnitude, unchecked
 using uint256_t = number<cpp_int_backend<256, 256, unsigned_magnitude, unchecked, void> >  ;
 using uint512_t = number<cpp_int_backend<512, 512, unsigned_magnitude, unchecked, void> >  ;
 using uint1024_t = number<cpp_int_backend<1024, 1024, unsigned_magnitude, unchecked, void> >;
+using uint2048_t = number<cpp_int_backend<2048, 2048, unsigned_magnitude, unchecked, void> >;
+using uint4096_t = number<cpp_int_backend<4096, 4096, unsigned_magnitude, unchecked, void> >;
+using uint8192_t = number<cpp_int_backend<8192, 8192, unsigned_magnitude, unchecked, void> >;
+using uint16384_t = number<cpp_int_backend<16384, 16384, unsigned_magnitude, unchecked, void> >;
+using uint32768_t = number<cpp_int_backend<32768, 32768, unsigned_magnitude, unchecked, void> >;
+using uint65536_t = number<cpp_int_backend<65536, 65536, unsigned_magnitude, unchecked, void> >;
 
 // Fixed precision signed types:
 using int128_t = number<cpp_int_backend<128, 128, signed_magnitude, unchecked, void> >  ;
 using int256_t = number<cpp_int_backend<256, 256, signed_magnitude, unchecked, void> >  ;
 using int512_t = number<cpp_int_backend<512, 512, signed_magnitude, unchecked, void> >  ;
 using int1024_t = number<cpp_int_backend<1024, 1024, signed_magnitude, unchecked, void> >;
+using int2048_t = number<cpp_int_backend<2048, 2048, signed_magnitude, unchecked, void> >;
+using int4096_t = number<cpp_int_backend<4096, 4096, signed_magnitude, unchecked, void> >;
+using int8192_t = number<cpp_int_backend<8192, 8192, signed_magnitude, unchecked, void> >;
+using int16384_t = number<cpp_int_backend<16384, 16384, signed_magnitude, unchecked, void> >;
+using int32768_t = number<cpp_int_backend<32768, 32768, signed_magnitude, unchecked, void> >;
+using int65536_t = number<cpp_int_backend<65536, 65536, signed_magnitude, unchecked, void> >;
 
 // Over again, but with checking enabled this time:
 using checked_cpp_int = number<cpp_int_backend<0, 0, signed_magnitude, checked> >          ;
@@ -2263,12 +2275,24 @@ using checked_uint128_t = number<cpp_int_backend<128, 128, unsigned_magnitude, c
 using checked_uint256_t = number<cpp_int_backend<256, 256, unsigned_magnitude, checked, void> >  ;
 using checked_uint512_t = number<cpp_int_backend<512, 512, unsigned_magnitude, checked, void> >  ;
 using checked_uint1024_t = number<cpp_int_backend<1024, 1024, unsigned_magnitude, checked, void> >;
+using checked_uint2048_t = number<cpp_int_backend<2048, 2048, unsigned_magnitude, checked, void> >;
+using checked_uint4096_t = number<cpp_int_backend<4096, 4096, unsigned_magnitude, checked, void> >;
+using checked_uint8192_t = number<cpp_int_backend<8192, 8192, unsigned_magnitude, checked, void> >;
+using checked_uint16384_t = number<cpp_int_backend<16384, 16384, unsigned_magnitude, checked, void> >;
+using checked_uint32768_t = number<cpp_int_backend<32768, 32768, unsigned_magnitude, checked, void> >;
+using checked_uint65536_t = number<cpp_int_backend<65536, 65536, unsigned_magnitude, checked, void> >;
 
 // Fixed precision signed types:
 using checked_int128_t = number<cpp_int_backend<128, 128, signed_magnitude, checked, void> >  ;
 using checked_int256_t = number<cpp_int_backend<256, 256, signed_magnitude, checked, void> >  ;
 using checked_int512_t = number<cpp_int_backend<512, 512, signed_magnitude, checked, void> >  ;
 using checked_int1024_t = number<cpp_int_backend<1024, 1024, signed_magnitude, checked, void> >;
+using checked_int2048_t = number<cpp_int_backend<2048, 2048, signed_magnitude, checked, void> >;
+using checked_int4096_t = number<cpp_int_backend<4096, 4096, signed_magnitude, checked, void> >;
+using checked_int8192_t = number<cpp_int_backend<8192, 8192, signed_magnitude, checked, void> >;
+using checked_int16384_t = number<cpp_int_backend<16384, 16384, signed_magnitude, checked, void> >;
+using checked_int32768_t = number<cpp_int_backend<32768, 32768, signed_magnitude, checked, void> >;
+using checked_int65536_t = number<cpp_int_backend<65536, 65536, signed_magnitude, checked, void> >;
 
 #ifdef _MSC_VER
 #pragma warning(pop)
