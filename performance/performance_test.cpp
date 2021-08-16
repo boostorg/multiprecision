@@ -3,6 +3,13 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
+#define TEST_CPP_QUAD_FLOAT
+//#define TEST_CPP_BIN_FLOAT
+
+// g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/performance -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/test -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DTEST_CPP_QUAD_FLOAT test.cpp -o test_perf.exe
+
+
+
 #include "performance_test.hpp"
 
 #ifdef TEST_MPZ
@@ -25,7 +32,7 @@ std::map<std::string, std::map<std::string, std::map<std::string, std::map<int, 
 
 unsigned bits_wanted; // for integer types
 
-void quickbook_results()
+static void quickbook_results()
 {
    //
    // Keys in order are:
@@ -99,15 +106,15 @@ void quickbook_results()
    }
 }
 
-#if defined(__HAS_INCLUDE)
-#if __has_include(<sys/utsname.h>)
-#define HAS_UTSNAME
-#include <sys/utsname.h>
-#endif
-#endif
-#ifdef _WIN32
-#include <windows.h>
-#endif
+//#if defined(__HAS_INCLUDE)
+//#if __has_include(<sys/utsname.h>)
+//#define HAS_UTSNAME
+//#include <sys/utsname.h>
+//#endif
+//#endif
+//#ifdef _WIN32
+//#include <windows.h>
+//#endif
 
 void quickbook_platform_details()
 {
@@ -141,58 +148,99 @@ int main()
 {
    quickbook_platform_details();
 
-   test01();
-   test02();
-   test03();
-   test04();
-   test05();
-   test06();
-   test07();
-   test08();
-   test09();
-   test10();
-   test11();
-   test12();
-   test13();
-   test14();
-   test15();
-   test16();
-   test17();
-   test18();
-   test19();
-   test20();
-   test21();
-   test22();
-   test23();
-   test24();
-   test25();
-   test26();
-   test27();
-   test28();
-   test29();
-   test30();
-   test31();
-   test32();
+   #if defined(TEST_CPP_QUAD_FLOAT)
+   test53();
+   #elif defined(TEST_CPP_BIN_FLOAT)
    test33();
-   test34();
-   test35();
-   test36();
-   test37();
-   test38();
-   test39();
-   test40();
-   test41();
-   test42();
-   test43();
-   test44();
-   test45();
-   test46();
-   test47();
-   test48();
-   test49();
-   test50();
-   test51();
+   #endif
 
    quickbook_results();
    return 0;
 }
+
+using local_float_constituent_type = double;
+
+#if defined(TEST_CPP_QUAD_FLOAT)
+
+///////////////////////////////////////////////////////////////
+//  Copyright 2019 John Maddock. Distributed under the Boost
+//  Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+
+//#include "performance_test.hpp"
+#if defined(BOOST_MATH_USE_FLOAT128)
+#include <boost/multiprecision/float128.hpp>
+#endif
+#include <boost/multiprecision/cpp_quad_float.hpp>
+
+void test53()
+{
+   using quad_float_of_double_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<local_float_constituent_type>, boost::multiprecision::et_off>;
+
+   test<quad_float_of_double_type>("cpp_quad_float", 1024*16);
+}
+
+#elif defined(TEST_CPP_BIN_FLOAT)
+
+///////////////////////////////////////////////////////////////
+//  Copyright 2019 John Maddock. Distributed under the Boost
+//  Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+
+#include <boost/multiprecision/cpp_bin_float.hpp>
+
+void test33()
+{
+   constexpr int my_digits10 = (int) (float((std::numeric_limits<local_float_constituent_type>::digits * 4) - 1) * 0.301F);
+
+   using cpp_bin_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<my_digits10>, boost::multiprecision::et_off>;
+
+   test<cpp_bin_float_type>("cpp_bin_float", 1024*16);
+}
+
+#endif
+
+// Chris PC TEST_CPP_QUAD_FLOAT
+//cpp_quad_float 16384     +                                  0.0328359
+//cpp_quad_float 16384     -                                  0.0326524
+//cpp_quad_float 16384     *                                  0.0516673
+//cpp_quad_float 16384     /                                  0.707075
+//cpp_quad_float 16384     str                                0.0419498
+//cpp_quad_float 16384     +(int)                             0.0267044
+//cpp_quad_float 16384     -(int)                             0.0279037
+//cpp_quad_float 16384     *(int)                             0.0512275
+//cpp_quad_float 16384     /(int)                             0.327655
+//cpp_quad_float 16384     construct                          0.0011852
+//cpp_quad_float 16384     construct(unsigned)                0.0011655
+//cpp_quad_float 16384     construct(unsigned long long)      0.171181
+//cpp_quad_float 16384     +(unsigned long long)              0.113957
+//cpp_quad_float 16384     -(unsigned long long)              0.115939
+//cpp_quad_float 16384     *(unsigned long long)              0.142094
+//cpp_quad_float 16384     /(unsigned long long)              0.407529
+//cpp_quad_float 16384     +=(unsigned long long)             0.113941
+//cpp_quad_float 16384     -=(unsigned long long)             0.114742
+//cpp_quad_float 16384     *=(unsigned long long)             0.141193
+//cpp_quad_float 16384     /=(unsigned long long)             0.410069
+
+
+// Chris PC TEST_CPP_BIN_FLOAT
+//cpp_bin_float  16384     +                                  0.0433169
+//cpp_bin_float  16384     -                                  0.0459543
+//cpp_bin_float  16384     *                                  0.102164
+//cpp_bin_float  16384     /                                  1.18277
+//cpp_bin_float  16384     str                                0.0042434
+//cpp_bin_float  16384     +(int)                             0.0486855
+//cpp_bin_float  16384     -(int)                             0.0529648
+//cpp_bin_float  16384     *(int)                             0.0262129
+//cpp_bin_float  16384     /(int)                             0.112234
+//cpp_bin_float  16384     construct                          0.0024933
+//cpp_bin_float  16384     construct(unsigned)                0.0134788
+//cpp_bin_float  16384     construct(unsigned long long)      0.0151112
+//cpp_bin_float  16384     +(unsigned long long)              0.0559024
+//cpp_bin_float  16384     -(unsigned long long)              0.0570488
+//cpp_bin_float  16384     *(unsigned long long)              0.0424473
+//cpp_bin_float  16384     /(unsigned long long)              0.431306
+//cpp_bin_float  16384     +=(unsigned long long)             0.0551851
+//cpp_bin_float  16384     -=(unsigned long long)             0.0525513
+//cpp_bin_float  16384     *=(unsigned long long)             0.0417501
+//cpp_bin_float  16384     /=(unsigned long long)             0.424533

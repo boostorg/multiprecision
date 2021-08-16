@@ -21,7 +21,7 @@
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_quad_float.hpp>
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/core/demangle.hpp>
@@ -53,7 +53,7 @@ namespace local
     static unsigned seed_prescaler;
 
     using quad_float_type    = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<float_type>, boost::multiprecision::et_off>;
-    using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<quad_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
+    using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<digits10>, boost::multiprecision::et_off>;
 
     static_assert( digits       == std::numeric_limits<quad_float_type>::digits       , "Discrepancy in limts." );
     static_assert( digits10     == std::numeric_limits<quad_float_type>::digits10     , "Discrepancy in limts." );
