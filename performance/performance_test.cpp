@@ -6,6 +6,10 @@
 #define TEST_CPP_QUAD_FLOAT
 //#define TEST_CPP_BIN_FLOAT
 
+// g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/performance -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/test -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DTEST_CPP_QUAD_FLOAT test.cpp -o test_perf.exe
+
+
+
 #include "performance_test.hpp"
 
 #ifdef TEST_MPZ
@@ -28,7 +32,7 @@ std::map<std::string, std::map<std::string, std::map<std::string, std::map<int, 
 
 unsigned bits_wanted; // for integer types
 
-void quickbook_results()
+static void quickbook_results()
 {
    //
    // Keys in order are:
@@ -102,15 +106,15 @@ void quickbook_results()
    }
 }
 
-#if defined(__HAS_INCLUDE)
-#if __has_include(<sys/utsname.h>)
-#define HAS_UTSNAME
-#include <sys/utsname.h>
-#endif
-#endif
-#ifdef _WIN32
-#include <windows.h>
-#endif
+//#if defined(__HAS_INCLUDE)
+//#if __has_include(<sys/utsname.h>)
+//#define HAS_UTSNAME
+//#include <sys/utsname.h>
+//#endif
+//#endif
+//#ifdef _WIN32
+//#include <windows.h>
+//#endif
 
 void quickbook_platform_details()
 {
@@ -191,7 +195,7 @@ void test33()
 
    using cpp_bin_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<my_digits10>, boost::multiprecision::et_off>;
 
-   test<boost::multiprecision::cpp_bin_float_100>("cpp_bin_float", 1024*16);
+   test<cpp_bin_float_type>("cpp_bin_float", 1024*16);
 }
 
 #endif
