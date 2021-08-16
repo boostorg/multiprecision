@@ -23,14 +23,12 @@
 
 int main()
 {
-   using quad_float_of_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<float>, boost::multiprecision::et_off>;
    using quad_float_of_double_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<double>, boost::multiprecision::et_off>;
    using quad_float_of_ldbl_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<long double>, boost::multiprecision::et_off>;
 #ifdef BOOST_MATH_USE_FLOAT128
    using quad_float_of_float128_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<boost::multiprecision::float128>, boost::multiprecision::et_off>;
 #endif
 
-   test<quad_float_of_float_type>();
    test<quad_float_of_double_type>();
    test<quad_float_of_ldbl_type>();
 #ifdef BOOST_MATH_USE_FLOAT128
