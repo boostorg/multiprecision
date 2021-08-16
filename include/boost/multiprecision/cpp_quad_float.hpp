@@ -161,9 +161,12 @@ class cpp_quad_float
    static constexpr int my_digits10       = boost::multiprecision::detail::calc_digits10<my_digits>::value;
    static constexpr int my_max_digits10   = boost::multiprecision::detail::calc_max_digits10<my_digits>::value;
    static constexpr int my_max_exponent   = std::numeric_limits<float_type>::max_exponent;
-   static constexpr int my_min_exponent   = std::numeric_limits<float_type>::min_exponent + 3 * std::numeric_limits<float_type>::digits;
+   static constexpr int my_min_exponent   = std::numeric_limits<float_type>::min_exponent + (3 * std::numeric_limits<float_type>::digits);
    static constexpr int my_max_exponent10 = (int)(float(my_max_exponent) * 0.301F);
    static constexpr int my_min_exponent10 = (int)(float(my_min_exponent) * 0.301F);
+
+   static_assert(((my_max_exponent - my_digits) >= 77),
+                 "Error: floating-point constituent does not have wide enough exponent range");
 
    // Default constructor.
    cpp_quad_float() {}
@@ -1116,27 +1119,57 @@ public:
    static constexpr bool is_iec559                     = false;
    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
 
-   static constexpr int digits       = inner_self_type::my_digits;
-   static constexpr int digits10     = inner_self_type::my_digits10;
-   static constexpr int max_digits10 = inner_self_type::my_max_digits10;
+   static constexpr int digits                         = inner_self_type::my_digits;
+   static constexpr int digits10                       = inner_self_type::my_digits10;
+   static constexpr int max_digits10                   = inner_self_type::my_max_digits10;
 
-   static constexpr int max_exponent   = inner_self_type::my_max_exponent;
-   static constexpr int min_exponent   = inner_self_type::my_min_exponent;
-   static constexpr int max_exponent10 = inner_self_type::my_max_exponent10;
-   static constexpr int min_exponent10 = inner_self_type::my_min_exponent10;
+   static constexpr int max_exponent                   = inner_self_type::my_max_exponent;
+   static constexpr int min_exponent                   = inner_self_type::my_min_exponent;
+   static constexpr int max_exponent10                 = inner_self_type::my_max_exponent10;
+   static constexpr int min_exponent10                 = inner_self_type::my_min_exponent10;
 
-   static constexpr           self_type(min)() noexcept { return self_type(inner_self_type::my_value_min()); }
-   static constexpr           self_type(max)() noexcept { return self_type(inner_self_type::my_value_max()); }
-   static constexpr self_type lowest() noexcept { return self_type(-(max)()); }
-   static constexpr self_type epsilon() noexcept { return self_type(inner_self_type::my_value_eps()); }
-   static constexpr self_type round_error() noexcept { return self_type(base_class_type::round_error()); }
-   static constexpr self_type denorm_min() noexcept { return self_type((min)()); }
-
-   static constexpr self_type infinity() noexcept { return self_type(base_class_type::infinity()); }
-   static constexpr self_type quiet_NaN() noexcept { return self_type(base_class_type::quiet_NaN()); }
+   static constexpr self_type(min)         () noexcept { return self_type(inner_self_type::my_value_min()); }
+   static constexpr self_type(max)         () noexcept { return self_type(inner_self_type::my_value_max()); }
+   static constexpr self_type lowest       () noexcept { return self_type(-(max)()); }
+   static constexpr self_type epsilon      () noexcept { return self_type(inner_self_type::my_value_eps()); }
+   static constexpr self_type round_error  () noexcept { return self_type(base_class_type::round_error()); }
+   static constexpr self_type denorm_min   () noexcept { return self_type((min)()); }
+   static constexpr self_type infinity     () noexcept { return self_type(base_class_type::infinity()); }
+   static constexpr self_type quiet_NaN    () noexcept { return self_type(base_class_type::quiet_NaN()); }
    static constexpr self_type signaling_NaN() noexcept { return self_type(base_class_type::signaling_NaN()); }
 };
 
 }
+
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_specialized;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_signed;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_integer;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_exact;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_bounded;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_modulo;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_iec559;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr std::float_denorm_style std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::has_denorm;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::digits;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::digits10;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::max_digits10;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::max_exponent;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::max_exponent10;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent10;
 
 #endif // BOOST_MP_CPP_QUAD_FLOAT_2021_07_29_HPP
