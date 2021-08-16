@@ -38,7 +38,7 @@ void represent_cyl_bessel_j()
    std::cout.precision(original_streamsize);
    std::cout.unsetf(std::ios::scientific);
 
-   BOOST_CHECK_CLOSE_FRACTION(b, ctrl, std::numeric_limits<float_type>::epsilon() * 1000U);
+   BOOST_CHECK_CLOSE_FRACTION(b, ctrl, std::numeric_limits<float_type>::epsilon() * 40U);
 }
 
 template<typename MpFloatType>
@@ -63,7 +63,7 @@ void represent_tgamma_half()
    std::cout.precision(original_streamsize);
    std::cout.unsetf(std::ios::scientific);
 
-   BOOST_CHECK_CLOSE_FRACTION(g, ctrl, std::numeric_limits<float_type>::epsilon() * 1000U);
+   BOOST_CHECK_CLOSE_FRACTION(g, ctrl, std::numeric_limits<float_type>::epsilon() * 40U);
 }
 
 int main()
