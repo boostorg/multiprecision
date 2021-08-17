@@ -6,7 +6,7 @@
 // (See accompanying file LICENSE_1_0.txt
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Ttimed multiplication cpp_quad_float<double> versuc cpp_bin_float
+// Timed multiplication cpp_quad_float<double> versus cpp_bin_float
 
 #include <ctime>
 #include <iomanip>
@@ -16,7 +16,6 @@
 #include <vector>
 
 #include <boost/config.hpp>
-#include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MATH_USE_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
