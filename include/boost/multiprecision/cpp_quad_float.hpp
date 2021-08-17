@@ -307,19 +307,31 @@ class cpp_quad_float
    cpp_quad_float& operator=(cpp_quad_float&&) = default;
 
    // Non-member add/sub/mul/div with constituent type.
-   // TODO Make specializations for these operators
-   friend inline cpp_quad_float operator+(const cpp_quad_float& a, const float_type& b) { return a + cpp_quad_float(b); }
-   friend inline cpp_quad_float operator-(const cpp_quad_float& a, const float_type& b) { return a - cpp_quad_float(b); }
-   friend inline cpp_quad_float operator*(const cpp_quad_float& a, const float_type& b) { return a * cpp_quad_float(b); }
-   friend inline cpp_quad_float operator/(const cpp_quad_float& a, const float_type& b) { return a / cpp_quad_float(b); }
-
-   // Unary add/sub/mul/div with constituent part.
-   cpp_quad_float& operator+=(const float_type& a) { *this = *this + a; return *this; }
-   cpp_quad_float& operator-=(const float_type& a) { *this = *this - a; return *this; }
-   cpp_quad_float& operator*=(const float_type& a) { *this = *this * a; return *this; }
-   cpp_quad_float& operator/=(const float_type& a) { *this = *this / a; return *this; }
+   friend inline cpp_quad_float operator+(const cpp_quad_float& a, const float_type& b) { return cpp_quad_float(a) += b; }
+   friend inline cpp_quad_float operator-(const cpp_quad_float& a, const float_type& b) { return cpp_quad_float(a) -= b; }
+   friend inline cpp_quad_float operator*(const cpp_quad_float& a, const float_type& b) { return cpp_quad_float(a) *= b; }
+   friend inline cpp_quad_float operator/(const cpp_quad_float& a, const float_type& b) { return cpp_quad_float(a) /= b; }
 
    // Unary add/sub/mul/div.
+   cpp_quad_float& operator+=(const float_type& other)
+   {
+     using std::tie;
+     using std::get;
+
+      rep_type f;
+      float_type              e;
+
+      tie(get<0>(f), e) = arithmetic::sum(get<0>(data), other);
+      tie(get<1>(f), e) = arithmetic::sum(get<1>(data), e);
+      tie(get<2>(f), e) = arithmetic::sum(get<2>(data), e);
+      tie(get<3>(f), e) = arithmetic::sum(get<3>(data), e);
+
+      data = f;
+      arithmetic::normalize(data, e);
+
+      return *this;
+   }
+
    cpp_quad_float& operator+=(const cpp_quad_float& other)
    {
       using std::array;
@@ -418,6 +430,12 @@ class cpp_quad_float
       return *this;
    }
 
+   cpp_quad_float& operator-=(const float_type& other)
+   {
+      *this += -other;
+      return *this;
+   }
+
    cpp_quad_float& operator*=(const cpp_quad_float& other)
    {
       using std::get;
@@ -499,6 +517,38 @@ class cpp_quad_float
       return *this;
    }
 
+   cpp_quad_float& operator*=(const float_type& other)
+   {
+     using std::tie;
+     using std::get;
+
+      rep_type p, s;
+      float_type q0, q1, q2;
+      float_type t1, t2, t3;
+
+      tie(get<0>(p), q0) = arithmetic::product(get<0>(data), other);
+      tie(get<1>(p), q1) = arithmetic::product(get<1>(data), other);
+      tie(get<2>(p), q2) = arithmetic::product(get<2>(data), other);
+      get<3>(p)          =                     get<3>(data) * other;
+
+      get<0>(s) = get<0>(p);
+
+      tie(get<1>(s), get<2>(s)) = arithmetic::sum(get<1>(p), q0);
+
+      arithmetic::three_sum(get<2>(s), q1, get<2>(p));
+
+      tie(t1, t2) = arithmetic::sum(q1, q2);
+      tie(q1, t3) = arithmetic::sum(get<3>(p), t1);
+      q2 = t2 + t3;
+
+      get<3>(s) = q1;
+
+      data = s;
+
+      arithmetic::normalize(data, q2 + get<2>(p));
+      return *this;
+   }
+
    cpp_quad_float& operator/=(const cpp_quad_float& other)
    {
       using std::get;
@@ -532,6 +582,13 @@ class cpp_quad_float
 
       arithmetic::normalize(q, get<0>(r.data) / get<0>(other.data));
       data = q;
+      return *this;
+   }
+
+   // Unary add/sub/mul/div with constituent part.
+   cpp_quad_float& operator/=(const float_type& a)
+   {
+      *this /= cpp_quad_float(a);
       return *this;
    }
 
@@ -770,11 +827,17 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_quad_float<Floati
 }
 
 template <typename FloatingPointType>
-void eval_add     (cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result += x; }
+void eval_add(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result += x; }
+template <typename FloatingPointType>
+void eval_add(cpp_quad_float<FloatingPointType>& result, const FloatingPointType& x) { result += x; }
 template <typename FloatingPointType>
 void eval_subtract(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result -= x; }
 template <typename FloatingPointType>
+void eval_subtract(cpp_quad_float<FloatingPointType>& result, const FloatingPointType& x) { result -= x; }
+template <typename FloatingPointType>
 void eval_multiply(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result *= x; }
+template <typename FloatingPointType>
+void eval_multiply(cpp_quad_float<FloatingPointType>& result, const FloatingPointType& x) { result *= x; }
 template <typename FloatingPointType>
 void eval_divide  (cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result /= x; }
 
