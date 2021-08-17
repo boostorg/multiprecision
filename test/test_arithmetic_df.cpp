@@ -23,11 +23,11 @@
 
 int main()
 {
-   using double_float_of_float_type    = boost::multiprecision::cpp_double_float>;
-   using double_float_of_double_type   = boost::multiprecision::cpp_double_double>;
-   using double_float_of_ldbl_type     = boost::multiprecision::cpp_double_long_double>;
+   using double_float_of_float_type    = boost::multiprecision::cpp_double_float;
+   using double_float_of_double_type   = boost::multiprecision::cpp_double_double;
+   using double_float_of_ldbl_type     = boost::multiprecision::cpp_double_long_double;
 #ifdef BOOST_MATH_USE_FLOAT128
-   using double_float_of_float128_type = boost::multiprecision::cpp_double_float128>;
+   using double_float_of_float128_type = boost::multiprecision::cpp_double_float128;
 #endif
 
    test<double_float_of_float_type>();
