@@ -318,7 +318,7 @@ class cpp_quad_float
      using std::tie;
      using std::get;
 
-      arithmetic::float_tuple f;
+      rep_type f;
       float_type              e;
 
       tie(get<0>(f), e) = arithmetic::sum(get<0>(data), other);
