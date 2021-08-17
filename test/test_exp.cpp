@@ -276,14 +276,14 @@ int main()
    test<boost::multiprecision::cpp_double_double>();
    test<boost::multiprecision::cpp_double_long_double>();
    #if defined(BOOST_MATH_USE_FLOAT128)
-   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> > >();
+   test<boost::multiprecision::cpp_double_float128>();
    #endif
 #endif
 #ifdef TEST_CPP_QUAD_FLOAT
    test<boost::multiprecision::cpp_quad_double>();
    test<boost::multiprecision::cpp_quad_long_double>();
    #if defined(BOOST_MATH_USE_FLOAT128)
-   test<boost::multiprecision::cpp_quad_float128> > >();
+   test<boost::multiprecision::cpp_quad_float128>();
    #endif
 #endif
    return boost::report_errors();
