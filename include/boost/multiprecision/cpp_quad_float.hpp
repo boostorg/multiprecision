@@ -830,14 +830,23 @@ template <typename FloatingPointType>
 void eval_add(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result += x; }
 template <typename FloatingPointType>
 void eval_add(cpp_quad_float<FloatingPointType>& result, const FloatingPointType& x) { result += x; }
+template <typename FloatingPointType, typename NumericType, typename std::enable_if<(std::numeric_limits<NumericType>::digits <= std::numeric_limits<FloatingPointType>::digits)>::type const* = nullptr>
+void eval_add(cpp_quad_float<FloatingPointType>& result, const NumericType& x) { eval_add(result, static_cast<FloatingPointType>(x)); }
+
 template <typename FloatingPointType>
 void eval_subtract(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result -= x; }
 template <typename FloatingPointType>
 void eval_subtract(cpp_quad_float<FloatingPointType>& result, const FloatingPointType& x) { result -= x; }
+template <typename FloatingPointType, typename NumericType, typename std::enable_if<std::numeric_limits<NumericType>::digits <= std::numeric_limits<FloatingPointType>::digits>::type const* = nullptr>
+void eval_subtract(cpp_quad_float<FloatingPointType>& result, const NumericType& x) { eval_subtract(result, static_cast<FloatingPointType>(x)); }
+
 template <typename FloatingPointType>
 void eval_multiply(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result *= x; }
 template <typename FloatingPointType>
 void eval_multiply(cpp_quad_float<FloatingPointType>& result, const FloatingPointType& x) { result *= x; }
+template <typename FloatingPointType, typename NumericType, typename std::enable_if<std::numeric_limits<NumericType>::digits <= std::numeric_limits<FloatingPointType>::digits>::type const* = nullptr>
+void eval_multiply(cpp_quad_float<FloatingPointType>& result, const NumericType& x) { eval_multiply(result, static_cast<FloatingPointType>(x)); }
+
 template <typename FloatingPointType>
 void eval_divide  (cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result /= x; }
 
