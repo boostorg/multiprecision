@@ -175,9 +175,9 @@ using local_float_constituent_type = double;
 
 void test53()
 {
-   using quad_float_of_double_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<local_float_constituent_type>, boost::multiprecision::et_off>;
+   using quad_float_of_double_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<local_float_constituent_type>, boost::multiprecision::et_off>;
 
-   test<quad_float_of_double_type>("cpp_quad_float", 1024*16);
+   test<quad_float_of_double_type>("cpp_quad_fp_backend", 1024*16);
 }
 
 #elif defined(TEST_CPP_BIN_FLOAT)
@@ -201,26 +201,26 @@ void test33()
 #endif
 
 // Chris PC TEST_CPP_QUAD_FLOAT
-//cpp_quad_float 16384     +                                  0.0328359
-//cpp_quad_float 16384     -                                  0.0326524
-//cpp_quad_float 16384     *                                  0.0516673
-//cpp_quad_float 16384     /                                  0.707075
-//cpp_quad_float 16384     str                                0.0419498
-//cpp_quad_float 16384     +(int)                             0.0267044
-//cpp_quad_float 16384     -(int)                             0.0279037
-//cpp_quad_float 16384     *(int)                             0.0512275
-//cpp_quad_float 16384     /(int)                             0.327655
-//cpp_quad_float 16384     construct                          0.0011852
-//cpp_quad_float 16384     construct(unsigned)                0.0011655
-//cpp_quad_float 16384     construct(unsigned long long)      0.171181
-//cpp_quad_float 16384     +(unsigned long long)              0.113957
-//cpp_quad_float 16384     -(unsigned long long)              0.115939
-//cpp_quad_float 16384     *(unsigned long long)              0.142094
-//cpp_quad_float 16384     /(unsigned long long)              0.407529
-//cpp_quad_float 16384     +=(unsigned long long)             0.113941
-//cpp_quad_float 16384     -=(unsigned long long)             0.114742
-//cpp_quad_float 16384     *=(unsigned long long)             0.141193
-//cpp_quad_float 16384     /=(unsigned long long)             0.410069
+//cpp_quad_fp_backend 16384     +                                  0.0328359
+//cpp_quad_fp_backend 16384     -                                  0.0326524
+//cpp_quad_fp_backend 16384     *                                  0.0516673
+//cpp_quad_fp_backend 16384     /                                  0.707075
+//cpp_quad_fp_backend 16384     str                                0.0419498
+//cpp_quad_fp_backend 16384     +(int)                             0.0267044
+//cpp_quad_fp_backend 16384     -(int)                             0.0279037
+//cpp_quad_fp_backend 16384     *(int)                             0.0512275
+//cpp_quad_fp_backend 16384     /(int)                             0.327655
+//cpp_quad_fp_backend 16384     construct                          0.0011852
+//cpp_quad_fp_backend 16384     construct(unsigned)                0.0011655
+//cpp_quad_fp_backend 16384     construct(unsigned long long)      0.171181
+//cpp_quad_fp_backend 16384     +(unsigned long long)              0.113957
+//cpp_quad_fp_backend 16384     -(unsigned long long)              0.115939
+//cpp_quad_fp_backend 16384     *(unsigned long long)              0.142094
+//cpp_quad_fp_backend 16384     /(unsigned long long)              0.407529
+//cpp_quad_fp_backend 16384     +=(unsigned long long)             0.113941
+//cpp_quad_fp_backend 16384     -=(unsigned long long)             0.114742
+//cpp_quad_fp_backend 16384     *=(unsigned long long)             0.141193
+//cpp_quad_fp_backend 16384     /=(unsigned long long)             0.410069
 
 
 // Chris PC TEST_CPP_BIN_FLOAT
