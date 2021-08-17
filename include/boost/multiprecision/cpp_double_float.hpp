@@ -1602,6 +1602,14 @@ std::size_t hash_value(const cpp_double_float<FloatingPointType>& a)
 }
 
 } // namespace backends
+
+using cpp_double_flt  = number<backends::cpp_double_float<float>>;
+using cpp_double_dbl  = number<backends::cpp_double_float<double>>;
+using cpp_double_ldbl = number<backends::cpp_double_float<long double>>;
+#ifdef BOOST_MATH_USE_FLOAT128
+using cpp_double_f128 = number<backends::cpp_double_float<float128>>;
+#endif
+
 }} // namespace boost::multiprecision
 
 namespace boost { namespace math {
