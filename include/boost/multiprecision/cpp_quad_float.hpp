@@ -1144,10 +1144,10 @@ std::size_t hash_value(const cpp_quad_float<FloatingPointType>& a)
 
 } // namespace backends
 
-using cpp_quad_dbl  = number<backends::cpp_quad_float<double>>;
-using cpp_quad_ldbl = number<backends::cpp_quad_float<long double>>;
+using cpp_quad_double      = number<backends::cpp_quad_float<double>>;
+using cpp_quad_long_double = number<backends::cpp_quad_float<long double>>;
 #ifdef BOOST_MATH_USE_FLOAT128
-using cpp_quad_f128 = number<backends::cpp_quad_float<float128>>;
+using cpp_quad_float128    = number<backends::cpp_quad_float<float128>>;
 #endif
 
 }} // namespace boost::multiprecision
