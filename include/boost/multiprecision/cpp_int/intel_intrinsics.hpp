@@ -26,7 +26,7 @@
 #undef BOOST_MP_HAS_IMMINTRIN_H
 #endif
 
-#if defined(__clang__) && (__clang__ < 9)
+#if defined(__clang_major__) && (__clang_major__ < 9)
 // We appear to crash the compiler if we try to use these intrinsics?
 #undef BOOST_MP_HAS_IMMINTRIN_H
 #endif
