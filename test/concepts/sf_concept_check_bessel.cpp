@@ -140,13 +140,13 @@ void foo()
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
    using cpp_double_float_of_double_type =
-      boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double>, boost::multiprecision::et_off>;
+      boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double>>;
 
    test_extra(cpp_double_float_of_double_type());
 #endif
 #ifdef TEST_CPP_QUAD_FLOAT
    using cpp_quad_float_of_double_type =
-      boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<double>, boost::multiprecision::et_off>;
+      boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<double>>;
 
    test_extra(cpp_quad_float_of_double_type());
 #endif
