@@ -69,7 +69,7 @@ void represent_tgamma_half()
 int main()
 {
    {
-      using quad_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<double>, boost::multiprecision::et_off>;
+      using quad_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<double>, boost::multiprecision::et_off>;
       using dec_float_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<quad_float_type>::digits10>, boost::multiprecision::et_off>;
 
       represent_tgamma_half<quad_float_type>();
@@ -80,7 +80,7 @@ int main()
    }
 
    {
-      using quad_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<long double>, boost::multiprecision::et_off>;
+      using quad_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<long double>, boost::multiprecision::et_off>;
       using dec_float_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<quad_float_type>::digits10>, boost::multiprecision::et_off>;
 
       represent_tgamma_half<quad_float_type>();
@@ -92,7 +92,7 @@ int main()
 
    #if defined(BOOST_MATH_USE_FLOAT128)
    {
-      using quad_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<boost::multiprecision::float128>, boost::multiprecision::et_off>;
+      using quad_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<boost::multiprecision::float128>, boost::multiprecision::et_off>;
       using dec_float_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<quad_float_type>::digits10>, boost::multiprecision::et_off>;
 
       represent_tgamma_half<quad_float_type>();

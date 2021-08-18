@@ -6,7 +6,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Constructor tests for cpp_double_float<>
+// Constructor tests for cpp_double_fp_backend<>
 
 // cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
 // g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_double_float.exe
@@ -75,10 +75,10 @@ FloatingPointType get_rand()
 }
 
 template <typename FloatingPointType>
-boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> get_rand()
+boost::multiprecision::backends::cpp_double_fp_backend<typename FloatingPointType::float_type> get_rand()
 {
    using float_type = typename FloatingPointType::float_type;
-   return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
+   return boost::multiprecision::backends::cpp_double_fp_backend<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_fp_backend<float_type>(uniform_real<float_type>());
 }
 
 template <typename ConstructionType, typename ArithmeticType, typename std::enable_if<std::is_arithmetic<ArithmeticType>::value || boost::multiprecision::backends::detail::is_floating_point_or_float128<ArithmeticType>::value>::type const* = nullptr>
@@ -90,7 +90,7 @@ ConstructionType construct_from(ArithmeticType f)
 template <typename ConstructionType, typename DoubleFloatType, typename std::enable_if<!(std::is_arithmetic<DoubleFloatType>::value || boost::multiprecision::backends::detail::is_floating_point_or_float128<DoubleFloatType>::value)>::type const* = nullptr>
 ConstructionType construct_from(DoubleFloatType f)
 {
-   static_assert(std::is_same< boost::multiprecision::backends::cpp_double_float<typename DoubleFloatType::float_type>
+   static_assert(std::is_same< boost::multiprecision::backends::cpp_double_fp_backend<typename DoubleFloatType::float_type>
                  , typename std::decay<DoubleFloatType>::type>::value, "Only double float should come here");
    return ConstructionType(f.first()) + ConstructionType(f.second());
 }
@@ -98,7 +98,7 @@ ConstructionType construct_from(DoubleFloatType f)
 template <typename FloatingPointType, typename NumericType>
 int test_constructor()
 {
-   using double_float_t     = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
+   using double_float_t     = boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>;
    using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<(detail::max)(std::numeric_limits<double_float_t>::digits10, std::numeric_limits<NumericType>::digits10) * 2 + 1>, boost::multiprecision::et_off>;
 
    std::cout << "Testing constructor for ";
@@ -115,11 +115,11 @@ int test_constructor()
       typename double_float_t::rep_type rep(d.rep());
       double_float_t::normalize_pair(rep);
 
-      // Check if representation of the cpp_double_float is not normalized
+      // Check if representation of the cpp_double_fp_backend is not normalized
       if (rep != d.rep())
       {
          std::cerr << "[FAILED]\nabnormal representation for " << typeid(NumericType).name() << " = " << n
-                   << " (cpp_double_float<" << typeid(FloatingPointType).name() << "> = " << d.get_raw_str() << ")" << std::endl;
+                   << " (cpp_double_fp_backend<" << typeid(FloatingPointType).name() << "> = " << d.get_raw_str() << ")" << std::endl;
          return -1;
       }
 
@@ -145,10 +145,10 @@ int test_constructor()
 template <typename FloatingPointType>
 int test_constructors()
 {
-   using double_float_t = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
+   using double_float_t = boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>;
    double_float_t a, b;
 
-   std::cout << "Testing cpp_double_float< " << typeid(FloatingPointType).name() << " >...\n==="
+   std::cout << "Testing cpp_double_fp_backend< " << typeid(FloatingPointType).name() << " >...\n==="
              << std::endl;
 
    int e = 0;
@@ -167,11 +167,11 @@ int test_constructors()
 #ifdef BOOST_MATH_USE_FLOAT128
    e += test_constructor<FloatingPointType, boost::multiprecision::float128>();
 #endif
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<float>>();
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<double>>();
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<long double>>();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<float>>();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<double>>();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<long double>>();
 #ifdef BOOST_MATH_USE_FLOAT128
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128>>();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<boost::multiprecision::float128>>();
 #endif
 
    if (e == 0)

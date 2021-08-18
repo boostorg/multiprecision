@@ -6,7 +6,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Constructor tests for cpp_quad_float<>
+// Constructor tests for cpp_quad_fp_backend<>
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
@@ -71,13 +71,13 @@ FloatingPointType get_rand()
 }
 
 template <typename FloatingPointType>
-boost::multiprecision::backends::cpp_quad_float<typename FloatingPointType::float_type> get_rand()
+boost::multiprecision::backends::cpp_quad_fp_backend<typename FloatingPointType::float_type> get_rand()
 {
    using float_type = typename FloatingPointType::float_type;
-   return boost::multiprecision::backends::cpp_quad_float<float_type>(uniform_real<float_type>())
-        * boost::multiprecision::backends::cpp_quad_float<float_type>(uniform_real<float_type>())
-        * boost::multiprecision::backends::cpp_quad_float<float_type>(uniform_real<float_type>())
-        * boost::multiprecision::backends::cpp_quad_float<float_type>(uniform_real<float_type>());
+   return boost::multiprecision::backends::cpp_quad_fp_backend<float_type>(uniform_real<float_type>())
+        * boost::multiprecision::backends::cpp_quad_fp_backend<float_type>(uniform_real<float_type>())
+        * boost::multiprecision::backends::cpp_quad_fp_backend<float_type>(uniform_real<float_type>())
+        * boost::multiprecision::backends::cpp_quad_fp_backend<float_type>(uniform_real<float_type>());
 }
 
 template <typename ConstructionType, typename ArithmeticType, typename std::enable_if<std::is_arithmetic<ArithmeticType>::value || boost::multiprecision::backends::detail::is_floating_point_or_float128<ArithmeticType>::value>::type const* = nullptr>
@@ -89,14 +89,14 @@ ConstructionType construct_from(ArithmeticType f)
 template <typename ConstructionType, typename QuadFloatType, typename std::enable_if<!(std::is_arithmetic<QuadFloatType>::value || boost::multiprecision::backends::detail::is_floating_point_or_float128<QuadFloatType>::value)>::type const* = nullptr>
 ConstructionType construct_from(QuadFloatType f)
 {
-   static_assert(std::is_same<boost::multiprecision::backends::cpp_quad_float<typename QuadFloatType::float_type>, typename std::decay<QuadFloatType>::type>::value, "Only quad float should come here");
+   static_assert(std::is_same<boost::multiprecision::backends::cpp_quad_fp_backend<typename QuadFloatType::float_type>, typename std::decay<QuadFloatType>::type>::value, "Only quad float should come here");
    return ConstructionType(std::get<0>(f.rep())) + ConstructionType(std::get<1>(f.rep())) + ConstructionType(std::get<2>(f.rep())) + ConstructionType(std::get<3>(f.rep()));
 }
 
 template <typename FloatingPointType, typename NumericType>
 int test_constructor()
 {
-   using quad_float_t     = boost::multiprecision::backends::cpp_quad_float<FloatingPointType>;
+   using quad_float_t     = boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>;
    using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<(detail::max)(std::numeric_limits<quad_float_t>::digits10, std::numeric_limits<NumericType>::digits10) * 2 + 1>, boost::multiprecision::et_off>;
 
    std::cout << "Testing constructor for ";
@@ -113,11 +113,11 @@ int test_constructor()
       typename quad_float_t::rep_type rep(d.rep());
       quad_float_t::arithmetic::normalize(rep);
 
-      // Check if representation of the cpp_quad_float is not normalized
+      // Check if representation of the cpp_quad_fp_backend is not normalized
       if (rep != d.rep())
       {
          std::cerr << "[FAILED]\nabnormal representation for " << typeid(NumericType).name() << " = " << n
-                   << " (cpp_quad_float<" << typeid(FloatingPointType).name() << "> = " << d.raw_str() << ")" << std::endl;
+                   << " (cpp_quad_fp_backend<" << typeid(FloatingPointType).name() << "> = " << d.raw_str() << ")" << std::endl;
          return -1;
       }
 
@@ -145,10 +145,10 @@ int test_constructor()
 template <typename FloatingPointType>
 int test_constructors()
 {
-   using quad_float_t = boost::multiprecision::backends::cpp_quad_float<FloatingPointType>;
+   using quad_float_t = boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>;
    quad_float_t a, b;
 
-   std::cout << "Testing cpp_quad_float< " << typeid(FloatingPointType).name() << " >...\n==="
+   std::cout << "Testing cpp_quad_fp_backend< " << typeid(FloatingPointType).name() << " >...\n==="
              << std::endl;
 
    int e = 0;
@@ -167,11 +167,11 @@ int test_constructors()
 #ifdef BOOST_MATH_USE_FLOAT128
    e += test_constructor<FloatingPointType, boost::multiprecision::float128>();
 #endif
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_quad_float<float> >();
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_quad_float<double> >();
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_quad_float<long double> >();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_quad_fp_backend<float> >();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_quad_fp_backend<double> >();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_quad_fp_backend<long double> >();
 #ifdef BOOST_MATH_USE_FLOAT128
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_quad_float<boost::multiprecision::float128> >();
+   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_quad_fp_backend<boost::multiprecision::float128> >();
 #endif
 
    if (e == 0)
