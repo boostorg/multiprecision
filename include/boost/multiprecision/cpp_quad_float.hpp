@@ -66,12 +66,51 @@ inline bool operator>(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp
 
 template <typename FloatingPointType>
 void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x);
+
+template <typename FloatingPointType>
+void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y);
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const* = nullptr>
+void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a);
+
 template <typename FloatingPointType>
 void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x);
+
+template <typename FloatingPointType>
+void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y);
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const* = nullptr>
+void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a);
+
 template <typename FloatingPointType>
 void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x);
+
+template <typename FloatingPointType>
+void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y);
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const* = nullptr>
+void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a);
+
 template <typename FloatingPointType>
 void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x);
+
+template <typename FloatingPointType>
+void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y);
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const* = nullptr>
+void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a);
 
 template <typename FloatingPointType>
 void eval_fabs(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& a);
@@ -519,8 +558,8 @@ class cpp_quad_fp_backend
 
    cpp_quad_fp_backend& operator*=(const float_type& other)
    {
-     using std::tie;
-     using std::get;
+      using std::tie;
+      using std::get;
 
       rep_type p, s;
       float_type q0, q1, q2;
@@ -826,30 +865,65 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_quad_fp_backend<F
    return is;
 }
 
-// TBD: We can potentially try to resolve the enable_if's a bit better in these eval_* ops.
 template <typename FloatingPointType>
 void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x) { result += x; }
+
 template <typename FloatingPointType>
-void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const FloatingPointType& x) { result += x; }
-template <typename FloatingPointType, typename NumericType, typename std::enable_if<(std::numeric_limits<NumericType>::digits <= std::numeric_limits<FloatingPointType>::digits)>::type const* = nullptr>
-void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const NumericType& x) { eval_add(result, static_cast<FloatingPointType>(x)); }
+void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y) { result = x + y; }
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const*>
+void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a)
+{
+  result = x + typename cpp_quad_fp_backend<FloatingPointType>::float_type(a);
+}
 
 template <typename FloatingPointType>
 void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x) { result -= x; }
+
 template <typename FloatingPointType>
-void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const FloatingPointType& x) { result -= x; }
-template <typename FloatingPointType, typename NumericType, typename std::enable_if<std::numeric_limits<NumericType>::digits <= std::numeric_limits<FloatingPointType>::digits>::type const* = nullptr>
-void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const NumericType& x) { eval_subtract(result, static_cast<FloatingPointType>(x)); }
+void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y) { result = x - y; }
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const*>
+void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a)
+{
+  result = x - typename cpp_quad_fp_backend<FloatingPointType>::float_type(a);
+}
 
 template <typename FloatingPointType>
 void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x) { result *= x; }
-template <typename FloatingPointType>
-void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const FloatingPointType& x) { result *= x; }
-template <typename FloatingPointType, typename NumericType, typename std::enable_if<std::numeric_limits<NumericType>::digits <= std::numeric_limits<FloatingPointType>::digits>::type const* = nullptr>
-void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const NumericType& x) { eval_multiply(result, static_cast<FloatingPointType>(x)); }
 
 template <typename FloatingPointType>
-void eval_divide  (cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x) { result /= x; }
+void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y) { result = x * y; }
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const*>
+void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a)
+{
+  result = x * typename cpp_quad_fp_backend<FloatingPointType>::float_type(a);
+}
+
+template <typename FloatingPointType>
+void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x) { result /= x; }
+
+template <typename FloatingPointType>
+void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y) { result = x / y; }
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const*>
+void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a)
+{
+  result = x / typename cpp_quad_fp_backend<FloatingPointType>::float_type(a);
+}
 
 template <typename FloatingPointType>
 void eval_fabs(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& a)
