@@ -54,7 +54,7 @@ namespace local
 
     static unsigned seed_prescaler;
 
-    using quad_float_type    = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<float_type>, boost::multiprecision::et_off>;
+    using quad_float_type    = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<float_type>, boost::multiprecision::et_off>;
     using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<quad_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
 
     static_assert( digits       == std::numeric_limits<quad_float_type>::digits       , "Error in digit parameters" );

@@ -6,8 +6,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Basic I/O tests for cpp_double_float<>
-// Note that the I/O of cpp_double_float<> is currently extremely underdeveloped
+// Basic I/O tests for cpp_double_fp_backend<>
+// Note that the I/O of cpp_double_fp_backend<> is currently extremely underdeveloped
 
 
 #include <boost/config.hpp>
@@ -35,10 +35,10 @@ FloatingPointType uniform_real()
 }
 
 template <typename FloatingPointType>
-boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> uniform_rand()
+boost::multiprecision::backends::cpp_double_fp_backend<typename FloatingPointType::float_type> uniform_rand()
 {
    using float_type = typename FloatingPointType::float_type;
-   return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
+   return boost::multiprecision::backends::cpp_double_fp_backend<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_fp_backend<float_type>(uniform_real<float_type>());
 }
 
 int rand_in_range(int a, int b)
@@ -52,13 +52,13 @@ FloatingPointType log_rand()
    if (uniform_real<float>() < (1. / 100.))
       return 0; // throw in a few zeroes
    using std::ldexp;
-   return ldexp(uniform_real<FloatingPointType>(), rand_in_range(std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >::min_exponent, std::numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >::max_exponent));
+   return ldexp(uniform_real<FloatingPointType>(), rand_in_range(std::numeric_limits<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType> >::min_exponent, std::numeric_limits<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType> >::max_exponent));
 }
 
 template <typename FloatingPointType>
 void test()
 {
-   using double_float_t = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
+   using double_float_t = boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>;
 
    bool passed = true;
    int  i;
@@ -132,7 +132,7 @@ void test()
       }
    }
 
-   std::cout << "cpp_double_float<" << typeid(FloatingPointType).name() << ">: "
+   std::cout << "cpp_double_fp_backend<" << typeid(FloatingPointType).name() << ">: "
      << (passed ? "PASS" : "FAIL") << " (" << i << " tests)" << std::endl;
 }
 } // namespace test_cpp_double_float_io
