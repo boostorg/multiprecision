@@ -6,7 +6,7 @@
 // (See accompanying file LICENSE_1_0.txt
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Timed multiplication cpp_quad_fp_backend<double> versus cpp_bin_float
+// Timed multiplication cpp_quad_float<double> versus cpp_bin_float
 
 #include <ctime>
 #include <iomanip>
@@ -51,7 +51,7 @@ namespace local
 
     static unsigned seed_prescaler;
 
-    using quad_float_type    = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<float_type>, boost::multiprecision::et_off>;
+    using quad_float_type    = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<float_type>, boost::multiprecision::et_off>;
     using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<digits10>, boost::multiprecision::et_off>;
 
     static_assert( digits       == std::numeric_limits<quad_float_type>::digits       , "Discrepancy in limts." );

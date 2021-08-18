@@ -29,19 +29,19 @@
 namespace std {
 
 // Since there are no longer inner specializations of
-// numeric_limits for standalone cpp_double_fp_backend<T>
-// and cpp_quad_fp_backend<T> template types, we provide our own
+// numeric_limits for standalone cpp_double_float<T>
+// and cpp_quad_float<T> template types, we provide our own
 // local specializations patched here.
 
 template <typename FloatingPointType>
-class numeric_limits<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType> >
-    : public std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType> > >
+class numeric_limits<boost::multiprecision::backends::cpp_double_float<FloatingPointType> >
+    : public std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<FloatingPointType> > >
 {
 };
 
 template <typename FloatingPointType>
-class numeric_limits<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType> >
-    : public std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType> > >
+class numeric_limits<boost::multiprecision::backends::cpp_quad_float<FloatingPointType> >
+    : public std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType> > >
 {
 };
 
@@ -103,22 +103,22 @@ namespace backends {
 template <typename T> int sign(T val) { return (T(0) < val) - (val < T(0)); }
 
 template <typename Rr>
-inline cpp_double_fp_backend<Rr> pow(const cpp_double_fp_backend<Rr>& a, int exp)
+inline cpp_double_float<Rr> pow(const cpp_double_float<Rr>& a, int exp)
 {
    return a.pown(a,exp);
 }
 
 template <typename Rr, typename Exp>
-inline cpp_double_fp_backend<Rr> frexp(const cpp_double_fp_backend<Rr>& a, Exp* b)
+inline cpp_double_float<Rr> frexp(const cpp_double_float<Rr>& a, Exp* b)
 {
-   cpp_double_fp_backend<Rr> ret(0);
+   cpp_double_float<Rr> ret(0);
    eval_frexp(ret, a, b);
    return ret;
 }
 
 template <typename Rr> void print_compound_number(const std::string& prefix, const Rr& arg) {};
-template <typename Rr> void print_compound_number(const std::string& prefix, const cpp_double_fp_backend<Rr>& arg);
-template <typename Rr> void print_compound_number(const std::string& prefix, const cpp_quad_fp_backend<Rr>& arg);
+template <typename Rr> void print_compound_number(const std::string& prefix, const cpp_double_float<Rr>& arg);
+template <typename Rr> void print_compound_number(const std::string& prefix, const cpp_quad_float<Rr>& arg);
 
 template<typename R>
 struct double_or_quad_traits {
@@ -128,14 +128,14 @@ struct double_or_quad_traits {
 };
 
 template<typename R>
-struct double_or_quad_traits<cpp_double_fp_backend<R>> {
+struct double_or_quad_traits<cpp_double_float<R>> {
    static constexpr auto guard_bits                = 3;
    static constexpr auto double_or_quad_multiplier = 2;
    using underlying_type                           = R;
 };
 
 template<typename R>
-struct double_or_quad_traits<cpp_quad_fp_backend<R>> {
+struct double_or_quad_traits<cpp_quad_float<R>> {
    static constexpr auto guard_bits                = 4;
    static constexpr auto double_or_quad_multiplier = 4;
    using underlying_type                           = R;
@@ -237,7 +237,7 @@ public:
    }
 };
 
-template <typename Rr> void print_compound_number(const std::string& prefix, const boost::multiprecision::backends::cpp_double_fp_backend<Rr>& arg) {
+template <typename Rr> void print_compound_number(const std::string& prefix, const boost::multiprecision::backends::cpp_double_float<Rr>& arg) {
    std::cout    << std::left << std::setw(15) << prefix+".first "  << " = " << std::right; auto ex1 = DecomposedReal(arg.crep().first).short_print_shifted();
    if(arg.crep().second != 0) {
       std::cout << std::left << std::setw(15) << prefix+".second " << " = " << std::right;            DecomposedReal(arg.crep().second).short_print_shifted(ex1,false);
@@ -245,7 +245,7 @@ template <typename Rr> void print_compound_number(const std::string& prefix, con
 }
 
 // not tested
-template <typename Rr> void print_compound_number(const std::string& prefix, const boost::multiprecision::backends::cpp_quad_fp_backend<Rr>& arg) {
+template <typename Rr> void print_compound_number(const std::string& prefix, const boost::multiprecision::backends::cpp_quad_float<Rr>& arg) {
    std::cout    << std::left << std::setw(15) << prefix+".first "  << " = " << std::right; auto ex1 = DecomposedReal(get<0>(arg.crep())).short_print_shifted();
    if(get<1>(arg.crep()) != 0) {
       std::cout << std::left << std::setw(15) << prefix+".second " << " = " << std::right;            DecomposedReal(get<1>(arg.crep())).short_print_shifted(ex1,false);
@@ -282,7 +282,7 @@ template <typename Rr> int test_number_decomposition(const Rr& arg, bool verbose
    DecomposedReal d(arg);
    auto rebuilt = d.rebuild<Rr>();
 
-   // FIXME: should these normalize calls be here, ot at the end of some functions inside cpp_double_fp_backend.hpp ?
+   // FIXME: should these normalize calls be here, ot at the end of some functions inside cpp_double_float.hpp ?
    Rr::arithmetic::normalize(rebuilt.rep());
    Rr::arithmetic::extra_normalize(rebuilt.rep());
 
@@ -337,7 +337,7 @@ int try_number(R& ref, Arg str, bool verbose) {
 
    int errors = 0;
    try {
-      // FIXME: should these normalize calls be here, ot at the end of some functions inside cpp_double_fp_backend.hpp ?
+      // FIXME: should these normalize calls be here, ot at the end of some functions inside cpp_double_float.hpp ?
       R::arithmetic::normalize(z.rep());
       R::arithmetic::extra_normalize(z.rep());
 
@@ -397,8 +397,8 @@ int test() {
    return errors;
 }
 
-template<class R> using double_float = boost::multiprecision::backends::cpp_double_fp_backend<R>;
-template<class R> using quad_float   = boost::multiprecision::backends::cpp_quad_fp_backend<R>;
+template<class R> using double_float = boost::multiprecision::backends::cpp_double_float<R>;
+template<class R> using quad_float   = boost::multiprecision::backends::cpp_quad_float<R>;
 
 int main()
 {

@@ -178,11 +178,11 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type> > >();
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
-   test<boost::multiprecision::cpp_double_float>();
-   test<boost::multiprecision::cpp_double_double>();
-   test<boost::multiprecision::cpp_double_long_double>();
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<float> > >();
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double> > >();
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<long double> > >();
    #if defined(BOOST_MATH_USE_FLOAT128)
-   test<boost::multiprecision::cpp_double_float128>();
+   test<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> > >();
    #endif
 #endif
    return boost::report_errors();

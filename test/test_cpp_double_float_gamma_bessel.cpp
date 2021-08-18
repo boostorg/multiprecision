@@ -59,7 +59,7 @@ void represent_tgamma_half()
 int main()
 {
    {
-      using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<float>, boost::multiprecision::et_off>;
+      using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<float>, boost::multiprecision::et_off>;
       using dec_float_type    = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<double_float_type>::digits10>, boost::multiprecision::et_off>;
 
       const double_float_type lg = log(double_float_type(602) / double_float_type(100));
@@ -76,7 +76,7 @@ int main()
    }
 
    {
-      using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<double>, boost::multiprecision::et_off>;
+      using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double>, boost::multiprecision::et_off>;
       using dec_float_type    = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<double_float_type>::digits10>, boost::multiprecision::et_off>;
 
       represent_tgamma_half<double_float_type>();
@@ -87,7 +87,7 @@ int main()
    }
 
    {
-      using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<long double>, boost::multiprecision::et_off>;
+      using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<long double>, boost::multiprecision::et_off>;
       using dec_float_type    = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<double_float_type>::digits10>, boost::multiprecision::et_off>;
 
       represent_tgamma_half<double_float_type>();
@@ -99,7 +99,7 @@ int main()
 
    #if defined(BOOST_MATH_USE_FLOAT128)
    {
-      using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<boost::multiprecision::float128>, boost::multiprecision::et_off>;
+      using double_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128>, boost::multiprecision::et_off>;
       using dec_float_type    = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<double_float_type>::digits10>, boost::multiprecision::et_off>;
 
       represent_tgamma_half<double_float_type>();

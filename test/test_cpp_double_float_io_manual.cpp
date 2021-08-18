@@ -6,8 +6,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Basic I/O tests for cpp_double_fp_backend<>
-// Note that the I/O of cpp_double_fp_backend<> is currently extremely underdeveloped
+// Basic I/O tests for cpp_double_float<>
+// Note that the I/O of cpp_double_float<> is currently extremely underdeveloped
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
@@ -22,9 +22,9 @@
 template <typename FloatingPointType>
 void test_basic_io_manual()
 {
-   using double_float_t = boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>;
+   using double_float_t = boost::multiprecision::backends::cpp_double_float<FloatingPointType>;
 
-   std::cout << "Testing cpp_double_fp_backend< " << typeid(FloatingPointType).name() << " >...\n"
+   std::cout << "Testing cpp_double_float< " << typeid(FloatingPointType).name() << " >...\n"
              << std::endl;
 
    double_float_t a, b;
@@ -113,9 +113,9 @@ void test_basic_io_manual()
 
 int main()
 {
-   test_basic_io_manual<boost::multiprecision::backends::cpp_double_fp_backend<double>>();
-   test_basic_io_manual < boost::multiprecision::backends::cpp_double_fp_backend<float>>();
-   //test_basic_io_manual < boost::multiprecision::backends::cpp_double_fp_backend<long double>>();
+   test_basic_io_manual<boost::multiprecision::backends::cpp_double_float<double>>();
+   test_basic_io_manual < boost::multiprecision::backends::cpp_double_float<float>>();
+   //test_basic_io_manual < boost::multiprecision::backends::cpp_double_float<long double>>();
 #ifdef BOOST_MATH_USE_FLOAT128
 // FIXME:
 // test_basic_io_manual<boost::multiprecision::float128>();

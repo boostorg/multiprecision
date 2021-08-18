@@ -6,7 +6,7 @@
 // (See accompanying file LICENSE_1_0.txt
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Test for correctness of arithmetic operators of cpp_double_fp_backend<>
+// Test for correctness of arithmetic operators of cpp_double_float<>
 
 // cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
 // g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_double_float.exe
@@ -54,7 +54,7 @@ namespace local
 
     static unsigned seed_prescaler;
 
-    using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<float_type>, boost::multiprecision::et_off>;
+    using double_float_type  = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<float_type>, boost::multiprecision::et_off>;
     using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<(2 * std::numeric_limits<double_float_type>::digits10) + 1>, boost::multiprecision::et_off>;
 
     static_assert( digits       == std::numeric_limits<double_float_type>::digits       , "Error in digit parameters" );
