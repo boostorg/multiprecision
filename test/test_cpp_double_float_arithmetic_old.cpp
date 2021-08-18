@@ -6,7 +6,7 @@
 // (See accompanying file LICENSE_1_0.txt
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Test for correctness of arithmetic operators of cpp_double_float<>
+// Test for correctness of arithmetic operators of cpp_double_fp_backend<>
 
 // cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
 // g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_double_float.exe
@@ -55,10 +55,10 @@ FloatingPointType uniform_rand()
 }
 
 template <typename FloatingPointType>
-boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> uniform_rand()
+boost::multiprecision::backends::cpp_double_fp_backend<typename FloatingPointType::float_type> uniform_rand()
 {
    using float_type = typename FloatingPointType::float_type;
-   return boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_float<float_type>(uniform_real<float_type>());
+   return boost::multiprecision::backends::cpp_double_fp_backend<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_fp_backend<float_type>(uniform_real<float_type>());
 }
 
 template <typename FloatingPointType>
@@ -74,9 +74,9 @@ log_rand()
 }
 
 template <typename FloatingPointType>
-boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> log_rand()
+boost::multiprecision::backends::cpp_double_fp_backend<typename FloatingPointType::float_type> log_rand()
 {
-   boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> a(uniform_rand<boost::multiprecision::backends::cpp_double_float<typename FloatingPointType::float_type> >() + typename FloatingPointType::float_type(1));
+   boost::multiprecision::backends::cpp_double_fp_backend<typename FloatingPointType::float_type> a(uniform_rand<boost::multiprecision::backends::cpp_double_fp_backend<typename FloatingPointType::float_type> >() + typename FloatingPointType::float_type(1));
    a *= log_rand<typename FloatingPointType::float_type>();
    return a;
 }
@@ -152,7 +152,7 @@ bool test_op(char op, const unsigned count = 0x10000U)
          std::cerr << std::setprecision(std::numeric_limits<naked_double_float_type>::digits10 + 2);
          std::cerr << " [FAILED] while performing '" << std::setprecision(100000) << ctrl_a << "' " << op << " '" << ctrl_b << "', got incorrect result: " << (df_c) << std::endl;
 
-         // uncomment for more debugging information (only for cpp_double_float<> type)
+         // uncomment for more debugging information (only for cpp_double_fp_backend<> type)
          std::cerr << "(df_a = " << df_a.get_raw_str() << ", df_b = " << df_b.get_raw_str() << ")" << std::endl;
          std::cerr << "expected: " << ctrl_c << std::endl;
          std::cerr << "actual  : " << ctrl_df_c << " (" << df_c.get_raw_str() << ")" << std::endl;
@@ -198,11 +198,11 @@ int main()
    //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::float128>();
 #endif
 
-   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<float> >();
-   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<double> >();
-   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<long double> >();
+   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_fp_backend<float> >();
+   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_fp_backend<double> >();
+   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_fp_backend<long double> >();
 #ifdef BOOST_MATH_USE_FLOAT128
-   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_float<boost::multiprecision::float128> >();
+   result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::backends::cpp_double_fp_backend<boost::multiprecision::float128> >();
 #endif
 
    return (result_is_ok ? 0 : -1);
