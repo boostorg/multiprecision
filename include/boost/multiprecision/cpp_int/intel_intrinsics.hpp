@@ -39,6 +39,11 @@
 #undef BOOST_MP_HAS_IMMINTRIN_H
 #endif
 
+#if defined(__APPLE_CC__) && defined(__clang_major__) && (__clang_major__ < 11) && defined(BOOST_MP_HAS_IMMINTRIN_H)
+// Apple clang has it's own version numbers.
+#undef BOOST_MP_HAS_IMMINTRIN_H
+#endif
+
 
 //
 // If the compiler supports the intrinsics used by GCC internally
