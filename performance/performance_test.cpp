@@ -8,8 +8,6 @@
 
 // g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/performance -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/test -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DTEST_CPP_QUAD_FLOAT test.cpp -o test_perf.exe
 
-
-
 #include "performance_test.hpp"
 
 #ifdef TEST_MPZ

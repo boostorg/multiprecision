@@ -32,6 +32,22 @@ constexpr T max(T a, T b)
    return ((a > b) ? a : b);
 }
 
+template<typename UnsignedIntegralType>
+constexpr typename std::enable_if<   (std::is_integral<UnsignedIntegralType>::value == true)
+                                  && (std::is_unsigned<UnsignedIntegralType>::value == true), UnsignedIntegralType>::type
+negate(UnsignedIntegralType u)
+{
+   return (UnsignedIntegralType) (((UnsignedIntegralType) ~u) + 1U);
+}
+
+template<typename SignedIntegralType>
+constexpr typename std::enable_if<   (std::is_integral<SignedIntegralType>::value == true)
+                                  && (std::is_signed  <SignedIntegralType>::value == true), SignedIntegralType>::type
+negate(SignedIntegralType n)
+{
+   return (SignedIntegralType) detail::negate((unsigned long long) n);
+}
+
 } // namespace detail
 
 template <typename NumericType,
@@ -40,7 +56,7 @@ NumericType get_rand()
 {
    static std::random_device                                   rd;
    static std::mt19937                                         gen(rd());
-   static boost::random::uniform_int_distribution<NumericType> dis(-std::numeric_limits<NumericType>::max(), std::numeric_limits<NumericType>::max());
+   static boost::random::uniform_int_distribution<NumericType> dis(detail::negate((std::numeric_limits<NumericType>::max)()), (std::numeric_limits<NumericType>::max)());
 
    return dis(gen);
 }
@@ -51,7 +67,7 @@ FloatingPointType get_rand()
 {
    static std::random_device                                          rd;
    static std::mt19937                                                gen(rd());
-   static boost::random::uniform_real_distribution<FloatingPointType> dis(-std::numeric_limits<FloatingPointType>::max(), std::numeric_limits<FloatingPointType>::max());
+   static boost::random::uniform_real_distribution<FloatingPointType> dis(-(std::numeric_limits<FloatingPointType>::max)(), (std::numeric_limits<FloatingPointType>::max)());
 
    return dis(gen);
 }
@@ -67,12 +83,18 @@ get_rand()
    static boost::random::uniform_real_distribution<float_type> dis(-1.0F, 1.0F);
    static boost::random::uniform_int_distribution<int>                exponent_dis(std::numeric_limits<QuadFloatType>::min_exponent, std::numeric_limits<QuadFloatType>::max_exponent);
 
-   auto shifted_rand = [&](int i) {
-      return std::ldexp(dis(gen), -i * std::numeric_limits<float_type>::digits);
+   auto shifted_rand = [&](int i)
+   {
+      using std::ldexp;
+      #ifdef BOOST_MATH_USE_FLOAT128
+      using boost::multiprecision::ldexp;
+      #endif
+
+      return ldexp(dis(gen), -i * std::numeric_limits<float_type>::digits);
    };
 
    QuadFloatType out;
-   out.backend() = QuadFloatType::backend_type(shifted_rand(0), shifted_rand(1), shifted_rand(2), shifted_rand(3), true);
+   out.backend() = typename QuadFloatType::backend_type(shifted_rand(0), shifted_rand(1), shifted_rand(2), shifted_rand(3), true);
 
    return boost::multiprecision::ldexp(out, exponent_dis(gen));
 }
@@ -96,7 +118,7 @@ ConstructionType construct_from(const boost::multiprecision::number<boost::multi
 template <typename FloatingPointType, typename NumericType>
 int test_constructor()
 {
-   using quad_float_backend_t = boost::multiprecision::backends::cpp_quad_fp_backend<typename FloatingPointType>;
+   using quad_float_backend_t = boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>;
    using quad_float_t         = boost::multiprecision::number<quad_float_backend_t>;
    using control_float_type   = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<(detail::max)(std::numeric_limits<quad_float_t>::digits10, std::numeric_limits<NumericType>::digits10) * 2 + 1>, boost::multiprecision::et_off>;
 
@@ -194,7 +216,7 @@ int main()
    e += test_cpp_quad_float_constructors::test_constructors<double>();
    e += test_cpp_quad_float_constructors::test_constructors<long double>();
 #ifdef BOOST_MATH_USE_FLOAT128
-   e += test_cpp_quad_constructors::test_constructors<boost::multiprecision::float128>();
+   e += test_cpp_quad_float_constructors::test_constructors<boost::multiprecision::float128>();
 #endif
 
    return e;
