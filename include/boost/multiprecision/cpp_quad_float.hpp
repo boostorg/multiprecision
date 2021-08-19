@@ -244,8 +244,13 @@ class cpp_quad_fp_backend
       *this += (precise_type)get<1>(a.rep());
       *this += (precise_type)get<2>(a.rep());
       *this += (precise_type)get<3>(a.rep());
-      //data = rep_type((float_type)get<0>(a.rep()), (float_type)get<1>(a.rep()), (float_type)get<2>(a.rep()), (float_type)get<3>(a.rep()));
-      //arithmetic::normalize(data);
+   }
+
+   // Constructor from four float_types
+   cpp_quad_fp_backend(const float_type& f1, const float_type& f2, const float_type& f3, const float_type& f4, bool normalize = false)
+       : data(std::make_tuple(f1, f2, f3, f4))
+   {
+      if (normalize) arithmetic::normalize(data);
    }
 
    // Constructors from integers which can be easily fit into underlying floating-point type
@@ -253,39 +258,56 @@ class cpp_quad_fp_backend
              typename std::enable_if<((std::is_integral<IntegralType>::value == true) && (std::numeric_limits<IntegralType>::digits <= std::numeric_limits<FloatingPointType>::digits))>::type const* = nullptr>
    constexpr cpp_quad_fp_backend(const IntegralType& f) : data(std::make_tuple(static_cast<float_type>(f), (float_type)0, (float_type)0, (float_type)0)) {}
 
+   template <typename SignedIntegralType,
+             typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true) && (std::is_signed<SignedIntegralType>::value == true) && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   cpp_quad_fp_backend(SignedIntegralType n)
+   {
+      std::get<0>(data) = static_cast<float_type>(n);
+      n -= static_cast<SignedIntegralType>(std::get<0>(data));
+
+      std::get<1>(data) = static_cast<float_type>(n);
+
+      // TODO test for 128-bit int
+      if (std::numeric_limits<SignedIntegralType>::digits < 2 * std::numeric_limits<float_type>::digits)
+      {
+         return;
+      }
+      else
+      {
+         n -= static_cast<SignedIntegralType>(std::get<1>(data));
+         std::get<2>(data) = static_cast<float_type>(n);
+
+         n -= static_cast<SignedIntegralType>(std::get<2>(data));
+         std::get<3>(data) = static_cast<float_type>(n);
+      }
+   }
+
    // Constructors from integers which hold more information than *this can contain
    template <typename UnsignedIntegralType,
              typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    cpp_quad_fp_backend(UnsignedIntegralType u)
    {
-      constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits - 1;
+      typedef typename std::make_signed<UnsignedIntegralType>::type SignedIntegralType;
 
-      int bit_index = sizeof(UnsignedIntegralType) * 8;
+      std::get<0>(data) = static_cast<float_type>(u);
 
-      for (;;)
+      SignedIntegralType u_ = SignedIntegralType(u - static_cast<UnsignedIntegralType>(std::get<0>(data)));
+
+      std::get<1>(data) = static_cast<float_type>(u_);
+
+      // TODO test for 128-bit int
+      if (std::numeric_limits<UnsignedIntegralType>::digits < 2 * std::numeric_limits<float_type>::digits)
       {
-         // Mask the maximum number of bits that can be stored without
-         // precision loss in a single FloatingPointType, then sum and shift
-         UnsignedIntegralType hi = u >> (std::max)(bit_index - MantissaBits, 0);
-         u &= ~(hi << (std::max)(bit_index - MantissaBits, 0));
-
-         *this += static_cast<FloatingPointType>(hi); // sum
-
-         bit_index -= MantissaBits;
-
-         if (bit_index < 0)
-            break;
-         else // shift
-            eval_ldexp(*this, *this, (std::min)(MantissaBits, bit_index));
+         return;
       }
-   }
+      else
+      {
+         u_ -= static_cast<SignedIntegralType>(std::get<1>(data));
+         std::get<2>(data) = static_cast<float_type>(u_);
 
-   template <typename SignedIntegralType,
-             typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true) && (std::is_signed<SignedIntegralType>::value == true) && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   cpp_quad_fp_backend(SignedIntegralType n) : cpp_quad_fp_backend(static_cast<typename std::make_unsigned<SignedIntegralType>::type>(std::abs(n)))
-   {
-      if (n < 0)
-         *this = -*this;
+         u_ -= static_cast<SignedIntegralType>(std::get<2>(data));
+         std::get<3>(data) = static_cast<float_type>(u_);
+      }
    }
 
    cpp_quad_fp_backend(const std::string& str)
