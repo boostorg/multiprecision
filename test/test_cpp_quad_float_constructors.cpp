@@ -8,7 +8,13 @@
 //
 // Constructor tests for cpp_quad_fp_backend<>
 
+#include <cstdlib>
+#include <iostream>
+#include <numeric>
+#include <random>
+
 #include <boost/config.hpp>
+#include <boost/core/demangle.hpp>
 #include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MATH_USE_FLOAT128
 #include <boost/multiprecision/float128.hpp>
@@ -17,10 +23,6 @@
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
-#include <iostream>
-#include <cstdlib>
-#include <random>
-#include <numeric>
 
 namespace test_cpp_quad_float_constructors {
 using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<500>, boost::multiprecision::et_off>;
@@ -28,13 +30,13 @@ using control_float_type = boost::multiprecision::number<boost::multiprecision::
 namespace detail {
 
 template <typename T>
-constexpr T max(T a, T b)
+constexpr T (max)(T a, T b)
 {
    return ((a > b) ? a : b);
 }
 
 template <typename T>
-constexpr T min(T a, T b)
+constexpr T (min)(T a, T b)
 {
    return ((a < b) ? a : b);
 }
@@ -63,11 +65,11 @@ NumericType get_rand(control_float_type mn = 0, control_float_type mx = 0)
 {
    NumericType max_n = (std::numeric_limits<NumericType>::max)();
    if (mx != 0)
-      max_n = detail::min(NumericType(mx), max_n);
+      max_n = (detail::min)(NumericType(mx), max_n);
 
    NumericType min_n = detail::negate(max_n);
    if (mn != 0)
-      min_n = detail::max(NumericType(mn), min_n);
+      min_n = (detail::max)(NumericType(mn), min_n);
 
    static std::random_device                                   rd;
    static std::mt19937                                         gen(rd());
@@ -82,11 +84,11 @@ FloatingPointType get_rand(control_float_type mn = 0, control_float_type mx = 0)
 {
    FloatingPointType max_n = (std::numeric_limits<FloatingPointType>::max)();
    if (mx != 0)
-      max_n = detail::min(FloatingPointType(mx), max_n);
+      max_n = (detail::min)(FloatingPointType(mx), max_n);
 
    FloatingPointType min_n = (std::numeric_limits<FloatingPointType>::lowest)();
    if (mn != 0)
-      min_n = detail::max(FloatingPointType(mn), min_n);
+      min_n = (detail::max)(FloatingPointType(mn), min_n);
 
    static std::random_device                                   rd;
    static std::mt19937                                         gen(rd());
@@ -106,8 +108,8 @@ get_rand(control_float_type mn = 0, control_float_type mx = 0)
    boost::multiprecision::frexp(mx, &max_exp);
    boost::multiprecision::frexp(mn, &min_exp);
 
-   max_exp = std::min(std::numeric_limits<QuadFloatType>::max_exponent, max_exp);
-   min_exp = std::max(std::numeric_limits<QuadFloatType>::min_exponent, min_exp);
+   max_exp = (detail::min)(std::numeric_limits<QuadFloatType>::max_exponent, max_exp);
+   min_exp = (detail::max)(std::numeric_limits<QuadFloatType>::min_exponent, min_exp);
 
    static std::random_device                                          rd;
    static std::mt19937                                                gen(rd());
@@ -158,10 +160,10 @@ int test_constructor()
 
    std::cout << "Testing constructor for ";
    std::cout.width(30);
-   std::cout << typeid(NumericType).name() << "... ";
+   std::cout << boost::core::demangle(typeid(NumericType).name()) << "... ";
 
    int i;
-   for (i = 0; i < 10000; ++i)
+   for (i = 0; i < 100000; ++i)
    {
       NumericType n = get_rand<NumericType>(quad_min, quad_max);
 
@@ -173,8 +175,8 @@ int test_constructor()
       // Check if representation of the cpp_quad_fp_backend is not normalized
       if (rep != d.backend().crep())
       {
-         std::cerr << "[FAILED]\nabnormal representation for " << typeid(NumericType).name() << " = " << n
-                   << " (cpp_quad_fp_backend<" << typeid(FloatingPointType).name() << "> = " << d.backend().raw_str() << ")" << std::endl;
+         std::cerr << "[FAILED]\nabnormal representation for " << boost::core::demangle(typeid(NumericType).name()) << " = " << n
+                   << " (cpp_quad_fp_backend<" << boost::core::demangle(typeid(FloatingPointType).name()) << "> = " << d.backend().raw_str() << ")" << std::endl;
          return -1;
       }
 
@@ -205,7 +207,7 @@ int test_constructors()
    using quad_float_t = boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>;
    quad_float_t a, b;
 
-   std::cout << "Testing cpp_quad_fp_backend< " << typeid(FloatingPointType).name() << " >...\n==="
+   std::cout << "Testing cpp_quad_fp_backend< " << boost::core::demangle(typeid(FloatingPointType).name()) << " >...\n==="
              << std::endl;
 
    int e = 0;
@@ -253,5 +255,13 @@ int main()
    e += test_cpp_quad_float_constructors::test_constructors<boost::multiprecision::float128>();
 #endif
 
-   return e;
+   if (e == 0)
+      std::cout << "TOTAL: PASSED all tests";
+   else
+      std::cout << "TOTAL: FAILED some test(s)";
+
+   std::cout << std::endl
+             << std::endl;
+
+   return ((e == 0) ? 0 : -1);
 }
