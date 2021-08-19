@@ -287,7 +287,7 @@ class cpp_quad_fp_backend
              typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    cpp_quad_fp_backend(UnsignedIntegralType u)
    {
-      typedef std::make_signed<UnsignedIntegralType>::type SignedIntegralType;
+      typedef typename std::make_signed<UnsignedIntegralType>::type SignedIntegralType;
 
       std::get<0>(data) = static_cast<float_type>(u);
 
