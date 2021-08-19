@@ -23,6 +23,7 @@
 #include <numeric>
 
 namespace test_cpp_quad_float_constructors {
+using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<500>, boost::multiprecision::et_off>;
 
 namespace detail {
 
@@ -32,47 +33,99 @@ constexpr T max(T a, T b)
    return ((a > b) ? a : b);
 }
 
+template <typename T>
+constexpr T min(T a, T b)
+{
+   return ((a < b) ? a : b);
+}
+
+template<typename UnsignedIntegralType>
+constexpr typename std::enable_if<   (std::is_integral<UnsignedIntegralType>::value == true)
+                                  && (std::is_unsigned<UnsignedIntegralType>::value == true), UnsignedIntegralType>::type
+negate(UnsignedIntegralType u)
+{
+   return (UnsignedIntegralType) (((UnsignedIntegralType) ~u) + 1U);
+}
+
+template<typename SignedIntegralType>
+constexpr typename std::enable_if<   (std::is_integral<SignedIntegralType>::value == true)
+                                  && (std::is_signed  <SignedIntegralType>::value == true), SignedIntegralType>::type
+negate(SignedIntegralType n)
+{
+   return (SignedIntegralType) detail::negate((unsigned long long) n);
+}
+
 } // namespace detail
 
 template <typename NumericType,
           typename std::enable_if<std::is_integral<NumericType>::value, bool>::type = true>
-NumericType get_rand()
+NumericType get_rand(control_float_type mn = 0, control_float_type mx = 0)
 {
+   NumericType max_n = (std::numeric_limits<NumericType>::max)();
+   if (mx != 0)
+      max_n = detail::min(NumericType(mx), max_n);
+
+   NumericType min_n = detail::negate(max_n);
+   if (mn != 0)
+      min_n = detail::max(NumericType(mn), min_n);
+
    static std::random_device                                   rd;
    static std::mt19937                                         gen(rd());
-   static boost::random::uniform_int_distribution<NumericType> dis(-std::numeric_limits<NumericType>::max(), std::numeric_limits<NumericType>::max());
+   static boost::random::uniform_int_distribution<NumericType> dis(min_n, max_n);
 
    return dis(gen);
 }
 
 template <typename FloatingPointType,
           typename std::enable_if<boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value, bool>::type = true>
-FloatingPointType get_rand()
+FloatingPointType get_rand(control_float_type mn = 0, control_float_type mx = 0)
 {
-   static std::random_device                                          rd;
-   static std::mt19937                                                gen(rd());
-   static boost::random::uniform_real_distribution<FloatingPointType> dis(-std::numeric_limits<FloatingPointType>::max(), std::numeric_limits<FloatingPointType>::max());
+   FloatingPointType max_n = (std::numeric_limits<FloatingPointType>::max)();
+   if (mx != 0)
+      max_n = detail::min(FloatingPointType(mx), max_n);
+
+   FloatingPointType min_n = (std::numeric_limits<FloatingPointType>::lowest)();
+   if (mn != 0)
+      min_n = detail::max(FloatingPointType(mn), min_n);
+
+   static std::random_device                                   rd;
+   static std::mt19937                                         gen(rd());
+   static boost::random::uniform_real_distribution<FloatingPointType> dis(min_n, max_n);
 
    return dis(gen);
 }
 
 template <typename QuadFloatType>
 boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<typename QuadFloatType::backend_type::float_type>>
-get_rand()
+get_rand(control_float_type mn = 0, control_float_type mx = 0)
 {
    using float_type = typename QuadFloatType::backend_type::float_type;
+
+   int max_exp, min_exp;
+
+   boost::multiprecision::frexp(mx, &max_exp);
+   boost::multiprecision::frexp(mn, &min_exp);
+
+   max_exp = std::min(std::numeric_limits<QuadFloatType>::max_exponent, max_exp);
+   min_exp = std::max(std::numeric_limits<QuadFloatType>::min_exponent, min_exp);
 
    static std::random_device                                          rd;
    static std::mt19937                                                gen(rd());
    static boost::random::uniform_real_distribution<float_type> dis(-1.0F, 1.0F);
-   static boost::random::uniform_int_distribution<int>                exponent_dis(std::numeric_limits<QuadFloatType>::min_exponent, std::numeric_limits<QuadFloatType>::max_exponent);
+   static boost::random::uniform_int_distribution<int>                exponent_dis(min_exp, max_exp);
 
-   auto shifted_rand = [&](int i) {
-      return std::ldexp(dis(gen), -i * std::numeric_limits<float_type>::digits);
+   auto shifted_rand = [&](int i)
+   {
+      using std::ldexp;
+      #ifdef BOOST_MATH_USE_FLOAT128
+      using boost::multiprecision::ldexp;
+      #endif
+
+      return ldexp(dis(gen), -i * std::numeric_limits<float_type>::digits);
    };
 
    QuadFloatType out;
-   out.backend() = QuadFloatType::backend_type(shifted_rand(0), shifted_rand(1), shifted_rand(2), shifted_rand(3), true);
+   out.backend() = typename QuadFloatType::backend_type(shifted_rand(0), shifted_rand(1), shifted_rand(2), shifted_rand(3), true);
 
    return boost::multiprecision::ldexp(out, exponent_dis(gen));
 }
@@ -96,9 +149,12 @@ ConstructionType construct_from(const boost::multiprecision::number<boost::multi
 template <typename FloatingPointType, typename NumericType>
 int test_constructor()
 {
-   using quad_float_backend_t = boost::multiprecision::backends::cpp_quad_fp_backend<typename FloatingPointType>;
+   using quad_float_backend_t = boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>;
    using quad_float_t         = boost::multiprecision::number<quad_float_backend_t>;
-   using control_float_type   = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<(detail::max)(std::numeric_limits<quad_float_t>::digits10, std::numeric_limits<NumericType>::digits10) * 2 + 1>, boost::multiprecision::et_off>;
+   using quad_limits          = std::numeric_limits<quad_float_t>;
+
+   control_float_type quad_min = construct_from<control_float_type, quad_float_t>(quad_limits::lowest());
+   control_float_type quad_max = construct_from<control_float_type, quad_float_t>(quad_limits::max());
 
    std::cout << "Testing constructor for ";
    std::cout.width(30);
@@ -107,7 +163,7 @@ int test_constructor()
    int i;
    for (i = 0; i < 10000; ++i)
    {
-      NumericType n = get_rand<NumericType>();
+      NumericType n = get_rand<NumericType>(quad_min, quad_max);
 
       quad_float_t d(n);
 
@@ -194,7 +250,7 @@ int main()
    e += test_cpp_quad_float_constructors::test_constructors<double>();
    e += test_cpp_quad_float_constructors::test_constructors<long double>();
 #ifdef BOOST_MATH_USE_FLOAT128
-   e += test_cpp_quad_constructors::test_constructors<boost::multiprecision::float128>();
+   e += test_cpp_quad_float_constructors::test_constructors<boost::multiprecision::float128>();
 #endif
 
    return e;

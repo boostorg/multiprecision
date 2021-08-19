@@ -1086,9 +1086,12 @@ void eval_exp(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_
       // Get a local copy of the argument and force it to be positive.
       const bool b_neg = x.is_neg();
 
-      quad_float_type xx;
+      quad_float_type xx(x);
 
-      eval_fabs(xx, x);
+      if(b_neg)
+      {
+         xx.negate();
+      }
 
       // Check the range of the input.
 
@@ -1146,8 +1149,7 @@ void eval_exp(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_
          // Taylor series expansion is actually more precise than Pade approximation.
          for (unsigned n = 2U; n < 64U; ++n)
          {
-            x_pow_n_div_n_fact *= xh;
-            x_pow_n_div_n_fact /= local_float_type(n);
+            eval_multiply(x_pow_n_div_n_fact,  xh / local_float_type(n));
 
             int n_tol;
 
