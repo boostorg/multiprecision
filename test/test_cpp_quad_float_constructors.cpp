@@ -121,6 +121,7 @@ int test_constructor()
    using quad_float_backend_t = boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>;
    using quad_float_t         = boost::multiprecision::number<quad_float_backend_t>;
    using control_float_type   = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<(detail::max)(std::numeric_limits<quad_float_t>::digits10, std::numeric_limits<NumericType>::digits10) * 2 + 1>, boost::multiprecision::et_off>;
+   using quad_limits          = std::numeric_limits<quad_float_t>;
 
    std::cout << "Testing constructor for ";
    std::cout.width(30);
@@ -129,7 +130,13 @@ int test_constructor()
    int i;
    for (i = 0; i < 10000; ++i)
    {
-      NumericType n = get_rand<NumericType>();
+      NumericType n;
+
+      do { n = get_rand<NumericType>(); }
+      while
+        (construct_from<control_float_type, NumericType>(n) > construct_from<control_float_type, quad_float_t>(quad_limits::max())
+      || construct_from<control_float_type, NumericType>(n) < construct_from<control_float_type, quad_float_t>(quad_limits::lowest())
+        );
 
       quad_float_t d(n);
 
