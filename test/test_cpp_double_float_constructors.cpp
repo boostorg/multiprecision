@@ -125,7 +125,7 @@ get_rand(control_float_type mn = 0, control_float_type mx = 0)
    };
 
    DoubleFloatType out;
-   out.backend() = typename DoubleFloatType::backend_type(shifted_rand(0), shifted_rand(1), true);
+   out.backend() = typename DoubleFloatType::backend_type(shifted_rand(0), shifted_rand(1));
 
    return boost::multiprecision::ldexp(out, exponent_dis(gen));
 }
