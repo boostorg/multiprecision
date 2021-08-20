@@ -540,10 +540,11 @@ class cpp_double_fp_backend
       data.second = static_cast<float_type>(u_);
    }
 
-   constexpr cpp_double_fp_backend(const float_type& a, const float_type& b, bool normalize = false) : data(std::make_pair(a, b))
+   const cpp_double_fp_backend(const float_type& a, const float_type& b, bool normalize = false) : data(std::make_pair(a, b))
    {
       if (normalize) arithmetic::normalize(data);
    }
+
    constexpr cpp_double_fp_backend(const std::pair<float_type, float_type>& p) : data(p) {}
 
    cpp_double_fp_backend(const std::string& str)
