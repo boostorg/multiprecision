@@ -600,7 +600,7 @@ class cpp_double_fp_backend
    std::string raw_str() const
    {
       std::stringstream ss;
-      ss << std::hexfloat << data.first << " + " << std::hexfloat << data.second;
+      ss << std::hexfloat << std::showpos << data.first << " + " << std::hexfloat << data.second;
       return ss.str();
    }
 
@@ -714,12 +714,13 @@ class cpp_double_fp_backend
       using boost::multiprecision::isfinite;
       using std::isfinite;
 
+      float_type sec = second();
       data = arithmetic::sum(first(), other.first());
 
       if ((isfinite)(first()) == false)
          return *this;
 
-      const rep_type t = arithmetic::sum(second(), other.second());
+      const rep_type t = arithmetic::sum(sec, other.second());
 
       data.second += t.first;
       arithmetic::normalize(data);
@@ -734,12 +735,13 @@ class cpp_double_fp_backend
       using boost::multiprecision::isfinite;
       using std::isfinite;
 
+      float_type sec = second();
       data = arithmetic::difference(first(), other.first());
 
       if ((isfinite)(first()) == false)
          return *this;
 
-      const rep_type t = arithmetic::difference(second(), other.second());
+      const rep_type t = arithmetic::difference(sec, other.second());
 
       data.second += t.first;
       arithmetic::normalize(data);
