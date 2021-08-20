@@ -8,10 +8,13 @@
 //
 // Constructor tests for cpp_double_fp_backend<>
 
-// cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
-// g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_double_float.exe
+#include <cstdlib>
+#include <iostream>
+#include <numeric>
+#include <random>
 
 #include <boost/config.hpp>
+#include <boost/core/demangle.hpp>
 #include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MATH_USE_FLOAT128
 #include <boost/multiprecision/float128.hpp>
@@ -19,107 +22,157 @@
 #include <boost/multiprecision/cpp_double_float.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
-#include <iostream>
-#include <cstdlib>
-#include <random>
-#include <numeric>
+#include <boost/random/uniform_int_distribution.hpp>
 
-namespace test_cpp_double_constructors {
+namespace test_cpp_double_float_constructors {
+using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<100>, boost::multiprecision::et_off>;
+constexpr int TestCases  = 1U << 14;
 
 namespace detail {
 
-template<typename T>
-constexpr T max(T a, T b)
+template <typename T>
+constexpr T(max)(T a, T b)
 {
-  return ((a > b) ? a : b);
+   return ((a > b) ? a : b);
 }
 
+template <typename T>
+constexpr T(min)(T a, T b)
+{
+   return ((a < b) ? a : b);
 }
 
-template <typename FloatingPointType,
-          typename std::enable_if<boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value, bool>::type = true>
-FloatingPointType uniform_real()
+template <typename UnsignedIntegralType>
+constexpr typename std::enable_if<(std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true), UnsignedIntegralType>::type
+negate(UnsignedIntegralType u)
 {
-   static std::random_device                                rd;
-   static std::mt19937                                      gen(rd());
-   static boost::random::uniform_real_distribution<FloatingPointType> dis(0.0, 1.0);
+   return (UnsignedIntegralType)(((UnsignedIntegralType)~u) + 1U);
+}
+
+template <typename SignedIntegralType>
+constexpr typename std::enable_if<(std::is_integral<SignedIntegralType>::value == true) && (std::is_signed<SignedIntegralType>::value == true), SignedIntegralType>::type
+negate(SignedIntegralType n)
+{
+   return (SignedIntegralType)detail::negate((unsigned long long)n);
+}
+
+} // namespace detail
+
+template <typename NumericType,
+          typename std::enable_if<std::is_integral<NumericType>::value, bool>::type = true>
+NumericType get_rand(control_float_type mn = 0, control_float_type mx = 0)
+{
+   NumericType max_n = (std::numeric_limits<NumericType>::max)();
+   if (mx != 0)
+      max_n = (detail::min)(NumericType(mx), max_n);
+
+   NumericType min_n = detail::negate(max_n);
+   if (mn != 0)
+      min_n = (detail::max)(NumericType(mn), min_n);
+
+   static std::random_device                                   rd;
+   static std::mt19937                                         gen(rd());
+   static boost::random::uniform_int_distribution<NumericType> dis(min_n, max_n);
 
    return dis(gen);
 }
 
-template <typename NumericType,
-          typename std::enable_if<std::is_integral<NumericType>::value, bool>::type = true>
-NumericType uniform_integral_number()
-{
-   NumericType out = 0;
-
-   for (int i = 0; i < int(sizeof(NumericType)); ++i)
-      out = (out << 8) + static_cast<NumericType>(std::round(256.0 * uniform_real<float>()));
-
-   return out;
-}
-
-
-template <typename NumericType,
-          typename std::enable_if<std::is_integral<NumericType>::value, bool>::type = true>
-NumericType get_rand()
-{
-   return uniform_integral_number<NumericType>();
-}
-
 template <typename FloatingPointType,
           typename std::enable_if<boost::multiprecision::backends::detail::is_floating_point_or_float128<FloatingPointType>::value, bool>::type = true>
-FloatingPointType get_rand()
+FloatingPointType get_rand(control_float_type mn = 0, control_float_type mx = 0)
 {
-   return uniform_real<FloatingPointType>();
+   FloatingPointType max_n = (std::numeric_limits<FloatingPointType>::max)();
+   if (mx != 0)
+      max_n = (detail::min)(FloatingPointType(mx), max_n);
+
+   FloatingPointType min_n = (std::numeric_limits<FloatingPointType>::lowest)();
+   if (mn != 0)
+      min_n = (detail::max)(FloatingPointType(mn), min_n);
+
+   static std::random_device                                          rd;
+   static std::mt19937                                                gen(rd());
+   static boost::random::uniform_real_distribution<FloatingPointType> dis(min_n, max_n);
+
+   return dis(gen);
 }
 
-template <typename FloatingPointType>
-boost::multiprecision::backends::cpp_double_fp_backend<typename FloatingPointType::float_type> get_rand()
+template <typename DoubleFloatType>
+boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<typename DoubleFloatType::backend_type::float_type> >
+get_rand(control_float_type mn = 0, control_float_type mx = 0)
 {
-   using float_type = typename FloatingPointType::float_type;
-   return boost::multiprecision::backends::cpp_double_fp_backend<float_type>(uniform_real<float_type>()) * boost::multiprecision::backends::cpp_double_fp_backend<float_type>(uniform_real<float_type>());
+   using float_type = typename DoubleFloatType::backend_type::float_type;
+
+   int max_exp, min_exp;
+
+   boost::multiprecision::frexp(mx, &max_exp);
+   boost::multiprecision::frexp(mn, &min_exp);
+
+   max_exp = (detail::min)(std::numeric_limits<DoubleFloatType>::max_exponent, max_exp);
+   min_exp = (detail::max)(std::numeric_limits<DoubleFloatType>::min_exponent, min_exp);
+
+   static std::random_device                                   rd;
+   static std::mt19937                                         gen(rd());
+   static boost::random::uniform_real_distribution<float_type> dis(-1.0F, 1.0F);
+   static boost::random::uniform_int_distribution<int>         exponent_dis(min_exp, max_exp);
+
+   auto shifted_rand = [&](int i) {
+      using std::ldexp;
+#ifdef BOOST_MATH_USE_FLOAT128
+      using boost::multiprecision::ldexp;
+#endif
+
+      return ldexp(dis(gen), -i * std::numeric_limits<float_type>::digits);
+   };
+
+   DoubleFloatType out;
+   out.backend() = typename DoubleFloatType::backend_type(shifted_rand(0), shifted_rand(1), true);
+
+   return boost::multiprecision::ldexp(out, exponent_dis(gen));
 }
 
-template <typename ConstructionType, typename ArithmeticType, typename std::enable_if<std::is_arithmetic<ArithmeticType>::value || boost::multiprecision::backends::detail::is_floating_point_or_float128<ArithmeticType>::value>::type const* = nullptr>
-ConstructionType construct_from(ArithmeticType f)
+template <typename ConstructionType, typename ArithmeticType, typename std::enable_if<(std::is_arithmetic<ArithmeticType>::value || boost::multiprecision::backends::detail::is_floating_point_or_float128<ArithmeticType>::value)>::type const* = nullptr>
+ConstructionType construct_from(const ArithmeticType& f)
 {
    return ConstructionType(f);
 }
 
-template <typename ConstructionType, typename DoubleFloatType, typename std::enable_if<!(std::is_arithmetic<DoubleFloatType>::value || boost::multiprecision::backends::detail::is_floating_point_or_float128<DoubleFloatType>::value)>::type const* = nullptr>
-ConstructionType construct_from(DoubleFloatType f)
+template <typename ConstructionType, typename DoubleFloatType>
+ConstructionType construct_from(const boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<typename DoubleFloatType::backend_type::float_type> >& f)
 {
-   static_assert(std::is_same< boost::multiprecision::backends::cpp_double_fp_backend<typename DoubleFloatType::float_type>
-                 , typename std::decay<DoubleFloatType>::type>::value, "Only double float should come here");
-   return ConstructionType(f.first()) + ConstructionType(f.second());
+   return ConstructionType(f.backend().first()) + ConstructionType(f.backend().second());
 }
 
 template <typename FloatingPointType, typename NumericType>
 int test_constructor()
 {
-   using double_float_t     = boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>;
-   using control_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<(detail::max)(std::numeric_limits<double_float_t>::digits10, std::numeric_limits<NumericType>::digits10) * 2 + 1>, boost::multiprecision::et_off>;
+   using double_float_backend_t = boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>;
+   using double_float_t         = boost::multiprecision::number<double_float_backend_t>;
+   using double_limits          = std::numeric_limits<double_float_t>;
+
+   static_assert(double_limits::digits10 + 5 < std::numeric_limits<control_float_type>::digits10, "Insufficient precision of control_float_type");
+
+   control_float_type double_min = construct_from<control_float_type, double_float_t>(double_limits::lowest());
+   control_float_type double_max = construct_from<control_float_type, double_float_t>(double_limits::max());
 
    std::cout << "Testing constructor for ";
    std::cout.width(30);
-   std::cout << typeid(NumericType).name() << "... ";
+   std::cout << boost::core::demangle(typeid(NumericType).name()) << "... ";
 
    int i;
-   for (i = 0; i < 10000; ++i)
+   for (i = 0; i < TestCases; ++i)
    {
-      NumericType n = get_rand<NumericType>();
+      NumericType n = get_rand<NumericType>(double_min, double_max);
 
       double_float_t d(n);
 
-      typename double_float_t::rep_type rep(d.rep());
-      double_float_t::normalize_pair(rep);
+      typename double_float_backend_t::rep_type rep(d.backend().crep());
+      double_float_backend_t::arithmetic::normalize(rep);
 
       // Check if representation of the cpp_double_fp_backend is not normalized
-      if (rep != d.rep())
+      if (rep != d.backend().crep())
       {
-         std::cerr << "[FAILED]\nabnormal representation for " << typeid(NumericType).name() << " = " << n
-                   << " (cpp_double_fp_backend<" << typeid(FloatingPointType).name() << "> = " << d.get_raw_str() << ")" << std::endl;
+         std::cerr << "[FAILED]\nabnormal representation for " << boost::core::demangle(typeid(NumericType).name()) << " = " << n
+                   << " (cpp_double_fp_backend<" << boost::core::demangle(typeid(FloatingPointType).name()) << "> = " << d.backend().raw_str() << ")" << std::endl;
          return -1;
       }
 
@@ -129,14 +182,16 @@ int test_constructor()
 
       using boost::multiprecision::fabs;
 
-      if (fabs(1- fabs(n_prime / d_prime)) > MaxError)
+      if (fabs(1 - fabs(n_prime / d_prime)) > MaxError)
       {
-            std::cerr << "[FAILED] exceeded acceptable error (n = " << n << ")" << std::endl;
-            return -1;
+         std::cerr << "[FAILED] exceeded acceptable error (n = " << n << ")" << std::endl;
+         std::cerr << "error    : " << fabs(1 - fabs(n_prime / d_prime)) << std::endl
+                   << "tolerance: " << MaxError << std::endl;
+         return -1;
       }
    }
 
-   std::cout << "ok (" << i << " cases tested)" << std::endl;
+   std::cout << "ok" << std::endl;
 
    return 0;
 }
@@ -148,8 +203,8 @@ int test_constructors()
    using double_float_t = boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>;
    double_float_t a, b;
 
-   std::cout << "Testing cpp_double_fp_backend< " << typeid(FloatingPointType).name() << " >...\n==="
-             << std::endl;
+   std::cout << "Testing cpp_double_fp_backend< " << boost::core::demangle(typeid(FloatingPointType).name()) << " >";
+   std::cout << " [" << TestCases << " cases per test]" << "...\n=== " << std::endl;
 
    int e = 0;
 
@@ -167,11 +222,12 @@ int test_constructors()
 #ifdef BOOST_MATH_USE_FLOAT128
    e += test_constructor<FloatingPointType, boost::multiprecision::float128>();
 #endif
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<float>>();
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<double>>();
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<long double>>();
+
+   e += test_constructor<FloatingPointType, boost::multiprecision::cpp_double_float>();
+   e += test_constructor<FloatingPointType, boost::multiprecision::cpp_double_double>();
+   e += test_constructor<FloatingPointType, boost::multiprecision::cpp_double_long_double>();
 #ifdef BOOST_MATH_USE_FLOAT128
-   e += test_constructor<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<boost::multiprecision::float128>>();
+   e += test_constructor<FloatingPointType, boost::multiprecision::cpp_double_float128>();
 #endif
 
    if (e == 0)
@@ -184,18 +240,26 @@ int test_constructors()
 
    return e;
 }
-} // namespace test_cpp_double_constructors
+} // namespace test_cpp_double_float_constructors
 
 int main()
 {
    int e = 0;
-
-   e += test_cpp_double_constructors::test_constructors<float>();
-   e += test_cpp_double_constructors::test_constructors<double>();
-   e += test_cpp_double_constructors::test_constructors<long double>();
+   
+   e += test_cpp_double_float_constructors::test_constructors<float>();
+   e += test_cpp_double_float_constructors::test_constructors<double>();
+   e += test_cpp_double_float_constructors::test_constructors<long double>();
 #ifdef BOOST_MATH_USE_FLOAT128
-   e += test_cpp_double_constructors::test_constructors<boost::multiprecision::float128>();
+   e += test_cpp_double_float_constructors::test_constructors<boost::multiprecision::float128>();
 #endif
 
-   return e;
+   if (e == 0)
+      std::cout << "TOTAL: PASSED all tests";
+   else
+      std::cout << "TOTAL: FAILED some test(s)";
+
+   std::cout << std::endl
+             << std::endl;
+
+   return ((e == 0) ? 0 : -1);
 }
