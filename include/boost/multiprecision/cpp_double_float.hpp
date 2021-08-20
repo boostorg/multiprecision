@@ -517,41 +517,31 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend(const IntegralType& f) : data(std::make_pair(static_cast<float_type>(f), (float_type)0)) {}
 
    // Constructors from integers which hold more information than *this can contain
+   template <typename SignedIntegralType,
+             typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true) && (std::is_signed<SignedIntegralType>::value == true) && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   cpp_double_fp_backend(SignedIntegralType n)
+   {
+      data.first = static_cast<float_type>(n);
+      n -= static_cast<SignedIntegralType>(std::get<0>(data));
+
+      data.second = static_cast<float_type>(n);
+   }
+
    template <typename UnsignedIntegralType,
              typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    cpp_double_fp_backend(UnsignedIntegralType u)
    {
-      constexpr int MantissaBits = std::numeric_limits<float_type>::digits - 1;
+      typedef typename std::make_signed<UnsignedIntegralType>::type SignedIntegralType;
 
-      int bit_index = sizeof(UnsignedIntegralType) * 8;
+      data.first = static_cast<float_type>(u);
 
-      for (;;)
-      {
-         // Mask the maximum number of bits that can be stored without
-         // precision loss in a single FloatingPointType, then sum and shift
-         UnsignedIntegralType hi = u >> (std::max)(bit_index - MantissaBits, 0);
-         u &= ~(hi << (std::max)(bit_index - MantissaBits, 0));
+      SignedIntegralType u_ = SignedIntegralType(u - static_cast<UnsignedIntegralType>(std::get<0>(data)));
 
-         *this += static_cast<FloatingPointType>(hi); // sum
-
-         bit_index -= MantissaBits;
-
-         if (bit_index < 0)
-            break;
-         else // shift
-            eval_ldexp(*this, *this, (std::min)(MantissaBits, bit_index));
-      }
-   }
-
-   template <typename SignedIntegralType,
-             typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true) && (std::is_signed<SignedIntegralType>::value == true) && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   cpp_double_fp_backend(SignedIntegralType n) : cpp_double_fp_backend(static_cast<typename std::make_unsigned<SignedIntegralType>::type>(std::abs(n)))
-   {
-      if (n < 0)
-         *this = -*this;
+      data.second = static_cast<float_type>(u_);
    }
 
    constexpr cpp_double_fp_backend(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
+
    constexpr cpp_double_fp_backend(const std::pair<float_type, float_type>& p) : data(p) {}
 
    cpp_double_fp_backend(const std::string& str)
@@ -607,10 +597,10 @@ class cpp_double_fp_backend
    const rep_type& crep() const { return data; }
 
    // Retrieve debug string.
-   std::string get_raw_str() const
+   std::string raw_str() const
    {
       std::stringstream ss;
-      ss << std::hexfloat << data.first << " + " << std::hexfloat << data.second;
+      ss << std::hexfloat << std::showpos << data.first << " + " << std::hexfloat << data.second;
       return ss.str();
    }
 
@@ -721,15 +711,16 @@ class cpp_double_fp_backend
    // Unary add/sub/mul/div.
    cpp_double_fp_backend& operator+=(const cpp_double_fp_backend& other)
    {
-      const rep_type t = arithmetic::sum(second(), other.second());
-
-      data = arithmetic::sum(first(), other.first());
-
       using boost::multiprecision::isfinite;
       using std::isfinite;
 
+      float_type sec = second();
+      data = arithmetic::sum(first(), other.first());
+
       if ((isfinite)(first()) == false)
          return *this;
+
+      const rep_type t = arithmetic::sum(sec, other.second());
 
       data.second += t.first;
       arithmetic::normalize(data);
@@ -741,14 +732,16 @@ class cpp_double_fp_backend
 
    cpp_double_fp_backend& operator-=(const cpp_double_fp_backend& other)
    {
-      const rep_type t = arithmetic::difference(second(), other.second());
-      data             = arithmetic::difference(first(), other.first());
-
       using boost::multiprecision::isfinite;
       using std::isfinite;
 
+      float_type sec = second();
+      data = arithmetic::difference(first(), other.first());
+
       if ((isfinite)(first()) == false)
          return *this;
+
+      const rep_type t = arithmetic::difference(sec, other.second());
 
       data.second += t.first;
       arithmetic::normalize(data);
