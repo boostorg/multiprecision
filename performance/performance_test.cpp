@@ -3,9 +3,14 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#define TEST_CPP_QUAD_FLOAT
-//#define TEST_CPP_BIN_FLOAT
+#define TEST_CPP_DOUBLE_FLOAT
+//#define TEST_CPP_QUAD_FLOAT
+#define TEST_CPP_BIN_FLOAT
 
+constexpr int TestBits = 1U << 16;
+#if defined(TEST_CPP_QUAD_FLOAT) && defined(TEST_CPP_DOUBLE_FLOAT)
+#error "Cannot test both cpp_quad_fp_backend and cpp_double_fp_backend at the same time!"
+#endif
 // g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/performance -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/test -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DTEST_CPP_QUAD_FLOAT test.cpp -o test_perf.exe
 
 #include "performance_test.hpp"
@@ -148,11 +153,18 @@ int main()
 
    #if defined(TEST_CPP_QUAD_FLOAT)
    test53();
-   #elif defined(TEST_CPP_BIN_FLOAT)
+   #endif
+   #if defined(TEST_CPP_DOUBLE_FLOAT)
+   test43();
+   #endif
+   #if defined(TEST_CPP_BIN_FLOAT)
    test33();
    #endif
 
    quickbook_results();
+
+   std::cin.get();
+
    return 0;
 }
 
@@ -175,10 +187,32 @@ void test53()
 {
    using quad_float_of_double_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<local_float_constituent_type>, boost::multiprecision::et_off>;
 
-   test<quad_float_of_double_type>("cpp_quad_fp_backend", 1024*16);
+   test<quad_float_of_double_type>("cpp_quad_fp_backend", TestBits);
 }
+#endif
 
-#elif defined(TEST_CPP_BIN_FLOAT)
+#if defined(TEST_CPP_DOUBLE_FLOAT)
+
+///////////////////////////////////////////////////////////////
+//  Copyright 2019 John Maddock. Distributed under the Boost
+//  Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+
+//#include "performance_test.hpp"
+#if defined(BOOST_MATH_USE_FLOAT128)
+#include <boost/multiprecision/float128.hpp>
+#endif
+#include <boost/multiprecision/cpp_quad_float.hpp>
+
+void test43()
+{
+   using double_float_of_double_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<local_float_constituent_type>, boost::multiprecision::et_off>;
+
+   test<double_float_of_double_type>("cpp_double_fp_backend", TestBits);
+}
+#endif
+
+#if defined(TEST_CPP_BIN_FLOAT)
 
 ///////////////////////////////////////////////////////////////
 //  Copyright 2019 John Maddock. Distributed under the Boost
@@ -189,11 +223,15 @@ void test53()
 
 void test33()
 {
-   constexpr int my_digits10 = (int) (float((std::numeric_limits<local_float_constituent_type>::digits * 4) - 1) * 0.301F);
+  #ifdef TEST_CPP_DOUBLE_FLOAT
+   constexpr int my_digits10 = (int) (float((std::numeric_limits<local_float_constituent_type>::digits * 2) - 1) * 0.301F);
+  #elif defined(TEST_CPP_QUAD_FLOAT)
+   constexpr int my_digits10 = (int)(float((std::numeric_limits<local_float_constituent_type>::digits * 4) - 1) * 0.301F);
+  #endif
 
    using cpp_bin_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<my_digits10>, boost::multiprecision::et_off>;
 
-   test<cpp_bin_float_type>("cpp_bin_float", 1024*16);
+   test<cpp_bin_float_type>("cpp_bin_float", TestBits);
 }
 
 #endif
