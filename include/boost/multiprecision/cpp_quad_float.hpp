@@ -31,89 +31,128 @@
 namespace boost { namespace multiprecision { namespace backends {
 
 template <typename FloatingPointType>
-class cpp_quad_float;
+class cpp_quad_fp_backend;
 
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator+(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b);
+inline cpp_quad_fp_backend<FloatingPointType> operator+(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator-(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b);
+inline cpp_quad_fp_backend<FloatingPointType> operator-(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator*(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b);
+inline cpp_quad_fp_backend<FloatingPointType> operator*(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator/(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b);
+inline cpp_quad_fp_backend<FloatingPointType> operator/(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b);
 
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator+(const cpp_quad_float<FloatingPointType>& a, const FloatingPointType& b);
+inline cpp_quad_fp_backend<FloatingPointType> operator+(const cpp_quad_fp_backend<FloatingPointType>& a, const FloatingPointType& b);
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator-(const cpp_quad_float<FloatingPointType>& a, const FloatingPointType& b);
+inline cpp_quad_fp_backend<FloatingPointType> operator-(const cpp_quad_fp_backend<FloatingPointType>& a, const FloatingPointType& b);
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator*(const cpp_quad_float<FloatingPointType>& a, const FloatingPointType& b);
+inline cpp_quad_fp_backend<FloatingPointType> operator*(const cpp_quad_fp_backend<FloatingPointType>& a, const FloatingPointType& b);
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator/(const cpp_quad_float<FloatingPointType>& a, const FloatingPointType& b);
+inline cpp_quad_fp_backend<FloatingPointType> operator/(const cpp_quad_fp_backend<FloatingPointType>& a, const FloatingPointType& b);
 
 template <typename FloatingPointType>
-inline bool operator<(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b);
+inline bool operator<(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-inline bool operator<=(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b);
+inline bool operator<=(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-inline bool operator==(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b);
+inline bool operator==(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-inline bool operator!=(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b);
+inline bool operator!=(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-inline bool operator>=(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b);
+inline bool operator>=(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-inline bool operator>(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b);
+inline bool operator>(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b);
 
 template <typename FloatingPointType>
-void eval_add(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x);
-template <typename FloatingPointType>
-void eval_subtract(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x);
-template <typename FloatingPointType>
-void eval_multiply(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x);
-template <typename FloatingPointType>
-void eval_divide(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x);
+void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x);
 
 template <typename FloatingPointType>
-void eval_fabs(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& a);
-template <typename FloatingPointType>
-void eval_frexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& a, int* v);
-template <typename FloatingPointType>
-void eval_ldexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& a, int v);
-template <typename FloatingPointType>
-void eval_floor(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x);
-template <typename FloatingPointType>
-void eval_ceil(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x);
-template <typename FloatingPointType>
-void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& o);
-template <typename FloatingPointType>
-void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& o);
+void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y);
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const* = nullptr>
+void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a);
 
 template <typename FloatingPointType>
-int eval_fpclassify(const cpp_quad_float<FloatingPointType>& o);
+void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x);
+
+template <typename FloatingPointType>
+void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y);
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const* = nullptr>
+void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a);
+
+template <typename FloatingPointType>
+void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x);
+
+template <typename FloatingPointType>
+void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y);
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const* = nullptr>
+void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a);
+
+template <typename FloatingPointType>
+void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x);
+
+template <typename FloatingPointType>
+void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y);
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const* = nullptr>
+void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a);
+
+template <typename FloatingPointType>
+void eval_fabs(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& a);
+template <typename FloatingPointType>
+void eval_frexp(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& a, int* v);
+template <typename FloatingPointType>
+void eval_ldexp(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& a, int v);
+template <typename FloatingPointType>
+void eval_floor(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x);
+template <typename FloatingPointType>
+void eval_ceil(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x);
+template <typename FloatingPointType>
+void eval_sqrt(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& o);
+template <typename FloatingPointType>
+void eval_exp(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& o);
+
+template <typename FloatingPointType>
+int eval_fpclassify(const cpp_quad_fp_backend<FloatingPointType>& o);
 
 template <typename FloatingPointType,
           typename R>
-typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_to(R* result, const cpp_quad_float<FloatingPointType>& backend);
+typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_to(R* result, const cpp_quad_fp_backend<FloatingPointType>& backend);
 
 template <typename FloatingPointType,
           typename R>
-typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_to(R* result, const cpp_quad_float<FloatingPointType>& backend);
+typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_to(R* result, const cpp_quad_fp_backend<FloatingPointType>& backend);
 
 template <typename FloatingPointType,
           typename char_type,
           typename traits_type>
 std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os,
-                                                       const cpp_quad_float<FloatingPointType>&  f);
+                                                       const cpp_quad_fp_backend<FloatingPointType>&  f);
 
 template <typename FloatingPointType>
-std::size_t hash_value(const cpp_quad_float<FloatingPointType>& a);
+std::size_t hash_value(const cpp_quad_fp_backend<FloatingPointType>& a);
 
 }}} // namespace boost::multiprecision::backends
 
 namespace boost { namespace math {
 
 template <typename FloatingPointType>
-int (fpclassify)(const boost::multiprecision::backends::cpp_quad_float<FloatingPointType>& o);
+int (fpclassify)(const boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>& o);
 
 }} // namespace boost::math
 
@@ -122,29 +161,29 @@ namespace std {
 // Foward declarations of various specializations of std::numeric_limits
 
 template <typename FloatingPointType>
-class numeric_limits<boost::multiprecision::backends::cpp_quad_float<FloatingPointType> >;
+class numeric_limits<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType> >;
 
 template <typename FloatingPointType,
           const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >;
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >;
 
 } // namespace std
 
 namespace boost { namespace multiprecision {
 
 template <typename FloatingPointType>
-struct number_category<backends::cpp_quad_float<FloatingPointType> >
+struct number_category<backends::cpp_quad_fp_backend<FloatingPointType> >
     : public std::integral_constant<int, number_kind_floating_point>
 {};
 
 namespace backends {
 
-// A cpp_quad_float is represented by an unevaluated sum of four floating-point
+// A cpp_quad_fp_backend is represented by an unevaluated sum of four floating-point
 // units (say a[0...n]) which satisfy |a[i+1]| <= (1 / 2) * ulp(a[i]).
 // The type of the floating-point constituents should adhere to IEEE754.
 
 template <typename FloatingPointType>
-class cpp_quad_float
+class cpp_quad_fp_backend
 {
  public:
    using float_type = FloatingPointType;
@@ -169,21 +208,21 @@ class cpp_quad_float
                  "Error: floating-point constituent does not have wide enough exponent range");
 
    // Default constructor.
-   cpp_quad_float() {}
+   cpp_quad_fp_backend() {}
 
    // Copy constructor.
-   constexpr cpp_quad_float(const cpp_quad_float&) = default;
+   constexpr cpp_quad_fp_backend(const cpp_quad_fp_backend&) = default;
 
    // Constructors from other floating-point types.
    template <typename OtherFloatType,
              typename std::enable_if<(detail::is_floating_point_or_float128<OtherFloatType>::value == true) && (std::numeric_limits<OtherFloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
-   constexpr cpp_quad_float(const OtherFloatType& f) : data(std::make_tuple(f, (float_type)0, (float_type)0, (float_type)0)) {}
+   constexpr cpp_quad_fp_backend(const OtherFloatType& f) : data(std::make_tuple(f, (float_type)0, (float_type)0, (float_type)0)) {}
 
-   constexpr cpp_quad_float(const rep_type& r) : data(r) {}
+   constexpr cpp_quad_fp_backend(const rep_type& r) : data(r) {}
 
    template <typename OtherFloatType,
              typename std::enable_if<((std::numeric_limits<OtherFloatType>::is_iec559 == true) && (std::numeric_limits<OtherFloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   cpp_quad_float(const OtherFloatType& f)
+   cpp_quad_fp_backend(const OtherFloatType& f)
    {
       using std::get;
       get<0>(data) = static_cast<float_type>(f);
@@ -192,76 +231,98 @@ class cpp_quad_float
       get<3>(data) = static_cast<float_type>(f - (OtherFloatType)get<2>(data) - (OtherFloatType)get<1>(data) - (OtherFloatType)get<0>(data));
    }
 
-   // Constructor from other cpp_quad_float<> objects.
+   // Constructor from other cpp_quad_fp_backend<> objects.
    template <typename OtherFloatType,
              typename std::enable_if<((std::is_floating_point<OtherFloatType>::value == true) && (std::is_same<FloatingPointType, OtherFloatType>::value == false))>::type const* = nullptr>
-   cpp_quad_float(const cpp_quad_float<OtherFloatType>& a)
+   cpp_quad_fp_backend(const cpp_quad_fp_backend<OtherFloatType>& a)
    {
       using std::get;
       using precise_type =
-         typename std::conditional<(std::numeric_limits<OtherFloatType>::digits > std::numeric_limits<float_type>::digits), cpp_quad_float, float_type>::type;
+         typename std::conditional<(std::numeric_limits<OtherFloatType>::digits > std::numeric_limits<float_type>::digits), cpp_quad_fp_backend, float_type>::type;
 
       *this += (precise_type)get<0>(a.rep());
       *this += (precise_type)get<1>(a.rep());
       *this += (precise_type)get<2>(a.rep());
       *this += (precise_type)get<3>(a.rep());
-      //data = rep_type((float_type)get<0>(a.rep()), (float_type)get<1>(a.rep()), (float_type)get<2>(a.rep()), (float_type)get<3>(a.rep()));
-      //arithmetic::normalize(data);
+   }
+
+   // Constructor from four float_types
+   cpp_quad_fp_backend(const float_type& f1, const float_type& f2, const float_type& f3, const float_type& f4, bool normalize = false)
+       : data(std::make_tuple(f1, f2, f3, f4))
+   {
+      if (normalize) arithmetic::normalize(data);
    }
 
    // Constructors from integers which can be easily fit into underlying floating-point type
    template <typename IntegralType,
              typename std::enable_if<((std::is_integral<IntegralType>::value == true) && (std::numeric_limits<IntegralType>::digits <= std::numeric_limits<FloatingPointType>::digits))>::type const* = nullptr>
-   constexpr cpp_quad_float(const IntegralType& f) : data(std::make_tuple(static_cast<float_type>(f), (float_type)0, (float_type)0, (float_type)0)) {}
+   constexpr cpp_quad_fp_backend(const IntegralType& f) : data(std::make_tuple(static_cast<float_type>(f), (float_type)0, (float_type)0, (float_type)0)) {}
+
+   template <typename SignedIntegralType,
+             typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true) && (std::is_signed<SignedIntegralType>::value == true) && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   cpp_quad_fp_backend(SignedIntegralType n)
+   {
+      std::get<0>(data) = static_cast<float_type>(n);
+      n -= static_cast<SignedIntegralType>(std::get<0>(data));
+
+      std::get<1>(data) = static_cast<float_type>(n);
+
+      // TODO test for 128-bit int
+      if (std::numeric_limits<SignedIntegralType>::digits < 2 * std::numeric_limits<float_type>::digits)
+      {
+         return;
+      }
+      else
+      {
+         n -= static_cast<SignedIntegralType>(std::get<1>(data));
+         std::get<2>(data) = static_cast<float_type>(n);
+
+         n -= static_cast<SignedIntegralType>(std::get<2>(data));
+         std::get<3>(data) = static_cast<float_type>(n);
+      }
+   }
 
    // Constructors from integers which hold more information than *this can contain
    template <typename UnsignedIntegralType,
              typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   cpp_quad_float(UnsignedIntegralType u)
+   cpp_quad_fp_backend(UnsignedIntegralType u)
    {
-      constexpr int MantissaBits = std::numeric_limits<FloatingPointType>::digits - 1;
+      typedef typename std::make_signed<UnsignedIntegralType>::type SignedIntegralType;
 
-      int bit_index = sizeof(UnsignedIntegralType) * 8;
+      std::get<0>(data) = static_cast<float_type>(u);
 
-      for (;;)
+      SignedIntegralType u_ = SignedIntegralType(u - static_cast<UnsignedIntegralType>(std::get<0>(data)));
+
+      std::get<1>(data) = static_cast<float_type>(u_);
+
+      // TODO test for 128-bit int
+      if (std::numeric_limits<UnsignedIntegralType>::digits < 2 * std::numeric_limits<float_type>::digits)
       {
-         // Mask the maximum number of bits that can be stored without
-         // precision loss in a single FloatingPointType, then sum and shift
-         UnsignedIntegralType hi = u >> (std::max)(bit_index - MantissaBits, 0);
-         u &= ~(hi << (std::max)(bit_index - MantissaBits, 0));
+         return;
+      }
+      else
+      {
+         u_ -= static_cast<SignedIntegralType>(std::get<1>(data));
+         std::get<2>(data) = static_cast<float_type>(u_);
 
-         *this += static_cast<FloatingPointType>(hi); // sum
-
-         bit_index -= MantissaBits;
-
-         if (bit_index < 0)
-            break;
-         else // shift
-            eval_ldexp(*this, *this, (std::min)(MantissaBits, bit_index));
+         u_ -= static_cast<SignedIntegralType>(std::get<2>(data));
+         std::get<3>(data) = static_cast<float_type>(u_);
       }
    }
 
-   template <typename SignedIntegralType,
-             typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true) && (std::is_signed<SignedIntegralType>::value == true) && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   cpp_quad_float(SignedIntegralType n) : cpp_quad_float(static_cast<typename std::make_unsigned<SignedIntegralType>::type>(std::abs(n)))
-   {
-      if (n < 0)
-         *this = -*this;
-   }
-
-   cpp_quad_float(const std::string& str)
+   cpp_quad_fp_backend(const std::string& str)
    {
       boost::multiprecision::detail::convert_from_string(*this, str.c_str());
    }
 
-   cpp_quad_float(const char* pstr)
+   cpp_quad_fp_backend(const char* pstr)
    {
       boost::multiprecision::detail::convert_from_string(*this, pstr);
    }
 
-   constexpr cpp_quad_float(cpp_quad_float&&) = default;
+   constexpr cpp_quad_fp_backend(cpp_quad_fp_backend&&) = default;
 
-   ~cpp_quad_float() = default;
+   ~cpp_quad_fp_backend() = default;
 
    std::size_t hash() const
    {
@@ -280,17 +341,17 @@ class cpp_quad_float
    }
 
    // Methods
-   constexpr cpp_quad_float negative() const
+   constexpr cpp_quad_fp_backend negative() const
    {
      using std::get;
-     return cpp_quad_float(std::make_tuple(-get<0>(data), -get<1>(data), -get<2>(data), -get<3>(data)));
+     return cpp_quad_fp_backend(std::make_tuple(-get<0>(data), -get<1>(data), -get<2>(data), -get<3>(data)));
    }
 
    constexpr bool is_neg() const { return get<0>(data) < 0; }
    constexpr bool is_negative() const { return is_neg(); }
 
-   bool is_zero() const { return (compare(cpp_quad_float(0U)) == 0); }
-   bool is_one() const { return (compare(cpp_quad_float(1U)) == 0); }
+   bool is_zero() const { return (compare(cpp_quad_fp_backend(0U)) == 0); }
+   bool is_one() const { return (compare(cpp_quad_fp_backend(1U)) == 0); }
 
    void negate()
    {
@@ -302,18 +363,18 @@ class cpp_quad_float
    const rep_type& crep() const { return data; }
 
    // Assignment operators.
-   cpp_quad_float& operator=(const cpp_quad_float&) = default;
+   cpp_quad_fp_backend& operator=(const cpp_quad_fp_backend&) = default;
 
-   cpp_quad_float& operator=(cpp_quad_float&&) = default;
+   cpp_quad_fp_backend& operator=(cpp_quad_fp_backend&&) = default;
 
    // Non-member add/sub/mul/div with constituent type.
-   friend inline cpp_quad_float operator+(const cpp_quad_float& a, const float_type& b) { return cpp_quad_float(a) += b; }
-   friend inline cpp_quad_float operator-(const cpp_quad_float& a, const float_type& b) { return cpp_quad_float(a) -= b; }
-   friend inline cpp_quad_float operator*(const cpp_quad_float& a, const float_type& b) { return cpp_quad_float(a) *= b; }
-   friend inline cpp_quad_float operator/(const cpp_quad_float& a, const float_type& b) { return cpp_quad_float(a) /= b; }
+   friend inline cpp_quad_fp_backend operator+(const cpp_quad_fp_backend& a, const float_type& b) { return cpp_quad_fp_backend(a) += b; }
+   friend inline cpp_quad_fp_backend operator-(const cpp_quad_fp_backend& a, const float_type& b) { return cpp_quad_fp_backend(a) -= b; }
+   friend inline cpp_quad_fp_backend operator*(const cpp_quad_fp_backend& a, const float_type& b) { return cpp_quad_fp_backend(a) *= b; }
+   friend inline cpp_quad_fp_backend operator/(const cpp_quad_fp_backend& a, const float_type& b) { return cpp_quad_fp_backend(a) /= b; }
 
    // Unary add/sub/mul/div.
-   cpp_quad_float& operator+=(const float_type& other)
+   cpp_quad_fp_backend& operator+=(const float_type& other)
    {
      using std::tie;
      using std::get;
@@ -332,7 +393,7 @@ class cpp_quad_float
       return *this;
    }
 
-   cpp_quad_float& operator+=(const cpp_quad_float& other)
+   cpp_quad_fp_backend& operator+=(const cpp_quad_fp_backend& other)
    {
       using std::array;
       using std::fabs;
@@ -424,19 +485,19 @@ class cpp_quad_float
       return *this;
    }
 
-   cpp_quad_float& operator-=(const cpp_quad_float& other)
+   cpp_quad_fp_backend& operator-=(const cpp_quad_fp_backend& other)
    {
       *this += -other;
       return *this;
    }
 
-   cpp_quad_float& operator-=(const float_type& other)
+   cpp_quad_fp_backend& operator-=(const float_type& other)
    {
       *this += -other;
       return *this;
    }
 
-   cpp_quad_float& operator*=(const cpp_quad_float& other)
+   cpp_quad_fp_backend& operator*=(const cpp_quad_fp_backend& other)
    {
       using std::get;
       using std::isfinite;
@@ -517,10 +578,10 @@ class cpp_quad_float
       return *this;
    }
 
-   cpp_quad_float& operator*=(const float_type& other)
+   cpp_quad_fp_backend& operator*=(const float_type& other)
    {
-     using std::tie;
-     using std::get;
+      using std::tie;
+      using std::get;
 
       rep_type p, s;
       float_type q0, q1, q2;
@@ -549,7 +610,7 @@ class cpp_quad_float
       return *this;
    }
 
-   cpp_quad_float& operator/=(const cpp_quad_float& other)
+   cpp_quad_fp_backend& operator/=(const cpp_quad_fp_backend& other)
    {
       using std::get;
       using std::isfinite;
@@ -559,7 +620,7 @@ class cpp_quad_float
       #endif
 
       rep_type       q;
-      cpp_quad_float r;
+      cpp_quad_fp_backend r;
 
       get<0>(q) = get<0>(this->data) / get<0>(other.data);
 
@@ -586,35 +647,35 @@ class cpp_quad_float
    }
 
    // Unary add/sub/mul/div with constituent part.
-   cpp_quad_float& operator/=(const float_type& a)
+   cpp_quad_fp_backend& operator/=(const float_type& a)
    {
-      *this /= cpp_quad_float(a);
+      *this /= cpp_quad_fp_backend(a);
       return *this;
    }
 
-   cpp_quad_float operator++(int)
+   cpp_quad_fp_backend operator++(int)
    {
-      cpp_quad_float t(*this);
+      cpp_quad_fp_backend t(*this);
       ++*this;
       return t;
    }
 
-   cpp_quad_float operator--(int)
+   cpp_quad_fp_backend operator--(int)
    {
-      cpp_quad_float t(*this);
+      cpp_quad_fp_backend t(*this);
       --*this;
       return t;
    }
 
-   cpp_quad_float& operator++() { return *this += cpp_quad_float<float_type>(float_type(1.0F)); }
-   cpp_quad_float& operator--() { return *this -= cpp_quad_float<float_type>(float_type(1.0F)); }
+   cpp_quad_fp_backend& operator++() { return *this += cpp_quad_fp_backend<float_type>(float_type(1.0F)); }
+   cpp_quad_fp_backend& operator--() { return *this -= cpp_quad_fp_backend<float_type>(float_type(1.0F)); }
 
-   cpp_quad_float  operator-() const { return negative(); }
+   cpp_quad_fp_backend  operator-() const { return negative(); }
 
    // Helper functions
-   static cpp_quad_float<float_type> pow10(int p)
+   static cpp_quad_fp_backend<float_type> pow10(int p)
    {
-      using local_float_type = cpp_quad_float;
+      using local_float_type = cpp_quad_fp_backend;
 
       local_float_type result;
 
@@ -661,7 +722,7 @@ class cpp_quad_float
       return result;
    }
 
-   void swap(cpp_quad_float& other)
+   void swap(cpp_quad_fp_backend& other)
    {
       rep_type tmp = data;
       data = other.data;
@@ -669,7 +730,7 @@ class cpp_quad_float
    }
 
    // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
-   int compare(const cpp_quad_float& other) const
+   int compare(const cpp_quad_fp_backend& other) const
    {
       using std::get;
       int n_result;
@@ -728,7 +789,7 @@ class cpp_quad_float
       return e2;
    }
 
-   static cpp_quad_float my_value_max() noexcept
+   static cpp_quad_fp_backend my_value_max() noexcept
    {
       using std::ldexp;
       using std::sqrt;
@@ -736,7 +797,7 @@ class cpp_quad_float
       using boost::multiprecision::ldexp;
       using boost::multiprecision::sqrt;
 #endif
-      return cpp_quad_float
+      return cpp_quad_fp_backend
       (
         arithmetic::four_sum
         (
@@ -748,17 +809,17 @@ class cpp_quad_float
       );
    }
 
-   static cpp_quad_float my_value_min() noexcept
+   static cpp_quad_fp_backend my_value_min() noexcept
    {
       using std::ldexp;
 #if defined(BOOST_MATH_USE_FLOAT128)
       using boost::multiprecision::ldexp;
 #endif
 
-      return cpp_quad_float(ldexp(float_type(1), std::numeric_limits<float_type>::min_exponent));
+      return cpp_quad_fp_backend(ldexp(float_type(1), std::numeric_limits<float_type>::min_exponent));
    }
 
-   static cpp_quad_float my_value_eps() noexcept
+   static cpp_quad_fp_backend my_value_eps() noexcept
    {
       using std::ldexp;
 #if defined(BOOST_MATH_USE_FLOAT128)
@@ -766,18 +827,18 @@ class cpp_quad_float
 #endif
 
       // TBD: Need a better value here.
-      return []() -> cpp_quad_float {
-         cpp_quad_float result;
+      return []() -> cpp_quad_fp_backend {
+         cpp_quad_fp_backend result;
 
-         eval_ldexp(result, cpp_quad_float(1), 6 - my_digits);
+         eval_ldexp(result, cpp_quad_fp_backend(1), 6 - my_digits);
 
          return result;
       }();
    }
 
-   static constexpr cpp_quad_float my_value_nan() noexcept
+   static constexpr cpp_quad_fp_backend my_value_nan() noexcept
    {
-      return cpp_quad_float(std::numeric_limits<float_type>::quiet_NaN());
+      return cpp_quad_fp_backend(std::numeric_limits<float_type>::quiet_NaN());
    }
 
  private:
@@ -785,31 +846,31 @@ class cpp_quad_float
 };
 
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator+(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b) { return cpp_quad_float<FloatingPointType>(a) += b; }
+inline cpp_quad_fp_backend<FloatingPointType> operator+(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b) { return cpp_quad_fp_backend<FloatingPointType>(a) += b; }
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator-(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b) { return cpp_quad_float<FloatingPointType>(a) -= b; }
+inline cpp_quad_fp_backend<FloatingPointType> operator-(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b) { return cpp_quad_fp_backend<FloatingPointType>(a) -= b; }
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator*(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b) { return cpp_quad_float<FloatingPointType>(a) *= b; }
+inline cpp_quad_fp_backend<FloatingPointType> operator*(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b) { return cpp_quad_fp_backend<FloatingPointType>(a) *= b; }
 template <typename FloatingPointType>
-inline cpp_quad_float<FloatingPointType> operator/(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b) { return cpp_quad_float<FloatingPointType>(a) /= b; }
+inline cpp_quad_fp_backend<FloatingPointType> operator/(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b) { return cpp_quad_fp_backend<FloatingPointType>(a) /= b; }
 
 template <typename FloatingPointType>
-inline bool operator<(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b) { return (a.compare(b) < 0); }
+inline bool operator<(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b) { return (a.compare(b) < 0); }
 template <typename FloatingPointType>
-inline bool operator<=(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b) { return (a.compare(b) <= 0); }
+inline bool operator<=(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b) { return (a.compare(b) <= 0); }
 template <typename FloatingPointType>
-inline bool operator==(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b) { return (a.compare(b) == 0); }
+inline bool operator==(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b) { return (a.compare(b) == 0); }
 template <typename FloatingPointType>
-inline bool operator!=(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b) { return (a.compare(b) != 0); }
+inline bool operator!=(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b) { return (a.compare(b) != 0); }
 template <typename FloatingPointType>
-inline bool operator>=(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b) { return (a.compare(b) >= 0); }
+inline bool operator>=(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b) { return (a.compare(b) >= 0); }
 template <typename FloatingPointType>
-inline bool operator>(const cpp_quad_float<FloatingPointType>& a, const cpp_quad_float<FloatingPointType>& b) { return (a.compare(b) > 0); }
+inline bool operator>(const cpp_quad_fp_backend<FloatingPointType>& a, const cpp_quad_fp_backend<FloatingPointType>& b) { return (a.compare(b) > 0); }
 
 // -- Input/Output Streaming
 template <typename FloatingPointType, typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_quad_float<FloatingPointType>& f)
+operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_quad_fp_backend<FloatingPointType>& f)
 {
    const std::string str_result = f.str(os.precision(), os.flags());
 
@@ -818,40 +879,76 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_quad_float<
 
 template <typename FloatingPointType, typename char_type, typename traits_type>
 std::basic_istream<char_type, traits_type>&
-operator>>(std::basic_istream<char_type, traits_type>& is, cpp_quad_float<FloatingPointType>& f)
+operator>>(std::basic_istream<char_type, traits_type>& is, cpp_quad_fp_backend<FloatingPointType>& f)
 {
    std::string str;
    is >> str;
-   f = cpp_quad_float<FloatingPointType>(str);
+   f = cpp_quad_fp_backend<FloatingPointType>(str);
    return is;
 }
 
 template <typename FloatingPointType>
-void eval_add(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result += x; }
-template <typename FloatingPointType>
-void eval_add(cpp_quad_float<FloatingPointType>& result, const FloatingPointType& x) { result += x; }
-template <typename FloatingPointType, typename NumericType, typename std::enable_if<(std::numeric_limits<NumericType>::digits <= std::numeric_limits<FloatingPointType>::digits)>::type const* = nullptr>
-void eval_add(cpp_quad_float<FloatingPointType>& result, const NumericType& x) { eval_add(result, static_cast<FloatingPointType>(x)); }
+void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x) { result += x; }
 
 template <typename FloatingPointType>
-void eval_subtract(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result -= x; }
-template <typename FloatingPointType>
-void eval_subtract(cpp_quad_float<FloatingPointType>& result, const FloatingPointType& x) { result -= x; }
-template <typename FloatingPointType, typename NumericType, typename std::enable_if<std::numeric_limits<NumericType>::digits <= std::numeric_limits<FloatingPointType>::digits>::type const* = nullptr>
-void eval_subtract(cpp_quad_float<FloatingPointType>& result, const NumericType& x) { eval_subtract(result, static_cast<FloatingPointType>(x)); }
+void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y) { result = x + y; }
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const*>
+void eval_add(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a)
+{
+  result = x + typename cpp_quad_fp_backend<FloatingPointType>::float_type(a);
+}
 
 template <typename FloatingPointType>
-void eval_multiply(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result *= x; }
-template <typename FloatingPointType>
-void eval_multiply(cpp_quad_float<FloatingPointType>& result, const FloatingPointType& x) { result *= x; }
-template <typename FloatingPointType, typename NumericType, typename std::enable_if<std::numeric_limits<NumericType>::digits <= std::numeric_limits<FloatingPointType>::digits>::type const* = nullptr>
-void eval_multiply(cpp_quad_float<FloatingPointType>& result, const NumericType& x) { eval_multiply(result, static_cast<FloatingPointType>(x)); }
+void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x) { result -= x; }
 
 template <typename FloatingPointType>
-void eval_divide  (cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x) { result /= x; }
+void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y) { result = x - y; }
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const*>
+void eval_subtract(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a)
+{
+  result = x - typename cpp_quad_fp_backend<FloatingPointType>::float_type(a);
+}
 
 template <typename FloatingPointType>
-void eval_fabs(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& a)
+void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x) { result *= x; }
+
+template <typename FloatingPointType>
+void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y) { result = x * y; }
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const*>
+void eval_multiply(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a)
+{
+  result = x * typename cpp_quad_fp_backend<FloatingPointType>::float_type(a);
+}
+
+template <typename FloatingPointType>
+void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x) { result /= x; }
+
+template <typename FloatingPointType>
+void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const cpp_quad_fp_backend<FloatingPointType>& y) { result = x / y; }
+
+template<typename FloatingPointType,
+         typename ArithmeticType,
+         typename std::enable_if<(   (std::is_arithmetic<ArithmeticType>::value == true)
+                                  && (std::numeric_limits<ArithmeticType>::digits <= std::numeric_limits<typename cpp_quad_fp_backend<FloatingPointType>::float_type>::digits))>::type const*>
+void eval_divide(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x, const ArithmeticType a)
+{
+  result = x / typename cpp_quad_fp_backend<FloatingPointType>::float_type(a);
+}
+
+template <typename FloatingPointType>
+void eval_fabs(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& a)
 {
    result = a;
 
@@ -862,7 +959,7 @@ void eval_fabs(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<F
 }
 
 template <typename FloatingPointType>
-void eval_frexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& a, int* v)
+void eval_frexp(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& a, int* v)
 {
    using std::frexp;
    using std::ldexp;
@@ -874,11 +971,11 @@ void eval_frexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<
 }
 
 template <typename FloatingPointType>
-void eval_ldexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& a, int v)
+void eval_ldexp(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& a, int v)
 {
    using std::ldexp;
 
-   using quad_float_type = cpp_quad_float<FloatingPointType>;
+   using quad_float_type = cpp_quad_fp_backend<FloatingPointType>;
 
    typename quad_float_type::rep_type z =
    std::make_tuple
@@ -895,12 +992,12 @@ void eval_ldexp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<
 }
 
 template <typename FloatingPointType>
-void eval_floor(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
+void eval_floor(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x)
 {
-   using local_float_type = typename cpp_quad_float<FloatingPointType>::float_type;
+   using local_float_type = typename cpp_quad_fp_backend<FloatingPointType>::float_type;
 
-   using double_float_type = cpp_double_float<local_float_type>;
-   using quad_float_type   = cpp_quad_float  <local_float_type>;
+   using double_float_type = cpp_double_fp_backend<local_float_type>;
+   using quad_float_type   = cpp_quad_fp_backend  <local_float_type>;
 
    double_float_type fhi;
 
@@ -932,7 +1029,7 @@ void eval_floor(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<
 }
 
 template <typename FloatingPointType>
-void eval_ceil(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
+void eval_ceil(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x)
 {
    // Compute -floor(-x);
    eval_floor(result, -x);
@@ -941,9 +1038,9 @@ void eval_ceil(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<F
 }
 
 template <typename FloatingPointType>
-void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
+void eval_sqrt(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x)
 {
-   using quad_float_type   = cpp_quad_float  <FloatingPointType>;
+   using quad_float_type   = cpp_quad_fp_backend  <FloatingPointType>;
    using std::sqrt;
 
 #if defined(BOOST_MATH_USE_FLOAT128)
@@ -956,7 +1053,7 @@ void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<F
    }
    else if(std::get<0>(x.crep()) < typename quad_float_type::float_type(0.0F))
    {
-      result = cpp_quad_float<FloatingPointType>::my_value_nan();
+      result = cpp_quad_fp_backend<FloatingPointType>::my_value_nan();
    }
    else
    {
@@ -973,7 +1070,7 @@ void eval_sqrt(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<F
 }
 
 template <typename FloatingPointType>
-void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<FloatingPointType>& x)
+void eval_exp(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_backend<FloatingPointType>& x)
 {
    const bool x_is_zero = x.is_zero();
 
@@ -983,15 +1080,18 @@ void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<Fl
    }
    else
    {
-      using quad_float_type  = cpp_quad_float<FloatingPointType>;
+      using quad_float_type  = cpp_quad_fp_backend<FloatingPointType>;
       using local_float_type = typename quad_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
       const bool b_neg = x.is_neg();
 
-      quad_float_type xx;
+      quad_float_type xx(x);
 
-      eval_fabs(xx, x);
+      if(b_neg)
+      {
+         xx.negate();
+      }
 
       // Check the range of the input.
 
@@ -1049,8 +1149,7 @@ void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<Fl
          // Taylor series expansion is actually more precise than Pade approximation.
          for (unsigned n = 2U; n < 64U; ++n)
          {
-            x_pow_n_div_n_fact *= xh;
-            x_pow_n_div_n_fact /= local_float_type(n);
+            eval_multiply(x_pow_n_div_n_fact,  xh / local_float_type(n));
 
             int n_tol;
 
@@ -1094,14 +1193,14 @@ void eval_exp(cpp_quad_float<FloatingPointType>& result, const cpp_quad_float<Fl
 }
 
 template <typename FloatingPointType>
-int eval_fpclassify(const cpp_quad_float<FloatingPointType>& o)
+int eval_fpclassify(const cpp_quad_fp_backend<FloatingPointType>& o)
 {
    return (int)(boost::math::fpclassify)(std::get<0>(o.crep()));
 }
 
 template <typename FloatingPointType,
           typename R>
-typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_to(R* result, const cpp_quad_float<FloatingPointType>& backend)
+typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_to(R* result, const cpp_quad_fp_backend<FloatingPointType>& backend)
 {
    // TBD: Does boost::common_type have a C++ 11 replacement?
    using c_type = typename boost::common_type<R, FloatingPointType>::type;
@@ -1116,7 +1215,7 @@ typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_t
 
    if (ct > my_max)
       if (!std::is_unsigned<R>::value)
-         *result = std::get<0>(backend.crep()) >= typename cpp_quad_float<FloatingPointType>::float_type(0U) ? (std::numeric_limits<R>::max)() : detail::minus_max<R>();
+         *result = std::get<0>(backend.crep()) >= typename cpp_quad_fp_backend<FloatingPointType>::float_type(0U) ? (std::numeric_limits<R>::max)() : detail::minus_max<R>();
       else
          *result = (std::numeric_limits<R>::max)();
    else
@@ -1134,7 +1233,7 @@ typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_t
 
 template <typename FloatingPointType,
           typename R>
-typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_to(R* result, const cpp_quad_float<FloatingPointType>& backend)
+typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_to(R* result, const cpp_quad_fp_backend<FloatingPointType>& backend)
 {
    *result = (R) std::get<0>(backend.crep());
    if (std::numeric_limits<decltype(*result)>::digits > std::numeric_limits<FloatingPointType>::digits)
@@ -1146,17 +1245,17 @@ typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_
 }
 
 template <typename FloatingPointType>
-std::size_t hash_value(const cpp_quad_float<FloatingPointType>& a)
+std::size_t hash_value(const cpp_quad_fp_backend<FloatingPointType>& a)
 {
    return a.hash();
 }
 
 } // namespace backends
 
-using cpp_quad_double      = number<backends::cpp_quad_float<double>>;
-using cpp_quad_long_double = number<backends::cpp_quad_float<long double>>;
+using cpp_quad_double      = number<backends::cpp_quad_fp_backend<double>>;
+using cpp_quad_long_double = number<backends::cpp_quad_fp_backend<long double>>;
 #ifdef BOOST_MATH_USE_FLOAT128
-using cpp_quad_float128    = number<backends::cpp_quad_float<float128>>;
+using cpp_quad_float128    = number<backends::cpp_quad_fp_backend<float128>>;
 #endif
 
 }} // namespace boost::multiprecision
@@ -1164,7 +1263,7 @@ using cpp_quad_float128    = number<backends::cpp_quad_float<float128>>;
 namespace boost { namespace math {
 
 template <typename FloatingPointType>
-int (fpclassify)(const boost::multiprecision::backends::cpp_quad_float<FloatingPointType>& o)
+int (fpclassify)(const boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>& o)
 {
    using std::fpclassify;
 
@@ -1174,16 +1273,16 @@ int (fpclassify)(const boost::multiprecision::backends::cpp_quad_float<FloatingP
 }} // namespace boost::math
 
 namespace std {
-// Specialization of numeric_limits for boost::multiprecision::number<cpp_quad_float<>>
+// Specialization of numeric_limits for boost::multiprecision::number<cpp_quad_fp_backend<>>
 template <typename FloatingPointType,
           const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption>>
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption>>
    : public std::numeric_limits<FloatingPointType>
 {
 private:
    using base_class_type = std::numeric_limits<FloatingPointType>;
 
-   using inner_self_type = boost::multiprecision::backends::cpp_quad_float<FloatingPointType>;
+   using inner_self_type = boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>;
 
    using self_type =
       boost::multiprecision::number<inner_self_type, ExpressionTemplatesOption>;
@@ -1221,34 +1320,34 @@ public:
 }
 
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_specialized;
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_specialized;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_signed;
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_signed;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_integer;
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_integer;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_exact;
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_exact;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_bounded;
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_bounded;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_modulo;
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_modulo;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::is_iec559;
+constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_iec559;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr std::float_denorm_style std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::has_denorm;
+constexpr std::float_denorm_style std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::has_denorm;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::digits;
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::digits;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::digits10;
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::digits10;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::max_digits10;
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::max_digits10;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::max_exponent;
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::max_exponent;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent;
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::max_exponent10;
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::max_exponent10;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_float<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent10;
+constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent10;
 
 #endif // BOOST_MP_CPP_QUAD_FLOAT_2021_07_29_HPP
