@@ -1,57 +1,94 @@
 # Report on Implementation of `cpp_quad_float` and `cpp_double_float`
 ## Boost.Multiprecision | Google Summer of Code 2021
 ---
-
+_Fork link_: [**BoostGSoC2021 _multiprecision_**](https://github.com/BoostGSoC21/multiprecision)
 This document briefly descrbes the implementation of new `Boost.Multiprecision` backends `cpp_double_fp_backend` and `cpp_quad_fp_backend`, which resemble the double-float and quad-float types that are used to extend the precision of the underlying floating point types. The aim of this project was to set up a practical draft of a generic implementation of the mentioned types, along with compaitibility with the `Boost.Multiprecision number` wrapper, and writing exhaustive tests to prove correctness of the new types.
 
-The mentioned backends implement the underlying arithmetic operators and algorithms on a lower level, while maintaining compaitibility with Boost.Multiprecision `number<>` wrapper (through the required [`eval_*()`](https://www.boost.org/doc/libs/1_77_0/libs/multiprecision/test/skeleton_backend.hpp) routines) which allows the end-user and all Boost libraries to interact with the class on a higher level. Finally, the `std::numeric_limits<>` specialization of the classes, along with `number<>` wrapper from Boost.Multiprecision allows easy integration in the rich library of generic Boost algorithms and tests. Both of the implementations were rigorously tested for correctness, and some unresolved issues remain which are planned to be tackled post-GSoC.
+The mentioned backends implement the underlying arithmetic operators and algorithms on a lower level, while maintaining compaitibility with Boost.Multiprecision `number<>` wrapper (through the required [`eval_*()`](https://www.boost.org/doc/libs/1_77_0/libs/multiprecision/test/skeleton_backend.hpp) routines) which allows the end-user and all Boost libraries to interact with the class on a higher level. Finally, the `std::numeric_limits<>` specialization of the classes, along with `number<>` wrapper from Boost.Multiprecision allows easy integration in the rich library of generic Boost algorithms and tests. Both of the implementations were rigorously tested for correctness.
 
-## The double-float implementation
-The design philosophy behind the double-float implementation was to write a generic template class called `cpp_double_fp_backend<>` which could theoretically double the precision of any IEEE-compaitible floating-point type, and to wrap it up using Boost.Multiprecision `number<>` wrapper. These wrappers are designed to mimic the native-float types, through extensive list of constructors and operator overloading:
+## The double-float and quad-float implementations
+The design philosophy behind the double-float and quad-float implementations was to write a generic template class called `cpp_double_fp_backend`/`cpp_quad_fp_backend` which could theoretically double/quadruple the precision of any IEEE-compaitible floating-point type, and to wrap it up using Boost.Multiprecision `number<>` wrapper. These wrappers are designed to mimic the native floating-point types, through extensive list of constructors and operator overloading:
 ```
 using boost::multiprecision;
 cpp_double_float a = 22.0, b = 7, c = "3.1415926535897932384626433832795";
 std::cout << "pi - 22/7 == " << c - a / b << std::endl;
+
+using boost::multiprecision::pow;
+cpp_quad_float pi = "3.1415926535897932384626433832795028841971693993751058209749445923078";
+cpp_quad_float e  = "2.7182818284590452353602874713526624977572470936999595749669676277241";
+std::cout << pow(e, pi) - pi << std::endl;
 ```
+
+### Code
+Double-float class and related tests: [`gsoc2021_double_float`](https://github.com/BoostGSoC21/multiprecision/tree/gsoc2021_double_float)
+Quad-float class and related tests: [`gsoc2021_quad_float`](https://github.com/BoostGSoC21/multiprecision/tree/gsoc2021_quad_float/)
+
+### Backend types
+The backend types constitute of a certain number of non-overlapping native floating-point types, the sum of which equals the represented number. Various algorithms are then used to perform basic arithmetic operations such as addition and multiplication, on top of which more complicated algorithms are built.
 
 ### `cpp_double_fp_backend`
-`cpp_double_fp_backend<>` is the backend type behind this implementation of double-float type. It is a generic template class which consitutes of a pair of two non-overlapping native floating point types, the sum of which equals the represented number. Various algorithms are then used to perform basic arithmetic operations such as addition and multiplication, on top of which more complicated algorithms are built.
-It has been exhaustively tested with 4-byte `float`, 8-byte `double`, 10-byte `long double`, and 16-byte `float128`.
+`cpp_double_fp_backend<>` is the backend type behind the implementation of double-float type. It is a generic template class which consitutes of a pair of two non-overlapping native floating point types. It has been exhaustively tested with 4-byte `float`, 8-byte `double`, 10-byte `long double`, and 16-byte `float128`.
+
+### `cpp_quad_fp_backend`
+`cpp_quad_fp_backend<>` is the backend type behind the implementation of quad-float type. Analogous to `cpp_double_fp_backend`, it is a generic template class which consitutes of a a 4-tuple of non-overlapping native floating-point types.
+It has been exhaustively tested with 8-byte `double`, 10-byte `long double`, and 16-byte `float128`. Howver, a `cpp_quad_fp_backend` cannot be initialized with a 4-byte `float` because of it's extremely limited exponent range (see `std::numeric_limits<>` specialization below).
 
 #### Boost.Multiprecision `number<>` wrapper
-The `number<>` wrapper wraps the `cpp_double_fp_backend<>` class to be easily usable by the end-user and compaitible with the rest of Boost library, which includes a rich set of mathematical algorithms, generic tests of correctness, and even overloaded constructors and operators for the `cpp_double_fp_backend<>` class. The available `number<>` wrappers for this class are:
+The `number<>` wrapper wraps the backend classes to be easily usable by the end-user and compaitible with the rest of Boost library, which includes a rich set of mathematical algorithms, generic tests of correctness, and even overloaded constructors and operators for the backend classes. The available `number<>` wrappers for this class are:
 ```
+// Double-float
 using cpp_double_float       = number<backends::cpp_double_fp_backend<float>>;
 using cpp_double_double      = number<backends::cpp_double_fp_backend<double>>;
 using cpp_double_long_double = number<backends::cpp_double_fp_backend<long double>>;
 using cpp_double_float128    = number<backends::cpp_double_fp_backend<float128>>;
+
+// Quad-float
+using cpp_quad_double      = number<backends::cpp_quad_fp_backend<double>>;
+using cpp_quad_long_double = number<backends::cpp_quad_fp_backend<long double>>;
+using cpp_quad_float128    = number<backends::cpp_quad_fp_backend<float128>>;
 ```
-_// TODO List relevant code_
+Note that the availablility of `cpp_quad_float128` is dependent on availability of `float128`.
 
 #### Constructors
 Most of the constructors are straighforward, except the constructors from arithmetic types which contain more information than a single underlying native floating-point type can hold. In those cases, special care needs to be taken to extract out maximum information.
-_// TODO List relevant code_
+
+##### Testing
+The testing suite for constructors is primarily coded in [`test_cpp_double_float_constructors.cpp`](https://github.com/BoostGSoC21/multiprecision/blob/gsoc2021_double_float/test/test_cpp_double_float_constructors.cpp) and [`test_cpp_quad_float_constructors.cpp`](https://github.com/BoostGSoC21/multiprecision/blob/gsoc2021_quad_float/test/test_cpp_quad_float_constructors.cpp). It works by verifying that the double-float implementation that is constructed from randomly genererated data satisfies the following criteria:
+- The maximum error in construction satisfies the bounds of accurary that are set in the `std::numeric_limits<>` specialization of the class
+- The underlying floating-point pair is non-overlapping
 
 #### Arithmetic operators
 The arithmetic operatory algorithms were primarily adaptations of David Bailey's [QD package](https://www.davidhbailey.com/dhbsoftware/qd-2.3.23.tar.gz).
-_// TODO List relevant code_
+##### Testing
+The arithmetic operatory algorithms were tested through two series of tests:
+- [`test_cpp_double_float_arithmetic.cpp`](https://github.com/BoostGSoC21/multiprecision/blob/gsoc2021_double_float/test/test_cpp_double_float_arithmetic_old.cpp)/[`test_cpp_quad_float_arithmetic.cpp`](https://github.com/BoostGSoC21/multiprecision/blob/gsoc2021_quad_float/test/test_cpp_quad_float_arithmetic.cpp): This homegrown series of tests works by verfying that the error in the arithmetic operations satisfied the bounds set in the `std::numeric_limits<>` specialization of the class.
+- `test_arithmetic.cpp`: These were generic series of tests that are standard to the Boost.Multiprecision library.
 
 #### `std::numeric_limits<>` specialization
-There was [significant discussion](https://github.com/BoostGSoC21/multiprecision/issues/21) regarding the correct values of `numeric_limits::digits` and `numeric_limits::digits10` for this class. The discussion was surrounded around the fact that in `cpp_double_fp_backend` a few bits of precision are lost during arithmetic operations, and this was needed to be reflected in the `std::numeric_limits<>` specialization for the class. The final [consensus](https://github.com/BoostGSoC21/multiprecision/issues/21#issuecomment-892638810) was that `numeric_limits::epsilon()` will be used to reflect the precision provided by the type instead of `numeric_limits::digits`.
-_// TODO List relevant code_
+Practical and correct values in the `std::numeric_limits<>` specialization of the classes were crucial to the usability of the library. After due discussion, the following table summarizes the consensus on some non-obvious values in the `std::numeric_limits<>` specialization:
 
-#### Tests
-The double-float implementation was exhaustively tested through two sets of tests:
-- **Homegrown Tests**: These included stress-tests for arithmetic operators, constructors, comparison operators, and decomposition. The focus of these tests was to ensure accuracy and correctness.
-- **Boost generic Tests**: These included tests for arithmetic robustness, computation of important mathematical functions including trigonometric and exponential functions.
+|                | `cpp_double_fp_backend<>` | `cpp_quad_fp_backend<>` | Comment |
+| -------------- | ------------------------- | ----------------------- | ------- |
+| `digits`       | `2 * base_class_digits`   | `4 * base_class_digits` | Reflects the total number of binary digits in the significand |
+| `epsilon()`    | `ldexp(1, 4 - digits)`    | `ldexp(1, 6 - digits)`  | Reflects the accuracy of the type |
+| `min_exponent` | `base_class_min_exponent + base_class_digits` | `base_class_min_exponent + 3 * base_class_digits` | Reduced to avoid subnormal numbers |
+| `max()`        | link | link | Choosen to ensure `sqrt(max()) * sqrt(max()) == max()` |
+| `min()`        | `ldexp(1, min_exponent)` | `ldexp(1, min_exponent)` | Smallest value representable without using subnormal numbers |
 
-_// TODO List relevant code_
-#### Issues
-_// TODO List known open and resolved issues_
+Note that this class has asymmetric exponent range. This is because the value `min_exponent` is reduced so that none of the constituent floating-point types of the class falls in the subnormal territory. The effects of this asymmetry were much more pronounced in `cpp_quad_fp_backend<float>`, which as a result was scrapped from implementation.
+
+There was [significant discussion](https://github.com/BoostGSoC21/multiprecision/issues/21) regarding the correct values of `numeric_limits::digits` and `numeric_limits::digits10` for the double-float implementation. The discussion was surrounded around the fact that a few bits of precision are lost during arithmetic operations, and this was needed to be reflected in the `std::numeric_limits<>` specialization for the class. The final [consensus](https://github.com/BoostGSoC21/multiprecision/issues/21#issuecomment-892638810) was that `numeric_limits::epsilon()` will be used to reflect the precision provided by the type instead of `numeric_limits::digits`.
+
+#### Other Tests
+The following homegrown tests were also instrumental in proving correctness and catching bugs:
+- [`test_cpp_double_float_comparison.cpp`](https://github.com/BoostGSoC21/multiprecision/blob/gsoc2021_double_float/test/test_cpp_double_float_comparision.cpp): Tested the correctness of the comparison operators.
+- [`test_cpp_double_float_io.cpp`](https://github.com/BoostGSoC21/multiprecision/blob/gsoc2021_double_float/test/test_cpp_double_float_io.cpp): Tested the string conversion facilities of the class, that are now replaced by the `number<>` wrapper rendering this test defunct.
 
 ### Performance
-`cpp_double_fp_backend` was tested against `cpp_bin_float` of similar precision. The following table summarizes the relative performance of the types (each operation was performed 10,000 times):
+`cpp_double_fp_backend` and `cpp_quad_fp_backend` were tested against `cpp_bin_float` of similar precision. The following table summarizes the relative performance of the types (each operation was performed 10,000 times).
 
+#### `cpp_double_fp_backend` with `double`
+The `cpp_double_fp_backend<double>` was found to be much faster than than `cpp_bin_float` of a similar precision.
 | Operator                      | cpp_bin_float        | cpp_double_fp_backend |
 | ----------------------------- | -------------------- | --------------------- |
 | *                             | 11.114 (0.362158s)   | ***1** (0.0325857s)   |
@@ -75,36 +112,37 @@ _// TODO List known open and resolved issues_
 | construct(unsigned)           | 21.2099 (1.39659s)   | ***1** (0.0658462s)   |
 | str                           | 1.23162 (0.0016888s) | ***1** (0.0013712s)   |
 
-The platform details for the tests were the following:
 
+#### `cpp_quad_fp_backend` with `double`
+The `cpp_quad_fp_backend<double>` class was found to be only slighly faster than the `cpp_bin_float` class of similar precision, suggesting a lot of room for optimization.
+| Operator                      | cpp_bin_float        | cpp_quad_fp_backend |
+| ----------------------------- | -------------------- | --------------------- |
+| *                      | 1.08476 (0.510203s) |  ***1** (0.47034s) |
+| *(int)                 | 1.08811 (0.248002s) |  ***1** (0.227921s) |
+| *(unsigned long long)  | ***1** (0.337846s) |  1.53843 (0.519752s) |
+| *=(unsigned long long) | ***1** (0.363478s) |  1.34969 (0.490582s) |
+| +                      | 1.08739 (0.389422s) |  ***1** (0.358125s) |
+| +(int)                 | 4.32414 (0.511417s) |  ***1** (0.11827s) |
+| +(unsigned long long)  | 1.7041 (0.478036s) |  ***1** (0.280522s) |
+| +=(unsigned long long) | 2.13633 (0.541517s) |  ***1** (0.253481s) |
+| -                      | 1.13197 (0.380691s) |  ***1** (0.336309s) |
+| -(int)                 | 4.25406 (0.502983s) |  ***1** (0.118236s) |
+| -(unsigned long long)  | 1.5853 (0.46435s) |  ***1** (0.292909s) |
+| -=(unsigned long long) | 1.78171 (0.454627s) |  ***1** (0.255164s) |
+| /                      | 1.2679 (7.21198s) |  ***1** (5.68811s) |
+| /(int)                 | ***1** (0.815899s) |  3.06754 (2.5028s) |
+| /(unsigned long long)  | 1.0521 (2.61045s) |  ***1** (2.48119s) |
+| /=(unsigned long long) | 1.21807 (2.97675s) |  ***1** (2.44382s) |
+| construct                     | 1.65911 (0.199257s) |  ***1** (0.120099s) |
+| construct(unsigned long long) | 10.8055 (1.47968s) |  ***1** (0.136938s) |
+| construct(unsigned)           | 12.1411 (1.47327s) |  ***1** (0.121345s) |
+| str                           | ***1** (0.0025268s) |  16.1572 (0.0408261s) |
+
+The platform details for the tests were the following:
 ```
 Platform: Windows x64 
 Compiler: Microsoft Visual C++ version 14.2
 Boost: 107500
 ```
 
-## The quad-float implementation
-_// TODO_
-### `cpp_quad_fp_backend`
-_// TODO_
-
-#### Boost.Multiprecision `number<>` wrapper
-_// TODO_
-
-#### Constructors
-_// TODO_
-
-#### Arithmetic operators
-_// TODO_
-
-#### `std::numeric_limits<>` specialization
-_// TODO_
-
-#### Tests
-_// TODO_
-
-#### Issues
-_// TODO List known open and resolved issues_
-
-### Performance
-_// TODO_
+## Future work
