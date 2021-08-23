@@ -11,12 +11,12 @@ The mentioned backends implement the underlying arithmetic operators and algorit
 The design philosophy behind the double-float and quad-float implementations was to write a generic template class called `cpp_double_fp_backend`/`cpp_quad_fp_backend` which could theoretically double/quadruple the precision of any IEEE-compaitible floating-point type, and to wrap it up using Boost.Multiprecision `number<>` wrapper. These wrappers are designed to mimic the native floating-point types, through extensive list of constructors and operator overloading:
 ```
 using boost::multiprecision;
-cpp_double_float a = 22.0, b = 7, c = "3.1415926535897932384626433832795";
+cpp_double_double a = 22.0, b = 7, c = "3.1415926535897932384626433832795";
 std::cout << "22/7 - pi == " << a / b - c << std::endl;
 
 using boost::multiprecision::pow;
-cpp_quad_float pi = "3.1415926535897932384626433832795028841971693993751058209749445923078";
-cpp_quad_float e  = "2.7182818284590452353602874713526624977572470936999595749669676277241";
+cpp_quad_double pi = "3.1415926535897932384626433832795028841971693993751058209749445923078";
+cpp_quad_double e  = "2.7182818284590452353602874713526624977572470936999595749669676277241";
 std::cout << pow(e, pi) - pi << std::endl;
 ```
 
@@ -41,15 +41,15 @@ It has been exhaustively tested with 8-byte `double`, 10-byte `long double`, and
 The `number<>` wrapper wraps the backend classes to be easily usable by the end-user and compatible with the rest of Boost library, which includes a rich set of mathematical algorithms, generic tests of correctness, and even overloaded constructors and operators for the backend classes. The available `number<>` wrappers for this class are:
 ```
 // Double-float
-using cpp_double_float       = number>;
-using cpp_double_double      = number>;
-using cpp_double_long_double = number>;
-using cpp_double_float128    = number>;
+using cpp_double_float       = number<backends::cpp_double_fp_backend<float>>;
+using cpp_double_double      = number<backends::cpp_double_fp_backend<double>>;
+using cpp_double_long_double = number<backends::cpp_double_fp_backend<long double>>;
+using cpp_double_float128    = number<backends::cpp_double_fp_backend<float128>>;
 
 // Quad-float
-using cpp_quad_double      = number>;
-using cpp_quad_long_double = number>;
-using cpp_quad_float128    = number>;
+using cpp_quad_double      = number<backends::cpp_quad_fp_backend<double>>;
+using cpp_quad_long_double = number<backends::cpp_quad_fp_backend<long double>>;
+using cpp_quad_float128    = number<backends::cpp_quad_fp_backend<float128>>;
 ```
 Note that the availability of `cpp_double_float128` and `cpp_quad_float128` is dependent on availability of `float128`.
 
