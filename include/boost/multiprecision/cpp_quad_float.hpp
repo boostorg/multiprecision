@@ -764,7 +764,7 @@ class cpp_quad_fp_backend
 
       std::stringstream ss;
 
-      ss << std::hexfloat;
+      ss << std::hexfloat << std::showpos;
       ss << get<0>(data) << " + " << get<1>(data) << " + " << get<2>(data) << " + " << get<3>(data);
       ss << std::endl;
 
