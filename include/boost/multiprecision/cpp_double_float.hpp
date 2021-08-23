@@ -214,7 +214,15 @@ struct exact_arithmetic
       // TODO Replace bit shifts with constexpr funcs or ldexp for better compaitibility
       constexpr int        MantissaBits   = std::numeric_limits<float_type>::digits;
       constexpr int        SplitBits      = MantissaBits / 2 + 1;
-      constexpr float_type Splitter       = FloatingPointType((1ULL << SplitBits) + 1);
+      
+      // Check if the integer is wide enough to hold the Splitter.
+      static_assert(std::numeric_limits<uintmax_t>::digits > SplitBits,
+        "Inadequate integer width for binary shifting needed in split(), try using ldexp instead");
+      // If the above line gives an compilation error, replace the
+      // line below it with the commented line
+
+      constexpr    float_type Splitter    = FloatingPointType((uintmax_t(1) << SplitBits) + 1);
+    //static const float_type Splitter    = std::ldexp(FloatingPointType(1), SplitBits) + 1;
       const float_type     SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter * 2);
 
       float_type temp, hi, lo;
