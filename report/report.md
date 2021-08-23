@@ -30,10 +30,10 @@ The code for implementation of the types can be found in the linked branches:
 ### Backend types
 The backend types constitute of a certain number of non-overlapping native floating-point types, the sum of which equals the represented number. Various algorithms are then used to perform basic arithmetic operations such as addition and multiplication, on top of which more complicated algorithms are built.
 
-### `cpp_double_fp_backend`
+#### `cpp_double_fp_backend`
 `cpp_double_fp_backend<>` is the backend type behind the implementation of the double-float type. It is a generic template class which constitutes of a pair of two non-overlapping native floating-point types. It has been exhaustively tested with 4-byte `float`, 8-byte `double`, 10-byte `long double`, and 16-byte `float128`.
 
-### `cpp_quad_fp_backend`
+#### `cpp_quad_fp_backend`
 `cpp_quad_fp_backend<>` is the backend type behind the implementation of the quad-float type. Analogous to `cpp_double_fp_backend`, it is a generic template class which constitutes of a 4-tuple of non-overlapping native floating-point types.
 It has been exhaustively tested with 8-byte `double`, 10-byte `long double`, and 16-byte `float128`. However, a `cpp_quad_fp_backend` cannot be initialized with a 4-byte `float` because of its extremely limited exponent range.
 
