@@ -7,9 +7,10 @@
 #include <vld.h>
 #endif
 
+#include <boost/core/demangle.hpp>
 #include <boost/math/special_functions/pow.hpp>
 #include <boost/integer/common_factor_rt.hpp>
-//#include <boost/functional/hash.hpp>
+#include <boost/functional/hash.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <functional>
 #include "test.hpp"
@@ -38,8 +39,8 @@ Target checked_lexical_cast(const Source& val)
    }
    catch (...)
    {
-      std::cerr << "Error in lexical cast\nSource type = " << typeid(Source).name() << " \"" << val << "\"\n";
-      std::cerr << "Target type = " << typeid(Target).name() << std::endl;
+      std::cerr << "Error in lexical cast\nSource type = " << boost::core::demangle(typeid(Source).name()) << " \"" << val << "\"\n";
+      std::cerr << "Target type = " << boost::core::demangle(typeid(Target).name()) << std::endl;
       throw;
    }
 #endif
@@ -1281,7 +1282,14 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
    r = pow(v, 6);
    BOOST_CHECK_EQUAL(r, boost::math::pow<6>(3.25));
    r = pow(v, 25);
-   //BOOST_CHECK_EQUAL(r, boost::math::pow<25>(Real(3.25)));
+   if(std::numeric_limits<Real>::digits10 > 14)
+   {
+      BOOST_CHECK_EQUAL(r, boost::math::pow<25>(Real(3.25)));
+   }
+   else
+   {
+      BOOST_CHECK_CLOSE_FRACTION(r, boost::math::pow<25>(Real(3.25)), std::numeric_limits<Real>::epsilon() * 10);
+   }
 
 #ifndef BOOST_NO_EXCEPTIONS
    //
@@ -1512,7 +1520,7 @@ void test_negative_mixed(std::integral_constant<bool, true> const&)
        std::is_convertible<Num, Real>::value,
        Num,
        Real>::type simple_cast_type;
-   std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name() << " and " << typeid(Num).name() << std::endl;
+   std::cout << "Testing mixed arithmetic with type: " << boost::core::demangle(typeid(Real).name()) << " and " << boost::core::demangle(typeid(Num).name()) << std::endl;
    static const int left_shift = std::numeric_limits<Num>::digits - 1;
    Num              n1         = -static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
    Num              n2         = -1;
@@ -1889,7 +1897,7 @@ void test_mixed(const std::integral_constant<bool, true>&)
    if (std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::is_bounded && std::numeric_limits<Real>::digits < std::numeric_limits<Num>::digits)
       return;
 
-   std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name() << " and " << typeid(Num).name() << std::endl;
+   std::cout << "Testing mixed arithmetic with type: " << boost::core::demangle(typeid(Real).name()) << " and " << boost::core::demangle(typeid(Num).name()) << std::endl;
    static const int left_shift = std::numeric_limits<Num>::digits - 1;
    Num              n1         = static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
    Num              n2         = 1;
@@ -3139,8 +3147,6 @@ void test()
 
    test_signed_ops<Real>(std::integral_constant<bool, std::numeric_limits<Real>::is_signed>());
 
-   // TBD: Figure out what happened to boost/functional/hash.hpp (or is this a misunderstanding?
-   #if 0
    //
    // Test hashing:
    //
@@ -3150,7 +3156,6 @@ void test()
    std::hash<Real> hasher2;
    s = hasher2(a);
    BOOST_CHECK_NE(s, 0);
-   #endif
 
    //
    // Test move:
