@@ -1179,19 +1179,37 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       eval_fabs(xx, x);
 
       // Check the range of the input.
-      // Will the result of exponentiation overflow/underflow?
-      static const local_float_type max_exp_input = []() -> local_float_type { using std::log; const local_float_type e_max = double_float_type::my_value_max().crep().first; return log(e_max); }();
-      static const local_float_type min_exp_input = []() -> local_float_type { using std::log; const local_float_type e_min = double_float_type::my_value_min().crep().first; return log(e_min); }();
+      static const double_float_type max_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_max().crep().first);
+         const double_float_type dx    =   double_float_type(double_float_type::my_value_max().crep().second)
+                                         / double_float_type(double_float_type::my_value_max().crep().first);
+
+         return lg_x0 + dx;
+      }();
+
+      static const double_float_type min_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_min().crep().first);
+
+         return lg_x0;
+      }();
 
       if (x_is_zero)
       {
          result = double_float_type(1U);
       }
-      else if (x.crep().first < min_exp_input)
+      else if (x < min_exp_input)
       {
          result = double_float_type(0U);
       }
-      else if (xx.crep().first > max_exp_input)
+      else if (xx > max_exp_input)
       {
          result = double_float_type(std::numeric_limits<local_float_type>::infinity());
       }
@@ -1299,19 +1317,37 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       eval_fabs(xx, x);
 
       // Check the range of the input.
-      // Will the result of exponentiation overflow/underflow?
-      static const local_float_type max_exp_input = []() -> local_float_type { using std::log; const local_float_type e_max = double_float_type::my_value_max().crep().first; return log(e_max); }();
-      static const local_float_type min_exp_input = []() -> local_float_type { using std::log; const local_float_type e_min = double_float_type::my_value_min().crep().first; return log(e_min); }();
+      static const double_float_type max_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_max().crep().first);
+         const double_float_type dx    =   double_float_type(double_float_type::my_value_max().crep().second)
+                                         / double_float_type(double_float_type::my_value_max().crep().first);
+
+         return lg_x0 + dx;
+      }();
+
+      static const double_float_type min_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_min().crep().first);
+
+         return lg_x0;
+      }();
 
       if (x_is_zero)
       {
          result = double_float_type(1U);
       }
-      else if (x.crep().first < min_exp_input)
+      else if (x < min_exp_input)
       {
          result = double_float_type(0U);
       }
-      else if (xx.crep().first > max_exp_input)
+      else if (xx > max_exp_input)
       {
          result = double_float_type(std::numeric_limits<local_float_type>::infinity());
       }
@@ -1419,19 +1455,37 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       eval_fabs(xx, x);
 
       // Check the range of the input.
-      // Will the result of exponentiation overflow/underflow?
-      static const local_float_type max_exp_input = []() -> local_float_type { using std::log; const local_float_type e_max = double_float_type::my_value_max().crep().first; return log(e_max); }();
-      static const local_float_type min_exp_input = []() -> local_float_type { using std::log; const local_float_type e_min = double_float_type::my_value_min().crep().first; return log(e_min); }();
+      static const double_float_type max_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_max().crep().first);
+         const double_float_type dx    =   double_float_type(double_float_type::my_value_max().crep().second)
+                                         / double_float_type(double_float_type::my_value_max().crep().first);
+
+         return lg_x0 + dx;
+      }();
+
+      static const double_float_type min_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_min().crep().first);
+
+         return lg_x0;
+      }();
 
       if (x_is_zero)
       {
          result = double_float_type(1U);
       }
-      else if (x.crep().first < min_exp_input)
+      else if (x < min_exp_input)
       {
          result = double_float_type(0U);
       }
-      else if (xx.crep().first > max_exp_input)
+      else if (xx > max_exp_input)
       {
          result = double_float_type(std::numeric_limits<local_float_type>::infinity());
       }
