@@ -6,6 +6,7 @@
 #define BOOST_MP_NOT_TESTING_NUMBER
 
 #include <boost/multiprecision/cpp_int.hpp>
+#include <boost/rational.hpp>
 
 #include "test_arithmetic.hpp"
 

@@ -416,9 +416,12 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, li
 
 inline BOOST_MP_CXX14_CONSTEXPR double_limb_type eval_gcd(double_limb_type u, double_limb_type v)
 {
-#if (__cpp_lib_gcd_lcm >= 201606L) && (!defined(BOOST_HAS_INT128) || !defined(__STRICT_ANSI__))
+#if 0 && (__cpp_lib_gcd_lcm >= 201606L) && (!defined(BOOST_HAS_INT128) || !defined(__STRICT_ANSI__))
    return std::gcd(u, v);
 #else
+   if (u == 0)
+      return v;
+
    unsigned shift = boost::multiprecision::detail::find_lsb(u | v);
    u >>= boost::multiprecision::detail::find_lsb(u);
    do
@@ -1110,6 +1113,7 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_trivial
 eval_gcd(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& b) noexcept
 {
    *result.limbs() = boost::integer::gcd(*a.limbs(), *b.limbs());
+   result.sign(false);
 }
 // This one is only enabled for unchecked cpp_int's, for checked int's we need the checking in the default version:
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
@@ -1118,6 +1122,7 @@ eval_lcm(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& r
 {
    *result.limbs() = boost::integer::lcm(*a.limbs(), *b.limbs());
    result.normalize(); // result may overflow the specified number of bits
+   result.sign(false);
 }
 
 inline void conversion_overflow(const std::integral_constant<int, checked>&)
