@@ -882,6 +882,44 @@ struct tester
       z1 = 0;
       z1 -= si;
       BOOST_CHECK_EQUAL(z1, -si);
+
+      z1 = si;
+      z1 /= si;
+      BOOST_CHECK_EQUAL(z1, 1);
+      z1 = si;
+      z1 /= -si;
+      BOOST_CHECK_EQUAL(z1, -1);
+      z1 = -si;
+      z1 /= si;
+      BOOST_CHECK_EQUAL(z1, -1);
+      z1 = -si;
+      z1 /= -si;
+      BOOST_CHECK_EQUAL(z1, 1);
+
+      x1 = si;
+      z1 = si / x1;
+      BOOST_CHECK_EQUAL(z1, 1);
+      x1 = si;
+      z1 = x1 / si;
+      BOOST_CHECK_EQUAL(z1, 1);
+      x1 = -si;
+      z1 = si / x1;
+      BOOST_CHECK_EQUAL(z1, -1);
+      x1 = -si;
+      z1 = x1 / si;
+      BOOST_CHECK_EQUAL(z1, -1);
+      x1 = -si;
+      z1 = -si / x1;
+      BOOST_CHECK_EQUAL(z1, 1);
+      x1 = -si;
+      z1 = x1 / -si;
+      BOOST_CHECK_EQUAL(z1, 1);
+      x1 = si;
+      z1 = -si / x1;
+      BOOST_CHECK_EQUAL(z1, -1);
+      x1 = si;
+      z1 = x1 / -si;
+      BOOST_CHECK_EQUAL(z1, -1);
    }
 
    void test()

@@ -772,11 +772,8 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::i
       result.num() = a_num;
       result.num().negate();
    }
-   /*
-    * cases 0 and 1 already handled above.
    else
       result.num() = a_num;
-   */
    if (integer_gcd > 1)
       eval_divide(result.denom(), a_denom, integer_gcd);
    else
