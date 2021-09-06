@@ -450,6 +450,12 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::
       eval_add(result.num(), t);
    else
       eval_subtract(result.num(), t);
+   //
+   // There is no need to re-normalize here, we have 
+   // (a + bm) / b
+   // and gcd(a + bm, b) = gcd(a, b) = 1
+   //
+   /*
    eval_gcd(t, result.num(), result.denom());
    if (!eval_eq(t, rational_adaptor<Backend>::one) != 0)
    {
@@ -459,6 +465,7 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::
       eval_divide(t2, result.denom(), t);
       t2.swap(result.denom());
    }
+   */
 }
 
 template <class Backend, class Arithmetic> 
@@ -765,8 +772,11 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::i
       result.num() = a_num;
       result.num().negate();
    }
+   /*
+    * cases 0 and 1 already handled above.
    else
       result.num() = a_num;
+   */
    if (integer_gcd > 1)
       eval_divide(result.denom(), a_denom, integer_gcd);
    else
@@ -855,6 +865,11 @@ eval_divide(rational_adaptor<Backend>& result, Arithmetic arg)
    }
    else if (arg == 1)
       return;
+   else if (is_minus_one(arg))
+   {
+      result.negate();
+      return;
+   }
    if (eval_get_sign(result) == 0)
    {
       return;
@@ -871,17 +886,13 @@ eval_divide(rational_adaptor<Backend>& result, Arithmetic arg)
    eval_gcd(gcd, result.num(), arg);
    eval_convert_to(&integer_gcd, gcd);
    arg /= integer_gcd;
-   if (boost::multiprecision::detail::unsigned_abs(arg) > 1)
+
+   eval_multiply(t, result.denom(), boost::multiprecision::detail::unsigned_abs(arg));
+   result.denom() = std::move(t);
+   if (arg < 0)
    {
-      eval_multiply(t, result.denom(), boost::multiprecision::detail::unsigned_abs(arg));
-      result.denom() = std::move(t);
-      if (arg < 0)
-      {
-         result.num().negate();
-      }
-   }
-   else if(arg < 0)
       result.num().negate();
+   }
    if (integer_gcd > 1)
    {
       eval_divide(t, result.num(), integer_gcd);
@@ -928,12 +939,7 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::i
    eval_gcd(gcd, a.num(), arg);
    eval_convert_to(&integer_gcd, gcd);
    arg /= integer_gcd;
-   if (boost::multiprecision::detail::unsigned_abs(arg) > 1)
-   {
-      eval_multiply(result.denom(), a.denom(), boost::multiprecision::detail::unsigned_abs(arg));
-   }
-   else
-      result.denom() = a.denom();
+   eval_multiply(result.denom(), a.denom(), boost::multiprecision::detail::unsigned_abs(arg));
 
    if (integer_gcd > 1)
    {
@@ -1025,59 +1031,6 @@ template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& 
 // template <class Backend> void eval_fabs(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& arg);
 //
 
-
-//
-// GCD/LCD:
-//
-#if 0
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned long long b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned long b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned short b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned char b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, long long b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, long b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, int b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, short b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, signed char b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, char b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, unsigned long long a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, unsigned long a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, unsigned a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, unsigned short a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, unsigned char a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, long long a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, long a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, int a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, short a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, signed char a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_gcd(rational_adaptor<Backend>& result, char a, const rational_adaptor<Backend>& b);
-
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned long long b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned long b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned short b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned char b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, long long b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, long b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, int b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, short b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, signed char b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, char b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, unsigned long long a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, unsigned long a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, unsigned a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, unsigned short a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, unsigned char a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, long long a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, long a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, int a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, short a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, signed char a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_lcm(rational_adaptor<Backend>& result, char a, const rational_adaptor<Backend>& b);
-#endif
 
 } // namespace backends
 

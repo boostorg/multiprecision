@@ -851,6 +851,14 @@ test-suite cpp_int_tests :
             : test_cpp_int_6
             ]
 
+      [ run test_cpp_rational.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            ]
+
       [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
            : # command line
            : # input files
