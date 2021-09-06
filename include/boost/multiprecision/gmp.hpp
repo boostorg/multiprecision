@@ -2283,6 +2283,20 @@ struct gmp_rational
          mpq_div_2exp(m_data, m_data, -e);
       return *this;
    }
+#ifdef BOOST_HAS_INT128
+   gmp_rational& operator=(unsigned __int128 i)
+   {
+      gmp_int gi;
+      gi = i;
+      return *this = gi;
+   }
+   gmp_rational& operator=(__int128 i)
+   {
+      gmp_int gi;
+      gi = i;
+      return *this = gi;
+   }
+#endif
    gmp_rational& operator=(const char* s)
    {
       if (m_data[0]._mp_den._mp_d == 0)
