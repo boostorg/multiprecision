@@ -7,7 +7,7 @@
 #define BOOST_MULTIPRECISION_RATIONAL_ADAPTOR_HPP
 
 #include <boost/multiprecision/number.hpp>
-#include <boost/container_hash/hash.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -48,10 +48,10 @@ struct rational_adaptor
    // from these types unless we make such constructors explicit.
    //
    template <class Arithmetic>
-   rational_adaptor(const Arithmetic& val, typename std::enable_if<std::is_constructible<Backend, Arithmetic>::value && !std::is_floating_point<Arithmetic>::value && std::is_constructible<Backend, ui_type>::value>::type const* = 0)
+   rational_adaptor(const Arithmetic& val, typename std::enable_if<std::is_constructible<Backend, Arithmetic>::value && !std::is_floating_point<Arithmetic>::value && std::is_constructible<Backend, ui_type>::value>::type const* = nullptr)
       : m_num(val), m_denom(one) {}
    template <class Arithmetic>
-   rational_adaptor(const Arithmetic& val, typename std::enable_if<std::is_constructible<Backend, Arithmetic>::value && !std::is_floating_point<Arithmetic>::value && !std::is_constructible<Backend, ui_type>::value>::type const* = 0)
+   rational_adaptor(const Arithmetic& val, typename std::enable_if<std::is_constructible<Backend, Arithmetic>::value && !std::is_floating_point<Arithmetic>::value && !std::is_constructible<Backend, ui_type>::value>::type const* = nullptr)
    {
       m_num = val;
       m_denom = one;
@@ -165,11 +165,11 @@ struct rational_adaptor
       }
       return result;
    }
-   void        negate()
+   void negate()
    {
       m_num.negate();
    }
-   int         compare(const rational_adaptor& o) const
+   int compare(const rational_adaptor& o) const
    {
       int s1 = eval_get_sign(*this);
       int s2 = eval_get_sign(o);
