@@ -30,15 +30,34 @@ struct rational_adaptor
 
    typedef typename std::tuple_element<0, unsigned_types>::type ui_type;
 
-   static constexpr ui_type one = 1;
-   static constexpr ui_type zero = 0;
+   static Backend get_one()
+   {
+      Backend t;
+      t = static_cast<ui_type>(1);
+      return t;
+   }
+   static Backend get_zero()
+   {
+      Backend t;
+      t = static_cast<ui_type>(0);
+      return t;
+   }
+
+   static const Backend& one()
+   {
+      static const Backend result(get_one());
+      return result;
+   }
+   static const Backend& zero()
+   {
+      static const Backend result(get_zero());
+      return result;
+   }
 
    // We must have a default constructor:
    rational_adaptor()
-   {
-      m_num = zero;
-      m_denom = one;
-   }
+      : m_num(one()), m_denom(one()) {}
+
    rational_adaptor(const rational_adaptor& o) : m_num(o.m_num), m_denom(o.m_denom) {}
    rational_adaptor(rational_adaptor&& o) = default;
 
@@ -48,14 +67,8 @@ struct rational_adaptor
    // from these types unless we make such constructors explicit.
    //
    template <class Arithmetic>
-   rational_adaptor(const Arithmetic& val, typename std::enable_if<std::is_constructible<Backend, Arithmetic>::value && !std::is_floating_point<Arithmetic>::value && std::is_constructible<Backend, ui_type>::value>::type const* = nullptr)
-      : m_num(val), m_denom(one) {}
-   template <class Arithmetic>
-   rational_adaptor(const Arithmetic& val, typename std::enable_if<std::is_constructible<Backend, Arithmetic>::value && !std::is_floating_point<Arithmetic>::value && !std::is_constructible<Backend, ui_type>::value>::type const* = nullptr)
-   {
-      m_num = val;
-      m_denom = one;
-   }
+   rational_adaptor(const Arithmetic& val, typename std::enable_if<std::is_constructible<Backend, Arithmetic>::value && !std::is_floating_point<Arithmetic>::value>::type const* = nullptr)
+      : m_num(val), m_denom(one()) {}
 
    //
    // In the absense of converting constructors, operator= takes the strain.
@@ -68,11 +81,13 @@ struct rational_adaptor
    inline typename std::enable_if<!std::is_floating_point<Arithmetic>::value, rational_adaptor&>::type operator=(const Arithmetic& i)
    {
       m_num = i;
-      m_denom = one;
+      m_denom = one();
       return *this;
    }
    rational_adaptor& operator=(const char* s)
    {
+      using default_ops::eval_eq;
+
       std::string                        s1;
       multiprecision::number<Backend>    v1, v2;
       char                               c;
@@ -108,7 +123,7 @@ struct rational_adaptor
       }
       multiprecision::number<Backend> gcd;
       eval_gcd(gcd.backend(), v1.backend(), v2.backend());
-      if (gcd != one)
+      if (!eval_eq(gcd.backend(), one()))
       {
          v1 /= gcd;
          v2 /= gcd;
@@ -120,6 +135,8 @@ struct rational_adaptor
    template <class Float>
    typename std::enable_if<std::is_floating_point<Float>::value, rational_adaptor&>::type operator=(Float i)
    {
+      using default_ops::eval_eq;
+
       int   e;
       Float f = std::frexp(i, &e);
       f = std::ldexp(f, std::numeric_limits<Float>::digits);
@@ -136,7 +153,7 @@ struct rational_adaptor
       }
       number<Backend> gcd;
       eval_gcd(gcd.backend(), num.backend(), denom.backend());
-      if (gcd != one)
+      if (!eval_eq(gcd.backend(), one()))
       {
          num /= gcd;
          denom /= gcd;
@@ -154,11 +171,12 @@ struct rational_adaptor
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
    {
+      using default_ops::eval_eq;
       //
       // We format the string ourselves so we can match what GMP's mpq type does:
       //
       std::string result = num().str(digits, f);
-      if (denom().compare(one) != 0)
+      if (!eval_eq(denom(), one()))
       {
          result.append(1, '/');
          result.append(denom().str(digits, f));
@@ -251,12 +269,6 @@ struct rational_adaptor
  private:
    Backend m_num, m_denom;
 };
-
-template <class Backend>
-constexpr typename rational_adaptor<Backend>::ui_type rational_adaptor<Backend>::one;
-
-template <class Backend>
-constexpr typename rational_adaptor<Backend>::ui_type rational_adaptor<Backend>::zero;
 
 //
 // Helpers:
@@ -359,9 +371,11 @@ void assign_components(rational_adaptor<Backend>& result, Backend const& a, Back
 {
    using default_ops::eval_gcd;
    using default_ops::eval_divide;
+   using default_ops::eval_eq;
+
    Backend g;
    eval_gcd(g, a, b);
-   if (g.compare(rational_adaptor<Backend>::one) == 0)
+   if (eval_eq(g, rational_adaptor<Backend>::one()))
    {
       result.num() = a;
       result.denom() = b;
@@ -380,10 +394,12 @@ inline void assign_components(rational_adaptor<Backend>& result, const Arithmeti
 {
    using default_ops::eval_gcd;
    using default_ops::eval_divide;
+   using default_ops::eval_eq;
+
    Backend g;
    result.num()   = a;
    eval_gcd(g, result.num(), b);
-   if (g.compare(rational_adaptor<Backend>::one) == 0)
+   if (eval_eq(g, rational_adaptor<Backend>::one()))
    {
       result.denom() = b;
    }
@@ -422,7 +438,7 @@ inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&&
    eval_eq(const rational_adaptor<Backend>& a, Arithmetic b)
 {
    using default_ops::eval_eq;
-   return eval_eq(a.denom(), rational_adaptor<Backend>::one) && eval_eq(a.num(), b);
+   return eval_eq(a.denom(), rational_adaptor<Backend>::one()) && eval_eq(a.num(), b);
 }
 
 template <class Backend, class Arithmetic>
@@ -430,7 +446,7 @@ inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&&
    eval_eq(Arithmetic b, const rational_adaptor<Backend>& a)
 {
    using default_ops::eval_eq;
-   return eval_eq(a.denom(), rational_adaptor<Backend>::one) && eval_eq(a.num(), b);
+   return eval_eq(a.denom(), rational_adaptor<Backend>::one()) && eval_eq(a.num(), b);
 }
 
 //
@@ -457,7 +473,7 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::
    //
    /*
    eval_gcd(t, result.num(), result.denom());
-   if (!eval_eq(t, rational_adaptor<Backend>::one) != 0)
+   if (!eval_eq(t, rational_adaptor<Backend>::one()) != 0)
    {
       Backend t2;
       eval_divide(t2, result.num(), t);
@@ -512,7 +528,7 @@ void eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_ada
    //
    // Do we have gcd > 1:
    //
-   if (!eval_eq(gcd, rational_adaptor<Backend>::one))
+   if (!eval_eq(gcd, rational_adaptor<Backend>::one()))
    {
       //
       // Scale the denominators by gcd, and put the results in t1 and t2:
@@ -535,7 +551,7 @@ void eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_ada
       // Get the gcd of gcd and our numerator (t3):
       //
       eval_gcd(t4, t3, gcd);
-      if (eval_eq(t4, rational_adaptor<Backend>::one))
+      if (eval_eq(t4, rational_adaptor<Backend>::one()))
       {
          result.num() = t3;
          eval_multiply(result.denom(), t1, a.denom());
@@ -588,25 +604,32 @@ eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_adaptor<
 {
    using default_ops::eval_add;
    using default_ops::eval_subtract;
-   using default_ops::eval_gcd;
    using default_ops::eval_multiply;
-   using default_ops::eval_divide;
-   Backend t;
-   eval_multiply(t, a.denom(), b);
+
+   if (&result == &a)
+      return eval_add_subtract_imp(result, b, isaddition);
+
+   eval_multiply(result.num(), a.denom(), b);
    if (isaddition)
-      eval_add(result.num(), t, a.num());
+      eval_add(result.num(), a.num());
    else
-      eval_subtract(result.num(), a.num(), t);
-   eval_gcd(t, a.num(), a.denom());
-   if (!eval_eq(t, rational_adaptor<Backend>::one))
+      BOOST_IF_CONSTEXPR(std::numeric_limits<Backend>::is_signed == false)
    {
-      Backend t2;
-      eval_divide(t2, a.num(), t);
-      t2.swap(result.num());
-      eval_divide(result.denom(), a.denom(), t);
+      Backend t;
+      eval_subtract(t, a.num(), result.num());
+      result.num() = std::move(t);
    }
    else
-      result.denom() = a.denom();
+   {
+      eval_subtract(result.num(), a.num());
+      result.negate();
+   }
+   result.denom() = a.denom();
+   //
+   // There is no need to re-normalize here, we have 
+   // (a + bm) / b
+   // and gcd(a + bm, b) = gcd(a, b) = 1
+   //
 }
 template <class Backend, class Arithmetic>
 inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type
@@ -631,6 +654,7 @@ void eval_multiply_imp(rational_adaptor<Backend>& result, const rational_adaptor
    using default_ops::eval_divide;
    using default_ops::eval_gcd;
    using default_ops::eval_get_sign;
+   using default_ops::eval_eq;
 
    Backend gcd_left, gcd_right, t1, t2;
    eval_gcd(gcd_left, a.num(), b_denom);
@@ -638,8 +662,8 @@ void eval_multiply_imp(rational_adaptor<Backend>& result, const rational_adaptor
    //
    // Unit gcd's are the most likely case:
    //
-   bool b_left = gcd_left.compare(rational_adaptor<Backend>::one) == 0;
-   bool b_right = gcd_right.compare(rational_adaptor<Backend>::one) == 0;
+   bool b_left = eval_eq(gcd_left, rational_adaptor<Backend>::one());
+   bool b_right = eval_eq(gcd_right, rational_adaptor<Backend>::one());
 
    if (b_left && b_right)
    {
@@ -700,8 +724,8 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::i
 {
    if (arg == 0)
    {
-      result_num = rational_adaptor<Backend>::zero;
-      result_denom = rational_adaptor<Backend>::one;
+      result_num = rational_adaptor<Backend>::zero();
+      result_denom = rational_adaptor<Backend>::one();
       return;
    }
    else if (arg == 1)
@@ -744,8 +768,8 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::i
 {
    if (b == 0)
    {
-      result.num() = rational_adaptor<Backend>::zero;
-      result.denom() = rational_adaptor<Backend>::one;
+      result.num() = rational_adaptor<Backend>::zero();
+      result.denom() = rational_adaptor<Backend>::one();
       return;
    }
    else if (b == 1)
@@ -814,7 +838,7 @@ inline void eval_divide(rational_adaptor<Backend>& result, const rational_adapto
    if (&a == &b)
    {
       // Huh? Really?
-      result.num() = result.denom() = rational_adaptor<Backend>::one;
+      result.num() = result.denom() = rational_adaptor<Backend>::one();
       return;
    }
    if (&result == &b)
