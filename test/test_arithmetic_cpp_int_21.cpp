@@ -12,14 +12,14 @@ struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprec
 {};
 
 template <>
-struct related_type<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::int128_t::backend_type> > >
+struct related_type<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::uint128_t::backend_type> > >
 {
-   typedef boost::multiprecision::int128_t type;
+   typedef boost::multiprecision::uint128_t type;
 };
 
 
 int main()
 {
-   test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::int128_t::backend_type> > >();
+   test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::uint128_t::backend_type> > >();
    return boost::report_errors();
 }

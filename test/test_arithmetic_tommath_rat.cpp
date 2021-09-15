@@ -15,6 +15,13 @@ template <>
 struct is_twos_complement_integer<boost::multiprecision::tom_int> : public std::integral_constant<bool, false>
 {};
 
+template <>
+struct related_type<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::tommath_int> > >
+{
+   typedef boost::multiprecision::number<boost::multiprecision::tommath_int> type;
+};
+
+
 int main()
 {
    test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::tommath_int> > >();

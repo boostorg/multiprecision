@@ -453,8 +453,7 @@ inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&&
 // Arithmetic operations, starting with addition:
 //
 template <class Backend, class Arithmetic> 
-typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type 
-   eval_add_subtract_imp(rational_adaptor<Backend>& result, Arithmetic arg, bool isaddition)
+void eval_add_subtract_imp(rational_adaptor<Backend>& result, const Arithmetic& arg, bool isaddition)
 {
    using default_ops::eval_multiply;
    using default_ops::eval_divide;
@@ -485,15 +484,15 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::
 }
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type 
-   eval_add(rational_adaptor<Backend>& result, Arithmetic arg)
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+   eval_add(rational_adaptor<Backend>& result, const Arithmetic& arg)
 {
    eval_add_subtract_imp(result, arg, true);
 }
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type 
-   eval_subtract(rational_adaptor<Backend>& result, Arithmetic arg)
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+   eval_subtract(rational_adaptor<Backend>& result, const Arithmetic& arg)
 {
    eval_add_subtract_imp(result, arg, false);
 }
@@ -599,8 +598,7 @@ inline void eval_subtract(rational_adaptor<Backend>& result, const rational_adap
 }
 
 template <class Backend, class Arithmetic>
-typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type
-eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, Arithmetic b, bool isaddition)
+void eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Arithmetic& b, bool isaddition)
 {
    using default_ops::eval_add;
    using default_ops::eval_subtract;
@@ -632,14 +630,14 @@ eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_adaptor<
    //
 }
 template <class Backend, class Arithmetic>
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type
-   eval_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, Arithmetic b)
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+   eval_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Arithmetic& b)
 {
    eval_add_subtract_imp(result, a, b, true);
 }
 template <class Backend, class Arithmetic>
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type
-   eval_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, Arithmetic b)
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+   eval_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Arithmetic& b)
 {
    eval_add_subtract_imp(result, a, b, false);
 }
@@ -719,8 +717,7 @@ void eval_multiply(rational_adaptor<Backend>& result, const rational_adaptor<Bac
 }
 
 template <class Backend, class Arithmetic> 
-typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value>::type 
-   eval_multiply_imp(Backend& result_num, Backend& result_denom, Arithmetic arg)
+void eval_multiply_imp(Backend& result_num, Backend& result_denom, Arithmetic arg)
 {
    if (arg == 0)
    {
@@ -754,10 +751,55 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::i
       result_denom = std::move(t);
    }
 }
+template <class Backend> 
+void eval_multiply_imp(Backend& result_num, Backend& result_denom, Backend arg)
+{
+   using default_ops::eval_multiply;
+   using default_ops::eval_divide;
+   using default_ops::eval_gcd;
+   using default_ops::eval_convert_to;
+   using default_ops::eval_is_zero;
+   using default_ops::eval_eq;
+   using default_ops::eval_get_sign;
+
+   if (eval_is_zero(arg))
+   {
+      result_num = rational_adaptor<Backend>::zero();
+      result_denom = rational_adaptor<Backend>::one();
+      return;
+   }
+   else if (eval_eq(arg, rational_adaptor<Backend>::one()))
+      return;
+
+   Backend gcd, t;
+   eval_gcd(gcd, result_denom, arg);
+   if (!eval_eq(gcd, rational_adaptor<Backend>::one()))
+   {
+      eval_divide(t, arg, gcd);
+      arg = t;
+   }
+   else
+      t = arg;
+   if (eval_get_sign(arg) < 0)
+      t.negate();
+
+   if (!eval_eq(t, rational_adaptor<Backend>::one()))
+   {
+      eval_multiply(t, result_num, arg);
+      result_num = std::move(t);
+   }
+   else if (eval_get_sign(arg) < 0)
+      result_num.negate();
+   if (!eval_eq(gcd, rational_adaptor<Backend>::one()))
+   {
+      eval_divide(t, result_denom, gcd);
+      result_denom = std::move(t);
+   }
+}
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value>::type 
-   eval_multiply(rational_adaptor<Backend>& result, Arithmetic arg)
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+   eval_multiply(rational_adaptor<Backend>& result, const Arithmetic& arg)
 {
    eval_multiply_imp(result.num(), result.denom(), arg);
 }
@@ -803,10 +845,17 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::i
    else
       result.denom() = a_denom;
 }
+template <class Backend> 
+inline void eval_multiply_imp(rational_adaptor<Backend>& result, const Backend& a_num, const Backend& a_denom, const Backend& b)
+{
+   result.num() = a_num;
+   result.denom() = a_denom;
+   eval_multiply_imp(result.num(), result.denom(), b);
+}
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value>::type
-   eval_multiply(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, Arithmetic b)
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+   eval_multiply(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Arithmetic& b)
 {
    if (&result == &a)
       return eval_multiply(result, b);
@@ -815,8 +864,8 @@ inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&&
 }
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value>::type
-   eval_multiply(rational_adaptor<Backend>& result, unsigned long long b, const rational_adaptor<Backend>& a)
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+   eval_multiply(rational_adaptor<Backend>& result, const Arithmetic& b, const rational_adaptor<Backend>& a)
 {
    return eval_multiply(result, a, b);
 }
@@ -850,8 +899,8 @@ inline void eval_divide(rational_adaptor<Backend>& result, const rational_adapto
 }
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value>::type
-   eval_divide(rational_adaptor<Backend>& result, Arithmetic b, const rational_adaptor<Backend>& a)
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+   eval_divide(rational_adaptor<Backend>& result, const Arithmetic& b, const rational_adaptor<Backend>& a)
 {
    using default_ops::eval_get_sign;
 
@@ -920,6 +969,63 @@ eval_divide(rational_adaptor<Backend>& result, Arithmetic arg)
       result.num() = std::move(t);
    }
 }
+template <class Backend>
+void eval_divide(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, Backend arg)
+{
+   using default_ops::eval_multiply;
+   using default_ops::eval_gcd;
+   using default_ops::eval_convert_to;
+   using default_ops::eval_divide;
+   using default_ops::eval_is_zero;
+   using default_ops::eval_eq;
+   using default_ops::eval_get_sign;
+
+   if (eval_is_zero(arg))
+   {
+      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      return;
+   }
+   else if (eval_eq(a, rational_adaptor<Backend>::one()) || (eval_get_sign(a) == 0))
+   {
+      if (&result != &a)
+         result = a;
+      return;
+   }
+
+   Backend gcd, u_arg, t;
+   eval_gcd(gcd, a.num(), arg);
+   bool has_unit_gcd = eval_eq(gcd, rational_adaptor<Backend>::one());
+   if (!has_unit_gcd)
+   {
+      eval_divide(u_arg, arg, gcd);
+      arg = u_arg;
+   }
+   else
+      u_arg = arg;
+   if (eval_get_sign(u_arg) < 0)
+      u_arg.negate();
+
+   eval_multiply(t, a.denom(), u_arg);
+   result.denom() = std::move(t);
+   
+   if (!has_unit_gcd)
+   {
+      eval_divide(t, a.num(), gcd);
+      result.num() = std::move(t);
+   }
+   else if (&result != &a)
+      result.num() = a.num();
+
+   if (eval_get_sign(arg) < 0)
+   {
+      result.num().negate();
+   }
+}
+template <class Backend>
+void eval_divide(rational_adaptor<Backend>& result, Backend arg)
+{
+   eval_divide(result, result, arg);
+}
 
 template <class Backend, class Arithmetic>
 typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value>::type
@@ -975,83 +1081,31 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::i
 }
 
 //
-// Multiply and add/subtract as one:
-//
-#if 0
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned long long b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned long b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned short b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned char b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, long long b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, long b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, int b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, short b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, signed char b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, char b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, long double b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, double b);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, float b);
-
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, unsigned long long b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, unsigned long b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, unsigned b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, unsigned short b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, unsigned char b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, long long b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, long b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, int b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, short b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, signed char b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, char b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, long double b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, double b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_add(rational_adaptor<Backend>& result, float b, const rational_adaptor<Backend>& a);
-
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned long long b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned long b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned short b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, unsigned char b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, long long b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, long b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, int b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, short b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, signed char b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, char b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, long double b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, double b);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, float b);
-
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, unsigned long long b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, unsigned long b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, unsigned b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, unsigned short b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, unsigned char b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, long long b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, long b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, int b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, short b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, signed char b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, char b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, long double b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, double b, const rational_adaptor<Backend>& a);
-template <class Backend> void eval_multiply_subtract(rational_adaptor<Backend>& result, float b, const rational_adaptor<Backend>& a);
-#endif
-//
 // Increment and decrement:
 //
-//template <class Backend> void eval_increment(rational_adaptor<Backend>& arg);
-//template <class Backend> void eval_decrement(rational_adaptor<Backend>& arg);
-//
-// abs/fabs:
-//
-// template <class Backend> void eval_abs(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& arg);
-// template <class Backend> void eval_fabs(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& arg);
-//
+template <class Backend> 
+inline void eval_increment(rational_adaptor<Backend>& arg)
+{
+   using default_ops::eval_add;
+   eval_add(arg.num(), arg.denom());
+}
+template <class Backend> 
+inline void eval_decrement(rational_adaptor<Backend>& arg)
+{
+   using default_ops::eval_subtract;
+   eval_subtract(arg.num(), arg.denom());
+}
 
+//
+// abs:
+//
+template <class Backend> 
+inline void eval_abs(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& arg)
+{
+   using default_ops::eval_abs;
+   eval_abs(result.num(), arg.num());
+   result.denom() = arg.denom();
+}
 
 } // namespace backends
 
@@ -1092,6 +1146,11 @@ inline number<IntBackend, ET> denominator(const number<rational_adaptor<IntBacke
 {
    return val.backend().denom();
 }
+
+template <class Backend>
+struct is_unsigned_number<rational_adaptor<Backend> > : public is_unsigned_number<Backend>
+{};
+
 
 }} // namespace boost::multiprecision
 

@@ -162,6 +162,9 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_cpp_int_18.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj ]
    [ run test_arithmetic_cpp_int_19.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj ]
    [ run test_arithmetic_cpp_int_20.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+   [ run test_arithmetic_cpp_int_21.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+   [ run test_arithmetic_cpp_int_22.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+   [ run test_arithmetic_cpp_int_23.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
    [ run test_arithmetic_cpp_int_br.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj ]
 
    [ run test_arithmetic_ab_1.cpp no_eh_support ]

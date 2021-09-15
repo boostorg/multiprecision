@@ -922,6 +922,242 @@ struct tester
       BOOST_CHECK_EQUAL(z1, -1);
    }
 
+   void t6()
+   {
+      //
+      // Mixed with signed integer:
+      //
+      boost::multiprecision::mpq_rational x(a, b), y(c, d), z;
+      boost::multiprecision::cpp_rational x1(a1, b1), y1(c1, d1), z1;
+
+      boost::multiprecision::mpz_int bi = generate_random<boost::multiprecision::mpz_int>(1000);
+      boost::multiprecision::cpp_int bi1(bi.str());
+
+      BOOST_CHECK_EQUAL(x.str(), x1.str());
+      BOOST_CHECK_EQUAL(y.str(), y1.str());
+      BOOST_CHECK_EQUAL(bi.str(), bi1.str());
+
+      // Both positive:
+      z  = x + bi;
+      z1 = x1 + bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x - bi;
+      z1 = x1 - bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x * bi;
+      z1 = x1 * bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x / bi;
+      z1 = x1 / bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi + x;
+      z1 = bi1 + x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi - x;
+      z1 = bi1 - x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi * x;
+      z1 = bi1 * x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi / x;
+      z1 = bi1 / x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+
+      // x negative:
+      x  = -x;
+      x1 = -x1;
+      z  = x + bi;
+      z1 = x1 + bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x - bi;
+      z1 = x1 - bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x * bi;
+      z1 = x1 * bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x / bi;
+      z1 = x1 / bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi + x;
+      z1 = bi1 + x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi - x;
+      z1 = bi1 - x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi * x;
+      z1 = bi1 * x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi / x;
+      z1 = bi1 / x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+
+      // x and bi both negative:
+      z  = x + bi;
+      z1 = x1 + bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x - bi;
+      z1 = x1 - bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x * bi;
+      z1 = x1 * bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x / bi;
+      z1 = x1 / bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi + x;
+      z1 = bi1 + x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi - x;
+      z1 = bi1 - x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi * x;
+      z1 = bi1 * x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi / x;
+      z1 = bi1 / x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+
+      // bi negative:
+      x  = -x;
+      x1 = -x1;
+      z  = x + bi;
+      z1 = x1 + bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x - bi;
+      z1 = x1 - bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x * bi;
+      z1 = x1 * bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x / bi;
+      z1 = x1 / bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi + x;
+      z1 = bi1 + x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi - x;
+      z1 = bi1 - x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi * x;
+      z1 = bi1 * x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = bi / x;
+      z1 = bi1 / x1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+
+      bi = -bi;
+      bi1 = -bi1;
+      // Inplace:
+      z  = x;
+      z1 = x1;
+      z += bi;
+      z1 += bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z -= bi;
+      z1 -= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z *= bi;
+      z1 *= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z /= bi;
+      z1 /= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+
+      // bi negative:
+      bi = -bi;
+      bi1 = -bi1;
+      z  = x;
+      z1 = x1;
+      z += bi;
+      z1 += bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z -= bi;
+      z1 -= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z *= bi;
+      z1 *= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z /= bi;
+      z1 /= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+
+      // Both negative:
+      x  = -x;
+      x1 = -x1;
+      z  = x;
+      z1 = x1;
+      z += bi;
+      z1 += bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z -= bi;
+      z1 -= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z *= bi;
+      z1 *= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z /= bi;
+      z1 /= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+
+      // x negative:
+      bi = -bi;
+      bi1 = -bi1;
+      z  = x;
+      z1 = x1;
+      z += bi;
+      z1 += bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z -= bi;
+      z1 -= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z *= bi;
+      z1 *= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+      z  = x;
+      z1 = x1;
+      z /= bi;
+      z1 /= bi1;
+      BOOST_CHECK_EQUAL(z.str(), z1.str());
+
+      BOOST_CHECK_EQUAL((x == bi), (x1 == bi1));
+      BOOST_CHECK_EQUAL((x != bi), (x1 != bi1));
+      BOOST_CHECK_EQUAL((x <= bi), (x1 <= bi1));
+      BOOST_CHECK_EQUAL((x >= bi), (x1 >= bi1));
+      BOOST_CHECK_EQUAL((x < bi), (x1 < bi1));
+      BOOST_CHECK_EQUAL((x > bi), (x1 > bi1));
+
+      z  = bi;
+      z1 = bi1;
+      BOOST_CHECK_EQUAL((x == bi), (x1 == bi1));
+      BOOST_CHECK_EQUAL((x != bi), (x1 != bi1));
+      BOOST_CHECK_EQUAL((x <= bi), (x1 <= bi1));
+      BOOST_CHECK_EQUAL((x >= bi), (x1 >= bi1));
+      BOOST_CHECK_EQUAL((x < bi), (x1 < bi1));
+      BOOST_CHECK_EQUAL((x > bi), (x1 > bi1));
+   }
+
    void test()
    {
       using namespace boost::multiprecision;
@@ -951,6 +1187,7 @@ struct tester
          t3();
          t4();
          t5();
+         t6();
 
          if (last_error_count != (unsigned)boost::detail::test_errors())
          {
