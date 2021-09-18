@@ -103,9 +103,11 @@ class cpp_dec_float
    static constexpr exponent_type cpp_dec_float_max_exp           = cpp_dec_float_max_exp10;
    static constexpr exponent_type cpp_dec_float_min_exp           = cpp_dec_float_min_exp10;
 
-   static_assert(cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10 == -cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10, "Failed exponent range check");
+   static_assert(cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10 == -cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10,
+                 "Failed exponent range check");
 
-   static_assert(0 == cpp_dec_float_max_exp10 % cpp_dec_float_elem_digits10, "Failed digit sanity check");
+   static_assert(0 == cpp_dec_float_max_exp10 % cpp_dec_float_elem_digits10,
+                 "Failed digit sanity check");
 
  private:
    // There are three guard limbs.
@@ -128,7 +130,8 @@ class cpp_dec_float
       cpp_dec_float_finite,
       cpp_dec_float_inf,
       cpp_dec_float_NaN
-   } fpclass_type;
+   }
+   fpclass_type;
 
    array_type    data;
    exponent_type exp;
@@ -162,11 +165,12 @@ class cpp_dec_float
 
  public:
    // Public Constructors
-   cpp_dec_float() noexcept(noexcept(array_type())) : data(),
-                                                      exp(static_cast<exponent_type>(0)),
-                                                      neg(false),
-                                                      fpclass(cpp_dec_float_finite),
-                                                      prec_elem(cpp_dec_float_elem_number) {}
+   constexpr cpp_dec_float() noexcept(noexcept(array_type()))
+     : data(),
+       exp(static_cast<exponent_type>(0)),
+       neg(false),
+       fpclass(cpp_dec_float_finite),
+       prec_elem(cpp_dec_float_elem_number) { }
 
    cpp_dec_float(const char* s) : data(),
                                   exp(static_cast<exponent_type>(0)),
@@ -179,7 +183,8 @@ class cpp_dec_float
 
    template <class I>
    cpp_dec_float(I i,
-                 typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value >::type* = nullptr)
+                 typename std::enable_if<(   boost::multiprecision::detail::is_unsigned<I>::value
+                                          && boost::multiprecision::detail::is_integral<I>::value)>::type* = nullptr)
       : data(),
         exp(static_cast<exponent_type>(0)),
         neg(false),
@@ -208,12 +213,12 @@ class cpp_dec_float
          from_unsigned_long_long(i);
    }
 
-   cpp_dec_float(const cpp_dec_float& f) noexcept(noexcept(array_type(std::declval<const array_type&>())))
+   constexpr cpp_dec_float(const cpp_dec_float& f) noexcept(noexcept(array_type(std::declval<const array_type&>())))
       : data(f.data),
         exp(f.exp),
         neg(f.neg),
         fpclass(f.fpclass),
-        prec_elem(f.prec_elem) {}
+        prec_elem(f.prec_elem) { }
 
    template <unsigned D, class ET, class A>
    cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if<D <= Digits10>::type* = nullptr)
@@ -223,8 +228,9 @@ class cpp_dec_float
         fpclass(static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
         prec_elem(cpp_dec_float_elem_number)
    {
-      std::copy(f.data.begin(), f.data.begin() + f.prec_elem, data.begin());
+      std::copy(f.data.cbegin(), f.data.cbegin() + f.prec_elem, data.begin());
    }
+
    template <unsigned D, class ET, class A>
    explicit cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if< !(D <= Digits10)>::type* = nullptr)
       : data(),
@@ -234,7 +240,7 @@ class cpp_dec_float
         prec_elem(cpp_dec_float_elem_number)
    {
       // TODO: this doesn't round!
-      std::copy(f.data.begin(), f.data.begin() + prec_elem, data.begin());
+      std::copy(f.data.cbegin(), f.data.cbegin() + prec_elem, data.begin());
    }
 
    template <class F>
@@ -333,7 +339,7 @@ class cpp_dec_float
       neg            = f.neg;
       fpclass        = static_cast<enum_fpclass_type>(static_cast<int>(f.fpclass));
       unsigned elems = (std::min)(f.prec_elem, cpp_dec_float_elem_number);
-      std::copy(f.data.begin(), f.data.begin() + elems, data.begin());
+      std::copy(f.data.cbegin(), f.data.cbegin() + elems, data.begin());
       std::fill(data.begin() + elems, data.end(), 0);
       prec_elem = cpp_dec_float_elem_number;
       return *this;
@@ -399,8 +405,8 @@ class cpp_dec_float
    }
 
    // Comparison functions
-   bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION() const { return (fpclass == cpp_dec_float_NaN); }
-   bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION() const { return (fpclass == cpp_dec_float_inf); }
+   bool isnan    BOOST_PREVENT_MACRO_SUBSTITUTION() const { return (fpclass == cpp_dec_float_NaN); }
+   bool isinf    BOOST_PREVENT_MACRO_SUBSTITUTION() const { return (fpclass == cpp_dec_float_inf); }
    bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION() const { return (fpclass == cpp_dec_float_finite); }
 
    bool iszero() const
@@ -459,7 +465,9 @@ class cpp_dec_float
 
       prec_elem = (std::min)(cpp_dec_float_elem_number, (std::max)(elems, static_cast<std::int32_t>(2)));
    }
+
    static cpp_dec_float pow2(boost::long_long_type i);
+
    exponent_type order() const
    {
       const bool bo_order_is_zero = ((!(isfinite)()) || (data[0] == static_cast<std::uint32_t>(0u)));
@@ -523,10 +531,6 @@ class cpp_dec_float
    }
 
  private:
-   static bool data_elem_is_non_zero_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(0u)); }
-   static bool data_elem_is_non_nine_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(cpp_dec_float::cpp_dec_float_elem_mask - 1)); }
-   static bool char_is_nonzero_predicate(const char& c) { return (c != static_cast<char>('0')); }
-
    void from_unsigned_long_long(const boost::ulong_long_type u);
 
    template <typename InputIteratorTypeLeft,
@@ -741,7 +745,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 
    // Get the offset for the add/sub operation.
    constexpr exponent_type max_delta_exp =
-     static_cast<exponent_type>((cpp_dec_float_elem_number - 1) * cpp_dec_float_elem_digits10);
+      static_cast<exponent_type>((cpp_dec_float_elem_number - 1) * cpp_dec_float_elem_digits10);
 
    const exponent_type ofs_exp = static_cast<exponent_type>(exp - v.exp);
 
@@ -847,11 +851,19 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       }
 
       // Is it necessary to justify the data?
-      const typename array_type::const_iterator first_nonzero_elem = std::find_if(data.begin(), data.end(), data_elem_is_non_zero_predicate);
+      const typename array_type::const_iterator first_nonzero_elem =
+         std::find_if
+         (
+            data.cbegin(),
+            data.cend(),
+            [](const std::uint32_t& d) -> bool
+            {
+               return (d != static_cast<std::uint32_t>(0u));
+            });
 
-      if (first_nonzero_elem != data.begin())
+      if (first_nonzero_elem != data.cbegin())
       {
-         if (first_nonzero_elem == data.end())
+         if (first_nonzero_elem == data.cend())
          {
             // This result of the subtraction is exactly zero.
             // Reset the sign and the exponent.
@@ -861,9 +873,13 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
          else
          {
             // Justify the data
-            const std::size_t sj = static_cast<std::size_t>(std::distance<typename array_type::const_iterator>(data.begin(), first_nonzero_elem));
+            const std::size_t sj =
+              static_cast<std::size_t>
+              (
+                 std::distance<typename array_type::const_iterator>(data.cbegin(), first_nonzero_elem)
+              );
 
-            std::copy(data.begin() + static_cast<std::size_t>(sj), data.end(), data.begin());
+            std::copy(data.cbegin() + static_cast<std::size_t>(sj), data.cend(), data.begin());
             std::fill(data.end() - sj, data.end(), static_cast<std::uint32_t>(0u));
 
             exp -= static_cast<exponent_type>(sj * static_cast<std::size_t>(cpp_dec_float_elem_digits10));
@@ -1062,8 +1078,8 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       exp += static_cast<exponent_type>(cpp_dec_float_elem_digits10);
 
       // Shift the result of the multiplication one element to the right.
-      std::copy_backward(data.begin(),
-                         data.begin() + static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1)),
+      std::copy_backward(data.cbegin(),
+                         data.cbegin() + static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1)),
                          data.begin() + static_cast<std::size_t>(prec_elem));
 
       data.front() = static_cast<std::uint32_t>(carry);
@@ -1153,8 +1169,8 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
          exp -= static_cast<exponent_type>(cpp_dec_float_elem_digits10);
 
          // Shift result of the division one element to the left.
-         std::copy(data.begin() + static_cast<std::size_t>(1u),
-                   data.begin() + static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1)),
+         std::copy(data.cbegin() + static_cast<std::size_t>(1u),
+                   data.cbegin() + static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1)),
                    data.begin());
 
          data[prec_elem - static_cast<std::int32_t>(1)] = static_cast<std::uint32_t>(static_cast<std::uint64_t>(prev * static_cast<std::uint64_t>(cpp_dec_float_elem_mask)) / nn);
@@ -1428,13 +1444,33 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::isone() const
    {
       if ((data[0u] == static_cast<std::uint32_t>(1u)) && (exp == static_cast<exponent_type>(0)))
       {
-         const typename array_type::const_iterator it_non_zero = std::find_if(data.begin(), data.end(), data_elem_is_non_zero_predicate);
-         return (it_non_zero == data.end());
+         const typename array_type::const_iterator it_non_zero =
+            std::find_if
+            (
+               data.cbegin(),
+               data.cend(),
+               [](const std::uint32_t& d) -> bool
+               {
+                  return (d != static_cast<std::uint32_t>(0u));
+               }
+            );
+
+         return (it_non_zero == data.cend());
       }
       else if ((data[0u] == static_cast<std::uint32_t>(cpp_dec_float_elem_mask - 1)) && (exp == static_cast<exponent_type>(-cpp_dec_float_elem_digits10)))
       {
-         const typename array_type::const_iterator it_non_nine = std::find_if(data.begin(), data.end(), data_elem_is_non_nine_predicate);
-         return (it_non_nine == data.end());
+         const typename array_type::const_iterator it_non_nine =
+            std::find_if
+            (
+               data.cbegin(),
+               data.cend(),
+               [](const std::uint32_t& d) -> bool
+               {
+                 return (d != static_cast<std::uint32_t>(cpp_dec_float::cpp_dec_float_elem_mask - 1));
+               }
+            );
+
+         return (it_non_nine == data.cend());
       }
    }
 
@@ -1468,9 +1504,18 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::isint() const
       return true;
    }
 
-   typename array_type::const_iterator it_non_zero = std::find_if(data.begin() + offset_decimal_part, data.end(), data_elem_is_non_zero_predicate);
+   const typename array_type::const_iterator it_non_zero =
+      std::find_if
+      (
+         data.cbegin() + offset_decimal_part,
+         data.cend(),
+         [](const std::uint32_t& d) -> bool
+         {
+            return (d != static_cast<std::uint32_t>(0u));
+         }
+      );
 
-   return (it_non_zero == data.end());
+   return (it_non_zero == data.cend());
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -1932,6 +1977,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       if (((pos = str.find('e')) != std::string::npos) || ((pos = str.find('E')) != std::string::npos))
       {
          // Remove the exponent part from the string.
+         // TBD: Avoid using boost::lexical_cast for standalone.
          exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(str.c_str() + (pos + 1u)));
          str = str.substr(static_cast<std::size_t>(0u), pos);
       }
@@ -1972,11 +2018,20 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       }
 
       // Remove the leading zeros for all input types.
-      const std::string::iterator fwd_it_leading_zero = std::find_if(str.begin(), str.end(), char_is_nonzero_predicate);
+      const std::string::const_iterator fwd_it_leading_zero =
+         std::find_if
+         (
+            str.cbegin(),
+            str.cend(),
+            [](const char& c) -> bool
+            {
+               return (c != static_cast<char>('0'));
+            }
+         );
 
-      if (fwd_it_leading_zero != str.begin())
+      if (fwd_it_leading_zero != str.cbegin())
       {
-         if (fwd_it_leading_zero == str.end())
+         if (fwd_it_leading_zero == str.cend())
          {
             // The string contains nothing but leading zeros.
             // This string represents zero.
@@ -1985,7 +2040,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          }
          else
          {
-            str.erase(str.begin(), fwd_it_leading_zero);
+            str.erase(str.cbegin(), fwd_it_leading_zero);
          }
       }
 
@@ -2001,11 +2056,22 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       if (pos != std::string::npos)
       {
          // Remove all trailing insignificant zeros.
-         const std::string::const_reverse_iterator rit_non_zero = std::find_if(str.rbegin(), str.rend(), char_is_nonzero_predicate);
+         const std::string::const_reverse_iterator rit_non_zero =
+            std::find_if
+            (
+               str.crbegin(),
+               str.crend(),
+               [](const char& c) -> bool
+               {
+                  return (c != static_cast<char>('0'));
+               }
+            );
 
-         if (rit_non_zero != static_cast<std::string::const_reverse_iterator>(str.rbegin()))
+         if (rit_non_zero != static_cast<std::string::const_reverse_iterator>(str.crbegin()))
          {
-            const std::string::size_type ofs = str.length() - std::distance<std::string::const_reverse_iterator>(str.rbegin(), rit_non_zero);
+            const std::string::size_type ofs =
+               str.length() - std::distance<std::string::const_reverse_iterator>(str.crbegin(), rit_non_zero);
+
             str.erase(str.begin() + ofs, str.end());
          }
 
@@ -2022,17 +2088,26 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          // and peels away the zeros just after the decimal point.
          if (str.at(static_cast<std::size_t>(0u)) == static_cast<char>('.'))
          {
-            const std::string::iterator it_non_zero = std::find_if(str.begin() + 1u, str.end(), char_is_nonzero_predicate);
+            const std::string::const_iterator it_non_zero =
+               std::find_if
+               (
+                  str.cbegin() + 1u,
+                  str.cend(),
+                  [](const char& c) -> bool
+                  {
+                     return (c != static_cast<char>('0'));
+                  }
+               );
 
             std::size_t delta_exp = static_cast<std::size_t>(0u);
 
             if (str.at(static_cast<std::size_t>(1u)) == static_cast<char>('0'))
             {
-               delta_exp = std::distance<std::string::const_iterator>(str.begin() + 1u, it_non_zero);
+               delta_exp = std::distance<std::string::const_iterator>(str.cbegin() + 1u, it_non_zero);
             }
 
             // Bring one single digit into the mantissa and adjust the exponent accordingly.
-            str.erase(str.begin(), it_non_zero);
+            str.erase(str.cbegin(), it_non_zero);
             str.insert(static_cast<std::string::size_type>(1u), ".");
             exp -= static_cast<exponent_type>(delta_exp + 1u);
          }
@@ -2044,7 +2119,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       }
 
       // Shift the decimal point such that the exponent is an even multiple of cpp_dec_float_elem_digits10.
-      std::ptrdiff_t       n_shift   = static_cast<std::ptrdiff_t>(0);
+            std::ptrdiff_t n_shift   = static_cast<std::ptrdiff_t>(0);
       const std::ptrdiff_t n_exp_rem = static_cast<std::ptrdiff_t>(exp % static_cast<exponent_type>(cpp_dec_float_elem_digits10));
 
       if((exp % static_cast<exponent_type>(cpp_dec_float_elem_digits10)) != static_cast<exponent_type>(0))
@@ -2061,7 +2136,8 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
       if ((static_cast<std::ptrdiff_t>(str.length()) - pos_plus_one) < n_shift)
       {
-         const std::ptrdiff_t sz = static_cast<std::ptrdiff_t>(n_shift - (static_cast<std::ptrdiff_t>(str.length()) - pos_plus_one));
+         const std::ptrdiff_t sz =
+            static_cast<std::ptrdiff_t>(n_shift - (static_cast<std::ptrdiff_t>(str.length()) - pos_plus_one));
 
          str.append(std::string(static_cast<std::string::size_type>(sz), static_cast<char>('0')));
       }
@@ -2082,9 +2158,9 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
       if (pos > static_cast<std::size_t>(cpp_dec_float_elem_digits10))
       {
-         const std::int32_t n_pos         = static_cast<std::int32_t>(pos);
+         const std::int32_t n_pos         =   static_cast<std::int32_t>(pos);
          const std::int32_t n_rem_is_zero = ((static_cast<std::int32_t>(n_pos % cpp_dec_float_elem_digits10) == static_cast<std::int32_t>(0)) ? static_cast<std::int32_t>(1) : static_cast<std::int32_t>(0));
-         const std::int32_t n             = static_cast<std::int32_t>(static_cast<std::int32_t>(n_pos / cpp_dec_float_elem_digits10) - n_rem_is_zero);
+         const std::int32_t n             =   static_cast<std::int32_t>(static_cast<std::int32_t>(n_pos / cpp_dec_float_elem_digits10) - n_rem_is_zero);
 
          str.insert(static_cast<std::size_t>(static_cast<std::int32_t>(n_pos - static_cast<std::int32_t>(n * cpp_dec_float_elem_digits10))), ".");
 
@@ -2128,16 +2204,23 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // Extract the data.
 
       // First get the digits to the left of the decimal point...
+      // TBD: Avoid using boost::lexical_cast for standalone.
       data[0u] = boost::lexical_cast<std::uint32_t>(str.substr(static_cast<std::size_t>(0u), pos));
 
       // ...then get the remaining digits to the right of the decimal point.
-      const std::string::size_type i_end = ((str.length() - pos_plus_one) / static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
+      const std::string::size_type i_end =
+         ((str.length() - pos_plus_one) / static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
 
       for (std::string::size_type i = static_cast<std::string::size_type>(0u); i < i_end; i++)
       {
-         const std::string::const_iterator it = str.begin() + pos_plus_one + (i * static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
+         const std::string::const_iterator it =
+              str.cbegin()
+            + pos_plus_one
+            + (i * static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
 
-         data[i + 1u] = boost::lexical_cast<std::uint32_t>(std::string(it, it + static_cast<std::string::size_type>(cpp_dec_float_elem_digits10)));
+         // TBD: Avoid using boost::lexical_cast for standalone.
+         data[i + 1u] =
+            boost::lexical_cast<std::uint32_t>(std::string(it, it + static_cast<std::string::size_type>(cpp_dec_float_elem_digits10)));
       }
 
       // Check for overflow...
@@ -2322,7 +2405,11 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::from_unsigned_long_long(c
 
    boost::ulong_long_type uu = u;
 
-   std::uint32_t temp[(std::numeric_limits<boost::ulong_long_type>::digits10 / static_cast<int>(cpp_dec_float_elem_digits10)) + 3] = {static_cast<std::uint32_t>(0u)};
+   using local_temp_array_type =
+      std::array<std::uint32_t,
+                 (std::numeric_limits<boost::ulong_long_type>::digits10 / static_cast<int>(cpp_dec_float_elem_digits10)) + 3>;
+
+   local_temp_array_type temp = {static_cast<std::uint32_t>(0u)};
 
    while (uu != static_cast<boost::ulong_long_type>(0u))
    {
@@ -2336,8 +2423,10 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::from_unsigned_long_long(c
       exp += static_cast<exponent_type>((i - 1u) * static_cast<std::size_t>(cpp_dec_float_elem_digits10));
    }
 
-   std::reverse(temp, temp + i);
-   std::copy(temp, temp + (std::min)(i, static_cast<std::size_t>(cpp_dec_float_elem_number)), data.begin());
+   std::reverse(temp.begin(), temp.begin() + i);
+   std::copy(temp.cbegin(),
+             temp.cbegin() + (std::min)(i, static_cast<std::size_t>(cpp_dec_float_elem_number)),
+             data.begin());
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
