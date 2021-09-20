@@ -94,8 +94,8 @@ struct logged_adaptor
    {
       log_postfix_event(m_value, "construct from arithmetic type");
    }
-   template <class T>
-   logged_adaptor(const T& i, const T& j)
+   template <class T, class U>
+   logged_adaptor(const T& i, const U& j, typename std::enable_if<std::is_constructible<Backend, const T&, const U&>::value>::type* = nullptr)
       : m_value(i, j)
    {
       log_postfix_event(m_value, "construct from a pair of arithmetic types");
