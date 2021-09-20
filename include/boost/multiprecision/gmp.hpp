@@ -2189,6 +2189,17 @@ struct gmp_rational
          mpq_canonicalize(m_data);
       j.data()[0]._mp_d = nullptr;
    }
+   template <class U>
+   gmp_rational(gmp_int&& a, const U& b, typename std::enable_if<std::is_constructible<gmp_int, U>::value>::type* = nullptr)
+   {
+      gmp_int j(b);
+      m_data[0]._mp_num = a.data()[0];
+      m_data[0]._mp_den = j.data()[0];
+      if (boost::multiprecision::detail::unsigned_abs(b) > 1)
+         mpq_canonicalize(m_data);
+      a.data()[0]._mp_d = nullptr;
+      j.data()[0]._mp_d = nullptr;
+   }
    template <class T>
    gmp_rational(const T& a, const gmp_int& b, typename std::enable_if<std::is_constructible<gmp_int, T>::value>::type* = nullptr)
    {
@@ -2199,11 +2210,30 @@ struct gmp_rational
          mpq_canonicalize(m_data);
       i.data()[0]._mp_d = nullptr;
    }
+   template <class T>
+   gmp_rational(const T& a, gmp_int&& b, typename std::enable_if<std::is_constructible<gmp_int, T>::value>::type* = nullptr)
+   {
+      gmp_int i(a);
+      m_data[0]._mp_num = i.data()[0];
+      m_data[0]._mp_den = b.data()[0];
+      if(boost::multiprecision::detail::unsigned_abs(a) > 1)
+         mpq_canonicalize(m_data);
+      i.data()[0]._mp_d = nullptr;
+      b.data()[0]._mp_d = nullptr;
+   }
    gmp_rational(const gmp_int& a, const gmp_int& b)
    {
       mpz_init_set(&m_data[0]._mp_num, a.data());
       mpz_init_set(&m_data[0]._mp_den, b.data());
       mpq_canonicalize(m_data);
+   }
+   gmp_rational(gmp_int&& a, gmp_int&& b)
+   {
+      m_data[0]._mp_num = a.data()[0];
+      m_data[0]._mp_den = b.data()[0];
+      mpq_canonicalize(m_data);
+      a.data()[0]._mp_d = nullptr;
+      b.data()[0]._mp_d = nullptr;
    }
    // rvalue copy
    gmp_rational(gmp_rational&& o) noexcept
