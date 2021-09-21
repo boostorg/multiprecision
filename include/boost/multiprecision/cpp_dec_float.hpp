@@ -522,6 +522,117 @@ class cpp_dec_float
       ar& boost::make_nvp("precision", prec_elem);
    }
 
+   void eval_round_self()
+   {
+      const bool needs_rounding = (((isfinite)() == true) && (iszero() == false));
+
+      if(needs_rounding)
+      {
+         using local_size_type = typename array_type::size_type;
+         using local_limb_type = typename array_type::value_type;
+
+         std::int32_t digit_count_limb_0 = 0;
+
+         local_limb_type tmp_limb_0 = data[0U];
+
+         // Manually count the number of base-10 digits on the zero'th limb.
+         while(tmp_limb_0 > 0U)
+         {
+            tmp_limb_0 /= 10U;
+
+            ++digit_count_limb_0;
+         }
+
+         constexpr std::int32_t local_max_digits10 = cpp_dec_float_digits10 + 3;
+
+         const std::int32_t digit_count_limbs_1_to_n = local_max_digits10 - digit_count_limb_0;
+
+         // Find the index of the element that contains the least-significant base-10 digit.
+         std::int32_t digit_idx = std::int32_t(   (digit_count_limbs_1_to_n / cpp_dec_float_elem_digits10)
+                                               + ((digit_count_limbs_1_to_n % cpp_dec_float_elem_digits10) != 0));
+
+         std::int32_t digit_rem = std::int32_t( local_max_digits10 - digit_count_limb_0 - std::int32_t((digit_idx - ((digit_count_limbs_1_to_n % cpp_dec_float_elem_digits10) != 0))* cpp_dec_float_elem_digits10));
+
+         local_limb_type least_significant_p10;
+         local_limb_type rounding_p10;
+
+         // Get the value of the least-significant base-10 digit.
+         const std::uint8_t least_significant_digit =
+         detail::digit_at_pos_in_limb
+            (
+               data[local_size_type(digit_idx)],
+               static_cast<unsigned>(cpp_dec_float_elem_digits10 - digit_rem),
+               least_significant_p10
+            );
+
+         static_cast<void>(least_significant_digit);
+
+         // Get the value of the rounding digit, which is one digit
+         // less significant than the least-significant base-10 digit.
+         const std::uint8_t rounding_digit =
+            detail::digit_at_pos_in_limb
+            (
+               data[local_size_type((digit_rem != 0) ? digit_idx : digit_idx + 1)],
+               static_cast<unsigned>((cpp_dec_float_elem_digits10 - digit_rem) - 1),
+               rounding_p10
+            );
+
+         // Clear the lower base-10 digits of the rounded element.
+         data[local_size_type(digit_idx)] -= local_limb_type(data[local_size_type(digit_idx)] % least_significant_p10);
+
+         // Clear the lower base-10 limbs.
+         if(local_size_type(digit_idx) < local_size_type(data.size() - 1U))
+         {
+            std::fill(data.begin() + local_size_type(digit_idx + 1), data.end(), local_limb_type(0U));
+         }
+
+         // Perform round-to-nearest with no tie-breaking whatsoever.
+         if(rounding_digit >= 5U)
+         {
+            data[local_size_type(digit_idx)] += least_significant_p10;
+
+            // There is a carry from rounding up.
+            std::uint_fast8_t carry_out =
+            ((data[local_size_type(digit_idx)] >= cpp_dec_float_elem_mask) ? static_cast<std::uint_fast8_t>(1U)
+                                                                  : static_cast<std::uint_fast8_t>(0U));
+
+            // Propogate the carry into the limbs of higher significance as needed.
+            if(carry_out != 0U)
+            {
+               data[local_size_type(digit_idx)] -= cpp_dec_float_elem_mask;
+
+               --digit_idx;
+
+               for( ; digit_idx >= 0 && (carry_out != 0U); --digit_idx)
+               {
+                  const local_limb_type tt = local_limb_type(data[local_size_type(digit_idx)] + local_limb_type(carry_out));
+
+                  carry_out = ((tt >= cpp_dec_float_elem_mask) ? static_cast<std::uint_fast8_t>(1U)
+                                                               : static_cast<std::uint_fast8_t>(0U));
+
+                  data[local_size_type(digit_idx)] =
+                     static_cast<local_limb_type>(tt - ((carry_out != 0U) ? cpp_dec_float_elem_mask
+                                                                          : static_cast<local_limb_type>(0U)));
+               }
+
+               if((digit_idx < 0) && (carry_out != 0U))
+               {
+                  // In rare cases, propagation of the carry reaches the zero'th limb
+                  // of highest significance, and we must shift the data, create a new limb
+                  // with the carry value of 1 and adjust the exponent accordingly.
+                  std::copy_backward(data.cbegin(),
+                                     data.cend() - 1,
+                                     data.end());
+
+                  data[0U] = carry_out;
+
+                  exp = static_cast<exponent_type>(exp + static_cast<exponent_type>(cpp_dec_float_elem_digits10));
+               }
+            }
+         }
+      }
+   }
+
  private:
    static bool data_elem_is_non_zero_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(0u)); }
    static bool data_elem_is_non_nine_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(cpp_dec_float::cpp_dec_float_elem_mask - 1)); }
@@ -1643,9 +1754,14 @@ boost::long_long_type cpp_dec_float<Digits10, ExponentType, Allocator>::extract_
    else
    {
       // Extract the data into an boost::ulong_long_type value.
-      cpp_dec_float<Digits10, ExponentType, Allocator> xn(extract_integer_part());
+      cpp_dec_float<Digits10, ExponentType, Allocator> xn(*this);
+
+      xn.eval_round_self();
+
       if (xn.isneg())
          xn.negate();
+
+      xn = xn.extract_integer_part();
 
       val = static_cast<boost::ulong_long_type>(xn.data[0]);
 
@@ -1688,35 +1804,40 @@ boost::ulong_long_type cpp_dec_float<Digits10, ExponentType, Allocator>::extract
    {
       return static_cast<boost::ulong_long_type>(extract_signed_long_long());
    }
-
-   if (exp < static_cast<exponent_type>(0))
+   else if (exp < static_cast<exponent_type>(0))
    {
       return static_cast<boost::ulong_long_type>(0u);
    }
-
-   const cpp_dec_float<Digits10, ExponentType, Allocator> xn(extract_integer_part());
-
-   boost::ulong_long_type val;
-
-   if (xn.compare(ulong_long_max()) > 0)
-   {
-      return (std::numeric_limits<boost::ulong_long_type>::max)();
-   }
    else
    {
-      // Extract the data into an boost::ulong_long_type value.
-      val = static_cast<boost::ulong_long_type>(xn.data[0]);
+      cpp_dec_float<Digits10, ExponentType, Allocator> xn(*this);
 
-      const std::int32_t imax = (std::min)(static_cast<std::int32_t>(static_cast<std::int32_t>(xn.exp) / cpp_dec_float_elem_digits10), static_cast<std::int32_t>(cpp_dec_float_elem_number - static_cast<std::int32_t>(1)));
+      xn.eval_round_self();
 
-      for (std::int32_t i = static_cast<std::int32_t>(1); i <= imax; i++)
+      xn = xn.extract_integer_part();
+
+      boost::ulong_long_type val;
+
+      if (xn.compare(ulong_long_max()) > 0)
       {
-         val *= static_cast<boost::ulong_long_type>(cpp_dec_float_elem_mask);
-         val += static_cast<boost::ulong_long_type>(xn.data[i]);
+         return (std::numeric_limits<boost::ulong_long_type>::max)();
       }
-   }
+      else
+      {
+         // Extract the data into an boost::ulong_long_type value.
+         val = static_cast<boost::ulong_long_type>(xn.data[0]);
 
-   return val;
+         const std::int32_t imax = (std::min)(static_cast<std::int32_t>(static_cast<std::int32_t>(xn.exp) / cpp_dec_float_elem_digits10), static_cast<std::int32_t>(cpp_dec_float_elem_number - static_cast<std::int32_t>(1)));
+
+         for (std::int32_t i = static_cast<std::int32_t>(1); i <= imax; i++)
+         {
+            val *= static_cast<boost::ulong_long_type>(cpp_dec_float_elem_mask);
+            val += static_cast<boost::ulong_long_type>(xn.data[i]);
+         }
+      }
+
+      return val;
+   }
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -3091,37 +3212,73 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_floor(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x)
 {
    result = x;
-   if (!(x.isfinite)() || x.isint())
+
+   if((x.isfinite)() == false)
    {
       if ((x.isnan)())
          errno = EDOM;
-      return;
    }
+   else
+   {
+      result.eval_round_self();
 
-   if (x.isneg())
-      result -= cpp_dec_float<Digits10, ExponentType, Allocator>::one();
-   result = result.extract_integer_part();
+      if(result.isint())
+      {
+         ;
+      }
+      else
+      {
+         if(result.isneg())
+         {
+            result -= cpp_dec_float<Digits10, ExponentType, Allocator>::one();
+         }
+         else
+         {
+            ;
+         }
+
+         result  = result.extract_integer_part();
+      }
+   }
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_ceil(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x)
 {
    result = x;
-   if (!(x.isfinite)() || x.isint())
+
+   if ((x.isfinite)() == false)
    {
       if ((x.isnan)())
          errno = EDOM;
-      return;
    }
+   else
+   {
+      result.eval_round_self();
 
-   if (!x.isneg())
-      result += cpp_dec_float<Digits10, ExponentType, Allocator>::one();
-   result = result.extract_integer_part();
+      if(result.isint())
+      {
+         ;
+      }
+      else
+      {
+         if(result.isneg())
+         {
+         }
+         else
+         {
+            result += cpp_dec_float<Digits10, ExponentType, Allocator>::one();
+         }
+
+         result = result.extract_integer_part();
+      }
+   }
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_trunc(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x)
 {
+
    if (x.isint() || !(x.isfinite)())
    {
       result = x;

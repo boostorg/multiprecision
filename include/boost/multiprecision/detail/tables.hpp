@@ -75,6 +75,14 @@ constexpr std::uint32_t pow10_maker(std::uint32_t n)
    return ((n == UINT32_C(0)) ? UINT32_C(1) : pow10_maker(n - UINT32_C(1)) * UINT32_C(10));
 }
 
+template<typename LimbType>
+inline std::uint8_t digit_at_pos_in_limb(const LimbType u, const unsigned pos, LimbType& p10)
+{
+   p10 = static_cast<LimbType>(pow10_maker(pos));
+
+   return std::uint8_t(LimbType(u / p10) % LimbType(10U));
+}
+
 }}}} // namespace boost::multiprecision::backends::detail
 
 #endif // BOOST_MP_DETAIL_TABLES_HPP
