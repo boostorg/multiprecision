@@ -76,9 +76,9 @@ constexpr std::uint32_t pow10_maker(std::uint32_t n)
 }
 
 template<typename LimbType>
-inline std::uint8_t digit_at_pos_in_limb(const LimbType u, const unsigned pos, LimbType& p10)
+inline std::uint8_t digit_at_pos_in_limb(const LimbType u, const unsigned pos)
 {
-   p10 = static_cast<LimbType>(pow10_maker(pos));
+   LimbType p10 = static_cast<LimbType>(pow10_maker(pos));
 
    return std::uint8_t(LimbType(u / p10) % LimbType(10U));
 }
