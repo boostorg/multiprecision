@@ -1158,7 +1158,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    {
       using common_type = typename std::common_type<T, local_limb_type>::type;
 
-      if (static_cast<common_type>(val) > limb_mask)
+      if (static_cast<common_type>(val) > static_cast<common_type>(limb_mask))
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
       if (val < 0)
          BOOST_THROW_EXCEPTION(std::range_error("The argument to an unsigned cpp_int constructor was negative."));

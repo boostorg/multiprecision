@@ -522,14 +522,14 @@ void eval_add_subtract_imp(rational_adaptor<Backend>& result, const Arithmetic& 
 }
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
    eval_add(rational_adaptor<Backend>& result, const Arithmetic& arg)
 {
    eval_add_subtract_imp(result, arg, true);
 }
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
    eval_subtract(rational_adaptor<Backend>& result, const Arithmetic& arg)
 {
    eval_add_subtract_imp(result, arg, false);
@@ -668,13 +668,13 @@ void eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_ada
    //
 }
 template <class Backend, class Arithmetic>
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
    eval_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Arithmetic& b)
 {
    eval_add_subtract_imp(result, a, b, true);
 }
 template <class Backend, class Arithmetic>
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
    eval_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Arithmetic& b)
 {
    eval_add_subtract_imp(result, a, b, false);
@@ -836,14 +836,14 @@ void eval_multiply_imp(Backend& result_num, Backend& result_denom, Backend arg)
 }
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
    eval_multiply(rational_adaptor<Backend>& result, const Arithmetic& arg)
 {
    eval_multiply_imp(result.num(), result.denom(), arg);
 }
 
 template <class Backend, class Arithmetic> 
-typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value>::type
+typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type
    eval_multiply_imp(rational_adaptor<Backend>& result, const Backend& a_num, const Backend& a_denom, Arithmetic b)
 {
    if (b == 0)
@@ -892,7 +892,7 @@ inline void eval_multiply_imp(rational_adaptor<Backend>& result, const Backend& 
 }
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
    eval_multiply(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Arithmetic& b)
 {
    if (&result == &a)
@@ -902,7 +902,7 @@ inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&&
 }
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
    eval_multiply(rational_adaptor<Backend>& result, const Arithmetic& b, const rational_adaptor<Backend>& a)
 {
    return eval_multiply(result, a, b);
@@ -937,7 +937,7 @@ inline void eval_divide(rational_adaptor<Backend>& result, const rational_adapto
 }
 
 template <class Backend, class Arithmetic> 
-inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value>::type
+inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
    eval_divide(rational_adaptor<Backend>& result, const Arithmetic& b, const rational_adaptor<Backend>& a)
 {
    using default_ops::eval_get_sign;
@@ -963,7 +963,7 @@ inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&&
 }
 
 template <class Backend, class Arithmetic>
-typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value>::type
+typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type
 eval_divide(rational_adaptor<Backend>& result, Arithmetic arg)
 {
    if (arg == 0)
@@ -1066,7 +1066,7 @@ void eval_divide(rational_adaptor<Backend>& result, Backend arg)
 }
 
 template <class Backend, class Arithmetic>
-typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value>::type
+typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type
    eval_divide(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, Arithmetic arg)
 {
    if (&result == &a)
