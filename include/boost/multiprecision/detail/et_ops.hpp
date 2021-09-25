@@ -142,18 +142,21 @@ operator+(const number<B, ET>& a, const detail::expression<tag, Arg1, Arg2, Arg3
 }
 
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::plus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< 
+   std::is_same<typename detail::expression<detail::plus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET> >::value,
+   typename detail::expression<detail::plus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
 operator+(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::plus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET> >::value)
-   {
-      a += b;
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-   {
-      return detail::expression<detail::plus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
-   }
+   a += b;
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< 
+   !std::is_same<typename detail::expression<detail::plus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET> >::value,
+   typename detail::expression<detail::plus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
+operator+(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::plus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
@@ -164,18 +167,21 @@ operator+(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::plus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< 
+   std::is_same<typename detail::expression<detail::plus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::plus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type>::type
 operator+(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::plus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type, number<B, ET>>::value)
-   {
-      b += a;
-      return static_cast<number<B, et_on>&&>(b);
-   }
-   else
-   {
-      return detail::expression<detail::plus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >(a, b);
-   }
+   b += a;
+   return static_cast<number<B, et_on>&&>(b);
+}
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< 
+   !std::is_same<typename detail::expression<detail::plus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::plus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type>::type
+operator+(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
+{
+   return detail::expression<detail::plus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >(a, b);
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
@@ -221,18 +227,21 @@ operator+(const number<B, ET>& a, const detail::expression<detail::multiply_imme
 }
 
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type>::type
 operator+(number<B, ET>&& a, const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type, number<B, ET>>::value)
-   {
-      a += b;
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-   {
-      return detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >(b.left(), b.right(), a);
-   }
+   a += b;
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type>::type
+operator+(number<B, ET>&& a, const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >(b.left(), b.right(), a);
 }
 
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
@@ -243,18 +252,21 @@ operator+(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3
 }
 
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type>::type
 operator+(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type, number<B, ET>>::value)
-   {
-      b += a;
-      return static_cast<number<B, et_on>&&>(b);
-   }
-   else
-   {
-      return detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >(a.left(), a.right(), b);
-   }
+   b += a;
+   return static_cast<number<B, et_on>&&>(b);
+}
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >::result_type>::type
+operator+(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
+{
+   return detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >(a.left(), a.right(), b);
 }
 
 //
@@ -282,18 +294,21 @@ operator-(const number<B, ET>& a, const detail::expression<detail::multiply_imme
 }
 
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::negate, detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> > >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::negate, detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> > >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> > >::result_type>::type
 operator-(number<B, ET>&& a, const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::negate, detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> > >::result_type, number<B, ET>>::value)
-   {
-      a -= b;
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-   {
-      return detail::expression<detail::negate, detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> > >(detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >(b.left(), b.right(), a));
-   }
+   a -= b;
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::negate, detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> > >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> > >::result_type>::type
+operator-(number<B, ET>&& a, const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::negate, detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> > >(detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >(b.left(), b.right(), a));
 }
 
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
@@ -321,18 +336,21 @@ operator+(const number<B, ET>& a, const detail::expression<detail::negate, Arg1,
 }
 
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type>::type
 operator+(number<B, ET>&& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type, number<B, ET>>::value)
-   {
-      a -= b.left_ref();
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-   {
-      return detail::expression<detail::minus, number<B, ET>, Arg1>(a, b.left_ref());
-   }
+   a -= b.left_ref();
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type>::type
+operator+(number<B, ET>&& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::minus, number<B, ET>, Arg1>(a, b.left_ref());
 }
 
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
@@ -343,18 +361,21 @@ operator+(const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, c
 }
 
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type>::type
 operator+(const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type, number<B, ET>>::value)
-   {
-      b -= a.left_ref();
-      return static_cast<number<B, et_on>&&>(b);
-   }
-   else
-   {
-      return detail::expression<detail::minus, number<B, ET>, Arg1>(b, a.left_ref());
-   }
+   b -= a.left_ref();
+   return static_cast<number<B, et_on>&&>(b);
+}
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::minus, number<B, ET>, Arg1>::result_type>::type
+operator+(const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
+{
+   return detail::expression<detail::minus, number<B, ET>, Arg1>(b, a.left_ref());
 }
 
 template <class B>
@@ -506,18 +527,21 @@ operator-(const number<B, ET>& a, const detail::expression<tag, Arg1, Arg2, Arg3
 }
 
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::minus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::minus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::minus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
 operator-(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::minus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET>>::value)
-   {
-      a -= b;
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-   {
-      return detail::expression<detail::minus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
-   }
+   a -= b;
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::minus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::minus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
+operator-(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::minus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
@@ -528,19 +552,22 @@ operator-(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::minus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::minus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::minus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type>::type
 operator-(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::minus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type, number<B, ET>>::value)
-   {
-      b -= a;
-      b.backend().negate();
-      return static_cast<number<B, et_on>&&>(b);
-   }
-   else
-   {
-      return detail::expression<detail::minus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >(a, b);
-   }
+   b -= a;
+   b.backend().negate();
+   return static_cast<number<B, et_on>&&>(b);
+}
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::minus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::minus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type>::type
+operator-(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
+{
+   return detail::expression<detail::minus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >(a, b);
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
@@ -572,16 +599,21 @@ operator-(const number<B, ET>& a, const detail::expression<detail::negate, Arg1,
 }
 
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::plus, number<B, ET>, Arg1>::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::plus, number<B, ET>, Arg1>::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::plus, number<B, ET>, Arg1>::result_type>::type
 operator-(number<B, ET>&& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::plus, number<B, ET>, Arg1>::result_type, number<B, ET>>::value)
-   {
-      a += b.left_ref();
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-      return detail::expression<detail::plus, number<B, ET>, Arg1>(a, b.left_ref());
+   a += b.left_ref();
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::plus, number<B, ET>, Arg1>::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::plus, number<B, ET>, Arg1>::result_type>::type
+operator-(number<B, ET>&& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::plus, number<B, ET>, Arg1>(a, b.left_ref());
 }
 
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
@@ -593,17 +625,22 @@ operator-(const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, c
 }
 
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, Arg1> >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, Arg1> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, Arg1> >::result_type>::type
 operator-(const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, Arg1> >::result_type, number<B, ET>>::value)
-   {
-      b += a.left_ref();
-      b.backend().negate();
-      return static_cast<number<B, et_on>&&>(b);
-   }
-   else
-      return detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, Arg1> >(detail::expression<detail::plus, number<B, ET>, Arg1>(b, a.left_ref()));
+   b += a.left_ref();
+   b.backend().negate();
+   return static_cast<number<B, et_on>&&>(b);
+}
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, Arg1> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, Arg1> >::result_type>::type
+operator-(const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
+{
+   return detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, Arg1> >(detail::expression<detail::plus, number<B, ET>, Arg1>(b, a.left_ref()));
 }
 
 template <class B>
@@ -631,18 +668,23 @@ operator-(const detail::expression<detail::negate, number<B, et_on> >& a, const 
 }
 
 template <class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >::result_type, number<B, et_on>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >::result_type>::type
 operator-(const detail::expression<detail::negate, number<B, et_on> >& a, number<B, et_on>&& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >::result_type, number<B, et_on>>::value)
-   {
-      using default_ops::eval_add;
-      eval_add(b.backend(), a.left_ref().backend());
-      b.backend().negate();
-      return static_cast<number<B, et_on>&&>(b);
-   }
-   else
-      return detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >(
+   using default_ops::eval_add;
+   eval_add(b.backend(), a.left_ref().backend());
+   b.backend().negate();
+   return static_cast<number<B, et_on>&&>(b);
+}
+template <class B>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >::result_type, number<B, et_on>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >::result_type>::type
+operator-(const detail::expression<detail::negate, number<B, et_on> >& a, number<B, et_on>&& b)
+{
+   return detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >(
          detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> >(b, a.left_ref()));
 }
 
@@ -761,16 +803,21 @@ operator*(const number<B, ET>& a, const detail::expression<tag, Arg1, Arg2, Arg3
 }
 
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::multiplies, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::multiplies, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::multiplies, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
 operator*(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::multiplies, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET>>::value)
-   {
-      a *= b;
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-      return detail::expression<detail::multiplies, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
+   a *= b;
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::multiplies, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::multiplies, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
+operator*(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::multiplies, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
@@ -781,16 +828,21 @@ operator*(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::multiplies, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::multiplies, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::multiplies, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type>::type
 operator*(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::multiplies, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type, number<B, ET>>::value)
-   {
-      b *= a;
-      return static_cast<number<B, et_on>&&>(b);
-   }
-   else
-      return detail::expression<detail::multiplies, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >(a, b);
+   b *= a;
+   return static_cast<number<B, et_on>&&>(b);
+}
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::multiplies, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::multiplies, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >::result_type>::type
+operator*(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
+{
+   return detail::expression<detail::multiplies, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >(a, b);
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
@@ -855,17 +907,22 @@ operator*(const number<B, et_on>& a, const detail::expression<detail::negate, nu
 }
 
 template <class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type, number<B, et_on>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type>::type
 operator*(number<B, et_on>&& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type, number<B, et_on>>::value)
-   {
-      a *= b.left_ref();
-      a.backend().negate();
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-      return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >(
+   a *= b.left_ref();
+   a.backend().negate();
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type, number<B, et_on>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type>::type
+operator*(number<B, et_on>&& a, const detail::expression<detail::negate, number<B, et_on> >& b)
+{
+   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >(
          detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> >(a, b.left_ref()));
 }
 
@@ -878,17 +935,22 @@ operator*(const detail::expression<detail::negate, number<B, et_on> >& a, const 
 }
 
 template <class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type, number<B, et_on>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type>::type
 operator*(const detail::expression<detail::negate, number<B, et_on> >& a, number<B, et_on>&& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type, number<B, et_on>>::value)
-   {
-      b *= a.left_ref();
-      b.backend().negate();
-      return static_cast<number<B, et_on>&&>(b);
-   }
-   else
-      return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >(
+   b *= a.left_ref();
+   b.backend().negate();
+   return static_cast<number<B, et_on>&&>(b);
+}
+template <class B>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type, number<B, et_on>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >::result_type>::type
+operator*(const detail::expression<detail::negate, number<B, et_on> >& a, number<B, et_on>&& b)
+{
+   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >(
          detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> >(b, a.left_ref()));
 }
 
@@ -1002,16 +1064,21 @@ operator/(const number<B, ET>& a, const detail::expression<tag, Arg1, Arg2, Arg3
    return detail::expression<detail::divides, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<detail::divides, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::divides, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::divides, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
 operator/(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::divides, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET>>::value)
-   {
-      a /= b;
-      return static_cast<number<B, ET>&&>(a);
-   }
-   else
-      return detail::expression<detail::divides, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
+   a /= b;
+   return static_cast<number<B, ET>&&>(a);
+}
+template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::divides, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::divides, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
+operator/(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::divides, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline BOOST_MP_CXX14_CONSTEXPR detail::expression<detail::divides, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >
@@ -1054,17 +1121,22 @@ operator/(const number<B, ET>& a, const detail::expression<detail::negate, Arg1,
        detail::expression<detail::divides, number<B, ET>, Arg1>(a, b.left_ref()));
 }
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
-inline typename detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, Arg1> >::result_type
+inline typename std::enable_if<
+   std::is_same<typename detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, Arg1> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, Arg1> >::result_type>::type
 operator/(number<B, ET>&& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, Arg1> >::result_type, number<B, ET>>::value)
-   {
-      a /= b.left_ref();
-      a.backend().negate();
-      return static_cast<number<B, ET>&&>(a);
-   }
-   else
-      return detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, Arg1> >(
+   a /= b.left_ref();
+   a.backend().negate();
+   return static_cast<number<B, ET>&&>(a);
+}
+template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
+inline typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, Arg1> >::result_type, number<B, ET>>::value,
+   typename detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, Arg1> >::result_type>::type
+operator/(number<B, ET>&& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, Arg1> >(
          detail::expression<detail::divides, number<B, ET>, Arg1>(a, b.left_ref()));
 }
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
@@ -1225,17 +1297,23 @@ operator%(const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, A
    return detail::expression<detail::modulus, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::modulus, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value 
+   && number_category<B>::value == number_kind_integer,
    typename detail::expression<detail::modulus, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type >::type
 operator%(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::modulus, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value)
-   {
-      a %= b;
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-      return detail::expression<detail::modulus, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
+   a %= b;
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::modulus, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value 
+   && number_category<B>::value == number_kind_integer,
+   typename detail::expression<detail::modulus, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type >::type
+operator%(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::modulus, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1399,17 +1477,23 @@ operator&(const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, A
    return detail::expression<detail::bitwise_and, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::bitwise_and, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
    typename detail::expression<detail::bitwise_and, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type >::type
 operator&(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::bitwise_and, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value)
-   {
-      a &= b;
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-      return detail::expression<detail::bitwise_and, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
+   a &= b;
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::bitwise_and, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
+   typename detail::expression<detail::bitwise_and, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type >::type
+operator&(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::bitwise_and, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1419,17 +1503,23 @@ operator&(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number
    return detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
    typename detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type >::type
 operator&(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, et_on>&& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type, number<B, et_on>>::value)
-   {
-      b &= a;
-      return static_cast<number<B, et_on>&&>(b);
-   }
-   else
-      return detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
+   b &= a;
+   return static_cast<number<B, et_on>&&>(b);
+}
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
+   typename detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type >::type
+operator&(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, et_on>&& b)
+{
+   return detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer,
@@ -1529,17 +1619,23 @@ operator|(const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, A
    return detail::expression<detail::bitwise_or, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::bitwise_or, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
    typename detail::expression<detail::bitwise_or, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
 operator|(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::bitwise_or, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value)
-   {
-      a |= b;
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-      return detail::expression<detail::bitwise_or, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
+   a |= b;
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::bitwise_or, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
+   typename detail::expression<detail::bitwise_or, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
+operator|(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::bitwise_or, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1549,17 +1645,23 @@ operator|(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number
    return detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
    typename detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type>::type
 operator|(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, et_on>&& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type, number<B, et_on>>::value)
-   {
-      b |= a;
-      return static_cast<number<B, et_on>&&>(b);
-   }
-   else
-      return detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
+   b |= a;
+   return static_cast<number<B, et_on>&&>(b);
+}
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
+   typename detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type>::type
+operator|(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, et_on>&& b)
+{
+   return detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer,
@@ -1659,17 +1761,23 @@ operator^(const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, A
    return detail::expression<detail::bitwise_xor, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::bitwise_xor, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
    typename detail::expression<detail::bitwise_xor, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
 operator^(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::bitwise_xor, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value)
-   {
-      a ^= b;
-      return static_cast<number<B, et_on>&&>(a);
-   }
-   else
-      return detail::expression<detail::bitwise_xor, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
+   a ^= b;
+   return static_cast<number<B, et_on>&&>(a);
+}
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::bitwise_xor, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
+   typename detail::expression<detail::bitwise_xor, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >::result_type>::type
+operator^(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+{
+   return detail::expression<detail::bitwise_xor, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1679,17 +1787,23 @@ operator^(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number
    return detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   std::is_same<typename detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
    typename detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type>::type
 operator^(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, et_on>&& b)
 {
-   BOOST_IF_CONSTEXPR(std::is_same<typename detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type, number<B, et_on>>::value)
-   {
-      b ^= a;
-      return static_cast<number<B, et_on>&&>(b);
-   }
-   else
-      return detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
+   b ^= a;
+   return static_cast<number<B, et_on>&&>(b);
+}
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+   !std::is_same<typename detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type, number<B, et_on>>::value
+   && number_category<B>::value == number_kind_integer,
+   typename detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >::result_type>::type
+operator^(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, et_on>&& b)
+{
+   return detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer,

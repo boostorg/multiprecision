@@ -54,6 +54,23 @@ struct rational_adaptor
       return result;
    }
 
+   void normalize()
+   {
+      using default_ops::eval_gcd;
+      using default_ops::eval_eq;
+      using default_ops::eval_divide;
+
+      Backend g, t;
+      eval_gcd(g, m_num, m_denom);
+      if (!eval_eq(g, one()))
+      {
+         eval_divide(t, m_num, g);
+         m_num.swap(t);
+         eval_divide(t, m_denom, g);
+         m_denom = std::move(t);
+      }
+   }
+
    // We must have a default constructor:
    rational_adaptor()
       : m_num(one()), m_denom(one()) {}
@@ -70,6 +87,33 @@ struct rational_adaptor
    rational_adaptor(const Arithmetic& val, typename std::enable_if<std::is_constructible<Backend, Arithmetic>::value && !std::is_floating_point<Arithmetic>::value>::type const* = nullptr)
       : m_num(val), m_denom(one()) {}
 
+   //
+   // Pass-through 2-arg construction of components:
+   //
+   template <class T, class U>
+   rational_adaptor(const T& a, const U& b, typename std::enable_if<std::is_constructible<Backend, T const&>::value && std::is_constructible<Backend, U const&>::value>::type const* = nullptr)
+      : m_num(a), m_denom(b) 
+   {
+      normalize();
+   }
+   template <class T, class U>
+   rational_adaptor(T&& a, const U& b, typename std::enable_if<std::is_constructible<Backend, T>::value && std::is_constructible<Backend, U>::value>::type const* = nullptr)
+      : m_num(static_cast<T&&>(a)), m_denom(b) 
+   {
+      normalize();
+   }
+   template <class T, class U>
+   rational_adaptor(T&& a, U&& b, typename std::enable_if<std::is_constructible<Backend, T>::value && std::is_constructible<Backend, U>::value>::type const* = nullptr)
+      : m_num(static_cast<T&&>(a)), m_denom(static_cast<U&&>(b)) 
+   {
+      normalize();
+   }
+   template <class T, class U>
+   rational_adaptor(const T& a, U&& b, typename std::enable_if<std::is_constructible<Backend, T>::value && std::is_constructible<Backend, U>::value>::type const* = nullptr)
+      : m_num(a), m_denom(static_cast<U&&>(b)) 
+   {
+      normalize();
+   }
    //
    // In the absense of converting constructors, operator= takes the strain.
    // In addition to the usual suspects, there must be one operator= for each type
@@ -290,26 +334,20 @@ is_minus_one(const T& val)
 // Required non-members:
 //
 template <class Backend> 
-void eval_add(rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+inline void eval_add(rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
 {
-   rational_adaptor<Backend> t;
-   eval_add(t, a, b);
-   a = std::move(t);
+   eval_add_subtract_imp(a, a, b, true);
 }
 template <class Backend> 
-void eval_subtract(rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+inline void eval_subtract(rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
 {
-   rational_adaptor<Backend> t;
-   eval_subtract(t, a, b);
-   a = std::move(t);
+   eval_add_subtract_imp(a, a, b, false);
 }
 
 template <class Backend> 
-void eval_multiply(rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+inline void eval_multiply(rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
 {
-   rational_adaptor<Backend> t;
-   eval_multiply(t, a, b);
-   a = std::move(t);
+   eval_multiply_imp(a, a, b.num(), b.denom());
 }
 
 template <class Backend> 

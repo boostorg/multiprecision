@@ -62,9 +62,9 @@ static void BM_bernoulli(benchmark::State& state)
 }
 
 
-BENCHMARK_TEMPLATE(BM_bernoulli, boost::multiprecision::cpp_rational)->DenseRange(10, 100, 2);
-BENCHMARK_TEMPLATE(BM_bernoulli, boost::multiprecision::mpq_rational)->DenseRange(10, 100, 2);
-BENCHMARK_TEMPLATE(BM_bernoulli, boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::gmp_int>>)->DenseRange(10, 100, 2);
-BENCHMARK_TEMPLATE(BM_bernoulli, mpq_class, mpz_class)->DenseRange(10, 100, 2);
+BENCHMARK_TEMPLATE(BM_bernoulli, boost::multiprecision::cpp_rational)->DenseRange(50, 200, 4);
+BENCHMARK_TEMPLATE(BM_bernoulli, boost::multiprecision::mpq_rational)->DenseRange(50, 200, 4);
+BENCHMARK_TEMPLATE(BM_bernoulli, boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::gmp_int> >)->DenseRange(50, 200, 4);
+BENCHMARK_TEMPLATE(BM_bernoulli, mpq_class, mpz_class)->DenseRange(50, 200, 4);
 
 BENCHMARK_MAIN();
