@@ -732,12 +732,10 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
 // but that division is very slow.
 //
 // We begin with a specialized routine for division.
-// We know that u > v > ~limb_type(0), and therefore
-// that the result will fit into a single limb_type.
-// We also know that most of the time this is called the result will be 1.
+// We know that most of the time this is called the result will be 1.
 // For small limb counts, this almost doubles the performance of Lehmer's routine!
 //
-BOOST_FORCEINLINE void divide_subtract(limb_type& q, double_limb_type& u, const double_limb_type& v)
+BOOST_FORCEINLINE void divide_subtract(double_limb_type& q, double_limb_type& u, const double_limb_type& v)
 {
    BOOST_ASSERT(q == 1); // precondition on entry.
    u -= v;
@@ -746,7 +744,7 @@ BOOST_FORCEINLINE void divide_subtract(limb_type& q, double_limb_type& u, const 
       u -= v;
       if (++q > 30)
       {
-         limb_type t = u / v;
+         double_limb_type t = u / v;
          u -= t * v;
          q += t;
       }
@@ -855,7 +853,7 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
    //
    while (true)
    {
-      limb_type q = 1;
+      double_limb_type q = 1;
       double_limb_type tt = u;
       divide_subtract(q, u, v);
       std::swap(u, v);
