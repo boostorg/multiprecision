@@ -460,55 +460,12 @@ class cpp_dec_float
       prec_elem = (std::min)(cpp_dec_float_elem_number, (std::max)(elems, static_cast<std::int32_t>(2)));
    }
    static cpp_dec_float pow2(boost::long_long_type i);
+
    exponent_type order() const
    {
       const bool bo_order_is_zero = ((!(isfinite)()) || (data[0] == static_cast<std::uint32_t>(0u)));
-      //
-      // Binary search to find the order of the leading term:
-      //
-      exponent_type prefix = 0;
 
-      if (data[0] >= 100000UL)
-      {
-         if (data[0] >= 10000000UL)
-         {
-            if (data[0] >= 100000000UL)
-            {
-               if (data[0] >= 1000000000UL)
-                  prefix = 9;
-               else
-                  prefix = 8;
-            }
-            else
-               prefix = 7;
-         }
-         else
-         {
-            if (data[0] >= 1000000UL)
-               prefix = 6;
-            else
-               prefix = 5;
-         }
-      }
-      else
-      {
-         if (data[0] >= 1000UL)
-         {
-            if (data[0] >= 10000UL)
-               prefix = 4;
-            else
-               prefix = 3;
-         }
-         else
-         {
-            if (data[0] >= 100)
-               prefix = 2;
-            else if (data[0] >= 10)
-               prefix = 1;
-         }
-      }
-
-      return (bo_order_is_zero ? static_cast<exponent_type>(0) : static_cast<exponent_type>(exp + prefix));
+      return (bo_order_is_zero ? static_cast<exponent_type>(0) : static_cast<exponent_type>(exp + order_prefix()));
    }
 
    template <class Archive>
@@ -531,17 +488,8 @@ class cpp_dec_float
          using local_size_type = typename array_type::size_type;
          using local_limb_type = typename array_type::value_type;
 
-         std::int32_t digits_limb_0 = 0;
-
-         local_limb_type tmp_limb_0 = data[0U];
-
-         // Manually count the number of base-10 digits on the zero'th limb.
-         while(tmp_limb_0 > 0U)
-         {
-            tmp_limb_0 /= 10U;
-
-            ++digits_limb_0;
-         }
+         // Obtain the number of base-10 digits on the zero'th limb.
+         std::int32_t digits_limb_0 = static_cast<std::int32_t>(order_prefix());
 
          constexpr std::int32_t local_max_digits10 =
             std::int32_t
@@ -556,13 +504,13 @@ class cpp_dec_float
                                                      + ((digits_limb_1_to_n % cpp_dec_float_elem_digits10) != 0));
 
          // Set the index of the element that contains the rounding base-10 digit.
-         std::int32_t round_digit_idx =
+         const std::int32_t round_digit_idx =
             std::int32_t(((digits_limb_1_to_n % cpp_dec_float_elem_digits10) != 0)
                               ? least_digit_idx
                               : least_digit_idx + 1);
 
          // Find the base-10 order (position) of the least-significant base-10 digit.
-         std::int32_t least_digit_pos =
+         const std::int32_t least_digit_pos =
             (std::int32_t(digits_limb_1_to_n % cpp_dec_float_elem_digits10) != 0)
                ? std::int32_t
                  (
@@ -572,19 +520,8 @@ class cpp_dec_float
                : 0;
 
          // Find the base-10 order (position) of the rounding base-10 digit.
-         std::int32_t round_digit_pos =
+         const std::int32_t round_digit_pos =
             std::int32_t((least_digit_pos != 0) ? least_digit_pos - 1 : cpp_dec_float_elem_digits10 - 1);
-
-         // Get the value of the least-significant base-10 digit.
-         const std::uint8_t least_digit_value =
-            detail::digit_at_pos_in_limb
-            (
-               data[local_size_type(least_digit_idx)],
-               unsigned(least_digit_pos)
-            );
-
-         // TBD: Remove unused debug-helper variable.
-         static_cast<void>(least_digit_value);
 
          // Get the value of the rounding base-10 digit.
          const std::uint8_t round_digit_value =
@@ -594,11 +531,7 @@ class cpp_dec_float
                unsigned(round_digit_pos)
             );
 
-         local_limb_type least_digit_p10 = detail::pow10_maker(std::uint32_t(least_digit_pos));
-         local_limb_type round_digit_p10 = detail::pow10_maker(std::uint32_t(round_digit_pos));
-
-         // TBD: Remove unused debug-helper variable.
-         static_cast<void>(round_digit_p10);
+         const local_limb_type least_digit_p10 = detail::pow10_maker_as_runtime_value(std::uint32_t(least_digit_pos));
 
          // Clear the lower base-10 digits of the rounded element.
          data[local_size_type(least_digit_idx)] -= local_limb_type(data[local_size_type(least_digit_idx)] % least_digit_p10);
@@ -661,6 +594,56 @@ class cpp_dec_float
    static bool data_elem_is_non_zero_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(0u)); }
    static bool data_elem_is_non_nine_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(cpp_dec_float::cpp_dec_float_elem_mask - 1)); }
    static bool char_is_nonzero_predicate(const char& c) { return (c != static_cast<char>('0')); }
+
+   exponent_type order_prefix() const
+   {
+      //
+      // Binary search to find the order of the leading term:
+      //
+      exponent_type prefix = 0;
+
+      if (data[0] >= 100000UL)
+      {
+         if (data[0] >= 10000000UL)
+         {
+            if (data[0] >= 100000000UL)
+            {
+               if (data[0] >= 1000000000UL)
+                  prefix = 9;
+               else
+                  prefix = 8;
+            }
+            else
+               prefix = 7;
+         }
+         else
+         {
+            if (data[0] >= 1000000UL)
+               prefix = 6;
+            else
+               prefix = 5;
+         }
+      }
+      else
+      {
+         if (data[0] >= 1000UL)
+         {
+            if (data[0] >= 10000UL)
+               prefix = 4;
+            else
+               prefix = 3;
+         }
+         else
+         {
+            if (data[0] >= 100)
+               prefix = 2;
+            else if (data[0] >= 10)
+               prefix = 1;
+         }
+      }
+
+      return prefix;
+   }
 
    void from_unsigned_long_long(const boost::ulong_long_type u);
 
