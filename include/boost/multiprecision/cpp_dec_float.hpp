@@ -489,7 +489,7 @@ class cpp_dec_float
          using local_limb_type = typename array_type::value_type;
 
          // Obtain the number of base-10 digits on the zero'th limb.
-         std::int32_t digits_limb_0 = static_cast<std::int32_t>(order_prefix());
+         const std::int32_t digits_limb_0 = static_cast<std::int32_t>(order_prefix());
 
          constexpr std::int32_t local_max_digits10 =
             std::int32_t
@@ -3229,19 +3229,11 @@ inline void eval_floor(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
    {
       result.eval_round_self();
 
-      if(result.isint())
-      {
-         ;
-      }
-      else
+      if(result.isint() == false)
       {
          if(result.isneg())
          {
             result -= cpp_dec_float<Digits10, ExponentType, Allocator>::one();
-         }
-         else
-         {
-            ;
          }
 
          result  = result.extract_integer_part();
@@ -3263,16 +3255,9 @@ inline void eval_ceil(cpp_dec_float<Digits10, ExponentType, Allocator>& result, 
    {
       result.eval_round_self();
 
-      if(result.isint())
+      if(result.isint() == false)
       {
-         ;
-      }
-      else
-      {
-         if(result.isneg())
-         {
-         }
-         else
+         if(result.isneg() == false)
          {
             result += cpp_dec_float<Digits10, ExponentType, Allocator>::one();
          }
@@ -3285,7 +3270,6 @@ inline void eval_ceil(cpp_dec_float<Digits10, ExponentType, Allocator>& result, 
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_trunc(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x)
 {
-
    if (x.isint() || !(x.isfinite)())
    {
       result = x;

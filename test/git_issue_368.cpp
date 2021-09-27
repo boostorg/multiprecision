@@ -20,6 +20,17 @@ namespace local
       1U
    );
 
+  void test_original_issue_368()
+  {
+    using decimal = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<10>,
+                                                  boost::multiprecision::et_off>;
+
+     decimal a = decimal {"69000"} / decimal {"184"};
+     decimal b = ceil(a);
+
+     BOOST_CHECK_EQUAL(b, 375);
+  }
+
   template<typename DecimalType>
   void test_floor_rounding()
   {
@@ -91,8 +102,11 @@ namespace local
 
 int main(int, char**)
 {
-  bool result_is_ok = true;
+  // Test the original code from the issue
+  // (or a simplified form thereof)
+  local::test_original_issue_368();
 
+  // Test floor/ceil for 10 decimal digits.
   {
     using decimal = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<10>,
                                                   boost::multiprecision::et_off>;
@@ -101,6 +115,7 @@ int main(int, char**)
     local::test_ceil_rounding<decimal>();
   }
 
+  // Test floor/ceil for 12 decimal digits.
   {
     using decimal = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<12>,
                                                   boost::multiprecision::et_off>;
