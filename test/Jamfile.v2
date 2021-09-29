@@ -1123,6 +1123,7 @@ test-suite misc :
       [ run bug12039.cpp no_eh_support ]
       [ compile git_issue_30.cpp ]
       [ run git_issue_167.cpp ]
+      [ run git_issue_370.cpp ]
       [ run git_issue_175.cpp ]
       [ run git_issue_248.cpp ]
       [ run git_issue_265.cpp : : : [ check-target-builds ../config//has_mpfr : <source>gmp <source>mpfr : <build>no ] ]
