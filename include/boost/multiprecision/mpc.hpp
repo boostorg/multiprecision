@@ -406,18 +406,6 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
    {
       mpc_set(this->m_data, val.data(), GMP_RNDN);
    }
-   template <unsigned D>
-   mpc_complex_backend(const mpfr_float_backend<D>& val, typename std::enable_if<D <= digits10>::type* = 0)
-       : detail::mpc_complex_imp<digits10>()
-   {
-      mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
-   }
-   template <unsigned D>
-   explicit mpc_complex_backend(const mpfr_float_backend<D>& val, typename std::enable_if<!(D <= digits10)>::type* = 0)
-       : detail::mpc_complex_imp<digits10>()
-   {
-      mpc_set(this->m_data, val.data(), GMP_RNDN);
-   }
    mpc_complex_backend(const mpc_t val)
        : detail::mpc_complex_imp<digits10>()
    {
@@ -504,7 +492,12 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
       return *this;
    }
    template <unsigned D10, mpfr_allocation_type AllocationType>
-   mpc_complex_backend(mpfr_float_backend<D10, AllocationType> const& val) : detail::mpc_complex_imp<digits10>()
+   mpc_complex_backend(mpfr_float_backend<D10, AllocationType> const& val, typename std::enable_if<D10 <= digits10>::type* = 0) : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
+   }
+   template <unsigned D10, mpfr_allocation_type AllocationType>
+   explicit mpc_complex_backend(mpfr_float_backend<D10, AllocationType> const& val, typename std::enable_if<!(D10 <= digits10)>::type* = 0) : detail::mpc_complex_imp<digits10>()
    {
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
    }
