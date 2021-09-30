@@ -130,6 +130,7 @@ Time for cpp_dec_float_100 = 260.738 seconds
 Total allocations for cpp_dec_float_100 = 0
 Time for cpp_bin_float_100 = 128.675 seconds
 Total allocations for cpp_bin_float_100 = 0
+
 [table Bessel Functions (100 digit precision)
 [[Type][Time][# Allocations]]
 [[cpp_bin_float_100][3.77539 (0.931753s)][913]]
