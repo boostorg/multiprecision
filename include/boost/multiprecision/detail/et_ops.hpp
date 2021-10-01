@@ -39,7 +39,7 @@ inline BOOST_MP_CXX14_CONSTEXPR number<B, et_on> operator-(number<B, et_on>&& v)
 {
    static_assert(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
    v.backend().negate();
-   return static_cast<number<B, et_on>&&>(v);
+   return std::move(v);
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
@@ -60,7 +60,7 @@ operator~(number<B, et_on>&& v)
 { 
    using default_ops::eval_complement;
    eval_complement(v.backend(), v.backend());
-   return static_cast<number<B, et_on>&&>(v);
+   return std::move(v);
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
@@ -83,7 +83,7 @@ operator+(number<B, et_on>&& a, const number<B, et_on>& b)
 {
    using default_ops::eval_add;
    eval_add(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR number<B, et_on>
@@ -91,7 +91,7 @@ operator+(const number<B, et_on>& a, number<B, et_on>&& b)
 {
    using default_ops::eval_add;
    eval_add(b.backend(), a.backend());
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR number<B, et_on>
@@ -99,7 +99,7 @@ operator+(number<B, et_on>&& a, number<B, et_on>&& b)
 {
    using default_ops::eval_add;
    eval_add(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 
 template <class B, class V>
@@ -115,7 +115,7 @@ operator+(number<B, et_on>&& a, const V& b)
 {
    using default_ops::eval_add;
    eval_add(a.backend(), number<B, et_on>::canonical_value(b));
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 
 template <class V, class B>
@@ -131,7 +131,7 @@ operator+(const V& a, number<B, et_on>&& b)
 {
    using default_ops::eval_add;
    eval_add(b.backend(), number<B, et_on>::canonical_value(a));
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
@@ -148,7 +148,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator+(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a += b;
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< 
@@ -173,7 +173,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator+(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
 {
    b += a;
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< 
@@ -233,7 +233,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator+(number<B, ET>&& a, const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a += b;
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -258,7 +258,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator+(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
 {
    b += a;
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -300,7 +300,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator-(number<B, ET>&& a, const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a -= b;
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -342,7 +342,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator+(number<B, ET>&& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a -= b.left_ref();
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -367,7 +367,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator+(const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
 {
    b -= a.left_ref();
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -391,7 +391,7 @@ operator+(number<B, et_on>&& a, const detail::expression<detail::negate, number<
 {
    using default_ops::eval_subtract;
    eval_subtract(a.backend(), b.left_ref().backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 
 template <class B>
@@ -407,7 +407,7 @@ operator+(const detail::expression<detail::negate, number<B, et_on> >& a, number
 {
    using default_ops::eval_subtract;
    eval_subtract(b.backend(), a.left_ref().backend());
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 
 template <class B, class V>
@@ -466,7 +466,7 @@ operator-(number<B, et_on>&& a, const number<B, et_on>& b)
 {
    using default_ops::eval_subtract;
    eval_subtract(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR number<B, et_on>
@@ -475,7 +475,7 @@ operator-(const number<B, et_on>& a, number<B, et_on>&& b)
    using default_ops::eval_subtract;
    eval_subtract(b.backend(), a.backend());
    b.backend().negate();
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR number<B, et_on>
@@ -483,7 +483,7 @@ operator-(number<B, et_on>&& a, number<B, et_on>&& b)
 {
    using default_ops::eval_subtract;
    eval_subtract(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 
 template <class B, class V>
@@ -499,7 +499,7 @@ operator-(number<B, et_on>&& a, const V& b)
 {
    using default_ops::eval_subtract;
    eval_subtract(a.backend(), number<B, et_on>::canonical_value(b));
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 
 template <class V, class B>
@@ -516,7 +516,7 @@ operator-(const V& a, number<B, et_on>&& b)
    using default_ops::eval_subtract;
    eval_subtract(b.backend(), number<B, et_on>::canonical_value(a));
    b.backend().negate();
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
@@ -533,7 +533,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator-(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a -= b;
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -559,7 +559,7 @@ operator-(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET
 {
    b -= a;
    b.backend().negate();
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -605,7 +605,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator-(number<B, ET>&& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a += b.left_ref();
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -632,7 +632,7 @@ operator-(const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, n
 {
    b += a.left_ref();
    b.backend().negate();
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -656,7 +656,7 @@ operator-(number<B, et_on>&& a, const detail::expression<detail::negate, number<
 {
    using default_ops::eval_add;
    eval_add(a.backend(), b.left_ref().backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 
 template <class B>
@@ -676,7 +676,7 @@ operator-(const detail::expression<detail::negate, number<B, et_on> >& a, number
    using default_ops::eval_add;
    eval_add(b.backend(), a.left_ref().backend());
    b.backend().negate();
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -744,7 +744,7 @@ operator*(number<B, et_on>&& a, const number<B, et_on>& b)
 {
    using default_ops::eval_multiply;
    eval_multiply(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR number<B, et_on>
@@ -752,7 +752,7 @@ operator*(const number<B, et_on>& a, number<B, et_on>&& b)
 {
    using default_ops::eval_multiply;
    eval_multiply(b.backend(), a.backend());
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR number<B, et_on>
@@ -760,7 +760,7 @@ operator*(number<B, et_on>&& a, number<B, et_on>&& b)
 {
    using default_ops::eval_multiply;
    eval_multiply(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 
 template <class B, class V>
@@ -776,7 +776,7 @@ operator*(number<B, et_on>&& a, const V& b)
 {
    using default_ops::eval_multiply;
    eval_multiply(a.backend(), number<B, et_on>::canonical_value(b));
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 
 template <class V, class B>
@@ -792,7 +792,7 @@ operator*(const V& a, number<B, et_on>&& b)
 {
    using default_ops::eval_multiply;
    eval_multiply(b.backend(), number<B, et_on>::canonical_value(a));
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
@@ -809,7 +809,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator*(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a *= b;
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -834,7 +834,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator*(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, ET>&& b)
 {
    b *= a;
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -914,7 +914,7 @@ operator*(number<B, et_on>&& a, const detail::expression<detail::negate, number<
 {
    a *= b.left_ref();
    a.backend().negate();
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -942,7 +942,7 @@ operator*(const detail::expression<detail::negate, number<B, et_on> >& a, number
 {
    b *= a.left_ref();
    b.backend().negate();
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -1015,7 +1015,7 @@ operator/(number<B, et_on>&& a, const number<B, et_on>& b)
 {
    using default_ops::eval_divide;
    eval_divide(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR number<B, et_on>
@@ -1029,7 +1029,7 @@ operator/(number<B, et_on>&& a, number<B, et_on>&& b)
 {
    using default_ops::eval_divide;
    eval_divide(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_equivalent_number_type<V, number<B, et_on> >::value, detail::expression<detail::divide_immediates, number<B, et_on>, V> >::type
@@ -1043,7 +1043,7 @@ operator/(number<B, et_on>&& a, const V& b)
 {
    using default_ops::eval_divide;
    eval_divide(a.backend(), number<B, et_on>::canonical_value(b));
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class V, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >::value, detail::expression<detail::divide_immediates, V, number<B, et_on> > >::type
@@ -1070,7 +1070,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator/(number<B, ET>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a /= b;
-   return static_cast<number<B, ET>&&>(a);
+   return std::move(a);
 }
 template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -1128,7 +1128,7 @@ operator/(number<B, ET>&& a, const detail::expression<detail::negate, Arg1, Arg2
 {
    a /= b.left_ref();
    a.backend().negate();
-   return static_cast<number<B, ET>&&>(a);
+   return std::move(a);
 }
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline typename std::enable_if<
@@ -1166,7 +1166,7 @@ operator/(number<B, et_on>&& a, const detail::expression<detail::negate, number<
 {
    a /= b.left_ref();
    a.backend().negate();
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, et_on>, number<B, et_on> > >
@@ -1241,7 +1241,7 @@ operator%(number<B, et_on>&& a, const number<B, et_on>& b)
 {
    using default_ops::eval_modulus;
    eval_modulus(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1257,7 +1257,7 @@ operator%(number<B, et_on>&& a, number<B, et_on>&& b)
 {
    using default_ops::eval_modulus;
    eval_modulus(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer) && !is_equivalent_number_type<V, number<B, et_on> >::value,
@@ -1273,7 +1273,7 @@ operator%(number<B, et_on>&& a, const V& b)
 {
    using default_ops::eval_modulus;
    eval_modulus(a.backend(), number<B, et_on>::canonical_value(b));
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class V, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
@@ -1304,7 +1304,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator%(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a %= b;
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -1365,7 +1365,7 @@ operator<<(number<B, et_on>&& a, const I& b)
 {
    using default_ops::eval_left_shift;
    eval_left_shift(a.backend(), b);
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class I>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
@@ -1391,7 +1391,7 @@ operator>>(number<B, et_on>&& a, const I& b)
 {
    using default_ops::eval_right_shift;
    eval_right_shift(a.backend(), b);
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class I>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I>::value && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
@@ -1417,7 +1417,7 @@ operator&(number<B, et_on>&& a, const number<B, et_on>& b)
 {
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1426,7 +1426,7 @@ operator&(const number<B, et_on>& a, number<B, et_on>&& b)
 {
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(b.backend(), a.backend());
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1435,7 +1435,7 @@ operator&(number<B, et_on>&& a, number<B, et_on>&& b)
 {
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
@@ -1451,7 +1451,7 @@ operator&(number<B, et_on>&& a, const V& b)
 {
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(a.backend(), number<B, et_on>::canonical_value(b));
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class V, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
@@ -1467,7 +1467,7 @@ operator&(const V& a, number<B, et_on>&& b)
 {
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(b.backend(), number<B, et_on>::canonical_value(a));
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1484,7 +1484,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator&(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a &= b;
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -1510,7 +1510,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator&(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, et_on>&& b)
 {
    b &= a;
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -1559,7 +1559,7 @@ operator|(number<B, et_on>&& a, const number<B, et_on>& b)
 {
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1568,7 +1568,7 @@ operator|(const number<B, et_on>& a, number<B, et_on>&& b)
 {
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(b.backend(), a.backend());
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1577,7 +1577,7 @@ operator|(number<B, et_on>&& a, number<B, et_on>&& b)
 {
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
@@ -1593,7 +1593,7 @@ operator|(number<B, et_on>&& a, const V& b)
 {
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(a.backend(), number<B, et_on>::canonical_value(b));
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class V, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
@@ -1609,7 +1609,7 @@ operator|(const V& a, number<B, et_on>&& b)
 {
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(b.backend(), number<B, et_on>::canonical_value(a));
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1626,7 +1626,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator|(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a |= b;
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -1652,7 +1652,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator|(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, et_on>&& b)
 {
    b |= a;
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -1701,7 +1701,7 @@ operator^(number<B, et_on>&& a, const number<B, et_on>& b)
 {
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1710,7 +1710,7 @@ operator^(const number<B, et_on>& a, number<B, et_on>&& b)
 {
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(b.backend(), a.backend());
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1719,7 +1719,7 @@ operator^(number<B, et_on>&& a, number<B, et_on>&& b)
 {
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(a.backend(), b.backend());
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, class V>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
@@ -1735,7 +1735,7 @@ operator^(number<B, et_on>&& a, const V& b)
 {
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(a.backend(), number<B, et_on>::canonical_value(b));
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class V, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
@@ -1751,7 +1751,7 @@ operator^(const V& a, number<B, et_on>&& b)
 {
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(b.backend(), number<B, et_on>::canonical_value(a));
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
@@ -1768,7 +1768,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator^(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    a ^= b;
-   return static_cast<number<B, et_on>&&>(a);
+   return std::move(a);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
@@ -1794,7 +1794,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
 operator^(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, number<B, et_on>&& b)
 {
    b ^= a;
-   return static_cast<number<B, et_on>&&>(b);
+   return std::move(b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
