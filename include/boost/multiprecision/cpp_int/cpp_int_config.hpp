@@ -20,7 +20,7 @@ namespace detail {
 
 //
 // These traits calculate the largest type in the list
-// [unsigned] boost::long_long_type, long, int, which has the specified number
+// [unsigned] long long, long, int, which has the specified number
 // of bits.  Note that intN_t and boost::int_t<N> find the first
 // member of the above list, not the last.  We want the last in the
 // list to ensure that mixed arithmetic operations are as efficient
@@ -30,8 +30,8 @@ template <unsigned N>
 struct largest_signed_type
 {
    using type = typename std::conditional<
-       1 + std::numeric_limits<boost::long_long_type>::digits == N,
-       boost::long_long_type,
+       1 + std::numeric_limits<long long>::digits == N,
+       long long,
        typename std::conditional<
            1 + std::numeric_limits<long>::digits == N,
            long,
@@ -45,8 +45,8 @@ template <unsigned N>
 struct largest_unsigned_type
 {
    using type = typename std::conditional<
-       std::numeric_limits<boost::ulong_long_type>::digits == N,
-       boost::ulong_long_type,
+       std::numeric_limits<unsigned long long>::digits == N,
+       unsigned long long,
        typename std::conditional<
            std::numeric_limits<unsigned long>::digits == N,
            unsigned long,
@@ -61,9 +61,9 @@ struct largest_unsigned_type
 #if defined(BOOST_HAS_INT128)
 
 using limb_type = detail::largest_unsigned_type<64>::type;
-using signed_limb_type = detail::largest_signed_type<64>::type  ;
-using double_limb_type = boost::uint128_type                    ;
-using signed_double_limb_type = boost::int128_type                     ;
+using signed_limb_type = detail::largest_signed_type<64>::type;
+using double_limb_type = unsigned __int128;
+using signed_double_limb_type = __int128;
 constexpr const limb_type                       max_block_10        = 1000000000000000000uLL;
 constexpr const limb_type                       digits_per_block_10 = 18;
 
