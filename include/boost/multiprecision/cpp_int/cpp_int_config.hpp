@@ -6,9 +6,12 @@
 #ifndef BOOST_MP_CPP_INT_CORE_HPP
 #define BOOST_MP_CPP_INT_CORE_HPP
 
+#include <type_traits>
+#include <limits>
+#include <boost/multiprecision/detail/number_base.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 #include <boost/integer.hpp>
 #include <boost/integer_traits.hpp>
-#include <boost/assert.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -67,7 +70,7 @@ constexpr const limb_type                       digits_per_block_10 = 18;
 inline BOOST_MP_CXX14_CONSTEXPR limb_type block_multiplier(unsigned count)
 {
    constexpr const limb_type values[digits_per_block_10] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000};
-   BOOST_ASSERT(count < digits_per_block_10);
+   BOOST_MP_ASSERT(count < digits_per_block_10);
    return values[count];
 }
 
@@ -102,7 +105,7 @@ constexpr const limb_type                       digits_per_block_10 = 9;
 inline limb_type block_multiplier(unsigned count)
 {
    constexpr const limb_type values[digits_per_block_10] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
-   BOOST_ASSERT(count < digits_per_block_10);
+   BOOST_MP_ASSERT(count < digits_per_block_10);
    return values[count];
 }
 
