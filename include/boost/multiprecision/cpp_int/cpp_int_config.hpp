@@ -1,17 +1,17 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2012 John Maddock. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+//  Copyright 2012 - 2021 John Maddock.
+//  Copyright 2021 Matt Borland.
+//  Distributed under the Boost Software License, Version 1.0.
+//  See accompanying file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef BOOST_MP_CPP_INT_CORE_HPP
 #define BOOST_MP_CPP_INT_CORE_HPP
 
+#include <cstdint>
 #include <type_traits>
 #include <limits>
 #include <boost/multiprecision/detail/number_base.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
-#include <boost/integer.hpp>
-#include <boost/integer_traits.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -21,11 +21,34 @@ namespace detail {
 //
 // These traits calculate the largest type in the list
 // [unsigned] long long, long, int, which has the specified number
-// of bits.  Note that intN_t and boost::int_t<N> find the first
+// of bits.  Note that int_t and uint_t find the first
 // member of the above list, not the last.  We want the last in the
 // list to ensure that mixed arithmetic operations are as efficient
 // as possible.
 //
+
+template <unsigned Bits>
+struct int_t
+{
+   using exact = typename std::conditional<Bits == sizeof(signed char) * CHAR_BIT, signed char,
+                 typename std::conditional<Bits == sizeof(short) * CHAR_BIT, short,
+                 typename std::conditional<Bits == sizeof(int) * CHAR_BIT, int,
+                 typename std::conditional<Bits == sizeof(long) * CHAR_BIT, long, long long
+                 >::type>::type>::type>::type;
+
+};
+
+template <unsigned Bits>
+struct uint_t
+{
+   using exact = typename std::conditional<Bits == sizeof(unsigned char) * CHAR_BIT, unsigned char,
+                 typename std::conditional<Bits == sizeof(unsigned short) * CHAR_BIT, unsigned short,
+                 typename std::conditional<Bits == sizeof(unsigned int) * CHAR_BIT, unsigned int,
+                 typename std::conditional<Bits == sizeof(unsigned long) * CHAR_BIT, unsigned long, unsigned long long
+                 >::type>::type>::type>::type;
+
+};
+
 template <unsigned N>
 struct largest_signed_type
 {
@@ -38,7 +61,7 @@ struct largest_signed_type
            typename std::conditional<
                1 + std::numeric_limits<int>::digits == N,
                int,
-               typename boost::int_t<N>::exact>::type>::type>::type;
+               typename int_t<N>::exact>::type>::type>::type;
 };
 
 template <unsigned N>
@@ -53,7 +76,7 @@ struct largest_unsigned_type
            typename std::conditional<
                std::numeric_limits<unsigned int>::digits == N,
                unsigned int,
-               typename boost::uint_t<N>::exact>::type>::type>::type;
+               typename uint_t<N>::exact>::type>::type>::type;
 };
 
 } // namespace detail
