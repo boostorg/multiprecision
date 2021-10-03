@@ -10,7 +10,7 @@
 #ifndef BOOST_MP_TOOLS_ASSERT_HPP
 #define BOOST_MP_TOOLS_ASSERT_HPP
 
-#include <boost/multiprecision/detail/is_standalone.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 
 #ifndef BOOST_MP_STANDALONE
 

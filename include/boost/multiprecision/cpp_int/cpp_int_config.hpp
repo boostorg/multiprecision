@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <type_traits>
 #include <limits>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 
@@ -85,8 +86,8 @@ struct largest_unsigned_type
 
 using limb_type = detail::largest_unsigned_type<64>::type;
 using signed_limb_type = detail::largest_signed_type<64>::type;
-using double_limb_type = unsigned __int128;
-using signed_double_limb_type = __int128;
+using double_limb_type = boost::uint128_type;
+using signed_double_limb_type = boost::int128_type;
 constexpr const limb_type                       max_block_10        = 1000000000000000000uLL;
 constexpr const limb_type                       digits_per_block_10 = 18;
 
