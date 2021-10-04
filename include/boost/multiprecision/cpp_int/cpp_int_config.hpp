@@ -34,9 +34,12 @@ struct int_t
    using exact = typename std::conditional<Bits == sizeof(signed char) * CHAR_BIT, signed char,
                  typename std::conditional<Bits == sizeof(short) * CHAR_BIT, short,
                  typename std::conditional<Bits == sizeof(int) * CHAR_BIT, int,
-                 typename std::conditional<Bits == sizeof(long) * CHAR_BIT, long, long long
-                 >::type>::type>::type>::type;
-
+                 typename std::conditional<Bits == sizeof(long) * CHAR_BIT, long,
+                 typename std::conditional<Bits == sizeof(long long) * CHAR_BIT, long long, void
+                 >::type>::type>::type>::type>::type;
+   
+   static_assert(!std::is_same<void, exact>::value, "Number of bits does not match any standard data type. \
+      Please file an issue at https://github.com/boostorg/multiprecision/ referencing this error from cpp_int_config.hpp");
 };
 
 template <unsigned Bits>
@@ -45,9 +48,12 @@ struct uint_t
    using exact = typename std::conditional<Bits == sizeof(unsigned char) * CHAR_BIT, unsigned char,
                  typename std::conditional<Bits == sizeof(unsigned short) * CHAR_BIT, unsigned short,
                  typename std::conditional<Bits == sizeof(unsigned int) * CHAR_BIT, unsigned int,
-                 typename std::conditional<Bits == sizeof(unsigned long) * CHAR_BIT, unsigned long, unsigned long long
-                 >::type>::type>::type>::type;
+                 typename std::conditional<Bits == sizeof(unsigned long) * CHAR_BIT, unsigned long,
+                 typename std::conditional<Bits == sizeof(unsigned long long) * CHAR_BIT, unsigned long long, void
+                 >::type>::type>::type>::type>::type;
 
+   static_assert(!std::is_same<void, exact>::value, "Number of bits does not match any standard data type. \
+      Please file an issue at https://github.com/boostorg/multiprecision/ referencing this error from cpp_int_config.hpp");
 };
 
 template <unsigned N>
@@ -86,8 +92,8 @@ struct largest_unsigned_type
 
 using limb_type = detail::largest_unsigned_type<64>::type;
 using signed_limb_type = detail::largest_signed_type<64>::type;
-using double_limb_type = boost::uint128_type;
-using signed_double_limb_type = boost::int128_type;
+using double_limb_type = boost::multiprecision::uint128_type;
+using signed_double_limb_type = boost::multiprecision::int128_type;
 constexpr const limb_type                       max_block_10        = 1000000000000000000uLL;
 constexpr const limb_type                       digits_per_block_10 = 18;
 
