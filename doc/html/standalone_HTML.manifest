@@ -76,6 +76,7 @@ boost_multiprecision/perf.html
 boost_multiprecision/perf/overhead.html
 boost_multiprecision/perf/realworld.html
 boost_multiprecision/perf/int_real_world.html
+boost_multiprecision/perf/rational_real_world.html
 boost_multiprecision/perf/float_performance.html
 boost_multiprecision/perf/integer_performance.html
 boost_multiprecision/perf/rational_performance.html

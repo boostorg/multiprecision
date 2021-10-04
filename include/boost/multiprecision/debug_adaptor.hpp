@@ -68,8 +68,8 @@ struct debug_adaptor
    {
       update_view();
    }
-   template <class T>
-   debug_adaptor(const T& i, const T& j)
+   template <class T, class U>
+   debug_adaptor(const T& i, const U& j, typename std::enable_if<std::is_constructible<Backend, const T&, const U&>::value>::type* = nullptr)
        : m_value(i, j)
    {
       update_view();

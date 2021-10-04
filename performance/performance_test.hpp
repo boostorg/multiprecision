@@ -387,96 +387,96 @@ struct tester
    template <class U>
    double test_multiply_hetero()
    {
-      static const U                                  val = get_hetero_test_value<U>();
+      const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] = b[j] * val;
+            a[j] = b[j] * vals[j];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    template <class U>
    double test_inplace_multiply_hetero()
    {
-      static const U val = get_hetero_test_value<U>();
+      const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] = b[j], a[j] *= val;
+            a[j] = b[j], a[j] *= vals[j];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    template <class U>
    double test_add_hetero()
    {
-      static const U                                  val = get_hetero_test_value<U>();
+      const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] = b[j] + val;
+            a[j] = b[j] + vals[j];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    template <class U>
    double test_inplace_add_hetero()
    {
-      static const U val = get_hetero_test_value<U>();
+      const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] = b[j], a[j] += val;
+            a[j] = b[j], a[j] += vals[j];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    template <class U>
    double test_subtract_hetero()
    {
-      static const U                                  val = get_hetero_test_value<U>();
+      const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] = b[j] - val;
+            a[j] = b[j] - vals[j];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    template <class U>
    double test_inplace_subtract_hetero()
    {
-      static const U val = get_hetero_test_value<U>();
+      const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] = b[j], a[j] -= val;
+            a[j] = b[j], a[j] -= vals[j];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    template <class U>
    double test_divide_hetero()
    {
-      static const U                                  val = get_hetero_test_value<U>();
+      const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] = b[j] / val;
+            a[j] = b[j] / vals[j];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    template <class U>
    double test_inplace_divide_hetero()
    {
-      static const U val = get_hetero_test_value<U>();
+      const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] = b[j], a[j] /= val;
+            a[j] = b[j], a[j] /= vals[j];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
@@ -484,12 +484,13 @@ struct tester
  private:
    T generate_random()
    {
-      return generate_random(std::integral_constant<int, Type>());
+      return generate_random<T>(std::integral_constant<int, Type>());
    }
-   T generate_random(const std::integral_constant<int, boost::multiprecision::number_kind_floating_point>&)
+   template <class U>
+   U generate_random(const std::integral_constant<int, boost::multiprecision::number_kind_floating_point>&)
    {
-      T val      = gen();
-      T prev_val = -1;
+      U val      = gen();
+      U prev_val = -1;
       while (val != prev_val)
       {
          val *= (gen.max)();
@@ -499,24 +500,25 @@ struct tester
       int e;
       val = frexp(val, &e);
 
-      typedef typename T::backend_type::exponent_type        e_type;
+      typedef typename U::backend_type::exponent_type        e_type;
       static boost::random::uniform_int_distribution<e_type> ui(-30, 30);
       return ldexp(val, static_cast<int>(ui(gen)));
    }
-   T generate_random(const std::integral_constant<int, boost::multiprecision::number_kind_integer>&)
+   template <class U>
+   U generate_random(const std::integral_constant<int, boost::multiprecision::number_kind_integer>&)
    {
       typedef boost::random::mt19937::result_type random_type;
 
-      T        max_val;
+      U        max_val;
       unsigned digits;
-      if (std::numeric_limits<T>::is_bounded)
+      if (std::numeric_limits<U>::is_bounded)
       {
-         max_val = (std::numeric_limits<T>::max)();
-         digits  = std::numeric_limits<T>::digits;
+         max_val = (std::numeric_limits<U>::max)();
+         digits  = std::numeric_limits<U>::digits;
       }
       else
       {
-         max_val = T(1) << bits_wanted;
+         max_val = U(1) << bits_wanted;
          digits  = bits_wanted;
       }
 
@@ -526,7 +528,7 @@ struct tester
 
       unsigned terms_needed = digits / bits_per_r_val + 1;
 
-      T val = 0;
+      U val = 0;
       for (unsigned i = 0; i < terms_needed; ++i)
       {
          val *= (gen.max)();
@@ -535,10 +537,11 @@ struct tester
       val %= max_val;
       return val;
    }
-   T generate_random(const std::integral_constant<int, boost::multiprecision::number_kind_rational>&)
+   template <class U>
+   U generate_random(const std::integral_constant<int, boost::multiprecision::number_kind_rational>&)
    {
       typedef boost::random::mt19937::result_type                     random_type;
-      typedef typename boost::multiprecision::component_type<T>::type IntType;
+      typedef typename boost::multiprecision::component_type<U>::type IntType;
 
       IntType  max_val;
       unsigned digits;
@@ -575,8 +578,20 @@ struct tester
          denom = 1;
       val %= max_val;
       denom %= max_val;
-      return T(val, denom);
+      return U(val, denom);
    }
+
+   template <class U>
+   const std::vector<U>& get_hetero_test_vector()
+   {
+      static std::vector<U> result;
+      while (result.size() < a.size())
+      {
+         result.push_back(generate_random<U>(std::integral_constant<int, boost::multiprecision::number_category<U>::value>()));
+      }
+      return result;
+   }
+
    std::vector<T>                a, b, c, small;
    static boost::random::mt19937 gen;
 };
@@ -638,6 +653,23 @@ void test_int_ops(tester<Number, N>&, const char*, unsigned, const U&)
 {
 }
 
+template <class Number, int N, class U>
+void test_related_ops(tester<Number, N>& t, const char* type, unsigned precision, const U&, const char* cat)
+{
+   report_result(cat, type, "+(value_type)", precision, t.template test_add_hetero<U>());
+   report_result(cat, type, "-(value_type)", precision, t.template test_subtract_hetero<U>());
+   report_result(cat, type, "*(value_type)", precision, t.template test_multiply_hetero<U>());
+   report_result(cat, type, "/(value_type)", precision, t.template test_divide_hetero<U>());
+   report_result(cat, type, "+=(value_type)", precision, t.template test_inplace_add_hetero<U>());
+   report_result(cat, type, "-=(value_type)", precision, t.template test_inplace_subtract_hetero<U>());
+   report_result(cat, type, "*=(value_type)", precision, t.template test_inplace_multiply_hetero<U>());
+   report_result(cat, type, "/=(value_type)", precision, t.template test_inplace_divide_hetero<U>());
+}
+template <class Number, int N>
+void test_related_ops(tester<Number, N>& t, const char* type, unsigned precision, const Number&, const char* cat)
+{
+}
+
 template <class Number>
 void test(const char* type, unsigned precision)
 {
@@ -671,6 +703,7 @@ void test(const char* type, unsigned precision)
    report_result(cat, type, "construct(unsigned)", precision, t.test_construct_unsigned());
    report_result(cat, type, "construct(unsigned long long)", precision, t.test_construct_unsigned_ll());
    test_int_ops(t, type, precision, typename boost::multiprecision::number_category<Number>::type());
+   test_related_ops(t, type, precision, typename Number::value_type(), cat);
    // Hetero ops:
    report_result(cat, type, "+(unsigned long long)", precision, t.template test_add_hetero<unsigned long long>());
    report_result(cat, type, "-(unsigned long long)", precision, t.template test_subtract_hetero<unsigned long long>());

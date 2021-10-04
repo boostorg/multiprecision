@@ -3,10 +3,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#define BOOST_MP_NOT_TESTING_NUMBER
-
 #include <boost/multiprecision/cpp_int.hpp>
-#include <boost/rational.hpp>
 
 #include "test_arithmetic.hpp"
 
@@ -15,18 +12,14 @@ struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprec
 {};
 
 template <>
-struct related_type<boost::multiprecision::cpp_int>
+struct related_type<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::uint128_t::backend_type> > >
 {
-   typedef boost::multiprecision::int256_t type;
+   typedef boost::multiprecision::uint128_t type;
 };
-template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ET>
-struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ET> >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits / 2, MaxBits / 2, SignType, Checked, Allocator>, ET> type;
-};
+
 
 int main()
 {
-   test<boost::rational<boost::multiprecision::cpp_int> >();
+   test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::uint128_t::backend_type> > >();
    return boost::report_errors();
 }

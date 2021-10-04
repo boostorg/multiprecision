@@ -1255,6 +1255,14 @@ struct gmp_int
    {
       mpz_init_set(this->m_data, val);
    }
+   gmp_int(long i)
+   {
+      mpz_init_set_si(this->m_data, i);
+   }
+   gmp_int(unsigned long i)
+   {
+      mpz_init_set_ui(this->m_data, i);
+   }
    explicit gmp_int(const mpq_t val)
    {
       mpz_init(this->m_data);
@@ -2147,8 +2155,99 @@ struct gmp_rational
    }
    gmp_rational(const gmp_int& o)
    {
-      mpq_init(m_data);
-      mpq_set_z(m_data, o.data());
+      mpz_init_set(&m_data[0]._mp_num, o.data());
+      mpz_init_set_ui(&m_data[0]._mp_den, 1u);
+   }
+   gmp_rational(long i)
+   {
+      mpz_init_set_si(&m_data[0]._mp_num, i);
+      mpz_init_set_ui(&m_data[0]._mp_den, 1u);
+   }
+   gmp_rational(unsigned long ui)
+   {
+      mpz_init_set_ui(&m_data[0]._mp_num, ui);
+      mpz_init_set_ui(&m_data[0]._mp_den, 1u);
+   }
+   // 2-arg constructors:
+   template <class T, class U>
+   gmp_rational(const T& a, const U& b, typename std::enable_if<std::is_constructible<gmp_int, T>::value && std::is_constructible<gmp_int, U>::value>::type* = nullptr)
+   {
+      gmp_int i(a), j(b);
+      m_data[0]._mp_num = i.data()[0];
+      m_data[0]._mp_den = j.data()[0];
+      mpq_canonicalize(m_data);
+      i.data()[0]._mp_d = nullptr;
+      j.data()[0]._mp_d = nullptr;
+   }
+   template <class U>
+   gmp_rational(const gmp_int& a, const U& b, typename std::enable_if<std::is_constructible<gmp_int, U>::value>::type* = nullptr)
+   {
+      gmp_int j(b);
+      mpz_init_set(&m_data[0]._mp_num, a.data());
+      m_data[0]._mp_den = j.data()[0];
+      if (boost::multiprecision::detail::unsigned_abs(b) > 1)
+         mpq_canonicalize(m_data);
+      j.data()[0]._mp_d = nullptr;
+   }
+   template <class U>
+   gmp_rational(gmp_int&& a, const U& b, typename std::enable_if<std::is_constructible<gmp_int, U>::value>::type* = nullptr)
+   {
+      gmp_int j(b);
+      m_data[0]._mp_num = a.data()[0];
+      m_data[0]._mp_den = j.data()[0];
+      if (boost::multiprecision::detail::unsigned_abs(b) > 1)
+         mpq_canonicalize(m_data);
+      a.data()[0]._mp_d = nullptr;
+      j.data()[0]._mp_d = nullptr;
+   }
+   template <class T>
+   gmp_rational(const T& a, const gmp_int& b, typename std::enable_if<std::is_constructible<gmp_int, T>::value>::type* = nullptr)
+   {
+      gmp_int i(a);
+      m_data[0]._mp_num = i.data()[0];
+      mpz_init_set(&m_data[0]._mp_den, b.data());
+      if(boost::multiprecision::detail::unsigned_abs(a) > 1)
+         mpq_canonicalize(m_data);
+      i.data()[0]._mp_d = nullptr;
+   }
+   template <class T>
+   gmp_rational(const T& a, gmp_int&& b, typename std::enable_if<std::is_constructible<gmp_int, T>::value>::type* = nullptr)
+   {
+      gmp_int i(a);
+      m_data[0]._mp_num = i.data()[0];
+      m_data[0]._mp_den = b.data()[0];
+      if(boost::multiprecision::detail::unsigned_abs(a) > 1)
+         mpq_canonicalize(m_data);
+      i.data()[0]._mp_d = nullptr;
+      b.data()[0]._mp_d = nullptr;
+   }
+   gmp_rational(const gmp_int& a, const gmp_int& b)
+   {
+      mpz_init_set(&m_data[0]._mp_num, a.data());
+      mpz_init_set(&m_data[0]._mp_den, b.data());
+      mpq_canonicalize(m_data);
+   }
+   gmp_rational(const gmp_int& a, gmp_int&& b)
+   {
+      mpz_init_set(&m_data[0]._mp_num, a.data());
+      m_data[0]._mp_den = b.data()[0];
+      mpq_canonicalize(m_data);
+      b.data()[0]._mp_d = nullptr;
+   }
+   gmp_rational(gmp_int&& a, const gmp_int& b)
+   {
+      m_data[0]._mp_num = a.data()[0];
+      mpz_init_set(&m_data[0]._mp_den, b.data());
+      mpq_canonicalize(m_data);
+      a.data()[0]._mp_d = nullptr;
+   }
+   gmp_rational(gmp_int&& a, gmp_int&& b)
+   {
+      m_data[0]._mp_num = a.data()[0];
+      m_data[0]._mp_den = b.data()[0];
+      mpq_canonicalize(m_data);
+      a.data()[0]._mp_d = nullptr;
+      b.data()[0]._mp_d = nullptr;
    }
    // rvalue copy
    gmp_rational(gmp_rational&& o) noexcept
@@ -2283,6 +2382,20 @@ struct gmp_rational
          mpq_div_2exp(m_data, m_data, -e);
       return *this;
    }
+#ifdef BOOST_HAS_INT128
+   gmp_rational& operator=(unsigned __int128 i)
+   {
+      gmp_int gi;
+      gi = i;
+      return *this = gi;
+   }
+   gmp_rational& operator=(__int128 i)
+   {
+      gmp_int gi;
+      gi = i;
+      return *this = gi;
+   }
+#endif
    gmp_rational& operator=(const char* s)
    {
       if (m_data[0]._mp_den._mp_d == 0)
@@ -2432,6 +2545,174 @@ inline void eval_divide(gmp_rational& t, const gmp_rational& p, const gmp_ration
       BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpq_div(t.data(), p.data(), o.data());
 }
+//
+// operator with scalars:
+//
+inline void eval_add(gmp_rational& result, gmp_rational const& a, gmp_int const& b)
+{
+   // we allow result and a to be the same object here:
+   if (&a != &result)
+   {
+      mpz_set(mpq_numref(result.data()), mpq_numref(a.data()));
+      mpz_set(mpq_denref(result.data()), mpq_denref(a.data()));
+   }
+   mpz_addmul(mpq_numref(result.data()), mpq_denref(a.data()), b.data());
+   // no need to normalize, there can be no common divisor as long as a is already normalized.
+}
+inline void eval_add(gmp_rational& result, gmp_rational const& a, unsigned long b)
+{
+   // we allow result and a to be the same object here:
+   if (&a != &result)
+   {
+      mpz_set(mpq_numref(result.data()), mpq_numref(a.data()));
+      mpz_set(mpq_denref(result.data()), mpq_denref(a.data()));
+   }
+   mpz_addmul_ui(mpq_numref(result.data()), mpq_denref(a.data()), b);
+   // no need to normalize, there can be no common divisor as long as a is already normalized.
+}
+inline void eval_add(gmp_rational& result, gmp_rational const& a, long b)
+{
+   // we allow result and a to be the same object here:
+   if (&a != &result)
+   {
+      mpz_set(mpq_numref(result.data()), mpq_numref(a.data()));
+      mpz_set(mpq_denref(result.data()), mpq_denref(a.data()));
+   }
+   if(b > 0)
+      mpz_addmul_ui(mpq_numref(result.data()), mpq_denref(a.data()), b);
+   else
+      mpz_submul_ui(mpq_numref(result.data()), mpq_denref(a.data()), boost::multiprecision::detail::unsigned_abs(b));
+   // no need to normalize, there can be no common divisor as long as a is already normalized.
+}
+template <class T>
+inline void eval_add(gmp_rational& result, gmp_rational const& a, const T& b)
+{
+   gmp_int t;
+   t = b;
+   eval_add(result, a, t);
+}
+template <class T>
+inline void eval_add(gmp_rational& result, const T& b, gmp_rational const& a)
+{
+   eval_add(result, a, b);
+}
+template <class T>
+inline void eval_add(gmp_rational& result, const T& b)
+{
+   eval_add(result, result, b);
+}
+inline void eval_subtract(gmp_rational& result, gmp_rational const& a, gmp_int const& b)
+{
+   // we allow result and a to be the same object here:
+   if (&a != &result)
+   {
+      mpz_set(mpq_numref(result.data()), mpq_numref(a.data()));
+      mpz_set(mpq_denref(result.data()), mpq_denref(a.data()));
+   }
+   mpz_submul(mpq_numref(result.data()), mpq_denref(a.data()), b.data());
+   // no need to normalize, there can be no common divisor as long as a is already normalized.
+}
+inline void eval_subtract(gmp_rational& result, gmp_rational const& a, unsigned long b)
+{
+   // we allow result and a to be the same object here:
+   if (&a != &result)
+   {
+      mpz_set(mpq_numref(result.data()), mpq_numref(a.data()));
+      mpz_set(mpq_denref(result.data()), mpq_denref(a.data()));
+   }
+   mpz_submul_ui(mpq_numref(result.data()), mpq_denref(a.data()), b);
+   // no need to normalize, there can be no common divisor as long as a is already normalized.
+}
+inline void eval_subtract(gmp_rational& result, gmp_rational const& a, long b)
+{
+   // we allow result and a to be the same object here:
+   if (&a != &result)
+   {
+      mpz_set(mpq_numref(result.data()), mpq_numref(a.data()));
+      mpz_set(mpq_denref(result.data()), mpq_denref(a.data()));
+   }
+   if(b > 0)
+      mpz_submul_ui(mpq_numref(result.data()), mpq_denref(a.data()), b);
+   else
+      mpz_addmul_ui(mpq_numref(result.data()), mpq_denref(a.data()), boost::multiprecision::detail::unsigned_abs(b));
+   // no need to normalize, there can be no common divisor as long as a is already normalized.
+}
+template <class T>
+inline void eval_subtract(gmp_rational& result, gmp_rational const& a, const T& b)
+{
+   gmp_int t;
+   t = b;
+   eval_subtract(result, a, t);
+}
+template <class T>
+inline void eval_subtract(gmp_rational& result, const T& b, gmp_rational const& a)
+{
+   eval_subtract(result, a, b);
+   result.negate();
+}
+template <class T>
+inline void eval_subtract(gmp_rational& result, const T& b)
+{
+   eval_subtract(result, result, b);
+}
+
+inline void eval_multiply(gmp_rational& result, gmp_rational const& a, gmp_int const& b)
+{
+   gmp_int g, t;
+   mpz_gcd(g.data(), mpq_denref(a.data()), b.data());
+   if (!mpz_fits_uint_p(g.data()) || (mpz_get_ui(g.data()) != 1))
+   {
+      eval_divide(t, b, g);
+      mpz_mul(mpq_numref(result.data()), t.data(), mpq_numref(a.data()));
+      mpz_div(mpq_denref(result.data()), mpq_denref(a.data()), g.data());
+   }
+   else
+   {
+      mpz_mul(mpq_numref(result.data()), mpq_numref(a.data()), b.data());
+      if (&result != &a)
+         mpz_set(mpq_denref(result.data()), mpq_denref(a.data()));
+   }
+}
+inline void eval_multiply(gmp_rational& result, gmp_rational const& a, unsigned long b)
+{
+   gmp_int g;
+   mpz_gcd_ui(g.data(), mpq_denref(a.data()), b);
+   if (!mpz_fits_uint_p(g.data()) || (mpz_get_ui(g.data()) != 1))
+   {
+      b /= mpz_get_ui(g.data());
+      mpz_mul_ui(mpq_numref(result.data()), mpq_numref(a.data()), b);
+      mpz_div(mpq_denref(result.data()), mpq_denref(a.data()), g.data());
+   }
+   else
+   {
+      mpz_mul_ui(mpq_numref(result.data()), mpq_numref(a.data()), b);
+      if (&result != &a)
+         mpz_set(mpq_denref(result.data()), mpq_denref(a.data()));
+   }
+}
+inline void eval_multiply(gmp_rational& result, gmp_rational const& a, long b)
+{
+   eval_multiply(result, a, boost::multiprecision::detail::unsigned_abs(b));
+   if (b < 0)
+      result.negate();
+}
+template <class T>
+inline void eval_multiply(gmp_rational& result, gmp_rational const& a, const T& b)
+{
+   gmp_int t;
+   t = b;
+   eval_multiply(result, a, t);
+}
+template <class T>
+inline void eval_multiply(gmp_rational& result, const T& b, gmp_rational const& a)
+{
+   eval_multiply(result, a, b);
+}
+template <class T>
+inline void eval_multiply(gmp_rational& result, const T& b)
+{
+   eval_multiply(result, result, b);
+}
 
 inline int eval_get_sign(const gmp_rational& val)
 {
@@ -2500,6 +2781,35 @@ inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int c
    mpz_set(mpq_denref(result.data()), v2.data());
    mpq_canonicalize(result.data());
 }
+template <class T, class U>
+void assign_components(gmp_rational& result, const T& a, const U& b)
+{
+   gmp_int x, y;
+   x = a;
+   y = b;
+   std::swap(result.data()[0]._mp_num, x.data()[0]);
+   std::swap(result.data()[0]._mp_den, y.data()[0]);
+   mpq_canonicalize(result.data());
+}
+template <class U>
+void assign_components(gmp_rational& result, const gmp_int& a, const U& b)
+{
+   gmp_int y;
+   y = b;
+   mpz_set(&result.data()[0]._mp_num, a.data());
+   std::swap(result.data()[0]._mp_den, y.data()[0]);
+   mpq_canonicalize(result.data());
+}
+template <class T>
+void assign_components(gmp_rational& result, const T& a, const gmp_int& b)
+{
+   gmp_int x;
+   x = a;
+   std::swap(result.data()[0]._mp_num, x.data()[0]);
+   mpz_set(&result.data()[0]._mp_den, b.data());
+   mpq_canonicalize(result.data());
+}
+
 
 inline std::size_t hash_value(const gmp_rational& val)
 {

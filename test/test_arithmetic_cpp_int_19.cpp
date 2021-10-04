@@ -11,6 +11,13 @@ template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer
 struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ExpressionTemplates> > : public std::integral_constant<bool, false>
 {};
 
+template <>
+struct related_type<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::int128_t::backend_type> > >
+{
+   typedef boost::multiprecision::int128_t type;
+};
+
+
 int main()
 {
    test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::int128_t::backend_type> > >();

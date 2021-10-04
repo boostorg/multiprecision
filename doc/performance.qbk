@@ -13,6 +13,7 @@
 [include performance_overhead.qbk]
 [include performance_real_world.qbk]
 [include performance_integer_real_world.qbk]
+[include performance_rational_real_world.qbk]
 [include performance_float.qbk]
 [include performance_integer.qbk]
 [include performance_rational.qbk]
