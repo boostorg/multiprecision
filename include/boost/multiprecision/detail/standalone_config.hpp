@@ -29,10 +29,12 @@
 #include <boost/integer_traits.hpp>
 
 // Required typedefs for interoperability with standalone mode
+#if defined(BOOST_HAS_INT128) && defined(__cplusplus)
 namespace boost { namespace multiprecision {
    using int128_type = boost::int128_type;
    using uint128_type = boost::uint128_type;
 }}
+#endif
 
 #else // Standalone mode
 
