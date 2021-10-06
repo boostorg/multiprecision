@@ -6,7 +6,7 @@
 #ifndef BOOST_MP_CONSTEXPR_HPP
 #define BOOST_MP_CONSTEXPR_HPP
 
-#include <boost/config.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 
 namespace boost {
 

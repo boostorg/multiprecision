@@ -7,7 +7,7 @@
 #ifndef BOOST_MT_ATOMIC_DETAIL_HPP
 #define BOOST_MT_ATOMIC_DETAIL_HPP
 
-#include <boost/config.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 
 #ifdef BOOST_HAS_THREADS
 
