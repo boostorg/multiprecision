@@ -9,6 +9,7 @@
 #define BOOST_MP_CPP_INT_BIT_HPP
 
 #include <stdexcept>
+#include <type_traits>
 #include <boost/multiprecision/detail/endian.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
@@ -753,7 +754,7 @@ eval_bitwise_and(
 
    if (result.sign() || o.sign())
    {
-      constexpr const unsigned m = static_unsigned_max<static_unsigned_max<MinBits1, MinBits2>::value, static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
+      constexpr const unsigned m = detail::static_unsigned_max<detail::static_unsigned_max<MinBits1, MinBits2>::value, detail::static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t1(result);
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t2(o);
       eval_bitwise_and(t1, t2);
@@ -796,7 +797,7 @@ eval_bitwise_or(
 
    if (result.sign() || o.sign())
    {
-      constexpr const unsigned m = static_unsigned_max<static_unsigned_max<MinBits1, MinBits2>::value, static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
+      constexpr const unsigned m = detail::static_unsigned_max<detail::static_unsigned_max<MinBits1, MinBits2>::value, detail::static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t1(result);
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t2(o);
       eval_bitwise_or(t1, t2);
@@ -840,7 +841,7 @@ eval_bitwise_xor(
 
    if (result.sign() || o.sign())
    {
-      constexpr const unsigned m = static_unsigned_max<static_unsigned_max<MinBits1, MinBits2>::value, static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
+      constexpr const unsigned m = detail::static_unsigned_max<detail::static_unsigned_max<MinBits1, MinBits2>::value, detail::static_unsigned_max<MaxBits1, MaxBits2>::value>::value;
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t1(result);
       cpp_int_backend<m + 1, m + 1, unsigned_magnitude, unchecked, void> t2(o);
       eval_bitwise_xor(t1, t2);
