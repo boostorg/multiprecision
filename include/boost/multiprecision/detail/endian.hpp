@@ -14,16 +14,6 @@
 #  define BOOST_MP_ENDIAN_BIG_BYTE BOOST_ENDIAN_BIG_BYTE
 #  define BOOST_MP_ENDIAN_LITTLE_BYTE BOOST_ENDIAN_LITTLE_BYTE
 
-#elif (__cplusplus >= 202002L || _MSVC_LANG >= 202002L)
-
-#  if __has_include(<bit>)
-#    include <bit>
-#    define BOOST_MP_ENDIAN_BIG_BYTE (std::endian::native == std::endian::big)
-#    define BOOST_MP_ENDIAN_LITTLE_BYTE (std::endian::native == std::endian::little)
-#  else
-#    error Missing <bit> header. Please disable standalone mode, and file an issue at https://github.com/boostorg/multiprecision
-#  endif
-
 #elif defined(_WIN32)
 
 #  define BOOST_MP_ENDIAN_BIG_BYTE 0
