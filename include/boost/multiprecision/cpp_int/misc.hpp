@@ -10,12 +10,16 @@
 #ifndef BOOST_MP_CPP_INT_MISC_HPP
 #define BOOST_MP_CPP_INT_MISC_HPP
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 #include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
-#include <boost/integer/common_factor_rt.hpp>      // gcd/lcm
+#include <boost/multiprecision/detail/common_factor.hpp> // gcd/lcm
 #include <numeric> // std::gcd
+#include <type_traits>
+#include <stdexcept>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -609,18 +613,18 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
       //
       if ((i & 1u) == 0)
       {
-         BOOST_ASSERT(u > v);
+         BOOST_MP_ASSERT(u > v);
          if ((v < x[2]) || ((u - v) < (y[2] + y[1])))
             break;
       }
       else
       {
-         BOOST_ASSERT(u > v);
+         BOOST_MP_ASSERT(u > v);
          if ((v < y[2]) || ((u - v) < (x[2] + x[1])))
             break;
       }
 #ifdef BOOST_MP_GCD_DEBUG
-      BOOST_ASSERT(q == UU / VV);
+      BOOST_MP_ASSERT(q == UU / VV);
       UU %= VV;
       UU.swap(VV);
 #endif
@@ -661,16 +665,16 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
          U = t2;
       else
       {
-         BOOST_ASSERT(t2.compare(t1) >= 0);
+         BOOST_MP_ASSERT(t2.compare(t1) >= 0);
          eval_subtract(U, t2, t1);
-         BOOST_ASSERT(U.sign() == false);
+         BOOST_MP_ASSERT(U.sign() == false);
       }
    }
    else
    {
-      BOOST_ASSERT(t1.compare(t2) >= 0);
+      BOOST_MP_ASSERT(t1.compare(t2) >= 0);
       eval_subtract(U, t1, t2);
-      BOOST_ASSERT(U.sign() == false);
+      BOOST_MP_ASSERT(U.sign() == false);
    }
    eval_multiply(t2, V, static_cast<limb_type>(y[1]));
    if (i & 1u)
@@ -679,23 +683,23 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
          V = t2;
       else
       {
-         BOOST_ASSERT(t2.compare(t3) >= 0);
+         BOOST_MP_ASSERT(t2.compare(t3) >= 0);
          eval_subtract(V, t2, t3);
-         BOOST_ASSERT(V.sign() == false);
+         BOOST_MP_ASSERT(V.sign() == false);
       }
    }
    else
    {
-      BOOST_ASSERT(t3.compare(t2) >= 0);
+      BOOST_MP_ASSERT(t3.compare(t2) >= 0);
       eval_subtract(V, t3, t2);
-      BOOST_ASSERT(V.sign() == false);
+      BOOST_MP_ASSERT(V.sign() == false);
    }
-   BOOST_ASSERT(U.compare(V) >= 0);
-   BOOST_ASSERT(lu > eval_msb(U));
+   BOOST_MP_ASSERT(U.compare(V) >= 0);
+   BOOST_MP_ASSERT(lu > eval_msb(U));
 #ifdef BOOST_MP_GCD_DEBUG
 
-   BOOST_ASSERT(UU == U);
-   BOOST_ASSERT(VV == V);
+   BOOST_MP_ASSERT(UU == U);
+   BOOST_MP_ASSERT(VV == V);
 
    extern unsigned total_lehmer_gcd_calls;
    extern unsigned total_lehmer_gcd_bits_saved;
@@ -741,7 +745,7 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
 //
 BOOST_FORCEINLINE void divide_subtract(double_limb_type& q, double_limb_type& u, const double_limb_type& v)
 {
-   BOOST_ASSERT(q == 1); // precondition on entry.
+   BOOST_MP_ASSERT(q == 1); // precondition on entry.
    u -= v;
    while (u >= v)
    {
@@ -820,7 +824,7 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
       }
       v = tu - t;
       ++i;
-      BOOST_ASSERT((u <= v) || (t / q == old_v));
+      BOOST_MP_ASSERT((u <= v) || (t / q == old_v));
       if (u <= v)
       {
          // We've gone terribly wrong, probably numeric overflow:
@@ -837,7 +841,7 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
             break;
       }
 #ifdef BOOST_MP_GCD_DEBUG
-      BOOST_ASSERT(q == UU / VV);
+      BOOST_MP_ASSERT(q == UU / VV);
       UU %= VV;
       UU.swap(VV);
 #endif
@@ -876,18 +880,18 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
       ++i;
       if ((i & 1u) == 0)
       {
-         BOOST_ASSERT(u > v);
+         BOOST_MP_ASSERT(u > v);
          if ((v < x[2]) || ((u - v) < (static_cast<double_limb_type>(y[2]) + y[1])))
             break;
       }
       else
       {
-         BOOST_ASSERT(u > v);
+         BOOST_MP_ASSERT(u > v);
          if ((v < y[2]) || ((u - v) < (static_cast<double_limb_type>(x[2]) + x[1])))
             break;
       }
 #ifdef BOOST_MP_GCD_DEBUG
-      BOOST_ASSERT(q == UU / VV);
+      BOOST_MP_ASSERT(q == UU / VV);
       UU %= VV;
       UU.swap(VV);
 #endif
@@ -928,16 +932,16 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
          U = t2;
       else
       {
-         BOOST_ASSERT(t2.compare(t1) >= 0);
+         BOOST_MP_ASSERT(t2.compare(t1) >= 0);
          eval_subtract(U, t2, t1);
-         BOOST_ASSERT(U.sign() == false);
+         BOOST_MP_ASSERT(U.sign() == false);
       }
    }
    else
    {
-      BOOST_ASSERT(t1.compare(t2) >= 0);
+      BOOST_MP_ASSERT(t1.compare(t2) >= 0);
       eval_subtract(U, t1, t2);
-      BOOST_ASSERT(U.sign() == false);
+      BOOST_MP_ASSERT(U.sign() == false);
    }
    eval_multiply(t2, V, y[1]);
    if (i & 1u)
@@ -946,23 +950,23 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
          V = t2;
       else
       {
-         BOOST_ASSERT(t2.compare(t3) >= 0);
+         BOOST_MP_ASSERT(t2.compare(t3) >= 0);
          eval_subtract(V, t2, t3);
-         BOOST_ASSERT(V.sign() == false);
+         BOOST_MP_ASSERT(V.sign() == false);
       }
    }
    else
    {
-      BOOST_ASSERT(t3.compare(t2) >= 0);
+      BOOST_MP_ASSERT(t3.compare(t2) >= 0);
       eval_subtract(V, t3, t2);
-      BOOST_ASSERT(V.sign() == false);
+      BOOST_MP_ASSERT(V.sign() == false);
    }
-   BOOST_ASSERT(U.compare(V) >= 0);
-   BOOST_ASSERT(lu > eval_msb(U));
+   BOOST_MP_ASSERT(U.compare(V) >= 0);
+   BOOST_MP_ASSERT(lu > eval_msb(U));
 #ifdef BOOST_MP_GCD_DEBUG
 
-   BOOST_ASSERT(UU == U);
-   BOOST_ASSERT(VV == V);
+   BOOST_MP_ASSERT(UU == U);
+   BOOST_MP_ASSERT(VV == V);
 
    extern unsigned total_lehmer_gcd_calls;
    extern unsigned total_lehmer_gcd_bits_saved;
@@ -1111,7 +1115,7 @@ template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_gcd(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& b) noexcept
 {
-   *result.limbs() = boost::integer::gcd(*a.limbs(), *b.limbs());
+   *result.limbs() = boost::multiprecision::detail::constexpr_gcd(*a.limbs(), *b.limbs());
    result.sign(false);
 }
 // This one is only enabled for unchecked cpp_int's, for checked int's we need the checking in the default version:
@@ -1119,7 +1123,7 @@ template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && (Checked1 == unchecked)>::type
 eval_lcm(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
-   *result.limbs() = boost::integer::lcm(*a.limbs(), *b.limbs());
+   *result.limbs() = boost::multiprecision::detail::constexpr_lcm(*a.limbs(), *b.limbs());
    result.normalize(); // result may overflow the specified number of bits
    result.sign(false);
 }
