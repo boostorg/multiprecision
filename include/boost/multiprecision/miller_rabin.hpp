@@ -6,8 +6,16 @@
 #ifndef BOOST_MP_MR_HPP
 #define BOOST_MP_MR_HPP
 
-#include <boost/random.hpp>
+#include <cstdint>
+#include <type_traits>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/integer.hpp>
+
+#ifndef BOOST_MP_STANDALONE
+#include <boost/random.hpp>
+#else
+#include <random>
+#endif
 
 namespace boost {
 namespace multiprecision {
@@ -161,7 +169,12 @@ miller_rabin_test(const I& n, unsigned trials, Engine& gen)
    q >>= k;
 
    // Declare our random number generator:
+   #ifndef BOOST_MP_STANDALONE
    boost::random::uniform_int_distribution<number_type> dist(2, n - 2);
+   #else
+   std::uniform_int_distribution<number_type> dist(2, n - 2);
+   #endif
+
    //
    // Execute the trials:
    //
@@ -188,6 +201,7 @@ miller_rabin_test(const I& n, unsigned trials, Engine& gen)
    return true; // Yeheh! probably prime.
 }
 
+#ifndef BOOST_MP_STANDALONE
 template <class I>
 typename std::enable_if<number_category<I>::value == number_kind_integer, bool>::type
 miller_rabin_test(const I& x, unsigned trials)
@@ -209,6 +223,39 @@ bool miller_rabin_test(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& n,
    using number_type = typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type;
    return miller_rabin_test(number_type(n), trials);
 }
+
+#else
+
+template <class I>
+typename std::enable_if<std::is_integral<I>::value, bool>::type
+miller_rabin_test(const I& x, unsigned trials)
+{
+   static std::mt19937 gen;
+   return miller_rabin_test(x, trials, gen);
+}
+
+template <class I>
+typename std::enable_if<!std::is_integral<I>::value, bool>::type
+miller_rabin_test(const I& x, unsigned trials)
+{
+   static_assert(sizeof(I) == 1, "Standalone mode does not allow for miller-rabin tests on non-builtin types");
+   return false;
+}
+
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class Engine>
+bool miller_rabin_test(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& n, unsigned trials, Engine& gen)
+{
+   static_assert(sizeof(tag) == 1, "Standalone mode does not allow for miller-rabin tests on non-builtin types");
+   return false;
+}
+
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+bool miller_rabin_test(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& n, unsigned trials)
+{
+   static_assert(sizeof(tag) == 1, "Standalone mode does not allow for miller-rabin tests on non-builtin types");
+   return false;
+}
+#endif // BOOST_MP_STANDALONE
 
 }} // namespace boost::multiprecision
 
