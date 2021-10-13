@@ -11,6 +11,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/miller_rabin.hpp>
 #include <boost/math/special_functions/prime.hpp>
+#include <random>
 #include <iostream>
 #include <iomanip>
 #include "test.hpp"
@@ -25,23 +26,18 @@ void test()
    // no reason why they should actually agree - except the probability of
    // disagreement for 25 trials is almost infinitely small.
    //
-   using namespace boost::random;
    using namespace boost::multiprecision;
 
    typedef I test_type;
 
-   static const unsigned test_bits =
-       std::numeric_limits<test_type>::digits && (std::numeric_limits<test_type>::digits <= 256)
-           ? std::numeric_limits<test_type>::digits
-           : 128;
-
-   independent_bits_engine<mt11213b, test_bits, test_type> gen;
+   std::random_device rd;
+   std::mt19937 gen(rd());
    //
    // We must use a different generator for the tests and number generation, otherwise
    // we get false positives.  Further we use the same random number engine for the
    // Miller Rabin test as GMP uses internally:
    //
-   mt19937 gen2;
+   std::ranlux48 gen2(rd());
 
    //
    // Begin by testing the primes in our table as all these should return true:
