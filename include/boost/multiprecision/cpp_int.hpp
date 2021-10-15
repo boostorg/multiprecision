@@ -13,7 +13,6 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/detail/rebind.hpp>
-#include <boost/core/empty_value.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/traits/is_byte_container.hpp>
@@ -22,6 +21,7 @@
 #include <boost/multiprecision/cpp_int/checked.hpp>
 #include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/cpp_int/value_pack.hpp>
+#include <boost/multiprecision/detail/empty_value.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -169,7 +169,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void verify_limb_mask(bool /*b*/, U /*limb*/, U 
 //
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
 struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>
-    : private boost::empty_value<typename detail::rebind<limb_type, Allocator>::type>
+    : private boost::multiprecision::detail::empty_value<typename detail::rebind<limb_type, Allocator>::type>
 {
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, bool trivial2>
    friend struct cpp_int_base;
@@ -184,7 +184,7 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
    //
    static_assert(!std::is_void<Allocator>::value, "Allocator must not be void here");
 
-   using base_type = boost::empty_value<allocator_type>;
+   using base_type = boost::multiprecision::detail::empty_value<allocator_type>;
 
 private:
    struct limb_data
@@ -267,23 +267,23 @@ private:
    //
    // Aliasing constructor aliases data:
    //
-   struct scoped_shared_storage : private boost::empty_value<allocator_type>
+   struct scoped_shared_storage : private boost::multiprecision::detail::empty_value<allocator_type>
    {
     private:
       limb_type*      data;
       unsigned        capacity;
       unsigned        allocated;
       bool            is_alias;
-      allocator_type& allocator() noexcept { return boost::empty_value<allocator_type>::get(); }
+      allocator_type& allocator() noexcept { return boost::multiprecision::detail::empty_value<allocator_type>::get(); }
 
     public:
       scoped_shared_storage(const allocator_type& a, unsigned len)
-          : boost::empty_value<allocator_type>(boost::empty_init_t(), a), capacity(len), allocated(0), is_alias(false)
+          : boost::multiprecision::detail::empty_value<allocator_type>(boost::multiprecision::detail::empty_init_t(), a), capacity(len), allocated(0), is_alias(false)
       {
          data = allocator().allocate(len);
       }
       scoped_shared_storage(const cpp_int_base& i, unsigned len)
-          : boost::empty_value<allocator_type>(boost::empty_init_t(), i.allocator()), capacity(len), allocated(0), is_alias(false)
+          : boost::multiprecision::detail::empty_value<allocator_type>(boost::multiprecision::detail::empty_init_t(), i.allocator()), capacity(len), allocated(0), is_alias(false)
       {
          data = allocator().allocate(len);
       }
@@ -510,7 +510,7 @@ const unsigned cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocat
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
 struct cpp_int_base<MinBits, MaxBits, unsigned_magnitude, Checked, Allocator, false>
-    : private boost::empty_value<typename detail::rebind<limb_type, Allocator>::type>
+    : private boost::multiprecision::detail::empty_value<typename detail::rebind<limb_type, Allocator>::type>
 {
    //
    // There is currently no support for unsigned arbitrary precision arithmetic, largely

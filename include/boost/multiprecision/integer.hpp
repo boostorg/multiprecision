@@ -329,7 +329,7 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
       r = 0u;
       return 0u;
    }
-   Integer t{};
+
    return detail::karatsuba_sqrt(x, r, msb(x) + 1);
 }
 
