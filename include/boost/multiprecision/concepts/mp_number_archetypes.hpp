@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <boost/multiprecision/number.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -77,7 +78,7 @@ struct number_backend_float_architype
       }
       catch (const std::exception&)
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse input string: \"") + s + std::string("\" as a valid floating point number.")));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse input string: \"") + s + std::string("\" as a valid floating point number.")));
       }
 #endif
       std::cout << "const char* Assignment (" << s << ")" << std::endl;

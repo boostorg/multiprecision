@@ -6,6 +6,8 @@
 #ifndef BOOST_MP_CPP_INT_CHECKED_HPP
 #define BOOST_MP_CPP_INT_CHECKED_HPP
 
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
+
 namespace boost { namespace multiprecision { namespace backends { namespace detail {
 
 //
@@ -15,7 +17,7 @@ namespace boost { namespace multiprecision { namespace backends { namespace deta
 
 inline void raise_overflow(std::string op)
 {
-   BOOST_THROW_EXCEPTION(std::overflow_error("overflow in " + op));
+   BOOST_MP_THROW_EXCEPTION(std::overflow_error("overflow in " + op));
 }
 inline void raise_add_overflow()
 {
@@ -23,7 +25,7 @@ inline void raise_add_overflow()
 }
 inline void raise_subtract_overflow()
 {
-   BOOST_THROW_EXCEPTION(std::range_error("Subtraction resulted in a negative value, but the type is unsigned"));
+   BOOST_MP_THROW_EXCEPTION(std::range_error("Subtraction resulted in a negative value, but the type is unsigned"));
 }
 inline void raise_mul_overflow()
 {
@@ -133,7 +135,7 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_left_shift(A a, boost::ulong_long_type
    if (a && shift)
    {
       if ((shift > sizeof(A) * CHAR_BIT) || (a >> (sizeof(A) * CHAR_BIT - shift)))
-         BOOST_THROW_EXCEPTION(std::overflow_error("Shift out of range"));
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Shift out of range"));
    }
    return a << shift;
 }

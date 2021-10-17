@@ -12,6 +12,7 @@
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
@@ -1439,7 +1440,7 @@ inline void eval_convert_to(boost::long_long_type* res, const cpp_bin_float<Digi
       *res = 0;
       return;
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
       *res = (std::numeric_limits<boost::long_long_type>::max)();
       if (arg.sign())
@@ -1499,7 +1500,7 @@ inline void eval_convert_to(boost::ulong_long_type* res, const cpp_bin_float<Dig
       *res = 0;
       return;
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
       *res = (std::numeric_limits<boost::ulong_long_type>::max)();
       return;
@@ -1628,7 +1629,7 @@ inline void eval_frexp(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Min
    eval_frexp(res, arg, &e);
    if ((e > (std::numeric_limits<I>::max)()) || (e < (std::numeric_limits<I>::min)()))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Exponent was outside of the range of the argument type to frexp."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent was outside of the range of the argument type to frexp."));
    }
    *pe = static_cast<I>(e);
 }

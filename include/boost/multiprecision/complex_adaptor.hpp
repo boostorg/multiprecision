@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <cmath>
 #include <algorithm>
 #include <complex>
@@ -357,7 +358,7 @@ inline typename std::enable_if< !boost::multiprecision::detail::is_complex<Resul
    using default_ops::eval_is_zero;
    if (!eval_is_zero(val.imag_data()))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    eval_convert_to(result, val.real_data());
 }

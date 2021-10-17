@@ -12,6 +12,7 @@
 #include <boost/math/tools/complex.hpp>
 #include <boost/multiprecision/traits/transcendental_reduction_type.hpp>
 #include <boost/multiprecision/traits/std_integer_traits.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4307)
@@ -1527,21 +1528,21 @@ template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, true>&)
 {
    if (val > (std::numeric_limits<std::size_t>::max)())
-      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
    if (val < 0)
-      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, false>&, const std::integral_constant<bool, true>&)
 {
    if (val < 0)
-      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, false>&)
 {
    if (val > (std::numeric_limits<std::size_t>::max)())
-      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V, const std::integral_constant<bool, false>&, const std::integral_constant<bool, false>&) noexcept {}

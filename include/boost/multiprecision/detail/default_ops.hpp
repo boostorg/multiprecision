@@ -7,7 +7,7 @@
 #ifndef BOOST_MATH_BIG_NUM_DEF_OPS
 #define BOOST_MATH_BIG_NUM_DEF_OPS
 
-#include <boost/core/no_exceptions_support.hpp> // BOOST_TRY
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -1076,11 +1076,11 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    //
    BOOST_IF_CONSTEXPR (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
       if (eval_get_sign(backend) < 0)
-         BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
-   BOOST_TRY {
+         BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
+   BOOST_MP_TRY {
       result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
    }
-   BOOST_CATCH (const bad_lexical_cast&)
+   BOOST_MP_CATCH (const bad_lexical_cast&)
    {
       if (eval_get_sign(backend) < 0)
       {
@@ -1094,7 +1094,7 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
       else
          *result = (std::numeric_limits<R>::max)();
    }
-   BOOST_CATCH_END
+   BOOST_MP_CATCH_END
 }
 
 template <class R, class B>
@@ -1106,19 +1106,19 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    // a lexical_cast and hope for the best:
    //
    if (eval_get_sign(backend) < 0)
-      BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
-   BOOST_TRY {
+      BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
+   BOOST_MP_TRY {
       B t(backend);
       R mask = ~static_cast<R>(0u);
       eval_bitwise_and(t, mask);
       result->value = boost::lexical_cast<R>(t.str(0, std::ios_base::fmtflags(0)));
    }
-   BOOST_CATCH (const bad_lexical_cast&)
+   BOOST_MP_CATCH (const bad_lexical_cast&)
    {
       // We should never really get here...
       *result = (std::numeric_limits<R>::max)();
    }
-   BOOST_CATCH_END
+   BOOST_MP_CATCH_END
 }
 
 template <class R, class B>
@@ -1533,11 +1533,11 @@ inline BOOST_MP_CXX14_CONSTEXPR unsigned eval_lsb(const T& val)
    int                                                                          c = eval_get_sign(val);
    if (c == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (c < 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    unsigned result = 0;
    T        mask, t;
@@ -1558,11 +1558,11 @@ inline BOOST_MP_CXX14_CONSTEXPR int eval_msb(const T& val)
    int c = eval_get_sign(val);
    if (c == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (c < 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    //
    // This implementation is really really rubbish - it does

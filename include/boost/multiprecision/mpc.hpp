@@ -13,6 +13,7 @@
 #include <boost/multiprecision/traits/is_variable_precision.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <mpc.h>
 #include <cmath>
 #include <algorithm>
@@ -1166,7 +1167,7 @@ inline void eval_convert_to(unsigned long* result, const mpc_complex_backend<dig
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);
@@ -1177,7 +1178,7 @@ inline void eval_convert_to(long* result, const mpc_complex_backend<digits10>& v
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);
@@ -1189,7 +1190,7 @@ inline void eval_convert_to(boost::ulong_long_type* result, const mpc_complex_ba
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);
@@ -1200,7 +1201,7 @@ inline void eval_convert_to(boost::long_long_type* result, const mpc_complex_bac
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);
@@ -1212,7 +1213,7 @@ inline void eval_convert_to(double* result, const mpc_complex_backend<digits10>&
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);
@@ -1223,7 +1224,7 @@ inline void eval_convert_to(long double* result, const mpc_complex_backend<digit
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);

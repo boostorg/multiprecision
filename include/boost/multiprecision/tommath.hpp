@@ -10,6 +10,7 @@
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
 #include <tommath.h>
@@ -30,7 +31,7 @@ inline void check_tommath_result(ErrType v)
 {
    if (v != MP_OKAY)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error(mp_error_to_string(v)));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error(mp_error_to_string(v)));
    }
 }
 
@@ -317,7 +318,7 @@ struct tommath_int
                      val = 400;
                   if (val > radix)
                   {
-                     BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
+                     BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
                   }
                   block <<= shift;
                   block |= val;
@@ -349,7 +350,7 @@ struct tommath_int
                   if (*s >= '0' && *s <= '9')
                      val = *s - '0';
                   else
-                     BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected character encountered in input."));
+                     BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected character encountered in input."));
                   block *= 10;
                   block += val;
                   if (!*++s)
@@ -383,7 +384,7 @@ struct tommath_int
       // sanity check, bases 8 and 16 are only available for positive numbers:
       //
       if ((base != 10) && m_data.sign)
-         BOOST_THROW_EXCEPTION(std::runtime_error("Formatted output in bases 8 or 16 is only available for positive numbers"));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Formatted output in bases 8 or 16 is only available for positive numbers"));
       
       int s;
       detail::check_tommath_result(mp_radix_size(const_cast< ::mp_int*>(&m_data), base, &s));
@@ -459,11 +460,11 @@ struct tommath_int
 #ifndef mp_isneg
 #define BOOST_MP_TOMMATH_BIT_OP_CHECK(x) \
    if (SIGN(&x.data()))                  \
-   BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
+   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
 #else
 #define BOOST_MP_TOMMATH_BIT_OP_CHECK(x) \
    if (mp_isneg(&x.data()))              \
-   BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
+   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
 #endif
 
 int eval_get_sign(const tommath_int& val);
@@ -485,14 +486,14 @@ inline void eval_divide(tommath_int& t, const tommath_int& o)
    using default_ops::eval_is_zero;
    tommath_int temp;
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    detail::check_tommath_result(mp_div(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data(), &temp.data()));
 }
 inline void eval_modulus(tommath_int& t, const tommath_int& o)
 {
    using default_ops::eval_is_zero;
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    bool neg  = eval_get_sign(t) < 0;
    bool neg2 = eval_get_sign(o) < 0;
    detail::check_tommath_result(mp_mod(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
@@ -576,14 +577,14 @@ inline void eval_divide(tommath_int& t, const tommath_int& p, const tommath_int&
    using default_ops::eval_is_zero;
    tommath_int d;
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    detail::check_tommath_result(mp_div(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data(), &d.data()));
 }
 inline void eval_modulus(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
    using default_ops::eval_is_zero;
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    bool neg  = eval_get_sign(p) < 0;
    bool neg2 = eval_get_sign(o) < 0;
    detail::check_tommath_result(mp_mod(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
@@ -696,7 +697,7 @@ inline void eval_powm(tommath_int& result, const tommath_int& base, const tommat
 {
    if (eval_get_sign(p) < 0)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
    detail::check_tommath_result(mp_exptmod(const_cast< ::mp_int*>(&base.data()), const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&m.data()), &result.data()));
 }
@@ -712,11 +713,11 @@ inline unsigned eval_lsb(const tommath_int& val)
    int c = eval_get_sign(val);
    if (c == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (c < 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    return mp_cnt_lsb(const_cast< ::mp_int*>(&val.data()));
 }
@@ -726,11 +727,11 @@ inline unsigned eval_msb(const tommath_int& val)
    int c = eval_get_sign(val);
    if (c == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (c < 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    return mp_count_bits(const_cast< ::mp_int*>(&val.data())) - 1;
 }

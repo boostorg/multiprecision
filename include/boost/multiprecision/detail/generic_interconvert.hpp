@@ -7,6 +7,7 @@
 #define BOOST_MP_GENERIC_INTERCONVERT_HPP
 
 #include <boost/multiprecision/detail/default_ops.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -554,7 +555,7 @@ void generic_interconvert_complex_to_scalar(To& to, const From& from, const std:
    To im;
    eval_imag(im, from);
    if (!eval_is_zero(im))
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
 }
 template <class To, class From>
 void generic_interconvert_complex_to_scalar(To& to, const From& from, const std::integral_constant<bool, false>&, const std::integral_constant<bool, true>&)

@@ -8,6 +8,8 @@
 #ifndef BOOST_MP_CPP_INT_DIV_HPP
 #define BOOST_MP_CPP_INT_DIV_HPP
 
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
+
 namespace boost { namespace multiprecision { namespace backends {
 
 template <class CppInt1, class CppInt2, class CppInt3>
@@ -337,7 +339,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
 
    if (y == 0)
    {
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer Division by zero."));
    }
    //
    // Find the most significant word of numerator.
@@ -613,7 +615,7 @@ eval_divide(
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
 {
    if (!*o.limbs())
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    *result.limbs() /= *o.limbs();
    result.sign(result.sign() != o.sign());
 }
@@ -626,7 +628,7 @@ eval_divide(
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
 {
    if (!*o.limbs())
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    *result.limbs() /= *o.limbs();
 }
 
@@ -638,7 +640,7 @@ eval_modulus(
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
 {
    if (!*o.limbs())
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    *result.limbs() %= *o.limbs();
    result.sign(result.sign());
 }

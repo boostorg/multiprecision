@@ -12,6 +12,7 @@
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
 
@@ -293,7 +294,7 @@ struct gmp_float_imp
       if (s && (*s == '+'))
          ++s;  // Leading "+" sign not supported by mpf_set_str:
       if (0 != mpf_set_str(m_data, s, 10))
-         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid floating point number.")));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid floating point number.")));
       return *this;
    }
    void swap(gmp_float_imp& o) noexcept
@@ -825,7 +826,7 @@ template <unsigned D1, unsigned D2>
 inline void eval_divide(gmp_float<D1>& result, const gmp_float<D2>& o)
 {
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
@@ -847,7 +848,7 @@ template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& result, unsigned long i)
 {
    if (i == 0)
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
@@ -877,7 +878,7 @@ template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& result, long i)
 {
    if (i == 0)
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
    if (i < 0)
       mpf_neg(result.data(), result.data());
@@ -996,21 +997,21 @@ template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_divide(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y)
 {
    if (eval_is_zero(y))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div(a.data(), x.data(), y.data());
 }
 template <unsigned D1, unsigned D2>
 inline void eval_divide(gmp_float<D1>& a, const gmp_float<D2>& x, unsigned long y)
 {
    if (y == 0)
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div_ui(a.data(), x.data(), y);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_divide(gmp_float<D1>& a, const gmp_float<D2>& x, long y)
 {
    if (y == 0)
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    if (y < 0)
    {
       mpf_div_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y));
@@ -1023,14 +1024,14 @@ template <unsigned D1, unsigned D2>
 inline void eval_divide(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y)
 {
    if (eval_is_zero(y))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_ui_div(a.data(), x, y.data());
 }
 template <unsigned D1, unsigned D2>
 inline void eval_divide(gmp_float<D1>& a, long x, const gmp_float<D2>& y)
 {
    if (eval_is_zero(y))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    if (x < 0)
    {
       mpf_ui_div(a.data(), boost::multiprecision::detail::unsigned_abs(x), y.data());
@@ -1457,7 +1458,7 @@ struct gmp_int
       if (n)
       {
          if (0 != mpz_set_str(m_data, s, radix))
-            BOOST_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid integer.")));
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid integer.")));
       }
       else
          mpz_set_ui(m_data, 0);
@@ -1510,7 +1511,7 @@ struct gmp_int
       // sanity check, bases 8 and 16 are only available for positive numbers:
       //
       if ((base != 10) && (mpz_sgn(m_data) < 0))
-         BOOST_THROW_EXCEPTION(std::runtime_error("Formatted output in bases 8 or 16 is only available for positive numbers"));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Formatted output in bases 8 or 16 is only available for positive numbers"));
       void* (*alloc_func_ptr)(size_t);
       void* (*realloc_func_ptr)(void*, size_t, size_t);
       void (*free_func_ptr)(void*, size_t);
@@ -1622,7 +1623,7 @@ inline void eval_multiply(gmp_int& t, const gmp_int& o)
 inline void eval_divide(gmp_int& t, const gmp_int& o)
 {
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q(t.data(), t.data(), o.data());
 }
 inline void eval_modulus(gmp_int& t, const gmp_int& o)
@@ -1656,7 +1657,7 @@ inline void eval_modulus(gmp_int& t, unsigned long i)
 inline void eval_divide(gmp_int& t, unsigned long i)
 {
    if (i == 0)
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), t.data(), i);
 }
 inline void eval_add(gmp_int& t, long i)
@@ -1700,7 +1701,7 @@ inline void eval_modulus(gmp_int& t, long i)
 inline void eval_divide(gmp_int& t, long i)
 {
    if (i == 0)
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), t.data(), boost::multiprecision::detail::unsigned_abs(i));
    if (i < 0)
       mpz_neg(t.data(), t.data());
@@ -1756,7 +1757,7 @@ inline void eval_multiply(gmp_int& t, const gmp_int& p, const gmp_int& o)
 inline void eval_divide(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q(t.data(), p.data(), o.data());
 }
 inline void eval_modulus(gmp_int& t, const gmp_int& p, const gmp_int& o)
@@ -1782,7 +1783,7 @@ inline void eval_modulus(gmp_int& t, const gmp_int& p, unsigned long i)
 inline void eval_divide(gmp_int& t, const gmp_int& p, unsigned long i)
 {
    if (i == 0)
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), p.data(), i);
 }
 inline void eval_add(gmp_int& t, const gmp_int& p, long i)
@@ -1812,7 +1813,7 @@ inline void eval_modulus(gmp_int& t, const gmp_int& p, long i)
 inline void eval_divide(gmp_int& t, const gmp_int& p, long i)
 {
    if (i == 0)
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), p.data(), boost::multiprecision::detail::unsigned_abs(i));
    if (i < 0)
       mpz_neg(t.data(), t.data());
@@ -1846,7 +1847,7 @@ inline void eval_convert_to(unsigned long* result, const gmp_int& val)
 {
    if (mpz_sgn(val.data()) < 0)
    {
-      BOOST_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
+      BOOST_MP_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
    }
    else
       *result = (unsigned long)mpz_get_ui(val.data());
@@ -1869,7 +1870,7 @@ inline void eval_convert_to(boost::ulong_long_type* result, const gmp_int& val)
 {
    if (mpz_sgn(val.data()) < 0)
    {
-      BOOST_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
+      BOOST_MP_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
    }
    *result = 0;
    gmp_int t(val);
@@ -1925,7 +1926,7 @@ inline void eval_convert_to(unsigned __int128* result, const gmp_int& val)
 {
    if (mpz_sgn(val.data()) < 0)
    {
-      BOOST_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
+      BOOST_MP_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
    }
    *result = 0;
    gmp_int t(val);
@@ -2022,11 +2023,11 @@ inline unsigned eval_lsb(const gmp_int& val)
    int c = eval_get_sign(val);
    if (c == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (c < 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    return static_cast<unsigned>(mpz_scan1(val.data(), 0));
 }
@@ -2036,11 +2037,11 @@ inline unsigned eval_msb(const gmp_int& val)
    int c = eval_get_sign(val);
    if (c == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (c < 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    return static_cast<unsigned>(mpz_sizeinbase(val.data(), 2) - 1);
 }
@@ -2096,7 +2097,7 @@ inline void eval_powm(gmp_int& result, const gmp_int& base, const gmp_int& p, co
 {
    if (eval_get_sign(p) < 0)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
    mpz_powm(result.data(), base.data(), p.data(), m.data());
 }
@@ -2114,7 +2115,7 @@ eval_powm(gmp_int& result, const gmp_int& base, Integer p, const gmp_int& m)
 {
    if (p < 0)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
    mpz_powm_ui(result.data(), base.data(), p, m.data());
 }
@@ -2401,7 +2402,7 @@ struct gmp_rational
       if (m_data[0]._mp_den._mp_d == 0)
          mpq_init(m_data);
       if (0 != mpq_set_str(m_data, s, 10))
-         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid rational number.")));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid rational number.")));
       return *this;
    }
    gmp_rational& operator=(const gmp_int& o)
@@ -2524,7 +2525,7 @@ inline void eval_multiply(gmp_rational& t, const gmp_rational& o)
 inline void eval_divide(gmp_rational& t, const gmp_rational& o)
 {
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpq_div(t.data(), t.data(), o.data());
 }
 inline void eval_add(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
@@ -2542,7 +2543,7 @@ inline void eval_multiply(gmp_rational& t, const gmp_rational& p, const gmp_rati
 inline void eval_divide(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
 {
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpq_div(t.data(), p.data(), o.data());
 }
 //

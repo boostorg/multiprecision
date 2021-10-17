@@ -29,6 +29,7 @@
 #include <boost/multiprecision/detail/itos.hpp>
 #include <boost/multiprecision/detail/static_array.hpp>
 #include <boost/multiprecision/detail/tables.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 //
 // Headers required for Boost.Math integration:
@@ -3161,7 +3162,7 @@ inline void eval_ldexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
    const boost::long_long_type the_exp = static_cast<boost::long_long_type>(e);
 
    if ((the_exp > (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)()) || (the_exp < (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::min)()))
-      BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Exponent value is out of range.")));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Exponent value is out of range.")));
 
    result = x;
 
@@ -3232,9 +3233,9 @@ inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
       eval_frexp(r2, result, &e2);
       // overflow protection:
       if ((t > 0) && (e2 > 0) && (t > (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)() - e2))
-         BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
       if ((t < 0) && (e2 < 0) && (t < (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::min)() - e2))
-         BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
       t += e2;
       result = r2;
    }
@@ -3260,7 +3261,7 @@ inline typename std::enable_if< !std::is_same<ExponentType, int>::value>::type e
    typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type t;
    eval_frexp(result, x, &t);
    if ((t > (std::numeric_limits<int>::max)()) || (t < (std::numeric_limits<int>::min)()))
-      BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is outside the range of an int"));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is outside the range of an int"));
    *e = static_cast<int>(t);
 }
 
