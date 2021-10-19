@@ -225,3 +225,54 @@ static_assert(!noexcept(std::declval<checked_uint30_t>() = std::declval<std::uin
 static_assert(!noexcept(std::declval<checked_int32_t>() = std::declval<std::uint64_t>()), "noexcept test");
 static_assert(!noexcept(std::declval<checked_uint32_t>() = std::declval<std::uint64_t>()), "noexcept test");
 
+//
+// Check regular construct/assign as well, see https://github.com/boostorg/multiprecision/issues/383
+//
+//
+// Move assign:
+//
+static_assert(std::is_move_assignable<boost::multiprecision::cpp_int>::value, "noexcept test");
+static_assert(std::is_move_assignable<boost::multiprecision::int128_t>::value, "noexcept test");
+static_assert(std::is_move_assignable<boost::multiprecision::checked_int128_t>::value, "noexcept test");
+static_assert(std::is_move_assignable<boost::multiprecision::uint128_t>::value, "noexcept test");
+static_assert(std::is_move_assignable<boost::multiprecision::checked_uint128_t>::value, "noexcept test");
+static_assert(std::is_move_assignable<boost::multiprecision::int512_t>::value, "noexcept test");
+static_assert(std::is_move_assignable<boost::multiprecision::checked_int512_t>::value, "noexcept test");
+static_assert(std::is_move_assignable<boost::multiprecision::uint512_t>::value, "noexcept test");
+static_assert(std::is_move_assignable<boost::multiprecision::checked_uint512_t>::value, "noexcept test");
+//
+// Construct:
+//
+static_assert(std::is_default_constructible<boost::multiprecision::cpp_int>::value, "noexcept test");
+static_assert(std::is_default_constructible<boost::multiprecision::int128_t>::value, "noexcept test");
+static_assert(std::is_default_constructible<boost::multiprecision::checked_int128_t>::value, "noexcept test");
+static_assert(std::is_default_constructible<boost::multiprecision::uint128_t>::value, "noexcept test");
+static_assert(std::is_default_constructible<boost::multiprecision::checked_uint128_t>::value, "noexcept test");
+static_assert(std::is_default_constructible<boost::multiprecision::int512_t>::value, "noexcept test");
+static_assert(std::is_default_constructible<boost::multiprecision::checked_int512_t>::value, "noexcept test");
+static_assert(std::is_default_constructible<boost::multiprecision::uint512_t>::value, "noexcept test");
+static_assert(std::is_default_constructible<boost::multiprecision::checked_uint512_t>::value, "noexcept test");
+//
+// Copy construct:
+//
+static_assert(std::is_copy_constructible<boost::multiprecision::cpp_int>::value, "noexcept test");
+static_assert(std::is_copy_constructible<boost::multiprecision::int128_t>::value, "noexcept test");
+static_assert(std::is_copy_constructible<boost::multiprecision::checked_int128_t>::value, "noexcept test");
+static_assert(std::is_copy_constructible<boost::multiprecision::uint128_t>::value, "noexcept test");
+static_assert(std::is_copy_constructible<boost::multiprecision::checked_uint128_t>::value, "noexcept test");
+static_assert(std::is_copy_constructible<boost::multiprecision::int512_t>::value, "noexcept test");
+static_assert(std::is_copy_constructible<boost::multiprecision::checked_int512_t>::value, "noexcept test");
+static_assert(std::is_copy_constructible<boost::multiprecision::uint512_t>::value, "noexcept test");
+static_assert(std::is_copy_constructible<boost::multiprecision::checked_uint512_t>::value, "noexcept test");
+//
+// Assign:
+//
+static_assert(std::is_copy_assignable<boost::multiprecision::cpp_int>::value, "noexcept test");
+static_assert(std::is_copy_assignable<boost::multiprecision::int128_t>::value, "noexcept test");
+static_assert(std::is_copy_assignable<boost::multiprecision::checked_int128_t>::value, "noexcept test");
+static_assert(std::is_copy_assignable<boost::multiprecision::uint128_t>::value, "noexcept test");
+static_assert(std::is_copy_assignable<boost::multiprecision::checked_uint128_t>::value, "noexcept test");
+static_assert(std::is_copy_assignable<boost::multiprecision::int512_t>::value, "noexcept test");
+static_assert(std::is_copy_assignable<boost::multiprecision::checked_int512_t>::value, "noexcept test");
+static_assert(std::is_copy_assignable<boost::multiprecision::uint512_t>::value, "noexcept test");
+static_assert(std::is_copy_assignable<boost::multiprecision::checked_uint512_t>::value, "noexcept test");

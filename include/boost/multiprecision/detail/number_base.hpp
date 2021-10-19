@@ -1555,6 +1555,12 @@ BOOST_MP_CXX14_CONSTEXPR typename expression<tag, Arg1, Arg2, Arg3, Arg4>::resul
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 BOOST_MP_CXX14_CONSTEXPR typename expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type evaluate_if_expression(expression<tag, Arg1, Arg2, Arg3, Arg4>&& val) { return val; }
 
+template <class T>
+struct convertible_to
+{
+   operator T () const;
+};
+
 } // namespace detail
 
 //
