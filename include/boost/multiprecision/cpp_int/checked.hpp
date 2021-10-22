@@ -130,7 +130,7 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_divide(A a, A b, const std::integral_c
 }
 
 template <class A>
-inline BOOST_MP_CXX14_CONSTEXPR A checked_left_shift(A a, boost::ulong_long_type shift, const std::integral_constant<int, checked>&)
+inline BOOST_MP_CXX14_CONSTEXPR A checked_left_shift(A a, unsigned long long shift, const std::integral_constant<int, checked>&)
 {
    if (a && shift)
    {
@@ -140,7 +140,7 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_left_shift(A a, boost::ulong_long_type
    return a << shift;
 }
 template <class A>
-inline BOOST_MP_CXX14_CONSTEXPR A checked_left_shift(A a, boost::ulong_long_type shift, const std::integral_constant<int, unchecked>&)
+inline BOOST_MP_CXX14_CONSTEXPR A checked_left_shift(A a, unsigned long long shift, const std::integral_constant<int, unchecked>&)
 {
    return (shift >= sizeof(A) * CHAR_BIT) ? 0 : a << shift;
 }

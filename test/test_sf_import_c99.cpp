@@ -2247,7 +2247,7 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<100>, boost::multiprecision::et_on> >();
 #endif
 #ifdef TEST_CPP_BIN_FLOAT_2
-   test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
 #endif
 #ifdef TEST_CPP_BIN_FLOAT_3
    test_c99_appendix_F<boost::multiprecision::cpp_bin_float_50>();

@@ -408,7 +408,7 @@ template <class To, class From>
 void generic_interconvert_float2rational(To& to, const From& from, const std::integral_constant<int, 2>& /*radix*/)
 {
    using ui_type = typename std::tuple_element<0, typename To::unsigned_types>::type;
-   constexpr const int                                                       shift = std::numeric_limits<boost::long_long_type>::digits;
+   constexpr const int                                                       shift = std::numeric_limits<long long>::digits;
    typename From::exponent_type                                   e;
    typename component_type<number<To> >::type                     num, denom;
    number<From>                                                   val(from);
@@ -417,7 +417,7 @@ void generic_interconvert_float2rational(To& to, const From& from, const std::in
    {
       val = ldexp(val, shift);
       e -= shift;
-      boost::long_long_type ll = boost::math::lltrunc(val);
+      long long ll = boost::math::lltrunc(val);
       val -= ll;
       num <<= shift;
       num += ll;
@@ -453,7 +453,7 @@ void generic_interconvert_float2rational(To& to, const From& from, const std::in
    val = scalbn(val, -e);
    while (val)
    {
-      boost::long_long_type ll = boost::math::lltrunc(val);
+      long long ll = boost::math::lltrunc(val);
       val -= ll;
       val = scalbn(val, 1);
       num *= Radix;
@@ -489,7 +489,7 @@ template <class To, class From>
 void generic_interconvert_float2int(To& to, const From& from, const std::integral_constant<int, 2>& /*radix*/)
 {
    using exponent_type = typename From::exponent_type;
-   constexpr const exponent_type        shift = std::numeric_limits<boost::long_long_type>::digits;
+   constexpr const exponent_type        shift = std::numeric_limits<long long>::digits;
    exponent_type                        e;
    number<To>                           num(0u);
    number<From>                         val(from);
@@ -505,7 +505,7 @@ void generic_interconvert_float2int(To& to, const From& from, const std::integra
       exponent_type s = (std::min)(e, shift);
       val             = ldexp(val, s);
       e -= s;
-      boost::long_long_type ll = boost::math::lltrunc(val);
+      long long ll = boost::math::lltrunc(val);
       val -= ll;
       num <<= s;
       num += ll;
@@ -530,7 +530,7 @@ void generic_interconvert_float2int(To& to, const From& from, const std::integra
    val = scalbn(val, -e);
    while (e >= 0)
    {
-      boost::long_long_type ll = boost::math::lltrunc(val);
+      long long ll = boost::math::lltrunc(val);
       val -= ll;
       val = scalbn(val, 1);
       num *= Radix;

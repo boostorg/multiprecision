@@ -921,7 +921,7 @@ template <unsigned MinBits, cpp_int_check_type Checked>
 const unsigned cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::internal_limb_count;
 //
 // Traits classes to figure out a native type with N bits, these vary from boost::uint_t<N> only
-// because some platforms have native integer types longer than boost::long_long_type, "really boost::long_long_type" anyone??
+// because some platforms have native integer types longer than long long, "really long long" anyone??
 //
 template <unsigned N, bool s>
 struct trivial_limb_type_imp
@@ -936,7 +936,7 @@ struct trivial_limb_type_imp<N, true>
 };
 
 template <unsigned N>
-struct trivial_limb_type : public trivial_limb_type_imp<N, N <= sizeof(boost::long_long_type) * CHAR_BIT>
+struct trivial_limb_type : public trivial_limb_type_imp<N, N <= sizeof(long long) * CHAR_BIT>
 {};
 //
 // Backend for fixed precision signed-magnitude type which will fit entirely inside a "double_limb_type":
@@ -1327,12 +1327,12 @@ struct cpp_int_backend
        is_trivial_cpp_int<self_type>::value,
        std::tuple<
            signed char, short, int, long,
-           boost::long_long_type, signed_double_limb_type>,
+           long long, signed_double_limb_type>,
        std::tuple<signed_limb_type, signed_double_limb_type> >::type;
    using unsigned_types = typename std::conditional<
        is_trivial_cpp_int<self_type>::value,
        std::tuple<unsigned char, unsigned short, unsigned,
-                 unsigned long, boost::ulong_long_type, double_limb_type>,
+                 unsigned long, unsigned long long, double_limb_type>,
        std::tuple<limb_type, double_limb_type> >::type;
    using float_types = typename std::conditional<
        is_trivial_cpp_int<self_type>::value,

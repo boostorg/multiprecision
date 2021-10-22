@@ -50,17 +50,17 @@ namespace detail {
 //
 // Figure out the kind of integer that has twice as many bits as some builtin
 // integer type I.  Use a native type if we can (including types which may not
-// be recognised by boost::int_t because they're larger than boost::long_long_type),
+// be recognised by boost::int_t because they're larger than long long),
 // otherwise synthesize a cpp_int to do the job.
 //
 template <class I>
 struct double_integer
 {
    static constexpr const unsigned int_t_digits =
-       2 * sizeof(I) <= sizeof(boost::long_long_type) ? std::numeric_limits<I>::digits * 2 : 1;
+       2 * sizeof(I) <= sizeof(long long) ? std::numeric_limits<I>::digits * 2 : 1;
 
    using type = typename std::conditional<
-       2 * sizeof(I) <= sizeof(boost::long_long_type),
+       2 * sizeof(I) <= sizeof(long long),
        typename std::conditional<
            boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value,
            typename boost::int_t<int_t_digits>::least,

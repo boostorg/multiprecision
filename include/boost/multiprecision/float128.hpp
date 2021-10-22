@@ -163,8 +163,8 @@ namespace backends {
 
 struct float128_backend
 {
-   using signed_types = std::tuple<signed char, short, int, long, boost::long_long_type>;
-   using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, boost::ulong_long_type>;
+   using signed_types = std::tuple<signed char, short, int, long, long long>;
+   using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long>;
    using float_types = std::tuple<float, double, long double>;
    using exponent_type = int                                  ;
 

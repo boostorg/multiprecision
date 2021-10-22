@@ -67,8 +67,8 @@ template <unsigned digits10>
 struct mpc_complex_imp
 {
 #ifdef BOOST_HAS_LONG_LONG
-   using signed_types = std::tuple<long, boost::long_long_type>          ;
-   using unsigned_types = std::tuple<unsigned long, boost::ulong_long_type>;
+   using signed_types = std::tuple<long, long long>          ;
+   using unsigned_types = std::tuple<unsigned long, unsigned long long>;
 #else
    using signed_types = std::tuple<long>         ;
    using unsigned_types = std::tuple<unsigned long>;
@@ -135,14 +135,14 @@ struct mpc_complex_imp
    }
 #ifdef BOOST_HAS_LONG_LONG
 #ifdef _MPFR_H_HAVE_INTMAX_T
-   mpc_complex_imp& operator=(boost::ulong_long_type i)
+   mpc_complex_imp& operator=(unsigned long long i)
    {
       if (m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
       mpc_set_uj(data(), i, GMP_RNDD);
       return *this;
    }
-   mpc_complex_imp& operator=(boost::long_long_type i)
+   mpc_complex_imp& operator=(long long i)
    {
       if (m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
@@ -150,14 +150,14 @@ struct mpc_complex_imp
       return *this;
    }
 #else
-   mpc_complex_imp& operator=(boost::ulong_long_type i)
+   mpc_complex_imp& operator=(unsigned long long i)
    {
       mpfr_float_backend<digits10> f(0uL, mpc_get_prec(m_data));
       f = i;
       mpc_set_fr(this->data(), f.data(), GMP_RNDN);
       return *this;
    }
-   mpc_complex_imp& operator=(boost::long_long_type i)
+   mpc_complex_imp& operator=(long long i)
    {
       mpfr_float_backend<digits10> f(0uL, mpc_get_prec(m_data));
       f = i;
@@ -1186,7 +1186,7 @@ inline void eval_convert_to(long* result, const mpc_complex_backend<digits10>& v
 }
 #ifdef _MPFR_H_HAVE_INTMAX_T
 template <unsigned digits10>
-inline void eval_convert_to(boost::ulong_long_type* result, const mpc_complex_backend<digits10>& val)
+inline void eval_convert_to(unsigned long long* result, const mpc_complex_backend<digits10>& val)
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
@@ -1197,7 +1197,7 @@ inline void eval_convert_to(boost::ulong_long_type* result, const mpc_complex_ba
    eval_convert_to(result, t);
 }
 template <unsigned digits10>
-inline void eval_convert_to(boost::long_long_type* result, const mpc_complex_backend<digits10>& val)
+inline void eval_convert_to(long long* result, const mpc_complex_backend<digits10>& val)
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {

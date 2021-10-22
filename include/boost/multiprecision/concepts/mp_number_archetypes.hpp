@@ -28,8 +28,8 @@ namespace concepts {
 
 struct number_backend_float_architype
 {
-   using signed_types = std::tuple<boost::long_long_type> ;
-   using unsigned_types = std::tuple<boost::ulong_long_type>;
+   using signed_types = std::tuple<long long> ;
+   using unsigned_types = std::tuple<unsigned long long>;
    using float_types = std::tuple<long double>           ;
    using exponent_type = int                              ;
 
@@ -49,13 +49,13 @@ struct number_backend_float_architype
       std::cout << "Assignment (" << m_value << ")" << std::endl;
       return *this;
    }
-   number_backend_float_architype& operator=(boost::ulong_long_type i)
+   number_backend_float_architype& operator=(unsigned long long i)
    {
       m_value = i;
       std::cout << "UInt Assignment (" << i << ")" << std::endl;
       return *this;
    }
-   number_backend_float_architype& operator=(boost::long_long_type i)
+   number_backend_float_architype& operator=(long long i)
    {
       m_value = i;
       std::cout << "Int Assignment (" << i << ")" << std::endl;
@@ -119,12 +119,12 @@ struct number_backend_float_architype
       std::cout << "Comparison" << std::endl;
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
-   int compare(boost::long_long_type i) const
+   int compare(long long i) const
    {
       std::cout << "Comparison with int" << std::endl;
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
    }
-   int compare(boost::ulong_long_type i) const
+   int compare(unsigned long long i) const
    {
       std::cout << "Comparison with unsigned" << std::endl;
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
@@ -158,13 +158,13 @@ inline void eval_divide(number_backend_float_architype& result, const number_bac
    result.m_value /= o.m_value;
 }
 
-inline void eval_convert_to(boost::ulong_long_type* result, const number_backend_float_architype& val)
+inline void eval_convert_to(unsigned long long* result, const number_backend_float_architype& val)
 {
-   *result = static_cast<boost::ulong_long_type>(val.m_value);
+   *result = static_cast<unsigned long long>(val.m_value);
 }
-inline void eval_convert_to(boost::long_long_type* result, const number_backend_float_architype& val)
+inline void eval_convert_to(long long* result, const number_backend_float_architype& val)
 {
-   *result = static_cast<boost::long_long_type>(val.m_value);
+   *result = static_cast<long long>(val.m_value);
 }
 inline void eval_convert_to(long double* result, number_backend_float_architype& val)
 {

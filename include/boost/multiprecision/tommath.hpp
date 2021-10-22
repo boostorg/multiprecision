@@ -44,8 +44,8 @@ void eval_add(tommath_int& t, const tommath_int& o);
 
 struct tommath_int
 {
-   using signed_types = std::tuple<std::int32_t, boost::long_long_type>  ;
-   using unsigned_types = std::tuple<std::uint32_t, boost::ulong_long_type>;
+   using signed_types = std::tuple<std::int32_t, long long>  ;
+   using unsigned_types = std::tuple<std::uint32_t, unsigned long long>;
    using float_types = std::tuple<long double>                            ;
 
    tommath_int()
@@ -77,11 +77,11 @@ struct tommath_int
    }
 #ifndef mp_get_u64
    // Pick off 32 bit chunks for mp_set_int:
-   tommath_int& operator=(boost::ulong_long_type i)
+   tommath_int& operator=(unsigned long long i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-      boost::ulong_long_type mask = ((1uLL << 32) - 1);
+      unsigned long long mask = ((1uLL << 32) - 1);
       unsigned shift = 0;
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
@@ -100,16 +100,16 @@ struct tommath_int
    }
 #elif !defined(ULLONG_MAX) || (ULLONG_MAX != 18446744073709551615uLL)
    // Pick off 64 bit chunks for mp_set_i64:
-   tommath_int& operator=(boost::ulong_long_type i)
+   tommath_int& operator=(unsigned long long i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-      if(sizeof(boost::ulong_long_type) * CHAR_BIT == 64)
+      if(sizeof(unsigned long long) * CHAR_BIT == 64)
       {
          mp_set_u64(&m_data, i);
          return *this;
       }
-      boost::ulong_long_type mask = ((1uLL << 64) - 1);
+      unsigned long long mask = ((1uLL << 64) - 1);
       unsigned shift = 0;
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
@@ -127,7 +127,7 @@ struct tommath_int
       return *this;
    }
 #else
-   tommath_int& operator=(boost::ulong_long_type i)
+   tommath_int& operator=(unsigned long long i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
@@ -135,7 +135,7 @@ struct tommath_int
       return *this;
    }
 #endif
-   tommath_int& operator=(boost::long_long_type i)
+   tommath_int& operator=(long long i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
@@ -302,7 +302,7 @@ struct tommath_int
             unsigned block_count = MP_DIGIT_BIT / shift;
 #endif
             unsigned               block_shift = shift * block_count;
-            boost::ulong_long_type val, block;
+            unsigned long long val, block;
             while (*s)
             {
                block = 0;
@@ -645,7 +645,7 @@ inline void eval_complement(tommath_int& result, const tommath_int& u)
 
    // Create a mask providing the extra bits we need and add to result:
    tommath_int mask;
-   mask = static_cast<boost::long_long_type>((1u << padding) - 1);
+   mask = static_cast<long long>((1u << padding) - 1);
    eval_left_shift(mask, shift);
    add(result, mask);
 }

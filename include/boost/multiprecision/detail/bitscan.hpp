@@ -153,7 +153,7 @@ BOOST_FORCEINLINE unsigned find_lsb(unsigned long mask, std::integral_constant<i
 {
    return __builtin_ctzl(mask);
 }
-BOOST_FORCEINLINE unsigned find_lsb(boost::ulong_long_type mask, std::integral_constant<int, 3> const&)
+BOOST_FORCEINLINE unsigned find_lsb(unsigned long long mask, std::integral_constant<int, 3> const&)
 {
    return __builtin_ctzll(mask);
 }
@@ -165,9 +165,9 @@ BOOST_FORCEINLINE unsigned find_msb(unsigned long mask, std::integral_constant<i
 {
    return sizeof(unsigned long) * CHAR_BIT - 1 - __builtin_clzl(mask);
 }
-BOOST_FORCEINLINE unsigned find_msb(boost::ulong_long_type mask, std::integral_constant<int, 3> const&)
+BOOST_FORCEINLINE unsigned find_msb(unsigned long long mask, std::integral_constant<int, 3> const&)
 {
-   return sizeof(boost::ulong_long_type) * CHAR_BIT - 1 - __builtin_clzll(mask);
+   return sizeof(unsigned long long) * CHAR_BIT - 1 - __builtin_clzll(mask);
 }
 #ifdef BOOST_HAS_INT128
 
@@ -222,7 +222,7 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
            sizeof(Unsigned) <= sizeof(unsigned long),
            std::integral_constant<int, 2>,
            typename std::conditional<
-               sizeof(Unsigned) <= sizeof(boost::ulong_long_type),
+               sizeof(Unsigned) <= sizeof(unsigned long long),
                std::integral_constant<int, 3>,
                std::integral_constant<int, 0> >::type>::type>::type;
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -245,7 +245,7 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
            sizeof(Unsigned) <= sizeof(unsigned long),
            std::integral_constant<int, 2>,
            typename std::conditional<
-               sizeof(Unsigned) <= sizeof(boost::ulong_long_type),
+               sizeof(Unsigned) <= sizeof(unsigned long long),
                std::integral_constant<int, 3>,
                std::integral_constant<int, 0> >::type>::type>::type;
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
