@@ -12,6 +12,7 @@
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/integer.hpp>
 #include <boost/multiprecision/detail/uniform_int_distribution.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -28,7 +29,7 @@ bool check_small_factors(const I& n)
 
    for (unsigned i = 0; i < sizeof(small_factors1) / sizeof(small_factors1[0]); ++i)
    {
-      BOOST_ASSERT(pp1 % small_factors1[i] == 0);
+      BOOST_MP_ASSERT(pp1 % small_factors1[i] == 0);
       if (m1 % small_factors1[i] == 0)
          return false;
    }
@@ -41,7 +42,7 @@ bool check_small_factors(const I& n)
 
    for (unsigned i = 0; i < sizeof(small_factors2) / sizeof(small_factors2[0]); ++i)
    {
-      BOOST_ASSERT(pp2 % small_factors2[i] == 0);
+      BOOST_MP_ASSERT(pp2 % small_factors2[i] == 0);
       if (m1 % small_factors2[i] == 0)
          return false;
    }
@@ -54,7 +55,7 @@ bool check_small_factors(const I& n)
 
    for (unsigned i = 0; i < sizeof(small_factors3) / sizeof(small_factors3[0]); ++i)
    {
-      BOOST_ASSERT(pp3 % small_factors3[i] == 0);
+      BOOST_MP_ASSERT(pp3 % small_factors3[i] == 0);
       if (m1 % small_factors3[i] == 0)
          return false;
    }
@@ -67,7 +68,7 @@ bool check_small_factors(const I& n)
 
    for (unsigned i = 0; i < sizeof(small_factors4) / sizeof(small_factors4[0]); ++i)
    {
-      BOOST_ASSERT(pp4 % small_factors4[i] == 0);
+      BOOST_MP_ASSERT(pp4 % small_factors4[i] == 0);
       if (m1 % small_factors4[i] == 0)
          return false;
    }
@@ -94,7 +95,7 @@ bool check_small_factors(const I& n)
 
       for (unsigned i = 0; i < 4; ++i)
       {
-         BOOST_ASSERT(pp5[k] % small_factors5[k][i] == 0);
+         BOOST_MP_ASSERT(pp5[k] % small_factors5[k][i] == 0);
          if (m1 % small_factors5[k][i] == 0)
             return false;
       }

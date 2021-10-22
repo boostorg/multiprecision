@@ -11,6 +11,7 @@
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
 #include <tommath.h>
@@ -200,8 +201,8 @@ struct tommath_int
          return *this;
       }
 
-      BOOST_ASSERT(!(boost::math::isinf)(a));
-      BOOST_ASSERT(!(boost::math::isnan)(a));
+      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
 
       int         e;
       long double f, term;
@@ -374,7 +375,7 @@ struct tommath_int
    }
    std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f) const
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       int base = 10;
       if ((f & std::ios_base::oct) == std::ios_base::oct)
          base = 8;
@@ -421,12 +422,12 @@ struct tommath_int
    }
    void negate()
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       detail::check_tommath_result(mp_neg(&m_data, &m_data));
    }
    int compare(const tommath_int& o) const
    {
-      BOOST_ASSERT(m_data.dp && o.m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp && o.m_data.dp);
       return mp_cmp(const_cast< ::mp_int*>(&m_data), const_cast< ::mp_int*>(&o.m_data));
    }
    template <class V>
@@ -440,12 +441,12 @@ struct tommath_int
    }
    ::mp_int& data()
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       return m_data;
    }
    const ::mp_int& data() const
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       return m_data;
    }
    void swap(tommath_int& o) noexcept

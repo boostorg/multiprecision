@@ -169,7 +169,7 @@
    <span class="comment">// import back again, and check for equality:</span>
    <span class="identifier">cpp_int</span> <span class="identifier">j</span><span class="special">;</span>
    <span class="identifier">import_bits</span><span class="special">(</span><span class="identifier">j</span><span class="special">,</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">end</span><span class="special">());</span>
-   <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="identifier">i</span> <span class="special">==</span> <span class="identifier">j</span><span class="special">);</span>
+   <span class="identifier">BOOST_MP_ASSERT</span><span class="special">(</span><span class="identifier">i</span> <span class="special">==</span> <span class="identifier">j</span><span class="special">);</span>
 <span class="special">}</span>
 </pre>
 <p>
@@ -201,7 +201,7 @@
    <span class="identifier">import_bits</span><span class="special">(</span><span class="identifier">i</span><span class="special">,</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">end</span><span class="special">());</span>
    <span class="identifier">cpp_bin_float_100</span> <span class="identifier">g</span><span class="special">(</span><span class="identifier">i</span><span class="special">);</span>
    <span class="identifier">g</span><span class="special">.</span><span class="identifier">backend</span><span class="special">().</span><span class="identifier">exponent</span><span class="special">()</span> <span class="special">=</span> <span class="identifier">e</span><span class="special">;</span>
-   <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="identifier">f</span> <span class="special">==</span> <span class="identifier">g</span><span class="special">);</span>
+   <span class="identifier">BOOST_MP_ASSERT</span><span class="special">(</span><span class="identifier">f</span> <span class="special">==</span> <span class="identifier">g</span><span class="special">);</span>
 <span class="special">}</span>
 </pre>
 </div>

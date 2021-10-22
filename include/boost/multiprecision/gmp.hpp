@@ -13,6 +13,7 @@
 #include <boost/multiprecision/detail/atomic.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
 
@@ -255,8 +256,8 @@ struct gmp_float_imp
          return *this;
       }
 
-      BOOST_ASSERT(!(boost::math::isinf)(a));
-      BOOST_ASSERT(!(boost::math::isnan)(a));
+      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
 
       int         e;
       long double f, term;
@@ -303,7 +304,7 @@ struct gmp_float_imp
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
 
       bool            scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
       bool            fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
@@ -420,22 +421,22 @@ struct gmp_float_imp
    }
    void negate() noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
       mpf_neg(m_data, m_data);
    }
    int compare(const gmp_float<digits10>& o) const noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d && o.m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d && o.m_data[0]._mp_d);
       return mpf_cmp(m_data, o.m_data);
    }
    int compare(long i) const noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
       return mpf_cmp_si(m_data, i);
    }
    int compare(unsigned long i) const noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
       return mpf_cmp_ui(m_data, i);
    }
    template <class V>
@@ -447,12 +448,12 @@ struct gmp_float_imp
    }
    mpf_t& data() noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
       return m_data;
    }
    const mpf_t& data() const noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
       return m_data;
    }
 
@@ -1405,8 +1406,8 @@ struct gmp_int
          return *this;
       }
 
-      BOOST_ASSERT(!(boost::math::isinf)(a));
-      BOOST_ASSERT(!(boost::math::isnan)(a));
+      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
 
       int         e;
       long double f, term;
@@ -1500,7 +1501,7 @@ struct gmp_int
    }
    std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f) const
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
 
       int base = 10;
       if ((f & std::ios_base::oct) == std::ios_base::oct)
@@ -1540,22 +1541,22 @@ struct gmp_int
    }
    void negate() noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
       mpz_neg(m_data, m_data);
    }
    int compare(const gmp_int& o) const noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d && o.m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d && o.m_data[0]._mp_d);
       return mpz_cmp(m_data, o.m_data);
    }
    int compare(long i) const noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
       return mpz_cmp_si(m_data, i);
    }
    int compare(unsigned long i) const noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
       return mpz_cmp_ui(m_data, i);
    }
    template <class V>
@@ -1567,12 +1568,12 @@ struct gmp_int
    }
    mpz_t& data() noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
       return m_data;
    }
    const mpz_t& data() const noexcept
    {
-      BOOST_ASSERT(m_data[0]._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_d);
       return m_data;
    }
 
@@ -2353,8 +2354,8 @@ struct gmp_rational
          return *this;
       }
 
-      BOOST_ASSERT(!(boost::math::isinf)(a));
-      BOOST_ASSERT(!(boost::math::isnan)(a));
+      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
 
       int         e;
       long double f, term;
@@ -2432,7 +2433,7 @@ struct gmp_rational
    }
    std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags /*f*/) const
    {
-      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_num._mp_d);
       // TODO make a better job of this including handling of f!!
       void* (*alloc_func_ptr)(size_t);
       void* (*realloc_func_ptr)(void*, size_t, size_t);
@@ -2450,12 +2451,12 @@ struct gmp_rational
    }
    void negate()
    {
-      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_num._mp_d);
       mpq_neg(m_data, m_data);
    }
    int compare(const gmp_rational& o) const
    {
-      BOOST_ASSERT(m_data[0]._mp_num._mp_d && o.m_data[0]._mp_num._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_num._mp_d && o.m_data[0]._mp_num._mp_d);
       return mpq_cmp(m_data, o.m_data);
    }
    template <class V>
@@ -2467,22 +2468,22 @@ struct gmp_rational
    }
    int compare(unsigned long v) const
    {
-      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_num._mp_d);
       return mpq_cmp_ui(m_data, v, 1);
    }
    int compare(long v) const
    {
-      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_num._mp_d);
       return mpq_cmp_si(m_data, v, 1);
    }
    mpq_t& data()
    {
-      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_num._mp_d);
       return m_data;
    }
    const mpq_t& data() const
    {
-      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
+      BOOST_MP_ASSERT(m_data[0]._mp_num._mp_d);
       return m_data;
    }
 

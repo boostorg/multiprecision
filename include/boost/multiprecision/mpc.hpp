@@ -14,6 +14,7 @@
 #include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 #include <mpc.h>
 #include <cmath>
 #include <algorithm>
@@ -270,7 +271,7 @@ struct mpc_complex_imp
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
    {
-      BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].re[0]._mpfr_d);
 
       mpfr_float_backend<digits10> a(0uL, mpc_get_prec(m_data)), b(0uL, mpc_get_prec(m_data));
 
@@ -289,27 +290,27 @@ struct mpc_complex_imp
    }
    void negate() noexcept
    {
-      BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].re[0]._mpfr_d);
       mpc_neg(m_data, m_data, GMP_RNDD);
    }
    int compare(const mpc_complex_imp& o) const noexcept
    {
-      BOOST_ASSERT(m_data[0].re[0]._mpfr_d && o.m_data[0].re[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].re[0]._mpfr_d && o.m_data[0].re[0]._mpfr_d);
       return mpc_cmp(m_data, o.m_data);
    }
    int compare(const mpc_complex_backend<digits10>& o) const noexcept
    {
-      BOOST_ASSERT(m_data[0].re[0]._mpfr_d && o.m_data[0].re[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].re[0]._mpfr_d && o.m_data[0].re[0]._mpfr_d);
       return mpc_cmp(m_data, o.data());
    }
    int compare(long int i) const noexcept
    {
-      BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].re[0]._mpfr_d);
       return mpc_cmp_si(m_data, i);
    }
    int compare(unsigned long int i) const noexcept
    {
-      BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].re[0]._mpfr_d);
       constexpr const unsigned long int max_val = (std::numeric_limits<long>::max)();
       if (i > max_val)
       {
@@ -328,12 +329,12 @@ struct mpc_complex_imp
    }
    mpc_t& data() noexcept
    {
-      BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].re[0]._mpfr_d);
       return m_data;
    }
    const mpc_t& data() const noexcept
    {
-      BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].re[0]._mpfr_d);
       return m_data;
    }
 

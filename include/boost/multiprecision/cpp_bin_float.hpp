@@ -13,6 +13,7 @@
 #include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
@@ -521,7 +522,7 @@ class cpp_bin_float
             m_exponent = static_cast<Exponent>(shift);
             eval_left_shift(m_data, bit_count - shift - 1);
          }
-         BOOST_ASSERT(eval_bit_test(m_data, bit_count - 1));
+         BOOST_MP_ASSERT(eval_bit_test(m_data, bit_count - 1));
          m_sign = detail::is_negative(i);
       }
       return *this;
@@ -586,13 +587,13 @@ class cpp_bin_float
       using default_ops::eval_is_zero;
       if ((m_exponent <= max_exponent) && (m_exponent >= min_exponent))
       {
-         BOOST_ASSERT(eval_bit_test(m_data, bit_count - 1));
+         BOOST_MP_ASSERT(eval_bit_test(m_data, bit_count - 1));
       }
       else
       {
-         BOOST_ASSERT(m_exponent > max_exponent);
-         BOOST_ASSERT(m_exponent <= exponent_nan);
-         BOOST_ASSERT(eval_is_zero(m_data));
+         BOOST_MP_ASSERT(m_exponent > max_exponent);
+         BOOST_MP_ASSERT(m_exponent <= exponent_nan);
+         BOOST_MP_ASSERT(eval_is_zero(m_data));
       }
    }
 
@@ -696,7 +697,7 @@ inline void copy_and_round(cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
       return;
    }
    // Result must be normalized:
-   BOOST_ASSERT(((int)eval_msb(res.bits()) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
+   BOOST_MP_ASSERT(((int)eval_msb(res.bits()) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
 
    if (res.exponent() > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent)
    {
@@ -778,7 +779,7 @@ inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
    else
    {
       exponent_type e_diff = a.exponent() - b.exponent();
-      BOOST_ASSERT(e_diff >= 0);
+      BOOST_MP_ASSERT(e_diff >= 0);
       eval_left_shift(dt, e_diff);
       res.exponent() = a.exponent() - e_diff;
       eval_add(dt, b.bits());
@@ -1233,7 +1234,7 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       // remainder is non-zero (ie we do not have a tie) or the quotient would
       // be odd if it were shifted to the correct number of bits (ie a tiebreak).
       //
-      BOOST_ASSERT((eval_msb(q) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count));
+      BOOST_MP_ASSERT((eval_msb(q) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count));
       if ((q.limbs()[0] & 1u) && (eval_get_sign(r) || (q.limbs()[0] & 2u)))
       {
          eval_increment(q);
@@ -1248,7 +1249,7 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       // so we'll left shift q and add some fake digits on the end to represent
       // how we'll be rounding.
       //
-      BOOST_ASSERT((eval_msb(q) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
+      BOOST_MP_ASSERT((eval_msb(q) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
       constexpr const unsigned lshift = (cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count < limb_bits) ? 2 : limb_bits;
       eval_left_shift(q, lshift);
       res.exponent() -= lshift;
@@ -1355,7 +1356,7 @@ inline typename std::enable_if<boost::multiprecision::detail::is_unsigned<U>::va
       // we just need to changes things if the last bit is 1 and the
       // remainder is non-zero (ie we do not have a tie).
       //
-      BOOST_ASSERT((eval_msb(q) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count));
+      BOOST_MP_ASSERT((eval_msb(q) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count));
       if ((q.limbs()[0] & 1u) && eval_get_sign(r))
       {
          eval_increment(q);
@@ -1370,7 +1371,7 @@ inline typename std::enable_if<boost::multiprecision::detail::is_unsigned<U>::va
       // so we'll left shift q and add some fake cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count on the end to represent
       // how we'll be rounding.
       //
-      BOOST_ASSERT((eval_msb(q) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
+      BOOST_MP_ASSERT((eval_msb(q) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
       constexpr const unsigned lshift = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count < limb_bits ? 2 : limb_bits;
       eval_left_shift(q, lshift);
       res.exponent() -= lshift;

@@ -22,6 +22,7 @@
 #include <boost/multiprecision/cpp_int/value_pack.hpp>
 #include <boost/multiprecision/detail/empty_value.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -305,12 +306,12 @@ private:
       {
          limb_type* result = data + allocated;
          allocated += n;
-         BOOST_ASSERT(allocated <= capacity);
+         BOOST_MP_ASSERT(allocated <= capacity);
          return result; 
       }
       void deallocate(unsigned n)
       {
-         BOOST_ASSERT(n <= allocated);
+         BOOST_MP_ASSERT(n <= allocated);
          allocated -= n;
       }
    };
@@ -367,7 +368,7 @@ private:
       if (new_size > cap)
       {
          // We must not be an alias, memory allocation here defeats the whole point of aliasing:
-         BOOST_ASSERT(!m_alias);
+         BOOST_MP_ASSERT(!m_alias);
          // Allocate a new buffer and copy everything over:
          cap             = (std::min)((std::max)(cap * 4, new_size), max_limbs);
          limb_pointer pl = allocator().allocate(cap);

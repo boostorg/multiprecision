@@ -19,6 +19,7 @@
 #endif
 
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 namespace detail {
 
@@ -105,7 +106,7 @@ void hyp0F0(T& H0F0, const T& x)
 
    using ui_type = typename std::tuple_element<0, typename T::unsigned_types>::type;
 
-   BOOST_ASSERT(&H0F0 != &x);
+   BOOST_MP_ASSERT(&H0F0 != &x);
    long tol = boost::multiprecision::detail::digits2<number<T, et_on> >::value();
    T    t;
 
@@ -152,8 +153,8 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
 
    using si_type = typename boost::multiprecision::detail::canonical<int, T>::type;
 
-   BOOST_ASSERT(&H1F0 != &x);
-   BOOST_ASSERT(&H1F0 != &a);
+   BOOST_MP_ASSERT(&H1F0 != &x);
+   BOOST_MP_ASSERT(&H1F0 != &a);
 
    T x_pow_n_div_n_fact(x);
    T pochham_a(a);

@@ -17,6 +17,7 @@
 #include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 #include <mpfr.h>
 #include <cmath>
 #include <algorithm>
@@ -279,7 +280,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
    {
-      BOOST_ASSERT(m_data[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0]._mpfr_d);
 
       bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
       bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
@@ -405,33 +406,33 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
    }
    void negate() noexcept
    {
-      BOOST_ASSERT(m_data[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0]._mpfr_d);
       mpfr_neg(m_data, m_data, GMP_RNDN);
    }
    template <mpfr_allocation_type AllocationType>
    int compare(const mpfr_float_backend<digits10, AllocationType>& o) const
    {
-      BOOST_ASSERT(m_data[0]._mpfr_d && o.m_data[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0]._mpfr_d && o.m_data[0]._mpfr_d);
       return mpfr_cmp(m_data, o.m_data);
    }
    int compare(long i) const
    {
-      BOOST_ASSERT(m_data[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0]._mpfr_d);
       return mpfr_cmp_si(m_data, i);
    }
    int compare(double i) const
    {
-      BOOST_ASSERT(m_data[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0]._mpfr_d);
       return mpfr_cmp_d(m_data, i);
    }
    int compare(long double i) const
    {
-      BOOST_ASSERT(m_data[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0]._mpfr_d);
       return mpfr_cmp_ld(m_data, i);
    }
    int compare(unsigned long i) const
    {
-      BOOST_ASSERT(m_data[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0]._mpfr_d);
       return mpfr_cmp_ui(m_data, i);
    }
    template <class V>
@@ -443,12 +444,12 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
    }
    mpfr_t& data() noexcept
    {
-      BOOST_ASSERT(m_data[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0]._mpfr_d);
       return m_data;
    }
    const mpfr_t& data() const noexcept
    {
-      BOOST_ASSERT(m_data[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0]._mpfr_d);
       return m_data;
    }
 
@@ -611,7 +612,7 @@ struct mpfr_float_imp<digits10, allocate_stack>
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
    {
-      BOOST_ASSERT(m_data[0]._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0]._mpfr_d);
 
       bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
       bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
@@ -1862,7 +1863,7 @@ max_value<boost::multiprecision::mpfr_float>()
 {
    boost::multiprecision::mpfr_float result(0.5);
    mpfr_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax(), GMP_RNDN);
-   BOOST_ASSERT(mpfr_number_p(result.backend().data()));
+   BOOST_MP_ASSERT(mpfr_number_p(result.backend().data()));
    return result;
 }
 
@@ -1872,7 +1873,7 @@ min_value<boost::multiprecision::mpfr_float>()
 {
    boost::multiprecision::mpfr_float result(0.5);
    mpfr_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin(), GMP_RNDN);
-   BOOST_ASSERT(mpfr_number_p(result.backend().data()));
+   BOOST_MP_ASSERT(mpfr_number_p(result.backend().data()));
    return result;
 }
 
@@ -1882,7 +1883,7 @@ max_value<boost::multiprecision::number<boost::multiprecision::mpfr_float_backen
 {
    boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> result(0.5);
    mpfr_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax(), GMP_RNDN);
-   BOOST_ASSERT(mpfr_number_p(result.backend().data()));
+   BOOST_MP_ASSERT(mpfr_number_p(result.backend().data()));
    return result;
 }
 
@@ -1892,7 +1893,7 @@ min_value<boost::multiprecision::number<boost::multiprecision::mpfr_float_backen
 {
    boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> result(0.5);
    mpfr_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin(), GMP_RNDN);
-   BOOST_ASSERT(mpfr_number_p(result.backend().data()));
+   BOOST_MP_ASSERT(mpfr_number_p(result.backend().data()));
    return result;
 }
 //

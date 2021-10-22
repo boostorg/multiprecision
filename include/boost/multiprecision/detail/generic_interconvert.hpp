@@ -8,6 +8,7 @@
 
 #include <boost/multiprecision/detail/default_ops.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -261,7 +262,7 @@ R safe_convert_to_float(const LargeInteger& i)
       if (mb >= std::numeric_limits<R>::max_exponent)
       {
          int scale_factor = (int)mb + 1 - std::numeric_limits<R>::max_exponent;
-         BOOST_ASSERT(scale_factor >= 1);
+         BOOST_MP_ASSERT(scale_factor >= 1);
          val >>= scale_factor;
          R result = val.template convert_to<R>();
          BOOST_IF_CONSTEXPR(std::numeric_limits<R>::digits == 0 || std::numeric_limits<R>::digits >= std::numeric_limits<R>::max_exponent)
@@ -354,7 +355,7 @@ generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, 
    }
    else
    {
-      BOOST_ASSERT(q_bits == std::numeric_limits<To>::digits);
+      BOOST_MP_ASSERT(q_bits == std::numeric_limits<To>::digits);
       //
       // We basically already have the rounding info:
       //

@@ -21,6 +21,7 @@
 #include <boost/multiprecision/logged_adaptor.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <mpfi.h>
 
@@ -288,7 +289,7 @@ struct mpfi_float_imp
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
 
       mpfr_float_backend<digits10> a, b;
 
@@ -307,12 +308,12 @@ struct mpfi_float_imp
    }
    void negate() noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       mpfi_neg(m_data, m_data);
    }
    int compare(const mpfi_float_imp& o) const noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d && o.m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d && o.m_data[0].left._mpfr_d);
       if (mpfr_cmp(right_data(), o.left_data()) < 0)
          return -1;
       if (mpfr_cmp(left_data(), o.right_data()) > 0)
@@ -331,32 +332,32 @@ struct mpfi_float_imp
    }
    mpfi_t& data() noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return m_data;
    }
    const mpfi_t& data() const noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return m_data;
    }
    mpfr_ptr left_data() noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].left);
    }
    mpfr_srcptr left_data() const noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].left);
    }
    mpfr_ptr right_data() noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].right);
    }
    mpfr_srcptr right_data() const noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].right);
    }
 
@@ -1788,7 +1789,7 @@ max_value<boost::multiprecision::mpfi_float>()
 {
    boost::multiprecision::mpfi_float result(0.5);
    mpfi_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1798,7 +1799,7 @@ min_value<boost::multiprecision::mpfi_float>()
 {
    boost::multiprecision::mpfi_float result(0.5);
    mpfi_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1808,7 +1809,7 @@ max_value<boost::multiprecision::number<boost::multiprecision::mpfi_float_backen
 {
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<0>, boost::multiprecision::et_off> result(0.5);
    mpfi_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1818,7 +1819,7 @@ min_value<boost::multiprecision::number<boost::multiprecision::mpfi_float_backen
 {
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<0>, boost::multiprecision::et_off> result(0.5);
    mpfi_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1849,7 +1850,7 @@ max_value<logged_type1>()
 {
    logged_type1 result(0.5);
    mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1859,7 +1860,7 @@ min_value<logged_type1>()
 {
    logged_type1 result(0.5);
    mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1869,7 +1870,7 @@ max_value<logged_type2>()
 {
    logged_type2 result(0.5);
    mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1879,7 +1880,7 @@ min_value<logged_type2>()
 {
    logged_type2 result(0.5);
    mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 // mpfi gets used with debug_adaptor fairly often, so specialize for that use case as well:
@@ -1909,7 +1910,7 @@ max_value<debug_type1>()
 {
    debug_type1 result(0.5);
    mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    result.backend().update_view();
    return result;
 }
@@ -1920,7 +1921,7 @@ min_value<debug_type1>()
 {
    debug_type1 result(0.5);
    mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    result.backend().update_view();
    return result;
 }
@@ -1931,7 +1932,7 @@ max_value<debug_type2>()
 {
    debug_type2 result(0.5);
    mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    result.backend().update_view();
    return result;
 }
@@ -1942,7 +1943,7 @@ min_value<debug_type2>()
 {
    debug_type2 result(0.5);
    mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    result.backend().update_view();
    return result;
 }

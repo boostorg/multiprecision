@@ -164,12 +164,12 @@ which we can then simply decrement.  The result from a call to `b2` is the same 
 We can equally test bits, so for example the n'th bit of the result returned from `b2` shouldn't be set
 unless we increment it first:
 
-   BOOST_ASSERT(!bit_test(b1(200), 200));     // OK
-   BOOST_ASSERT(bit_test(++b1(200), 200));    // OK
+   BOOST_MP_ASSERT(!bit_test(b1(200), 200));     // OK
+   BOOST_MP_ASSERT(bit_test(++b1(200), 200));    // OK
 
 And of course if we flip the n'th bit after increment, then we should get back to zero:
 
-   BOOST_ASSERT(!bit_flip(++b1(200), 200));   // OK
+   BOOST_MP_ASSERT(!bit_flip(++b1(200), 200));   // OK
 */
 
 //]
@@ -180,9 +180,9 @@ int main()
 
    std::cout << std::hex << std::showbase << b1(200) << std::endl;
    std::cout << std::hex << std::showbase << b2(200) << std::endl;
-   BOOST_ASSERT(!bit_test(b1(200), 200));  // OK
-   BOOST_ASSERT(bit_test(++b1(200), 200));    // OK
-   BOOST_ASSERT(!bit_flip(++b1(200), 200));   // OK
+   BOOST_MP_ASSERT(!bit_test(b1(200), 200));  // OK
+   BOOST_MP_ASSERT(bit_test(++b1(200), 200));    // OK
+   BOOST_MP_ASSERT(!bit_flip(++b1(200), 200));   // OK
    return 0;
 }
 

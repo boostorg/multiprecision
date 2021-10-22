@@ -10,6 +10,7 @@
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/special_functions/next.hpp>
 #include <boost/math/special_functions/hypot.hpp>
@@ -1750,7 +1751,7 @@ void BOOST_MP_CXX14_CONSTEXPR eval_integer_sqrt_bitwise(B& s, B& r, const B& x)
          eval_bit_set(t, 2 * g);
          if (t.compare(r) <= 0)
          {
-            BOOST_ASSERT(g >= 0);
+            BOOST_MP_ASSERT(g >= 0);
             eval_bit_set(s, g);
             eval_subtract(r, t);
             if (eval_get_sign(r) == 0)

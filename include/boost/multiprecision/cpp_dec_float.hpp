@@ -30,6 +30,7 @@
 #include <boost/multiprecision/detail/static_array.hpp>
 #include <boost/multiprecision/detail/tables.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 //
 // Headers required for Boost.Math integration:
@@ -2279,7 +2280,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
 
    f = frexp(a, &e);
    // See https://svn.boost.org/trac/boost/ticket/10924 for an example of why this may go wrong:
-   BOOST_ASSERT((boost::math::isfinite)(f));
+   BOOST_MP_ASSERT((boost::math::isfinite)(f));
 
    constexpr int shift = std::numeric_limits<int>::digits - 1;
 
@@ -2287,7 +2288,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
    {
       // extract int sized bits from f:
       f = ldexp(f, shift);
-      BOOST_ASSERT((boost::math::isfinite)(f));
+      BOOST_MP_ASSERT((boost::math::isfinite)(f));
       term = floor(f);
       e -= shift;
       *this *= pow2(shift);
