@@ -63,8 +63,8 @@ struct double_integer
        2 * sizeof(I) <= sizeof(long long),
        typename std::conditional<
            boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value,
-           typename boost::int_t<int_t_digits>::least,
-           typename boost::uint_t<int_t_digits>::least>::type,
+           typename boost::multiprecision::detail::int_t<int_t_digits>::least,
+           typename boost::multiprecision::detail::uint_t<int_t_digits>::least>::type,
        typename std::conditional<
            2 * sizeof(I) <= sizeof(double_limb_type),
            typename std::conditional<
