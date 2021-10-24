@@ -81,7 +81,6 @@ test-suite performance :
           <define>TEST_CPP_BIN_FLOAT
           <define>TEST_CPP_INT
           <define>TEST_CPP_INT_RATIONAL
-          <define>TEST_MUL_ONLY
           [ requires cxx11_auto_declarations cxx11_allocator ]
           ]
 

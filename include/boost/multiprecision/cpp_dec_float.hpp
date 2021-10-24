@@ -16,14 +16,12 @@
 #ifndef BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 #define BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 
-#include <boost/config.hpp>
-
 #include <algorithm>
 #include <array>
 #include <cstdint>
 #include <initializer_list>
 #include <limits>
-
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 
 #include <boost/multiprecision/detail/dynamic_array.hpp>

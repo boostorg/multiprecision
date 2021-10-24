@@ -311,6 +311,18 @@ void test_rational(const std::integral_constant<bool, true>&)
    ss >> b;
    BOOST_CHECK_EQUAL(a, b);
 }
+template <class Real>
+void test_rational_signed(const std::integral_constant<bool, true>&)
+{
+   Real three = -3;
+   BOOST_CHECK_EQUAL(static_cast<std::int16_t>(three), -3);
+   BOOST_CHECK_EQUAL(static_cast<std::int32_t>(three), -3);
+   BOOST_CHECK_EQUAL(static_cast<std::int64_t>(three), -3);
+}
+template <class Real>
+void test_rational_signed(const std::integral_constant<bool, false>&)
+{
+}
 
 template <class Real>
 void test_rational(const std::integral_constant<bool, false>&)
@@ -343,10 +355,7 @@ void test_rational(const std::integral_constant<bool, false>&)
    BOOST_CHECK_EQUAL(static_cast<std::uint16_t>(three), 3);
    BOOST_CHECK_EQUAL(static_cast<std::uint32_t>(three), 3);
    BOOST_CHECK_EQUAL(static_cast<std::uint64_t>(three), 3);
-   three = -three;
-   BOOST_CHECK_EQUAL(static_cast<std::int16_t>(three), -3);
-   BOOST_CHECK_EQUAL(static_cast<std::int32_t>(three), -3);
-   BOOST_CHECK_EQUAL(static_cast<std::int64_t>(three), -3);
+   test_rational_signed<Real>(std::integral_constant<bool, std::numeric_limits<Real>::is_signed>());
 }
 
 template <class Real>

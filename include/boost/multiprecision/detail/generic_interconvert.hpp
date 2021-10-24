@@ -237,6 +237,15 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
    assign_components(to, n.backend(), d.backend());
 }
 
+template <class LargeInteger>
+inline typename std::enable_if<is_signed_number<LargeInteger>::value>::type make_positive(LargeInteger& val)
+{
+   if (val.sign() < 0)
+      val = -val;
+}
+template <class LargeInteger>
+inline typename std::enable_if<!is_signed_number<LargeInteger>::value>::type make_positive(LargeInteger&){}
+
 template <class R, class LargeInteger>
 R safe_convert_to_float(const LargeInteger& i)
 {
@@ -246,8 +255,7 @@ R safe_convert_to_float(const LargeInteger& i)
    BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::max_exponent)
    {
       LargeInteger val(i);
-      if (val.sign() < 0)
-         val = -val;
+      make_positive(val);
       unsigned mb = msb(val);
       if (mb >= std::numeric_limits<R>::max_exponent)
       {

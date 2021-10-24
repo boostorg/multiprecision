@@ -6,6 +6,10 @@
 #ifndef BOOST_MP_CPP_INT_IMPORT_EXPORT_HPP
 #define BOOST_MP_CPP_INT_IMPORT_EXPORT_HPP
 
+#include <climits>
+#include <cstring>
+#include <boost/multiprecision/detail/endian.hpp>
+
 namespace boost {
 namespace multiprecision {
 
@@ -167,7 +171,7 @@ inline number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, E
 import_bits(
     number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>& val, T* i, T* j, unsigned chunk_size = 0, bool msv_first = true)
 {
-#if BOOST_ENDIAN_LITTLE_BYTE
+#if BOOST_MP_ENDIAN_LITTLE_BYTE
    if (((chunk_size % CHAR_BIT) == 0) && !msv_first)
       return detail::import_bits_fast(val, i, j, chunk_size);
 #endif

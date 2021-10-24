@@ -77,6 +77,18 @@ struct complex_adaptor
       m_real = val.real();
       m_imag = val.imag();
    }
+   template <class T, class U>
+   complex_adaptor(const T& a, const U& b, typename std::enable_if<std::is_constructible<Backend, T const&>::value&& std::is_constructible<Backend, U const&>::value>::type const* = nullptr)
+      : m_real(a), m_imag(b) {}
+   template <class T, class U>
+   complex_adaptor(T&& a, const U& b, typename std::enable_if<std::is_constructible<Backend, T>::value&& std::is_constructible<Backend, U>::value>::type const* = nullptr)
+      : m_real(static_cast<T&&>(a)), m_imag(b) {}
+   template <class T, class U>
+   complex_adaptor(T&& a, U&& b, typename std::enable_if<std::is_constructible<Backend, T>::value&& std::is_constructible<Backend, U>::value>::type const* = nullptr)
+      : m_real(static_cast<T&&>(a)), m_imag(static_cast<U&&>(b)) {}
+   template <class T, class U>
+   complex_adaptor(const T& a, U&& b, typename std::enable_if<std::is_constructible<Backend, T>::value&& std::is_constructible<Backend, U>::value>::type const* = nullptr)
+      : m_real(a), m_imag(static_cast<U&&>(b)) {}
 
    complex_adaptor& operator=(const complex_adaptor& o)
    {

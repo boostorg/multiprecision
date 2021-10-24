@@ -162,6 +162,9 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_cpp_int_18.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj ]
    [ run test_arithmetic_cpp_int_19.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj ]
    [ run test_arithmetic_cpp_int_20.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+   [ run test_arithmetic_cpp_int_21.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+   [ run test_arithmetic_cpp_int_22.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+   [ run test_arithmetic_cpp_int_23.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
    [ run test_arithmetic_cpp_int_br.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj ]
 
    [ run test_arithmetic_ab_1.cpp no_eh_support ]
@@ -851,6 +854,14 @@ test-suite cpp_int_tests :
             : test_cpp_int_6
             ]
 
+      [ run test_cpp_rational.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            ]
+
       [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
            : # command line
            : # input files
@@ -1112,6 +1123,7 @@ test-suite misc :
       [ run bug12039.cpp no_eh_support ]
       [ compile git_issue_30.cpp ]
       [ run git_issue_167.cpp ]
+      [ run git_issue_370.cpp ]
       [ run git_issue_175.cpp ]
       [ run git_issue_248.cpp ]
       [ run git_issue_265.cpp : : : [ check-target-builds ../config//has_mpfr : <source>gmp <source>mpfr : <build>no ] ]

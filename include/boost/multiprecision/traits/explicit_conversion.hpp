@@ -7,7 +7,7 @@
 #ifndef BOOST_MP_EXPLICIT_CONVERTIBLE_HPP
 #define BOOST_MP_EXPLICIT_CONVERTIBLE_HPP
 
-#include <boost/config.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/number_base.hpp> // number_category
 
 namespace boost {

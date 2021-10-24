@@ -7,7 +7,7 @@
 #define BOOST_MP_FLOAT128_HPP
 
 #include <tuple>
-#include <boost/config.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 

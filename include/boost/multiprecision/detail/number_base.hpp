@@ -1548,8 +1548,18 @@ BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V, const std::integral_constant<
 
 template <class T>
 BOOST_MP_CXX14_CONSTEXPR const T& evaluate_if_expression(const T& val) { return val; }
+template <class T>
+BOOST_MP_CXX14_CONSTEXPR T&& evaluate_if_expression(T&& val) { return static_cast<T&&>(val); }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 BOOST_MP_CXX14_CONSTEXPR typename expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type evaluate_if_expression(const expression<tag, Arg1, Arg2, Arg3, Arg4>& val) { return val; }
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+BOOST_MP_CXX14_CONSTEXPR typename expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type evaluate_if_expression(expression<tag, Arg1, Arg2, Arg3, Arg4>&& val) { return val; }
+
+template <class T>
+struct convertible_to
+{
+   operator T () const;
+};
 
 } // namespace detail
 

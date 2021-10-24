@@ -12,6 +12,13 @@
 
 #include "test_arithmetic.hpp"
 
+template <>
+struct related_type<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::gmp_int> > >
+{
+   typedef boost::multiprecision::mpz_int type;
+};
+
+
 int main()
 {
    test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::gmp_int> > >();
