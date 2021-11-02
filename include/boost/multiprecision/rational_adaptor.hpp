@@ -73,7 +73,7 @@ struct rational_adaptor
 
    // We must have a default constructor:
    rational_adaptor()
-      : m_num(one()), m_denom(one()) {}
+      : m_num(zero()), m_denom(one()) {}
 
    rational_adaptor(const rational_adaptor& o) : m_num(o.m_num), m_denom(o.m_denom) {}
    rational_adaptor(rational_adaptor&& o) = default;
