@@ -16,6 +16,11 @@ struct related_type<boost::multiprecision::cpp_int>
 {
    typedef boost::multiprecision::int256_t type;
 };
+template <>
+struct related_type<boost::multiprecision::cpp_rational>
+{
+   typedef boost::multiprecision::cpp_int type;
+};
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ET>
 struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ET> >
 {

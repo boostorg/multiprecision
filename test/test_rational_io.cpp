@@ -25,6 +25,7 @@
 
 #if defined(TEST_MPQ)
 #include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/rational_adaptor.hpp>
 #endif
 #if defined(TEST_TOMMATH)
 #include <boost/multiprecision/tommath.hpp>
@@ -36,7 +37,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/multiprecision/rational_adaptor.hpp>
+#include <boost/rational.hpp>
 #include "test.hpp"
 #include <iostream>
 #include <iomanip>

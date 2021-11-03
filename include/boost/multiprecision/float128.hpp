@@ -7,7 +7,7 @@
 #define BOOST_MP_FLOAT128_HPP
 
 #include <tuple>
-#include <boost/config.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 
@@ -825,7 +825,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    static constexpr float_denorm_style has_denorm      = denorm_present;
    static constexpr bool               has_denorm_loss = true;
    static BOOST_MP_CXX14_CONSTEXPR number_type                        infinity() { return HUGE_VAL; /* conversion from double infinity OK */ }
-   static BOOST_MP_CXX14_CONSTEXPR number_type                        quiet_NaN() { return number_type("nan"); }
+   static BOOST_MP_CXX14_CONSTEXPR number_type                        quiet_NaN() { return number_type(NAN); }
    static BOOST_MP_CXX14_CONSTEXPR number_type                        signaling_NaN() { return 0; }
    static BOOST_MP_CXX14_CONSTEXPR number_type                        denorm_min() { return BOOST_MP_QUAD_DENORM_MIN; }
    static constexpr bool               is_iec559       = true;

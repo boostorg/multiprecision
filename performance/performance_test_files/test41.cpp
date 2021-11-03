@@ -10,7 +10,7 @@
 
 void test41()
 {
-#ifdef TEST_CPP_INT
+#if defined(TEST_CPP_INT) && defined(TEST_KARATSUBA)
    test<boost::multiprecision::cpp_int>("cpp_int", (boost::multiprecision::backends::karatsuba_cutoff + 2) * sizeof(boost::multiprecision::limb_type) * CHAR_BIT);
 #endif
 }

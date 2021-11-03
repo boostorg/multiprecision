@@ -355,6 +355,8 @@ two argument constructor:
    number(arg1, arg2);
 
 Where the two args must either be arithmetic types, or types that are convertible to the two components of `this`.
+Rvalue forwarding overloads are provided so either one or both arguments may be rvalue-references which will be moved
+into the result, if the backend is able to make use of them.
 
 Finally, when the type has a variable precision, then there are constructors:
 
