@@ -47,8 +47,11 @@ Clone the whole boost project, which includes the individual Boost projects as s
 The Boost Multiprecision Library is located in `libs/multiprecision/`. 
 
 ### Running tests ###
-First, make sure you are in `libs/multiprecision/test`. 
-You can either run all the tests listed in `Jamfile.v2` or run a single test:
+First, build the B2 engine by running `bootstrap.sh` in the root of the boost directory. This will generate B2 configuration in `project-config.jam`.
+     
+    ./bootstrap.sh
+
+Now make sure you are in `libs/multiprecision/test`. You can either run all the tests listed in `Jamfile.v2` or run a single test:
 
     ../../../b2                        <- run all tests
     ../../../b2 test_complex           <- single test
