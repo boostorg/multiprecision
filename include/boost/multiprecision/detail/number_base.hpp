@@ -8,7 +8,6 @@
 
 #include <limits>
 #include <type_traits>
-#include <boost/core/nvp.hpp>
 #include <boost/math/tools/complex.hpp>
 #include <boost/multiprecision/traits/transcendental_reduction_type.hpp>
 #include <boost/multiprecision/traits/std_integer_traits.hpp>
@@ -21,6 +20,11 @@
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
+
+#ifndef BOOST_MP_STANDALONE
+#include <boost/core/nvp.hpp>
+#endif
+
 //
 // We now require C++11, if something we use is not supported, then error and say why:
 //

@@ -510,6 +510,7 @@ class cpp_dec_float
       return (bo_order_is_zero ? static_cast<exponent_type>(0) : static_cast<exponent_type>(exp + prefix));
    }
 
+   #ifndef BOOST_MP_STANDALONE
    template <class Archive>
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
@@ -520,6 +521,7 @@ class cpp_dec_float
       ar& boost::make_nvp("class-type", fpclass);
       ar& boost::make_nvp("precision", prec_elem);
    }
+   #endif
 
  private:
    static bool data_elem_is_non_zero_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(0u)); }

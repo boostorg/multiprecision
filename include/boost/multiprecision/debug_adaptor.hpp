@@ -123,6 +123,8 @@ struct debug_adaptor
    {
       return m_value;
    }
+
+   #ifndef BOOST_MP_STANDALONE
    template <class Archive>
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
@@ -131,6 +133,8 @@ struct debug_adaptor
       if (tag::value)
          update_view();
    }
+   #endif 
+   
    static unsigned default_precision() noexcept
    {
       return Backend::default_precision();

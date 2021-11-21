@@ -735,6 +735,7 @@ using boost::multiprecision::signbit;
 
 } // namespace boost
 
+#ifndef BOOST_MP_STANDALONE
 namespace boost {
 namespace archive {
 
@@ -794,6 +795,7 @@ void serialize(Archive& ar, boost::multiprecision::backends::float128_backend& v
 } // namespace serialization
 
 } // namespace boost
+#endif // BOOST_MP_STANDALONE
 
 namespace std {
 

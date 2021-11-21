@@ -1008,11 +1008,14 @@ class number
    {
       return m_backend.str(digits, f);
    }
+
+   #ifndef BOOST_MP_STANDALONE
    template <class Archive>
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
       ar& boost::make_nvp("backend", m_backend);
    }
+   #endif
 
  private:
    template <class T>

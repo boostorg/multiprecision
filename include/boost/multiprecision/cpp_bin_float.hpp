@@ -595,6 +595,8 @@ class cpp_bin_float
          BOOST_ASSERT(eval_is_zero(m_data));
       }
    }
+
+   #ifndef BOOST_MP_STANDALONE
    template <class Archive>
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
@@ -602,6 +604,7 @@ class cpp_bin_float
       ar& boost::make_nvp("exponent", m_exponent);
       ar& boost::make_nvp("sign", m_sign);
    }
+   #endif
 };
 
 #ifdef BOOST_MSVC

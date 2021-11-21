@@ -286,6 +286,7 @@ struct rational_adaptor
    Backend& denom() { return m_denom; }
    const Backend& denom()const { return m_denom; }
 
+   #ifndef BOOST_MP_STANDALONE
    template <class Archive>
    void serialize(Archive& ar, const std::integral_constant<bool, true>&)
    {
@@ -311,6 +312,8 @@ struct rational_adaptor
       using saving_tag = std::integral_constant<bool, tag::value>;
       serialize(ar, saving_tag());
    }
+   #endif // BOOST_MP_STANDALONE
+   
  private:
    Backend m_num, m_denom;
 };

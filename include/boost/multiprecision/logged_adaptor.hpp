@@ -169,6 +169,8 @@ struct logged_adaptor
    {
       return m_value;
    }
+   
+   #ifndef BOOST_MP_STANDALONE
    template <class Archive>
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
@@ -176,6 +178,8 @@ struct logged_adaptor
       ar& boost::make_nvp("value", m_value);
       log_postfix_event(m_value, "serialize");
    }
+   #endif
+
    static unsigned default_precision() noexcept
    {
       return Backend::default_precision();
