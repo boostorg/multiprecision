@@ -8,8 +8,10 @@
 #ifndef BOOST_MP_DETAIL_BITSCAN_HPP
 #define BOOST_MP_DETAIL_BITSCAN_HPP
 
-#include <boost/predef/other/endian.h>
 #include <cstdint>
+#include <climits>
+#include <type_traits>
+#include <boost/multiprecision/detail/endian.hpp>
 
 #if (defined(BOOST_MSVC) || (defined(__clang__) && defined(__c2__)) || (defined(BOOST_INTEL) && defined(_MSC_VER))) && (defined(_M_IX86) || defined(_M_X64))
 #include <intrin.h>
@@ -179,7 +181,7 @@ BOOST_FORCEINLINE unsigned find_msb(uint128_type mask, std::integral_constant<in
       std::uint64_t sv[2];
    } val;
    val.v = mask;
-#if BOOST_ENDIAN_LITTLE_BYTE
+#if BOOST_MP_ENDIAN_LITTLE_BYTE
    if (val.sv[1])
       return find_msb(val.sv[1], std::integral_constant<int, 3>()) + 64;
    return find_msb(val.sv[0], std::integral_constant<int, 3>());
@@ -197,7 +199,7 @@ BOOST_FORCEINLINE unsigned find_lsb(uint128_type mask, std::integral_constant<in
       std::uint64_t sv[2];
    } val;
    val.v = mask;
-#if BOOST_ENDIAN_LITTLE_BYTE
+#if BOOST_MP_ENDIAN_LITTLE_BYTE
    if (val.sv[0] == 0)
       return find_lsb(val.sv[1], std::integral_constant<int, 3>()) + 64;
    return find_lsb(val.sv[0], std::integral_constant<int, 3>());

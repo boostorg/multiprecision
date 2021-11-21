@@ -10,6 +10,9 @@
 #ifndef BOOST_MP_CPP_INT_MUL_HPP
 #define BOOST_MP_CPP_INT_MUL_HPP
 
+#include <limits>
+#include <boost/multiprecision/detail/endian.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 #include <boost/multiprecision/integer.hpp>
 
 namespace boost { namespace multiprecision { namespace backends {
@@ -481,18 +484,18 @@ eval_multiply(
    double_limb_type carry = 0;
    for (unsigned i = 0; i < as; ++i)
    {
-      BOOST_ASSERT(result.size() > i);
+      BOOST_MP_ASSERT(result.size() > i);
       unsigned inner_limit = !is_fixed_precision<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value ? bs : (std::min)(result.size() - i, bs);
       unsigned j           = 0;
       for (; j < inner_limit; ++j)
       {
-         BOOST_ASSERT(i + j < result.size());
+         BOOST_MP_ASSERT(i + j < result.size());
 #if (!defined(__GLIBCXX__) && !defined(__GLIBCPP__)) || !BOOST_WORKAROUND(BOOST_GCC_VERSION, <= 50100)
-         BOOST_ASSERT(!std::numeric_limits<double_limb_type>::is_specialized || ((std::numeric_limits<double_limb_type>::max)() - carry >
+         BOOST_MP_ASSERT(!std::numeric_limits<double_limb_type>::is_specialized || ((std::numeric_limits<double_limb_type>::max)() - carry >
                                                                                  static_cast<double_limb_type>(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::max_limb_value) * static_cast<double_limb_type>(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::max_limb_value)));
 #endif
          carry += static_cast<double_limb_type>(pa[i]) * static_cast<double_limb_type>(pb[j]);
-         BOOST_ASSERT(!std::numeric_limits<double_limb_type>::is_specialized || ((std::numeric_limits<double_limb_type>::max)() - carry >= pr[i + j]));
+         BOOST_MP_ASSERT(!std::numeric_limits<double_limb_type>::is_specialized || ((std::numeric_limits<double_limb_type>::max)() - carry >= pr[i + j]));
          carry += pr[i + j];
 #ifdef __MSVC_RUNTIME_CHECKS
          pr[i + j] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
@@ -500,7 +503,7 @@ eval_multiply(
          pr[i + j] = static_cast<limb_type>(carry);
 #endif
          carry >>= cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
-         BOOST_ASSERT(carry <= (cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::max_limb_value));
+         BOOST_MP_ASSERT(carry <= (cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::max_limb_value));
       }
       if (carry)
       {
@@ -558,7 +561,7 @@ eval_multiply(
    }
    else
    {
-#if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
+#if BOOST_MP_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t(val);
 #else
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t;
@@ -626,7 +629,7 @@ eval_multiply(
       result.negate();
       return;
    }
-#if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
+#if BOOST_MP_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t(val);
 #else
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t;

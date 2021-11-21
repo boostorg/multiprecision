@@ -8,6 +8,8 @@
 #ifndef BOOST_MP_CPP_INT_BIT_HPP
 #define BOOST_MP_CPP_INT_BIT_HPP
 
+#include <stdexcept>
+#include <boost/multiprecision/detail/endian.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 #ifdef _MSC_VER
@@ -446,7 +448,7 @@ eval_left_shift(
    if (!s)
       return;
 
-#if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
+#if BOOST_MP_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
    constexpr const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - 1;
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
 
@@ -462,7 +464,7 @@ eval_left_shift(
    {
       left_shift_byte(result, s);
    }
-#elif BOOST_ENDIAN_LITTLE_BYTE
+#elif BOOST_MP_ENDIAN_LITTLE_BYTE
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
 
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -586,7 +588,7 @@ eval_right_shift(
    if (!s)
       return;
 
-#if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
+#if BOOST_MP_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
    constexpr const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
 
@@ -598,7 +600,7 @@ eval_right_shift(
    else if (((s & byte_shift_mask) == 0) && !BOOST_MP_IS_CONST_EVALUATED(s))
 #endif
       right_shift_byte(result, s);
-#elif BOOST_ENDIAN_LITTLE_BYTE
+#elif BOOST_MP_ENDIAN_LITTLE_BYTE
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
 
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -633,7 +635,7 @@ eval_right_shift(
    if (is_neg)
       eval_increment(result);
 
-#if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
+#if BOOST_MP_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
    constexpr const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
 
@@ -645,7 +647,7 @@ eval_right_shift(
    else if (((s & byte_shift_mask) == 0) && !BOOST_MP_IS_CONST_EVALUATED(s))
 #endif
       right_shift_byte(result, s);
-#elif BOOST_ENDIAN_LITTLE_BYTE
+#elif BOOST_MP_ENDIAN_LITTLE_BYTE
    constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
 
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION

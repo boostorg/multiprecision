@@ -433,6 +433,9 @@
 <p>
         Where the two args must either be arithmetic types, or types that are convertible
         to the two components of <code class="computeroutput"><span class="keyword">this</span></code>.
+        Rvalue forwarding overloads are provided so either one or both arguments
+        may be rvalue-references which will be moved into the result, if the backend
+        is able to make use of them.
       </p>
 <p>
         Finally, when the type has a variable precision, then there are constructors:
