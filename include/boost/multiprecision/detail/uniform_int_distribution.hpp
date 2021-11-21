@@ -42,7 +42,7 @@ struct make_unsigned_mp
     using type = typename make_unsigned_impl<T, boost::multiprecision::detail::is_integral<T>::value>::type;
 };
 
-template <typename Engine, typename T, typename std::enable_if<boost::multiprecision::detail::is_integral<typename Engine::result_type>::value, bool>::type = true>
+template <typename Engine, typename T>
 T generate_uniform_int (Engine& eng, T min_value, T max_value)
 {
     using range_type = typename boost::multiprecision::detail::make_unsigned_mp<T>::type;

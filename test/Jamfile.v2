@@ -949,7 +949,7 @@ test-suite misc :
                release  # otherwise [ runtime is too slow!!
                ]
         
-      [ run test_miller_rabin_standalone.cpp ]
+      [ run test_miller_rabin_standalone.cpp gmp ]
 
       [ run test_rational_io.cpp $(TOMMATH) no_eh_support
               : # command line
