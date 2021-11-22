@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////
 //  Copyright 2012-2020 John Maddock.
 //  Copyright 2020 Madhur Chauhan.
+//  Copyright 2021 Matt Borland.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //   https://www.boost.org/LICENSE_1_0.txt)
@@ -16,10 +17,13 @@
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
-#include <boost/multiprecision/detail/common_factor.hpp> // gcd/lcm
 #include <numeric> // std::gcd
 #include <type_traits>
 #include <stdexcept>
+
+#ifndef BOOST_MP_STANDALONE
+#include <boost/integer/common_factor_rt.hpp>
+#endif
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -27,6 +31,17 @@
 #pragma warning(disable : 4127) // conditional expression is constant
 #pragma warning(disable : 4146) // unary minus operator applied to unsigned type, result still unsigned
 #endif
+
+// Forward decleration of gcd and lcm functions
+namespace boost { namespace multiprecision { namespace detail {
+
+template <typename T>
+inline BOOST_CXX14_CONSTEXPR T constexpr_gcd(T a, T b) noexcept;
+
+template <typename T>
+inline BOOST_CXX14_CONSTEXPR T constexpr_lcm(T a, T b) noexcept;
+
+}}} // namespace boost::multiprecision::detail
 
 namespace boost { namespace multiprecision { namespace backends {
 
@@ -1300,6 +1315,42 @@ inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const cpp_int_backend<Min
 #pragma warning(pop)
 #endif
 
-}}} // namespace boost::multiprecision::backends
+} // Namespace backends
+
+namespace detail {
+
+#ifndef BOOST_MP_STANDALONE
+template <typename T>
+inline BOOST_CXX14_CONSTEXPR T constexpr_gcd(T a, T b) noexcept
+{
+   return boost::integer::gcd(a, b);
+}
+
+template <typename T>
+inline BOOST_CXX14_CONSTEXPR T constexpr_lcm(T a, T b) noexcept
+{
+   return boost::integer::lcm(a, b);
+}
+
+#else
+
+template <typename T>
+inline BOOST_CXX14_CONSTEXPR constexpr_gcd(T a, T b) noexcept
+{
+   return boost::multiprecision::backends::eval_gcd(a, b);
+}
+
+template <typename T>
+inline BOOST_CXX14_CONSTEXPR T constexpr_lcm(T a, T b) noexcept
+{
+   const T ab_gcd = boost::multiprecision::detail::constexpr_gcd(a, b);
+   return (a * b) / ab_gcd;
+}
+
+#endif // BOOST_MP_STANDALONE
+
+}
+
+}} // Namespace boost::multiprecision
 
 #endif
