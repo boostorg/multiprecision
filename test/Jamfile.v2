@@ -949,7 +949,13 @@ test-suite misc :
                release  # otherwise [ runtime is too slow!!
                ]
         
-      [ run test_miller_rabin_standalone.cpp gmp ]
+      [ run test_miller_rabin_standalone.cpp no_eh_support gmp
+              : # command line
+              : # input files
+              : # requirements
+               [ check-target-builds ../config//has_gmp : : <build>no ]
+               release  # otherwise [ runtime is too slow!!
+               ]
 
       [ run test_rational_io.cpp $(TOMMATH) no_eh_support
               : # command line
