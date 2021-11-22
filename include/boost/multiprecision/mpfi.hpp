@@ -20,6 +20,7 @@
 #include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/logged_adaptor.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <mpfi.h>
 
@@ -67,7 +68,7 @@ inline int mpfi_sgn(mpfi_srcptr p)
       return 1;
    if (mpfi_is_strictly_neg(p))
       return -1;
-   BOOST_THROW_EXCEPTION(interval_error("Sign of interval is ambiguous."));
+   BOOST_MP_THROW_EXCEPTION(interval_error("Sign of interval is ambiguous."));
 }
 
 template <unsigned digits10>
@@ -270,14 +271,14 @@ struct mpfi_float_imp
          {
             if (a.compare(b) > 0)
             {
-               BOOST_THROW_EXCEPTION(std::runtime_error("Attempt to create interval with invalid range (start is greater than end)."));
+               BOOST_MP_THROW_EXCEPTION(std::runtime_error("Attempt to create interval with invalid range (start is greater than end)."));
             }
             mpfi_interv_fr(m_data, a.data(), b.data());
          }
       }
       else if (mpfi_set_str(m_data, s, 10) != 0)
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse string \"") + s + std::string("\"as a valid floating point number.")));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse string \"") + s + std::string("\"as a valid floating point number.")));
       }
       return *this;
    }
@@ -318,7 +319,7 @@ struct mpfi_float_imp
          return 1;
       if ((mpfr_cmp(left_data(), o.left_data()) == 0) && (mpfr_cmp(right_data(), o.right_data()) == 0))
          return 0;
-      BOOST_THROW_EXCEPTION(interval_error("Ambiguous comparison between two values."));
+      BOOST_MP_THROW_EXCEPTION(interval_error("Ambiguous comparison between two values."));
       return 0;
    }
    template <class V>
@@ -959,7 +960,7 @@ inline void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_b
    {
       if (a.compare(b) > 0)
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error("Attempt to create interval with invalid range (start is greater than end)."));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Attempt to create interval with invalid range (start is greater than end)."));
       }
       mpfi_interv_fr(result.data(), a.data(), b.data());
    }
@@ -1003,7 +1004,7 @@ inline void eval_ceil(mpfi_float_backend<Digits10>& result, const mpfi_float_bac
    eval_ceil(b, b);
    if (a.compare(b) != 0)
    {
-      BOOST_THROW_EXCEPTION(interval_error("Attempt to take the ceil of a value that straddles an integer boundary."));
+      BOOST_MP_THROW_EXCEPTION(interval_error("Attempt to take the ceil of a value that straddles an integer boundary."));
    }
    mpfi_set_fr(result.data(), a.data());
 }
@@ -1017,7 +1018,7 @@ inline void eval_floor(mpfi_float_backend<Digits10>& result, const mpfi_float_ba
    eval_floor(b, b);
    if (a.compare(b) != 0)
    {
-      BOOST_THROW_EXCEPTION(interval_error("Attempt to take the floor of a value that straddles an integer boundary."));
+      BOOST_MP_THROW_EXCEPTION(interval_error("Attempt to take the floor of a value that straddles an integer boundary."));
    }
    mpfi_set_fr(result.data(), a.data());
 }

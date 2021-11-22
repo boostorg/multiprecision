@@ -14,7 +14,6 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/detail/rebind.hpp>
-#include <boost/core/empty_value.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/traits/is_byte_container.hpp>
@@ -22,6 +21,8 @@
 #include <boost/multiprecision/cpp_int/checked.hpp>
 #include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/cpp_int/value_pack.hpp>
+#include <boost/multiprecision/detail/empty_value.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -147,7 +148,7 @@ namespace detail {
 inline BOOST_MP_CXX14_CONSTEXPR void verify_new_size(unsigned new_size, unsigned min_size, const std::integral_constant<int, checked>&)
 {
    if (new_size < min_size)
-      BOOST_THROW_EXCEPTION(std::overflow_error("Unable to allocate sufficient storage for the value of the result: value overflows the maximum allowable magnitude."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Unable to allocate sufficient storage for the value of the result: value overflows the maximum allowable magnitude."));
 }
 inline BOOST_MP_CXX14_CONSTEXPR void verify_new_size(unsigned /*new_size*/, unsigned /*min_size*/, const std::integral_constant<int, unchecked>&) {}
 
@@ -156,7 +157,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void verify_limb_mask(bool b, U limb, U mask, co
 {
    // When we mask out "limb" with "mask", do we loose bits?  If so it's an overflow error:
    if (b && (limb & ~mask))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Overflow in cpp_int arithmetic: there is insufficient precision in the target type to hold all of the bits of the result."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Overflow in cpp_int arithmetic: there is insufficient precision in the target type to hold all of the bits of the result."));
 }
 template <class U>
 inline BOOST_MP_CXX14_CONSTEXPR void verify_limb_mask(bool /*b*/, U /*limb*/, U /*mask*/, const std::integral_constant<int, unchecked>&) {}
@@ -169,7 +170,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void verify_limb_mask(bool /*b*/, U /*limb*/, U 
 //
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
 struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>
-    : private boost::empty_value<typename detail::rebind<limb_type, Allocator>::type>
+    : private boost::multiprecision::detail::empty_value<typename detail::rebind<limb_type, Allocator>::type>
 {
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, bool trivial2>
    friend struct cpp_int_base;
@@ -184,7 +185,7 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
    //
    static_assert(!std::is_void<Allocator>::value, "Allocator must not be void here");
 
-   using base_type = boost::empty_value<allocator_type>;
+   using base_type = boost::multiprecision::detail::empty_value<allocator_type>;
 
 private:
    struct limb_data
@@ -267,23 +268,23 @@ private:
    //
    // Aliasing constructor aliases data:
    //
-   struct scoped_shared_storage : private boost::empty_value<allocator_type>
+   struct scoped_shared_storage : private boost::multiprecision::detail::empty_value<allocator_type>
    {
     private:
       limb_type*      data;
       unsigned        capacity;
       unsigned        allocated;
       bool            is_alias;
-      allocator_type& allocator() noexcept { return boost::empty_value<allocator_type>::get(); }
+      allocator_type& allocator() noexcept { return boost::multiprecision::detail::empty_value<allocator_type>::get(); }
 
     public:
       scoped_shared_storage(const allocator_type& a, unsigned len)
-          : boost::empty_value<allocator_type>(boost::empty_init_t(), a), capacity(len), allocated(0), is_alias(false)
+          : boost::multiprecision::detail::empty_value<allocator_type>(boost::multiprecision::detail::empty_init_t(), a), capacity(len), allocated(0), is_alias(false)
       {
          data = allocator().allocate(len);
       }
       scoped_shared_storage(const cpp_int_base& i, unsigned len)
-          : boost::empty_value<allocator_type>(boost::empty_init_t(), i.allocator()), capacity(len), allocated(0), is_alias(false)
+          : boost::multiprecision::detail::empty_value<allocator_type>(boost::multiprecision::detail::empty_init_t(), i.allocator()), capacity(len), allocated(0), is_alias(false)
       {
          data = allocator().allocate(len);
       }
@@ -510,7 +511,7 @@ const unsigned cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocat
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
 struct cpp_int_base<MinBits, MaxBits, unsigned_magnitude, Checked, Allocator, false>
-    : private boost::empty_value<typename detail::rebind<limb_type, Allocator>::type>
+    : private boost::multiprecision::detail::empty_value<typename detail::rebind<limb_type, Allocator>::type>
 {
    //
    // There is currently no support for unsigned arbitrary precision arithmetic, largely
@@ -866,7 +867,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
  private:
    void check_negate(const std::integral_constant<int, checked>&)
    {
-      BOOST_THROW_EXCEPTION(std::range_error("Attempt to negate an unsigned number."));
+      BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to negate an unsigned number."));
    }
    BOOST_MP_CXX14_CONSTEXPR void check_negate(const std::integral_constant<int, unchecked>&) {}
 
@@ -968,7 +969,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
       using common_type = typename std::common_type<typename boost::multiprecision::detail::make_unsigned<T>::type, local_limb_type>::type;
 
       if (static_cast<common_type>(boost::multiprecision::detail::unsigned_abs(val)) > static_cast<common_type>(limb_mask))
-         BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
+         BOOST_MP_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
    }
    template <class T>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(boost::multiprecision::detail::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)))>::type
@@ -978,7 +979,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
       using common_type = typename std::common_type<T, local_limb_type>::type;
 
       if (static_cast<common_type>(abs(val)) > static_cast<common_type>(limb_mask))
-         BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
+         BOOST_MP_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
    }
    template <class T, int C>
    BOOST_MP_CXX14_CONSTEXPR void check_in_range(T, const std::integral_constant<int, C>&) noexcept {}
@@ -1151,7 +1152,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
       using common_type = typename std::common_type<T, local_limb_type>::type;
 
       if (static_cast<common_type>(val) > limb_mask)
-         BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
+         BOOST_MP_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
    }
    template <class T>
    BOOST_MP_CXX14_CONSTEXPR void check_in_range(T val, const std::integral_constant<int, checked>&, const std::integral_constant<bool, true>&)
@@ -1159,9 +1160,9 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
       using common_type = typename std::common_type<T, local_limb_type>::type;
 
       if (static_cast<common_type>(val) > static_cast<common_type>(limb_mask))
-         BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
+         BOOST_MP_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
       if (val < 0)
-         BOOST_THROW_EXCEPTION(std::range_error("The argument to an unsigned cpp_int constructor was negative."));
+         BOOST_MP_THROW_EXCEPTION(std::range_error("The argument to an unsigned cpp_int constructor was negative."));
    }
    template <class T, int C, bool B>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void check_in_range(T, const std::integral_constant<int, C>&, const std::integral_constant<bool, B>&) noexcept {}
@@ -1263,7 +1264,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    {
       BOOST_IF_CONSTEXPR(Checked == checked)
       {
-         BOOST_THROW_EXCEPTION(std::range_error("Attempt to negate an unsigned type."));
+         BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to negate an unsigned type."));
       }
       m_data = ~m_data;
       ++m_data;
@@ -1382,7 +1383,7 @@ struct cpp_int_backend
          {
             if (other.size() > 2)
             {
-               BOOST_THROW_EXCEPTION(std::range_error("Assignment of a cpp_int that is out of range for the target type."));
+               BOOST_MP_THROW_EXCEPTION(std::range_error("Assignment of a cpp_int that is out of range for the target type."));
             }
          }
       }
@@ -1579,7 +1580,7 @@ struct cpp_int_backend
 
       if ((boost::math::isinf)(a) || (boost::math::isnan)(a))
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error("Cannot convert a non-finite number to an integer."));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Cannot convert a non-finite number to an integer."));
       }
 
       int         e = 0;
@@ -1675,7 +1676,7 @@ struct cpp_int_backend
                val = radix + 1;
             if (val >= radix)
             {
-               BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
+               BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
             }
             *this->limbs() = detail::checked_multiply(*this->limbs(), static_cast<typename base_type::local_limb_type>(radix), checked_type());
             *this->limbs() = detail::checked_add(*this->limbs(), static_cast<typename base_type::local_limb_type>(val), checked_type());
@@ -1745,7 +1746,7 @@ struct cpp_int_backend
                   val = 10 + *s - 'A';
                else
                {
-                  BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
+                  BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
                }
                limb  = bitcount / (sizeof(limb_type) * CHAR_BIT);
                shift = bitcount % (sizeof(limb_type) * CHAR_BIT);
@@ -1779,7 +1780,7 @@ struct cpp_int_backend
                   val = *s - '0';
                else
                {
-                  BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
+                  BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
                }
                limb  = bitcount / (sizeof(limb_type) * CHAR_BIT);
                shift = bitcount % (sizeof(limb_type) * CHAR_BIT);
@@ -1821,7 +1822,7 @@ struct cpp_int_backend
                   if (*s >= '0' && *s <= '9')
                      val = *s - '0';
                   else
-                     BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected character encountered in input."));
+                     BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected character encountered in input."));
                   block *= 10;
                   block += val;
                   if (!*++s)
@@ -1856,7 +1857,7 @@ struct cpp_int_backend
    {
       using io_type = typename std::conditional<sizeof(typename base_type::local_limb_type) == 1, unsigned, typename base_type::local_limb_type>::type;
       if (this->sign() && (((f & std::ios_base::hex) == std::ios_base::hex) || ((f & std::ios_base::oct) == std::ios_base::oct)))
-         BOOST_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
       std::stringstream ss;
       ss.flags(f & ~std::ios_base::showpos);
       ss << static_cast<io_type>(*this->limbs());
@@ -1883,7 +1884,7 @@ struct cpp_int_backend
       if (base == 8 || base == 16)
       {
          if (this->sign())
-            BOOST_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
          limb_type                           shift = base == 8 ? 3 : 4;
          limb_type                           mask  = static_cast<limb_type>((1u << shift) - 1);
          typename base_type::local_limb_type v     = *this->limbs();
@@ -1969,7 +1970,7 @@ struct cpp_int_backend
       if (base == 8 || base == 16)
       {
          if (this->sign())
-            BOOST_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
          limb_type       shift = base == 8 ? 3 : 4;
          limb_type       mask  = static_cast<limb_type>((1u << shift) - 1);
          cpp_int_backend t(*this);

@@ -6,6 +6,8 @@
 #ifndef BOOST_MP_CPP_INT_SERIALIZE_HPP
 #define BOOST_MP_CPP_INT_SERIALIZE_HPP
 
+#ifndef BOOST_MP_STANDALONE
+
 namespace boost {
 
 namespace archive {
@@ -203,5 +205,7 @@ void serialize(Archive& ar, mp::cpp_int_backend<MinBits, MaxBits, SignType, Chec
 
 } // namespace serialization
 } // namespace boost
+
+#endif // BOOST_MP_STANDALONE
 
 #endif // BOOST_MP_CPP_INT_SERIALIZE_HPP

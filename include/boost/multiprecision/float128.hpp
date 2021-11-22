@@ -10,6 +10,7 @@
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 #if defined(BOOST_INTEL) && !defined(BOOST_MP_USE_FLOAT128) && !defined(BOOST_MP_USE_QUAD)
 #if defined(BOOST_INTEL_CXX_VERSION) && (BOOST_INTEL_CXX_VERSION >= 1310) && defined(__GNUC__)
@@ -209,7 +210,7 @@ struct float128_backend
       m_value = strtoflt128(s, &p_end);
       if (p_end - s != (std::ptrdiff_t)std::strlen(s))
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error("Unable to interpret input string as a floating point value"));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unable to interpret input string as a floating point value"));
       }
 #else
       boost::multiprecision::detail::convert_from_string(*this, s);
@@ -262,7 +263,7 @@ struct float128_backend
          v = quadmath_snprintf(&buf2[0], v_max + 3, format.c_str(), digits, m_value);
          if (v >= v_max + 3)
          {
-            BOOST_THROW_EXCEPTION(std::runtime_error("Formatting of float128_type failed."));
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Formatting of float128_type failed."));
          }
          return &buf2[0];
       }
@@ -734,6 +735,7 @@ using boost::multiprecision::signbit;
 
 } // namespace boost
 
+#ifndef BOOST_MP_STANDALONE
 namespace boost {
 namespace archive {
 
@@ -793,6 +795,7 @@ void serialize(Archive& ar, boost::multiprecision::backends::float128_backend& v
 } // namespace serialization
 
 } // namespace boost
+#endif // BOOST_MP_STANDALONE
 
 namespace std {
 

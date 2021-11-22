@@ -10,6 +10,7 @@
 
 #include <stdexcept>
 #include <boost/multiprecision/detail/endian.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -24,7 +25,7 @@ BOOST_MP_CXX14_CONSTEXPR void is_valid_bitwise_op(
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const std::integral_constant<int, checked>&)
 {
    if (result.sign() || o.sign())
-      BOOST_THROW_EXCEPTION(std::range_error("Bitwise operations on negative values results in undefined behavior."));
+      BOOST_MP_THROW_EXCEPTION(std::range_error("Bitwise operations on negative values results in undefined behavior."));
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
@@ -37,7 +38,7 @@ BOOST_MP_CXX14_CONSTEXPR void is_valid_bitwise_op(
     const cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>& result, const std::integral_constant<int, checked>&)
 {
    if (result.sign())
-      BOOST_THROW_EXCEPTION(std::range_error("Bitwise operations on negative values results in undefined behavior."));
+      BOOST_MP_THROW_EXCEPTION(std::range_error("Bitwise operations on negative values results in undefined behavior."));
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_int_check_type Checked1, class Allocator1>

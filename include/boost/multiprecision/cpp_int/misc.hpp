@@ -13,6 +13,7 @@
 #include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/integer/common_factor_rt.hpp>      // gcd/lcm
 #include <numeric> // std::gcd
 
@@ -45,14 +46,14 @@ BOOST_MP_CXX14_CONSTEXPR void check_in_range(const CppInt& val, const std::integ
    if (val.sign())
    {
       BOOST_IF_CONSTEXPR (boost::multiprecision::detail::is_signed<R>::value == false)
-         BOOST_THROW_EXCEPTION(std::range_error("Attempt to assign a negative value to an unsigned type."));
+         BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to assign a negative value to an unsigned type."));
       if (val.compare(static_cast<cast_type>((numeric_limits_workaround<R>::min)())) < 0)
-         BOOST_THROW_EXCEPTION(std::overflow_error("Could not convert to the target type - -value is out of range."));
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Could not convert to the target type - -value is out of range."));
    }
    else
    {
       if (val.compare(static_cast<cast_type>((numeric_limits_workaround<R>::max)())) > 0)
-         BOOST_THROW_EXCEPTION(std::overflow_error("Could not convert to the target type - -value is out of range."));
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Could not convert to the target type - -value is out of range."));
    }
 }
 template <class R, class CppInt>
@@ -61,7 +62,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void check_in_range(const CppInt& /*val*/, const
 inline BOOST_MP_CXX14_CONSTEXPR void check_is_negative(const std::integral_constant<bool, true>&) noexcept {}
 inline void                          check_is_negative(const std::integral_constant<bool, false>&)
 {
-   BOOST_THROW_EXCEPTION(std::range_error("Attempt to assign a negative value to an unsigned type."));
+   BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to assign a negative value to an unsigned type."));
 }
 
 template <class Integer>
@@ -195,11 +196,11 @@ eval_lsb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
    using default_ops::eval_get_sign;
    if (eval_get_sign(a) == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (a.sign())
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
 
    //
@@ -236,11 +237,11 @@ eval_msb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
    using default_ops::eval_get_sign;
    if (eval_get_sign(a) == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (a.sign())
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    return eval_msb_imp(a);
 }
@@ -1125,7 +1126,7 @@ eval_lcm(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& r
 
 inline void conversion_overflow(const std::integral_constant<int, checked>&)
 {
-   BOOST_THROW_EXCEPTION(std::overflow_error("Overflow in conversion to narrower type"));
+   BOOST_MP_THROW_EXCEPTION(std::overflow_error("Overflow in conversion to narrower type"));
 }
 inline BOOST_MP_CXX14_CONSTEXPR void conversion_overflow(const std::integral_constant<int, unchecked>&) {}
 
@@ -1241,11 +1242,11 @@ eval_lsb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
    using default_ops::eval_get_sign;
    if (eval_get_sign(a) == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (a.sign())
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    //
    // Find the index of the least significant bit within that limb:
@@ -1270,11 +1271,11 @@ eval_msb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
    using default_ops::eval_get_sign;
    if (eval_get_sign(a) == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (a.sign())
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    return eval_msb_imp(a);
 }

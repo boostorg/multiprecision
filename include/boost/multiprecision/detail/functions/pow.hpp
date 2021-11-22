@@ -18,7 +18,7 @@
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
-#include <boost/core/no_exceptions_support.hpp> // BOOST_TRY
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 namespace detail {
 
@@ -139,7 +139,7 @@ void hyp0F0(T& H0F0, const T& x)
          x_pow_n_div_n_fact.negate();
    }
    if (n >= series_limit)
-      BOOST_THROW_EXCEPTION(std::runtime_error("H0F0 failed to converge"));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("H0F0 failed to converge"));
 }
 
 template <class T>
@@ -188,7 +188,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
          break;
    }
    if (n >= series_limit)
-      BOOST_THROW_EXCEPTION(std::runtime_error("H1F0 failed to converge"));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("H1F0 failed to converge"));
 }
 
 template <class T>
@@ -499,7 +499,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
          break;
       case FP_NORMAL: {
          // Need to check for a an odd integer as a special case:
-         BOOST_TRY
+         BOOST_MP_TRY
          {
             typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type i;
             eval_convert_to(&i, a);
@@ -529,11 +529,11 @@ inline void eval_pow(T& result, const T& x, const T& a)
                return;
             }
          }
-         BOOST_CATCH(const std::exception&)
+         BOOST_MP_CATCH(const std::exception&)
          {
             // fallthrough..
          }
-         BOOST_CATCH_END
+         BOOST_MP_CATCH_END
          BOOST_FALLTHROUGH;
       }
       default:
@@ -578,7 +578,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
        std::numeric_limits<typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type>::is_specialized ? (std::numeric_limits<typename boost::multiprecision::detail::canonical<std::intmax_t, T>::type>::min)() : -min_an;
 
    T fa;
-   BOOST_TRY
+   BOOST_MP_TRY
    {
       eval_convert_to(&an, a);
       if (a.compare(an) == 0)
@@ -587,16 +587,16 @@ inline void eval_pow(T& result, const T& x, const T& a)
          return;
       }
    }
-   BOOST_CATCH(const std::exception&)
+   BOOST_MP_CATCH(const std::exception&)
    {
       // conversion failed, just fall through, value is not an integer.
       an = (std::numeric_limits<std::intmax_t>::max)();
    }
-   BOOST_CATCH_END
+   BOOST_MP_CATCH_END
    if ((eval_get_sign(x) < 0))
    {
       typename boost::multiprecision::detail::canonical<std::uintmax_t, T>::type aun;
-      BOOST_TRY
+      BOOST_MP_TRY
       {
          eval_convert_to(&aun, a);
          if (a.compare(aun) == 0)
@@ -609,11 +609,11 @@ inline void eval_pow(T& result, const T& x, const T& a)
             return;
          }
       }
-      BOOST_CATCH(const std::exception&)
+      BOOST_MP_CATCH(const std::exception&)
       {
          // conversion failed, just fall through, value is not an integer.
       }
-      BOOST_CATCH_END
+      BOOST_MP_CATCH_END
 
       eval_floor(result, a);
       // -1^INF is a special case in C99:
@@ -644,7 +644,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
       }
       else
       {
-         BOOST_THROW_EXCEPTION(std::domain_error("Result of pow is undefined or non-real and there is no NaN for this number type."));
+         BOOST_MP_THROW_EXCEPTION(std::domain_error("Result of pow is undefined or non-real and there is no NaN for this number type."));
       }
       return;
    }
@@ -747,7 +747,7 @@ void eval_exp2(T& result, const T& arg)
    // Check for pure-integer arguments which can be either signed or unsigned.
    typename boost::multiprecision::detail::canonical<typename T::exponent_type, T>::type i;
    T                                                                                     temp;
-   BOOST_TRY
+   BOOST_MP_TRY
    {
       eval_trunc(temp, arg);
       eval_convert_to(&i, temp);
@@ -758,13 +758,13 @@ void eval_exp2(T& result, const T& arg)
          return;
       }
    }
-   BOOST_CATCH(const boost::math::rounding_error&)
+   BOOST_MP_CATCH(const boost::math::rounding_error&)
    { /* Fallthrough */
    }
-   BOOST_CATCH(const std::runtime_error&)
+   BOOST_MP_CATCH(const std::runtime_error&)
    { /* Fallthrough */
    }
-   BOOST_CATCH_END
+   BOOST_MP_CATCH_END
 
    temp = static_cast<typename std::tuple_element<0, typename T::unsigned_types>::type>(2u);
    eval_pow(result, temp, arg);

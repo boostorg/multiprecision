@@ -6,6 +6,8 @@
 #ifndef BOOST_MP_CPP_BIN_FLOAT_IO_HPP
 #define BOOST_MP_CPP_BIN_FLOAT_IO_HPP
 
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
+
 namespace boost { namespace multiprecision {
 namespace cpp_bf_io_detail {
 
@@ -259,7 +261,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
       //
       // Oops unexpected input at the end of the number:
       //
-      BOOST_THROW_EXCEPTION(std::runtime_error("Unable to parse string as a valid floating point number."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unable to parse string as a valid floating point number."));
    }
    if (n == 0)
    {

@@ -13,6 +13,7 @@
 #define BOOST_MP_FLOAT_STRING_CVT_HPP
 
 #include <cctype>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 namespace boost { namespace multiprecision { namespace detail {
 
@@ -311,7 +312,7 @@ void convert_from_string(Backend& b, const char* p)
    if (*p)
    {
       // Unexpected input in string:
-      BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected characters in string being interpreted as a float128."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected characters in string being interpreted as a float128."));
    }
 }
 

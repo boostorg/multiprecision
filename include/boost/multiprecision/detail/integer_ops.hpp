@@ -7,6 +7,7 @@
 #define BOOST_MP_INT_FUNC_HPP
 
 #include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 namespace boost { namespace multiprecision {
 
@@ -267,7 +268,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void check_sign_of_backend(const Backend& v, con
 {
    if (eval_get_sign(v) < 0)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
 }
 template <class Backend>
@@ -325,7 +326,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_powm(Backend& result, const Backend& a, const
 
    if (eval_get_sign(p) < 0)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
 
    double_type x, y(a), b(p), t;
@@ -381,7 +382,7 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
 {
    if (b < 0)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
    eval_powm(result, a, static_cast<typename boost::multiprecision::detail::make_unsigned<Integer>::type>(b), c);
 }
@@ -423,7 +424,7 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
 {
    if (b < 0)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
    eval_powm(result, a, static_cast<typename boost::multiprecision::detail::make_unsigned<Integer1>::type>(b), c);
 }

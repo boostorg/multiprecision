@@ -8,6 +8,7 @@
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -163,7 +164,7 @@ struct rational_adaptor
          v2 = 1;
       if (*s)
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Could not parse the string \"") + p + std::string("\" as a valid rational number.")));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Could not parse the string \"") + p + std::string("\" as a valid rational number.")));
       }
       multiprecision::number<Backend> gcd;
       eval_gcd(gcd.backend(), v1.backend(), v2.backend());
@@ -285,6 +286,7 @@ struct rational_adaptor
    Backend& denom() { return m_denom; }
    const Backend& denom()const { return m_denom; }
 
+   #ifndef BOOST_MP_STANDALONE
    template <class Archive>
    void serialize(Archive& ar, const std::integral_constant<bool, true>&)
    {
@@ -310,6 +312,8 @@ struct rational_adaptor
       using saving_tag = std::integral_constant<bool, tag::value>;
       serialize(ar, saving_tag());
    }
+   #endif // BOOST_MP_STANDALONE
+   
  private:
    Backend m_num, m_denom;
 };
@@ -919,7 +923,7 @@ inline void eval_divide(rational_adaptor<Backend>& result, const rational_adapto
 
    if (eval_get_sign(b.num()) == 0)
    {
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
       return;
    }
    if (&a == &b)
@@ -944,7 +948,7 @@ inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value &
 
    if (eval_get_sign(a.num()) == 0)
    {
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
       return;
    }
    if (&a == &result)
@@ -968,7 +972,7 @@ eval_divide(rational_adaptor<Backend>& result, Arithmetic arg)
 {
    if (arg == 0)
    {
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
       return;
    }
    else if (arg == 1)
@@ -1020,7 +1024,7 @@ void eval_divide(rational_adaptor<Backend>& result, const rational_adaptor<Backe
 
    if (eval_is_zero(arg))
    {
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
       return;
    }
    else if (eval_eq(a, rational_adaptor<Backend>::one()) || (eval_get_sign(a) == 0))
@@ -1073,7 +1077,7 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::
       return eval_divide(result, arg);
    if (arg == 0)
    {
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
       return;
    }
    else if (arg == 1)

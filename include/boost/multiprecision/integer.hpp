@@ -9,6 +9,7 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -104,7 +105,7 @@ powm(const I1& a, I2 b, I3 c)
 {
    if (b < 0)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
    return powm(a, static_cast<typename boost::multiprecision::detail::make_unsigned<I2>::type>(b), c);
 }
@@ -116,11 +117,11 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
    {
       if (val == 0)
       {
-         BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+         BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
       }
       else
       {
-         BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+         BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
       }
    }
    return detail::find_lsb(val);
@@ -133,11 +134,11 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
    {
       if (val == 0)
       {
-         BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+         BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
       }
       else
       {
-         BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+         BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
       }
    }
    return detail::find_msb(val);
@@ -329,7 +330,7 @@ BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::
       r = 0u;
       return 0u;
    }
-   Integer t{};
+
    return detail::karatsuba_sqrt(x, r, msb(x) + 1);
 }
 

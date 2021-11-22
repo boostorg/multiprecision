@@ -12,6 +12,8 @@
 // This file has no include guards or namespaces - it's expanded inline inside default_ops.hpp
 //
 
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
+
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 6326) // comparison of two constants
@@ -68,7 +70,7 @@ void hyp0F1(T& result, const T& b, const T& x)
    }
 
    if (n >= series_limit)
-      BOOST_THROW_EXCEPTION(std::runtime_error("H0F1 Failed to Converge"));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("H0F1 Failed to Converge"));
 }
 
 template <class T, unsigned N, bool b = boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<T> >::value>
@@ -177,7 +179,7 @@ void eval_sin(T& result, const T& x)
          errno  = EDOM;
       }
       else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+         BOOST_MP_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    case FP_ZERO:
       result = x;
@@ -369,7 +371,7 @@ void eval_cos(T& result, const T& x)
          errno  = EDOM;
       }
       else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+         BOOST_MP_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    case FP_ZERO:
       result = ui_type(1);
@@ -556,7 +558,7 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
          break;
    }
    if (n > series_limit)
-      BOOST_THROW_EXCEPTION(std::runtime_error("H2F1 failed to converge."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("H2F1 failed to converge."));
 }
 
 template <class T>
@@ -583,7 +585,7 @@ void eval_asin(T& result, const T& x)
          errno  = EDOM;
       }
       else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+         BOOST_MP_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    case FP_ZERO:
       result = x;
@@ -606,7 +608,7 @@ void eval_asin(T& result, const T& x)
          errno  = EDOM;
       }
       else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+         BOOST_MP_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    }
    else if (c == 0)
@@ -705,7 +707,7 @@ inline void eval_acos(T& result, const T& x)
          errno  = EDOM;
       }
       else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+         BOOST_MP_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    case FP_ZERO:
       result = get_constant_pi<T>();
@@ -725,7 +727,7 @@ inline void eval_acos(T& result, const T& x)
          errno  = EDOM;
       }
       else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+         BOOST_MP_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    }
    else if (c == 0)

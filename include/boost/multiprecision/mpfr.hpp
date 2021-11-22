@@ -16,6 +16,7 @@
 #include <boost/multiprecision/detail/atomic.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <mpfr.h>
 #include <cmath>
 #include <algorithm>
@@ -268,7 +269,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
          mpfr_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
       if (mpfr_set_str(m_data, s, 10, GMP_RNDN) != 0)
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse string \"") + s + std::string("\"as a valid floating point number.")));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse string \"") + s + std::string("\"as a valid floating point number.")));
       }
       return *this;
    }
@@ -597,7 +598,7 @@ struct mpfr_float_imp<digits10, allocate_stack>
    {
       if (mpfr_set_str(m_data, s, 10, GMP_RNDN) != 0)
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse string \"") + s + std::string("\"as a valid floating point number.")));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse string \"") + s + std::string("\"as a valid floating point number.")));
       }
       return *this;
    }
@@ -1448,7 +1449,7 @@ inline void eval_convert_to(unsigned long* result, const mpfr_float_backend<digi
 {
    if (mpfr_nan_p(val.data()))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    }
    *result = mpfr_get_ui(val.data(), GMP_RNDZ);
 }
@@ -1457,7 +1458,7 @@ inline void eval_convert_to(long* result, const mpfr_float_backend<digits10, All
 {
    if (mpfr_nan_p(val.data()))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    }
    *result = mpfr_get_si(val.data(), GMP_RNDZ);
 }
@@ -1467,7 +1468,7 @@ inline void eval_convert_to(boost::ulong_long_type* result, const mpfr_float_bac
 {
    if (mpfr_nan_p(val.data()))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    }
    *result = mpfr_get_uj(val.data(), GMP_RNDZ);
 }
@@ -1476,7 +1477,7 @@ inline void eval_convert_to(boost::long_long_type* result, const mpfr_float_back
 {
    if (mpfr_nan_p(val.data()))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    }
    *result = mpfr_get_sj(val.data(), GMP_RNDZ);
 }
