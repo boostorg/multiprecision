@@ -22,6 +22,10 @@
 #include <string_view>
 #endif
 
+#ifndef BOOST_MP_STANDALONE
+#include <boost/core/nvp.hpp>
+#endif
+
 namespace boost {
 namespace multiprecision {
 
