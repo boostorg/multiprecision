@@ -17,7 +17,6 @@
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/traits/is_byte_container.hpp>
-#include <boost/integer/static_min_max.hpp>
 #include <boost/multiprecision/cpp_int/checked.hpp>
 #include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/cpp_int/value_pack.hpp>
@@ -50,6 +49,14 @@ struct is_byte_container<backends::cpp_int_backend<MinBits, MaxBits, SignType, C
 
 namespace backends {
 
+namespace detail {
+   template <unsigned Value1, unsigned Value2>
+   struct static_unsigned_max
+   {
+      static constexpr const unsigned value = (Value1 > Value2) ? Value1 : Value2;
+   };
+} // Namespace detail
+
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, bool trivial = false>
 struct cpp_int_base;
 //
@@ -61,7 +68,7 @@ struct max_precision;
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct max_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
-   static constexpr const unsigned value = std::is_void<Allocator>::value ? static_unsigned_max<MinBits, MaxBits>::value
+   static constexpr const unsigned value = std::is_void<Allocator>::value ? detail::static_unsigned_max<MinBits, MaxBits>::value
                                                            : (((MaxBits >= MinBits) && MaxBits) ? MaxBits : UINT_MAX);
 };
 
@@ -71,7 +78,7 @@ struct min_precision;
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct min_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
-   static constexpr const unsigned value = (std::is_void<Allocator>::value ? static_unsigned_max<MinBits, MaxBits>::value : MinBits);
+   static constexpr const unsigned value = (std::is_void<Allocator>::value ? detail::static_unsigned_max<MinBits, MaxBits>::value : MinBits);
 };
 //
 // Traits class determines whether the number of bits precision requested could fit in a native type,
