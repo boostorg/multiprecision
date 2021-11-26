@@ -10,6 +10,7 @@
 #include <boost/math/special_functions/pow.hpp>
 #include <boost/integer/common_factor_rt.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/lexical_cast.hpp>
 #include <functional>
 #include "test.hpp"
 

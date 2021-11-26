@@ -20,9 +20,10 @@
 #pragma warning(pop)
 #endif
 
-//#ifndef BOOST_MP_STANDALONE
+#ifndef BOOST_MP_STANDALONE
 #include <boost/lexical_cast.hpp>
-//#endif
+#include <boost/core/nvp.hpp>
+#endif
 
 //
 // We now require C++11, if something we use is not supported, then error and say why:
