@@ -1,21 +1,20 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2012 John Maddock. Distributed under the Boost
+//  Copyright 2012-2021 John Maddock.
+//  Copyright 2021 Matt Borland. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#ifdef _MSC_VER
-#define _SCL_SECURE_NO_WARNINGS
-#endif
-
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/miller_rabin.hpp>
 #include <boost/math/special_functions/prime.hpp>
 #include <boost/random.hpp>
 #include <random>
 #include <iostream>
 #include <iomanip>
 #include "test.hpp"
+
+#define BOOST_MP_STANDALONE
+#include <boost/multiprecision/miller_rabin.hpp>
 
 template <class I>
 void test()

@@ -6,8 +6,12 @@
 #ifndef BOOST_MP_MR_HPP
 #define BOOST_MP_MR_HPP
 
-#include <boost/random.hpp>
+#include <random>
+#include <cstdint>
+#include <type_traits>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/integer.hpp>
+#include <boost/multiprecision/detail/uniform_int_distribution.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -161,7 +165,8 @@ miller_rabin_test(const I& n, unsigned trials, Engine& gen)
    q >>= k;
 
    // Declare our random number generator:
-   boost::random::uniform_int_distribution<number_type> dist(2, n - 2);
+   boost::multiprecision::uniform_int_distribution<number_type> dist(2, n - 2);
+
    //
    // Execute the trials:
    //
@@ -192,7 +197,7 @@ template <class I>
 typename std::enable_if<number_category<I>::value == number_kind_integer, bool>::type
 miller_rabin_test(const I& x, unsigned trials)
 {
-   static mt19937 gen;
+   static std::mt19937 gen;
    return miller_rabin_test(x, trials, gen);
 }
 
