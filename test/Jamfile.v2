@@ -948,14 +948,6 @@ test-suite misc :
                [ check-target-builds ../config//has_gmp : : <build>no ]
                release  # otherwise [ runtime is too slow!!
                ]
-        
-      [ run test_miller_rabin_standalone.cpp no_eh_support gmp
-              : # command line
-              : # input files
-              : # requirements
-               [ check-target-builds ../config//has_gmp : : <build>no ]
-               release  # otherwise [ runtime is too slow!!
-               ]
 
       [ run test_rational_io.cpp $(TOMMATH) no_eh_support
               : # command line
@@ -1169,6 +1161,30 @@ test-suite misc :
       [ run test_eigen_interop_mpc.cpp mpc mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpc : : <build>no ] ]
 ;
 
+test-suite standalone :
+
+      [ run standalone_constexpr_test_cpp_int.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+      [ compile standalone_constexpr_test_float128.cpp : 
+         [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_float128 : <source>quadmath : <build>no ] ]
+
+      [ run standalone_test_arithmetic_ab.cpp no_eh_support ]
+      
+      [ run standalone_test_arithmetic_complex128.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
+      [ run standalone_test_arithmetic_cpp_bin_float.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj ]
+      [ run standalone_test_arithmetic_cpp_dec_float.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj ]
+      [ run standalone_test_arithmetic_cpp_int.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+      [ run standalone_test_arithmetic_int512.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+      [ run standalone_test_arithmetic_cpp_rational.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+      [ run standalone_test_arithmetic_float_128.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ]
+
+      [ run standalone_test_miller_rabin.cpp no_eh_support gmp
+                : # command line
+                : # input files
+                : # requirements
+                [ check-target-builds ../config//has_gmp : : <build>no ]
+                release  # otherwise [ runtime is too slow!!
+      ]
+;
 
 #
 # This take too long to run as a regular part of the tests:
