@@ -2257,13 +2257,13 @@ imag(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 // expression template versions here, plus overloads for non-complex types:
 //
 template <class T, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename boost::lazy_enable_if_c<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates> > >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates>>>::type::type
 abs(const number<T, ExpressionTemplates>& v)
 {
    return std::move(boost::math::hypot(real(v), imag(v)));
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline BOOST_MP_CXX14_CONSTEXPR typename boost::lazy_enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex, component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex, component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type>>::type::type
 abs(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
@@ -2291,7 +2291,7 @@ arg(const detail::expression<tag, A1, A2, A3, A4>& v)
 }
 
 template <class T, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename boost::lazy_enable_if_c<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates> > >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates>>>::type::type
 norm(const number<T, ExpressionTemplates>& v)
 {
    typename component_type<number<T, ExpressionTemplates> >::type a(real(v)), b(imag(v));
