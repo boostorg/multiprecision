@@ -933,7 +933,7 @@ struct trivial_limb_type_imp
 template <unsigned N>
 struct trivial_limb_type_imp<N, true>
 {
-   using type = typename boost::uint_t<N>::least;
+   using type = typename boost::multiprecision::detail::uint_t<N>::least;
 };
 
 template <unsigned N>
@@ -946,9 +946,9 @@ template <unsigned MinBits, cpp_int_check_type Checked>
 struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 {
    using local_limb_type = typename trivial_limb_type<MinBits>::type;
-   using limb_pointer = local_limb_type*                         ;
-   using const_limb_pointer = const local_limb_type*                   ;
-   using checked_type = std::integral_constant<int, Checked>                       ;
+   using limb_pointer = local_limb_type*;
+   using const_limb_pointer = const local_limb_type*;
+   using checked_type = std::integral_constant<int, Checked>;
 
    struct scoped_shared_storage 
    {

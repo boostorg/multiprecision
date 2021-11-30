@@ -18,6 +18,7 @@
 #include <cstdio>  // EOF
 #include <cctype>  // isspace
 #include <functional>  // std::hash
+#include <type_traits>
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
 #include <string_view>
 #endif
@@ -162,7 +163,7 @@ class number
          (std::is_convertible<V, value_type>::value
             && std::is_convertible<U, value_type>::value
             && !std::is_same<value_type, self_type>::value
-            && std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
+            && std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
             && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = nullptr)
       : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)))
    {
@@ -173,7 +174,7 @@ class number
          (std::is_convertible<V, value_type>::value
             && std::is_convertible<U, value_type>::value
             && !std::is_same<value_type, self_type>::value
-            && std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
+            && std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
             && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = nullptr)
       : m_backend(canonical_value(detail::evaluate_if_expression(static_cast<V&&>(v1))), canonical_value(detail::evaluate_if_expression(v2)))
    {
@@ -184,7 +185,7 @@ class number
       (std::is_convertible<V, value_type>::value
          && std::is_convertible<U, value_type>::value
          && !std::is_same<value_type, self_type>::value
-         && std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
+         && std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
          && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = nullptr)
       : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(static_cast<U&&>(v2))))
    {
@@ -195,7 +196,7 @@ class number
       (std::is_convertible<V, value_type>::value
          && std::is_convertible<U, value_type>::value
          && !std::is_same<value_type, self_type>::value
-         && std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
+         && std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
          && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = nullptr)
       : m_backend(canonical_value(detail::evaluate_if_expression(static_cast<V&&>(v1))), canonical_value(detail::evaluate_if_expression(static_cast<U&&>(v2))))
    {
@@ -206,7 +207,7 @@ class number
          (std::is_convertible<V, value_type>::value 
             && std::is_convertible<U, value_type>::value 
             && !std::is_same<value_type, self_type>::value
-            && (!std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
+            && (!std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
                || boost::multiprecision::detail::is_variable_precision<Backend>::value))>::type* = nullptr)
    {
       using default_ops::assign_components;
@@ -274,7 +275,7 @@ class number
       const number<Other, ET>& v2, 
       typename std::enable_if<
          std::is_convertible<Other, Backend>::value 
-         && (!std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const number<Other, ET>&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const number<Other, ET>&>()))>::type>::type, Backend>::type const&>::value || boost::multiprecision::detail::is_variable_precision<Backend>::value) >::type* = nullptr)
+         && (!std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const number<Other, ET>&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const number<Other, ET>&>()))>::type>::type, Backend>::type const&>::value || boost::multiprecision::detail::is_variable_precision<Backend>::value) >::type* = nullptr)
    {
       using default_ops::assign_components;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2);

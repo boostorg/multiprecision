@@ -7,6 +7,7 @@
 #ifndef BOOST_MP_INTEGER_HPP
 #define BOOST_MP_INTEGER_HPP
 
+#include <type_traits>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
@@ -77,7 +78,7 @@ struct double_integer
 } // namespace detail
 
 template <class I1, class I2, class I3>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I1>::value && boost::multiprecision::detail::is_unsigned<I2>::value && is_integral<I3>::value, I1>::type
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I1>::value && boost::multiprecision::detail::is_unsigned<I2>::value && boost::multiprecision::detail::is_integral<I3>::value, I1>::type
 powm(const I1& a, I2 b, I3 c)
 {
    using double_type = typename detail::double_integer<I1>::type;
