@@ -22,6 +22,7 @@
 #include <boost/multiprecision/cpp_int/value_pack.hpp>
 #include <boost/multiprecision/detail/empty_value.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -305,12 +306,12 @@ private:
       {
          limb_type* result = data + allocated;
          allocated += n;
-         BOOST_ASSERT(allocated <= capacity);
+         BOOST_MP_ASSERT(allocated <= capacity);
          return result; 
       }
       void deallocate(unsigned n)
       {
-         BOOST_ASSERT(n <= allocated);
+         BOOST_MP_ASSERT(n <= allocated);
          allocated -= n;
       }
    };
@@ -367,7 +368,7 @@ private:
       if (new_size > cap)
       {
          // We must not be an alias, memory allocation here defeats the whole point of aliasing:
-         BOOST_ASSERT(!m_alias);
+         BOOST_MP_ASSERT(!m_alias);
          // Allocate a new buffer and copy everything over:
          cap             = (std::min)((std::max)(cap * 4, new_size), max_limbs);
          limb_pointer pl = allocator().allocate(cap);
@@ -921,7 +922,7 @@ template <unsigned MinBits, cpp_int_check_type Checked>
 const unsigned cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::internal_limb_count;
 //
 // Traits classes to figure out a native type with N bits, these vary from boost::uint_t<N> only
-// because some platforms have native integer types longer than boost::long_long_type, "really boost::long_long_type" anyone??
+// because some platforms have native integer types longer than long long, "really long long" anyone??
 //
 template <unsigned N, bool s>
 struct trivial_limb_type_imp
@@ -932,11 +933,11 @@ struct trivial_limb_type_imp
 template <unsigned N>
 struct trivial_limb_type_imp<N, true>
 {
-   using type = typename boost::uint_t<N>::least;
+   using type = typename boost::multiprecision::detail::uint_t<N>::least;
 };
 
 template <unsigned N>
-struct trivial_limb_type : public trivial_limb_type_imp<N, N <= sizeof(boost::long_long_type) * CHAR_BIT>
+struct trivial_limb_type : public trivial_limb_type_imp<N, N <= sizeof(long long) * CHAR_BIT>
 {};
 //
 // Backend for fixed precision signed-magnitude type which will fit entirely inside a "double_limb_type":
@@ -945,9 +946,9 @@ template <unsigned MinBits, cpp_int_check_type Checked>
 struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 {
    using local_limb_type = typename trivial_limb_type<MinBits>::type;
-   using limb_pointer = local_limb_type*                         ;
-   using const_limb_pointer = const local_limb_type*                   ;
-   using checked_type = std::integral_constant<int, Checked>                       ;
+   using limb_pointer = local_limb_type*;
+   using const_limb_pointer = const local_limb_type*;
+   using checked_type = std::integral_constant<int, Checked>;
 
    struct scoped_shared_storage 
    {
@@ -1327,12 +1328,12 @@ struct cpp_int_backend
        is_trivial_cpp_int<self_type>::value,
        std::tuple<
            signed char, short, int, long,
-           boost::long_long_type, signed_double_limb_type>,
+           long long, signed_double_limb_type>,
        std::tuple<signed_limb_type, signed_double_limb_type> >::type;
    using unsigned_types = typename std::conditional<
        is_trivial_cpp_int<self_type>::value,
        std::tuple<unsigned char, unsigned short, unsigned,
-                 unsigned long, boost::ulong_long_type, double_limb_type>,
+                 unsigned long, unsigned long long, double_limb_type>,
        std::tuple<limb_type, double_limb_type> >::type;
    using float_types = typename std::conditional<
        is_trivial_cpp_int<self_type>::value,

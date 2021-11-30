@@ -6,22 +6,22 @@
 #ifndef BOOST_MATH_BIG_NUM_BASE_HPP
 #define BOOST_MATH_BIG_NUM_BASE_HPP
 
+#include <string>
 #include <limits>
 #include <type_traits>
 #include <boost/math/tools/complex.hpp>
 #include <boost/multiprecision/traits/transcendental_reduction_type.hpp>
 #include <boost/multiprecision/traits/std_integer_traits.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4307)
-#endif
-#include <boost/lexical_cast.hpp>
-#ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 
 #ifndef BOOST_MP_STANDALONE
+#include <boost/lexical_cast.hpp>
 #include <boost/core/nvp.hpp>
 #endif
 
@@ -250,13 +250,13 @@ struct is_compatible_arithmetic_type
 
 namespace detail {
 //
-// Workaround for missing abs(boost::long_long_type) and abs(__int128) on some compilers:
+// Workaround for missing abs(long long) and abs(__int128) on some compilers:
 //
 template <class T>
 constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), T>::type abs(T t) noexcept
 {
    // This strange expression avoids a hardware trap in the corner case
-   // that val is the most negative value permitted in boost::long_long_type.
+   // that val is the most negative value permitted in long long.
    // See https://svn.boost.org/trac/boost/ticket/9740.
    return t < 0 ? T(1u) + T(-(t + 1)) : t;
 }
@@ -272,7 +272,7 @@ template <class T>
 constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), typename boost::multiprecision::detail::make_unsigned<T>::type>::type unsigned_abs(T t) noexcept
 {
    // This strange expression avoids a hardware trap in the corner case
-   // that val is the most negative value permitted in boost::long_long_type.
+   // that val is the most negative value permitted in long long.
    // See https://svn.boost.org/trac/boost/ticket/9740.
    return t < 0 ? static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(1u) + static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(-(t + 1)) : static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(t);
 }
@@ -1513,7 +1513,21 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
       if (showpoint || (str.size() > 1))
          str.insert(static_cast<std::string::size_type>(1u), 1, '.');
       str.append(static_cast<std::string::size_type>(1u), 'e');
-      S e = boost::lexical_cast<S>(abs(my_exp));
+
+      S e;
+      BOOST_IF_CONSTEXPR(std::is_same<S, std::string>::value)
+      {
+         e = std::to_string(abs(my_exp));
+      }
+      else
+      {
+         #ifndef BOOST_MP_STANDALONE
+         e = boost::lexical_cast<S>(abs(my_exp));
+         #else
+         static_assert(sizeof(S) == 1, "String type provided cannot be use with standalone mode");
+         #endif
+      }
+      
       if (e.size() < BOOST_MP_MIN_EXPONENT_DIGITS)
          e.insert(static_cast<std::string::size_type>(0), BOOST_MP_MIN_EXPONENT_DIGITS - e.size(), '0');
       if (my_exp < 0)

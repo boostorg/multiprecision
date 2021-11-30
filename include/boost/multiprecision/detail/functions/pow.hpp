@@ -19,6 +19,7 @@
 #endif
 
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 namespace detail {
 
@@ -105,7 +106,7 @@ void hyp0F0(T& H0F0, const T& x)
 
    using ui_type = typename std::tuple_element<0, typename T::unsigned_types>::type;
 
-   BOOST_ASSERT(&H0F0 != &x);
+   BOOST_MP_ASSERT(&H0F0 != &x);
    long tol = boost::multiprecision::detail::digits2<number<T, et_on> >::value();
    T    t;
 
@@ -152,8 +153,8 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
 
    using si_type = typename boost::multiprecision::detail::canonical<int, T>::type;
 
-   BOOST_ASSERT(&H1F0 != &x);
-   BOOST_ASSERT(&H1F0 != &a);
+   BOOST_MP_ASSERT(&H1F0 != &x);
+   BOOST_MP_ASSERT(&H1F0 != &a);
 
    T x_pow_n_div_n_fact(x);
    T pochham_a(a);
@@ -708,7 +709,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
 }
 
 template <class T, class A>
-#if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
+#if defined(BOOST_MSVC) && (BOOST_MSVC >= 1900)
 inline typename std::enable_if<!boost::multiprecision::detail::is_integral<A>::value, void>::type
 #else
 inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::value && !boost::multiprecision::detail::is_integral<A>::value, void>::type
@@ -725,7 +726,7 @@ eval_pow(T& result, const T& x, const A& a)
 }
 
 template <class T, class A>
-#if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
+#if defined(BOOST_MSVC) && (BOOST_MSVC >= 1900)
 inline void
 #else
 inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::value, void>::type

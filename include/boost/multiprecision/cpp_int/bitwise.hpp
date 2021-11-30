@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <boost/multiprecision/detail/endian.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -409,7 +410,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void left_shift_generic(Int& result, double_limb
 
    unsigned i = rs - result.size();
    // This code only works when shift is non-zero, otherwise we invoke undefined behaviour!
-   BOOST_ASSERT(shift);
+   BOOST_MP_ASSERT(shift);
    if (!truncated)
    {
       if (rs > ors + offset)
@@ -501,7 +502,7 @@ template <class Int>
 inline void right_shift_byte(Int& result, double_limb_type s)
 {
    limb_type offset = static_cast<limb_type>(s / Int::limb_bits);
-   BOOST_ASSERT((s % CHAR_BIT) == 0);
+   BOOST_MP_ASSERT((s % CHAR_BIT) == 0);
    unsigned ors = result.size();
    unsigned rs  = ors;
    if (offset >= rs)
@@ -528,7 +529,7 @@ template <class Int>
 inline BOOST_MP_CXX14_CONSTEXPR void right_shift_limb(Int& result, double_limb_type s)
 {
    limb_type offset = static_cast<limb_type>(s / Int::limb_bits);
-   BOOST_ASSERT((s % Int::limb_bits) == 0);
+   BOOST_MP_ASSERT((s % Int::limb_bits) == 0);
    unsigned ors = result.size();
    unsigned rs  = ors;
    if (offset >= rs)
@@ -569,7 +570,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void right_shift_generic(Int& result, double_lim
    unsigned i = 0;
 
    // This code only works for non-zero shift, otherwise we invoke undefined behaviour!
-   BOOST_ASSERT(shift);
+   BOOST_MP_ASSERT(shift);
    for (; i + offset + 1 < ors; ++i)
    {
       pr[i] = pr[i + offset] >> shift;

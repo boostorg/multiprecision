@@ -55,7 +55,7 @@ struct is_explicitly_convertible_imp
 
    static constexpr const bool value = sizeof(selector<S, T>(0)) == sizeof(int);
 
-   using type = boost::integral_constant<bool, value>;
+   using type = std::integral_constant<bool, value>;
 };
 
 template <typename From, typename To>
