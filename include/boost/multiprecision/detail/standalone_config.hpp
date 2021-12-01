@@ -35,6 +35,11 @@ namespace boost { namespace multiprecision {
    using uint128_type = boost::uint128_type;
 }}
 #endif
+#if defined(BOOST_HAS_FLOAT128) && defined(__cplusplus)
+namespace boost { namespace multiprecision {
+   using float128_type = boost::float128_type;
+}}
+#endif
 
 #else // Standalone mode
 

@@ -10,6 +10,7 @@
 #include <limits>
 #include <type_traits>
 #include <boost/math/tools/complex.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/traits/transcendental_reduction_type.hpp>
 #include <boost/multiprecision/traits/std_integer_traits.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
@@ -1615,15 +1616,15 @@ struct number_category<detail::expression<tag, A1, A2, A3, A4> > : public number
 //
 #ifdef BOOST_HAS_INT128
 template <>
-struct number_category<boost::int128_type> : public std::integral_constant<int, number_kind_integer>
+struct number_category<boost::multiprecision::int128_type> : public std::integral_constant<int, number_kind_integer>
 {};
 template <>
-struct number_category<boost::uint128_type> : public std::integral_constant<int, number_kind_integer>
+struct number_category<boost::multiprecision::uint128_type> : public std::integral_constant<int, number_kind_integer>
 {};
 #endif
 #ifdef BOOST_HAS_FLOAT128
 template <>
-struct number_category<__float128> : public std::integral_constant<int, number_kind_floating_point>
+struct number_category<boost::multiprecision::float128_type> : public std::integral_constant<int, number_kind_floating_point>
 {};
 #endif
 
