@@ -7,6 +7,7 @@
 #ifndef BOOST_MATH_BIG_NUM_DEF_OPS
 #define BOOST_MATH_BIG_NUM_DEF_OPS
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>

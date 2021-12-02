@@ -525,7 +525,7 @@ struct arg_type<expression<Tag, Arg1, Arg2, Arg3, Arg4> >
 
 struct unmentionable
 {
-   unmentionable* proc() { return 0; }
+   unmentionable* proc() { return nullptr; }
 };
 
 typedef unmentionable* (unmentionable::*unmentionable_type)();
