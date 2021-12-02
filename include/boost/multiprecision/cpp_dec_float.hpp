@@ -1939,7 +1939,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       if (((pos = str.find('e')) != std::string::npos) || ((pos = str.find('E')) != std::string::npos))
       {
          // Remove the exponent part from the string.
-         exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(str.c_str() + (pos + 1u)));
+         exp = std::atoi/*boost::lexical_cast<exponent_type>*/(static_cast<const char*>(str.c_str() + (pos + 1u)));
          str = str.substr(static_cast<std::size_t>(0u), pos);
       }
 
@@ -2141,7 +2141,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // Extract the data.
 
       // First get the digits to the left of the decimal point...
-      data[0u] = boost::lexical_cast<std::uint32_t>(str.substr(static_cast<std::size_t>(0u), pos));
+      data[0u] = std::atoi/*boost::lexical_cast<std::uint32_t>*/(str.substr(static_cast<std::size_t>(0u), pos).c_str());
 
       // ...then get the remaining digits to the right of the decimal point.
       const std::string::size_type i_end = ((str.length() - pos_plus_one) / static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
@@ -2150,7 +2150,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       {
          const std::string::const_iterator it = str.begin() + pos_plus_one + (i * static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
 
-         data[i + 1u] = boost::lexical_cast<std::uint32_t>(std::string(it, it + static_cast<std::string::size_type>(cpp_dec_float_elem_digits10)));
+         data[i + 1u] = std::atoi/*boost::lexical_cast<std::uint32_t>*/(std::string(it, it + static_cast<std::string::size_type>(cpp_dec_float_elem_digits10)).c_str());
       }
 
       // Check for overflow...
