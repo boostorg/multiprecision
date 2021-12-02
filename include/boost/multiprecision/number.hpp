@@ -14,6 +14,7 @@
 #include <boost/multiprecision/traits/is_restricted_conversion.hpp>
 #include <boost/multiprecision/traits/is_complex.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/number_base.hpp>
 #include <istream> // stream operators
 #include <cstdio>  // EOF
 #include <cctype>  // isspace
@@ -1050,7 +1051,9 @@ class number
    //
    // Use in boolean context, and explicit conversion operators:
    //
-#if (defined(BOOST_MSVC) && (BOOST_MSVC >= 1900)) || (defined(__apple_build_version__) && (defined(__clang_major__) && (__clang_major__ >= 9)))
+
+#if (defined(_MSC_VER) && (_MSC_VER < 1900)) || (defined(__apple_build_version__) && (defined(__clang_major__) && (__clang_major__ < 9)))
+//#if BOOST_WORKAROUND(BOOST_MSVC, < 1900) || (defined(__apple_build_version__) && BOOST_WORKAROUND(__clang_major__, < 9))
    template <class T>
 #else
    template <class T, class = typename std::enable_if<std::is_enum<T>::value || !(std::is_constructible<T, detail::convertible_to<self_type const&> >::value || !std::is_default_constructible<T>::value || (!boost::multiprecision::detail::is_arithmetic<T>::value && !boost::multiprecision::detail::is_complex<T>::value)), T>::type>

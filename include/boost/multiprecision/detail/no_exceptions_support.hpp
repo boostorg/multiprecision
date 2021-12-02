@@ -11,7 +11,7 @@
 
 #ifdef BOOST_MP_STANDALONE
 
-#if !(defined BOOST_NO_EXCEPTIONS)
+#if !defined (BOOST_NO_EXCEPTIONS)
 #   define BOOST_MP_TRY { try
 #   define BOOST_MP_CATCH(x) catch(x)
 #   define BOOST_MP_RETHROW throw;

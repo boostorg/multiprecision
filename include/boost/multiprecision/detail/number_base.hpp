@@ -6,10 +6,13 @@
 #ifndef BOOST_MATH_BIG_NUM_BASE_HPP
 #define BOOST_MATH_BIG_NUM_BASE_HPP
 
-#include <string>
+#include <climits>
+#include <ios>
 #include <limits>
+#include <string>
 #include <type_traits>
 #include <boost/math/tools/complex.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/traits/transcendental_reduction_type.hpp>
 #include <boost/multiprecision/traits/std_integer_traits.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
@@ -524,7 +527,7 @@ struct arg_type<expression<Tag, Arg1, Arg2, Arg3, Arg4> >
 
 struct unmentionable
 {
-   unmentionable* proc() { return 0; }
+   unmentionable* proc() { return nullptr; }
 };
 
 typedef unmentionable* (unmentionable::*unmentionable_type)();
@@ -1546,21 +1549,21 @@ template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, true>&)
 {
    if (val > (std::numeric_limits<std::size_t>::max)())
-      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+      {;}//BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
    if (val < 0)
-      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+      {;}////BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, false>&, const std::integral_constant<bool, true>&)
 {
    if (val < 0)
-      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+      {;}////BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, false>&)
 {
    if (val > (std::numeric_limits<std::size_t>::max)())
-      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+      {;}//BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V, const std::integral_constant<bool, false>&, const std::integral_constant<bool, false>&) noexcept {}
@@ -1615,15 +1618,15 @@ struct number_category<detail::expression<tag, A1, A2, A3, A4> > : public number
 //
 #ifdef BOOST_HAS_INT128
 template <>
-struct number_category<boost::int128_type> : public std::integral_constant<int, number_kind_integer>
+struct number_category<boost::multiprecision::int128_type> : public std::integral_constant<int, number_kind_integer>
 {};
 template <>
-struct number_category<boost::uint128_type> : public std::integral_constant<int, number_kind_integer>
+struct number_category<boost::multiprecision::uint128_type> : public std::integral_constant<int, number_kind_integer>
 {};
 #endif
 #ifdef BOOST_HAS_FLOAT128
 template <>
-struct number_category<__float128> : public std::integral_constant<int, number_kind_floating_point>
+struct number_category<boost::multiprecision::float128_type> : public std::integral_constant<int, number_kind_floating_point>
 {};
 #endif
 

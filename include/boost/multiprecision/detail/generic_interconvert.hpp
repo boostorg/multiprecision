@@ -556,7 +556,7 @@ void generic_interconvert_complex_to_scalar(To& to, const From& from, const std:
    To im;
    eval_imag(im, from);
    if (!eval_is_zero(im))
-      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+      {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
 }
 template <class To, class From>
 void generic_interconvert_complex_to_scalar(To& to, const From& from, const std::integral_constant<bool, false>&, const std::integral_constant<bool, true>&)

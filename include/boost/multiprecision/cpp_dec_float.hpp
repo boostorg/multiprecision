@@ -20,6 +20,7 @@
 #include <array>
 #include <cstdint>
 #include <initializer_list>
+#include <iomanip>
 #include <limits>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
@@ -120,8 +121,8 @@ class cpp_dec_float
  private:
    using array_type =
       typename std::conditional<std::is_void<Allocator>::value,
-                                detail::static_array <std::uint32_t, cpp_dec_float_elem_number>,
-                                detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number, Allocator> >::type;
+                                detail::static_array <std::uint32_t, std::uint32_t(cpp_dec_float_elem_number)>,
+                                detail::dynamic_array<std::uint32_t, std::uint32_t(cpp_dec_float_elem_number), Allocator> >::type;
 
    typedef enum enum_fpclass_type
    {
@@ -205,7 +206,7 @@ class cpp_dec_float
          negate();
       }
       else
-         from_unsigned_long_long(i);
+         from_unsigned_long_long(static_cast<unsigned long long>(i));
    }
 
    cpp_dec_float(const cpp_dec_float& f) noexcept(noexcept(array_type(std::declval<const array_type&>())))
@@ -242,11 +243,11 @@ class cpp_dec_float
 #ifdef BOOST_HAS_FLOAT128
                                                    && !std::is_same<F, __float128>::value
 #endif
-                                                   >::type* = 0) : data(),
-                                                                   exp(static_cast<exponent_type>(0)),
-                                                                   neg(false),
-                                                                   fpclass(cpp_dec_float_finite),
-                                                                   prec_elem(cpp_dec_float_elem_number)
+                                                   >::type* = nullptr) : data(),
+                                                                         exp(static_cast<exponent_type>(0)),
+                                                                         neg(false),
+                                                                         fpclass(cpp_dec_float_finite),
+                                                                         prec_elem(cpp_dec_float_elem_number)
    {
       *this = val;
    }
@@ -574,12 +575,12 @@ class cpp_dec_float
 
       using array_for_mul_result_type =
          typename std::conditional<std::is_void<Allocator>::value,
-                                   detail::static_array <std::uint32_t, cpp_dec_float_elem_number * 2>,
-                                   detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number * 2, Allocator> >::type;
+                                   detail::static_array <std::uint32_t, std::uint32_t(cpp_dec_float_elem_number * 2)>,
+                                   detail::dynamic_array<std::uint32_t, std::uint32_t(cpp_dec_float_elem_number * 2), Allocator> >::type;
 
       array_for_mul_result_type result;
 
-      eval_multiply_n_by_n_to_2n(result.data(), data.data(), v.data.data(), prec_elems_for_multiply);
+      eval_multiply_n_by_n_to_2n(result.data(), data.data(), v.data.data(), static_cast<std::uint32_t>(prec_elems_for_multiply));
 
       // Handle a potential carry.
       if(result[0U] != static_cast<std::uint32_t>(0U))
@@ -612,8 +613,8 @@ class cpp_dec_float
 
          using array_for_mul_result_type =
             typename std::conditional<std::is_void<Allocator>::value,
-                                      detail::static_array <std::uint32_t, cpp_dec_float_elem_number * 2>,
-                                      detail::dynamic_array<std::uint32_t, cpp_dec_float_elem_number * 2, Allocator> >::type;
+                                      detail::static_array <std::uint32_t, std::uint32_t(cpp_dec_float_elem_number * 2)>,
+                                      detail::dynamic_array<std::uint32_t, std::uint32_t(cpp_dec_float_elem_number * 2), Allocator> >::type;
 
          array_for_mul_result_type result;
 
@@ -1159,7 +1160,11 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
                    data.begin() + static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1)),
                    data.begin());
 
-         data[prec_elem - static_cast<std::int32_t>(1)] = static_cast<std::uint32_t>(static_cast<std::uint64_t>(prev * static_cast<std::uint64_t>(cpp_dec_float_elem_mask)) / nn);
+         {
+            const std::size_t prec_index = static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1));
+
+            data[prec_index] = static_cast<std::uint32_t>(static_cast<std::uint64_t>(prev * static_cast<std::uint64_t>(cpp_dec_float_elem_mask)) / nn);
+         }
       }
    }
 
@@ -1309,7 +1314,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 
    constexpr std::uint32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
 
-   for (std::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_max_digits10; digits *= 2u)
+   for (std::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_max_digits10; digits *= 2)
    {
       // Adjust precision of the terms.
       precision((digits + 10) * 2);
@@ -1656,7 +1661,7 @@ long long cpp_dec_float<Digits10, ExponentType, Allocator>::extract_signed_long_
       for (std::int32_t i = static_cast<std::int32_t>(1); i <= imax; i++)
       {
          val *= static_cast<unsigned long long>(cpp_dec_float_elem_mask);
-         val += static_cast<unsigned long long>(xn.data[i]);
+         val += static_cast<unsigned long long>(xn.data[static_cast<std::size_t>(i)]);
       }
    }
 
@@ -2007,7 +2012,13 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
          if (rit_non_zero != static_cast<std::string::const_reverse_iterator>(str.rbegin()))
          {
-            const std::string::size_type ofs = str.length() - std::distance<std::string::const_reverse_iterator>(str.rbegin(), rit_non_zero);
+            const std::string::size_type ofs =
+               std::string::size_type
+               (
+                    static_cast<std::ptrdiff_t>(str.length())
+                  - std::distance<std::string::const_reverse_iterator>(str.rbegin(), rit_non_zero)
+               );
+
             str.erase(str.begin() + ofs, str.end());
          }
 
@@ -2240,8 +2251,9 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
 
    for (std::int32_t i = static_cast<std::int32_t>(0); i < digit_loops; i++)
    {
-      std::uint32_t n = static_cast<std::uint32_t>(static_cast<std::uint64_t>(d));
-      data[i]           = static_cast<std::uint32_t>(n);
+      std::uint32_t n      = static_cast<std::uint32_t>(static_cast<std::uint64_t>(d));
+      data[std::size_t(i)] = static_cast<std::uint32_t>(n);
+
       d -= static_cast<double>(n);
       d *= static_cast<double>(cpp_dec_float_elem_mask);
    }
@@ -2427,7 +2439,7 @@ std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::eval_subtract_n(
       r[j] = static_cast<std::uint32_t>(t);
    }
 
-   return static_cast<std::int32_t>(borrow);
+   return static_cast<std::uint32_t>(borrow);
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -3027,7 +3039,7 @@ inline void eval_divide(cpp_dec_float<Digits10, ExponentType, Allocator>& result
       result.negate();
    }
    else
-      result.div_unsigned_long_long(o);
+      result.div_unsigned_long_long(static_cast<unsigned long long>(o));
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -3165,7 +3177,7 @@ inline void eval_ldexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
    const long long the_exp = static_cast<long long>(e);
 
    if ((the_exp > (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)()) || (the_exp < (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::min)()))
-      BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Exponent value is out of range.")));
+      {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Exponent value is out of range.")));
 
    result = x;
 
@@ -3236,9 +3248,9 @@ inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
       eval_frexp(r2, result, &e2);
       // overflow protection:
       if ((t > 0) && (e2 > 0) && (t > (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)() - e2))
-         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
+         {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
       if ((t < 0) && (e2 < 0) && (t < (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::min)() - e2))
-         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
+         {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
       t += e2;
       result = r2;
    }
@@ -3264,7 +3276,7 @@ inline typename std::enable_if< !std::is_same<ExponentType, int>::value>::type e
    typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type t;
    eval_frexp(result, x, &t);
    if ((t > (std::numeric_limits<int>::max)()) || (t < (std::numeric_limits<int>::min)()))
-      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is outside the range of an int"));
+      {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is outside the range of an int"));
    *e = static_cast<int>(t);
 }
 

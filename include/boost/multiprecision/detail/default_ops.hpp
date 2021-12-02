@@ -402,7 +402,9 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_multiply_default(T& t, const T& u, con
       eval_multiply(t, v);
    }
 }
-#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
+
+#if !(defined(_MSC_VER) && (_MSC_VER < 1900))
+//#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
 {
@@ -529,7 +531,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_divide_default(T& t, const T& u, const
       eval_divide(t, v);
    }
 }
-#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
+#if !(defined(_MSC_VER) && (_MSC_VER < 1900))
+//#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
 {
@@ -1077,25 +1080,25 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    //
    BOOST_IF_CONSTEXPR (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
       if (eval_get_sign(backend) < 0)
-         BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
-   BOOST_MP_TRY {
-      result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
-   }
-   BOOST_MP_CATCH (const bad_lexical_cast&)
-   {
-      if (eval_get_sign(backend) < 0)
-      {
-         BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
-            *result = (std::numeric_limits<R>::max)(); // we should never get here, exception above will be raised.
-         else BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer)
-            *result = (std::numeric_limits<R>::min)();
-         else
-            *result = -(std::numeric_limits<R>::max)();
-      }
-      else
-         *result = (std::numeric_limits<R>::max)();
-   }
-   BOOST_MP_CATCH_END
+         {;}//BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
+   //BOOST_MP_TRY {
+   //   result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
+   //}
+   //BOOST_MP_CATCH (const bad_lexical_cast&)
+   //{
+   //   if (eval_get_sign(backend) < 0)
+   //   {
+   //      BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
+   //         *result = (std::numeric_limits<R>::max)(); // we should never get here, exception above will be raised.
+   //      else BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer)
+   //         *result = (std::numeric_limits<R>::min)();
+   //      else
+   //         *result = -(std::numeric_limits<R>::max)();
+   //   }
+   //   else
+   //      *result = (std::numeric_limits<R>::max)();
+   //}
+   //BOOST_MP_CATCH_END
 }
 
 template <class R, class B>
@@ -1107,19 +1110,19 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    // a lexical_cast and hope for the best:
    //
    if (eval_get_sign(backend) < 0)
-      BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
-   BOOST_MP_TRY {
-      B t(backend);
-      R mask = ~static_cast<R>(0u);
-      eval_bitwise_and(t, mask);
-      result->value = boost::lexical_cast<R>(t.str(0, std::ios_base::fmtflags(0)));
-   }
-   BOOST_MP_CATCH (const bad_lexical_cast&)
-   {
-      // We should never really get here...
-      *result = (std::numeric_limits<R>::max)();
-   }
-   BOOST_MP_CATCH_END
+      {;}//BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
+   //BOOST_MP_TRY {
+   //   B t(backend);
+   //   R mask = ~static_cast<R>(0u);
+   //   eval_bitwise_and(t, mask);
+   //   result->value = boost::lexical_cast<R>(t.str(0, std::ios_base::fmtflags(0)));
+   //}
+   //BOOST_MP_CATCH (const bad_lexical_cast&)
+   //{
+   //   // We should never really get here...
+   //   *result = (std::numeric_limits<R>::max)();
+   //}
+   //BOOST_MP_CATCH_END
 }
 
 template <class R, class B>

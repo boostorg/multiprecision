@@ -140,7 +140,7 @@ void hyp0F0(T& H0F0, const T& x)
          x_pow_n_div_n_fact.negate();
    }
    if (n >= series_limit)
-      BOOST_MP_THROW_EXCEPTION(std::runtime_error("H0F0 failed to converge"));
+      {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error("H0F0 failed to converge"));
 }
 
 template <class T>
@@ -189,7 +189,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
          break;
    }
    if (n >= series_limit)
-      BOOST_MP_THROW_EXCEPTION(std::runtime_error("H1F0 failed to converge"));
+      {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error("H1F0 failed to converge"));
 }
 
 template <class T>
@@ -709,7 +709,8 @@ inline void eval_pow(T& result, const T& x, const T& a)
 }
 
 template <class T, class A>
-#if defined(BOOST_MSVC) && (BOOST_MSVC >= 1900)
+#if (defined(_MSC_VER) && (_MSC_VER < 1800))
+//#if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
 inline typename std::enable_if<!boost::multiprecision::detail::is_integral<A>::value, void>::type
 #else
 inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::value && !boost::multiprecision::detail::is_integral<A>::value, void>::type
@@ -726,7 +727,8 @@ eval_pow(T& result, const T& x, const A& a)
 }
 
 template <class T, class A>
-#if defined(BOOST_MSVC) && (BOOST_MSVC >= 1900)
+#if (defined(_MSC_VER) && (_MSC_VER < 1800))
+//#if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
 inline void
 #else
 inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::value, void>::type
