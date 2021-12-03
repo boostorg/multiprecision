@@ -54,15 +54,17 @@ void test()
 {
    using value_type = typename extract_value_type<T>::type;
 
+   using std::real;
+
    T mp_zero{0};
-   T mp_m_zero{-mp_zero};
+   T mp_m_zero{-real(mp_zero)};
    T mp_finite{2};
    T mp_m_finite{-2};
    T mp_big{!std::is_same<T, value_type>::value ? std::numeric_limits<value_type>::has_infinity ? std::numeric_limits<value_type>::infinity() : (std::numeric_limits<value_type>::max)() : std::numeric_limits<T>::has_infinity ? std::numeric_limits<T>::infinity()
                                                                                                                                                                                                      : (std::numeric_limits<T>::max)()};
-   T mp_m_big{-mp_big};
+   T mp_m_big{-real(mp_big)};
    T mp_small{!std::is_same<T, value_type>::value ? (std::numeric_limits<value_type>::min)() : (std::numeric_limits<T>::min)()};
-   T mp_m_small{-mp_small};
+   T mp_m_small{-real(mp_small)};
 
    T result;
    //
@@ -76,11 +78,11 @@ void test()
    BOOST_TEST(get_sign_bit(result));
    result = mp_m_zero * mp_m_finite;
    BOOST_TEST(get_sign_bit(result) == 0);
-   result = mp_zero * -mp_finite;
+   result = mp_zero * -real(mp_finite);
    BOOST_TEST(get_sign_bit(result));
-   result = -mp_zero * mp_finite;
+   result = -real(mp_zero) * mp_finite;
    BOOST_TEST(get_sign_bit(result));
-   result = -mp_zero * -mp_finite;
+   result = -real(mp_zero) * -real(mp_finite);
    BOOST_TEST(get_sign_bit(result) == 0);
    result = mp_small * mp_small;
    BOOST_TEST(get_sign_bit(result) == 0);
@@ -88,9 +90,9 @@ void test()
    BOOST_TEST(get_sign_bit(result));
    result = mp_m_small * mp_m_small;
    BOOST_TEST(get_sign_bit(result) == 0);
-   result = mp_small * -mp_small;
+   result = mp_small * -real(mp_small);
    BOOST_TEST(get_sign_bit(result));
-   result = -mp_small * -mp_small;
+   result = -real(mp_small) * -real(mp_small);
    BOOST_TEST(get_sign_bit(result) == 0);
    //
    // Divisions:
@@ -98,9 +100,27 @@ void test()
    result = mp_zero / mp_finite;
    BOOST_TEST(get_sign_bit(result) == 0);
    result = mp_zero / mp_m_finite;
-   BOOST_TEST(get_sign_bit(result));
+   if constexpr (std::is_same<value_type, T>::value)
+   {
+      BOOST_TEST(get_sign_bit(result));
+   }
+   else
+   {
+      // Complex result is slightly different:
+      BOOST_TEST(!get_sign_bit(real(result)));
+      BOOST_TEST(get_sign_bit(imag(result)));
+   }
    result = mp_m_zero / mp_finite;
-   BOOST_TEST(get_sign_bit(result));
+   if constexpr (std::is_same<value_type, T>::value)
+   {
+      BOOST_TEST(get_sign_bit(result));
+   }
+   else
+   {
+      // Complex result is slightly different:
+      BOOST_TEST(!get_sign_bit(real(result)));
+      BOOST_TEST(!get_sign_bit(imag(result)));
+   }
    result = mp_m_zero / mp_m_finite;
    BOOST_TEST(get_sign_bit(result) == 0);
    result = mp_zero / -mp_finite;
@@ -113,9 +133,27 @@ void test()
    result = mp_small / mp_big;
    BOOST_TEST(get_sign_bit(result) == 0);
    result = mp_small / mp_m_big;
-   BOOST_TEST(get_sign_bit(result));
+   if constexpr (std::is_same<value_type, T>::value)
+   {
+      BOOST_TEST(get_sign_bit(result));
+   }
+   else
+   {
+      // Complex result is slightly different:
+      BOOST_TEST(!get_sign_bit(real(result)));
+      BOOST_TEST(get_sign_bit(imag(result)));
+   }
    result = mp_m_small / mp_big;
-   BOOST_TEST(get_sign_bit(result));
+   if constexpr (std::is_same<value_type, T>::value)
+   {
+      BOOST_TEST(get_sign_bit(result));
+   }
+   else
+   {
+      // Complex result is slightly different:
+      BOOST_TEST(!get_sign_bit(real(result)));
+      BOOST_TEST(!get_sign_bit(imag(result)));
+   }
    result = mp_m_small / mp_m_big;
    BOOST_TEST(get_sign_bit(result) == 0);
    result = mp_small / -mp_big;
@@ -307,6 +345,7 @@ int main()
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
+   test<boost::multiprecision::cpp_complex_50>();
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type>, boost::multiprecision::et_on>>();
 #endif
 #ifdef TEST_MPFR_FLOAT
