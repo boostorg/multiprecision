@@ -238,66 +238,83 @@ inline void eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<
    using default_ops::eval_subtract;
    Backend t1, t2;
 
+   //
+   // Backup sign bits for later, so we can fix up
+   // signed zeros at the end:
+   //
+   int a_sign = eval_signbit(result.real_data());
+   int b_sign = eval_signbit(result.imag_data());
+   int c_sign = eval_signbit(z.real_data());
+   int d_sign = eval_signbit(z.imag_data());
+
    if (eval_is_zero(z.imag_data()))
    {
-      int a_sign = eval_signbit(result.real_data());
-      int b_sign = eval_signbit(result.imag_data());
-      int c_sign = eval_signbit(z.real_data());
-      int d_sign = eval_signbit(z.imag_data());
       eval_divide(result.real_data(), z.real_data());
       eval_divide(result.imag_data(), z.real_data());
-      if (eval_is_zero(result.real_data()))
-      {
-         int r_sign = eval_signbit(result.real_data());
-         int r_required = (a_sign != c_sign) && (b_sign != d_sign);
-         if (r_required != r_sign)
-            result.real_data().negate();
-      }
-      if (eval_is_zero(result.imag_data()))
-      {
-         int i_sign = eval_signbit(result.imag_data());
-         int i_required = (b_sign != c_sign) && (a_sign == d_sign);
-         if (i_required != i_sign)
-            result.imag_data().negate();
-      }
-      return;
-   }
-
-   eval_fabs(t1, z.real_data());
-   eval_fabs(t2, z.imag_data());
-   if (t1.compare(t2) < 0)
-   {
-      eval_divide(t1, z.real_data(), z.imag_data()); // t1 = c/d
-      eval_multiply(t2, z.real_data(), t1);
-      eval_add(t2, z.imag_data()); // denom = c * (c/d) + d
-      Backend t_real(result.real_data());
-      // real = (a * (c/d) + b) / (denom)
-      eval_multiply(result.real_data(), t1);
-      eval_add(result.real_data(), result.imag_data());
-      eval_divide(result.real_data(), t2);
-      // imag = (b * c/d - a) / denom
-      eval_multiply(result.imag_data(), t1);
-      eval_subtract(result.imag_data(), t_real);
-      eval_divide(result.imag_data(), t2);
    }
    else
    {
-      eval_divide(t1, z.imag_data(), z.real_data()); // t1 = d/c
-      eval_multiply(t2, z.imag_data(), t1);
-      eval_add(t2, z.real_data()); // denom = d * d/c + c
+      eval_fabs(t1, z.real_data());
+      eval_fabs(t2, z.imag_data());
+      if (t1.compare(t2) < 0)
+      {
+         eval_divide(t1, z.real_data(), z.imag_data()); // t1 = c/d
+         eval_multiply(t2, z.real_data(), t1);
+         eval_add(t2, z.imag_data()); // denom = c * (c/d) + d
+         Backend t_real(result.real_data());
+         // real = (a * (c/d) + b) / (denom)
+         eval_multiply(result.real_data(), t1);
+         eval_add(result.real_data(), result.imag_data());
+         eval_divide(result.real_data(), t2);
+         // imag = (b * c/d - a) / denom
+         eval_multiply(result.imag_data(), t1);
+         eval_subtract(result.imag_data(), t_real);
+         eval_divide(result.imag_data(), t2);
+      }
+      else
+      {
+         eval_divide(t1, z.imag_data(), z.real_data()); // t1 = d/c
+         eval_multiply(t2, z.imag_data(), t1);
+         eval_add(t2, z.real_data()); // denom = d * d/c + c
 
-      Backend r_t(result.real_data());
-      Backend i_t(result.imag_data());
+         Backend r_t(result.real_data());
+         Backend i_t(result.imag_data());
 
-      // real = (b * d/c + a) / denom
-      eval_multiply(result.real_data(), result.imag_data(), t1);
-      eval_add(result.real_data(), r_t);
-      eval_divide(result.real_data(), t2);
-      // imag = (-a * d/c + b) / denom
-      eval_multiply(result.imag_data(), r_t, t1);
-      result.imag_data().negate();
-      eval_add(result.imag_data(), i_t);
-      eval_divide(result.imag_data(), t2);
+         // real = (b * d/c + a) / denom
+         eval_multiply(result.real_data(), result.imag_data(), t1);
+         eval_add(result.real_data(), r_t);
+         eval_divide(result.real_data(), t2);
+         // imag = (-a * d/c + b) / denom
+         eval_multiply(result.imag_data(), r_t, t1);
+         result.imag_data().negate();
+         eval_add(result.imag_data(), i_t);
+         eval_divide(result.imag_data(), t2);
+      }
+   }
+   //
+   // Finish off by fixing up signed zeros.
+   // 
+   // This sets the signs "as if" we had evaluated the result using:
+   // 
+   // real = (ac + bd) / (c^2 + d^2)
+   // imag = (bc - ad) / (c^2 + d^2)
+   // 
+   // ie a zero is negative only if the two parts of the numerator
+   // are both negative and zero.
+   //
+   if (eval_is_zero(result.real_data()))
+   {
+      int r_sign = eval_signbit(result.real_data());
+      int r_required = (a_sign != c_sign) && (b_sign != d_sign);
+      if (r_required != r_sign)
+         result.real_data().negate();
+   }
+   if (eval_is_zero(result.imag_data()))
+   {
+      int i_sign = eval_signbit(result.imag_data());
+      int i_required = (b_sign != c_sign) && (a_sign == d_sign);
+      if (i_required != i_sign)
+         result.imag_data().negate();
    }
 }
 template <class Backend, class T>
