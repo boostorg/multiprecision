@@ -7,9 +7,8 @@
 #define BOOST_MATH_BIG_NUM_BASE_HPP
 
 #include <climits>
-#include <ios>
-#include <limits>
 #include <string>
+#include <limits>
 #include <type_traits>
 #include <boost/math/tools/complex.hpp>
 #include <boost/multiprecision/detail/standalone_config.hpp>
@@ -1549,21 +1548,21 @@ template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, true>&)
 {
    if (val > (std::numeric_limits<std::size_t>::max)())
-      {;}//BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
    if (val < 0)
-      {;}////BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, false>&, const std::integral_constant<bool, true>&)
 {
    if (val < 0)
-      {;}////BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, false>&)
 {
    if (val > (std::numeric_limits<std::size_t>::max)())
-      {;}//BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V, const std::integral_constant<bool, false>&, const std::integral_constant<bool, false>&) noexcept {}

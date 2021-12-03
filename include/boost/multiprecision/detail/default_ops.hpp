@@ -7,6 +7,7 @@
 #ifndef BOOST_MATH_BIG_NUM_DEF_OPS
 #define BOOST_MATH_BIG_NUM_DEF_OPS
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
@@ -402,7 +403,6 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_multiply_default(T& t, const T& u, con
       eval_multiply(t, v);
    }
 }
-
 #if !(defined(_MSC_VER) && (_MSC_VER < 1900))
 //#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
@@ -1080,7 +1080,7 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    //
    BOOST_IF_CONSTEXPR (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
       if (eval_get_sign(backend) < 0)
-         {;}//BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
+         BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
    //BOOST_MP_TRY {
    //   result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
    //}
@@ -1110,7 +1110,7 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    // a lexical_cast and hope for the best:
    //
    if (eval_get_sign(backend) < 0)
-      {;}//BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
+      BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
    //BOOST_MP_TRY {
    //   B t(backend);
    //   R mask = ~static_cast<R>(0u);

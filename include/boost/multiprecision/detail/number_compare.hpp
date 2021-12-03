@@ -126,10 +126,7 @@ inline constexpr typename std::enable_if<number_category<Backend>::value != numb
 }
 template <class Backend, expression_template_option ExpressionTemplates>
 inline
-#if !(defined(BOOST_GCC_VERSION) && (BOOST_GCC_VERSION < 40700))
-//#if !BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40700)
     constexpr
-#endif
     typename std::enable_if<number_category<Backend>::value == number_kind_floating_point, bool>::type
     is_unordered_value(const number<Backend, ExpressionTemplates>& a)
 {

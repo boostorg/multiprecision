@@ -140,7 +140,7 @@ void hyp0F0(T& H0F0, const T& x)
          x_pow_n_div_n_fact.negate();
    }
    if (n >= series_limit)
-      {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error("H0F0 failed to converge"));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("H0F0 failed to converge"));
 }
 
 template <class T>
@@ -189,7 +189,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
          break;
    }
    if (n >= series_limit)
-      {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error("H1F0 failed to converge"));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("H1F0 failed to converge"));
 }
 
 template <class T>

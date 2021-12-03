@@ -16,11 +16,13 @@
 #ifndef BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 #define BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 
+#include <cstdint>
+#include <cstdlib>
 #include <algorithm>
 #include <array>
-#include <cstdint>
 #include <initializer_list>
 #include <iomanip>
+#include <string>
 #include <limits>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
@@ -1160,11 +1162,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
                    data.begin() + static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1)),
                    data.begin());
 
-         {
-            const std::size_t prec_index = static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1));
-
-            data[prec_index] = static_cast<std::uint32_t>(static_cast<std::uint64_t>(prev * static_cast<std::uint64_t>(cpp_dec_float_elem_mask)) / nn);
-         }
+         data[static_cast<std::size_t>(prec_elem - static_cast<std::int32_t>(1))] = static_cast<std::uint32_t>(static_cast<std::uint64_t>(prev * static_cast<std::uint64_t>(cpp_dec_float_elem_mask)) / nn);
       }
    }
 
@@ -1939,7 +1937,19 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       if (((pos = str.find('e')) != std::string::npos) || ((pos = str.find('E')) != std::string::npos))
       {
          // Remove the exponent part from the string.
-         exp = std::atoi/*boost::lexical_cast<exponent_type>*/(static_cast<const char*>(str.c_str() + (pos + 1u)));
+         #ifndef BOOST_MP_STANDALONE
+         exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(str.c_str() + (pos + 1u)));
+         #else
+         BOOST_IF_CONSTEXPR(std::is_integral<exponent_type>::value)
+         {
+            exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
+         }
+         else
+         {
+            static_assert(sizeof(exponent_type) > 1, "Can not use this exponent type in standalone mode. Please de-activate and try again");
+         }
+         #endif
+         
          str = str.substr(static_cast<std::size_t>(0u), pos);
       }
 
@@ -2012,13 +2022,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
          if (rit_non_zero != static_cast<std::string::const_reverse_iterator>(str.rbegin()))
          {
-            const std::string::size_type ofs =
-               std::string::size_type
-               (
-                    static_cast<std::ptrdiff_t>(str.length())
-                  - std::distance<std::string::const_reverse_iterator>(str.rbegin(), rit_non_zero)
-               );
-
+            const std::string::size_type ofs = static_cast<std::ptrdiff_t>(str.length()) - std::distance<std::string::const_reverse_iterator>(str.rbegin(), rit_non_zero);
             str.erase(str.begin() + ofs, str.end());
          }
 
@@ -2111,6 +2115,12 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       pos          = str.find(static_cast<char>('.'));
       pos_plus_one = static_cast<std::size_t>(pos + 1u);
 
+      // Throws an error for a strange construction like 3.14L
+      if(pos != std::string::npos && (str.back() == 'L' || str.back() == 'l' || str.back() == 'u' || str.back() == 'U'))
+      {
+         ;//throw std::runtime_error("Can not construct a floating point with an integer literal");
+      }
+
       const std::int32_t n_dec = static_cast<std::int32_t>(static_cast<std::int32_t>(str.length() - 1u) - static_cast<std::int32_t>(pos));
       const std::int32_t n_rem = static_cast<std::int32_t>(n_dec % cpp_dec_float_elem_digits10);
 
@@ -2141,7 +2151,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // Extract the data.
 
       // First get the digits to the left of the decimal point...
-      data[0u] = std::atoi/*boost::lexical_cast<std::uint32_t>*/(str.substr(static_cast<std::size_t>(0u), pos).c_str());
+      data[0u] = static_cast<std::uint32_t>(std::stol(str.substr(static_cast<std::size_t>(0u), pos)));
 
       // ...then get the remaining digits to the right of the decimal point.
       const std::string::size_type i_end = ((str.length() - pos_plus_one) / static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
@@ -2150,7 +2160,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       {
          const std::string::const_iterator it = str.begin() + pos_plus_one + (i * static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
 
-         data[i + 1u] = std::atoi/*boost::lexical_cast<std::uint32_t>*/(std::string(it, it + static_cast<std::string::size_type>(cpp_dec_float_elem_digits10)).c_str());
+         data[i + 1u] = static_cast<std::uint32_t>(std::stol(std::string(it, it + static_cast<std::string::size_type>(cpp_dec_float_elem_digits10))));
       }
 
       // Check for overflow...
@@ -2251,9 +2261,8 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
 
    for (std::int32_t i = static_cast<std::int32_t>(0); i < digit_loops; i++)
    {
-      std::uint32_t n      = static_cast<std::uint32_t>(static_cast<std::uint64_t>(d));
-      data[std::size_t(i)] = static_cast<std::uint32_t>(n);
-
+      std::uint32_t n = static_cast<std::uint32_t>(static_cast<std::uint64_t>(d));
+      data[static_cast<std::size_t>(i)] = static_cast<std::uint32_t>(n);
       d -= static_cast<double>(n);
       d *= static_cast<double>(cpp_dec_float_elem_mask);
    }
@@ -2429,11 +2438,11 @@ std::uint32_t cpp_dec_float<Digits10, ExponentType, Allocator>::eval_subtract_n(
       {
          // Yes, underflow and borrow
          t     += static_cast<std::int32_t>(cpp_dec_float_elem_mask);
-         borrow = static_cast<int_fast8_t>(1);
+         borrow = static_cast<std::int_fast8_t>(1);
       }
       else
       {
-         borrow = static_cast<int_fast8_t>(0);
+         borrow = static_cast<std::int_fast8_t>(0);
       }
 
       r[j] = static_cast<std::uint32_t>(t);
@@ -3177,7 +3186,7 @@ inline void eval_ldexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
    const long long the_exp = static_cast<long long>(e);
 
    if ((the_exp > (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)()) || (the_exp < (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::min)()))
-      {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Exponent value is out of range.")));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Exponent value is out of range.")));
 
    result = x;
 
@@ -3248,9 +3257,9 @@ inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
       eval_frexp(r2, result, &e2);
       // overflow protection:
       if ((t > 0) && (e2 > 0) && (t > (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)() - e2))
-         {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
       if ((t < 0) && (e2 < 0) && (t < (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::min)() - e2))
-         {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
       t += e2;
       result = r2;
    }
@@ -3276,7 +3285,7 @@ inline typename std::enable_if< !std::is_same<ExponentType, int>::value>::type e
    typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type t;
    eval_frexp(result, x, &t);
    if ((t > (std::numeric_limits<int>::max)()) || (t < (std::numeric_limits<int>::min)()))
-      {;}//BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is outside the range of an int"));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is outside the range of an int"));
    *e = static_cast<int>(t);
 }
 
