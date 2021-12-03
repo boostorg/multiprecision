@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <string>
 #include <limits>
+#include <stdexcept>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 
@@ -1946,7 +1947,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          }
          else
          {
-            static_assert(sizeof(exponent_type) == 1, "Can not use this exponent type in standalone mode. Please de-activate and try again");
+            throw std::runtime_error("Can not use this exponent type in standalone mode. Please de-activate and try again");
          }
          #endif
          
@@ -2196,7 +2197,11 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
 #ifndef BOOST_NO_EXCEPTIONS
    }
+   #ifndef BOOST_MP_STANDALONE
    catch (const bad_lexical_cast&)
+   #else
+   catch (const std::exception&)
+   #endif
    {
       // Rethrow with better error message:
       std::string msg = "Unable to parse the string \"";
