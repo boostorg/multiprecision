@@ -139,14 +139,14 @@ struct mpc_complex_imp
    {
       if (m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
-      mpc_set_uj(data(), i, GMP_RNDD);
+      mpc_set_uj(data(), i, GMP_RNDN);
       return *this;
    }
    mpc_complex_imp& operator=(boost::long_long_type i)
    {
       if (m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
-      mpc_set_sj(data(), i, GMP_RNDD);
+      mpc_set_sj(data(), i, GMP_RNDN);
       return *this;
    }
 #else
@@ -274,8 +274,8 @@ struct mpc_complex_imp
 
       mpfr_float_backend<digits10> a(0uL, mpc_get_prec(m_data)), b(0uL, mpc_get_prec(m_data));
 
-      mpc_real(a.data(), m_data, GMP_RNDD);
-      mpc_imag(b.data(), m_data, GMP_RNDD);
+      mpc_real(a.data(), m_data, GMP_RNDN);
+      mpc_imag(b.data(), m_data, GMP_RNDN);
 
       if (eval_is_zero(b))
          return a.str(digits, f);
@@ -290,7 +290,7 @@ struct mpc_complex_imp
    void negate() noexcept
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
-      mpc_neg(m_data, m_data, GMP_RNDD);
+      mpc_neg(m_data, m_data, GMP_RNDN);
    }
    int compare(const mpc_complex_imp& o) const noexcept
    {
@@ -869,22 +869,22 @@ inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::
 template <unsigned D1, unsigned D2>
 inline void eval_add(mpc_complex_backend<D1>& result, const mpc_complex_backend<D2>& o)
 {
-   mpc_add(result.data(), result.data(), o.data(), GMP_RNDD);
+   mpc_add(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_add(mpc_complex_backend<D1>& result, const mpfr_float_backend<D2>& o)
 {
-   mpc_add_fr(result.data(), result.data(), o.data(), GMP_RNDD);
+   mpc_add_fr(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_subtract(mpc_complex_backend<D1>& result, const mpc_complex_backend<D2>& o)
 {
-   mpc_sub(result.data(), result.data(), o.data(), GMP_RNDD);
+   mpc_sub(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_subtract(mpc_complex_backend<D1>& result, const mpfr_float_backend<D2>& o)
 {
-   mpc_sub_fr(result.data(), result.data(), o.data(), GMP_RNDD);
+   mpc_sub_fr(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_multiply(mpc_complex_backend<D1>& result, const mpc_complex_backend<D2>& o)
@@ -902,12 +902,12 @@ inline void eval_multiply(mpc_complex_backend<D1>& result, const mpfr_float_back
 template <unsigned D1, unsigned D2>
 inline void eval_divide(mpc_complex_backend<D1>& result, const mpc_complex_backend<D2>& o)
 {
-   mpc_div(result.data(), result.data(), o.data(), GMP_RNDD);
+   mpc_div(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_divide(mpc_complex_backend<D1>& result, const mpfr_float_backend<D2>& o)
 {
-   mpc_div_fr(result.data(), result.data(), o.data(), GMP_RNDD);
+   mpc_div_fr(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void eval_add(mpc_complex_backend<digits10>& result, unsigned long i)
@@ -965,35 +965,35 @@ inline void eval_divide(mpc_complex_backend<digits10>& result, long i)
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_add(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
-   mpc_add(a.data(), x.data(), y.data(), GMP_RNDD);
+   mpc_add(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_add(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpfr_float_backend<D3>& y)
 {
-   mpc_add_fr(a.data(), x.data(), y.data(), GMP_RNDD);
+   mpc_add_fr(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_add(mpc_complex_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
-   mpc_add_fr(a.data(), y.data(), x.data(), GMP_RNDD);
+   mpc_add_fr(a.data(), y.data(), x.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_add(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, unsigned long y)
 {
-   mpc_add_ui(a.data(), x.data(), y, GMP_RNDD);
+   mpc_add_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_add(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, long y)
 {
    if (y < 0)
-      mpc_sub_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDD);
+      mpc_sub_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDN);
    else
-      mpc_add_ui(a.data(), x.data(), y, GMP_RNDD);
+      mpc_add_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_add(mpc_complex_backend<D1>& a, unsigned long x, const mpc_complex_backend<D2>& y)
 {
-   mpc_add_ui(a.data(), y.data(), x, GMP_RNDD);
+   mpc_add_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_add(mpc_complex_backend<D1>& a, long x, const mpc_complex_backend<D2>& y)
@@ -1001,38 +1001,38 @@ inline void eval_add(mpc_complex_backend<D1>& a, long x, const mpc_complex_backe
    if (x < 0)
    {
       mpc_ui_sub(a.data(), boost::multiprecision::detail::unsigned_abs(x), y.data(), GMP_RNDN);
-      mpc_neg(a.data(), a.data(), GMP_RNDD);
+      mpc_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
-      mpc_add_ui(a.data(), y.data(), x, GMP_RNDD);
+      mpc_add_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_subtract(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
-   mpc_sub(a.data(), x.data(), y.data(), GMP_RNDD);
+   mpc_sub(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_subtract(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpfr_float_backend<D3>& y)
 {
-   mpc_sub_fr(a.data(), x.data(), y.data(), GMP_RNDD);
+   mpc_sub_fr(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_subtract(mpc_complex_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
-   mpc_fr_sub(a.data(), x.data(), y.data(), GMP_RNDD);
+   mpc_fr_sub(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_subtract(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, unsigned long y)
 {
-   mpc_sub_ui(a.data(), x.data(), y, GMP_RNDD);
+   mpc_sub_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_subtract(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, long y)
 {
    if (y < 0)
-      mpc_add_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDD);
+      mpc_add_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDN);
    else
-      mpc_sub_ui(a.data(), x.data(), y, GMP_RNDD);
+      mpc_sub_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_subtract(mpc_complex_backend<D1>& a, unsigned long x, const mpc_complex_backend<D2>& y)
@@ -1044,8 +1044,8 @@ inline void eval_subtract(mpc_complex_backend<D1>& a, long x, const mpc_complex_
 {
    if (x < 0)
    {
-      mpc_add_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x), GMP_RNDD);
-      mpc_neg(a.data(), a.data(), GMP_RNDD);
+      mpc_add_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x), GMP_RNDN);
+      mpc_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
       mpc_ui_sub(a.data(), x, y.data(), GMP_RNDN);
@@ -1055,99 +1055,99 @@ template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_multiply(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
    if ((void*)&x == (void*)&y)
-      mpc_sqr(a.data(), x.data(), GMP_RNDD);
+      mpc_sqr(a.data(), x.data(), GMP_RNDN);
    else
-      mpc_mul(a.data(), x.data(), y.data(), GMP_RNDD);
+      mpc_mul(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_multiply(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpfr_float_backend<D3>& y)
 {
-   mpc_mul_fr(a.data(), x.data(), y.data(), GMP_RNDD);
+   mpc_mul_fr(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_multiply(mpc_complex_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
-   mpc_mul_fr(a.data(), y.data(), x.data(), GMP_RNDD);
+   mpc_mul_fr(a.data(), y.data(), x.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_multiply(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, unsigned long y)
 {
-   mpc_mul_ui(a.data(), x.data(), y, GMP_RNDD);
+   mpc_mul_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_multiply(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, long y)
 {
    if (y < 0)
    {
-      mpc_mul_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDD);
+      mpc_mul_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDN);
       a.negate();
    }
    else
-      mpc_mul_ui(a.data(), x.data(), y, GMP_RNDD);
+      mpc_mul_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_multiply(mpc_complex_backend<D1>& a, unsigned long x, const mpc_complex_backend<D2>& y)
 {
-   mpc_mul_ui(a.data(), y.data(), x, GMP_RNDD);
+   mpc_mul_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_multiply(mpc_complex_backend<D1>& a, long x, const mpc_complex_backend<D2>& y)
 {
    if (x < 0)
    {
-      mpc_mul_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x), GMP_RNDD);
-      mpc_neg(a.data(), a.data(), GMP_RNDD);
+      mpc_mul_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x), GMP_RNDN);
+      mpc_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
-      mpc_mul_ui(a.data(), y.data(), x, GMP_RNDD);
+      mpc_mul_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_divide(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
-   mpc_div(a.data(), x.data(), y.data(), GMP_RNDD);
+   mpc_div(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_divide(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpfr_float_backend<D3>& y)
 {
-   mpc_div_fr(a.data(), x.data(), y.data(), GMP_RNDD);
+   mpc_div_fr(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_divide(mpc_complex_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
-   mpc_fr_div(a.data(), x.data(), y.data(), GMP_RNDD);
+   mpc_fr_div(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_divide(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, unsigned long y)
 {
-   mpc_div_ui(a.data(), x.data(), y, GMP_RNDD);
+   mpc_div_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_divide(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, long y)
 {
    if (y < 0)
    {
-      mpc_div_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDD);
+      mpc_div_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDN);
       a.negate();
    }
    else
-      mpc_div_ui(a.data(), x.data(), y, GMP_RNDD);
+      mpc_div_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_divide(mpc_complex_backend<D1>& a, unsigned long x, const mpc_complex_backend<D2>& y)
 {
-   mpc_ui_div(a.data(), x, y.data(), GMP_RNDD);
+   mpc_ui_div(a.data(), x, y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
 inline void eval_divide(mpc_complex_backend<D1>& a, long x, const mpc_complex_backend<D2>& y)
 {
    if (x < 0)
    {
-      mpc_ui_div(a.data(), boost::multiprecision::detail::unsigned_abs(x), y.data(), GMP_RNDD);
-      mpc_neg(a.data(), a.data(), GMP_RNDD);
+      mpc_ui_div(a.data(), boost::multiprecision::detail::unsigned_abs(x), y.data(), GMP_RNDN);
+      mpc_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
-      mpc_ui_div(a.data(), x, y.data(), GMP_RNDD);
+      mpc_ui_div(a.data(), x, y.data(), GMP_RNDN);
 }
 
 template <unsigned digits10>
