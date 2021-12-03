@@ -1069,6 +1069,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_enum<R>::value>:
    *result = static_cast<R>(t);
 }
 
+#ifndef BOOST_MP_STANDALONE
 template <class R, class B>
 inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const std::integral_constant<bool, false>&)
 {
@@ -1122,6 +1123,20 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    }
    BOOST_MP_CATCH_END
 }
+#else // Using standalone mode
+
+template <class R, class B>
+inline void last_chance_eval_convert_to(terminal<R>*, const B&, const std::integral_constant<bool, false>&)
+{
+   static_assert(sizeof(R) == 1, "This type can not be used in standalone mode. Please de-activate and file a bug at https://github.com/boostorg/multiprecision/");
+}
+
+template <class R, class B>
+inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const std::integral_constant<bool, true>&)
+{
+   static_assert(sizeof(R) == 1, "This type can not be used in standalone mode. Please de-activate and file a bug at https://github.com/boostorg/multiprecision/");
+}
+#endif
 
 template <class R, class B>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(terminal<R>* result, const B& backend)

@@ -1,4 +1,4 @@
-//////////////////3/////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 //  Copyright 2012 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
@@ -6,10 +6,11 @@
 #ifndef BOOST_MP_CPP_INT_HPP
 #define BOOST_MP_CPP_INT_HPP
 
+#include <cstdint>
 #include <iostream>
 #include <iomanip>
 #include <type_traits>
-#include <cstdint>
+#include <string>
 #include <boost/multiprecision/detail/endian.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
@@ -2028,7 +2029,7 @@ struct cpp_int_backend
          }
          if (this->size() == 1)
          {
-            result = boost::lexical_cast<std::string>(t.limbs()[0]);
+            result = std::to_string(t.limbs()[0]);
          }
          else
          {
