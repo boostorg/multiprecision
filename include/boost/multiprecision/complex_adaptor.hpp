@@ -240,8 +240,26 @@ inline void eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<
 
    if (eval_is_zero(z.imag_data()))
    {
+      int a_sign = eval_signbit(result.real_data());
+      int b_sign = eval_signbit(result.imag_data());
+      int c_sign = eval_signbit(z.real_data());
+      int d_sign = eval_signbit(z.imag_data());
       eval_divide(result.real_data(), z.real_data());
       eval_divide(result.imag_data(), z.real_data());
+      if (eval_is_zero(result.real_data()))
+      {
+         int r_sign = eval_signbit(result.real_data());
+         int r_required = (a_sign != c_sign) && (b_sign != d_sign);
+         if (r_required != r_sign)
+            result.real_data().negate();
+      }
+      if (eval_is_zero(result.imag_data()))
+      {
+         int i_sign = eval_signbit(result.imag_data());
+         int i_required = (b_sign != c_sign) && (a_sign == d_sign);
+         if (i_required != i_sign)
+            result.imag_data().negate();
+      }
       return;
    }
 
