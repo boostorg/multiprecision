@@ -6,6 +6,7 @@
 #ifndef BOOST_MATH_BIG_NUM_BASE_HPP
 #define BOOST_MATH_BIG_NUM_BASE_HPP
 
+#include <climits>
 #include <string>
 #include <limits>
 #include <type_traits>
