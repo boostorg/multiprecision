@@ -6,6 +6,8 @@
 #ifndef BOOST_MATH_CPP_BIN_FLOAT_HPP
 #define BOOST_MATH_CPP_BIN_FLOAT_HPP
 
+#include <limits>
+#include <type_traits>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/integer.hpp>
 #include <boost/math/special_functions/trunc.hpp>
@@ -89,17 +91,17 @@ template <unsigned Digits, digit_base_type DigitBase = digit_base_10, class Allo
 class cpp_bin_float
 {
  public:
-   static constexpr const unsigned                                                                                                                                                     bit_count = DigitBase == digit_base_2 ? Digits : (Digits * 1000uL) / 301uL + (((Digits * 1000uL) % 301) ? 2u : 1u);
-   using rep_type = cpp_int_backend<std::is_void<Allocator>::value ? bit_count : 0, bit_count, is_void<Allocator>::value ? unsigned_magnitude : signed_magnitude, unchecked, Allocator>        ;
-   using double_rep_type = cpp_int_backend<std::is_void<Allocator>::value ? 2 * bit_count : 0, 2 * bit_count, is_void<Allocator>::value ? unsigned_magnitude : signed_magnitude, unchecked, Allocator>;
+   static constexpr const unsigned bit_count = DigitBase == digit_base_2 ? Digits : (Digits * 1000uL) / 301uL + (((Digits * 1000uL) % 301) ? 2u : 1u);
+   using rep_type = cpp_int_backend<std::is_void<Allocator>::value ? bit_count : 0, bit_count, std::is_void<Allocator>::value ? unsigned_magnitude : signed_magnitude, unchecked, Allocator>;
+   using double_rep_type = cpp_int_backend<std::is_void<Allocator>::value ? 2 * bit_count : 0, 2 * bit_count, std::is_void<Allocator>::value ? unsigned_magnitude : signed_magnitude, unchecked, Allocator>;
 
-   using signed_types = typename rep_type::signed_types             ;
-   using unsigned_types = typename rep_type::unsigned_types           ;
+   using signed_types = typename rep_type::signed_types;
+   using unsigned_types = typename rep_type::unsigned_types;
    using float_types = std::tuple<float, double, long double>;
-   using exponent_type = Exponent                                    ;
+   using exponent_type = Exponent;
 
-   static constexpr const exponent_type max_exponent_limit = boost::integer_traits<exponent_type>::const_max - 2 * static_cast<exponent_type>(bit_count);
-   static constexpr const exponent_type min_exponent_limit = boost::integer_traits<exponent_type>::const_min + 2 * static_cast<exponent_type>(bit_count);
+   static constexpr const exponent_type max_exponent_limit = (std::numeric_limits<exponent_type>::max)()- 2 * static_cast<exponent_type>(bit_count);
+   static constexpr const exponent_type min_exponent_limit = (std::numeric_limits<exponent_type>::min)() + 2 * static_cast<exponent_type>(bit_count);
 
    static_assert(MinExponent >= min_exponent_limit, "Template parameter MinExponent is too negative for our internal logic to function correctly, sorry!");
    static_assert(MaxExponent <= max_exponent_limit, "Template parameter MaxExponent is too large for our internal logic to function correctly, sorry!");
@@ -768,7 +770,7 @@ inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       return; // result is a NaN.
    }
 
-   static_assert(boost::integer_traits<exponent_type>::const_max - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent, "Exponent range check failed");
+   static_assert((std::numeric_limits<exponent_type>::max)() - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent, "Exponent range check failed");
 
    bool s = a.sign();
    dt     = a.bits();
