@@ -12,6 +12,7 @@
 
 // Boost.Config is dependency free so it is considered a requirement to use Boost.Multiprecision in standalone mode
 #include <boost/config.hpp>
+#include <boost/config/workaround.hpp>
 
 // If any of the most frequently used boost headers are missing assume that standalone mode is supposed to be used
 #ifdef __has_include

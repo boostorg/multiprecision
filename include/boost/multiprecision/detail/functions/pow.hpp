@@ -18,6 +18,7 @@
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 

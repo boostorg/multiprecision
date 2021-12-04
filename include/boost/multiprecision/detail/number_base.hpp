@@ -7,9 +7,11 @@
 #define BOOST_MATH_BIG_NUM_BASE_HPP
 
 #include <climits>
+#include <ios>
 #include <string>
 #include <limits>
 #include <type_traits>
+#include <stdexcept>
 #include <boost/math/tools/complex.hpp>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/traits/transcendental_reduction_type.hpp>
@@ -92,7 +94,9 @@
 // Thread local storage:
 // Note fails on Mingw, see https://sourceforge.net/p/mingw-w64/bugs/527/
 //
-#if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !(defined(__MINGW32__) && (__GNUC__ < 9) && !defined(__clang__))
+#if defined(BOOST_NO_CXX11_THREAD_LOCAL)
+#define BOOST_MP_THREAD_LOCAL
+#elif !(defined(__MINGW32__) && (defined(__GNUC__) && (__GNUC__ < 9)) && !defined(__clang__))
 #define BOOST_MP_THREAD_LOCAL thread_local
 #define BOOST_MP_USING_THREAD_LOCAL
 #else

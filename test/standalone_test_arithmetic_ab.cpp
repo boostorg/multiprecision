@@ -10,7 +10,7 @@
 
 #include "../performance/arithmetic_backend.hpp"
 
-#include "test_arithmetic.hpp"
+#include "standalone_test_arithmetic.hpp"
 
 int main()
 {
