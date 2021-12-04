@@ -6,13 +6,14 @@
 #ifndef BOOST_MATH_CONCEPTS_ER_HPP
 #define BOOST_MATH_CONCEPTS_ER_HPP
 
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <tuple>
 #include <functional>
-#include <cmath>
-#include <cstdint>
 #include <boost/multiprecision/number.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
@@ -30,8 +31,8 @@ struct number_backend_float_architype
 {
    using signed_types = std::tuple<long long> ;
    using unsigned_types = std::tuple<unsigned long long>;
-   using float_types = std::tuple<long double>           ;
-   using exponent_type = int                              ;
+   using float_types = std::tuple<long double>;
+   using exponent_type = int;
 
    number_backend_float_architype()
    {
@@ -73,7 +74,16 @@ struct number_backend_float_architype
       try
       {
 #endif
+         #ifndef BOOST_MP_STANDALONE
          m_value = boost::lexical_cast<long double>(s);
+         #else
+         m_value = std::strtold(s, nullptr);
+
+         if(m_value == HUGE_VALL || m_value == 0)
+         {
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Value can not be assigned in standalone mode. Please disable and try again."));
+         }
+         #endif
 #ifndef BOOST_NO_EXCEPTIONS
       }
       catch (const std::exception&)

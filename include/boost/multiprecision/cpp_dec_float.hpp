@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <string>
 #include <limits>
+#include <stdexcept>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 
@@ -1946,7 +1947,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          }
          else
          {
-            static_assert(sizeof(exponent_type) > 1, "Can not use this exponent type in standalone mode. Please de-activate and try again");
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not use this exponent type in standalone mode. Please de-activate and try again"));
          }
          #endif
          
@@ -2118,7 +2119,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // Throws an error for a strange construction like 3.14L
       if(pos != std::string::npos && (str.back() == 'L' || str.back() == 'l' || str.back() == 'u' || str.back() == 'U'))
       {
-         ;//throw std::runtime_error("Can not construct a floating point with an integer literal");
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with an integer literal"));
       }
 
       const std::int32_t n_dec = static_cast<std::int32_t>(static_cast<std::int32_t>(str.length() - 1u) - static_cast<std::int32_t>(pos));
@@ -2196,7 +2197,11 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
 #ifndef BOOST_NO_EXCEPTIONS
    }
+   #ifndef BOOST_MP_STANDALONE
    catch (const bad_lexical_cast&)
+   #else
+   catch (const std::exception&)
+   #endif
    {
       // Rethrow with better error message:
       std::string msg = "Unable to parse the string \"";

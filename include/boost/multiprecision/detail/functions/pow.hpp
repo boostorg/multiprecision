@@ -18,6 +18,7 @@
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 
@@ -709,8 +710,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
 }
 
 template <class T, class A>
-#if (defined(_MSC_VER) && (_MSC_VER < 1800))
-//#if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
 inline typename std::enable_if<!boost::multiprecision::detail::is_integral<A>::value, void>::type
 #else
 inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::value && !boost::multiprecision::detail::is_integral<A>::value, void>::type
@@ -727,8 +727,7 @@ eval_pow(T& result, const T& x, const A& a)
 }
 
 template <class T, class A>
-#if (defined(_MSC_VER) && (_MSC_VER < 1800))
-//#if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
 inline void
 #else
 inline typename std::enable_if<is_compatible_arithmetic_type<A, number<T> >::value, void>::type

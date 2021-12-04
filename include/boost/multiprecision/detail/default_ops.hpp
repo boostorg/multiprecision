@@ -12,6 +12,7 @@
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
+#include <boost/multiprecision/traits/is_backend.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/special_functions/next.hpp>
 #include <boost/math/special_functions/hypot.hpp>
@@ -34,9 +35,6 @@ namespace multiprecision {
 
 namespace detail {
 
-template <class T>
-struct is_backend;
-
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const std::integral_constant<int, number_kind_floating_point>& /*to_type*/, const std::integral_constant<int, number_kind_integer>& /*from_type*/);
 template <class To, class From>
@@ -54,6 +52,23 @@ BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, si
 } // namespace detail
 
 namespace default_ops {
+
+template <class T>
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_backend<T>::value, int>::type eval_signbit(const T& val);
+
+template <class T>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!boost::multiprecision::detail::is_backend<T>::value, int>::type eval_signbit(const T& val) { return val < 0; }
+
+inline int eval_signbit(float val) { return (std::signbit)(val); }
+inline int eval_signbit(double val) { return (std::signbit)(val); }
+inline int eval_signbit(long double val) { return (std::signbit)(val); }
+#ifdef BOOST_HAS_FLOAT128
+extern "C" int signbitq(__float128) throw();
+inline int            eval_signbit(__float128 val) { return signbitq(val); }
+#endif
+
+template <class T>
+BOOST_MP_CXX14_CONSTEXPR bool eval_is_zero(const T& val);
 
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
@@ -340,7 +355,14 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, n
    eval_subtract(t, u, vv);
 }
 template <class T, class U>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && is_signed_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && is_signed_number<T>::value && (number_category<T>::value != number_kind_complex)>::type eval_subtract_default(T& t, const U& u, const T& v)
+{
+   eval_subtract(t, v, u);
+   if(!eval_is_zero(t) || (eval_signbit(u) != eval_signbit(v)))
+      t.negate();
+}
+template <class T, class U>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && is_signed_number<T>::value && (number_category<T>::value == number_kind_complex)>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    eval_subtract(t, v, u);
    t.negate();
@@ -403,8 +425,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_multiply_default(T& t, const T& u, con
       eval_multiply(t, v);
    }
 }
-#if !(defined(_MSC_VER) && (_MSC_VER < 1900))
-//#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
 {
@@ -531,8 +552,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_divide_default(T& t, const T& u, const
       eval_divide(t, v);
    }
 }
-#if !(defined(_MSC_VER) && (_MSC_VER < 1900))
-//#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, number<T, et_on> >::value && !std::is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
 {
@@ -1071,6 +1091,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_enum<R>::value>:
    *result = static_cast<R>(t);
 }
 
+#ifndef BOOST_MP_STANDALONE
 template <class R, class B>
 inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const std::integral_constant<bool, false>&)
 {
@@ -1081,24 +1102,24 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    BOOST_IF_CONSTEXPR (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
       if (eval_get_sign(backend) < 0)
          BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
-   //BOOST_MP_TRY {
-   //   result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
-   //}
-   //BOOST_MP_CATCH (const bad_lexical_cast&)
-   //{
-   //   if (eval_get_sign(backend) < 0)
-   //   {
-   //      BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
-   //         *result = (std::numeric_limits<R>::max)(); // we should never get here, exception above will be raised.
-   //      else BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer)
-   //         *result = (std::numeric_limits<R>::min)();
-   //      else
-   //         *result = -(std::numeric_limits<R>::max)();
-   //   }
-   //   else
-   //      *result = (std::numeric_limits<R>::max)();
-   //}
-   //BOOST_MP_CATCH_END
+   BOOST_MP_TRY {
+      result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
+   }
+   BOOST_MP_CATCH (const bad_lexical_cast&)
+   {
+      if (eval_get_sign(backend) < 0)
+      {
+         BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
+            *result = (std::numeric_limits<R>::max)(); // we should never get here, exception above will be raised.
+         else BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer)
+            *result = (std::numeric_limits<R>::min)();
+         else
+            *result = -(std::numeric_limits<R>::max)();
+      }
+      else
+         *result = (std::numeric_limits<R>::max)();
+   }
+   BOOST_MP_CATCH_END
 }
 
 template <class R, class B>
@@ -1111,19 +1132,33 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    //
    if (eval_get_sign(backend) < 0)
       BOOST_MP_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
-   //BOOST_MP_TRY {
-   //   B t(backend);
-   //   R mask = ~static_cast<R>(0u);
-   //   eval_bitwise_and(t, mask);
-   //   result->value = boost::lexical_cast<R>(t.str(0, std::ios_base::fmtflags(0)));
-   //}
-   //BOOST_MP_CATCH (const bad_lexical_cast&)
-   //{
-   //   // We should never really get here...
-   //   *result = (std::numeric_limits<R>::max)();
-   //}
-   //BOOST_MP_CATCH_END
+   BOOST_MP_TRY {
+      B t(backend);
+      R mask = ~static_cast<R>(0u);
+      eval_bitwise_and(t, mask);
+      result->value = boost::lexical_cast<R>(t.str(0, std::ios_base::fmtflags(0)));
+   }
+   BOOST_MP_CATCH (const bad_lexical_cast&)
+   {
+      // We should never really get here...
+      *result = (std::numeric_limits<R>::max)();
+   }
+   BOOST_MP_CATCH_END
 }
+#else // Using standalone mode
+
+template <class R, class B>
+inline void last_chance_eval_convert_to(terminal<R>*, const B&, const std::integral_constant<bool, false>&)
+{
+   static_assert(sizeof(R) == 1, "This type can not be used in standalone mode. Please de-activate and file a bug at https://github.com/boostorg/multiprecision/");
+}
+
+template <class R, class B>
+inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const std::integral_constant<bool, true>&)
+{
+   static_assert(sizeof(R) == 1, "This type can not be used in standalone mode. Please de-activate and file a bug at https://github.com/boostorg/multiprecision/");
+}
+#endif
 
 template <class R, class B>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(terminal<R>* result, const B& backend)
@@ -1849,9 +1884,6 @@ inline BOOST_MP_CXX14_CONSTEXPR typename B::exponent_type eval_ilogb(const B& va
    return e - 1;
 }
 
-template <class T>
-BOOST_MP_CXX14_CONSTEXPR int eval_signbit(const T& val);
-
 template <class B>
 inline BOOST_MP_CXX14_CONSTEXPR void eval_logb(B& result, const B& val)
 {
@@ -2010,7 +2042,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_rint(R& result, const T& a)
 }
 
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR int eval_signbit(const T& val)
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_backend<T>::value, int>::type eval_signbit(const T& val)
 {
    return eval_get_sign(val) < 0 ? 1 : 0;
 }

@@ -11,6 +11,7 @@
 #define BOOST_MP_CPP_INT_MUL_HPP
 
 #include <limits>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/endian.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 #include <boost/multiprecision/integer.hpp>
