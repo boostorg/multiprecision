@@ -1045,12 +1045,13 @@ inline typename std::enable_if<boost::multiprecision::detail::is_unsigned<U>::va
    using default_ops::eval_bit_test;
    using default_ops::eval_multiply;
 
+   bool s = a.sign(); // saved for later in case a and res are the same object.
+
    // Special cases first:
    switch (a.exponent())
    {
    case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_zero:
    {
-      bool s     = a.sign();
       res        = a;
       res.sign() = s;
       return;
@@ -1072,7 +1073,7 @@ inline typename std::enable_if<boost::multiprecision::detail::is_unsigned<U>::va
    res.exponent() = a.exponent();
    copy_and_round(res, dt);
    res.check_invariants();
-   res.sign() = a.sign();
+   res.sign() = s;
 }
 
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, class U>
