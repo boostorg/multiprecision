@@ -310,7 +310,10 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       if (mpfr_zero_p(m_data))
       {
          e      = 0;
-         result = "0";
+         if (mpfr_signbit(m_data))
+            result = "-0";
+         else
+            result = "0";
       }
       else
       {
