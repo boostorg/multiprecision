@@ -21,6 +21,28 @@ namespace boost { namespace multiprecision { namespace backends { namespace deta
 // Note that this is not a complete header, it must be included as part of boost/multiprecision/cpp_int.hpp.
 //
 
+template <typename T>
+inline constexpr T type_max(T) noexcept
+{
+   return 
+   #ifdef BOOST_HAS_INT128
+   std::is_same<T, boost::multiprecision::int128_type>::value ? INT128_MAX :
+   std::is_same<T, boost::multiprecision::uint128_type>::value ? UINT128_MAX :
+   #endif
+   (std::numeric_limits<T>::max)();
+}
+
+template <typename T>
+inline constexpr T type_min(T) noexcept
+{
+   return 
+   #ifdef BOOST_HAS_INT128
+   std::is_same<T, boost::multiprecision::int128_type>::value ? INT128_MIN :
+   std::is_same<T, boost::multiprecision::uint128_type>::value ? T(0) :
+   #endif
+   (std::numeric_limits<T>::min)();
+}
+
 inline void raise_overflow(std::string op)
 {
    BOOST_MP_THROW_EXCEPTION(std::overflow_error("overflow in " + op));
@@ -47,12 +69,12 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const std::integral_
 {
    if (a > 0)
    {
-      if ((b > 0) && (((std::numeric_limits<A>::max)() - b) < a))
+      if ((b > 0) && ((type_max(a) - b) < a))
          raise_add_overflow();
    }
    else
    {
-      if ((b < 0) && (((std::numeric_limits<A>::min)() - b) > a))
+      if ((b < 0) && ((type_min(a) - b) > a))
          raise_add_overflow();
    }
    return a + b;
@@ -60,7 +82,7 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const std::integral_
 template <class A>
 inline BOOST_MP_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const std::integral_constant<bool, false>&)
 {
-   if (((std::numeric_limits<A>::max)() - b) < a)
+   if ((type_max(a) - b) < a)
       raise_add_overflow();
    return a + b;
 }
@@ -80,12 +102,12 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_subtract_imp(A a, A b, const std::inte
 {
    if (a > 0)
    {
-      if ((b < 0) && (((std::numeric_limits<A>::max)() + b) < a))
+      if ((b < 0) && ((type_max(a) + b) < a))
          raise_subtract_overflow();
    }
    else
    {
-      if ((b > 0) && (((std::numeric_limits<A>::min)() + b) > a))
+      if ((b > 0) && ((type_min(a) + b) > a))
          raise_subtract_overflow();
    }
    return a - b;
@@ -112,25 +134,8 @@ template <class A>
 inline BOOST_MP_CXX14_CONSTEXPR A checked_multiply(A a, A b, const std::integral_constant<int, checked>&)
 {
    BOOST_MP_USING_ABS
-   
-   #ifndef BOOST_HAS_INT128
-   if (a && ((std::numeric_limits<A>::max)() / abs(a) < abs(b)))
+   if (a && (type_max(a) / abs(a) < abs(b)))
       raise_mul_overflow();
-   return a * b;
-   #else
-   BOOST_IF_CONSTEXPR(std::is_same<A, boost::multiprecision::int128_type>::value)
-   {
-      // Older compliers do not provide a specialization for std::numeric_limits<__int128>
-      if (a && (INT128_MAX / abs(a) < abs(b)))
-         raise_mul_overflow();
-   }
-   else
-   {
-      if (a && ((std::numeric_limits<A>::max)() / abs(a) < abs(b)))
-         raise_mul_overflow();
-   }
-   #endif
-
    return a * b;
 }
 template <class A>

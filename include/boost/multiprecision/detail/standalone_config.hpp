@@ -10,6 +10,7 @@
 #ifndef BOOST_MP_STANDALONE_CONFIG_HPP
 #define BOOST_MP_STANDALONE_CONFIG_HPP
 
+#include <climits>
 // Boost.Config is dependency free so it is considered a requirement to use Boost.Multiprecision in standalone mode
 #include <boost/config.hpp>
 #include <boost/config/workaround.hpp>
@@ -35,11 +36,6 @@ namespace boost { namespace multiprecision {
    using int128_type = boost::int128_type;
    using uint128_type = boost::uint128_type;
 }}
-
-#ifndef INT128_MAX
-#  define INT128_MAX (__int128) (((unsigned __int128) 1 << ((__SIZEOF_INT128__ * __CHAR_BIT__) - 1)) - 1)
-#endif
-
 #endif
 #if defined(BOOST_HAS_FLOAT128) && defined(__cplusplus)
 namespace boost { namespace multiprecision {
@@ -65,10 +61,6 @@ namespace boost { namespace multiprecision {
 #  endif
 }}
 
-#ifndef INT128_MAX
-#  define INT128_MAX (__int128) (((unsigned __int128) 1 << ((__SIZEOF_INT128__ * __CHAR_BIT__) - 1)) - 1)
-#endif
-
 #endif
 // same again for __float128:
 #if defined(BOOST_HAS_FLOAT128) && defined(__cplusplus)
@@ -83,5 +75,18 @@ namespace boost { namespace multiprecision {
 #endif
 
 #endif // BOOST_MP_STANDALONE
+
+// Workarounds for numeric limits on old compilers
+#ifdef BOOST_HAS_INT128
+#  ifndef INT128_MAX
+#    define INT128_MAX (__int128) (((unsigned __int128) 1 << ((__SIZEOF_INT128__ * __CHAR_BIT__) - 1)) - 1)
+#  endif
+#  ifndef INT128_MIN
+#    define INT128_MIN (-INT128_MAX - 1)
+#  endif
+#  ifndef UINT128_MAX
+#    define UINT128_MAX ((2 * (unsigned __int128) INT128_MAX) + 1)
+#  endif
+#endif
 
 #endif // BOOST_MP_STANDALONE_CONFIG_HPP
