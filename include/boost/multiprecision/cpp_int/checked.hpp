@@ -6,6 +6,12 @@
 #ifndef BOOST_MP_CPP_INT_CHECKED_HPP
 #define BOOST_MP_CPP_INT_CHECKED_HPP
 
+#include <climits>
+#include <limits>
+#include <type_traits>
+#include <stdexcept>
+#include <string>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 namespace boost { namespace multiprecision { namespace backends { namespace detail {
@@ -41,12 +47,12 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const std::integral_
 {
    if (a > 0)
    {
-      if ((b > 0) && ((integer_traits<A>::const_max - b) < a))
+      if ((b > 0) && (((std::numeric_limits<A>::max)() - b) < a))
          raise_add_overflow();
    }
    else
    {
-      if ((b < 0) && ((integer_traits<A>::const_min - b) > a))
+      if ((b < 0) && (((std::numeric_limits<A>::min)() - b) > a))
          raise_add_overflow();
    }
    return a + b;
@@ -54,7 +60,7 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const std::integral_
 template <class A>
 inline BOOST_MP_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const std::integral_constant<bool, false>&)
 {
-   if ((integer_traits<A>::const_max - b) < a)
+   if (((std::numeric_limits<A>::max)() - b) < a)
       raise_add_overflow();
    return a + b;
 }
@@ -74,12 +80,12 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_subtract_imp(A a, A b, const std::inte
 {
    if (a > 0)
    {
-      if ((b < 0) && ((integer_traits<A>::const_max + b) < a))
+      if ((b < 0) && (((std::numeric_limits<A>::max)() + b) < a))
          raise_subtract_overflow();
    }
    else
    {
-      if ((b > 0) && ((integer_traits<A>::const_min + b) > a))
+      if ((b > 0) && (((std::numeric_limits<A>::min)() + b) > a))
          raise_subtract_overflow();
    }
    return a - b;
@@ -106,8 +112,25 @@ template <class A>
 inline BOOST_MP_CXX14_CONSTEXPR A checked_multiply(A a, A b, const std::integral_constant<int, checked>&)
 {
    BOOST_MP_USING_ABS
-   if (a && (integer_traits<A>::const_max / abs(a) < abs(b)))
+   
+   #ifndef BOOST_HAS_INT128
+   if (a && ((std::numeric_limits<A>::max)() / abs(a) < abs(b)))
       raise_mul_overflow();
+   return a * b;
+   #else
+   BOOST_IF_CONSTEXPR(std::is_same<A, boost::multiprecision::int128_type>::value)
+   {
+      // Older compliers do not provide a specialization for std::numeric_limits<__int128>
+      if (a && (INT128_MAX / abs(a) < abs(b)))
+         raise_mul_overflow();
+   }
+   else
+   {
+      if (a && ((std::numeric_limits<A>::max)() / abs(a) < abs(b)))
+         raise_mul_overflow();
+   }
+   #endif
+
    return a * b;
 }
 template <class A>

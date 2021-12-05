@@ -35,6 +35,11 @@ namespace boost { namespace multiprecision {
    using int128_type = boost::int128_type;
    using uint128_type = boost::uint128_type;
 }}
+
+#ifndef INT128_MAX
+#  define INT128_MAX (__int128) (((unsigned __int128) 1 << ((__SIZEOF_INT128__ * __CHAR_BIT__) - 1)) - 1)
+#endif
+
 #endif
 #if defined(BOOST_HAS_FLOAT128) && defined(__cplusplus)
 namespace boost { namespace multiprecision {
@@ -59,6 +64,11 @@ namespace boost { namespace multiprecision {
    typedef unsigned __int128 uint128_type;
 #  endif
 }}
+
+#ifndef INT128_MAX
+#  define INT128_MAX (__int128) (((unsigned __int128) 1 << ((__SIZEOF_INT128__ * __CHAR_BIT__) - 1)) - 1)
+#endif
+
 #endif
 // same again for __float128:
 #if defined(BOOST_HAS_FLOAT128) && defined(__cplusplus)
