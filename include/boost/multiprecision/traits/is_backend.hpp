@@ -6,6 +6,7 @@
 #ifndef BOOST_MP_IS_BACKEND_HPP
 #define BOOST_MP_IS_BACKEND_HPP
 
+#include <type_traits>
 #include <boost/multiprecision/detail/number_base.hpp>
 
 namespace boost { namespace multiprecision { namespace detail {

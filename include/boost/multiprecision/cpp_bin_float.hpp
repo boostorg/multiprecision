@@ -168,7 +168,7 @@ class cpp_bin_float
    template <class Float>
    cpp_bin_float(const Float& f,
                  typename std::enable_if<
-                     std::is_same<Float, __float128>::value && ((int)bit_count >= 113)>::type const* = 0)
+                     std::is_same<Float, __float128>::value && ((int)bit_count >= 113)>::type const* = nullptr)
        : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
@@ -176,7 +176,7 @@ class cpp_bin_float
    template <class Float>
    explicit cpp_bin_float(const Float& f,
                           typename std::enable_if<
-                              std::is_same<Float, __float128>::value && ((int)bit_count < 113)>::type const* = 0)
+                              std::is_same<Float, __float128>::value && ((int)bit_count < 113)>::type const* = nullptr)
        : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
