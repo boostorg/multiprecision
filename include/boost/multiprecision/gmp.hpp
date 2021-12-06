@@ -16,6 +16,7 @@
 #include <boost/multiprecision/detail/assert.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
+#include <cmath>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:

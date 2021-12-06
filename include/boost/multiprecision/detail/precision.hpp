@@ -150,7 +150,7 @@ struct scoped_default_precision
    //
    unsigned precision() const
    {
-      BOOST_MP_ASSERT("This function should never be called!!" == 0);
+      BOOST_MP_ASSERT("This function should never be called!!" == nullptr);
       return 0;
    }
 };

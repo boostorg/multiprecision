@@ -1405,10 +1405,11 @@ template <class S>
 void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std::ios_base::fmtflags f, bool iszero)
 {
    using size_type = typename S::size_type;
-   bool                          scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
-   bool                          fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
-   bool                          showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
-   bool                          showpos    = (f & std::ios_base::showpos) == std::ios_base::showpos;
+
+   bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
+   bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
+   bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
+   bool showpos    = (f & std::ios_base::showpos) == std::ios_base::showpos;
 
    bool neg = str.size() && (str[0] == '-');
 
@@ -1521,19 +1522,21 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
       str.append(static_cast<std::string::size_type>(1u), 'e');
 
       S e;
+
+      #ifndef BOOST_MP_STANDALONE
+      e = boost::lexical_cast<S>(abs(my_exp));
+      #else
       BOOST_IF_CONSTEXPR(std::is_same<S, std::string>::value)
       {
          e = std::to_string(abs(my_exp));
       }
       else
       {
-         #ifndef BOOST_MP_STANDALONE
-         e = boost::lexical_cast<S>(abs(my_exp));
-         #else
-         static_assert(sizeof(S) == 1, "String type provided cannot be use with standalone mode");
-         #endif
+         const std::string str_local_exp = std::to_string(abs(my_exp));
+         e = S(str_local_exp.cbegin(), str_local_exp.cend());
       }
-      
+      #endif
+
       if (e.size() < BOOST_MP_MIN_EXPONENT_DIGITS)
          e.insert(static_cast<std::string::size_type>(0), BOOST_MP_MIN_EXPONENT_DIGITS - e.size(), '0');
       if (my_exp < 0)
