@@ -121,22 +121,6 @@ inline BOOST_MP_CXX14_CONSTEXPR limb_type block_multiplier(unsigned count)
 // Can't do formatted IO on an __int128
 #define BOOST_MP_NO_DOUBLE_LIMB_TYPE_IO
 
-// Need to specialise integer_traits for __int128 as it's not a normal native type:
-} // namespace multiprecision
-
-template <>
-class integer_traits<multiprecision::double_limb_type>
-    : public std::numeric_limits<multiprecision::double_limb_type>,
-      public detail::integer_traits_base<multiprecision::double_limb_type, 0, ~static_cast<multiprecision::double_limb_type>(0)>
-{};
-template <>
-class integer_traits<multiprecision::signed_double_limb_type>
-    : public std::numeric_limits<multiprecision::signed_double_limb_type>,
-      public detail::integer_traits_base<multiprecision::signed_double_limb_type, static_cast<multiprecision::signed_double_limb_type>((static_cast<multiprecision::double_limb_type>(1) << 127)), static_cast<multiprecision::signed_double_limb_type>(((~static_cast<multiprecision::double_limb_type>(0)) >> 1))>
-{};
-
-namespace multiprecision {
-
 #else
 
 using limb_type = detail::largest_unsigned_type<32>::type;
