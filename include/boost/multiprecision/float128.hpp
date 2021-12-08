@@ -6,6 +6,15 @@
 #ifndef BOOST_MP_FLOAT128_HPP
 #define BOOST_MP_FLOAT128_HPP
 
+// https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+#if !defined(__amd64__) && !defined(__amd64) && !defined(__x86_64__) && !defined(__x86_64) && !defined(_M_X64) && !defined(_M_AMD64) && \
+    !defined(i386) && !defined(__i386) && !defined(__i386__) && !defined(_M_IX86) && !defined(__X86__) && !defined(_X86_) && !defined(__I86__) && \
+    !defined(__ia64__) && !defined(_IA64) && !defined(__IA64__) && !defined(__ia64) && !defined(_M_IA64) && !defined(__itanium__) && \
+    !defined(__hppa__) && !defined(__HPPA__) && !defined(__hppa) && \
+    !defined(__powerpc) && !defined(_M_PPC) && !defined(_ARCH_PPC) && !defined(_ARCH_PPC64) && !defined(__PPCBROADWAY__)
+#error libquadmath only works on on i386, x86_64, IA-64, and hppa HP-UX, as well as on PowerPC GNU/Linux targets that enable the vector scalar (VSX) instruction set.
+#endif
+
 #include <tuple>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
