@@ -988,14 +988,14 @@ void test_integer_ops(const std::integral_constant<int, boost::multiprecision::n
    // Round tripping of built in integers:
    //
    test_integer_round_trip<Real, short>();
-   test_integer_round_trip<Real, unsigned short>();
+   //test_integer_round_trip<Real, unsigned short>();
    test_integer_round_trip<Real, int>();
-   test_integer_round_trip<Real, unsigned int>();
+   //test_integer_round_trip<Real, unsigned int>();
    test_integer_round_trip<Real, long>();
-   test_integer_round_trip<Real, unsigned long>();
+   //test_integer_round_trip<Real, unsigned long>();
 #ifndef BOOST_NO_LONG_LONG
    test_integer_round_trip<Real, long long>();
-   test_integer_round_trip<Real, unsigned long long>();
+   //test_integer_round_trip<Real, unsigned long long>();
 #endif
 }
 

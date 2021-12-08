@@ -1193,6 +1193,17 @@ test-suite standalone :
                 [ check-target-builds ../config//has_gmp : : <build>no ]
                 release  # otherwise [ runtime is too slow!!
       ]
+
+      [ run standalone_test_convert_from_tom_int.cpp
+              : # command line
+              : # input files
+              : # requirements
+              [ check-target-builds ../config//has_gmp : <define>HAS_GMP <source>gmp : ]
+              [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR <source>gmp <source>mpfr : ]
+              [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI <source>gmp <source>mpfr <source>mpfi : ]
+              [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH <source>tommath : ]
+               [ check-target-builds ../config//has_float128 : <define>HAS_FLOAT128 <source>quadmath : ] 
+              ]
 ;
 
 #
