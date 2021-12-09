@@ -549,15 +549,6 @@ void test_float_type()
    example15<Num>();
    example16<Num>();
    example17<Num>();
-   /*
-   example18<Num>();
-   example19<Num>();
-   example20<Num>();
-   example21<Num>();
-   example22<Num>();
-   example23<Num>();
-   example24<Num>();
-   */
 }
 
 template <class Num>
@@ -573,10 +564,6 @@ void test_float_type_2()
    example19<Num>();
    example20<Num>();
    example21<Num>();
-
-   //example22<Num>();
-   //example23<Num>();
-   //example24<Num>();
 }
 
 template <class Num>
