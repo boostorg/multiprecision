@@ -552,6 +552,7 @@ test-suite conversions :
 
    [ run test_test.cpp ]
    [ run test_cpp_int_lit.cpp no_eh_support ]
+   [ run test_convert_cpp_int_2_float.cpp no_eh_support ]
 
       #
       # Interconversion tests:
@@ -1165,6 +1166,7 @@ test-suite misc :
       [ run test_eigen_interop_mpfr_3.cpp mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpfr : : <build>no ] ]
       [ run test_eigen_interop_gmp.cpp gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_gmp : : <build>no ] ]
       [ run test_eigen_interop_mpc.cpp mpc mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpc : : <build>no ] ]
+      [ run git_issue_393.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
 ;
 
 test-suite standalone :
