@@ -552,6 +552,7 @@ test-suite conversions :
 
    [ run test_test.cpp ]
    [ run test_cpp_int_lit.cpp no_eh_support ]
+   [ run test_convert_cpp_int_2_float.cpp no_eh_support ]
 
       #
       # Interconversion tests:
