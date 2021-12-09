@@ -22,12 +22,19 @@ struct has_member_const_iterator
 };
 
 
-template <class C, bool b>
-struct is_byte_container_imp
+template <class C, class Iterator>
+struct is_byte_container_imp_2
 {
-   // Note: Don't use C::value_type as this is a rather widespread typedef, even for non-range types
    using container_value_type = typename std::remove_cv<typename std::iterator_traits<typename C::const_iterator>::value_type>::type;
    static constexpr const bool value = boost::multiprecision::detail::is_integral<container_value_type>::value && (sizeof(container_value_type) == 1);
+};
+template <class C>
+struct is_byte_container_imp_2<C, void> : public boost::false_type
+{};
+
+template <class C, bool b>
+struct is_byte_container_imp : public is_byte_container_imp_2<C, typename C::const_iterator>
+{
 };
 
 template <class C>
