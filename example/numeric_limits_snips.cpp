@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
   typedef double T;
 
   bool denorm = std::numeric_limits<T>::denorm_min() < (std::numeric_limits<T>::min)();
-  BOOST_ASSERT(denorm);
+  BOOST_MP_ASSERT(denorm);
 
 //] [/max_digits10_6]
   }
@@ -432,10 +432,10 @@ Then we can equally well use a multiprecision type cpp_bin_float_quad:
     ss.imbue(new_locale);
     T inf = std::numeric_limits<T>::infinity();
     ss << inf; // Write out.
-   BOOST_ASSERT(ss.str() == "inf");
+   BOOST_MP_ASSERT(ss.str() == "inf");
     T r;
     ss >> r; // Read back in.
-    BOOST_ASSERT(inf == r); // Confirms that the floating-point values really are identical.
+    BOOST_MP_ASSERT(inf == r); // Confirms that the floating-point values really are identical.
     std::cout << "infinity output was " << ss.str() << std::endl;
     std::cout << "infinity input was " << r << std::endl;
   }
@@ -456,7 +456,7 @@ Similarly we can do the same with NaN (except that we cannot use `assert` (becau
     T n;
     T NaN = std::numeric_limits<T>::quiet_NaN();
     ss << NaN; // Write out.
-    BOOST_ASSERT(ss.str() == "nan");
+    BOOST_MP_ASSERT(ss.str() == "nan");
     std::cout << "NaN output was " << ss.str() << std::endl;
     ss >> n; // Read back in.
     std::cout << "NaN input was " << n << std::endl;

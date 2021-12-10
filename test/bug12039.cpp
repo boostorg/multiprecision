@@ -32,7 +32,7 @@ int main()
    long_ext_float_t lf(1);
    lf += std::numeric_limits<long_ext_float_t>::epsilon();
    lf += std::numeric_limits<float>::epsilon() / 2;
-   BOOST_ASSERT(lf != 1);
+   BOOST_MP_ASSERT(lf != 1);
    float f3 = lf.convert_to<float>();
    std::cout << std::setprecision(9) << f3 << std::endl;
 

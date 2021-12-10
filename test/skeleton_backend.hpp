@@ -1192,11 +1192,11 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::skeleton
    // Fixed N-digit precision, return reference to internal/cached object:
    //
    template <int N>
-   static inline const result_type& get(const boost::integral_constant<int, N>&);
+   static inline const result_type& get(const std::integral_constant<int, N>&);
    //
    // Variable precision, returns fresh result each time (unless precision is unchanged from last call):
    //
-   static inline const result_type  get(const boost::integral_constant<int, 0>&);
+   static inline const result_type  get(const std::integral_constant<int, 0>&);
 };
 //
 // Plus any other constants supported natively by this type....
