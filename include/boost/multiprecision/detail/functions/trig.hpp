@@ -13,6 +13,7 @@
 //
 
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -264,8 +265,8 @@ void eval_sin(T& result, const T& x)
 
       BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
       BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
-      BOOST_ASSERT(xx.compare(half_pi) <= 0);
-      BOOST_ASSERT(xx.compare(ui_type(0)) >= 0);
+      BOOST_MP_ASSERT(xx.compare(half_pi) <= 0);
+      BOOST_MP_ASSERT(xx.compare(ui_type(0)) >= 0);
    }
 
    t = half_pi;
@@ -421,7 +422,7 @@ void eval_cos(T& result, const T& x)
       }
       else
       {
-         BOOST_ASSERT(t.compare(ui_type(3)) == 0);
+         BOOST_MP_ASSERT(t.compare(ui_type(3)) == 0);
       }
 
       if (b_go_down)
@@ -458,8 +459,8 @@ void eval_cos(T& result, const T& x)
          eval_subtract(xx, half_pi, xx);
          eval_ldexp(half_pi, half_pi, -1);
       }
-      BOOST_ASSERT(xx.compare(half_pi) <= 0);
-      BOOST_ASSERT(xx.compare(ui_type(0)) >= 0);
+      BOOST_MP_ASSERT(xx.compare(half_pi) <= 0);
+      BOOST_MP_ASSERT(xx.compare(ui_type(0)) >= 0);
    }
    else
    {

@@ -8,6 +8,7 @@
 #define BOOST_MP_ADD_UNSIGNED_ADDC_32_HPP
 
 #include <boost/multiprecision/cpp_int/intel_intrinsics.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 namespace boost { namespace multiprecision { namespace backends {
 
@@ -155,7 +156,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned_constexpr(CppInt1& result
    // Any remaining digits are the same as those in pa:
    if ((x != i) && (pa != pr))
       std_constexpr::copy(pa + i, pa + x, pr + i);
-   BOOST_ASSERT(0 == borrow);
+   BOOST_MP_ASSERT(0 == borrow);
 
    //
    // We may have lost digits, if so update limb usage count:
@@ -348,7 +349,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned(CppInt1& result, const Cp
       // Any remaining digits are the same as those in pa:
       if ((x != i) && (pa != pr))
          std_constexpr::copy(pa + i, pa + x, pr + i);
-      BOOST_ASSERT(0 == borrow);
+      BOOST_MP_ASSERT(0 == borrow);
 
       //
       // We may have lost digits, if so update limb usage count:

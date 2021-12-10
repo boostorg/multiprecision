@@ -6,22 +6,26 @@
 #ifndef BOOST_MATH_BIG_NUM_BASE_HPP
 #define BOOST_MATH_BIG_NUM_BASE_HPP
 
+#include <climits>
+#include <ios>
+#include <string>
 #include <limits>
 #include <type_traits>
+#include <stdexcept>
 #include <boost/math/tools/complex.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/traits/transcendental_reduction_type.hpp>
 #include <boost/multiprecision/traits/std_integer_traits.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4307)
-#endif
-#include <boost/lexical_cast.hpp>
-#ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 
 #ifndef BOOST_MP_STANDALONE
+#include <boost/lexical_cast.hpp>
 #include <boost/core/nvp.hpp>
 #endif
 
@@ -90,7 +94,9 @@
 // Thread local storage:
 // Note fails on Mingw, see https://sourceforge.net/p/mingw-w64/bugs/527/
 //
-#if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !(defined(__MINGW32__) && (__GNUC__ < 9) && !defined(__clang__))
+#if defined(BOOST_NO_CXX11_THREAD_LOCAL)
+#define BOOST_MP_THREAD_LOCAL
+#elif !(defined(__MINGW32__) && (defined(__GNUC__) && (__GNUC__ < 9)) && !defined(__clang__))
 #define BOOST_MP_THREAD_LOCAL thread_local
 #define BOOST_MP_USING_THREAD_LOCAL
 #else
@@ -250,13 +256,13 @@ struct is_compatible_arithmetic_type
 
 namespace detail {
 //
-// Workaround for missing abs(boost::long_long_type) and abs(__int128) on some compilers:
+// Workaround for missing abs(long long) and abs(__int128) on some compilers:
 //
 template <class T>
 constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), T>::type abs(T t) noexcept
 {
    // This strange expression avoids a hardware trap in the corner case
-   // that val is the most negative value permitted in boost::long_long_type.
+   // that val is the most negative value permitted in long long.
    // See https://svn.boost.org/trac/boost/ticket/9740.
    return t < 0 ? T(1u) + T(-(t + 1)) : t;
 }
@@ -272,7 +278,7 @@ template <class T>
 constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), typename boost::multiprecision::detail::make_unsigned<T>::type>::type unsigned_abs(T t) noexcept
 {
    // This strange expression avoids a hardware trap in the corner case
-   // that val is the most negative value permitted in boost::long_long_type.
+   // that val is the most negative value permitted in long long.
    // See https://svn.boost.org/trac/boost/ticket/9740.
    return t < 0 ? static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(1u) + static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(-(t + 1)) : static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(t);
 }
@@ -524,7 +530,7 @@ struct arg_type<expression<Tag, Arg1, Arg2, Arg3, Arg4> >
 
 struct unmentionable
 {
-   unmentionable* proc() { return 0; }
+   unmentionable* proc() { return nullptr; }
 };
 
 typedef unmentionable* (unmentionable::*unmentionable_type)();
@@ -1399,10 +1405,11 @@ template <class S>
 void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std::ios_base::fmtflags f, bool iszero)
 {
    using size_type = typename S::size_type;
-   bool                          scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
-   bool                          fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
-   bool                          showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
-   bool                          showpos    = (f & std::ios_base::showpos) == std::ios_base::showpos;
+
+   bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
+   bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
+   bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
+   bool showpos    = (f & std::ios_base::showpos) == std::ios_base::showpos;
 
    bool neg = str.size() && (str[0] == '-');
 
@@ -1513,7 +1520,23 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
       if (showpoint || (str.size() > 1))
          str.insert(static_cast<std::string::size_type>(1u), 1, '.');
       str.append(static_cast<std::string::size_type>(1u), 'e');
-      S e = boost::lexical_cast<S>(abs(my_exp));
+
+      S e;
+
+      #ifndef BOOST_MP_STANDALONE
+      e = boost::lexical_cast<S>(abs(my_exp));
+      #else
+      BOOST_IF_CONSTEXPR(std::is_same<S, std::string>::value)
+      {
+         e = std::to_string(abs(my_exp));
+      }
+      else
+      {
+         const std::string str_local_exp = std::to_string(abs(my_exp));
+         e = S(str_local_exp.cbegin(), str_local_exp.cend());
+      }
+      #endif
+
       if (e.size() < BOOST_MP_MIN_EXPONENT_DIGITS)
          e.insert(static_cast<std::string::size_type>(0), BOOST_MP_MIN_EXPONENT_DIGITS - e.size(), '0');
       if (my_exp < 0)
@@ -1601,15 +1624,15 @@ struct number_category<detail::expression<tag, A1, A2, A3, A4> > : public number
 //
 #ifdef BOOST_HAS_INT128
 template <>
-struct number_category<boost::int128_type> : public std::integral_constant<int, number_kind_integer>
+struct number_category<boost::multiprecision::int128_type> : public std::integral_constant<int, number_kind_integer>
 {};
 template <>
-struct number_category<boost::uint128_type> : public std::integral_constant<int, number_kind_integer>
+struct number_category<boost::multiprecision::uint128_type> : public std::integral_constant<int, number_kind_integer>
 {};
 #endif
 #ifdef BOOST_HAS_FLOAT128
 template <>
-struct number_category<__float128> : public std::integral_constant<int, number_kind_floating_point>
+struct number_category<boost::multiprecision::float128_type> : public std::integral_constant<int, number_kind_floating_point>
 {};
 #endif
 

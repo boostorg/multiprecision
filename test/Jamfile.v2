@@ -552,6 +552,7 @@ test-suite conversions :
 
    [ run test_test.cpp ]
    [ run test_cpp_int_lit.cpp no_eh_support ]
+   [ run test_convert_cpp_int_2_float.cpp no_eh_support ]
 
       #
       # Interconversion tests:
@@ -954,14 +955,6 @@ test-suite misc :
                [ check-target-builds ../config//has_gmp : : <build>no ]
                release  # otherwise [ runtime is too slow!!
                ]
-        
-      [ run test_miller_rabin_standalone.cpp no_eh_support gmp
-              : # command line
-              : # input files
-              : # requirements
-               [ check-target-builds ../config//has_gmp : : <build>no ]
-               release  # otherwise [ runtime is too slow!!
-               ]
 
       [ run test_rational_io.cpp $(TOMMATH) no_eh_support
               : # command line
@@ -1180,11 +1173,50 @@ test-suite misc :
       [ compile git_issue_393.cpp : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
 ;
 
-alias eigen_tests : test_eigen_interop_cpp_int test_eigen_interop_cpp_dec_float test_eigen_interop_cpp_dec_float_2 test_eigen_interop_cpp_dec_float_3
-test_eigen_interop_cpp_bin_float_1 test_eigen_interop_cpp_bin_float_2 test_eigen_interop_cpp_bin_float_3 test_eigen_interop_mpfr_1
-test_eigen_interop_mpfr_2 test_eigen_interop_mpfr_3 test_eigen_interop_mpfr_4 test_eigen_interop_mpfr_5 test_eigen_interop_mpfr_6 
-test_eigen_interop_gmp test_eigen_interop_gmp_2 test_eigen_interop_mpc git_issue_393 ;
+alias eigen_tests : 
+    test_eigen_interop_cpp_int test_eigen_interop_cpp_dec_float test_eigen_interop_cpp_dec_float_2 test_eigen_interop_cpp_dec_float_3
+    test_eigen_interop_cpp_bin_float_1 test_eigen_interop_cpp_bin_float_2 test_eigen_interop_cpp_bin_float_3 test_eigen_interop_mpfr_1
+    test_eigen_interop_mpfr_2 test_eigen_interop_mpfr_3 test_eigen_interop_mpfr_4 test_eigen_interop_mpfr_5 test_eigen_interop_mpfr_6 
+    test_eigen_interop_gmp test_eigen_interop_gmp_2 test_eigen_interop_mpc git_issue_393 ;
 
+test-suite standalone :
+
+      [ run standalone_constexpr_test_cpp_int.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+      [ compile standalone_constexpr_test_float128.cpp : 
+         [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_float128 : <source>quadmath : <build>no ] ]
+
+      [ run standalone_test_arithmetic_ab.cpp no_eh_support ]
+      
+      [ run standalone_test_arithmetic_complex128.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
+      [ run standalone_test_arithmetic_cpp_bin_float.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj ]
+      [ run standalone_test_arithmetic_cpp_dec_float.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj ]
+      [ run standalone_test_arithmetic_cpp_int.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+      [ run standalone_test_arithmetic_int512.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+      [ run standalone_test_arithmetic_cpp_rational.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
+      [ run standalone_test_arithmetic_tommath.cpp $(TOMMATH) no_eh_support : : : [ check-target-builds ../config//has_tommath : : <build>no ] ]
+      [ run standalone_test_arithmetic_float_128.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ]
+      [ run standalone_test_arithmetic_gmp.cpp gmp no_eh_support : : : [ check-target-builds ../config//has_gmp : : <build>no ] ]
+      [ run standalone_test_arithmetic_mpf_logged_adptr.cpp gmp : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_gmp : : <build>no ]  ]
+
+      [ run standalone_test_miller_rabin.cpp no_eh_support gmp
+                : # command line
+                : # input files
+                : # requirements
+                [ check-target-builds ../config//has_gmp : : <build>no ]
+                release  # otherwise [ runtime is too slow!!
+      ]
+
+      [ run standalone_test_convert_from_tom_int.cpp
+              : # command line
+              : # input files
+              : # requirements
+              [ check-target-builds ../config//has_gmp : <define>HAS_GMP <source>gmp : ]
+              [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR <source>gmp <source>mpfr : ]
+              [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI <source>gmp <source>mpfr <source>mpfi : ]
+              [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH <source>tommath : ]
+               [ check-target-builds ../config//has_float128 : <define>HAS_FLOAT128 <source>quadmath : ] 
+              ]
+;
 
 #
 # This take too long to run as a regular part of the tests:

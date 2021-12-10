@@ -173,13 +173,63 @@ template <class R, unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignTy
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_floating_point<R>::value && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value, void>::type
 eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& backend) noexcept(boost::multiprecision::detail::is_arithmetic<R>::value)
 {
-   typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::const_limb_pointer p     = backend.limbs();
-   unsigned                                                                                          shift = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
-   *result                                                                                                 = static_cast<R>(*p);
-   for (unsigned i = 1; i < backend.size(); ++i)
+   if (eval_is_zero(backend))
    {
-      *result += static_cast<R>(std::ldexp(static_cast<long double>(p[i]), shift));
-      shift += cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
+      *result = 0.0f;
+      return;
+   }
+
+   std::ptrdiff_t bits_to_keep = std::numeric_limits<R>::digits;
+   std::ptrdiff_t bits = eval_msb_imp(backend) + 1;
+
+   if (bits > bits_to_keep)
+   {
+      // Extract the bits we need, and then manually round the result:
+      *result = 0.0f;
+      typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::const_limb_pointer p = backend.limbs();
+      limb_type mask = ~static_cast<limb_type>(0u);
+      std::size_t index = backend.size() - 1;
+      std::size_t shift = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits * index;
+      while (bits_to_keep > 0)
+      {
+         if (bits_to_keep < cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
+         {
+            if(index != backend.size() - 1)
+               mask <<= cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - bits_to_keep;
+            else
+            {
+               std::ptrdiff_t bits_in_first_limb = bits % cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
+               if (bits_in_first_limb == 0)
+                  bits_in_first_limb = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
+               if (bits_in_first_limb > bits_to_keep)
+                  mask <<= bits_in_first_limb - bits_to_keep;
+            }
+         }
+         *result += std::ldexp(static_cast<R>(p[index] & mask), (int)shift);
+         shift -= cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
+         bits_to_keep -= (index == backend.size() - 1) && (bits % cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
+            ? bits % cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits 
+            : cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
+         --index;
+      }
+      // Perform rounding:
+      bits -= 1 + std::numeric_limits<R>::digits;
+      if (eval_bit_test(backend, (unsigned)bits))
+      {
+         if ((eval_lsb_imp(backend) < bits) || eval_bit_test(backend, (unsigned)(bits + 1)))
+            *result = boost::math::float_next(*result);
+      }
+   }
+   else
+   {
+      typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::const_limb_pointer p = backend.limbs();
+      unsigned                                                                                          shift = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
+      *result = static_cast<R>(*p);
+      for (unsigned i = 1; i < backend.size(); ++i)
+      {
+         *result += static_cast<R>(std::ldexp(static_cast<long double>(p[i]), shift));
+         shift += cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
+      }
    }
    if (backend.sign())
       *result = -*result;
@@ -210,18 +260,8 @@ eval_abs(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& r
 //
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value, unsigned>::type
-eval_lsb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a)
+eval_lsb_imp(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a)
 {
-   using default_ops::eval_get_sign;
-   if (eval_get_sign(a) == 0)
-   {
-      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
-   }
-   if (a.sign())
-   {
-      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
-   }
-
    //
    // Find the index of the least significant limb that is non-zero:
    //
@@ -234,6 +274,22 @@ eval_lsb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
    unsigned result = boost::multiprecision::detail::find_lsb(a.limbs()[index]);
 
    return result + index * cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value, unsigned>::type
+eval_lsb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a)
+{
+   using default_ops::eval_get_sign;
+   if (eval_get_sign(a) == 0)
+   {
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+   }
+   if (a.sign())
+   {
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+   }
+   return eval_lsb_imp(a);
 }
 
 //
@@ -1335,7 +1391,7 @@ inline BOOST_CXX14_CONSTEXPR T constexpr_lcm(T a, T b) noexcept
 #else
 
 template <typename T>
-inline BOOST_CXX14_CONSTEXPR constexpr_gcd(T a, T b) noexcept
+inline BOOST_CXX14_CONSTEXPR T constexpr_gcd(T a, T b) noexcept
 {
    return boost::multiprecision::backends::eval_gcd(a, b);
 }

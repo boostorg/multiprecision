@@ -6,6 +6,7 @@
 #ifndef BOOST_MP_IS_BACKEND_HPP
 #define BOOST_MP_IS_BACKEND_HPP
 
+#include <type_traits>
 #include <boost/multiprecision/detail/number_base.hpp>
 
 namespace boost { namespace multiprecision { namespace detail {
@@ -14,7 +15,7 @@ template <class T>
 struct has_signed_types
 {
    template <class U>
-   static double check(U*, typename U::signed_types* = 0);
+   static double check(U*, typename U::signed_types* = nullptr);
    static char   check(...);
    static T* get();
    static constexpr bool value = sizeof(check(get())) == sizeof(double);
@@ -23,7 +24,7 @@ template <class T>
 struct has_unsigned_types
 {
    template <class U>
-   static double check(U*, typename U::unsigned_types* = 0);
+   static double check(U*, typename U::unsigned_types* = nullptr);
    static char   check(...);
    static T* get();
    static constexpr bool value = sizeof(check(get())) == sizeof(double);
@@ -32,7 +33,7 @@ template <class T>
 struct has_float_types
 {
    template <class U>
-   static double check(U*, typename U::float_types* = 0);
+   static double check(U*, typename U::float_types* = nullptr);
    static char   check(...);
    static T* get();
    static constexpr bool value = sizeof(check(get())) == sizeof(double);

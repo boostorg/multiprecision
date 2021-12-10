@@ -14,12 +14,18 @@
 #include <boost/multiprecision/traits/is_restricted_conversion.hpp>
 #include <boost/multiprecision/traits/is_complex.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/number_base.hpp>
 #include <istream> // stream operators
 #include <cstdio>  // EOF
 #include <cctype>  // isspace
 #include <functional>  // std::hash
+#include <type_traits>
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
 #include <string_view>
+#endif
+
+#ifndef BOOST_MP_STANDALONE
+#include <boost/core/nvp.hpp>
 #endif
 
 namespace boost {
@@ -51,13 +57,13 @@ class number
 #ifdef BOOST_HAS_FLOAT128
                                                                         && !std::is_same<V, __float128>::value
 #endif
-                                               >::type* = 0)
+                                               >::type* = nullptr)
    {
       m_backend = canonical_value(v);
    }
    template <class V>
    BOOST_MP_FORCEINLINE constexpr number(const V& v, typename std::enable_if<
-                                                         std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
+                                                         std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = nullptr)
 #ifndef BOOST_INTEL
        noexcept(noexcept(Backend(std::declval<typename detail::canonical<V, Backend>::type const&>())))
 #endif
@@ -68,7 +74,7 @@ class number
 #ifdef BOOST_HAS_FLOAT128
                                                                                                 && !std::is_same<V, __float128>::value
 #endif
-                                                                                                          >::type* = 0)
+                                                                                                          >::type* = nullptr)
        : m_backend(canonical_value(v), digits10)
    {}
    //
@@ -80,7 +86,7 @@ class number
       constexpr 
 #endif
       number(const V& v, typename std::enable_if<
-      std::is_enum<V>::value && std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
+      std::is_enum<V>::value && std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = nullptr)
       : number(static_cast<typename std::underlying_type<V>::type>(v))
    {}
    //
@@ -92,7 +98,7 @@ class number
        constexpr
 #endif
        number(const V& v, typename std::enable_if<
-      std::is_enum<V>::value && !std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
+      std::is_enum<V>::value && !std::is_convertible<V, int>::value && !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = nullptr)
       : number(static_cast<typename std::underlying_type<V>::type>(v))
    {}
 
@@ -101,18 +107,18 @@ class number
        : m_backend(e.m_backend, digits10) {}
    template <class V>
    explicit BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const V& v, typename std::enable_if<
-                                                                                 (boost::multiprecision::detail::is_arithmetic<V>::value || std::is_same<std::string, V>::value || std::is_convertible<V, const char*>::value) && !detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
+                                                                                 (boost::multiprecision::detail::is_arithmetic<V>::value || std::is_same<std::string, V>::value || std::is_convertible<V, const char*>::value) && !detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = nullptr)
        noexcept(noexcept(std::declval<Backend&>() = std::declval<typename detail::canonical<V, Backend>::type const&>()))
    {
       m_backend = canonical_value(v);
    }
    template <class V>
    explicit BOOST_MP_FORCEINLINE constexpr number(const V& v, typename std::enable_if<
-                                                                  detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && (detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value || !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value)>::type* = 0)
+                                                                  detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && (detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value || !std::is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value)>::type* = nullptr)
        noexcept(noexcept(Backend(std::declval<typename detail::canonical<V, Backend>::type const&>())))
        : m_backend(canonical_value(v)) {}
    template <class V>
-   explicit BOOST_MP_FORCEINLINE constexpr number(const V& v, unsigned digits10, typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<V>::value || std::is_same<std::string, V>::value || std::is_convertible<V, const char*>::value) && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_complex) && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational)>::type* = 0)
+   explicit BOOST_MP_FORCEINLINE constexpr number(const V& v, unsigned digits10, typename std::enable_if<(boost::multiprecision::detail::is_arithmetic<V>::value || std::is_same<std::string, V>::value || std::is_convertible<V, const char*>::value) && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_complex) && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational)>::type* = nullptr)
        : m_backend(canonical_value(v), digits10) {}
 
    template <expression_template_option ET>
@@ -121,13 +127,13 @@ class number
 
    template <class Other, expression_template_option ET>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const number<Other, ET>& val,
-                                                        typename std::enable_if<(std::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0)
+                                                        typename std::enable_if<(std::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = nullptr)
        noexcept(noexcept(Backend(std::declval<Other const&>())))
        : m_backend(val.backend()) {}
 
    template <class Other, expression_template_option ET>
    explicit BOOST_MP_CXX14_CONSTEXPR number(const number<Other, ET>& val, typename std::enable_if<
-                                                     (!detail::is_explicitly_convertible<Other, Backend>::value)>::type* = 0)
+                                                     (!detail::is_explicitly_convertible<Other, Backend>::value)>::type* = nullptr)
    {
       //
       // Attempt a generic interconvertion:
@@ -149,7 +155,7 @@ class number
    }
    template <class Other, expression_template_option ET>
    explicit BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const number<Other, ET>& val, typename std::enable_if<
-                                                                                                   (detail::is_explicitly_convertible<Other, Backend>::value && (detail::is_restricted_conversion<Other, Backend>::value || !std::is_convertible<Other, Backend>::value))>::type* = 0) noexcept(noexcept(Backend(std::declval<Other const&>())))
+                                                                                                   (detail::is_explicitly_convertible<Other, Backend>::value && (detail::is_restricted_conversion<Other, Backend>::value || !std::is_convertible<Other, Backend>::value))>::type* = nullptr) noexcept(noexcept(Backend(std::declval<Other const&>())))
        : m_backend(val.backend()) {}
 
    template <class V, class U>
@@ -158,8 +164,8 @@ class number
          (std::is_convertible<V, value_type>::value
             && std::is_convertible<U, value_type>::value
             && !std::is_same<value_type, self_type>::value
-            && std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
-            && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = 0)
+            && std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
+            && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = nullptr)
       : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)))
    {
    }
@@ -169,8 +175,8 @@ class number
          (std::is_convertible<V, value_type>::value
             && std::is_convertible<U, value_type>::value
             && !std::is_same<value_type, self_type>::value
-            && std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
-            && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = 0)
+            && std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
+            && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = nullptr)
       : m_backend(canonical_value(detail::evaluate_if_expression(static_cast<V&&>(v1))), canonical_value(detail::evaluate_if_expression(v2)))
    {
    }
@@ -180,8 +186,8 @@ class number
       (std::is_convertible<V, value_type>::value
          && std::is_convertible<U, value_type>::value
          && !std::is_same<value_type, self_type>::value
-         && std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
-         && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = 0)
+         && std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
+         && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = nullptr)
       : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(static_cast<U&&>(v2))))
    {
    }
@@ -191,8 +197,8 @@ class number
       (std::is_convertible<V, value_type>::value
          && std::is_convertible<U, value_type>::value
          && !std::is_same<value_type, self_type>::value
-         && std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
-         && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = 0)
+         && std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
+         && !boost::multiprecision::detail::is_variable_precision<Backend>::value)>::type* = nullptr)
       : m_backend(canonical_value(detail::evaluate_if_expression(static_cast<V&&>(v1))), canonical_value(detail::evaluate_if_expression(static_cast<U&&>(v2))))
    {
    }
@@ -202,8 +208,8 @@ class number
          (std::is_convertible<V, value_type>::value 
             && std::is_convertible<U, value_type>::value 
             && !std::is_same<value_type, self_type>::value
-            && (!std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
-               || boost::multiprecision::detail::is_variable_precision<Backend>::value))>::type* = 0)
+            && (!std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const V&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const U&>()))>::type>::type, Backend>::type const&>::value
+               || boost::multiprecision::detail::is_variable_precision<Backend>::value))>::type* = nullptr)
    {
       using default_ops::assign_components;
       // Copy precision options from this type to component_type:
@@ -216,7 +222,7 @@ class number
    template <class V, class U>
    BOOST_MP_FORCEINLINE explicit BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2,
                                         typename std::enable_if<
-                                                                     (std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<value_type, self_type>::value && !std::is_same<V, self_type>::value && !(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value)>::type* = 0)
+                                                                     (std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<value_type, self_type>::value && !std::is_same<V, self_type>::value && !(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value)>::type* = nullptr)
    {
       using default_ops::assign_components;
       // Copy precision options from this type to component_type:
@@ -256,12 +262,12 @@ class number
 
    template <class V, class U>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2, unsigned digits10,
-                                                        typename std::enable_if<(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value && !std::is_same<value_type, self_type>::value)>::type* = 0)
+                                                        typename std::enable_if<(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value && !std::is_same<value_type, self_type>::value)>::type* = nullptr)
        : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)), digits10)
    {}
    template <class V, class U>
    BOOST_MP_FORCEINLINE explicit BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2, unsigned digits10,
-                                                                 typename std::enable_if<((std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<value_type, self_type>::value) && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
+                                                                 typename std::enable_if<((std::is_constructible<value_type, V>::value || std::is_convertible<V, std::string>::value) && (std::is_constructible<value_type, U>::value || std::is_convertible<U, std::string>::value) && !std::is_same<value_type, self_type>::value) && !(std::is_convertible<V, value_type>::value && std::is_convertible<U, value_type>::value)>::type* = nullptr)
        : m_backend(detail::evaluate_if_expression(v1), detail::evaluate_if_expression(v2), digits10) {}
 
    template <class Other, expression_template_option ET>
@@ -270,7 +276,7 @@ class number
       const number<Other, ET>& v2, 
       typename std::enable_if<
          std::is_convertible<Other, Backend>::value 
-         && (!std::is_constructible<Backend, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const number<Other, ET>&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename remove_cv<typename remove_reference<decltype(detail::evaluate_if_expression(std::declval<const number<Other, ET>&>()))>::type>::type, Backend>::type const&>::value || boost::multiprecision::detail::is_variable_precision<Backend>::value) >::type* = 0)
+         && (!std::is_constructible<Backend, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const number<Other, ET>&>()))>::type>::type, Backend>::type const&, typename detail::canonical<typename std::remove_cv<typename std::remove_reference<decltype(detail::evaluate_if_expression(std::declval<const number<Other, ET>&>()))>::type>::type, Backend>::type const&>::value || boost::multiprecision::detail::is_variable_precision<Backend>::value) >::type* = nullptr)
    {
       using default_ops::assign_components;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2);
@@ -411,7 +417,7 @@ class number
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   BOOST_MP_CXX14_CONSTEXPR number(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, typename std::enable_if<std::is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value>::type* = 0)
+   BOOST_MP_CXX14_CONSTEXPR number(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, typename std::enable_if<std::is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value>::type* = nullptr)
    {
       //
       // No preicsion guard here, we already have one in operator=
@@ -420,7 +426,7 @@ class number
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    explicit BOOST_MP_CXX14_CONSTEXPR number(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e,
-                                            typename std::enable_if<!std::is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value && boost::multiprecision::detail::is_explicitly_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value>::type* = 0)
+                                            typename std::enable_if<!std::is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value && boost::multiprecision::detail::is_explicitly_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value>::type* = nullptr)
    {
       //
       // No precision guard as assign has one already:
@@ -440,7 +446,7 @@ class number
    }
    template <class Other, expression_template_option ET>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(number<Other, ET>&& val,
-                                                        typename std::enable_if<(std::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0)
+                                                        typename std::enable_if<(std::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = nullptr)
        noexcept(noexcept(Backend(std::declval<Other const&>())))
        : m_backend(static_cast<number<Other, ET>&&>(val).backend()) {}
    template <class Other, expression_template_option ET>
