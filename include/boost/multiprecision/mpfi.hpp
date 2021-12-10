@@ -21,6 +21,7 @@
 #include <boost/multiprecision/logged_adaptor.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <mpfi.h>
 
@@ -78,8 +79,8 @@ template <unsigned digits10>
 struct mpfi_float_imp
 {
 #ifdef BOOST_HAS_LONG_LONG
-   using signed_types = std::tuple<long, boost::long_long_type>          ;
-   using unsigned_types = std::tuple<unsigned long, boost::ulong_long_type>;
+   using signed_types = std::tuple<long, long long>          ;
+   using unsigned_types = std::tuple<unsigned long, unsigned long long>;
 #else
    using signed_types = std::tuple<long>         ;
    using unsigned_types = std::tuple<unsigned long>;
@@ -152,7 +153,7 @@ struct mpfi_float_imp
    }
 #ifdef BOOST_HAS_LONG_LONG
 #ifdef _MPFR_H_HAVE_INTMAX_T
-   mpfi_float_imp& operator=(boost::ulong_long_type i)
+   mpfi_float_imp& operator=(unsigned long long i)
    {
       if (m_data[0].left._mpfr_d == 0)
          mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
@@ -160,7 +161,7 @@ struct mpfi_float_imp
       mpfr_set_uj(right_data(), i, GMP_RNDU);
       return *this;
    }
-   mpfi_float_imp& operator=(boost::long_long_type i)
+   mpfi_float_imp& operator=(long long i)
    {
       if (m_data[0].left._mpfr_d == 0)
          mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
@@ -169,14 +170,14 @@ struct mpfi_float_imp
       return *this;
    }
 #else
-   mpfi_float_imp& operator=(boost::ulong_long_type i)
+   mpfi_float_imp& operator=(unsigned long long i)
    {
       if (m_data[0].left._mpfr_d == 0)
          mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
-      boost::ulong_long_type mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1u);
+      unsigned long long mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1u);
       unsigned               shift = 0;
       mpfi_t                 t;
-      mpfi_init2(t, (std::max)(static_cast<mpfr_prec_t>(std::numeric_limits<boost::ulong_long_type>::digits), static_cast<mpfr_prec_t>(multiprecision::detail::digits10_2_2(digits10))));
+      mpfi_init2(t, (std::max)(static_cast<mpfr_prec_t>(std::numeric_limits<unsigned long long>::digits), static_cast<mpfr_prec_t>(multiprecision::detail::digits10_2_2(digits10))));
       mpfi_set_ui(m_data, 0);
       while (i)
       {
@@ -190,7 +191,7 @@ struct mpfi_float_imp
       mpfi_clear(t);
       return *this;
    }
-   mpfi_float_imp& operator=(boost::long_long_type i)
+   mpfi_float_imp& operator=(long long i)
    {
       if (m_data[0].left._mpfr_d == 0)
          mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
@@ -288,7 +289,7 @@ struct mpfi_float_imp
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
 
       mpfr_float_backend<digits10> a, b;
 
@@ -307,12 +308,12 @@ struct mpfi_float_imp
    }
    void negate() noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       mpfi_neg(m_data, m_data);
    }
    int compare(const mpfi_float_imp& o) const noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d && o.m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d && o.m_data[0].left._mpfr_d);
       if (mpfr_cmp(right_data(), o.left_data()) < 0)
          return -1;
       if (mpfr_cmp(left_data(), o.right_data()) > 0)
@@ -331,32 +332,32 @@ struct mpfi_float_imp
    }
    mpfi_t& data() noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return m_data;
    }
    const mpfi_t& data() const noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return m_data;
    }
    mpfr_ptr left_data() noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].left);
    }
    mpfr_srcptr left_data() const noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].left);
    }
    mpfr_ptr right_data() noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].right);
    }
    mpfr_srcptr right_data() const noexcept
    {
-      BOOST_ASSERT(m_data[0].left._mpfr_d);
+      BOOST_MP_ASSERT(m_data[0].left._mpfr_d);
       return &(m_data[0].right);
    }
 
@@ -887,14 +888,14 @@ inline void eval_convert_to(long* result, const mpfi_float_backend<digits10>& va
 }
 #ifdef _MPFR_H_HAVE_INTMAX_T
 template <unsigned digits10>
-inline void eval_convert_to(boost::ulong_long_type* result, const mpfi_float_backend<digits10>& val)
+inline void eval_convert_to(unsigned long long* result, const mpfi_float_backend<digits10>& val)
 {
    mpfr_float_backend<digits10> t;
    mpfi_mid(t.data(), val.data());
    eval_convert_to(result, t);
 }
 template <unsigned digits10>
-inline void eval_convert_to(boost::long_long_type* result, const mpfi_float_backend<digits10>& val)
+inline void eval_convert_to(long long* result, const mpfi_float_backend<digits10>& val)
 {
    mpfr_float_backend<digits10> t;
    mpfi_mid(t.data(), val.data());
@@ -1788,7 +1789,7 @@ max_value<boost::multiprecision::mpfi_float>()
 {
    boost::multiprecision::mpfi_float result(0.5);
    mpfi_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1798,7 +1799,7 @@ min_value<boost::multiprecision::mpfi_float>()
 {
    boost::multiprecision::mpfi_float result(0.5);
    mpfi_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1808,7 +1809,7 @@ max_value<boost::multiprecision::number<boost::multiprecision::mpfi_float_backen
 {
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<0>, boost::multiprecision::et_off> result(0.5);
    mpfi_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1818,7 +1819,7 @@ min_value<boost::multiprecision::number<boost::multiprecision::mpfi_float_backen
 {
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<0>, boost::multiprecision::et_off> result(0.5);
    mpfi_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1849,7 +1850,7 @@ max_value<logged_type1>()
 {
    logged_type1 result(0.5);
    mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1859,7 +1860,7 @@ min_value<logged_type1>()
 {
    logged_type1 result(0.5);
    mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1869,7 +1870,7 @@ max_value<logged_type2>()
 {
    logged_type2 result(0.5);
    mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 
@@ -1879,7 +1880,7 @@ min_value<logged_type2>()
 {
    logged_type2 result(0.5);
    mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    return result;
 }
 // mpfi gets used with debug_adaptor fairly often, so specialize for that use case as well:
@@ -1909,7 +1910,7 @@ max_value<debug_type1>()
 {
    debug_type1 result(0.5);
    mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    result.backend().update_view();
    return result;
 }
@@ -1920,7 +1921,7 @@ min_value<debug_type1>()
 {
    debug_type1 result(0.5);
    mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    result.backend().update_view();
    return result;
 }
@@ -1931,7 +1932,7 @@ max_value<debug_type2>()
 {
    debug_type2 result(0.5);
    mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    result.backend().update_view();
    return result;
 }
@@ -1942,7 +1943,7 @@ min_value<debug_type2>()
 {
    debug_type2 result(0.5);
    mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
-   //BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+   //BOOST_MP_ASSERT(mpfi_number_p(result.backend().data()));
    result.backend().update_view();
    return result;
 }

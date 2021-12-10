@@ -31,28 +31,42 @@ namespace detail {
 template <unsigned Bits>
 struct int_t
 {
-   using exact = typename std::conditional<Bits == sizeof(signed char) * CHAR_BIT, signed char,
-                 typename std::conditional<Bits == sizeof(short) * CHAR_BIT, short,
-                 typename std::conditional<Bits == sizeof(int) * CHAR_BIT, int,
-                 typename std::conditional<Bits == sizeof(long) * CHAR_BIT, long,
-                 typename std::conditional<Bits == sizeof(long long) * CHAR_BIT, long long, void
+   using exact = typename std::conditional<Bits <= sizeof(signed char) * CHAR_BIT, signed char,
+                 typename std::conditional<Bits <= sizeof(short) * CHAR_BIT, short,
+                 typename std::conditional<Bits <= sizeof(int) * CHAR_BIT, int,
+                 typename std::conditional<Bits <= sizeof(long) * CHAR_BIT, long,
+                 typename std::conditional<Bits <= sizeof(long long) * CHAR_BIT, long long, void
+                 >::type>::type>::type>::type>::type;
+
+   using least = typename std::conditional<Bits-1 <= std::numeric_limits<signed char>::digits, signed char,
+                 typename std::conditional<Bits-1 <= std::numeric_limits<short>::digits, short,
+                 typename std::conditional<Bits-1 <= std::numeric_limits<int>::digits, int,
+                 typename std::conditional<Bits-1 <= std::numeric_limits<long>::digits, long,
+                 typename std::conditional<Bits-1 <= std::numeric_limits<long long>::digits, long long, void
                  >::type>::type>::type>::type>::type;
    
-   static_assert(!std::is_same<void, exact>::value, "Number of bits does not match any standard data type. \
+   static_assert(!std::is_same<void, exact>::value && !std::is_same<void, least>::value, "Number of bits does not match any standard data type. \
       Please file an issue at https://github.com/boostorg/multiprecision/ referencing this error from cpp_int_config.hpp");
 };
 
 template <unsigned Bits>
 struct uint_t
 {
-   using exact = typename std::conditional<Bits == sizeof(unsigned char) * CHAR_BIT, unsigned char,
-                 typename std::conditional<Bits == sizeof(unsigned short) * CHAR_BIT, unsigned short,
-                 typename std::conditional<Bits == sizeof(unsigned int) * CHAR_BIT, unsigned int,
-                 typename std::conditional<Bits == sizeof(unsigned long) * CHAR_BIT, unsigned long,
-                 typename std::conditional<Bits == sizeof(unsigned long long) * CHAR_BIT, unsigned long long, void
+   using exact = typename std::conditional<Bits <= sizeof(unsigned char) * CHAR_BIT, unsigned char,
+                 typename std::conditional<Bits <= sizeof(unsigned short) * CHAR_BIT, unsigned short,
+                 typename std::conditional<Bits <= sizeof(unsigned int) * CHAR_BIT, unsigned int,
+                 typename std::conditional<Bits <= sizeof(unsigned long) * CHAR_BIT, unsigned long,
+                 typename std::conditional<Bits <= sizeof(unsigned long long) * CHAR_BIT, unsigned long long, void
                  >::type>::type>::type>::type>::type;
 
-   static_assert(!std::is_same<void, exact>::value, "Number of bits does not match any standard data type. \
+   using least = typename std::conditional<Bits <= std::numeric_limits<unsigned char>::digits, unsigned char,
+                 typename std::conditional<Bits <= std::numeric_limits<unsigned short>::digits, unsigned short,
+                 typename std::conditional<Bits <= std::numeric_limits<unsigned int>::digits, unsigned int,
+                 typename std::conditional<Bits <= std::numeric_limits<unsigned long>::digits, unsigned long,
+                 typename std::conditional<Bits <= std::numeric_limits<unsigned long long>::digits, unsigned long long, void
+                 >::type>::type>::type>::type>::type;
+
+   static_assert(!std::is_same<void, exact>::value && !std::is_same<void, least>::value, "Number of bits does not match any standard data type. \
       Please file an issue at https://github.com/boostorg/multiprecision/ referencing this error from cpp_int_config.hpp");
 };
 
@@ -106,22 +120,6 @@ inline BOOST_MP_CXX14_CONSTEXPR limb_type block_multiplier(unsigned count)
 
 // Can't do formatted IO on an __int128
 #define BOOST_MP_NO_DOUBLE_LIMB_TYPE_IO
-
-// Need to specialise integer_traits for __int128 as it's not a normal native type:
-} // namespace multiprecision
-
-template <>
-class integer_traits<multiprecision::double_limb_type>
-    : public std::numeric_limits<multiprecision::double_limb_type>,
-      public detail::integer_traits_base<multiprecision::double_limb_type, 0, ~static_cast<multiprecision::double_limb_type>(0)>
-{};
-template <>
-class integer_traits<multiprecision::signed_double_limb_type>
-    : public std::numeric_limits<multiprecision::signed_double_limb_type>,
-      public detail::integer_traits_base<multiprecision::signed_double_limb_type, static_cast<multiprecision::signed_double_limb_type>((static_cast<multiprecision::double_limb_type>(1) << 127)), static_cast<multiprecision::signed_double_limb_type>(((~static_cast<multiprecision::double_limb_type>(0)) >> 1))>
-{};
-
-namespace multiprecision {
 
 #else
 

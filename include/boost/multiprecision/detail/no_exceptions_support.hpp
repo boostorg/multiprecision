@@ -11,7 +11,7 @@
 
 #ifdef BOOST_MP_STANDALONE
 
-#if !(defined BOOST_NO_EXCEPTIONS)
+#ifndef BOOST_NO_EXCEPTIONS
 #   define BOOST_MP_TRY { try
 #   define BOOST_MP_CATCH(x) catch(x)
 #   define BOOST_MP_RETHROW throw;
@@ -36,7 +36,7 @@
 #   endif
 #   define BOOST_MP_RETHROW
 #   define BOOST_MP_CATCH_END }
-#   define BOOST_MP_THROW_EXCEPTION(x)
+#   define BOOST_MP_THROW_EXCEPTION(x) {(void)(x);}
 #endif
 
 #else // Not standalone mode

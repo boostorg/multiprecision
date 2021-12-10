@@ -9,6 +9,7 @@
 #define BOOST_MP_CPP_INT_DIV_HPP
 
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 namespace boost { namespace multiprecision { namespace backends {
 
@@ -174,11 +175,11 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
       {
          double_limb_type a = (static_cast<double_limb_type>(prem[r_order]) << CppInt1::limb_bits) | prem[r_order - 1];
          double_limb_type b = (y_order > 0) ? (static_cast<double_limb_type>(py[y_order]) << CppInt1::limb_bits) | py[y_order - 1] : (static_cast<double_limb_type>(py[y_order]) << CppInt1::limb_bits);
-         BOOST_ASSERT(b);
+         BOOST_MP_ASSERT(b);
          double_limb_type v = a / b;
          guess              = static_cast<limb_type>(v);
       }
-      BOOST_ASSERT(guess); // If the guess ever gets to zero we go on forever....
+      BOOST_MP_ASSERT(guess); // If the guess ever gets to zero we go on forever....
       //
       // Update result:
       //
@@ -308,7 +309,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
          eval_subtract(r, y, r);
    }
 
-   BOOST_ASSERT(r.compare_unsigned(y) < 0); // remainder must be less than the divisor or our code has failed
+   BOOST_MP_ASSERT(r.compare_unsigned(y) < 0); // remainder must be less than the divisor or our code has failed
 }
 
 template <class CppInt1, class CppInt2>
@@ -449,7 +450,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
    r.normalize();
    r.sign(x.sign());
 
-   BOOST_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
+   BOOST_MP_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>

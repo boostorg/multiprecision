@@ -1391,7 +1391,7 @@ inline BOOST_CXX14_CONSTEXPR T constexpr_lcm(T a, T b) noexcept
 #else
 
 template <typename T>
-inline BOOST_CXX14_CONSTEXPR constexpr_gcd(T a, T b) noexcept
+inline BOOST_CXX14_CONSTEXPR T constexpr_gcd(T a, T b) noexcept
 {
    return boost::multiprecision::backends::eval_gcd(a, b);
 }

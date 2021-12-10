@@ -7,6 +7,7 @@
 #define BOOST_MP_CPP_BIN_FLOAT_IO_HPP
 
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 namespace boost { namespace multiprecision {
 namespace cpp_bf_io_detail {
@@ -33,7 +34,7 @@ inline I restricted_multiply(cpp_int& result, const cpp_int& a, const cpp_int& b
          error = error ? error * 2 : 1;
       if (rshift)
       {
-         BOOST_ASSERT(rshift < INT_MAX);
+         BOOST_MP_ASSERT(rshift < INT_MAX);
          if (bit_test(result, static_cast<unsigned>(rshift - 1)))
          {
             if (lb == rshift - 1)
@@ -55,7 +56,7 @@ inline I restricted_multiply(cpp_int& result, const cpp_int& a, const cpp_int& b
 template <class I>
 inline I restricted_pow(cpp_int& result, const cpp_int& a, I e, I max_bits, std::int64_t& error)
 {
-   BOOST_ASSERT(&result != &a);
+   BOOST_MP_ASSERT(&result != &a);
    I exp = 0;
    if (e == 1)
    {
@@ -92,8 +93,8 @@ inline int get_round_mode(const cpp_int& what, std::int64_t location, std::int64
    //  1: tie.
    //  2: round up.
    //
-   BOOST_ASSERT(location >= 0);
-   BOOST_ASSERT(location < INT_MAX);
+   BOOST_MP_ASSERT(location >= 0);
+   BOOST_MP_ASSERT(location < INT_MAX);
    std::int64_t error_radius = error & 1 ? (1 + error) / 2 : error / 2;
    if (error_radius && ((int)msb(error_radius) >= location))
       return -1;
@@ -326,7 +327,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
          }
          else
          {
-            BOOST_ASSERT(!error);
+            BOOST_MP_ASSERT(!error);
          }
          if (final_exponent > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent)
          {
@@ -371,7 +372,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
          cpp_int q, r;
          divide_qr(n, d, q, r);
          int gb = msb(q);
-         BOOST_ASSERT((gb >= static_cast<int>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) - 1));
+         BOOST_MP_ASSERT((gb >= static_cast<int>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) - 1));
          //
          // Check for rounding conditions we have to
          // handle ourselves:
@@ -389,7 +390,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
             int lshift = gb - (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + 1;
             q >>= lshift;
             final_exponent += static_cast<Exponent>(lshift);
-            BOOST_ASSERT((msb(q) >= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
+            BOOST_MP_ASSERT((msb(q) >= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
             if (error && (r < (error / 2) * q))
                roundup = -1;
             else if (error && (r + (error / 2) * q >= d))
@@ -544,7 +545,7 @@ std::string cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::s
             {
                // We go straight to the answer with all integer arithmetic,
                // the result is always exact and never needs rounding:
-               BOOST_ASSERT(power10 <= (std::intmax_t)INT_MAX);
+               BOOST_MP_ASSERT(power10 <= (std::intmax_t)INT_MAX);
                i <<= -shift;
                if (power10)
                   i *= pow(cpp_int(5), static_cast<unsigned>(power10));
@@ -554,7 +555,7 @@ std::string cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::s
                cpp_int d;
                calc_exp = boost::multiprecision::cpp_bf_io_detail::restricted_pow(d, cpp_int(5), -power10, max_bits, error);
                shift += calc_exp;
-               BOOST_ASSERT(shift < 0); // Must still be true!
+               BOOST_MP_ASSERT(shift < 0); // Must still be true!
                i <<= -shift;
                cpp_int r;
                divide_qr(i, d, i, r);
@@ -619,7 +620,7 @@ std::string cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::s
                // so 5^-power10 can never be that large or we'd simply
                // get zero as a result, and that case is already handled above:
                cpp_int r;
-               BOOST_ASSERT(-power10 < INT_MAX);
+               BOOST_MP_ASSERT(-power10 < INT_MAX);
                cpp_int d = pow(cpp_int(5), static_cast<unsigned>(-power10));
                d <<= shift;
                divide_qr(i, d, i, r);

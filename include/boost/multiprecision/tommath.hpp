@@ -11,6 +11,7 @@
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
 #include <tommath.h>
@@ -19,6 +20,7 @@
 #include <limits>
 #include <climits>
 #include <cstddef>
+#include <cstdlib>
 
 namespace boost {
 namespace multiprecision {
@@ -44,8 +46,8 @@ void eval_add(tommath_int& t, const tommath_int& o);
 
 struct tommath_int
 {
-   using signed_types = std::tuple<std::int32_t, boost::long_long_type>  ;
-   using unsigned_types = std::tuple<std::uint32_t, boost::ulong_long_type>;
+   using signed_types = std::tuple<std::int32_t, long long>  ;
+   using unsigned_types = std::tuple<std::uint32_t, unsigned long long>;
    using float_types = std::tuple<long double>                            ;
 
    tommath_int()
@@ -77,11 +79,11 @@ struct tommath_int
    }
 #ifndef mp_get_u64
    // Pick off 32 bit chunks for mp_set_int:
-   tommath_int& operator=(boost::ulong_long_type i)
+   tommath_int& operator=(unsigned long long i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-      boost::ulong_long_type mask = ((1uLL << 32) - 1);
+      unsigned long long mask = ((1uLL << 32) - 1);
       unsigned shift = 0;
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
@@ -100,16 +102,16 @@ struct tommath_int
    }
 #elif !defined(ULLONG_MAX) || (ULLONG_MAX != 18446744073709551615uLL)
    // Pick off 64 bit chunks for mp_set_i64:
-   tommath_int& operator=(boost::ulong_long_type i)
+   tommath_int& operator=(unsigned long long i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-      if(sizeof(boost::ulong_long_type) * CHAR_BIT == 64)
+      if(sizeof(unsigned long long) * CHAR_BIT == 64)
       {
          mp_set_u64(&m_data, i);
          return *this;
       }
-      boost::ulong_long_type mask = ((1uLL << 64) - 1);
+      unsigned long long mask = ((1uLL << 64) - 1);
       unsigned shift = 0;
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
@@ -127,7 +129,7 @@ struct tommath_int
       return *this;
    }
 #else
-   tommath_int& operator=(boost::ulong_long_type i)
+   tommath_int& operator=(unsigned long long i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
@@ -135,7 +137,7 @@ struct tommath_int
       return *this;
    }
 #endif
-   tommath_int& operator=(boost::long_long_type i)
+   tommath_int& operator=(long long i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
@@ -200,8 +202,8 @@ struct tommath_int
          return *this;
       }
 
-      BOOST_ASSERT(!(boost::math::isinf)(a));
-      BOOST_ASSERT(!(boost::math::isnan)(a));
+      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
 
       int         e;
       long double f, term;
@@ -302,7 +304,7 @@ struct tommath_int
             unsigned block_count = MP_DIGIT_BIT / shift;
 #endif
             unsigned               block_shift = shift * block_count;
-            boost::ulong_long_type val, block;
+            unsigned long long val, block;
             while (*s)
             {
                block = 0;
@@ -374,7 +376,7 @@ struct tommath_int
    }
    std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f) const
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       int base = 10;
       if ((f & std::ios_base::oct) == std::ios_base::oct)
          base = 8;
@@ -421,12 +423,12 @@ struct tommath_int
    }
    void negate()
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       detail::check_tommath_result(mp_neg(&m_data, &m_data));
    }
    int compare(const tommath_int& o) const
    {
-      BOOST_ASSERT(m_data.dp && o.m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp && o.m_data.dp);
       return mp_cmp(const_cast< ::mp_int*>(&m_data), const_cast< ::mp_int*>(&o.m_data));
    }
    template <class V>
@@ -440,12 +442,12 @@ struct tommath_int
    }
    ::mp_int& data()
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       return m_data;
    }
    const ::mp_int& data() const
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       return m_data;
    }
    void swap(tommath_int& o) noexcept
@@ -645,7 +647,7 @@ inline void eval_complement(tommath_int& result, const tommath_int& u)
 
    // Create a mask providing the extra bits we need and add to result:
    tommath_int mask;
-   mask = static_cast<boost::long_long_type>((1u << padding) - 1);
+   mask = static_cast<long long>((1u << padding) - 1);
    eval_left_shift(mask, shift);
    add(result, mask);
 }
@@ -662,25 +664,110 @@ inline int eval_get_sign(const tommath_int& val)
    return mp_iszero(&val.data()) ? 0 : mp_isneg(&val.data()) ? -1 : 1;
 #endif
 }
-/*
-template <class A>
-inline void eval_convert_to(A* result, const tommath_int& val)
+
+#ifdef BOOST_MP_STANDALONE
+
+namespace detail {
+
+template <typename T1, typename T2>
+inline void safe_conversion(T1 test_result, T2* result)
 {
-   *result = boost::lexical_cast<A>(val.str(0, std::ios_base::fmtflags(0)));
+   if(test_result >= (std::numeric_limits<T2>::max)())
+   {
+      *result = (std::numeric_limits<T2>::max)();
+   }
+   else if(test_result <= (std::numeric_limits<T2>::min)())
+   {
+      *result = (std::numeric_limits<T2>::min)();
+   }
+   else
+   {
+      *result = static_cast<T2>(test_result);
+   }
 }
-inline void eval_convert_to(char* result, const tommath_int& val)
+
+template <typename T1, typename T2>
+inline void safe_unsigned_conversion(T1 test_result, T2* result)
 {
-   *result = static_cast<char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
+   if(test_result >= (std::numeric_limits<T2>::max)())
+   {
+      *result = (std::numeric_limits<T2>::max)();
+   }
+   else if(test_result < (std::numeric_limits<T2>::min)())
+   {
+      *result = (std::numeric_limits<T2>::min)();
+   }
+   else
+   {
+      *result = static_cast<T2>(test_result);
+   }
 }
-inline void eval_convert_to(unsigned char* result, const tommath_int& val)
+
+}
+
+inline void eval_convert_to(unsigned long long* result, const tommath_int& val)
 {
-   *result = static_cast<unsigned char>(boost::lexical_cast<unsigned>(val.str(0, std::ios_base::fmtflags(0))));
+   *result = std::strtoull(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
 }
-inline void eval_convert_to(signed char* result, const tommath_int& val)
+
+inline void eval_convert_to(long long* result, const tommath_int& val)
 {
-   *result = static_cast<signed char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
+   *result = std::strtoll(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
 }
-*/
+
+inline void eval_convert_to(unsigned long* result, const tommath_int& val)
+{
+   *result = std::strtoul(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
+}
+
+inline void eval_convert_to(long* result, const tommath_int& val)
+{
+   const long long test_result = std::strtoll(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
+   detail::safe_conversion(test_result, result);
+}
+
+inline void eval_convert_to(unsigned* result, const tommath_int& val)
+{
+   *result = static_cast<unsigned>(std::strtoul(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10));
+}
+
+inline void eval_convert_to(int* result, const tommath_int& val)
+{
+   const long long test_result = std::strtoll(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
+   detail::safe_conversion(test_result, result);
+}
+
+inline void eval_convert_to(unsigned short* result, const tommath_int& val)
+{
+   const unsigned long long test_result = std::strtoull(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
+   detail::safe_unsigned_conversion(test_result, result);
+}
+
+inline void eval_convert_to(short* result, const tommath_int& val)
+{
+   const long long test_result = std::strtoll(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
+   detail::safe_conversion(test_result, result);
+}
+
+#ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
+inline void eval_convert_to(long double* result, const tommath_int& val)
+{
+   *result = std::strtold(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr);
+}
+#endif
+
+inline void eval_convert_to(double* result, const tommath_int& val)
+{
+   *result = std::strtod(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr);
+}
+
+inline void eval_convert_to(float* result, const tommath_int& val)
+{
+   *result = std::strtof(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr);
+}
+#endif // BOOST_MP_STANDALONE
+
+
 inline void eval_abs(tommath_int& result, const tommath_int& val)
 {
    detail::check_tommath_result(mp_abs(const_cast< ::mp_int*>(&val.data()), &result.data()));

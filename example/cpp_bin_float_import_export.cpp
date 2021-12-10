@@ -42,7 +42,7 @@ int main()
    import_bits(i, v.begin(), v.end());
    cpp_bin_float_100 g(i);
    g.backend().exponent() = e;
-   BOOST_ASSERT(f == g);
+   BOOST_MP_ASSERT(f == g);
 }
 
 //]

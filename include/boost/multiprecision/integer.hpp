@@ -7,6 +7,7 @@
 #ifndef BOOST_MP_INTEGER_HPP
 #define BOOST_MP_INTEGER_HPP
 
+#include <type_traits>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
@@ -50,21 +51,21 @@ namespace detail {
 //
 // Figure out the kind of integer that has twice as many bits as some builtin
 // integer type I.  Use a native type if we can (including types which may not
-// be recognised by boost::int_t because they're larger than boost::long_long_type),
+// be recognised by boost::int_t because they're larger than long long),
 // otherwise synthesize a cpp_int to do the job.
 //
 template <class I>
 struct double_integer
 {
    static constexpr const unsigned int_t_digits =
-       2 * sizeof(I) <= sizeof(boost::long_long_type) ? std::numeric_limits<I>::digits * 2 : 1;
+       2 * sizeof(I) <= sizeof(long long) ? std::numeric_limits<I>::digits * 2 : 1;
 
    using type = typename std::conditional<
-       2 * sizeof(I) <= sizeof(boost::long_long_type),
+       2 * sizeof(I) <= sizeof(long long),
        typename std::conditional<
            boost::multiprecision::detail::is_signed<I>::value && boost::multiprecision::detail::is_integral<I>::value,
-           typename boost::int_t<int_t_digits>::least,
-           typename boost::uint_t<int_t_digits>::least>::type,
+           typename boost::multiprecision::detail::int_t<int_t_digits>::least,
+           typename boost::multiprecision::detail::uint_t<int_t_digits>::least>::type,
        typename std::conditional<
            2 * sizeof(I) <= sizeof(double_limb_type),
            typename std::conditional<
@@ -77,7 +78,7 @@ struct double_integer
 } // namespace detail
 
 template <class I1, class I2, class I3>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I1>::value && boost::multiprecision::detail::is_unsigned<I2>::value && is_integral<I3>::value, I1>::type
+BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<I1>::value && boost::multiprecision::detail::is_unsigned<I2>::value && boost::multiprecision::detail::is_integral<I3>::value, I1>::type
 powm(const I1& a, I2 b, I3 c)
 {
    using double_type = typename detail::double_integer<I1>::type;

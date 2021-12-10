@@ -103,7 +103,7 @@ void test_extra(T)
 #ifdef BOOST_HAS_LONG_LONG
    boost::math::lltrunc(v1);
    boost::math::llround(v1);
-   boost::long_long_type ll;
+   long long ll;
    boost::math::modf(v1, &ll);
 #endif
    boost::math::pow<2>(v1);

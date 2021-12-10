@@ -9,6 +9,7 @@
 #include <boost/multiprecision/traits/is_variable_precision.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 namespace boost { namespace multiprecision { namespace detail {
 
@@ -149,7 +150,7 @@ struct scoped_default_precision
    //
    unsigned precision() const
    {
-      BOOST_ASSERT("This function should never be called!!" == 0);
+      BOOST_MP_ASSERT("This function should never be called!!" == nullptr);
       return 0;
    }
 };

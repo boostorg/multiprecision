@@ -12,8 +12,10 @@
 #ifndef BOOST_MP_FLOAT_STRING_CVT_HPP
 #define BOOST_MP_FLOAT_STRING_CVT_HPP
 
+#include <string>
 #include <cctype>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 namespace boost { namespace multiprecision { namespace detail {
 
@@ -62,7 +64,7 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
    bool            isneg      = false;
    exponent_type   expon      = 0;
    std::streamsize org_digits = digits;
-   BOOST_ASSERT(digits > 0);
+   BOOST_MP_ASSERT(digits > 0);
 
    int fpt = eval_fpclassify(b);
 
@@ -181,7 +183,7 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
          ++digits;
       }
    }
-   BOOST_ASSERT(org_digits >= 0);
+   BOOST_MP_ASSERT(org_digits >= 0);
    if (isneg)
       result.insert(static_cast<std::string::size_type>(0), 1, '-');
    format_float_string(result, expon, org_digits, f, iszero);
