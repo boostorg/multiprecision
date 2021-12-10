@@ -75,7 +75,7 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES include=/usr/include/eigen3
         working-directory: ../boost-root/libs/multiprecision/test
   ubuntu-focal-slow-tests:
     runs-on: ubuntu-20.04
@@ -137,7 +137,7 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES include=/usr/include/eigen3
         working-directory: ../boost-root/libs/multiprecision/test
   ubuntu-focal-standalone-tests:
     runs-on: ubuntu-20.04
