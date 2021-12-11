@@ -192,7 +192,7 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
       std::size_t shift = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits * index;
       while (bits_to_keep > 0)
       {
-         if (bits_to_keep < cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
+         if (static_cast<unsigned>(bits_to_keep) < cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
          {
             if(index != backend.size() - 1)
                mask <<= cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - bits_to_keep;
@@ -214,9 +214,9 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
       }
       // Perform rounding:
       bits -= 1 + std::numeric_limits<R>::digits;
-      if (eval_bit_test(backend, (unsigned)bits))
+      if (eval_bit_test(backend, static_cast<unsigned>(bits)))
       {
-         if ((eval_lsb_imp(backend) < bits) || eval_bit_test(backend, (unsigned)(bits + 1)))
+         if ((eval_lsb_imp(backend) < static_cast<unsigned>(bits)) || eval_bit_test(backend, static_cast<unsigned>(bits + 1)))
             *result = boost::math::float_next(*result);
       }
    }
