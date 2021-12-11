@@ -124,8 +124,8 @@ class cpp_dec_float
  private:
    using array_type =
       typename std::conditional<std::is_void<Allocator>::value,
-                                detail::static_array <std::uint32_t, std::uint32_t(cpp_dec_float_elem_number)>,
-                                detail::dynamic_array<std::uint32_t, std::uint32_t(cpp_dec_float_elem_number), Allocator> >::type;
+                                detail::static_array <std::uint32_t, static_cast<std::uint32_t>(cpp_dec_float_elem_number)>,
+                                detail::dynamic_array<std::uint32_t, static_cast<std::uint32_t>(cpp_dec_float_elem_number), Allocator> >::type;
 
    typedef enum enum_fpclass_type
    {
@@ -1941,14 +1941,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          #ifndef BOOST_MP_STANDALONE
          exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(str.c_str() + (pos + 1u)));
          #else
-         BOOST_IF_CONSTEXPR(std::is_integral<exponent_type>::value)
-         {
-            exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
-         }
-         else
-         {
-            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not use this exponent type in standalone mode. Please de-activate and try again"));
-         }
+         exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
          #endif
          
          str = str.substr(static_cast<std::size_t>(0u), pos);
