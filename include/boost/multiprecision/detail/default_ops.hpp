@@ -1688,7 +1688,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_karatsuba_sqrt(Backend& result, const Backend
 #ifdef BOOST_HAS_INT128
    if (bits <= 128)
    {
-      unsigned __int128 a{}, b{}, c{};
+      boost::multiprecision::uint128_type a{}, b{}, c{};
       eval_convert_to(&a, x);
       c = boost::multiprecision::detail::karatsuba_sqrt(a, b, bits);
       r = number<Backend>::canonical_value(b);

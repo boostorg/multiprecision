@@ -22,7 +22,7 @@ namespace boost { namespace multiprecision { namespace backends { namespace deta
 //
 
 template <typename T>
-inline constexpr T type_max(T) noexcept
+inline constexpr T type_max() noexcept
 {
    return 
    #ifdef BOOST_HAS_INT128
@@ -33,7 +33,7 @@ inline constexpr T type_max(T) noexcept
 }
 
 template <typename T>
-inline constexpr T type_min(T) noexcept
+inline constexpr T type_min() noexcept
 {
    return 
    #ifdef BOOST_HAS_INT128
@@ -69,12 +69,12 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const std::integral_
 {
    if (a > 0)
    {
-      if ((b > 0) && ((type_max(a) - b) < a))
+      if ((b > 0) && ((type_max<A>() - b) < a))
          raise_add_overflow();
    }
    else
    {
-      if ((b < 0) && ((type_min(a) - b) > a))
+      if ((b < 0) && ((type_min<A>() - b) > a))
          raise_add_overflow();
    }
    return a + b;
@@ -82,7 +82,7 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const std::integral_
 template <class A>
 inline BOOST_MP_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const std::integral_constant<bool, false>&)
 {
-   if ((type_max(a) - b) < a)
+   if ((type_max<A>() - b) < a)
       raise_add_overflow();
    return a + b;
 }
@@ -102,12 +102,12 @@ inline BOOST_MP_CXX14_CONSTEXPR A checked_subtract_imp(A a, A b, const std::inte
 {
    if (a > 0)
    {
-      if ((b < 0) && ((type_max(a) + b) < a))
+      if ((b < 0) && ((type_max<A>() + b) < a))
          raise_subtract_overflow();
    }
    else
    {
-      if ((b > 0) && ((type_min(a) + b) > a))
+      if ((b > 0) && ((type_min<A>() + b) > a))
          raise_subtract_overflow();
    }
    return a - b;
@@ -134,7 +134,7 @@ template <class A>
 inline BOOST_MP_CXX14_CONSTEXPR A checked_multiply(A a, A b, const std::integral_constant<int, checked>&)
 {
    BOOST_MP_USING_ABS
-   if (a && (type_max(a) / abs(a) < abs(b)))
+   if (a && (type_max<A>() / abs(a) < abs(b)))
       raise_mul_overflow();
    return a * b;
 }
