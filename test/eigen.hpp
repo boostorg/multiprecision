@@ -563,7 +563,7 @@ void test_float_type_2()
    example18<Num>();
    example19<Num>();
    example20<Num>();
-#if EIGEN_VERSION_AT_LEAST(3, 4, 0) || (BOOST_CXX_VERSION < 202002L)
+#if EIGEN_VERSION_AT_LEAST(3, 4, 0) || (BOOST_CXX_VERSION <= 201703L)
    example21<Num>();
 #endif
 }
@@ -609,7 +609,7 @@ void test_complex_type()
    example18a<Num>();
    example19<Num>();
    example20<Num>();
-#if EIGEN_VERSION_AT_LEAST(3, 4, 0) || (BOOST_CXX_VERSION < 202002L)
+#if EIGEN_VERSION_AT_LEAST(3, 4, 0) || (BOOST_CXX_VERSION <= 201703L)
    example21<Num>();
 #endif
    example22<Num>();
