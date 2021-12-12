@@ -6,6 +6,7 @@
 #ifndef BOOST_MATH_ER_GMP_BACKEND_HPP
 #define BOOST_MATH_ER_GMP_BACKEND_HPP
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
@@ -15,8 +16,12 @@
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <type_traits>
 #include <cstdint>
 #include <cmath>
+#include <cctype>
+#include <limits>
+#include <climits>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
@@ -42,11 +47,6 @@
 #else
 #define BOOST_MP_MPIR_VERSION 0
 #endif
-
-#include <cctype>
-#include <cmath>
-#include <limits>
-#include <climits>
 
 namespace boost {
 namespace multiprecision {
@@ -1333,11 +1333,11 @@ struct gmp_int
    }
 #endif
 #ifdef BOOST_HAS_INT128
-   gmp_int& operator=(unsigned __int128 i)
+   gmp_int& operator=(boost::multiprecision::uint128_type i)
    {
       if (m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
-      unsigned __int128 mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
+      boost::multiprecision::uint128_type mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
       unsigned               shift = 0;
       mpz_t                  t;
       mpz_set_ui(m_data, 0);
@@ -1354,7 +1354,7 @@ struct gmp_int
       mpz_clear(t);
       return *this;
    }
-   gmp_int& operator=(__int128 i)
+   gmp_int& operator=(boost::multiprecision::int128_type i)
    {
       if (m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
@@ -1924,7 +1924,7 @@ inline void eval_convert_to(long long* result, const gmp_int& val)
 }
 #endif
 #ifdef BOOST_HAS_INT128
-inline void eval_convert_to(unsigned __int128* result, const gmp_int& val)
+inline void eval_convert_to(boost::multiprecision::uint128_type* result, const gmp_int& val)
 {
    if (mpz_sgn(val.data()) < 0)
    {
@@ -1932,11 +1932,11 @@ inline void eval_convert_to(unsigned __int128* result, const gmp_int& val)
    }
    *result = 0;
    gmp_int t(val);
-   unsigned parts = sizeof(unsigned __int128) / sizeof(unsigned long);
+   unsigned parts = sizeof(boost::multiprecision::uint128_type) / sizeof(unsigned long);
 
    for (unsigned i = 0; i < parts; ++i)
    {
-      unsigned __int128 part = mpz_get_ui(t.data());
+      boost::multiprecision::uint128_type part = mpz_get_ui(t.data());
       if (i)
          *result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
       else
@@ -1944,17 +1944,17 @@ inline void eval_convert_to(unsigned __int128* result, const gmp_int& val)
       mpz_tdiv_q_2exp(t.data(), t.data(), sizeof(unsigned long) * CHAR_BIT);
    }
 }
-inline void eval_convert_to(__int128* result, const gmp_int& val)
+inline void eval_convert_to(boost::multiprecision::int128_type* result, const gmp_int& val)
 {
    int s = mpz_sgn(val.data());
    *result = 0;
    gmp_int t(val);
-   unsigned parts = sizeof(unsigned __int128) / sizeof(unsigned long);
-   unsigned __int128 unsigned_result = 0;
+   unsigned parts = sizeof(boost::multiprecision::uint128_type) / sizeof(unsigned long);
+   boost::multiprecision::uint128_type unsigned_result = 0;
 
    for (unsigned i = 0; i < parts; ++i)
    {
-      unsigned __int128 part = mpz_get_ui(t.data());
+      boost::multiprecision::uint128_type part = mpz_get_ui(t.data());
       if (i)
          unsigned_result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
       else
@@ -1964,21 +1964,21 @@ inline void eval_convert_to(__int128* result, const gmp_int& val)
    //
    // Overflow check:
    //
-   constexpr const __int128 int128_max = static_cast<__int128>((static_cast<unsigned __int128>(1u) << 127) - 1);
-   constexpr const __int128 int128_min = (static_cast<unsigned __int128>(1u) << 127);
+   constexpr const boost::multiprecision::int128_type int128_max = static_cast<boost::multiprecision::int128_type>((static_cast<boost::multiprecision::uint128_type>(1u) << 127) - 1);
+   constexpr const boost::multiprecision::int128_type int128_min = (static_cast<boost::multiprecision::uint128_type>(1u) << 127);
    bool overflow = false;
    if (mpz_sgn(t.data()))
    {
       overflow = true;
    }
-   if ((s > 0) && (unsigned_result > static_cast<unsigned __int128>(int128_max)))
+   if ((s > 0) && (unsigned_result > static_cast<boost::multiprecision::uint128_type>(int128_max)))
       overflow = true;
-   if ((s < 0) && (unsigned_result > 1u - static_cast<unsigned __int128>(int128_min + 1)))
+   if ((s < 0) && (unsigned_result > 1u - static_cast<boost::multiprecision::uint128_type>(int128_min + 1)))
       overflow = true;
    if (overflow)
       *result = s < 0 ? int128_min : int128_max;
    else
-      *result = s < 0 ? -__int128(unsigned_result - 1) - 1 : unsigned_result;
+      *result = s < 0 ? -boost::multiprecision::int128_type(unsigned_result - 1) - 1 : unsigned_result;
 }
 #endif
 inline void eval_abs(gmp_int& result, const gmp_int& val)
@@ -2386,13 +2386,13 @@ struct gmp_rational
       return *this;
    }
 #ifdef BOOST_HAS_INT128
-   gmp_rational& operator=(unsigned __int128 i)
+   gmp_rational& operator=(boost::multiprecision::uint128_type i)
    {
       gmp_int gi;
       gi = i;
       return *this = gi;
    }
-   gmp_rational& operator=(__int128 i)
+   gmp_rational& operator=(boost::multiprecision::int128_type i)
    {
       gmp_int gi;
       gi = i;

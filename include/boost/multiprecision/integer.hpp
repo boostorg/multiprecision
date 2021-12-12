@@ -11,6 +11,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -213,7 +214,7 @@ BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, si
    // Type which can hold at least "cutoff" bits:
    // 
 #ifdef BOOST_HAS_INT128
-   using cutoff_t = typename std::conditional<(cutoff > 64), unsigned __int128, std::uint64_t>::type;
+   using cutoff_t = typename std::conditional<(cutoff > 64), boost::multiprecision::uint128_type, std::uint64_t>::type;
 #else
    using cutoff_t = std::uint64_t;
 #endif
