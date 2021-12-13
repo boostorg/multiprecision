@@ -3,14 +3,13 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/multiprecision/mpc.hpp>
+#include <boost/multiprecision/gmp.hpp>
 
 #include "eigen.hpp"
 
 int main()
 {
-   using namespace boost::multiprecision;
-   test_complex_type<mpc_complex>();
-   test_complex_type<mpc_complex_50>();
+   test_float_type<boost::multiprecision::mpf_float_50>();
+   test_float_type<boost::multiprecision::mpf_float>();
    return 0;
 }
