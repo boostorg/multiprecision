@@ -234,8 +234,8 @@ struct rational_adaptor
    }
    int compare(const rational_adaptor& o) const
    {
-      int s1 = eval_get_sign(*this);
-      int s2 = eval_get_sign(o);
+      std::ptrdiff_t s1 = eval_get_sign(*this);
+      std::ptrdiff_t s2 = eval_get_sign(o);
       if (s1 != s2)
       {
          return s1 < s2 ? -1 : 1;

@@ -12,7 +12,7 @@
 
 Any integer number type that uses `cpp_int_backend` as its implementation layer can import or export its bits via two non-member functions:
 
-      template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
+      template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
                 expression_template_option ExpressionTemplates, class OutputIterator>
       OutputIterator export_bits(
          const number<const cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>& val,
@@ -20,7 +20,7 @@ Any integer number type that uses `cpp_int_backend` as its implementation layer 
          unsigned chunk_size,
          bool msv_first = true);
 
-      template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
+      template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
                 expression_template_option ExpressionTemplates, class Iterator>
       number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>&
          import_bits(
@@ -34,7 +34,7 @@ These functions are designed for data-interchange with other storage formats, an
 by extension they can be used for floating-point numbers based on that backend as well (see example below). 
 Parameters and use are as follows:
 
-      template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
+      template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
                 expression_template_option ExpressionTemplates, class OutputIterator>
       OutputIterator export_bits(
          const number<const cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>& val,
@@ -55,7 +55,7 @@ has to be specified manually.  It may also result in compiler warnings about the
 [@http://www.boost.org/doc/libs/release/libs/endian/doc/index.html  Boost.Endian]
 to create a custom OutputIterator that reverses the byte order of each chunk prior to actually storing the result.]
 
-      template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
+      template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
                 expression_template_option ExpressionTemplates, class ForwardIterator>
       number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>&
          import_bits(

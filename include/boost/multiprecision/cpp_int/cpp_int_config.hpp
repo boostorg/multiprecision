@@ -28,7 +28,7 @@ namespace detail {
 // as possible.
 //
 
-template <unsigned Bits>
+template <std::size_t Bits>
 struct int_t
 {
    using exact = typename std::conditional<Bits <= sizeof(signed char) * CHAR_BIT, signed char,
@@ -49,7 +49,7 @@ struct int_t
       Please file an issue at https://github.com/boostorg/multiprecision/ referencing this error from cpp_int_config.hpp");
 };
 
-template <unsigned Bits>
+template <std::size_t Bits>
 struct uint_t
 {
    using exact = typename std::conditional<Bits <= sizeof(unsigned char) * CHAR_BIT, unsigned char,
@@ -70,7 +70,7 @@ struct uint_t
       Please file an issue at https://github.com/boostorg/multiprecision/ referencing this error from cpp_int_config.hpp");
 };
 
-template <unsigned N>
+template <std::size_t N>
 struct largest_signed_type
 {
    using type = typename std::conditional<
@@ -85,7 +85,7 @@ struct largest_signed_type
                typename int_t<N>::exact>::type>::type>::type;
 };
 
-template <unsigned N>
+template <std::size_t N>
 struct largest_unsigned_type
 {
    using type = typename std::conditional<
@@ -111,7 +111,7 @@ using signed_double_limb_type = boost::multiprecision::int128_type;
 constexpr const limb_type                       max_block_10        = 1000000000000000000uLL;
 constexpr const limb_type                       digits_per_block_10 = 18;
 
-inline BOOST_MP_CXX14_CONSTEXPR limb_type block_multiplier(unsigned count)
+inline BOOST_MP_CXX14_CONSTEXPR limb_type block_multiplier(std::size_t count)
 {
    constexpr const limb_type values[digits_per_block_10] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000};
    BOOST_MP_ASSERT(count < digits_per_block_10);
@@ -130,7 +130,7 @@ using signed_double_limb_type = detail::largest_signed_type<64>::type  ;
 constexpr const limb_type                       max_block_10        = 1000000000;
 constexpr const limb_type                       digits_per_block_10 = 9;
 
-inline limb_type block_multiplier(unsigned count)
+inline limb_type block_multiplier(std::size_t count)
 {
    constexpr const limb_type values[digits_per_block_10] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
    BOOST_MP_ASSERT(count < digits_per_block_10);
@@ -139,7 +139,7 @@ inline limb_type block_multiplier(unsigned count)
 
 #endif
 
-constexpr const unsigned bits_per_limb = sizeof(limb_type) * CHAR_BIT;
+constexpr const std::size_t bits_per_limb = sizeof(limb_type) * CHAR_BIT;
 
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR void minmax(const T& a, const T& b, T& aa, T& bb)

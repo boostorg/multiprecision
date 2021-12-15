@@ -2020,7 +2020,7 @@ inline void eval_integer_sqrt(gmp_int& s, gmp_int& r, const gmp_int& x)
    mpz_sqrtrem(s.data(), r.data(), x.data());
 }
 
-inline unsigned eval_lsb(const gmp_int& val)
+inline std::size_t eval_lsb(const gmp_int& val)
 {
    int c = eval_get_sign(val);
    if (c == 0)
@@ -2034,7 +2034,7 @@ inline unsigned eval_lsb(const gmp_int& val)
    return static_cast<unsigned>(mpz_scan1(val.data(), 0));
 }
 
-inline unsigned eval_msb(const gmp_int& val)
+inline std::size_t eval_msb(const gmp_int& val)
 {
    int c = eval_get_sign(val);
    if (c == 0)
@@ -2048,22 +2048,22 @@ inline unsigned eval_msb(const gmp_int& val)
    return static_cast<unsigned>(mpz_sizeinbase(val.data(), 2) - 1);
 }
 
-inline bool eval_bit_test(const gmp_int& val, unsigned index)
+inline bool eval_bit_test(const gmp_int& val, std::size_t index)
 {
    return mpz_tstbit(val.data(), index) ? true : false;
 }
 
-inline void eval_bit_set(gmp_int& val, unsigned index)
+inline void eval_bit_set(gmp_int& val, std::size_t index)
 {
    mpz_setbit(val.data(), index);
 }
 
-inline void eval_bit_unset(gmp_int& val, unsigned index)
+inline void eval_bit_unset(gmp_int& val, std::size_t index)
 {
    mpz_clrbit(val.data(), index);
 }
 
-inline void eval_bit_flip(gmp_int& val, unsigned index)
+inline void eval_bit_flip(gmp_int& val, std::size_t index)
 {
    mpz_combit(val.data(), index);
 }

@@ -271,7 +271,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
       return *this;
    }
 
-   constexpr const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
+   constexpr const std::size_t limb_bits = sizeof(limb_type) * CHAR_BIT;
    //
    // Set our working precision - this is heuristic based, we want
    // a value as small as possible > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count to avoid large computations
@@ -306,7 +306,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
          else
             t = n;
          final_exponent = (std::int64_t)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1 + decimal_exp + calc_exp;
-         int rshift     = msb(t) - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + 1;
+         std::ptrdiff_t rshift     = msb(t) - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + 1;
          if (rshift > 0)
          {
             final_exponent += rshift;
@@ -362,7 +362,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
       {
          cpp_int d;
          calc_exp       = boost::multiprecision::cpp_bf_io_detail::restricted_pow(d, cpp_int(5), -decimal_exp, max_bits, error);
-         int shift      = (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - msb(n) + msb(d);
+         std::ptrdiff_t shift      = (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - msb(n) + msb(d);
          final_exponent = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1 + decimal_exp - calc_exp;
          if (shift > 0)
          {
@@ -371,7 +371,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
          }
          cpp_int q, r;
          divide_qr(n, d, q, r);
-         int gb = msb(q);
+         std::ptrdiff_t gb = msb(q);
          BOOST_MP_ASSERT((gb >= static_cast<int>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) - 1));
          //
          // Check for rounding conditions we have to
@@ -387,7 +387,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
          {
             // Too many bits in q and the bits in q indicate a tie, but we can break that using r,
             // note that the radius of error in r is error/2 * q:
-            int lshift = gb - (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + 1;
+            std::ptrdiff_t lshift = gb - (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + 1;
             q >>= lshift;
             final_exponent += static_cast<Exponent>(lshift);
             BOOST_MP_ASSERT((msb(q) >= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
@@ -514,7 +514,7 @@ std::string cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::s
       shift -= power10;
       cpp_int               i;
       int                   roundup   = 0; // 0=no rounding, 1=tie, 2=up
-      constexpr const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
+      constexpr const std::size_t limb_bits = sizeof(limb_type) * CHAR_BIT;
       //
       // Set our working precision - this is heuristic based, we want
       // a value as small as possible > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count to avoid large computations
