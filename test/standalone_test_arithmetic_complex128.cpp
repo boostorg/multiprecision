@@ -12,7 +12,7 @@
 #include <boost/multiprecision/complex128.hpp>
 #endif
 
-#include "standalone_test_arithmetic.hpp"
+#include "test_arithmetic.hpp"
 
 int main()
 {
