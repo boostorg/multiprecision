@@ -71,7 +71,7 @@ template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, c
 struct max_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
    static constexpr const std::size_t value = std::is_void<Allocator>::value ? detail::static_unsigned_max<MinBits, MaxBits>::value
-                                                           : (((MaxBits >= MinBits) && MaxBits) ? MaxBits : UINT_MAX);
+                                                           : (((MaxBits >= MinBits) && MaxBits) ? MaxBits : SIZE_MAX);
 };
 
 template <class T>
@@ -149,7 +149,7 @@ template <class T>
 struct is_fixed_precision;
 template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct is_fixed_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
-    : public std::integral_constant<bool, max_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value != UINT_MAX>
+    : public std::integral_constant<bool, max_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value != SIZE_MAX>
 {};
 
 namespace detail {

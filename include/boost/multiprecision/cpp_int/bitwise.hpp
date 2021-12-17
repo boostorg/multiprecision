@@ -313,7 +313,7 @@ eval_complement(
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
    std::size_t os = o.size();
-   result.resize(UINT_MAX, os);
+   result.resize(SIZE_MAX, os);
    for (std::size_t i = 0; i < os; ++i)
       result.limbs()[i] = ~o.limbs()[i];
    for (std::size_t i = os; i < result.size(); ++i)
