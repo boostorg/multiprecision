@@ -1164,10 +1164,20 @@ test-suite misc :
       [ run test_eigen_interop_mpfr_1.cpp mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpfr : : <build>no ] ]
       [ run test_eigen_interop_mpfr_2.cpp mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpfr : : <build>no ] ]
       [ run test_eigen_interop_mpfr_3.cpp mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpfr : : <build>no ] ]
+      [ run test_eigen_interop_mpfr_4.cpp mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpfr : : <build>no ] ]
+      [ run test_eigen_interop_mpfr_5.cpp mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpfr : : <build>no ] ]
+      [ run test_eigen_interop_mpfr_6.cpp mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpfr : : <build>no ] ]
       [ run test_eigen_interop_gmp.cpp gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_gmp : : <build>no ] ]
+      [ run test_eigen_interop_gmp_2.cpp gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_gmp : : <build>no ] ]
       [ run test_eigen_interop_mpc.cpp mpc mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpc : : <build>no ] ]
-      [ run git_issue_393.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
+      [ compile git_issue_393.cpp : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
 ;
+
+alias eigen_tests : 
+    test_eigen_interop_cpp_int test_eigen_interop_cpp_dec_float test_eigen_interop_cpp_dec_float_2 test_eigen_interop_cpp_dec_float_3
+    test_eigen_interop_cpp_bin_float_1 test_eigen_interop_cpp_bin_float_2 test_eigen_interop_cpp_bin_float_3 test_eigen_interop_mpfr_1
+    test_eigen_interop_mpfr_2 test_eigen_interop_mpfr_3 test_eigen_interop_mpfr_4 test_eigen_interop_mpfr_5 test_eigen_interop_mpfr_6 
+    test_eigen_interop_gmp test_eigen_interop_gmp_2 test_eigen_interop_mpc git_issue_393 ;
 
 test-suite standalone :
 
