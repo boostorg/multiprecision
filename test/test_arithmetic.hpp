@@ -602,6 +602,7 @@ void test_integer_overflow()
       else BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_signed && !boost::multiprecision::detail::is_signed<Int>::value)
       {
          // signed to unsigned converison with overflow, it's really not clear what should happen here!
+         #if 0
          m = (std::numeric_limits<Int>::max)();
          ++m;
          m = negate_if_signed(m, std::integral_constant<bool, std::numeric_limits<Real>::is_signed>());
@@ -611,6 +612,7 @@ void test_integer_overflow()
          m = pow(m, (std::min)(std::numeric_limits<Real>::digits - 1, 1000));
          m = negate_if_signed(m, std::integral_constant<bool, std::numeric_limits<Real>::is_signed>());
          BOOST_CHECK_THROW(m.template convert_to<Int>(), std::range_error);
+         #endif
       }
    }
 }

@@ -21,6 +21,7 @@
 #include <climits>
 #include <cstddef>
 #include <cstdlib>
+#include <string>
 
 namespace boost {
 namespace multiprecision {
@@ -689,9 +690,9 @@ inline void safe_conversion(T1 test_result, T2* result)
 template <typename T1, typename T2>
 inline void safe_unsigned_conversion(T1 test_result, T2* result)
 {
-   if(test_result >= (std::numeric_limits<T2>::max)())
+   if(test_result > (std::numeric_limits<T2>::max)())
    {
-      *result = (std::numeric_limits<T2>::max)();
+      *result = 0;
    }
    else if(test_result < (std::numeric_limits<T2>::min)())
    {
@@ -703,11 +704,40 @@ inline void safe_unsigned_conversion(T1 test_result, T2* result)
    }
 }
 
+template <typename T>
+inline bool unsigned_max(const std::string& val)
+{
+   const std::string max_val = std::to_string((std::numeric_limits<T>::max)());
+
+   if(val == max_val)
+   {
+      return true;
+   }
+   else
+   {
+      return false;
+   }
+}
+
+template <typename T>
+inline void safe_unsigned_long_conversion(T* test_result, const tommath_int& val)
+{
+   if(*test_result == (std::numeric_limits<T>::max)())
+   {
+      const std::string test_max = val.str(0, std::ios_base::fmtflags(0)).c_str();
+      if(!detail::unsigned_max<T>(test_max))
+      {
+         *test_result = 0;
+      } 
+   }
+}
+
 }
 
 inline void eval_convert_to(unsigned long long* result, const tommath_int& val)
 {
    *result = std::strtoull(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
+   detail::safe_unsigned_long_conversion(result, val);
 }
 
 inline void eval_convert_to(long long* result, const tommath_int& val)
@@ -718,6 +748,7 @@ inline void eval_convert_to(long long* result, const tommath_int& val)
 inline void eval_convert_to(unsigned long* result, const tommath_int& val)
 {
    *result = std::strtoul(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
+   detail::safe_unsigned_long_conversion(result, val);
 }
 
 inline void eval_convert_to(long* result, const tommath_int& val)
@@ -728,7 +759,8 @@ inline void eval_convert_to(long* result, const tommath_int& val)
 
 inline void eval_convert_to(unsigned* result, const tommath_int& val)
 {
-   *result = static_cast<unsigned>(std::strtoul(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10));
+   const unsigned long long test_result = std::strtoull(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
+   detail::safe_unsigned_conversion(test_result, result);
 }
 
 inline void eval_convert_to(int* result, const tommath_int& val)
