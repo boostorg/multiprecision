@@ -258,7 +258,7 @@ R safe_convert_to_float(const LargeInteger& i)
    {
       LargeInteger val(i);
       make_positive(val);
-      unsigned mb = msb(val);
+      std::size_t mb = msb(val);
       if (mb >= std::numeric_limits<R>::max_exponent)
       {
          int scale_factor = (int)mb + 1 - std::numeric_limits<R>::max_exponent;
@@ -330,15 +330,15 @@ generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, 
       s   = true;
       num = -num;
    }
-   int denom_bits = msb(denom);
-   int shift      = std::numeric_limits<To>::digits + denom_bits - msb(num);
+   std::ptrdiff_t denom_bits = msb(denom);
+   std::ptrdiff_t shift      = std::numeric_limits<To>::digits + denom_bits - msb(num);
    if (shift > 0)
       num <<= shift;
    else if (shift < 0)
       denom <<= boost::multiprecision::detail::unsigned_abs(shift);
    Integer q, r;
    divide_qr(num, denom, q, r);
-   int q_bits = msb(q);
+   std::ptrdiff_t q_bits = msb(q);
    if (q_bits == std::numeric_limits<To>::digits - 1)
    {
       //
@@ -367,7 +367,7 @@ generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, 
    }
    using std::ldexp;
    result = do_cast<To>(q);
-   result = ldexp(result, -shift);
+   result = ldexp(result, (int)-shift);
    if (s)
       result = -result;
 }

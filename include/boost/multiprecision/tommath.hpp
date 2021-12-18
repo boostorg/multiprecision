@@ -828,7 +828,7 @@ inline void eval_qr(const tommath_int& x, const tommath_int& y,
    detail::check_tommath_result(mp_div(const_cast< ::mp_int*>(&x.data()), const_cast< ::mp_int*>(&y.data()), &q.data(), &r.data()));
 }
 
-inline unsigned eval_lsb(const tommath_int& val)
+inline std::size_t eval_lsb(const tommath_int& val)
 {
    int c = eval_get_sign(val);
    if (c == 0)
@@ -842,7 +842,7 @@ inline unsigned eval_lsb(const tommath_int& val)
    return mp_cnt_lsb(const_cast< ::mp_int*>(&val.data()));
 }
 
-inline unsigned eval_msb(const tommath_int& val)
+inline std::size_t eval_msb(const tommath_int& val)
 {
    int c = eval_get_sign(val);
    if (c == 0)

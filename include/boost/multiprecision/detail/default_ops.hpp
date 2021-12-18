@@ -1569,7 +1569,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::d
 }
 
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR unsigned eval_lsb(const T& val)
+inline BOOST_MP_CXX14_CONSTEXPR std::size_t eval_lsb(const T& val)
 {
    using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
    int                                                                          c = eval_get_sign(val);
@@ -1581,7 +1581,7 @@ inline BOOST_MP_CXX14_CONSTEXPR unsigned eval_lsb(const T& val)
    {
       BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
-   unsigned result = 0;
+   std::size_t result = 0;
    T        mask, t;
    mask = ui_type(1);
    do
@@ -1595,7 +1595,7 @@ inline BOOST_MP_CXX14_CONSTEXPR unsigned eval_lsb(const T& val)
 }
 
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR int eval_msb(const T& val)
+inline BOOST_MP_CXX14_CONSTEXPR std::ptrdiff_t eval_msb(const T& val)
 {
    int c = eval_get_sign(val);
    if (c == 0)
@@ -1614,7 +1614,7 @@ inline BOOST_MP_CXX14_CONSTEXPR int eval_msb(const T& val)
    // backends it's likely that there will always be a more efficient
    // native implementation possible.
    //
-   unsigned result = 0;
+   std::size_t result = 0;
    T        t(val);
    while (!eval_is_zero(t))
    {
@@ -1625,7 +1625,7 @@ inline BOOST_MP_CXX14_CONSTEXPR int eval_msb(const T& val)
 }
 
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR bool eval_bit_test(const T& val, unsigned index)
+inline BOOST_MP_CXX14_CONSTEXPR bool eval_bit_test(const T& val, std::size_t index)
 {
    using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
    T                                                                            mask, t;
@@ -1636,7 +1636,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool eval_bit_test(const T& val, unsigned index)
 }
 
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_set(T& val, unsigned index)
+inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_set(T& val, std::size_t index)
 {
    using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
    T                                                                            mask;
@@ -1646,7 +1646,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_set(T& val, unsigned index)
 }
 
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_flip(T& val, unsigned index)
+inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_flip(T& val, std::size_t index)
 {
    using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
    T                                                                            mask;
@@ -1656,7 +1656,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_flip(T& val, unsigned index)
 }
 
 template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_unset(T& val, unsigned index)
+inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_unset(T& val, std::size_t index)
 {
    using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
    T                                                                            mask, t;
@@ -1764,7 +1764,7 @@ void BOOST_MP_CXX14_CONSTEXPR eval_integer_sqrt_bitwise(B& s, B& r, const B& x)
       r = ui_type(0u);
       return;
    }
-   int g = eval_msb(x);
+   std::ptrdiff_t g = eval_msb(x);
    if (g <= 1)
    {
       s = ui_type(1);
@@ -1775,14 +1775,14 @@ void BOOST_MP_CXX14_CONSTEXPR eval_integer_sqrt_bitwise(B& s, B& r, const B& x)
    B t;
    r = x;
    g /= 2;
-   int org_g = g;
+   std::ptrdiff_t org_g = g;
    eval_bit_set(s, g);
    eval_bit_set(t, 2 * g);
    eval_subtract(r, x, t);
    --g;
    if (eval_get_sign(r) == 0)
       return;
-   int msbr = eval_msb(r);
+   std::ptrdiff_t msbr = eval_msb(r);
    do
    {
       if (msbr >= org_g + g + 1)

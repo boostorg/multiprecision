@@ -462,49 +462,49 @@ inline void eval_right_shift(debug_adaptor<Backend>& arg, const debug_adaptor<Ba
 }
 
 template <class Backend, class T>
-inline unsigned eval_integer_modulus(const debug_adaptor<Backend>& arg, const T& a)
+inline T eval_integer_modulus(const debug_adaptor<Backend>& arg, const T& a)
 {
    using default_ops::eval_integer_modulus;
    return eval_integer_modulus(arg.value(), a);
 }
 
 template <class Backend>
-inline unsigned eval_lsb(const debug_adaptor<Backend>& arg)
+inline std::size_t eval_lsb(const debug_adaptor<Backend>& arg)
 {
    using default_ops::eval_lsb;
    return eval_lsb(arg.value());
 }
 
 template <class Backend>
-inline unsigned eval_msb(const debug_adaptor<Backend>& arg)
+inline std::size_t eval_msb(const debug_adaptor<Backend>& arg)
 {
    using default_ops::eval_msb;
    return eval_msb(arg.value());
 }
 
 template <class Backend>
-inline bool eval_bit_test(const debug_adaptor<Backend>& arg, unsigned a)
+inline bool eval_bit_test(const debug_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_bit_test;
    return eval_bit_test(arg.value(), a);
 }
 
 template <class Backend>
-inline void eval_bit_set(const debug_adaptor<Backend>& arg, unsigned a)
+inline void eval_bit_set(const debug_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_bit_set;
    eval_bit_set(arg.value(), a);
    arg.update_view();
 }
 template <class Backend>
-inline void eval_bit_unset(const debug_adaptor<Backend>& arg, unsigned a)
+inline void eval_bit_unset(const debug_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_bit_unset;
    eval_bit_unset(arg.value(), a);
    arg.update_view();
 }
 template <class Backend>
-inline void eval_bit_flip(const debug_adaptor<Backend>& arg, unsigned a)
+inline void eval_bit_flip(const debug_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_bit_flip;
    eval_bit_flip(arg.value(), a);
