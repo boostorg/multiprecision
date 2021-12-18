@@ -22,6 +22,7 @@
 #include <cctype>
 #include <limits>
 #include <climits>
+#include <cstdlib>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
@@ -1862,6 +1863,10 @@ inline void eval_convert_to(long* result, const gmp_int& val)
    }
    else
       *result = (signed long)mpz_get_si(val.data());
+}
+inline void eval_convert_to(long double* result, const gmp_int& val)
+{
+   *result = std::strtold(mpz_get_str(nullptr, 10, val.data()), nullptr);
 }
 inline void eval_convert_to(double* result, const gmp_int& val)
 {
