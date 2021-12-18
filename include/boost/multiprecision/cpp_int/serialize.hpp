@@ -191,7 +191,7 @@ void do_serialize(Archive& ar, Int& val, std::integral_constant<bool, true> cons
 
 } // namespace cpp_int_detail
 
-template <class Archive, unsigned MinBits, unsigned MaxBits, mp::cpp_integer_type SignType, mp::cpp_int_check_type Checked, class Allocator>
+template <class Archive, std::size_t MinBits, std::size_t MaxBits, mp::cpp_integer_type SignType, mp::cpp_int_check_type Checked, class Allocator>
 void serialize(Archive& ar, mp::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& val, const unsigned int /*version*/)
 {
    using archive_save_tag = typename Archive::is_saving                                ;

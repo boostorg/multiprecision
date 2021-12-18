@@ -530,37 +530,37 @@ inline void eval_right_shift(logged_adaptor<Backend>& arg, const logged_adaptor<
 }
 
 template <class Backend, class T>
-inline unsigned eval_integer_modulus(const logged_adaptor<Backend>& arg, const T& a)
+inline T eval_integer_modulus(const logged_adaptor<Backend>& arg, const T& a)
 {
    using default_ops::eval_integer_modulus;
    log_prefix_event(arg.value(), a, "integer-modulus");
-   unsigned r = eval_integer_modulus(arg.value(), a);
+   T r = eval_integer_modulus(arg.value(), a);
    log_postfix_event(arg.value(), r, "integer-modulus");
    return r;
 }
 
 template <class Backend>
-inline unsigned eval_lsb(const logged_adaptor<Backend>& arg)
+inline std::size_t eval_lsb(const logged_adaptor<Backend>& arg)
 {
    using default_ops::eval_lsb;
    log_prefix_event(arg.value(), "least-significant-bit");
-   unsigned r = eval_lsb(arg.value());
+   std::size_t r = eval_lsb(arg.value());
    log_postfix_event(arg.value(), r, "least-significant-bit");
    return r;
 }
 
 template <class Backend>
-inline unsigned eval_msb(const logged_adaptor<Backend>& arg)
+inline std::size_t eval_msb(const logged_adaptor<Backend>& arg)
 {
    using default_ops::eval_msb;
    log_prefix_event(arg.value(), "most-significant-bit");
-   unsigned r = eval_msb(arg.value());
+   std::size_t r = eval_msb(arg.value());
    log_postfix_event(arg.value(), r, "most-significant-bit");
    return r;
 }
 
 template <class Backend>
-inline bool eval_bit_test(const logged_adaptor<Backend>& arg, unsigned a)
+inline bool eval_bit_test(const logged_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_bit_test;
    log_prefix_event(arg.value(), a, "bit-test");
@@ -570,7 +570,7 @@ inline bool eval_bit_test(const logged_adaptor<Backend>& arg, unsigned a)
 }
 
 template <class Backend>
-inline void eval_bit_set(const logged_adaptor<Backend>& arg, unsigned a)
+inline void eval_bit_set(const logged_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_bit_set;
    log_prefix_event(arg.value(), a, "bit-set");
@@ -578,7 +578,7 @@ inline void eval_bit_set(const logged_adaptor<Backend>& arg, unsigned a)
    log_postfix_event(arg.value(), arg, "bit-set");
 }
 template <class Backend>
-inline void eval_bit_unset(const logged_adaptor<Backend>& arg, unsigned a)
+inline void eval_bit_unset(const logged_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_bit_unset;
    log_prefix_event(arg.value(), a, "bit-unset");
@@ -586,7 +586,7 @@ inline void eval_bit_unset(const logged_adaptor<Backend>& arg, unsigned a)
    log_postfix_event(arg.value(), arg, "bit-unset");
 }
 template <class Backend>
-inline void eval_bit_flip(const logged_adaptor<Backend>& arg, unsigned a)
+inline void eval_bit_flip(const logged_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_bit_flip;
    log_prefix_event(arg.value(), a, "bit-flip");
