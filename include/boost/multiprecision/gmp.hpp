@@ -1070,6 +1070,13 @@ inline void eval_convert_to(long* result, const gmp_float<digits10>& val) noexce
       *result = (long)mpf_get_si(val.data());
 }
 template <unsigned digits10>
+inline void eval_convert_to(long double* result, const gmp_float<digits10>& val) noexcept
+{
+   mp_exp_t exp = 0;
+   *result = std::strtold(mpf_get_str(nullptr, &exp, 10, LDBL_DIG, val.data()), nullptr);
+   *result *= std::pow(10l, exp);
+}
+template <unsigned digits10>
 inline void eval_convert_to(double* result, const gmp_float<digits10>& val) noexcept
 {
    *result = mpf_get_d(val.data());
