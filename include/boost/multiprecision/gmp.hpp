@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright 2011 John Maddock.
+//  Copyright 2021 Matt Borland. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,8 +16,9 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <type_traits>
+#include <memory>
+#include <utility>
 #include <cstdint>
 #include <cmath>
 #include <cctype>
@@ -27,12 +29,15 @@
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
+#ifndef BOOST_MP_STANDALONE
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#endif
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -1069,13 +1074,38 @@ inline void eval_convert_to(long* result, const gmp_float<digits10>& val) noexce
    else
       *result = (long)mpf_get_si(val.data());
 }
+#ifdef BOOST_MP_STANDALONE
 template <unsigned digits10>
 inline void eval_convert_to(long double* result, const gmp_float<digits10>& val) noexcept
 {
    mp_exp_t exp = 0;
-   *result = std::strtold(mpf_get_str(nullptr, &exp, 10, LDBL_DIG, val.data()), nullptr);
-   *result *= std::pow(10l, exp);
+
+   #if __cpp_lib_make_unique >= 201304L
+   std::unique_ptr<char*> val_char_ptr = std::make_unique<char*>(mpf_get_str(nullptr, &exp, 10, LDBL_DIG, val.data()));
+   #else
+   std::unique_ptr<char*> val_char_ptr = std::unique_ptr<char*>(new char*(std::forward<char*>(mpf_get_str(nullptr, &exp, 10, LDBL_DIG, val.data()))));
+   #endif
+
+   auto temp_string = std::string(*val_char_ptr.get());
+   if(exp > 0 && static_cast<std::size_t>(exp) < temp_string.size())
+   {
+      if(temp_string.front() == '-')
+      {
+         ++exp;
+      }
+
+      temp_string.insert(exp, 1, '.');
+   }
+
+   *result = std::strtold(temp_string.c_str(), nullptr);
+
+   if((temp_string.size() == 2ul && *result < 0.0l) ||
+      (static_cast<std::size_t>(exp) > temp_string.size()))
+   {
+      *result *= std::pow(10l, exp-1);
+   }
 }
+#endif // BOOST_MP_STANDALONE
 template <unsigned digits10>
 inline void eval_convert_to(double* result, const gmp_float<digits10>& val) noexcept
 {
