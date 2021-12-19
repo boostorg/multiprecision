@@ -1903,7 +1903,13 @@ inline void eval_convert_to(long* result, const gmp_int& val)
 }
 inline void eval_convert_to(long double* result, const gmp_int& val)
 {
-   *result = std::strtold(mpz_get_str(nullptr, 10, val.data()), nullptr);
+   #if __cpp_lib_make_unique >= 201304L
+   std::unique_ptr<char*> val_char_ptr = std::make_unique<char*>(mpz_get_str(nullptr, 10, val.data()));
+   #else
+   std::unique_ptr<char*> val_char_ptr = std::unique_ptr<char*>(new char*(std::forward<char*>(mpz_get_str(nullptr, 10, val.data()))));
+   #endif
+   
+   *result = std::strtold(*val_char_ptr.get(), nullptr);
 }
 inline void eval_convert_to(double* result, const gmp_int& val)
 {
