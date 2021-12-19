@@ -22,9 +22,9 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned_constexpr(CppInt1& result, con
    // Nothing fancy, just let uintmax_t take the strain:
    //
    double_limb_type carry = 0;
-   unsigned         m(0), x(0);
-   unsigned         as = a.size();
-   unsigned         bs = b.size();
+   std::size_t         m(0), x(0);
+   std::size_t         as = a.size();
+   std::size_t         bs = b.size();
    minmax(as, bs, m, x);
    if (x == 1)
    {
@@ -96,7 +96,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned_constexpr(CppInt1& result
    // Nothing fancy, just let uintmax_t take the strain:
    //
    double_limb_type borrow = 0;
-   unsigned         m(0), x(0);
+   std::size_t         m(0), x(0);
    minmax(a.size(), b.size(), m, x);
    //
    // special cases for small limb counts:
@@ -136,7 +136,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned_constexpr(CppInt1& result
       return;
    }
 
-   unsigned i = 0;
+   std::size_t i = 0;
    // First where a and b overlap:
    while (i < m)
    {
@@ -199,9 +199,9 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
       using std::swap;
 
       // Nothing fancy, just let uintmax_t take the strain:
-      unsigned m(0), x(0);
-      unsigned as = a.size();
-      unsigned bs = b.size();
+      std::size_t m(0), x(0);
+      std::size_t as = a.size();
+      std::size_t bs = b.size();
       minmax(as, bs, m, x);
       if (x == 1)
       {
@@ -218,7 +218,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
       if (as < bs)
          swap(pa, pb);
       // First where a and b overlap:
-      unsigned      i = 0;
+      std::size_t      i = 0;
       unsigned char carry = 0;
 #if defined(BOOST_MSVC) && !defined(BOOST_HAS_INT128) && defined(_M_X64)
       //
@@ -273,7 +273,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned(CppInt1& result, const Cp
       using std::swap;
 
       // Nothing fancy, just let uintmax_t take the strain:
-      unsigned         m(0), x(0);
+      std::size_t         m(0), x(0);
       minmax(a.size(), b.size(), m, x);
       //
       // special cases for small limb counts:
@@ -313,7 +313,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned(CppInt1& result, const Cp
          return;
       }
 
-      unsigned i = 0;
+      std::size_t i = 0;
       unsigned char borrow = 0;
       // First where a and b overlap:
 #if defined(BOOST_MSVC) && !defined(BOOST_HAS_INT128) && defined(_M_X64)

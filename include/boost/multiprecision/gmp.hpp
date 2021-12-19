@@ -2032,7 +2032,7 @@ inline void eval_integer_sqrt(gmp_int& s, gmp_int& r, const gmp_int& x)
    mpz_sqrtrem(s.data(), r.data(), x.data());
 }
 
-inline unsigned eval_lsb(const gmp_int& val)
+inline std::size_t eval_lsb(const gmp_int& val)
 {
    int c = eval_get_sign(val);
    if (c == 0)
@@ -2046,7 +2046,7 @@ inline unsigned eval_lsb(const gmp_int& val)
    return static_cast<unsigned>(mpz_scan1(val.data(), 0));
 }
 
-inline unsigned eval_msb(const gmp_int& val)
+inline std::size_t eval_msb(const gmp_int& val)
 {
    int c = eval_get_sign(val);
    if (c == 0)
@@ -2060,22 +2060,22 @@ inline unsigned eval_msb(const gmp_int& val)
    return static_cast<unsigned>(mpz_sizeinbase(val.data(), 2) - 1);
 }
 
-inline bool eval_bit_test(const gmp_int& val, unsigned index)
+inline bool eval_bit_test(const gmp_int& val, std::size_t index)
 {
    return mpz_tstbit(val.data(), index) ? true : false;
 }
 
-inline void eval_bit_set(gmp_int& val, unsigned index)
+inline void eval_bit_set(gmp_int& val, std::size_t index)
 {
    mpz_setbit(val.data(), index);
 }
 
-inline void eval_bit_unset(gmp_int& val, unsigned index)
+inline void eval_bit_unset(gmp_int& val, std::size_t index)
 {
    mpz_clrbit(val.data(), index);
 }
 
-inline void eval_bit_flip(gmp_int& val, unsigned index)
+inline void eval_bit_flip(gmp_int& val, std::size_t index)
 {
    mpz_combit(val.data(), index);
 }
@@ -3622,5 +3622,74 @@ constexpr float_round_style numeric_limits<boost::multiprecision::number<boost::
 #endif
 
 } // namespace std
+
+namespace Eigen
+{
+
+   template <class B1, class B2>
+   struct NumTraitsImp;
+
+   template <boost::multiprecision::expression_template_option ExpressionTemplates>
+   struct NumTraitsImp<boost::multiprecision::number<boost::multiprecision::gmp_float<0>, ExpressionTemplates>, boost::multiprecision::number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >
+   {
+      using self_type = boost::multiprecision::number<boost::multiprecision::gmp_float<0>, ExpressionTemplates>;
+      using Real = typename boost::multiprecision::scalar_result_from_possible_complex<self_type>::type;
+      using NonInteger = self_type; // Not correct but we can't do much better??
+      using Literal = double;
+      using Nested = self_type;
+      enum
+      {
+         IsComplex = boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_complex,
+         IsInteger = boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer,
+         ReadCost = 1,
+         AddCost = 4,
+         MulCost = 8,
+         IsSigned = std::numeric_limits<self_type>::is_specialized ? std::numeric_limits<self_type>::is_signed : true,
+         RequireInitialization = 1,
+      };
+      static Real epsilon()
+      {
+         return boost::math::tools::epsilon<Real>();
+      }
+      static Real dummy_precision()
+      {
+         return 1000 * epsilon();
+      }
+      static Real highest()
+      {
+         return boost::math::tools::max_value<Real>();
+      }
+      static Real lowest()
+      {
+         return boost::math::tools::min_value<Real>();
+      }
+      static int digits10()
+      {
+         return Real::thread_default_precision();
+      }
+      static int digits()
+      {
+         return boost::math::tools::digits<Real>();
+      }
+      static int min_exponent()
+      {
+         return LONG_MIN;
+      }
+      static int max_exponent()
+      {
+         return LONG_MAX;
+      }
+      static Real infinity()
+      {
+         return Real();
+      }
+      static Real quiet_NaN()
+      {
+         return Real();
+      }
+   };
+
+}
+
 
 #endif

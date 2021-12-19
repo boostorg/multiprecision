@@ -69,11 +69,12 @@ void test_convert()
       From from = generate_random<From>(bits);
       To   t1(from);
       From b(t1);
-      if (bits > std::numeric_limits<To>::digits)
+      std::size_t m = msb(from);
+      if (m >= std::numeric_limits<To>::digits)
       {
          // For error <= 1ulp
          // Note msb(from) returns one less than the number of bits in from:
-         From max_error = (From(1) << (msb(from) - std::numeric_limits<To>::digits));
+         From max_error = (From(1) << (m - std::numeric_limits<To>::digits));
          BOOST_TEST_GE(max_error, abs(b - from));
          if (max_error < abs(b - from))
             // debugging help:

@@ -41,7 +41,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b)
    using default_ops::eval_is_zero;
    using default_ops::eval_lsb;
 
-   int shift(0);
+   std::ptrdiff_t shift(0);
 
    B u(a), v(b);
 
@@ -71,8 +71,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b)
    /* Let shift := lg K, where K is the greatest power of 2
    dividing both u and v. */
 
-   unsigned us = eval_lsb(u);
-   unsigned vs = eval_lsb(v);
+   std::size_t us = eval_lsb(u);
+   std::size_t vs = eval_lsb(v);
    shift       = (std::min)(us, vs);
    eval_right_shift(u, us);
    eval_right_shift(v, vs);
@@ -167,7 +167,7 @@ integer_modulus(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, std::size_t>::type
 lsb(const number<Backend, ExpressionTemplates>& x)
 {
    using default_ops::eval_lsb;
@@ -175,7 +175,7 @@ lsb(const number<Backend, ExpressionTemplates>& x)
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, std::size_t>::type
 lsb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 {
    using number_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
@@ -185,7 +185,7 @@ lsb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, std::size_t>::type
 msb(const number<Backend, ExpressionTemplates>& x)
 {
    using default_ops::eval_msb;
@@ -193,7 +193,7 @@ msb(const number<Backend, ExpressionTemplates>& x)
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, std::size_t>::type
 msb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 {
    using number_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
@@ -204,7 +204,7 @@ msb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 
 template <class Backend, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, bool>::type
-bit_test(const number<Backend, ExpressionTemplates>& x, unsigned index)
+bit_test(const number<Backend, ExpressionTemplates>& x, std::size_t index)
 {
    using default_ops::eval_bit_test;
    return eval_bit_test(x.backend(), index);
@@ -212,7 +212,7 @@ bit_test(const number<Backend, ExpressionTemplates>& x, unsigned index)
 
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, bool>::type
-bit_test(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, unsigned index)
+bit_test(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, std::size_t index)
 {
    using number_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
    number_type                                                                           n(x);
@@ -222,7 +222,7 @@ bit_test(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, unsig
 
 template <class Backend, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
-bit_set(number<Backend, ExpressionTemplates>& x, unsigned index)
+bit_set(number<Backend, ExpressionTemplates>& x, std::size_t index)
 {
    using default_ops::eval_bit_set;
    eval_bit_set(x.backend(), index);
@@ -231,7 +231,7 @@ bit_set(number<Backend, ExpressionTemplates>& x, unsigned index)
 
 template <class Backend, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
-bit_unset(number<Backend, ExpressionTemplates>& x, unsigned index)
+bit_unset(number<Backend, ExpressionTemplates>& x, std::size_t index)
 {
    using default_ops::eval_bit_unset;
    eval_bit_unset(x.backend(), index);
@@ -240,7 +240,7 @@ bit_unset(number<Backend, ExpressionTemplates>& x, unsigned index)
 
 template <class Backend, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
-bit_flip(number<Backend, ExpressionTemplates>& x, unsigned index)
+bit_flip(number<Backend, ExpressionTemplates>& x, std::size_t index)
 {
    using default_ops::eval_bit_flip;
    eval_bit_flip(x.backend(), index);

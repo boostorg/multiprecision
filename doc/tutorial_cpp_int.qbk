@@ -19,8 +19,8 @@
    enum cpp_integer_type    { signed_magnitude, unsigned_magnitude };
    enum cpp_int_check_type  { checked, unchecked };
 
-   template <unsigned MinBits = 0,
-             unsigned MaxBits = 0,
+   template <std::size_t MinBits = 0,
+             std::size_t MaxBits = 0,
              cpp_integer_type SignType = signed_magnitude,
              cpp_int_check_type Checked = unchecked,
              class Allocator = std::allocator<limb_type> >
@@ -28,7 +28,7 @@
    //
    // Expression templates default to et_off if there is no allocator:
    //
-   template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+   template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
    struct expression_template_default<cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> >
    { static const expression_template_option value = et_off; };
 

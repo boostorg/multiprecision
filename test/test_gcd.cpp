@@ -20,7 +20,7 @@
 // Just exclude that combination from testing for now as it's purely a testing issue
 // and we have other compilers that cover this sanity check...
 //
-#if 1// !(defined(__clang__) && (__cplusplus > 201300))
+#if !(defined(__clang__) && (__cplusplus > 201300))
 
 using boost::multiprecision::cpp_int;
 
@@ -79,9 +79,9 @@ namespace boost {
 namespace multiprecision {
 namespace backends {
 
-unsigned total_lehmer_gcd_calls = 0;
-unsigned total_lehmer_gcd_bits_saved = 0;
-unsigned total_lehmer_gcd_cycles = 0;
+std::size_t total_lehmer_gcd_calls      = 0;
+std::size_t total_lehmer_gcd_bits_saved = 0;
+std::size_t total_lehmer_gcd_cycles     = 0;
 
 }}}
 
