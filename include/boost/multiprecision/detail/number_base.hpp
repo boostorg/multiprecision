@@ -317,7 +317,7 @@ struct has_enough_bits
 template <class Tuple, int i, int digits, bool = (i >= std::tuple_size<Tuple>::value)>
 struct find_index_of_large_enough_type
 {
-   static constexpr int value = bits_of<typename std::tuple_element<i, Tuple>::type>::value >= digits ? i : find_index_of_large_enough_type<Tuple, i + 1, digits>::value;
+   static constexpr int value = bits_of<typename std::tuple_element<static_cast<std::size_t>(i), Tuple>::type>::value >= digits ? i : find_index_of_large_enough_type<Tuple, i + 1, digits>::value;
 };
 template <class Tuple, int i, int digits>
 struct find_index_of_large_enough_type<Tuple, i, digits, true>
@@ -328,7 +328,7 @@ struct find_index_of_large_enough_type<Tuple, i, digits, true>
 template <int index, class Tuple, class Fallback, bool = (std::tuple_size<Tuple>::value <= index)>
 struct dereference_tuple
 {
-   using type = typename std::tuple_element<index, Tuple>::type;
+   using type = typename std::tuple_element<static_cast<std::size_t>(index), Tuple>::type;
 };
 template <int index, class Tuple, class Fallback>
 struct dereference_tuple<index, Tuple, Fallback, true>

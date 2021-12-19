@@ -1004,7 +1004,10 @@ struct terminal
 template <class Tuple, int i, class T, bool = (i == std::tuple_size<Tuple>::value)>
 struct find_index_of_type
 {
-   static constexpr int value = std::is_same<T, typename std::tuple_element<i, Tuple>::type>::value ? i : find_index_of_type<Tuple, i + 1, T>::value;
+   static constexpr int value =
+      std::is_same<T, typename std::tuple_element<static_cast<std::size_t>(i), Tuple>::type>::value
+         ? i
+         : find_index_of_type<Tuple, i + 1, T>::value;
 };
 template <class Tuple, int i, class T>
 struct find_index_of_type<Tuple, i, T, true>
