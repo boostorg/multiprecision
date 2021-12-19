@@ -13,7 +13,6 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
 #include <tommath.h>
 #include <cctype>
@@ -23,6 +22,10 @@
 #include <cstddef>
 #include <cstdlib>
 #include <string>
+
+#if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
+#include <boost/math/special_functions/fpclassify.hpp>
+#endif
 
 namespace boost {
 namespace multiprecision {
@@ -204,8 +207,10 @@ struct tommath_int
          return *this;
       }
 
+      #if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
       BOOST_MP_ASSERT(!(boost::math::isinf)(a));
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      #endif
 
       int         e;
       long double f, term;
