@@ -29,7 +29,7 @@
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
-#ifndef BOOST_MP_STANDALONE
+#if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
@@ -263,8 +263,10 @@ struct gmp_float_imp
          return *this;
       }
 
+      #ifndef BOOST_MP_STANDALONE
       BOOST_MP_ASSERT(!(boost::math::isinf)(a));
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      #endif
 
       int         e;
       long double f, term;
@@ -1445,8 +1447,10 @@ struct gmp_int
          return *this;
       }
 
+      #ifndef BOOST_MP_STANDALONE
       BOOST_MP_ASSERT(!(boost::math::isinf)(a));
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      #endif
 
       int         e;
       long double f, term;
@@ -2403,8 +2407,10 @@ struct gmp_rational
          return *this;
       }
 
+      #ifndef BOOST_MP_STANDALONE
       BOOST_MP_ASSERT(!(boost::math::isinf)(a));
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      #endif
 
       int         e;
       long double f, term;
@@ -3683,35 +3689,39 @@ namespace Eigen
          IsSigned = std::numeric_limits<self_type>::is_specialized ? std::numeric_limits<self_type>::is_signed : true,
          RequireInitialization = 1,
       };
-      static Real epsilon()
+      static constexpr Real epsilon() noexcept
       {
-         return boost::math::tools::epsilon<Real>();
+         return std::numeric_limits<Real>::epsilon();
       }
-      static Real dummy_precision()
+      static constexpr Real dummy_precision() noexcept
       {
          return 1000 * epsilon();
       }
-      static Real highest()
+      static constexpr Real highest() noexcept
       {
-         return boost::math::tools::max_value<Real>();
+         static_assert(std::numeric_limits<Real>::is_specialized, "Type Real must be specialized");
+         return (std::numeric_limits<Real>::max)();
       }
-      static Real lowest()
+      static constexpr Real lowest() noexcept
       {
-         return boost::math::tools::min_value<Real>();
+         static_assert(std::numeric_limits<Real>::is_specialized, "Type Real must be specialized");
+         return (std::numeric_limits<Real>::min)();
       }
       static int digits10()
       {
          return Real::thread_default_precision();
       }
-      static int digits()
+      static constexpr int digits() noexcept
       {
-         return boost::math::tools::digits<Real>();
+         static_assert(std::numeric_limits<Real>::is_specialized, "Type Real must be specialized");
+         static_assert(std::numeric_limits<Real>::radix == 2 || std::numeric_limits<Real>::radix == 10, "Type Real must have a radix of 2 or 10");
+         return std::numeric_limits<Real>::radix == 2 ? std::numeric_limits<Real>::digits : ((std::numeric_limits<Real>::digits + 1) * 1000L) / 301L;
       }
-      static int min_exponent()
+      static constexpr long min_exponent() noexcept
       {
          return LONG_MIN;
       }
-      static int max_exponent()
+      static constexpr long max_exponent() noexcept
       {
          return LONG_MAX;
       }
