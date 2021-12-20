@@ -3706,12 +3706,10 @@ namespace Eigen
       }
       static constexpr Real highest() noexcept
       {
-         static_assert(std::numeric_limits<Real>::is_specialized, "Type Real must be specialized");
          return (std::numeric_limits<Real>::max)();
       }
       static constexpr Real lowest() noexcept
       {
-         static_assert(std::numeric_limits<Real>::is_specialized, "Type Real must be specialized");
          return (std::numeric_limits<Real>::min)();
       }
       static int digits10()
@@ -3720,7 +3718,6 @@ namespace Eigen
       }
       static constexpr int digits() noexcept
       {
-         static_assert(std::numeric_limits<Real>::is_specialized, "Type Real must be specialized");
          static_assert(std::numeric_limits<Real>::radix == 2 || std::numeric_limits<Real>::radix == 10, "Type Real must have a radix of 2 or 10");
          return std::numeric_limits<Real>::radix == 2 ? std::numeric_limits<Real>::digits : ((std::numeric_limits<Real>::digits + 1) * 1000L) / 301L;
       }
