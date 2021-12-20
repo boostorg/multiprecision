@@ -502,6 +502,22 @@ struct gmp_float_imp
    }
 };
 
+class gmp_char_ptr
+{
+private:
+   char* ptr_val;
+
+public:
+   gmp_char_ptr() = delete;
+   explicit gmp_char_ptr(char* val_) : ptr_val {val_} {}
+   ~gmp_char_ptr() noexcept 
+   { 
+      free(ptr_val); 
+      ptr_val = nullptr;
+   }
+   inline char* get() noexcept { return ptr_val; }
+};
+
 } // namespace detail
 
 struct gmp_int;
@@ -1082,13 +1098,9 @@ inline void eval_convert_to(long double* result, const gmp_float<digits10>& val)
 {
    mp_exp_t exp = 0;
 
-   #if __cpp_lib_make_unique >= 201304L
-   std::unique_ptr<char*> val_char_ptr = std::make_unique<char*>(mpf_get_str(nullptr, &exp, 10, LDBL_DIG, val.data()));
-   #else
-   std::unique_ptr<char*> val_char_ptr = std::unique_ptr<char*>(new char*(std::forward<char*>(mpf_get_str(nullptr, &exp, 10, LDBL_DIG, val.data()))));
-   #endif
+   detail::gmp_char_ptr val_char_ptr {mpf_get_str(nullptr, &exp, 10, LDBL_DIG, val.data())};
 
-   auto temp_string = std::string(*val_char_ptr.get());
+   auto temp_string = std::string(val_char_ptr.get());
    if(exp > 0 && static_cast<std::size_t>(exp) < temp_string.size())
    {
       if(temp_string.front() == '-')
@@ -1907,13 +1919,8 @@ inline void eval_convert_to(long* result, const gmp_int& val)
 }
 inline void eval_convert_to(long double* result, const gmp_int& val)
 {
-   #if __cpp_lib_make_unique >= 201304L
-   std::unique_ptr<char*> val_char_ptr = std::make_unique<char*>(mpz_get_str(nullptr, 10, val.data()));
-   #else
-   std::unique_ptr<char*> val_char_ptr = std::unique_ptr<char*>(new char*(std::forward<char*>(mpz_get_str(nullptr, 10, val.data()))));
-   #endif
-   
-   *result = std::strtold(*val_char_ptr.get(), nullptr);
+   detail::gmp_char_ptr val_char_ptr {mpz_get_str(nullptr, 10, val.data())};
+   *result = std::strtold(val_char_ptr.get(), nullptr);
 }
 inline void eval_convert_to(double* result, const gmp_int& val)
 {
