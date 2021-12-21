@@ -1,11 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright 2011 John Maddock.
+//  Copyright 2021 Matt Borland. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_MATH_ER_GMP_BACKEND_HPP
 #define BOOST_MATH_ER_GMP_BACKEND_HPP
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
@@ -14,19 +16,28 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
+#include <type_traits>
+#include <memory>
+#include <utility>
 #include <cstdint>
 #include <cmath>
+#include <cctype>
+#include <limits>
+#include <climits>
+#include <cstdlib>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
+#if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#endif
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -42,11 +53,6 @@
 #else
 #define BOOST_MP_MPIR_VERSION 0
 #endif
-
-#include <cctype>
-#include <cmath>
-#include <limits>
-#include <climits>
 
 namespace boost {
 namespace multiprecision {
@@ -257,8 +263,10 @@ struct gmp_float_imp
          return *this;
       }
 
+      #ifndef BOOST_MP_STANDALONE
       BOOST_MP_ASSERT(!(boost::math::isinf)(a));
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      #endif
 
       int         e;
       long double f, term;
@@ -492,6 +500,22 @@ struct gmp_float_imp
    {
       return get_default_options() >= variable_precision_options::preserve_source_precision;
    }
+};
+
+class gmp_char_ptr
+{
+private:
+   char* ptr_val;
+
+public:
+   gmp_char_ptr() = delete;
+   explicit gmp_char_ptr(char* val_) : ptr_val {val_} {}
+   ~gmp_char_ptr() noexcept 
+   { 
+      free(ptr_val); 
+      ptr_val = nullptr;
+   }
+   inline char* get() noexcept { return ptr_val; }
 };
 
 } // namespace detail
@@ -1068,6 +1092,34 @@ inline void eval_convert_to(long* result, const gmp_float<digits10>& val) noexce
    else
       *result = (long)mpf_get_si(val.data());
 }
+#ifdef BOOST_MP_STANDALONE
+template <unsigned digits10>
+inline void eval_convert_to(long double* result, const gmp_float<digits10>& val) noexcept
+{
+   mp_exp_t exp = 0;
+
+   detail::gmp_char_ptr val_char_ptr {mpf_get_str(nullptr, &exp, 10, LDBL_DIG, val.data())};
+
+   auto temp_string = std::string(val_char_ptr.get());
+   if(exp > 0 && static_cast<std::size_t>(exp) < temp_string.size())
+   {
+      if(temp_string.front() == '-')
+      {
+         ++exp;
+      }
+
+      temp_string.insert(exp, 1, '.');
+   }
+
+   *result = std::strtold(temp_string.c_str(), nullptr);
+
+   if((temp_string.size() == 2ul && *result < 0.0l) ||
+      (static_cast<std::size_t>(exp) > temp_string.size()))
+   {
+      *result *= std::pow(10l, exp-1);
+   }
+}
+#endif // BOOST_MP_STANDALONE
 template <unsigned digits10>
 inline void eval_convert_to(double* result, const gmp_float<digits10>& val) noexcept
 {
@@ -1333,11 +1385,11 @@ struct gmp_int
    }
 #endif
 #ifdef BOOST_HAS_INT128
-   gmp_int& operator=(unsigned __int128 i)
+   gmp_int& operator=(boost::multiprecision::uint128_type i)
    {
       if (m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
-      unsigned __int128 mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
+      boost::multiprecision::uint128_type mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
       unsigned               shift = 0;
       mpz_t                  t;
       mpz_set_ui(m_data, 0);
@@ -1354,7 +1406,7 @@ struct gmp_int
       mpz_clear(t);
       return *this;
    }
-   gmp_int& operator=(__int128 i)
+   gmp_int& operator=(boost::multiprecision::int128_type i)
    {
       if (m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
@@ -1407,8 +1459,10 @@ struct gmp_int
          return *this;
       }
 
+      #ifndef BOOST_MP_STANDALONE
       BOOST_MP_ASSERT(!(boost::math::isinf)(a));
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      #endif
 
       int         e;
       long double f, term;
@@ -1863,6 +1917,11 @@ inline void eval_convert_to(long* result, const gmp_int& val)
    else
       *result = (signed long)mpz_get_si(val.data());
 }
+inline void eval_convert_to(long double* result, const gmp_int& val)
+{
+   detail::gmp_char_ptr val_char_ptr {mpz_get_str(nullptr, 10, val.data())};
+   *result = std::strtold(val_char_ptr.get(), nullptr);
+}
 inline void eval_convert_to(double* result, const gmp_int& val)
 {
    *result = mpz_get_d(val.data());
@@ -1924,7 +1983,7 @@ inline void eval_convert_to(long long* result, const gmp_int& val)
 }
 #endif
 #ifdef BOOST_HAS_INT128
-inline void eval_convert_to(unsigned __int128* result, const gmp_int& val)
+inline void eval_convert_to(boost::multiprecision::uint128_type* result, const gmp_int& val)
 {
    if (mpz_sgn(val.data()) < 0)
    {
@@ -1932,11 +1991,11 @@ inline void eval_convert_to(unsigned __int128* result, const gmp_int& val)
    }
    *result = 0;
    gmp_int t(val);
-   unsigned parts = sizeof(unsigned __int128) / sizeof(unsigned long);
+   unsigned parts = sizeof(boost::multiprecision::uint128_type) / sizeof(unsigned long);
 
    for (unsigned i = 0; i < parts; ++i)
    {
-      unsigned __int128 part = mpz_get_ui(t.data());
+      boost::multiprecision::uint128_type part = mpz_get_ui(t.data());
       if (i)
          *result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
       else
@@ -1944,17 +2003,17 @@ inline void eval_convert_to(unsigned __int128* result, const gmp_int& val)
       mpz_tdiv_q_2exp(t.data(), t.data(), sizeof(unsigned long) * CHAR_BIT);
    }
 }
-inline void eval_convert_to(__int128* result, const gmp_int& val)
+inline void eval_convert_to(boost::multiprecision::int128_type* result, const gmp_int& val)
 {
    int s = mpz_sgn(val.data());
    *result = 0;
    gmp_int t(val);
-   unsigned parts = sizeof(unsigned __int128) / sizeof(unsigned long);
-   unsigned __int128 unsigned_result = 0;
+   unsigned parts = sizeof(boost::multiprecision::uint128_type) / sizeof(unsigned long);
+   boost::multiprecision::uint128_type unsigned_result = 0;
 
    for (unsigned i = 0; i < parts; ++i)
    {
-      unsigned __int128 part = mpz_get_ui(t.data());
+      boost::multiprecision::uint128_type part = mpz_get_ui(t.data());
       if (i)
          unsigned_result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
       else
@@ -1964,21 +2023,21 @@ inline void eval_convert_to(__int128* result, const gmp_int& val)
    //
    // Overflow check:
    //
-   constexpr const __int128 int128_max = static_cast<__int128>((static_cast<unsigned __int128>(1u) << 127) - 1);
-   constexpr const __int128 int128_min = (static_cast<unsigned __int128>(1u) << 127);
+   constexpr const boost::multiprecision::int128_type int128_max = static_cast<boost::multiprecision::int128_type>((static_cast<boost::multiprecision::uint128_type>(1u) << 127) - 1);
+   constexpr const boost::multiprecision::int128_type int128_min = (static_cast<boost::multiprecision::uint128_type>(1u) << 127);
    bool overflow = false;
    if (mpz_sgn(t.data()))
    {
       overflow = true;
    }
-   if ((s > 0) && (unsigned_result > static_cast<unsigned __int128>(int128_max)))
+   if ((s > 0) && (unsigned_result > static_cast<boost::multiprecision::uint128_type>(int128_max)))
       overflow = true;
-   if ((s < 0) && (unsigned_result > 1u - static_cast<unsigned __int128>(int128_min + 1)))
+   if ((s < 0) && (unsigned_result > 1u - static_cast<boost::multiprecision::uint128_type>(int128_min + 1)))
       overflow = true;
    if (overflow)
       *result = s < 0 ? int128_min : int128_max;
    else
-      *result = s < 0 ? -__int128(unsigned_result - 1) - 1 : unsigned_result;
+      *result = s < 0 ? -boost::multiprecision::int128_type(unsigned_result - 1) - 1 : unsigned_result;
 }
 #endif
 inline void eval_abs(gmp_int& result, const gmp_int& val)
@@ -2355,8 +2414,10 @@ struct gmp_rational
          return *this;
       }
 
+      #ifndef BOOST_MP_STANDALONE
       BOOST_MP_ASSERT(!(boost::math::isinf)(a));
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      #endif
 
       int         e;
       long double f, term;
@@ -2386,13 +2447,13 @@ struct gmp_rational
       return *this;
    }
 #ifdef BOOST_HAS_INT128
-   gmp_rational& operator=(unsigned __int128 i)
+   gmp_rational& operator=(boost::multiprecision::uint128_type i)
    {
       gmp_int gi;
       gi = i;
       return *this = gi;
    }
-   gmp_rational& operator=(__int128 i)
+   gmp_rational& operator=(boost::multiprecision::int128_type i)
    {
       gmp_int gi;
       gi = i;
@@ -3635,35 +3696,36 @@ namespace Eigen
          IsSigned = std::numeric_limits<self_type>::is_specialized ? std::numeric_limits<self_type>::is_signed : true,
          RequireInitialization = 1,
       };
-      static Real epsilon()
+      static constexpr Real epsilon() noexcept
       {
-         return boost::math::tools::epsilon<Real>();
+         return std::numeric_limits<Real>::epsilon();
       }
-      static Real dummy_precision()
+      static constexpr Real dummy_precision() noexcept
       {
          return 1000 * epsilon();
       }
-      static Real highest()
+      static constexpr Real highest() noexcept
       {
-         return boost::math::tools::max_value<Real>();
+         return (std::numeric_limits<Real>::max)();
       }
-      static Real lowest()
+      static constexpr Real lowest() noexcept
       {
-         return boost::math::tools::min_value<Real>();
+         return (std::numeric_limits<Real>::min)();
       }
       static int digits10()
       {
          return Real::thread_default_precision();
       }
-      static int digits()
+      static constexpr int digits() noexcept
       {
-         return boost::math::tools::digits<Real>();
+         static_assert(std::numeric_limits<Real>::radix == 2 || std::numeric_limits<Real>::radix == 10, "Type Real must have a radix of 2 or 10");
+         return std::numeric_limits<Real>::radix == 2 ? std::numeric_limits<Real>::digits : ((std::numeric_limits<Real>::digits + 1) * 1000L) / 301L;
       }
-      static int min_exponent()
+      static constexpr long min_exponent() noexcept
       {
          return LONG_MIN;
       }
-      static int max_exponent()
+      static constexpr long max_exponent() noexcept
       {
          return LONG_MAX;
       }

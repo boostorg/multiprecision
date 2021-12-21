@@ -4,10 +4,9 @@
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "constexpr_arithmetric_test.hpp"
-
 #define BOOST_MP_STANDALONE
 
+#include "constexpr_arithmetric_test.hpp"
 #include <boost/multiprecision/float128.hpp>
 #include <iostream>
 
