@@ -244,8 +244,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
       for (; i < m; ++i)
          carry = ::boost::multiprecision::detail::addcarry_limb(carry, pa[i], pb[i], pr + i);
       for (; i < x && carry; ++i)
-         // We know carry is 1, so we just need to increment pa[i] (ie add a literal 1) and capture the carry:
-         carry = ::boost::multiprecision::detail::addcarry_limb(0, pa[i], 1, pr + i);
+         carry = ::boost::multiprecision::detail::addcarry_limb(carry, pa[i], 0, pr + i);
       if (i == x && carry)
       {
          // We overflowed, need to add one more limb:
@@ -253,9 +252,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
          if (result.size() > x)
             result.limbs()[x] = static_cast<limb_type>(1u);
       }
-      else if ((x != i) && (pa != pr))
-         // Copy remaining digits only if we need to:
-         std_constexpr::copy(pa + i, pa + x, pr + i);
+      else
+         std::copy(pa + i, pa + x, pr + i);
       result.normalize();
       result.sign(a.sign());
    }
