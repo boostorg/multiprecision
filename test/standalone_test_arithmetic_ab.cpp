@@ -8,14 +8,14 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
+#include "../performance/arithmetic_backend.hpp"
+
 #include "standalone_test_arithmetic.hpp"
-
-#define BOOST_MP_STANDALONE
-
-#include <boost/multiprecision/float128.hpp>
 
 int main()
 {
-   test<boost::multiprecision::float128>();
+   test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<double>>>();
+   test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<int>>>();
+   test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<unsigned>>>();
    return boost::report_errors();
 }

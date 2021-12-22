@@ -1004,10 +1004,7 @@ struct terminal
 template <class Tuple, int i, class T, bool = (i == std::tuple_size<Tuple>::value)>
 struct find_index_of_type
 {
-   static constexpr int value =
-      std::is_same<T, typename std::tuple_element<static_cast<std::size_t>(i), Tuple>::type>::value
-         ? i
-         : find_index_of_type<Tuple, i + 1, T>::value;
+   static constexpr int value = std::is_same<T, typename std::tuple_element<i, Tuple>::type>::value ? i : find_index_of_type<Tuple, i + 1, T>::value;
 };
 template <class Tuple, int i, class T>
 struct find_index_of_type<Tuple, i, T, true>
@@ -1691,7 +1688,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_karatsuba_sqrt(Backend& result, const Backend
 #ifdef BOOST_HAS_INT128
    if (bits <= 128)
    {
-      boost::multiprecision::uint128_type a{}, b{}, c{};
+      unsigned __int128 a{}, b{}, c{};
       eval_convert_to(&a, x);
       c = boost::multiprecision::detail::karatsuba_sqrt(a, b, bits);
       r = number<Backend>::canonical_value(b);

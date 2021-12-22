@@ -1184,6 +1184,8 @@ test-suite standalone :
       [ run standalone_constexpr_test_cpp_int.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
       [ compile standalone_constexpr_test_float128.cpp : 
          [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_float128 : <source>quadmath : <build>no ] ]
+
+      [ run standalone_test_arithmetic_ab.cpp no_eh_support ]
       
       [ run standalone_test_arithmetic_complex128.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
       [ run standalone_test_arithmetic_cpp_bin_float.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj ]

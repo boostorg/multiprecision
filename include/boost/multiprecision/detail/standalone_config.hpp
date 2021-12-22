@@ -79,13 +79,13 @@ namespace boost { namespace multiprecision {
 // Workarounds for numeric limits on old compilers
 #ifdef BOOST_HAS_INT128
 #  ifndef INT128_MAX
-#    define INT128_MAX static_cast<boost::multiprecision::int128_type>((static_cast<boost::multiprecision::uint128_type>(1) << ((__SIZEOF_INT128__ * __CHAR_BIT__) - 1)) - 1)
+#    define INT128_MAX (__int128) (((unsigned __int128) 1 << ((__SIZEOF_INT128__ * __CHAR_BIT__) - 1)) - 1)
 #  endif
 #  ifndef INT128_MIN
 #    define INT128_MIN (-INT128_MAX - 1)
 #  endif
 #  ifndef UINT128_MAX
-#    define UINT128_MAX ((2 * static_cast<boost::multiprecision::uint128_type>(INT128_MAX)) + 1)
+#    define UINT128_MAX ((2 * (unsigned __int128) INT128_MAX) + 1)
 #  endif
 #endif
 

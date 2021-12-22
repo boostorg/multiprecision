@@ -124,8 +124,8 @@ class cpp_dec_float
  private:
    using array_type =
       typename std::conditional<std::is_void<Allocator>::value,
-                                detail::static_array <std::uint32_t, static_cast<std::uint32_t>(cpp_dec_float_elem_number)>,
-                                detail::dynamic_array<std::uint32_t, static_cast<std::uint32_t>(cpp_dec_float_elem_number), Allocator> >::type;
+                                detail::static_array <std::uint32_t, std::uint32_t(cpp_dec_float_elem_number)>,
+                                detail::dynamic_array<std::uint32_t, std::uint32_t(cpp_dec_float_elem_number), Allocator> >::type;
 
    typedef enum enum_fpclass_type
    {
@@ -1564,7 +1564,15 @@ double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_double() const
                      : -std::numeric_limits<double>::infinity());
    }
 
-   return std::strtod(str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific).c_str(), nullptr);
+   std::stringstream ss;
+   ss.imbue(std::locale::classic());
+
+   ss << str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific);
+
+   double d;
+   ss >> d;
+
+   return d;
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -1603,7 +1611,15 @@ long double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_long_doubl
                      : -std::numeric_limits<long double>::infinity());
    }
 
-   return std::strtold(str(std::numeric_limits<long double>::digits10 + (2 + 1), std::ios_base::scientific).c_str(), nullptr);
+   std::stringstream ss;
+   ss.imbue(std::locale::classic());
+
+   ss << str(std::numeric_limits<long double>::digits10 + (2 + 1), std::ios_base::scientific);
+
+   long double ld;
+   ss >> ld;
+
+   return ld;
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -1925,7 +1941,14 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          #ifndef BOOST_MP_STANDALONE
          exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(str.c_str() + (pos + 1u)));
          #else
-         exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
+         BOOST_IF_CONSTEXPR(std::is_integral<exponent_type>::value)
+         {
+            exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
+         }
+         else
+         {
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not use this exponent type in standalone mode. Please de-activate and try again"));
+         }
          #endif
          
          str = str.substr(static_cast<std::size_t>(0u), pos);
@@ -2000,13 +2023,8 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
          if (rit_non_zero != static_cast<std::string::const_reverse_iterator>(str.rbegin()))
          {
-            const std::string::size_type ofs =
-               static_cast<std::string::size_type>
-               (
-                    static_cast<std::ptrdiff_t>(str.length())
-                  - std::distance<std::string::const_reverse_iterator>(str.rbegin(), rit_non_zero)
-               );
-            str.erase(str.begin() + static_cast<std::ptrdiff_t>(ofs), str.end());
+            const std::string::size_type ofs = static_cast<std::ptrdiff_t>(str.length()) - std::distance<std::string::const_reverse_iterator>(str.rbegin(), rit_non_zero);
+            str.erase(str.begin() + ofs, str.end());
          }
 
          // Check if the input is identically zero.
@@ -2028,7 +2046,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
             if (str.at(static_cast<std::size_t>(1u)) == static_cast<char>('0'))
             {
-               delta_exp = static_cast<std::size_t>(std::distance<std::string::const_iterator>(str.begin() + 1u, it_non_zero));
+               delta_exp = std::distance<std::string::const_iterator>(str.begin() + 1u, it_non_zero);
             }
 
             // Bring one single digit into the mantissa and adjust the exponent accordingly.
@@ -2078,7 +2096,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
       // Cut the size of the mantissa to <= cpp_dec_float_elem_digits10.
       pos          = str.find(static_cast<char>('.'));
-      pos_plus_one = static_cast<std::ptrdiff_t>(pos + 1u);
+      pos_plus_one = static_cast<std::size_t>(pos + 1u);
 
       if (pos > static_cast<std::size_t>(cpp_dec_float_elem_digits10))
       {
@@ -2088,7 +2106,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
          str.insert(static_cast<std::size_t>(static_cast<std::int32_t>(n_pos - static_cast<std::int32_t>(n * cpp_dec_float_elem_digits10))), ".");
 
-         str.erase(static_cast<std::size_t>(pos_plus_one), static_cast<std::size_t>(1u));
+         str.erase(pos_plus_one, static_cast<std::size_t>(1u));
 
          exp += static_cast<exponent_type>(static_cast<exponent_type>(n) * static_cast<exponent_type>(cpp_dec_float_elem_digits10));
       }
@@ -2096,7 +2114,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // Pad the decimal part such that its value is an even
       // multiple of cpp_dec_float_elem_digits10.
       pos          = str.find(static_cast<char>('.'));
-      pos_plus_one = static_cast<std::ptrdiff_t>(pos + 1u);
+      pos_plus_one = static_cast<std::size_t>(pos + 1u);
 
       // Throws an error for a strange construction like 3.14L
       if(pos != std::string::npos && (str.back() == 'L' || str.back() == 'l' || str.back() == 'u' || str.back() == 'U'))
@@ -2122,7 +2140,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       if (static_cast<std::size_t>(str.length() - pos) > max_dec)
       {
          str = str.substr(static_cast<std::size_t>(0u),
-                          static_cast<std::size_t>(pos_plus_one + static_cast<std::ptrdiff_t>(max_dec)));
+                          static_cast<std::size_t>(pos_plus_one + max_dec));
       }
 
       // Now the input string has the standard cpp_dec_float<Digits10, ExponentType, Allocator> input form.
@@ -2137,21 +2155,11 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       data[0u] = static_cast<std::uint32_t>(std::stol(str.substr(static_cast<std::size_t>(0u), pos)));
 
       // ...then get the remaining digits to the right of the decimal point.
-      const std::string::size_type i_end =
-      (
-           static_cast<std::string::size_type>(str.length() - static_cast<std::string::size_type>(pos_plus_one))
-         / static_cast<std::string::size_type>(cpp_dec_float_elem_digits10)
-      );
+      const std::string::size_type i_end = ((str.length() - pos_plus_one) / static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
 
       for (std::string::size_type i = static_cast<std::string::size_type>(0u); i < i_end; i++)
       {
-         const std::string::const_iterator it =
-              str.begin()
-            + static_cast<std::ptrdiff_t>
-              (
-                   static_cast<std::string::size_type>(pos_plus_one)
-                 + static_cast<std::string::size_type>(i * static_cast<std::string::size_type>(cpp_dec_float_elem_digits10))
-              );
+         const std::string::const_iterator it = str.begin() + pos_plus_one + (i * static_cast<std::string::size_type>(cpp_dec_float_elem_digits10));
 
          data[i + 1u] = static_cast<std::uint32_t>(std::stol(std::string(it, it + static_cast<std::string::size_type>(cpp_dec_float_elem_digits10))));
       }
