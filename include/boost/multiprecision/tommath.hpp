@@ -101,7 +101,7 @@ struct tommath_int
       return *this;
    }
 #elif !defined(ULLONG_MAX) || (ULLONG_MAX != 18446744073709551615uLL)
-   // Pick off 64 bit chunks for mp_set_i64:
+   // Pick off 64 bit chunks for mp_set_u64:
    tommath_int& operator=(unsigned long long i)
    {
       if (m_data.dp == 0)
@@ -118,7 +118,7 @@ struct tommath_int
       mp_zero(&m_data);
       while (i)
       {
-         detail::check_tommath_result(mp_set_i64(&t, static_cast<std::uint64_t>(i & mask)));
+         detail::check_tommath_result(mp_set_u64(&t, static_cast<std::uint64_t>(i & mask)));
          if (shift)
             detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
          detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
@@ -147,6 +147,41 @@ struct tommath_int
          detail::check_tommath_result(mp_neg(&m_data, &m_data));
       return *this;
    }
+#ifdef BOOST_HAS_INT128
+   // Pick off 64 bit chunks for mp_set_u64:
+   tommath_int& operator=(unsigned __int128 i)
+   {
+      if (m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
+
+      __int128  mask  = ((static_cast<unsigned __int128>(1u) << 64) - 1);
+      unsigned           shift = 0;
+      ::mp_int           t;
+      detail::check_tommath_result(mp_init(&t));
+      mp_zero(&m_data);
+      while (i)
+      {
+         mp_set_u64(&t, static_cast<std::uint64_t>(i & mask));
+         if (shift)
+            detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
+         detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
+         shift += 64;
+         i >>= 64;
+      }
+      mp_clear(&t);
+      return *this;
+   }
+   tommath_int& operator=(__int128 i)
+   {
+      if (m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
+      bool neg = i < 0;
+      *this    = boost::multiprecision::detail::unsigned_abs(i);
+      if (neg)
+         detail::check_tommath_result(mp_neg(&m_data, &m_data));
+      return *this;
+   }
+#endif
    //
    // Note that although mp_set_int takes an unsigned long as an argument
    // it only sets the first 32-bits to the result, and ignores the rest.
@@ -173,11 +208,10 @@ struct tommath_int
          detail::check_tommath_result(mp_neg(&m_data, &m_data));
       return *this;
    }
-   tommath_int& operator=(long double a)
+   template <class F>
+   tommath_int& assign_float(F a)
    {
-      using std::floor;
-      using std::frexp;
-      using std::ldexp;
+      BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
 
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
@@ -206,7 +240,7 @@ struct tommath_int
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
 
       int         e;
-      long double f, term;
+      F f, term;
 #ifndef mp_get_u32
       detail::check_tommath_result(mp_set_int(&m_data, 0u));
 #else
@@ -262,6 +296,16 @@ struct tommath_int
       mp_clear(&t);
       return *this;
    }
+   tommath_int& operator=(long double a)
+   {
+      return assign_float(a);
+   }
+#ifdef BOOST_HAS_FLOAT128
+   tommath_int& operator= (__float128 a)
+   {
+      return assign_float(a);
+   }
+#endif
    tommath_int& operator=(const char* s)
    {
       //

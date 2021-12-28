@@ -9,6 +9,7 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
+#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
@@ -225,6 +226,43 @@ struct gmp_float_imp
       mpf_set_si(m_data, i);
       return *this;
    }
+#ifdef BOOST_HAS_INT128
+   gmp_float_imp& operator=(unsigned __int128 i)
+   {
+      if (m_data[0]._mp_d == 0)
+      {
+         mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      }
+      unsigned long      mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
+      unsigned           shift = 0;
+      mpf_t              t;
+      mpf_init2(t, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      mpf_set_ui(m_data, 0);
+      while (i)
+      {
+         mpf_set_ui(t, static_cast<unsigned long>(i & mask));
+         if (shift)
+            mpf_mul_2exp(t, t, shift);
+         mpf_add(m_data, m_data, t);
+         shift += std::numeric_limits<unsigned long>::digits;
+         i >>= std::numeric_limits<unsigned long>::digits;
+      }
+      mpf_clear(t);
+      return *this;
+   }
+   gmp_float_imp& operator=(__int128 i)
+   {
+      if (m_data[0]._mp_d == 0)
+      {
+         mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      }
+      bool neg = i < 0;
+      *this    = static_cast<unsigned __int128>(boost::multiprecision::detail::unsigned_abs(i));
+      if (neg)
+         mpf_neg(m_data, m_data);
+      return *this;
+   }
+#endif
    gmp_float_imp& operator=(double d)
    {
       if (m_data[0]._mp_d == 0)
@@ -234,11 +272,10 @@ struct gmp_float_imp
       mpf_set_d(m_data, d);
       return *this;
    }
-   gmp_float_imp& operator=(long double a)
+   template <class F>
+   gmp_float_imp& assign_float(F a)
    {
-      using std::floor;
-      using std::frexp;
-      using std::ldexp;
+      BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
 
       if (m_data[0]._mp_d == 0)
       {
@@ -261,7 +298,7 @@ struct gmp_float_imp
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
 
       int         e;
-      long double f, term;
+      F f, term;
       mpf_set_ui(m_data, 0u);
 
       f = frexp(a, &e);
@@ -287,6 +324,16 @@ struct gmp_float_imp
          mpf_div_2exp(m_data, m_data, -e);
       return *this;
    }
+   gmp_float_imp& operator=(long double a)
+   {
+      return assign_float(a);
+   }
+#ifdef BOOST_HAS_FLOAT128
+   gmp_float_imp& operator= (__float128 a)
+   {
+      return assign_float(a);
+   }
+#endif
    gmp_float_imp& operator=(const char* s)
    {
       if (m_data[0]._mp_d == 0)
@@ -567,7 +614,7 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
       return *this;
    }
    template <class V>
-   gmp_float& operator=(const V& v)
+   typename std::enable_if<std::is_assignable<detail::gmp_float_imp<digits10>, V>::value, gmp_float&>::type operator=(const V& v)
    {
       *static_cast<detail::gmp_float_imp<digits10>*>(this) = v;
       return *this;
@@ -711,7 +758,7 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       return *this;
    }
    template <class V>
-   gmp_float& operator=(const V& v)
+   typename std::enable_if<std::is_assignable<detail::gmp_float_imp<0>, V>::value, gmp_float&>::type operator=(const V& v)
    {
       constexpr unsigned d10 = std::is_floating_point<V>::value ?
          std::numeric_limits<V>::digits10 :
@@ -1386,11 +1433,10 @@ struct gmp_int
       mpz_set_d(m_data, d);
       return *this;
    }
-   gmp_int& operator=(long double a)
+   template <class F>
+   gmp_int& assign_float(F a)
    {
-      using std::floor;
-      using std::frexp;
-      using std::ldexp;
+      BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
 
       if (m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
@@ -1411,7 +1457,7 @@ struct gmp_int
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
 
       int         e;
-      long double f, term;
+      F f, term;
       mpz_set_ui(m_data, 0u);
 
       f = frexp(a, &e);
@@ -1436,6 +1482,10 @@ struct gmp_int
       else if (e < 0)
          mpz_div_2exp(m_data, m_data, -e);
       return *this;
+   }
+   gmp_int& operator=(long double a)
+   {
+      return assign_float(a);
    }
    gmp_int& operator=(const char* s)
    {
@@ -1466,6 +1516,12 @@ struct gmp_int
          mpz_set_ui(m_data, 0);
       return *this;
    }
+#ifdef BOOST_HAS_FLOAT128
+   gmp_int& operator=(__float128 a)
+   {
+      return assign_float(a);
+   }
+#endif
    gmp_int& operator=(const mpf_t val)
    {
       if (m_data[0]._mp_d == 0)
@@ -2332,13 +2388,12 @@ struct gmp_rational
       mpq_set_d(m_data, d);
       return *this;
    }
-   gmp_rational& operator=(long double a)
+   template <class F>
+   gmp_rational& assign_float(F a)
    {
       using default_ops::eval_add;
       using default_ops::eval_subtract;
-      using std::floor;
-      using std::frexp;
-      using std::ldexp;
+      BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
 
       if (m_data[0]._mp_den._mp_d == 0)
          mpq_init(m_data);
@@ -2359,7 +2414,7 @@ struct gmp_rational
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
 
       int         e;
-      long double f, term;
+      F f, term;
       mpq_set_ui(m_data, 0, 1);
       mpq_set_ui(m_data, 0u, 1);
       gmp_rational t;
@@ -2385,6 +2440,16 @@ struct gmp_rational
          mpq_div_2exp(m_data, m_data, -e);
       return *this;
    }
+   gmp_rational& operator=(long double a)
+   {
+      return assign_float(a);
+   }
+#ifdef BOOST_HAS_FLOAT128
+   gmp_rational& operator=(__float128 a)
+   {
+      return assign_float(a);
+   }
+#endif
 #ifdef BOOST_HAS_INT128
    gmp_rational& operator=(unsigned __int128 i)
    {

@@ -30,6 +30,7 @@
 
 #include <boost/multiprecision/detail/dynamic_array.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/detail/itos.hpp>
 #include <boost/multiprecision/detail/static_array.hpp>
 #include <boost/multiprecision/detail/tables.hpp>
@@ -183,7 +184,7 @@ class cpp_dec_float
 
    template <class I>
    cpp_dec_float(I i,
-                 typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value >::type* = nullptr)
+                 typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value && (sizeof(I) <= sizeof(long long))>::type* = nullptr)
       : data(),
         exp(static_cast<exponent_type>(0)),
         neg(false),
@@ -196,7 +197,8 @@ class cpp_dec_float
    template <class I>
    cpp_dec_float(I i,
                  typename std::enable_if<(   boost::multiprecision::detail::is_signed<I>::value
-                                          && boost::multiprecision::detail::is_integral<I>::value)>::type* = nullptr)
+                                          && boost::multiprecision::detail::is_integral<I>::value
+                                          && (sizeof(I) <= sizeof(long long)))>::type* = nullptr)
       : data(),
         exp(static_cast<exponent_type>(0)),
         neg(false),
@@ -243,9 +245,6 @@ class cpp_dec_float
 
    template <class F>
    cpp_dec_float(const F val, typename std::enable_if<std::is_floating_point<F>::value
-#ifdef BOOST_HAS_FLOAT128
-                                                   && !std::is_same<F, __float128>::value
-#endif
                                                    >::type* = nullptr) : data(),
                                                                          exp(static_cast<exponent_type>(0)),
                                                                          neg(false),
@@ -360,6 +359,35 @@ class cpp_dec_float
       from_unsigned_long_long(v);
       return *this;
    }
+#ifdef BOOST_HAS_INT128
+   cpp_dec_float& operator=(__int128 v)
+   {
+      *this = boost::multiprecision::detail::unsigned_abs(v);
+      if (v < 0)
+         negate();
+      return *this;
+   }
+
+   cpp_dec_float& operator=(unsigned __int128 v)
+   {
+      using default_ops::eval_add;
+      using default_ops::eval_multiply;
+      static constexpr unsigned          bit_shift = sizeof(unsigned long long) * CHAR_BIT;
+      static constexpr unsigned __int128 mask      = (static_cast<unsigned __int128>(1u) << bit_shift) - 1;
+      unsigned                           shift     = bit_shift;
+      *this                                        = static_cast<unsigned long long>(v & mask);
+      v >>= bit_shift;
+      while (v)
+      {
+         cpp_dec_float t(static_cast<unsigned long long>(v & mask));
+         eval_multiply(t, cpp_dec_float::pow2(bit_shift));
+         eval_add(*this, t);
+         v >>= bit_shift;
+         shift += bit_shift;
+      }
+      return *this;
+   }
+#endif
 
    template <class Float>
    typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float&>::type operator=(Float v);
@@ -2279,9 +2307,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
 {
    // Christopher Kormanyos's original code used a cast to long long here, but that fails
    // when long double has more digits than a long long.
-   using std::floor;
-   using std::frexp;
-   using std::ldexp;
+   BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
 
    if (a == 0)
       return *this = zero();

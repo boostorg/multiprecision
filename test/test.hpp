@@ -150,6 +150,30 @@ void report_unexpected_exception(const E& e, int severity, const char* file, int
    BOOST_MP_REPORT_SEVERITY(severity);
 }
 
+#ifdef BOOST_HAS_INT128
+
+std::ostream& operator<<(std::ostream& os, __int128 val)
+{
+   std::stringstream ss;
+   ss << std::hex << "0x" << static_cast<std::uint64_t>(static_cast<unsigned __int128>(val) >> 64) << static_cast<std::uint64_t>(val);
+   return os << ss.str();
+}
+
+std::ostream& operator<<(std::ostream& os, unsigned __int128 val)
+{
+   std::stringstream ss;
+   ss << std::hex << "0x" << static_cast<std::uint64_t>(val >> 64) << static_cast<std::uint64_t>(val);
+   return os << ss.str();
+}
+
+#endif
+#ifdef BOOST_HAS_FLOAT128
+std::ostream& operator<<(std::ostream& os, __float128 f)
+{
+   return os << static_cast<long double>(f);
+}
+#endif
+
 #ifndef BOOST_NO_EXCEPTIONS
 #define BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)                                       \
    catch (const std::exception& e)                                                          \

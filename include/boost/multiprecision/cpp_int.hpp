@@ -20,6 +20,7 @@
 #include <boost/multiprecision/traits/is_byte_container.hpp>
 #include <boost/multiprecision/cpp_int/checked.hpp>
 #include <boost/multiprecision/detail/constexpr.hpp>
+#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/cpp_int/value_pack.hpp>
 #include <boost/multiprecision/detail/empty_value.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
@@ -1022,11 +1023,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 #if !(defined(__clang__) && defined(__MINGW32__))
    template <class F>
    BOOST_MP_FORCEINLINE constexpr cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == unchecked)>::type const* = nullptr) noexcept
-       : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask),
+       : m_data(static_cast<local_limb_type>(i < 0 ? -i : i) & limb_mask),
          m_sign(i < 0) {}
    template <class F>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == checked)>::type const* = nullptr)
-       : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask), m_sign(i < 0) { check_in_range(i); }
+       : m_data(static_cast<local_limb_type>(i < 0 ? -i : i) & limb_mask), m_sign(i < 0) { check_in_range(i); }
 #else
    //
    // conversion from float to __int128 is broken on clang/mingw, 
@@ -1037,11 +1038,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    //
    template <class F>
    BOOST_MP_FORCEINLINE constexpr cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == unchecked)>::type const* = nullptr) noexcept
-       : m_data(static_cast<local_limb_type>(static_cast<std::uint64_t>(std::fabs(i))) & limb_mask),
+       : m_data(static_cast<local_limb_type>(static_cast<std::uint64_t>(i < 0 ? -i : i)) & limb_mask),
          m_sign(i < 0) {}
    template <class F>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == checked)>::type const* = nullptr)
-       : m_data(static_cast<local_limb_type>(static_cast<std::uint64_t>(std::fabs(i))) & limb_mask), m_sign(i < 0) { check_in_range(i); }
+       : m_data(static_cast<local_limb_type>(static_cast<std::uint64_t>(i < 0 ? -i : i)) & limb_mask), m_sign(i < 0) { check_in_range(i); }
 #endif
 
    constexpr cpp_int_base(literals::detail::value_pack<>) noexcept
@@ -1217,7 +1218,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
 #endif
    template <class F>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value >::type const* = nullptr) noexcept((Checked == unchecked))
-       : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask)
+       : m_data(static_cast<local_limb_type>(i < 0 ? -i : i) & limb_mask)
    {
       check_in_range(i);
       if (i < 0)
@@ -1510,7 +1511,7 @@ struct cpp_int_backend
       this->normalize();
    }
    template <class A>
-   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!boost::multiprecision::detail::is_integral<A>::value>::type do_assign_arithmetic(A val, const std::integral_constant<bool, true>&)
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<A, limb_type>::value && !boost::multiprecision::detail::is_integral<A>::value>::type do_assign_arithmetic(A val, const std::integral_constant<bool, true>&)
    {
       this->check_in_range(val);
       *this->limbs() = (val < 0) ? static_cast<typename self_type::local_limb_type>(boost::multiprecision::detail::abs(val)) : static_cast<typename self_type::local_limb_type>(val);
@@ -1562,13 +1563,12 @@ struct cpp_int_backend
       this->sign(s);
    }
 
-   BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(long double a, const std::integral_constant<bool, false>&)
+   template <class F>
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_float(F a)
    {
       using default_ops::eval_add;
       using default_ops::eval_subtract;
-      using std::floor;
-      using std::frexp;
-      using std::ldexp;
+      BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
 
       if (a < 0)
       {
@@ -1593,7 +1593,7 @@ struct cpp_int_backend
       }
 
       int         e = 0;
-      long double f(0), term(0);
+      F f(0), term(0);
       *this = static_cast<limb_type>(0u);
 
       f = frexp(a, &e);
@@ -1635,9 +1635,25 @@ struct cpp_int_backend
          eval_right_shift(*this, -e);
    }
 
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(long double a, const std::integral_constant<bool, false>&)
+   {
+      return do_assign_float(a);
+   }
+
+#ifdef BOOST_HAS_FLOAT128
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(__float128 a, const std::false_type&)
+   {
+      return do_assign_float(a);
+   }
+#endif
+
  public:
    template <class Arithmetic>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!boost::multiprecision::detail::is_byte_container<Arithmetic>::value, cpp_int_backend&>::type operator=(Arithmetic val) noexcept(noexcept(std::declval<cpp_int_backend>().do_assign_arithmetic(std::declval<Arithmetic>(), trivial_tag())))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+         !boost::multiprecision::detail::is_byte_container<Arithmetic>::value 
+         && std::is_void<decltype(std::declval<cpp_int_backend>().do_assign_arithmetic(std::declval<Arithmetic>(), trivial_tag()))>::value, 
+      cpp_int_backend&>::type operator=(Arithmetic val) 
+      noexcept(noexcept(std::declval<cpp_int_backend>().do_assign_arithmetic(std::declval<Arithmetic>(), trivial_tag())))
    {
       do_assign_arithmetic(val, trivial_tag());
       return *this;

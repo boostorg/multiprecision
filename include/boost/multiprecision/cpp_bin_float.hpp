@@ -16,6 +16,7 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
+#include <boost/multiprecision/detail/float128_functions.hpp>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
@@ -1540,7 +1541,11 @@ template <class Float, unsigned Digits, digit_base_type DigitBase, class Allocat
 inline typename std::enable_if<std::is_floating_point<Float>::value>::type eval_convert_to(Float* res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& original_arg)
 {
    using conv_type = cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>;
-   using common_exp_type = typename std::common_type<typename conv_type::exponent_type, int>::type                    ;
+   using common_exp_type = typename std::common_type<typename conv_type::exponent_type, int>::type;
+
+   static constexpr int float_digits = boost::multiprecision::detail::is_float128<Float>::value ? 113 : std::numeric_limits<Float>::digits;
+
+   BOOST_MP_FLOAT128_USING using std::ldexp;
    //
    // Special cases first:
    //
@@ -1552,10 +1557,24 @@ inline typename std::enable_if<std::is_floating_point<Float>::value>::type eval_
          *res = -*res;
       return;
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
-      *res = std::numeric_limits<Float>::quiet_NaN();
+      BOOST_IF_CONSTEXPR(boost::multiprecision::detail::is_float128<Float>::value)
+      {
+         *res = std::numeric_limits<double>::quiet_NaN();
+      }
+      else
+      {
+         *res = std::numeric_limits<Float>::quiet_NaN();
+      }
       return;
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
-      *res = (std::numeric_limits<Float>::infinity)();
+      BOOST_IF_CONSTEXPR(boost::multiprecision::detail::is_float128<Float>::value)
+      {
+         *res = (std::numeric_limits<double>::infinity)();
+      }
+      else
+      {
+         *res = (std::numeric_limits<Float>::infinity)();
+      }
       if (original_arg.sign())
          *res = -*res;
       return;
@@ -1563,9 +1582,16 @@ inline typename std::enable_if<std::is_floating_point<Float>::value>::type eval_
    //
    // Check for super large exponent that must be converted to infinity:
    //
-   if (original_arg.exponent() > std::numeric_limits<Float>::max_exponent)
+   if (original_arg.exponent() > (boost::multiprecision::detail::is_float128<Float>::value ? 16384 : std::numeric_limits<Float>::max_exponent))
    {
-      *res = std::numeric_limits<Float>::has_infinity ? std::numeric_limits<Float>::infinity() : (std::numeric_limits<Float>::max)();
+      BOOST_IF_CONSTEXPR(boost::multiprecision::detail::is_float128<Float>::value) 
+      {
+         *res = std::numeric_limits<double>::infinity();
+      }
+      else
+      {
+         *res = std::numeric_limits<Float>::has_infinity ? std::numeric_limits<Float>::infinity() : (std::numeric_limits<Float>::max)();
+      }
       if (original_arg.sign())
          *res = -*res;
       return;
@@ -1574,11 +1600,11 @@ inline typename std::enable_if<std::is_floating_point<Float>::value>::type eval_
    // Figure out how many digits we will have in our result,
    // allowing for a possibly denormalized result:
    //
-   common_exp_type digits_to_round_to = std::numeric_limits<Float>::digits;
+   common_exp_type digits_to_round_to = float_digits;
    if (original_arg.exponent() < std::numeric_limits<Float>::min_exponent - 1)
    {
       common_exp_type diff = original_arg.exponent();
-      diff -= std::numeric_limits<Float>::min_exponent - 1;
+      diff -= boost::multiprecision::detail::is_float128<Float>::value ? -16382 : std::numeric_limits<Float>::min_exponent - 1;
       digits_to_round_to += diff;
    }
    if (digits_to_round_to < 0)
@@ -1592,19 +1618,19 @@ inline typename std::enable_if<std::is_floating_point<Float>::value>::type eval_
    //
    // Perform rounding first, then afterwards extract the digits:
    //
-   cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, Allocator, Exponent, MinE, MaxE> arg;
-   typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::rep_type             bits(original_arg.bits());
+   cpp_bin_float<float_digits, digit_base_2, Allocator, Exponent, MinE, MaxE>           arg;
+   typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::rep_type bits(original_arg.bits());
    arg.exponent() = original_arg.exponent();
-   copy_and_round(arg, bits, (std::ptrdiff_t )digits_to_round_to);
+   copy_and_round(arg, bits, (std::ptrdiff_t)digits_to_round_to);
    common_exp_type e = arg.exponent();
    e -= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1;
-   constexpr const std::size_t limbs_needed      = std::numeric_limits<Float>::digits / (sizeof(*arg.bits().limbs()) * CHAR_BIT) + (std::numeric_limits<Float>::digits % (sizeof(*arg.bits().limbs()) * CHAR_BIT) ? 1 : 0);
-   std::size_t first_limb_needed = arg.bits().size() - limbs_needed;
-   *res                                    = 0;
+   constexpr const std::size_t limbs_needed      = float_digits / (sizeof(*arg.bits().limbs()) * CHAR_BIT) + (float_digits % (sizeof(*arg.bits().limbs()) * CHAR_BIT) ? 1 : 0);
+   std::size_t                 first_limb_needed = arg.bits().size() - limbs_needed;
+   *res                                          = 0;
    e += static_cast<common_exp_type>(first_limb_needed * sizeof(*arg.bits().limbs()) * CHAR_BIT);
    while (first_limb_needed < arg.bits().size())
    {
-      *res += std::ldexp(static_cast<Float>(arg.bits().limbs()[first_limb_needed]), static_cast<int>(e));
+      *res += ldexp(static_cast<Float>(arg.bits().limbs()[first_limb_needed]), static_cast<int>(e));
       ++first_limb_needed;
       e += sizeof(*arg.bits().limbs()) * CHAR_BIT;
    }
@@ -1915,6 +1941,14 @@ struct transcendental_reduction_type<boost::multiprecision::backends::cpp_bin_fl
        boost::multiprecision::backends::digit_base_2, 
        Allocator, Exponent, MinExponent, MaxExponent>;
 };
+#ifdef BOOST_HAS_INT128
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinExponent, Exponent MaxExponent>
+struct is_convertible_arithmetic<__int128, boost::multiprecision::backends::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent> > : public std::true_type
+{};
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinExponent, Exponent MaxExponent>
+struct is_convertible_arithmetic<unsigned __int128, boost::multiprecision::backends::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent> > : public std::true_type
+{};
+#endif
 
 } // namespace detail
 

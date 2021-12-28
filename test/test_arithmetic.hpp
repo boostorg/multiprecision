@@ -1609,7 +1609,7 @@ void test_negative_mixed(std::integral_constant<bool, true> const&)
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n2) + 0)), n2);
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n3) + 0)), n3);
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n4) + 0)), n4);
-   test_negative_mixed_numeric_limits<Real, Num>(std::integral_constant<bool, std::numeric_limits<Real>::is_specialized>());
+   test_negative_mixed_numeric_limits<Real, Num>(std::integral_constant<bool, std::numeric_limits<Real>::is_specialized && std::numeric_limits<Num>::is_specialized>());
    // Assignment:
    Real r(0);
    BOOST_CHECK(r != static_cast<cast_type>(n1));
@@ -2110,7 +2110,7 @@ void test_mixed(const std::integral_constant<bool, true>&)
    d = b * static_cast<cast_type>(n3) - static_cast<cast_type>(n1);
    BOOST_CHECK_EQUAL(d, 3 * 4 - 2);
 
-   test_mixed_numeric_limits<Real, Num>(std::integral_constant<bool, std::numeric_limits<Real>::is_specialized>());
+   test_mixed_numeric_limits<Real, Num>(std::integral_constant < bool, std::numeric_limits<Real>::is_specialized && std::numeric_limits<Num>::is_specialized > ());
 }
 
 template <class Real>
@@ -2909,9 +2909,20 @@ void test()
    test_mixed<Real, long long>(tag);
    test_mixed<Real, unsigned long long>(tag);
 #endif
+#if defined(BOOST_HAS_INT128) && !defined(BOOST_NO_CXX17_IF_CONSTEXPR)
+   if constexpr (std::is_constructible<Real, __int128>::value)
+   {
+      test_mixed<Real, __int128>(tag);
+      test_mixed<Real, unsigned __int128>(tag);
+   }
+#endif
    test_mixed<Real, float>(tag);
    test_mixed<Real, double>(tag);
    test_mixed<Real, long double>(tag);
+#if defined(BOOST_HAS_FLOAT128) && !defined(BOOST_NO_CXX17_IF_CONSTEXPR)
+   if constexpr (std::is_constructible<Real, __float128>::value)
+      test_mixed<Real, __float128>(tag);
+#endif
 
    typedef typename related_type<Real>::type                                                                      related_type;
    std::integral_constant<bool, boost::multiprecision::is_number<Real>::value && !std::is_same<related_type, Real>::value> tag2;
