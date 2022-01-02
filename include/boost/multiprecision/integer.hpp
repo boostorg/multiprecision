@@ -11,6 +11,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 
 namespace boost {
 namespace multiprecision {
