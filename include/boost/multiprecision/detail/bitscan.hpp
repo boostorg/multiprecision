@@ -12,6 +12,7 @@
 #include <climits>
 #include <type_traits>
 #include <boost/multiprecision/detail/endian.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 
 #if (defined(BOOST_MSVC) || (defined(__clang__) && defined(__c2__)) || (defined(BOOST_INTEL) && defined(_MSC_VER))) && (defined(_M_IX86) || defined(_M_X64))
 #include <intrin.h>
@@ -170,8 +171,6 @@ BOOST_FORCEINLINE std::size_t find_msb(unsigned long long mask, std::integral_co
    return sizeof(unsigned long long) * CHAR_BIT - 1 - __builtin_clzll(mask);
 }
 #ifdef BOOST_HAS_INT128
-
-__extension__ using uint128_type = unsigned __int128;
 
 BOOST_FORCEINLINE std::size_t find_msb(uint128_type mask, std::integral_constant<int, 0> const&)
 {

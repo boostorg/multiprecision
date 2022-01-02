@@ -187,8 +187,8 @@ struct rational_adaptor
       int   e;
       Float f = frexp(i, &e);
 #ifdef BOOST_HAS_FLOAT128
-      f = ldexp(f, std::is_same<__float128, Float>::value ? 113 : std::numeric_limits<Float>::digits);
-      e -= std::is_same<__float128, Float>::value ? 113 : std::numeric_limits<Float>::digits;
+      f = ldexp(f, std::is_same<float128_type, Float>::value ? 113 : std::numeric_limits<Float>::digits);
+      e -= std::is_same<float128_type, Float>::value ? 113 : std::numeric_limits<Float>::digits;
 #else
       f = ldexp(f, std::numeric_limits<Float>::digits);
       e -= std::numeric_limits<Float>::digits;

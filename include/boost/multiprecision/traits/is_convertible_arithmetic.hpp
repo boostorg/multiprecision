@@ -28,21 +28,21 @@ struct is_convertible_arithmetic
 //
 #ifdef BOOST_HAS_FLOAT128
 template <class Backend>
-struct is_convertible_arithmetic<__float128, Backend>
+struct is_convertible_arithmetic<float128_type, Backend>
 {
-   static constexpr bool value = std::is_assignable<Backend, convertible_to<__float128>>::value;
+   static constexpr bool value = std::is_assignable<Backend, convertible_to<float128_type>>::value;
 };
 #endif
 #ifdef BOOST_HAS_INT128
 template <class Backend>
-struct is_convertible_arithmetic<__int128, Backend>
+struct is_convertible_arithmetic<int128_type, Backend>
 {
-   static constexpr bool value = std::is_assignable<Backend, convertible_to<__int128>>::value;
+   static constexpr bool value = std::is_assignable<Backend, convertible_to<int128_type>>::value;
 };
 template <class Backend>
-struct is_convertible_arithmetic<unsigned __int128, Backend>
+struct is_convertible_arithmetic<uint128_type, Backend>
 {
-   static constexpr bool value = std::is_assignable<Backend, convertible_to<unsigned __int128>>::value;
+   static constexpr bool value = std::is_assignable<Backend, convertible_to<uint128_type>>::value;
 };
 #endif
 

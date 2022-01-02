@@ -210,13 +210,13 @@ struct mpc_complex_imp
       return *this;
    }
 #ifdef BOOST_HAS_INT128
-   mpc_complex_imp& operator=(__int128 val)
+   mpc_complex_imp& operator=(int128_type val)
    {
       gmp_int i;
       i            = val;
       return *this = i.data();
    }
-   mpc_complex_imp& operator=(unsigned __int128 val)
+   mpc_complex_imp& operator=(uint128_type val)
    {
       gmp_int i;
       i            = val;
@@ -224,7 +224,7 @@ struct mpc_complex_imp
    }
 #endif
 #ifdef BOOST_HAS_FLOAT128
-   mpc_complex_imp& operator=(__float128 val)
+   mpc_complex_imp& operator=(float128_type val)
    {
       mpfr_float_backend<digits10> f;
       f            = val;
@@ -1256,7 +1256,7 @@ inline void eval_convert_to(long double* result, const mpc_complex_backend<digit
 }
 #ifdef BOOST_HAS_INT128
 template <unsigned digits10>
-inline void eval_convert_to(unsigned __int128* result, const mpc_complex_backend<digits10>& val)
+inline void eval_convert_to(uint128_type* result, const mpc_complex_backend<digits10>& val)
 {
    using default_ops::eval_convert_to;
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
@@ -1268,7 +1268,7 @@ inline void eval_convert_to(unsigned __int128* result, const mpc_complex_backend
    eval_convert_to(result, t);
 }
 template <unsigned digits10>
-inline void eval_convert_to(__int128* result, const mpc_complex_backend<digits10>& val)
+inline void eval_convert_to(int128_type* result, const mpc_complex_backend<digits10>& val)
 {
    using default_ops::eval_convert_to;
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
@@ -1279,8 +1279,10 @@ inline void eval_convert_to(__int128* result, const mpc_complex_backend<digits10
    mpc_real(t.data(), val.data(), GMP_RNDN);
    eval_convert_to(result, t);
 }
+#endif
+#ifdef BOOST_HAS_FLOAT128
 template <unsigned digits10>
-inline void eval_convert_to(__float128* result, const mpc_complex_backend<digits10>& val)
+inline void eval_convert_to(float128_type* result, const mpc_complex_backend<digits10>& val)
 {
    using default_ops::eval_convert_to;
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))

@@ -202,7 +202,12 @@ BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, si
    // about the same amount of time as long as long double is not an emulated 128-bit type (ie the same type
    // as __float128 from libquadmath).  So only use long double if it's an 80-bit type:
    //
+#ifndef __clang__
    typedef typename std::conditional<(std::numeric_limits<long double>::digits == 64), long double, double>::type real_cast_type;
+#else
+   // clang has buggy __int128 -> long double conversion:
+   typedef double real_cast_type;
+#endif
    //
    // As per the Karatsuba sqrt algorithm, the low order bits/4 bits pay no part in the result, only in the remainder,
    // so define the number of bits our argument must have before passing to std::sqrt is safe, even if doing so
@@ -213,7 +218,7 @@ BOOST_MP_CXX14_CONSTEXPR Integer karatsuba_sqrt(const Integer& x, Integer& r, si
    // Type which can hold at least "cutoff" bits:
    // 
 #ifdef BOOST_HAS_INT128
-   using cutoff_t = typename std::conditional<(cutoff > 64), unsigned __int128, std::uint64_t>::type;
+   using cutoff_t = typename std::conditional<(cutoff > 64), uint128_type, std::uint64_t>::type;
 #else
    using cutoff_t = std::uint64_t;
 #endif

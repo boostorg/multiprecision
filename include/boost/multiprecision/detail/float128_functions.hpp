@@ -25,6 +25,7 @@ extern "C" __float128 floorq(__float128) throw();
 extern "C" __float128 nextafterq(__float128, __float128) throw();
 extern "C" int        isinfq(__float128) throw();
 extern "C" int        isnanq(__float128) throw();
+extern "C" __float128 strtoflt128(const char*, char**) throw();
 
 inline __float128 ldexp(__float128 f, int i) throw() { return ldexpq(f, i); }
 inline __float128 frexp(__float128 f, int* p) throw() { return frexpq(f, p); }

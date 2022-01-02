@@ -1930,6 +1930,17 @@ void test_mixed_numeric_limits(const std::integral_constant<bool, false>&)
 {
 }
 
+template <class Num>
+struct is_definitely_unsigned_int
+    : public std::integral_constant<bool, std::numeric_limits<Num>::is_specialized && !std::numeric_limits<Num>::is_signed>
+{};
+#ifdef BOOST_HAS_INT128
+template <>
+struct is_definitely_unsigned_int<unsigned __int128>
+    : public std::true_type
+{};
+#endif
+
 template <class Real, class Num>
 void test_mixed(const std::integral_constant<bool, true>&)
 {
@@ -2034,7 +2045,9 @@ void test_mixed(const std::integral_constant<bool, true>&)
    BOOST_CHECK_EQUAL(r, static_cast<cast_type>(n4));
 
    typedef std::integral_constant<bool, 
-       (!std::numeric_limits<Num>::is_specialized || std::numeric_limits<Num>::is_signed) && (!std::numeric_limits<Real>::is_specialized || std::numeric_limits<Real>::is_signed)>
+       (!std::numeric_limits<Num>::is_specialized || std::numeric_limits<Num>::is_signed) 
+      && (!std::numeric_limits<Real>::is_specialized || std::numeric_limits<Real>::is_signed) 
+      && !is_definitely_unsigned_int<Num>::value>
        signed_tag;
 
    test_negative_mixed<Real, Num>(signed_tag());

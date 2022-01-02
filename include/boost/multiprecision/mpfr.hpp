@@ -238,7 +238,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
 #endif
 #endif
 #ifdef BOOST_HAS_INT128
-   mpfr_float_imp& operator=(unsigned __int128 i)
+   mpfr_float_imp& operator=(uint128_type i)
    {
       if (m_data[0]._mpfr_d == 0)
          mpfr_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
@@ -259,7 +259,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       mpfr_clear(t);
       return *this;
    }
-   mpfr_float_imp& operator=(__int128 i)
+   mpfr_float_imp& operator=(int128_type i)
    {
       if (m_data[0]._mpfr_d == 0)
          mpfr_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
@@ -299,7 +299,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       return *this;
    }
 #ifdef BOOST_HAS_FLOAT128
-   mpfr_float_imp& operator=(__float128 a)
+   mpfr_float_imp& operator=(float128_type a)
    {
       BOOST_MP_FLOAT128_USING
       if (m_data[0]._mpfr_d == 0)
@@ -321,7 +321,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
 
       int        e;
-      __float128 f, term;
+      float128_type f, term;
       mpfr_set_ui(m_data, 0u, GMP_RNDN);
 
       f = frexp(a, &e);
@@ -663,7 +663,7 @@ struct mpfr_float_imp<digits10, allocate_stack>
 #endif
 #endif
 #ifdef BOOST_HAS_INT128
-   mpfr_float_imp& operator=(unsigned __int128 i)
+   mpfr_float_imp& operator=(uint128_type i)
    {
       unsigned long long mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uL);
       unsigned           shift = 0;
@@ -683,7 +683,7 @@ struct mpfr_float_imp<digits10, allocate_stack>
       }
       return *this;
    }
-   mpfr_float_imp& operator=(__int128 i)
+   mpfr_float_imp& operator=(int128_type i)
    {
       bool neg = i < 0;
       *this    = boost::multiprecision::detail::unsigned_abs(i);
@@ -713,7 +713,7 @@ struct mpfr_float_imp<digits10, allocate_stack>
       return *this;
    }
 #ifdef BOOST_HAS_FLOAT128
-   mpfr_float_imp& operator=(__float128 a)
+   mpfr_float_imp& operator=(float128_type a)
    {
       BOOST_MP_FLOAT128_USING
       if (a == 0)
@@ -732,7 +732,7 @@ struct mpfr_float_imp<digits10, allocate_stack>
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
 
       int        e;
-      __float128 f, term;
+      float128_type f, term;
       mpfr_set_ui(m_data, 0u, GMP_RNDN);
 
       f = frexp(a, &e);
@@ -1662,6 +1662,30 @@ inline void eval_convert_to(long double* result, const mpfr_float_backend<digits
 {
    *result = mpfr_get_ld(val.data(), GMP_RNDN);
 }
+
+#ifdef BOOST_HAS_INT128
+template <unsigned digits10, mpfr_allocation_type AllocationType>
+inline void eval_convert_to(int128_type* result, const mpfr_float_backend<digits10, AllocationType>& val) noexcept
+{
+   gmp_int i;
+   mpfr_get_z(i.data(), val.data(), GMP_RNDN);
+   eval_convert_to(result, i);
+}
+template <unsigned digits10, mpfr_allocation_type AllocationType>
+inline void eval_convert_to(uint128_type* result, const mpfr_float_backend<digits10, AllocationType>& val) noexcept
+{
+   gmp_int i;
+   mpfr_get_z(i.data(), val.data(), GMP_RNDN);
+   eval_convert_to(result, i);
+}
+#endif
+#if defined(BOOST_HAS_FLOAT128)
+template <unsigned digits10, mpfr_allocation_type AllocationType>
+inline void eval_convert_to(float128_type* result, const mpfr_float_backend<digits10, AllocationType>& val) noexcept
+{
+   *result = float128_procs::strtoflt128(val.str(0, std::ios_base::scientific).c_str(), nullptr);
+}
+#endif
 
 //
 // Native non-member operations:

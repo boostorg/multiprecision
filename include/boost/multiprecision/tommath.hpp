@@ -149,12 +149,12 @@ struct tommath_int
    }
 #ifdef BOOST_HAS_INT128
    // Pick off 64 bit chunks for mp_set_u64:
-   tommath_int& operator=(unsigned __int128 i)
+   tommath_int& operator=(uint128_type i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
 
-      __int128  mask  = ((static_cast<unsigned __int128>(1u) << 64) - 1);
+      int128_type  mask  = ((static_cast<uint128_type>(1u) << 64) - 1);
       unsigned           shift = 0;
       ::mp_int           t;
       detail::check_tommath_result(mp_init(&t));
@@ -171,7 +171,7 @@ struct tommath_int
       mp_clear(&t);
       return *this;
    }
-   tommath_int& operator=(__int128 i)
+   tommath_int& operator=(int128_type i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
@@ -301,7 +301,7 @@ struct tommath_int
       return assign_float(a);
    }
 #ifdef BOOST_HAS_FLOAT128
-   tommath_int& operator= (__float128 a)
+   tommath_int& operator= (float128_type a)
    {
       return assign_float(a);
    }
@@ -709,107 +709,88 @@ inline int eval_get_sign(const tommath_int& val)
 #endif
 }
 
-#ifdef BOOST_MP_STANDALONE
-
-namespace detail {
-
-template <typename T1, typename T2>
-inline void safe_conversion(T1 test_result, T2* result)
-{
-   if(test_result >= (std::numeric_limits<T2>::max)())
-   {
-      *result = (std::numeric_limits<T2>::max)();
-   }
-   else if(test_result <= (std::numeric_limits<T2>::min)())
-   {
-      *result = (std::numeric_limits<T2>::min)();
-   }
-   else
-   {
-      *result = static_cast<T2>(test_result);
-   }
-}
-
-template <typename T1, typename T2>
-inline void safe_unsigned_conversion(T1 test_result, T2* result)
-{
-   if(test_result >= (std::numeric_limits<T2>::max)())
-   {
-      *result = (std::numeric_limits<T2>::max)();
-   }
-   else if(test_result < (std::numeric_limits<T2>::min)())
-   {
-      *result = (std::numeric_limits<T2>::min)();
-   }
-   else
-   {
-      *result = static_cast<T2>(test_result);
-   }
-}
-
-}
-
 inline void eval_convert_to(unsigned long long* result, const tommath_int& val)
 {
-   *result = std::strtoull(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
+   if (mp_isneg(&val.data()))
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Converting negative arbitrary precision value to unsigned."));
+   }
+#ifdef MP_DEPRECATED
+   *result = mp_get_ull(&val.data());
+#else
+   *result = mp_get_long_long(&val.data());
+#endif
 }
 
 inline void eval_convert_to(long long* result, const tommath_int& val)
 {
-   *result = std::strtoll(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
+   if (!mp_iszero(&val.data()) && (mp_count_bits(const_cast<::mp_int*>(&val.data())) > std::numeric_limits<long long>::digits))
+   {
+      *result = mp_isneg(&val.data()) ? (std::numeric_limits<long long>::min)() : (std::numeric_limits<long long>::max)();
+      return;
+   }
+#ifdef MP_DEPRECATED
+   unsigned long long r = mp_get_mag_ull(&val.data());
+   if (mp_isneg(&val.data()))
+      *result = -static_cast<long long>(r);
+   else
+      *result = r;
+#else
+   * result = mp_get_long_long(&val.data());
+#endif
 }
 
-inline void eval_convert_to(unsigned long* result, const tommath_int& val)
+#ifdef BOOST_HAS_INT128
+inline void eval_convert_to(uint128_type* result, const tommath_int& val)
 {
-   *result = std::strtoul(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
+#ifdef MP_DEPRECATED
+   if (mp_ubin_size(&val.data()) > sizeof(uint128_type))
+   {
+      *result = ~static_cast<uint128_type>(0);
+      return;
+   }
+   unsigned char buf[sizeof(uint128_type)];
+   std::size_t   len;
+   detail::check_tommath_result(mp_to_ubin(&val.data(), buf, sizeof(buf), &len));
+   *result = 0;
+   for (std::size_t i = 0; i < len; ++i)
+   {
+      *result <<= CHAR_BIT;
+      *result |= buf[i];
+   }
+#else
+   std::size_t len = mp_unsigned_bin_size(&val.data());
+   if (len > sizeof(uint128_type))
+   {
+      *result = ~static_cast<uint128_type>(0);
+      return;
+   }
+   unsigned char buf[sizeof(uint128_type)];
+   detail::check_tommath_result(mp_to_unsigned_bin(&i.data(), buf));
+   *result = 0;
+   for (std::size_t i = 0; i < len; ++i)
+   {
+      *result <<= CHAR_BIT;
+      *result |= buf[i];
+   }
+#endif
 }
-
-inline void eval_convert_to(long* result, const tommath_int& val)
+inline void eval_convert_to(int128_type* result, const tommath_int& val)
 {
-   const long long test_result = std::strtoll(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
-   detail::safe_conversion(test_result, result);
-}
-
-inline void eval_convert_to(unsigned* result, const tommath_int& val)
-{
-   *result = static_cast<unsigned>(std::strtoul(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10));
-}
-
-inline void eval_convert_to(int* result, const tommath_int& val)
-{
-   const long long test_result = std::strtoll(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
-   detail::safe_conversion(test_result, result);
-}
-
-inline void eval_convert_to(unsigned short* result, const tommath_int& val)
-{
-   const unsigned long long test_result = std::strtoull(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
-   detail::safe_unsigned_conversion(test_result, result);
-}
-
-inline void eval_convert_to(short* result, const tommath_int& val)
-{
-   const long long test_result = std::strtoll(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr, 10);
-   detail::safe_conversion(test_result, result);
-}
-
-#ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
-inline void eval_convert_to(long double* result, const tommath_int& val)
-{
-   *result = std::strtold(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr);
+   uint128_type r;
+   eval_convert_to(&r, val);
+   if (mp_isneg(&val.data()))
+      *result = -static_cast<int128_type>(r);
+   else
+      *result = r;
 }
 #endif
-
-inline void eval_convert_to(double* result, const tommath_int& val)
+#if defined(BOOST_HAS_FLOAT128)
+inline void eval_convert_to(float128_type* result, const tommath_int& val) noexcept
 {
-   *result = std::strtod(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr);
+   *result = float128_procs::strtoflt128(val.str(0, std::ios_base::scientific).c_str(), nullptr);
 }
-
-inline void eval_convert_to(float* result, const tommath_int& val)
-{
-   *result = std::strtof(val.str(0, std::ios_base::fmtflags(0)).c_str(), nullptr);
-}
-#endif // BOOST_MP_STANDALONE
+#endif
 
 
 inline void eval_abs(tommath_int& result, const tommath_int& val)

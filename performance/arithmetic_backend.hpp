@@ -36,7 +36,7 @@ struct arithmetic_backend
    BOOST_MP_CXX14_CONSTEXPR arithmetic_backend() : m_value(0) {}
    BOOST_MP_CXX14_CONSTEXPR arithmetic_backend(const arithmetic_backend& o) : m_value(o.m_value) {}
    template <class A>
-   BOOST_MP_CXX14_CONSTEXPR arithmetic_backend(const A& o, const typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value >::type* = 0) : m_value(o) {}
+   BOOST_MP_CXX14_CONSTEXPR arithmetic_backend(const A& o, const typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value && std::numeric_limits<A>::is_specialized>::type* = 0) : m_value(o) {}
    template <class A>
    BOOST_MP_CXX14_CONSTEXPR arithmetic_backend(const arithmetic_backend<A>& o) : m_value(o.data()) {}
    BOOST_MP_CXX14_CONSTEXPR arithmetic_backend& operator=(const arithmetic_backend& o)

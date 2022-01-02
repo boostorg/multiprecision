@@ -182,7 +182,7 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
    }
 
 #ifdef BOOST_HAS_FLOAT128
-   std::ptrdiff_t bits_to_keep = std::is_same<R, __float128>::value ? 113 : std::numeric_limits<R>::digits;
+   std::ptrdiff_t bits_to_keep = std::is_same<R, float128_type>::value ? 113 : std::numeric_limits<R>::digits;
 #else
    std::ptrdiff_t bits_to_keep = std::numeric_limits<R>::digits;
 #endif

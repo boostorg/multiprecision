@@ -970,15 +970,15 @@ namespace detail {
    {};
 #ifdef BOOST_HAS_INT128
    template <class Backend>
-   struct is_convertible_arithmetic<__int128, complex_adaptor<Backend> > : is_convertible_arithmetic<__int128, Backend>
+   struct is_convertible_arithmetic<int128_type, complex_adaptor<Backend> > : is_convertible_arithmetic<int128_type, Backend>
    {};
    template <class Backend>
-   struct is_convertible_arithmetic<unsigned __int128, complex_adaptor<Backend> > : is_convertible_arithmetic<unsigned __int128, Backend>
+   struct is_convertible_arithmetic<uint128_type, complex_adaptor<Backend> > : is_convertible_arithmetic<uint128_type, Backend>
    {};
 #endif
 #ifdef BOOST_HAS_FLOAT128
    template <class Backend>
-   struct is_convertible_arithmetic<__float128, complex_adaptor<Backend> > : is_convertible_arithmetic<__float128, Backend>
+   struct is_convertible_arithmetic<float128_type, complex_adaptor<Backend> > : is_convertible_arithmetic<float128_type, Backend>
    {};
 #endif
    } // namespace detail
