@@ -3734,6 +3734,8 @@ namespace Eigen
          IsSigned = std::numeric_limits<self_type>::is_specialized ? std::numeric_limits<self_type>::is_signed : true,
          RequireInitialization = 1,
       };
+      
+      #if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
       static Real epsilon()
       {
          return boost::math::tools::epsilon<Real>();
@@ -3750,15 +3752,17 @@ namespace Eigen
       {
          return boost::math::tools::min_value<Real>();
       }
-      static int digits10()
-      {
-         return Real::thread_default_precision();
-      }
       static int digits()
       {
          return boost::math::tools::digits<Real>();
       }
-      static int min_exponent()
+      #endif // Standalone config options
+
+      static int digits10()
+      {
+         return Real::thread_default_precision();
+      }
+      static constexpr long min_exponent() noexcept
       {
          return LONG_MIN;
       }
