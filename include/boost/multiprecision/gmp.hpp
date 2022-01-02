@@ -541,6 +541,28 @@ struct gmp_float_imp
    }
 };
 
+class gmp_char_ptr
+{
+private:
+   char* ptr_val;
+   void* (*alloc_func_ptr)(size_t);
+   void* (*realloc_func_ptr)(void*, size_t, size_t);
+   void  (*free_func_ptr)(void*, size_t);
+
+public:
+   gmp_char_ptr() = delete;
+   explicit gmp_char_ptr(char* val_) : ptr_val {val_}
+   {
+      mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
+   }
+   ~gmp_char_ptr() noexcept 
+   {
+      (*free_func_ptr)((void*)ptr_val, sizeof(*ptr_val));
+      ptr_val = nullptr;
+   }
+   inline char* get() noexcept { return ptr_val; }
+};
+
 } // namespace detail
 
 struct gmp_int;
@@ -3734,7 +3756,7 @@ namespace Eigen
          IsSigned = std::numeric_limits<self_type>::is_specialized ? std::numeric_limits<self_type>::is_signed : true,
          RequireInitialization = 1,
       };
-      
+
       #if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
       static Real epsilon()
       {
