@@ -161,7 +161,11 @@ struct tommath_int
       mp_zero(&m_data);
       while (i)
       {
+#ifndef mp_get_u32
+         detail::check_tommath_result(mp_set_long_long(&t, static_cast<std::uint64_t>(i & mask)));
+#else
          mp_set_u64(&t, static_cast<std::uint64_t>(i & mask));
+#endif
          if (shift)
             detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
          detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
@@ -718,7 +722,7 @@ inline void eval_convert_to(unsigned long long* result, const tommath_int& val)
 #ifdef MP_DEPRECATED
    *result = mp_get_ull(&val.data());
 #else
-   *result = mp_get_long_long(&val.data());
+   *result = mp_get_long_long(const_cast<mp_int*>(&val.data()));
 #endif
 }
 
@@ -731,13 +735,13 @@ inline void eval_convert_to(long long* result, const tommath_int& val)
    }
 #ifdef MP_DEPRECATED
    unsigned long long r = mp_get_mag_ull(&val.data());
+#else
+   unsigned long long r = mp_get_long_long(const_cast<mp_int*>(&val.data()));
+#endif
    if (mp_isneg(&val.data()))
       *result = -static_cast<long long>(r);
    else
       *result = r;
-#else
-   * result = mp_get_long_long(&val.data());
-#endif
 }
 
 #ifdef BOOST_HAS_INT128
@@ -759,14 +763,14 @@ inline void eval_convert_to(uint128_type* result, const tommath_int& val)
       *result |= buf[i];
    }
 #else
-   std::size_t len = mp_unsigned_bin_size(&val.data());
+   std::size_t len = mp_unsigned_bin_size(const_cast<mp_int*>(&val.data()));
    if (len > sizeof(uint128_type))
    {
       *result = ~static_cast<uint128_type>(0);
       return;
    }
    unsigned char buf[sizeof(uint128_type)];
-   detail::check_tommath_result(mp_to_unsigned_bin(&i.data(), buf));
+   detail::check_tommath_result(mp_to_unsigned_bin(const_cast<mp_int*>(&val.data()), buf));
    *result = 0;
    for (std::size_t i = 0; i < len; ++i)
    {
