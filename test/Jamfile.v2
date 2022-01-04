@@ -512,7 +512,7 @@ test-suite conversions :
            : # command line
            : # input files
            : # requirements
-            [ check-target-builds ../config//has_gmp : : <build>no ] ]
+            [ check-target-builds ../config//has_gmp : : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath : ] ]
 
    [ run test_mpfr_conversions.cpp gmp mpfr no_eh_support
            : # command line
