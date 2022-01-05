@@ -3,7 +3,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#ifdef __MINGW32_MAJOR_VERSION
+#if defined(__GNUC__) && defined(_WIN32)
 //
 // Without this, our object files get to big!
 //
