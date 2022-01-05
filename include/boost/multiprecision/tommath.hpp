@@ -795,6 +795,18 @@ inline void eval_convert_to(float128_type* result, const tommath_int& val) noexc
    *result = float128_procs::strtoflt128(val.str(0, std::ios_base::scientific).c_str(), nullptr);
 }
 #endif
+inline void eval_convert_to(long double* result, const tommath_int& val) noexcept
+{
+   *result = std::strtold(val.str(0, std::ios_base::scientific).c_str(), nullptr);
+}
+inline void eval_convert_to(double* result, const tommath_int& val) noexcept
+{
+   *result = std::strtod(val.str(0, std::ios_base::scientific).c_str(), nullptr);
+}
+inline void eval_convert_to(float* result, const tommath_int& val) noexcept
+{
+   *result = std::strtof(val.str(0, std::ios_base::scientific).c_str(), nullptr);
+}
 
 
 inline void eval_abs(tommath_int& result, const tommath_int& val)
