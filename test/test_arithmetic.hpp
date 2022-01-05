@@ -26,6 +26,35 @@ struct is_checked_cpp_int : public std::integral_constant<bool, false>
 #pragma warning(disable : 4127)
 #endif
 
+//
+// This works around some platforms which have missing typeinfo
+// for __int128 and/or __float128:
+//
+template <class T>
+inline const char* name_of()
+{
+   return typeid(T).name();
+}
+#ifdef BOOST_HAS_INT128
+template <>
+inline const char* name_of<__int128>()
+{
+   return "__int128";
+}
+template <>
+inline const char* name_of<unsigned __int128>()
+{
+   return "unsigned __int128";
+}
+#endif
+#ifdef BOOST_HAS_FLOAT128
+template <>
+inline const char* name_of<__int128>()
+{
+   return "__float128";
+}
+#endif
+
 template <class Target, class Source>
 Target checked_lexical_cast(const Source& val)
 {
@@ -38,8 +67,8 @@ Target checked_lexical_cast(const Source& val)
    }
    catch (...)
    {
-      std::cerr << "Error in lexical cast\nSource type = " << typeid(Source).name() << " \"" << val << "\"\n";
-      std::cerr << "Target type = " << typeid(Target).name() << std::endl;
+      std::cerr << "Error in lexical cast\nSource type = " << name_of<Source>() << " \"" << val << "\"\n";
+      std::cerr << "Target type = " << name_of<Target>() << std::endl;
       throw;
    }
 #endif
