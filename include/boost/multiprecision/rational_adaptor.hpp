@@ -8,6 +8,7 @@
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 namespace boost {
@@ -181,11 +182,17 @@ struct rational_adaptor
    typename std::enable_if<std::is_floating_point<Float>::value, rational_adaptor&>::type operator=(Float i)
    {
       using default_ops::eval_eq;
+      BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
 
       int   e;
-      Float f = std::frexp(i, &e);
-      f = std::ldexp(f, std::numeric_limits<Float>::digits);
+      Float f = frexp(i, &e);
+#ifdef BOOST_HAS_FLOAT128
+      f = ldexp(f, std::is_same<float128_type, Float>::value ? 113 : std::numeric_limits<Float>::digits);
+      e -= std::is_same<float128_type, Float>::value ? 113 : std::numeric_limits<Float>::digits;
+#else
+      f = ldexp(f, std::numeric_limits<Float>::digits);
       e -= std::numeric_limits<Float>::digits;
+#endif
       number<Backend> num(f);
       number<Backend> denom(1u);
       if (e > 0)
@@ -207,7 +214,6 @@ struct rational_adaptor
       this->denom() = std::move(std::move(denom).backend());
       return *this;
    }
-
 
    void swap(rational_adaptor& o)
    {

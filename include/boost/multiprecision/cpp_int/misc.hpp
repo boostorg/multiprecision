@@ -12,6 +12,7 @@
 #define BOOST_MP_CPP_INT_MISC_HPP
 
 #include <boost/multiprecision/detail/standalone_config.hpp>
+#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 #include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
@@ -173,13 +174,18 @@ template <class R, std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type 
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_floating_point<R>::value && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value, void>::type
 eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& backend) noexcept(boost::multiprecision::detail::is_arithmetic<R>::value)
 {
+   BOOST_MP_FLOAT128_USING using std::ldexp;
    if (eval_is_zero(backend))
    {
       *result = 0.0f;
       return;
    }
 
+#ifdef BOOST_HAS_FLOAT128
+   std::ptrdiff_t bits_to_keep = std::is_same<R, float128_type>::value ? 113 : std::numeric_limits<R>::digits;
+#else
    std::ptrdiff_t bits_to_keep = std::numeric_limits<R>::digits;
+#endif
    std::ptrdiff_t bits = eval_msb_imp(backend) + 1;
 
    if (bits > bits_to_keep)
@@ -205,7 +211,7 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
                   mask <<= bits_in_first_limb - bits_to_keep;
             }
          }
-         *result += std::ldexp(static_cast<R>(p[index] & mask), (int)shift);
+         *result += ldexp(static_cast<R>(p[index] & mask), (int)shift);
          shift -= cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
          bits_to_keep -= (index == backend.size() - 1) && (bits % cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
             ? bits % cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits 
@@ -227,7 +233,7 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
       *result = static_cast<R>(*p);
       for (std::size_t i = 1; i < backend.size(); ++i)
       {
-         *result += static_cast<R>(std::ldexp(static_cast<long double>(p[i]), (int)shift));
+         *result += static_cast<R>(ldexp(static_cast<long double>(p[i]), (int)shift));
          shift += cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
       }
    }

@@ -20,6 +20,7 @@
 #include <boost/multiprecision/traits/is_byte_container.hpp>
 #include <boost/multiprecision/cpp_int/checked.hpp>
 #include <boost/multiprecision/detail/constexpr.hpp>
+#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/cpp_int/value_pack.hpp>
 #include <boost/multiprecision/detail/empty_value.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
@@ -1022,11 +1023,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 #if !(defined(__clang__) && defined(__MINGW32__))
    template <class F>
    BOOST_MP_FORCEINLINE constexpr cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == unchecked)>::type const* = nullptr) noexcept
-       : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask),
+       : m_data(static_cast<local_limb_type>(i < 0 ? -i : i) & limb_mask),
          m_sign(i < 0) {}
    template <class F>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == checked)>::type const* = nullptr)
-       : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask), m_sign(i < 0) { check_in_range(i); }
+       : m_data(static_cast<local_limb_type>(i < 0 ? -i : i) & limb_mask), m_sign(i < 0) { check_in_range(i); }
 #else
    //
    // conversion from float to __int128 is broken on clang/mingw, 
@@ -1037,11 +1038,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    //
    template <class F>
    BOOST_MP_FORCEINLINE constexpr cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == unchecked)>::type const* = nullptr) noexcept
-       : m_data(static_cast<local_limb_type>(static_cast<std::uint64_t>(std::fabs(i))) & limb_mask),
+       : m_data(static_cast<local_limb_type>(static_cast<std::uint64_t>(i < 0 ? -i : i)) & limb_mask),
          m_sign(i < 0) {}
    template <class F>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value && (Checked == checked)>::type const* = nullptr)
-       : m_data(static_cast<local_limb_type>(static_cast<std::uint64_t>(std::fabs(i))) & limb_mask), m_sign(i < 0) { check_in_range(i); }
+       : m_data(static_cast<local_limb_type>(static_cast<std::uint64_t>(i < 0 ? -i : i)) & limb_mask), m_sign(i < 0) { check_in_range(i); }
 #endif
 
    constexpr cpp_int_base(literals::detail::value_pack<>) noexcept
@@ -1217,7 +1218,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
 #endif
    template <class F>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(F i, typename std::enable_if<std::is_floating_point<F>::value >::type const* = nullptr) noexcept((Checked == unchecked))
-       : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask)
+       : m_data(static_cast<local_limb_type>(i < 0 ? -i : i) & limb_mask)
    {
       check_in_range(i);
       if (i < 0)
@@ -1490,46 +1491,70 @@ struct cpp_int_backend
       *static_cast<base_type*>(this) = static_cast<typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>::base_type&&>(o);
       return *this;
    }
- private:
+
    template <class A>
-   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_unsigned<A>::value>::type do_assign_arithmetic(A val, const std::integral_constant<bool, true>&)
-       noexcept(noexcept(std::declval<cpp_int_backend>().check_in_range(std::declval<A>())))
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+         boost::multiprecision::detail::is_unsigned<A>::value
+         && trivial_tag::value, cpp_int_backend&>::type 
+      operator=(const A& val)
+         noexcept(noexcept(std::declval<cpp_int_backend>().check_in_range(std::declval<A>())))
    {
       this->check_in_range(val);
       *this->limbs() = static_cast<typename self_type::local_limb_type>(val);
       this->sign(false);
       this->normalize();
+      return *this;
    }
    template <class A>
-   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(boost::multiprecision::detail::is_unsigned<A>::value || !boost::multiprecision::detail::is_integral<A>::value)>::type do_assign_arithmetic(A val, const std::integral_constant<bool, true>&)
-       noexcept(noexcept(std::declval<cpp_int_backend>().check_in_range(std::declval<A>())) && noexcept(std::declval<cpp_int_backend>().sign(true)))
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+         !(boost::multiprecision::detail::is_unsigned<A>::value || !boost::multiprecision::detail::is_integral<A>::value)
+         && trivial_tag::value, cpp_int_backend&>::type
+      operator=(const A& val)
+         noexcept(noexcept(std::declval<cpp_int_backend>().check_in_range(std::declval<A>())) && noexcept(std::declval<cpp_int_backend>().sign(true)))
    {
       this->check_in_range(val);
       *this->limbs() = (val < 0) ? static_cast<typename self_type::local_limb_type>(boost::multiprecision::detail::unsigned_abs(val)) : static_cast<typename self_type::local_limb_type>(val);
       this->sign(val < 0);
       this->normalize();
+      return *this;
    }
    template <class A>
-   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!boost::multiprecision::detail::is_integral<A>::value>::type do_assign_arithmetic(A val, const std::integral_constant<bool, true>&)
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+         std::is_convertible<A, limb_type>::value 
+         && !boost::multiprecision::detail::is_integral<A>::value
+         && trivial_tag::value, cpp_int_backend&>::type 
+      operator=(const A& val)
    {
       this->check_in_range(val);
       *this->limbs() = (val < 0) ? static_cast<typename self_type::local_limb_type>(boost::multiprecision::detail::abs(val)) : static_cast<typename self_type::local_limb_type>(val);
       this->sign(val < 0);
       this->normalize();
+      return *this;
    }
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(limb_type i, const std::integral_constant<bool, false>&) noexcept
+   template <class A>
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+         std::is_same<A, limb_type>::value && !trivial_tag::value, cpp_int_backend&>::type
+      operator=(A i) noexcept
    {
       this->resize(1, 1);
       *this->limbs() = i;
       this->sign(false);
+      return *this;
    }
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(signed_limb_type i, const std::integral_constant<bool, false>&) noexcept(noexcept(std::declval<cpp_int_backend>().sign(true)))
+   template <class A>
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if <
+         std::is_same<A, signed_limb_type>::value && !trivial_tag::value, cpp_int_backend&>::type
+      operator=(A i) noexcept(noexcept(std::declval<cpp_int_backend>().sign(true)))
    {
       this->resize(1, 1);
       *this->limbs() = static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i));
       this->sign(i < 0);
+      return *this;
    }
-   BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(double_limb_type i, const std::integral_constant<bool, false>&) noexcept
+   template <class A>
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if <
+         std::is_same<A, double_limb_type>::value && !trivial_tag::value, cpp_int_backend&>::type
+      operator=(A i) noexcept
    {
       static_assert(sizeof(i) == 2 * sizeof(limb_type), "Failed integer size check");
       static_assert(base_type::internal_limb_count >= 2, "Failed internal limb count");
@@ -1542,8 +1567,12 @@ struct cpp_int_backend
       p[1] = static_cast<limb_type>(i >> base_type::limb_bits);
       this->resize(p[1] ? 2 : 1, p[1] ? 2 : 1);
       this->sign(false);
+      return *this;
    }
-   BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(signed_double_limb_type i, const std::integral_constant<bool, false>&) noexcept(noexcept(std::declval<cpp_int_backend>().sign(true)))
+   template <class A>
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if <
+         std::is_same<A, signed_double_limb_type>::value && !trivial_tag::value, cpp_int_backend&>::type
+      operator=(A i) noexcept(noexcept(std::declval<cpp_int_backend>().sign(true)))
    {
       static_assert(sizeof(i) == 2 * sizeof(limb_type), "double limb type size check failed");
       static_assert(base_type::internal_limb_count >= 2, "Failed internal limb count check");
@@ -1560,19 +1589,19 @@ struct cpp_int_backend
       p[1] = static_cast<limb_type>(ui >> base_type::limb_bits);
       this->resize(p[1] ? 2 : 1, p[1] ? 2 : 1);
       this->sign(s);
+      return *this;
    }
-
-   BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(long double a, const std::integral_constant<bool, false>&)
+private:
+   template <class F>
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_float(F a)
    {
       using default_ops::eval_add;
       using default_ops::eval_subtract;
-      using std::floor;
-      using std::frexp;
-      using std::ldexp;
+      BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
 
       if (a < 0)
       {
-         do_assign_arithmetic(-a, std::integral_constant<bool, false>());
+         do_assign_float(-a);
          this->sign(true);
          return;
       }
@@ -1593,7 +1622,7 @@ struct cpp_int_backend
       }
 
       int         e = 0;
-      long double f(0), term(0);
+      F f(0), term(0);
       *this = static_cast<limb_type>(0u);
 
       f = frexp(a, &e);
@@ -1634,12 +1663,13 @@ struct cpp_int_backend
       else if (e < 0)
          eval_right_shift(*this, -e);
    }
-
- public:
-   template <class Arithmetic>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!boost::multiprecision::detail::is_byte_container<Arithmetic>::value, cpp_int_backend&>::type operator=(Arithmetic val) noexcept(noexcept(std::declval<cpp_int_backend>().do_assign_arithmetic(std::declval<Arithmetic>(), trivial_tag())))
+public:
+   template <class A>
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if <
+      std::is_floating_point<A>::value && !trivial_tag::value, cpp_int_backend&>::type
+      operator=(A a)
    {
-      do_assign_arithmetic(val, trivial_tag());
+      do_assign_float(a);
       return *this;
    }
 

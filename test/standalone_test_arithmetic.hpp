@@ -29,7 +29,39 @@ struct is_checked_cpp_int : public std::integral_constant<bool, false>
 #pragma warning(disable : 4127)
 #endif
 
-bool isfloat(float) { return true; }
+//
+// This works around some platforms which have missing typeinfo
+// for __int128 and/or __float128:
+//
+template <class T>
+inline const char* name_of()
+{
+   return typeid(T).name();
+}
+#ifdef BOOST_HAS_INT128
+template <>
+inline const char* name_of<__int128>()
+{
+   return "__int128";
+}
+template <>
+inline const char* name_of<unsigned __int128>()
+{
+   return "unsigned __int128";
+}
+#endif
+#ifdef BOOST_HAS_FLOAT128
+template <>
+inline const char* name_of<__float128>()
+{
+   return "__float128";
+}
+#endif
+
+bool isfloat(float)
+{
+   return true;
+}
 bool isfloat(double) { return true; }
 bool isfloat(long double) { return true; }
 template <class T>
@@ -1522,7 +1554,7 @@ void test_negative_mixed(std::integral_constant<bool, true> const&)
        std::is_convertible<Num, Real>::value,
        Num,
        Real>::type simple_cast_type;
-   std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name() << " and " << typeid(Num).name() << std::endl;
+   std::cout << "Testing mixed arithmetic with type: " << name_of<Real>() << " and " << name_of<Num>() << std::endl;
    static const int left_shift = std::numeric_limits<Num>::digits - 1;
    Num              n1         = -static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
    Num              n2         = -1;
@@ -1874,7 +1906,7 @@ void test_mixed(const std::integral_constant<bool, true>&)
    if (std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::is_bounded && std::numeric_limits<Real>::digits < std::numeric_limits<Num>::digits)
       return;
 
-   std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name() << " and " << typeid(Num).name() << std::endl;
+   std::cout << "Testing mixed arithmetic with type: " << name_of<Real>() << " and " << name_of<Num>() << std::endl;
    static const int left_shift = std::numeric_limits<Num>::digits - 1;
    Num              n1         = static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
    Num              n2         = 1;

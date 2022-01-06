@@ -63,8 +63,8 @@ inline int eval_signbit(float val) { return (std::signbit)(val); }
 inline int eval_signbit(double val) { return (std::signbit)(val); }
 inline int eval_signbit(long double val) { return (std::signbit)(val); }
 #ifdef BOOST_HAS_FLOAT128
-extern "C" int signbitq(__float128) throw();
-inline int            eval_signbit(__float128 val) { return signbitq(val); }
+extern "C" int signbitq(float128_type) throw();
+inline int            eval_signbit(float128_type val) { return signbitq(val); }
 #endif
 
 template <class T>
@@ -1025,7 +1025,7 @@ struct calculate_next_larger_type
            typename B::unsigned_types,
            typename B::float_types>::type>::type;
    static constexpr int start = find_index_of_type<list_type, 0, R>::value;
-   static constexpr int index_of_type = boost::multiprecision::detail::find_index_of_large_enough_type<list_type, start == INT_MAX ? 0 : start + 1, std::numeric_limits<R>::digits>::value;
+   static constexpr int index_of_type = boost::multiprecision::detail::find_index_of_large_enough_type<list_type, start == INT_MAX ? 0 : start + 1, boost::multiprecision::detail::bits_of<R>::value> ::value;
    using type = typename boost::multiprecision::detail::dereference_tuple<index_of_type, list_type, terminal<R> >::type;
 };
 
@@ -1688,7 +1688,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_karatsuba_sqrt(Backend& result, const Backend
 #ifdef BOOST_HAS_INT128
    if (bits <= 128)
    {
-      unsigned __int128 a{}, b{}, c{};
+      uint128_type a{}, b{}, c{};
       eval_convert_to(&a, x);
       c = boost::multiprecision::detail::karatsuba_sqrt(a, b, bits);
       r = number<Backend>::canonical_value(b);

@@ -113,7 +113,7 @@ struct logged_adaptor
       log_postfix_event(m_value, "construct from arithmetic type and precision");
    }
    template <class T>
-   typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value || std::is_convertible<T, Backend>::value, logged_adaptor&>::type operator=(const T& i)
+   typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value || std::is_assignable<Backend, T>::value, logged_adaptor&>::type operator=(const T& i)
    {
       log_prefix_event(m_value, i, "Assignment from arithmetic type");
       m_value = i;
@@ -753,7 +753,20 @@ namespace detail {
    template <class Backend>
    struct is_variable_precision<logged_adaptor<Backend> > : public is_variable_precision<Backend>
    {};
-} // namespace detail
+#ifdef BOOST_HAS_INT128
+   template <class Backend>
+   struct is_convertible_arithmetic<int128_type, logged_adaptor<Backend> > : public is_convertible_arithmetic<int128_type, Backend>
+   {};
+   template <class Backend>
+   struct is_convertible_arithmetic<uint128_type, logged_adaptor<Backend> > : public is_convertible_arithmetic<uint128_type, Backend>
+   {};
+#endif
+#ifdef BOOST_HAS_FLOAT128
+   template <class Backend>
+   struct is_convertible_arithmetic<float128_type, logged_adaptor<Backend> > : public is_convertible_arithmetic<float128_type, Backend>
+   {};
+#endif
+   } // namespace detail
 
 template <class Backend>
 struct number_category<backends::logged_adaptor<Backend> > : public number_category<Backend>

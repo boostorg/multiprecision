@@ -203,6 +203,39 @@ struct mpfi_float_imp
    }
 #endif
 #endif
+#ifdef BOOST_HAS_INT128
+   mpfi_float_imp& operator=(uint128_type i)
+   {
+      if (m_data[0].left._mpfr_d == 0)
+         mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      constexpr uint128_type mask = ((((static_cast<uint128_type>(1u) << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1u);
+      unsigned               shift = 0;
+      mpfi_t                 t;
+      mpfi_init2(t, (std::max)(static_cast<mpfr_prec_t>(128), static_cast<mpfr_prec_t>(multiprecision::detail::digits10_2_2(digits10))));
+      mpfi_set_ui(m_data, 0);
+      while (i)
+      {
+         mpfi_set_ui(t, static_cast<unsigned long>(i & mask));
+         if (shift)
+            mpfi_mul_2exp(t, t, shift);
+         mpfi_add(m_data, m_data, t);
+         shift += std::numeric_limits<unsigned long>::digits;
+         i >>= std::numeric_limits<unsigned long>::digits;
+      }
+      mpfi_clear(t);
+      return *this;
+   }
+   mpfi_float_imp& operator=(int128_type i)
+   {
+      if (m_data[0].left._mpfr_d == 0)
+         mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+      bool neg = i < 0;
+      *this = boost::multiprecision::detail::unsigned_abs(i);
+      if (neg)
+         mpfi_neg(m_data, m_data);
+      return *this;
+   }
+#endif
    mpfi_float_imp& operator=(unsigned long i)
    {
       if (m_data[0].left._mpfr_d == 0)
@@ -232,6 +265,56 @@ struct mpfi_float_imp
       mpfr_set_ld(right_data(), a, GMP_RNDU);
       return *this;
    }
+#ifdef BOOST_HAS_FLOAT128
+   mpfi_float_imp& operator=(float128_type a)
+   {
+      BOOST_MP_FLOAT128_USING
+      if (m_data[0].left._mpfr_d == 0)
+         mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
+
+      if (a == 0)
+      {
+         mpfi_set_si(m_data, 0);
+         return *this;
+      }
+
+      if (a == 1)
+      {
+         mpfi_set_si(m_data, 1);
+         return *this;
+      }
+
+      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+
+      int        e;
+      float128_type f, term;
+      mpfi_set_ui(m_data, 0u);
+
+      f = frexp(a, &e);
+
+      constexpr const int shift = std::numeric_limits<int>::digits - 1;
+
+      while (f)
+      {
+         // extract int sized bits from f:
+         f = ldexp(f, shift);
+         term = floor(f);
+         e -= shift;
+         mpfi_mul_2exp(m_data, m_data, shift);
+         if (term > 0)
+            mpfi_add_ui(m_data, m_data, static_cast<unsigned>(term));
+         else
+            mpfi_sub_ui(m_data, m_data, static_cast<unsigned>(-term));
+         f -= term;
+      }
+      if (e > 0)
+         mpfi_mul_2exp(m_data, m_data, e);
+      else if (e < 0)
+         mpfi_div_2exp(m_data, m_data, -e);
+      return *this;
+   }
+#endif
    mpfi_float_imp& operator=(const char* s)
    {
       using default_ops::eval_fpclassify;
@@ -470,7 +553,7 @@ struct mpfi_float_backend : public detail::mpfi_float_imp<digits10>
       return *this;
    }
    template <class V>
-   mpfi_float_backend& operator=(const V& v)
+   typename std::enable_if<std::is_assignable<detail::mpfi_float_imp<digits10>, V>::value, mpfi_float_backend&>::type operator=(const V& v)
    {
       *static_cast<detail::mpfi_float_imp<digits10>*>(this) = v;
       return *this;
@@ -902,6 +985,22 @@ inline void eval_convert_to(long long* result, const mpfi_float_backend<digits10
    eval_convert_to(result, t);
 }
 #endif
+#ifdef BOOST_HAS_INT128
+template <unsigned digits10>
+inline void eval_convert_to(uint128_type* result, const mpfi_float_backend<digits10>& val)
+{
+   mpfr_float_backend<digits10> t;
+   mpfi_mid(t.data(), val.data());
+   eval_convert_to(result, t);
+}
+template <unsigned digits10>
+inline void eval_convert_to(int128_type* result, const mpfi_float_backend<digits10>& val)
+{
+   mpfr_float_backend<digits10> t;
+   mpfi_mid(t.data(), val.data());
+   eval_convert_to(result, t);
+}
+#endif
 template <unsigned digits10>
 inline void eval_convert_to(double* result, const mpfi_float_backend<digits10>& val) noexcept
 {
@@ -914,7 +1013,15 @@ inline void eval_convert_to(long double* result, const mpfi_float_backend<digits
    mpfi_mid(t.data(), val.data());
    eval_convert_to(result, t);
 }
-
+#ifdef BOOST_HAS_FLOAT128
+template <unsigned digits10>
+inline void eval_convert_to(float128_type* result, const mpfi_float_backend<digits10>& val)
+{
+   mpfr_float_backend<digits10> t;
+   mpfi_mid(t.data(), val.data());
+   eval_convert_to(result, t);
+}
+#endif
 template <mpfr_allocation_type AllocationType>
 inline void assign_components_set_precision(mpfi_float_backend<0>& result, const mpfr_float_backend<0, AllocationType>& a, const mpfr_float_backend<0, AllocationType>& b)
 {

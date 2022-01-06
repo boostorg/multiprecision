@@ -209,6 +209,29 @@ struct mpc_complex_imp
       mpc_set_z(m_data, i.data(), GMP_RNDN);
       return *this;
    }
+#ifdef BOOST_HAS_INT128
+   mpc_complex_imp& operator=(int128_type val)
+   {
+      gmp_int i;
+      i            = val;
+      return *this = i.data();
+   }
+   mpc_complex_imp& operator=(uint128_type val)
+   {
+      gmp_int i;
+      i            = val;
+      return *this = i.data();
+   }
+#endif
+#ifdef BOOST_HAS_FLOAT128
+   mpc_complex_imp& operator=(float128_type val)
+   {
+      mpfr_float_backend<digits10> f;
+      f            = val;
+      mpc_set_fr(this->m_data, f.data(), GMP_RNDN);
+      return *this;
+   }
+#endif
 
    mpc_complex_imp& operator=(const char* s)
    {
@@ -521,7 +544,7 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
       return *this;
    }
    template <class V>
-   mpc_complex_backend& operator=(const V& v)
+   typename std::enable_if<std::is_assignable<detail::mpc_complex_imp<digits10>, V>::value, mpc_complex_backend&>::type operator=(const V& v)
    {
       *static_cast<detail::mpc_complex_imp<digits10>*>(this) = v;
       return *this;
@@ -1231,6 +1254,46 @@ inline void eval_convert_to(long double* result, const mpc_complex_backend<digit
    mpc_real(t.data(), val.data(), GMP_RNDN);
    eval_convert_to(result, t);
 }
+#ifdef BOOST_HAS_INT128
+template <unsigned digits10>
+inline void eval_convert_to(uint128_type* result, const mpc_complex_backend<digits10>& val)
+{
+   using default_ops::eval_convert_to;
+   if (0 == mpfr_zero_p(mpc_imagref(val.data())))
+   {
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+   }
+   mpfr_float_backend<digits10> t;
+   mpc_real(t.data(), val.data(), GMP_RNDN);
+   eval_convert_to(result, t);
+}
+template <unsigned digits10>
+inline void eval_convert_to(int128_type* result, const mpc_complex_backend<digits10>& val)
+{
+   using default_ops::eval_convert_to;
+   if (0 == mpfr_zero_p(mpc_imagref(val.data())))
+   {
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+   }
+   mpfr_float_backend<digits10> t;
+   mpc_real(t.data(), val.data(), GMP_RNDN);
+   eval_convert_to(result, t);
+}
+#endif
+#ifdef BOOST_HAS_FLOAT128
+template <unsigned digits10>
+inline void eval_convert_to(float128_type* result, const mpc_complex_backend<digits10>& val)
+{
+   using default_ops::eval_convert_to;
+   if (0 == mpfr_zero_p(mpc_imagref(val.data())))
+   {
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+   }
+   mpfr_float_backend<digits10> t;
+   mpc_real(t.data(), val.data(), GMP_RNDN);
+   eval_convert_to(result, t);
+}
+#endif
 
 template <mpfr_allocation_type AllocationType>
 inline void assign_components_set_precision(mpc_complex_backend<0>& result, const mpfr_float_backend<0, AllocationType>& a, const mpfr_float_backend<0, AllocationType>& b)

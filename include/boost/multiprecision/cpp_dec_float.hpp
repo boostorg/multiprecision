@@ -30,6 +30,7 @@
 
 #include <boost/multiprecision/detail/dynamic_array.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/detail/itos.hpp>
 #include <boost/multiprecision/detail/static_array.hpp>
 #include <boost/multiprecision/detail/tables.hpp>
@@ -183,7 +184,7 @@ class cpp_dec_float
 
    template <class I>
    cpp_dec_float(I i,
-                 typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value >::type* = nullptr)
+                 typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value && (sizeof(I) <= sizeof(long long))>::type* = nullptr)
       : data(),
         exp(static_cast<exponent_type>(0)),
         neg(false),
@@ -196,7 +197,8 @@ class cpp_dec_float
    template <class I>
    cpp_dec_float(I i,
                  typename std::enable_if<(   boost::multiprecision::detail::is_signed<I>::value
-                                          && boost::multiprecision::detail::is_integral<I>::value)>::type* = nullptr)
+                                          && boost::multiprecision::detail::is_integral<I>::value
+                                          && (sizeof(I) <= sizeof(long long)))>::type* = nullptr)
       : data(),
         exp(static_cast<exponent_type>(0)),
         neg(false),
@@ -243,9 +245,6 @@ class cpp_dec_float
 
    template <class F>
    cpp_dec_float(const F val, typename std::enable_if<std::is_floating_point<F>::value
-#ifdef BOOST_HAS_FLOAT128
-                                                   && !std::is_same<F, __float128>::value
-#endif
                                                    >::type* = nullptr) : data(),
                                                                          exp(static_cast<exponent_type>(0)),
                                                                          neg(false),
@@ -360,6 +359,35 @@ class cpp_dec_float
       from_unsigned_long_long(v);
       return *this;
    }
+#ifdef BOOST_HAS_INT128
+   cpp_dec_float& operator=(int128_type v)
+   {
+      *this = boost::multiprecision::detail::unsigned_abs(v);
+      if (v < 0)
+         negate();
+      return *this;
+   }
+
+   cpp_dec_float& operator=(uint128_type v)
+   {
+      using default_ops::eval_add;
+      using default_ops::eval_multiply;
+      static constexpr unsigned          bit_shift = sizeof(unsigned long long) * CHAR_BIT;
+      static constexpr uint128_type mask      = (static_cast<uint128_type>(1u) << bit_shift) - 1;
+      unsigned                           shift     = bit_shift;
+      *this                                        = static_cast<unsigned long long>(v & mask);
+      v >>= bit_shift;
+      while (v)
+      {
+         cpp_dec_float t(static_cast<unsigned long long>(v & mask));
+         eval_multiply(t, cpp_dec_float::pow2(bit_shift));
+         eval_add(*this, t);
+         v >>= bit_shift;
+         shift += bit_shift;
+      }
+      return *this;
+   }
+#endif
 
    template <class Float>
    typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float&>::type operator=(Float v);
@@ -452,6 +480,10 @@ class cpp_dec_float
    long double            extract_long_double() const;
    long long  extract_signed_long_long() const;
    unsigned long long extract_unsigned_long_long() const;
+#ifdef BOOST_HAS_INT128
+   int128_type  extract_signed_int128() const;
+   uint128_type extract_unsigned_int128() const;
+#endif
    void                   extract_parts(double& mantissa, exponent_type& exponent) const;
    cpp_dec_float          extract_integer_part() const;
 
@@ -1725,6 +1757,119 @@ unsigned long long cpp_dec_float<Digits10, ExponentType, Allocator>::extract_uns
    return val;
 }
 
+#ifdef BOOST_HAS_INT128
+
+template <unsigned Digits10, class ExponentType, class Allocator>
+int128_type cpp_dec_float<Digits10, ExponentType, Allocator>::extract_signed_int128() const
+{
+   // Extracts a signed __int128 from *this.
+   // If (x > maximum of __int128) or (x < minimum of __int128),
+   // then the maximum or minimum of long long is returned accordingly.
+
+   if (exp < static_cast<exponent_type>(0))
+   {
+      return static_cast<int128_type>(0);
+   }
+
+   const bool b_neg = isneg();
+   cpp_dec_float<Digits10, ExponentType, Allocator> i128max;
+   i128max = ((~static_cast<uint128_type>(0)) >> 1);
+   cpp_dec_float<Digits10, ExponentType, Allocator> i128min;
+   i128min = (-1 - static_cast<int128_type>((static_cast<uint128_type>(1) << 127) - 1));
+
+   uint128_type val;
+
+   if ((!b_neg) && (compare(i128max) > 0))
+   {
+      return ((~static_cast<uint128_type>(0)) >> 1);
+   }
+   else if (b_neg && (compare(i128min) < 0))
+   {
+      return (-1 - static_cast<int128_type>((static_cast<uint128_type>(1) << 127) - 1));
+   }
+   else
+   {
+      // Extract the data into an unsigned long long value.
+      cpp_dec_float<Digits10, ExponentType, Allocator> xn(extract_integer_part());
+      if (xn.isneg())
+         xn.negate();
+
+      val = static_cast<uint128_type>(xn.data[0]);
+
+      const std::int32_t imax = (std::min)(static_cast<std::int32_t>(static_cast<std::int32_t>(xn.exp) / cpp_dec_float_elem_digits10), static_cast<std::int32_t>(cpp_dec_float_elem_number - static_cast<std::int32_t>(1)));
+
+      for (std::int32_t i = static_cast<std::int32_t>(1); i <= imax; i++)
+      {
+         val *= static_cast<uint128_type>(cpp_dec_float_elem_mask);
+         val += static_cast<uint128_type>(xn.data[static_cast<std::size_t>(i)]);
+      }
+   }
+
+   if (!b_neg)
+   {
+      return static_cast<int128_type>(val);
+   }
+   else
+   {
+      // This strange expression avoids a hardware trap in the corner case
+      // that val is the most negative value permitted in long long.
+      // See https://svn.boost.org/trac/boost/ticket/9740.
+      //
+      int128_type sval = static_cast<int128_type>(val - 1);
+      sval                       = -sval;
+      --sval;
+      return sval;
+   }
+}
+
+template <unsigned Digits10, class ExponentType, class Allocator>
+uint128_type cpp_dec_float<Digits10, ExponentType, Allocator>::extract_unsigned_int128() const
+{
+   // Extracts an unsigned __int128 from *this.
+   // If x exceeds the maximum of unsigned __int128,
+   // then the maximum of unsigned __int128 is returned.
+   // If x is negative, then the unsigned __int128 cast of
+   // the __int128 extracted value is returned.
+
+   if (isneg())
+   {
+      return static_cast<uint128_type>(extract_signed_int128());
+   }
+
+   if (exp < static_cast<exponent_type>(0))
+   {
+      return 0u;
+   }
+
+   const cpp_dec_float<Digits10, ExponentType, Allocator> xn(extract_integer_part());
+   cpp_dec_float<Digits10, ExponentType, Allocator>       i128max;
+   i128max = (~static_cast<uint128_type>(0));
+
+   uint128_type val;
+
+   if (xn.compare(i128max) > 0)
+   {
+      return (~static_cast<uint128_type>(0));
+   }
+   else
+   {
+      // Extract the data into an unsigned long long value.
+      val = static_cast<uint128_type>(xn.data[0]);
+
+      const std::int32_t imax = (std::min)(static_cast<std::int32_t>(static_cast<std::int32_t>(xn.exp) / cpp_dec_float_elem_digits10), static_cast<std::int32_t>(cpp_dec_float_elem_number - static_cast<std::int32_t>(1)));
+
+      for (std::int32_t i = static_cast<std::int32_t>(1); i <= imax; i++)
+      {
+         val *= static_cast<uint128_type>(cpp_dec_float_elem_mask);
+         val += static_cast<uint128_type>(xn.data[i]);
+      }
+   }
+
+   return val;
+}
+
+#endif
+
 template <unsigned Digits10, class ExponentType, class Allocator>
 cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, ExponentType, Allocator>::extract_integer_part() const
 {
@@ -2279,9 +2424,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
 {
    // Christopher Kormanyos's original code used a cast to long long here, but that fails
    // when long double has more digits than a long long.
-   using std::floor;
-   using std::frexp;
-   using std::ldexp;
+   BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
 
    if (a == 0)
       return *this = zero();
@@ -3066,6 +3209,18 @@ inline void eval_convert_to(long long* result, const cpp_dec_float<Digits10, Exp
 {
    *result = val.extract_signed_long_long();
 }
+#ifdef BOOST_HAS_INT128
+template <unsigned Digits10, class ExponentType, class Allocator>
+inline void eval_convert_to(uint128_type* result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
+{
+   *result = val.extract_unsigned_int128();
+}
+template <unsigned Digits10, class ExponentType, class Allocator>
+inline void eval_convert_to(int128_type* result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
+{
+   *result = val.extract_signed_int128();
+}
+#endif
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_convert_to(long double* result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
 {
@@ -3076,6 +3231,13 @@ inline void eval_convert_to(double* result, const cpp_dec_float<Digits10, Expone
 {
    *result = val.extract_double();
 }
+#if defined(BOOST_HAS_FLOAT128)
+template <unsigned Digits10, class ExponentType, class Allocator>
+inline void eval_convert_to(float128_type* result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
+{
+   *result = float128_procs::strtoflt128(val.str(0, std::ios_base::scientific).c_str(), nullptr);
+}
+#endif
 
 //
 // Non member function support:

@@ -63,6 +63,11 @@ struct complex_adaptor
        : m_real(val)
    {}
 
+   template <class T>
+   complex_adaptor(const T& val, const typename std::enable_if<std::is_convertible<T, Backend>::value>::type* = nullptr)
+       : m_real(val) 
+   {}
+
    complex_adaptor(const std::complex<float>& val)
    {
       m_real = (long double)val.real();
@@ -105,7 +110,7 @@ struct complex_adaptor
       return *this;
    }
    template <class V>
-   complex_adaptor& operator=(const V& v)
+   typename std::enable_if<std::is_assignable<Backend, V>::value, complex_adaptor&>::type operator=(const V& v)
    {
       using ui_type = typename std::tuple_element<0, unsigned_types>::type;
       m_real = v;
@@ -963,7 +968,20 @@ namespace detail {
    template <class Backend>
    struct is_variable_precision<complex_adaptor<Backend> > : public is_variable_precision<Backend>
    {};
-} // namespace detail
+#ifdef BOOST_HAS_INT128
+   template <class Backend>
+   struct is_convertible_arithmetic<int128_type, complex_adaptor<Backend> > : is_convertible_arithmetic<int128_type, Backend>
+   {};
+   template <class Backend>
+   struct is_convertible_arithmetic<uint128_type, complex_adaptor<Backend> > : is_convertible_arithmetic<uint128_type, Backend>
+   {};
+#endif
+#ifdef BOOST_HAS_FLOAT128
+   template <class Backend>
+   struct is_convertible_arithmetic<float128_type, complex_adaptor<Backend> > : is_convertible_arithmetic<float128_type, Backend>
+   {};
+#endif
+   } // namespace detail
 
 
 

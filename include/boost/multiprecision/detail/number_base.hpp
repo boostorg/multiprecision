@@ -300,7 +300,7 @@ struct bits_of
 #if defined(_GLIBCXX_USE_FLOAT128) && defined(BOOST_GCC) && !defined(__STRICT_ANSI__)
 #define BOOST_MP_BITS_OF_FLOAT128_DEFINED
 template <>
-struct bits_of<__float128>
+struct bits_of<float128_type>
 {
    static constexpr const unsigned value = 113;
 };

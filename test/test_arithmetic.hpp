@@ -26,6 +26,35 @@ struct is_checked_cpp_int : public std::integral_constant<bool, false>
 #pragma warning(disable : 4127)
 #endif
 
+//
+// This works around some platforms which have missing typeinfo
+// for __int128 and/or __float128:
+//
+template <class T>
+inline const char* name_of()
+{
+   return typeid(T).name();
+}
+#ifdef BOOST_HAS_INT128
+template <>
+inline const char* name_of<__int128>()
+{
+   return "__int128";
+}
+template <>
+inline const char* name_of<unsigned __int128>()
+{
+   return "unsigned __int128";
+}
+#endif
+#ifdef BOOST_HAS_FLOAT128
+template <>
+inline const char* name_of<__float128>()
+{
+   return "__float128";
+}
+#endif
+
 template <class Target, class Source>
 Target checked_lexical_cast(const Source& val)
 {
@@ -38,8 +67,8 @@ Target checked_lexical_cast(const Source& val)
    }
    catch (...)
    {
-      std::cerr << "Error in lexical cast\nSource type = " << typeid(Source).name() << " \"" << val << "\"\n";
-      std::cerr << "Target type = " << typeid(Target).name() << std::endl;
+      std::cerr << "Error in lexical cast\nSource type = " << name_of<Source>() << " \"" << val << "\"\n";
+      std::cerr << "Target type = " << name_of<Target>() << std::endl;
       throw;
    }
 #endif
@@ -1568,7 +1597,7 @@ void test_negative_mixed(std::integral_constant<bool, true> const&)
        std::is_convertible<Num, Real>::value,
        Num,
        Real>::type simple_cast_type;
-   std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name() << " and " << typeid(Num).name() << std::endl;
+   std::cout << "Testing mixed arithmetic with type: " << name_of<Real>() << " and " << name_of<Num>() << std::endl;
    static const int left_shift = std::numeric_limits<Num>::digits - 1;
    Num              n1         = -static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
    Num              n2         = -1;
@@ -1609,7 +1638,7 @@ void test_negative_mixed(std::integral_constant<bool, true> const&)
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n2) + 0)), n2);
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n3) + 0)), n3);
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n4) + 0)), n4);
-   test_negative_mixed_numeric_limits<Real, Num>(std::integral_constant<bool, std::numeric_limits<Real>::is_specialized>());
+   test_negative_mixed_numeric_limits<Real, Num>(std::integral_constant<bool, std::numeric_limits<Real>::is_specialized && std::numeric_limits<Num>::is_specialized>());
    // Assignment:
    Real r(0);
    BOOST_CHECK(r != static_cast<cast_type>(n1));
@@ -1930,6 +1959,17 @@ void test_mixed_numeric_limits(const std::integral_constant<bool, false>&)
 {
 }
 
+template <class Num>
+struct is_definitely_unsigned_int
+    : public std::integral_constant<bool, std::numeric_limits<Num>::is_specialized && !std::numeric_limits<Num>::is_signed>
+{};
+#ifdef BOOST_HAS_INT128
+template <>
+struct is_definitely_unsigned_int<unsigned __int128>
+    : public std::true_type
+{};
+#endif
+
 template <class Real, class Num>
 void test_mixed(const std::integral_constant<bool, true>&)
 {
@@ -1945,7 +1985,7 @@ void test_mixed(const std::integral_constant<bool, true>&)
    if (std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::is_bounded && std::numeric_limits<Real>::digits < std::numeric_limits<Num>::digits)
       return;
 
-   std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name() << " and " << typeid(Num).name() << std::endl;
+   std::cout << "Testing mixed arithmetic with type: " << name_of<Real>() << " and " << name_of<Num>() << std::endl;
    static const int left_shift = std::numeric_limits<Num>::digits - 1;
    Num              n1         = static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
    Num              n2         = 1;
@@ -2034,7 +2074,9 @@ void test_mixed(const std::integral_constant<bool, true>&)
    BOOST_CHECK_EQUAL(r, static_cast<cast_type>(n4));
 
    typedef std::integral_constant<bool, 
-       (!std::numeric_limits<Num>::is_specialized || std::numeric_limits<Num>::is_signed) && (!std::numeric_limits<Real>::is_specialized || std::numeric_limits<Real>::is_signed)>
+       (!std::numeric_limits<Num>::is_specialized || std::numeric_limits<Num>::is_signed) 
+      && (!std::numeric_limits<Real>::is_specialized || std::numeric_limits<Real>::is_signed) 
+      && !is_definitely_unsigned_int<Num>::value>
        signed_tag;
 
    test_negative_mixed<Real, Num>(signed_tag());
@@ -2110,7 +2152,7 @@ void test_mixed(const std::integral_constant<bool, true>&)
    d = b * static_cast<cast_type>(n3) - static_cast<cast_type>(n1);
    BOOST_CHECK_EQUAL(d, 3 * 4 - 2);
 
-   test_mixed_numeric_limits<Real, Num>(std::integral_constant<bool, std::numeric_limits<Real>::is_specialized>());
+   test_mixed_numeric_limits<Real, Num>(std::integral_constant < bool, std::numeric_limits<Real>::is_specialized && std::numeric_limits<Num>::is_specialized > ());
 }
 
 template <class Real>
@@ -2909,9 +2951,20 @@ void test()
    test_mixed<Real, long long>(tag);
    test_mixed<Real, unsigned long long>(tag);
 #endif
+#if defined(BOOST_HAS_INT128) && !defined(BOOST_NO_CXX17_IF_CONSTEXPR)
+   if constexpr (std::is_constructible<Real, __int128>::value)
+   {
+      test_mixed<Real, __int128>(tag);
+      test_mixed<Real, unsigned __int128>(tag);
+   }
+#endif
    test_mixed<Real, float>(tag);
    test_mixed<Real, double>(tag);
    test_mixed<Real, long double>(tag);
+#if defined(BOOST_HAS_FLOAT128) && !defined(BOOST_NO_CXX17_IF_CONSTEXPR)
+   if constexpr (std::is_constructible<Real, __float128>::value)
+      test_mixed<Real, __float128>(tag);
+#endif
 
    typedef typename related_type<Real>::type                                                                      related_type;
    std::integral_constant<bool, boost::multiprecision::is_number<Real>::value && !std::is_same<related_type, Real>::value> tag2;

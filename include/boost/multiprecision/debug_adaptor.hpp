@@ -74,13 +74,14 @@ struct debug_adaptor
    {
       update_view();
    }
-   debug_adaptor(const Backend& i, unsigned digits10)
+   template <class B2>
+   debug_adaptor(const B2& i, unsigned digits10, typename std::enable_if<std::is_same<B2, Backend>::value && std::is_constructible<Backend, const Backend&, unsigned>::value>::type* = nullptr)
        : m_value(i, digits10)
    {
       update_view();
    }
    template <class T>
-   typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value || std::is_convertible<T, Backend>::value, debug_adaptor&>::type operator=(const T& i)
+   typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value || std::is_assignable<Backend, T>::value, debug_adaptor&>::type operator=(const T& i)
    {
       m_value = i;
       update_view();
@@ -673,7 +674,20 @@ namespace detail {
    template <class Backend>
    struct is_variable_precision<debug_adaptor<Backend> > : public is_variable_precision<Backend>
    {};
-} // namespace detail
+#ifdef BOOST_HAS_INT128
+   template <class Backend>
+   struct is_convertible_arithmetic<int128_type, debug_adaptor<Backend> > : public is_convertible_arithmetic<int128_type, Backend>
+   {};
+   template <class Backend>
+   struct is_convertible_arithmetic<uint128_type, debug_adaptor<Backend> > : public is_convertible_arithmetic<uint128_type, Backend>
+   {};
+#endif
+#ifdef BOOST_HAS_FLOAT128
+   template <class Backend>
+   struct is_convertible_arithmetic<float128_type, debug_adaptor<Backend> > : public is_convertible_arithmetic<float128_type, Backend>
+   {};
+#endif
+   } // namespace detail
 
 template <class Backend>
 struct number_category<backends::debug_adaptor<Backend> > : public number_category<Backend>
