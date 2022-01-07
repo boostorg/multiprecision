@@ -78,7 +78,6 @@ Target checked_lexical_cast(const Source& val)
    }
 #endif
 }
-#endif // BOOST_MP_STANDALONE
 
 bool isfloat(float) { return true; }
 bool isfloat(double) { return true; }
