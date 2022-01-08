@@ -60,6 +60,7 @@ inline const char* name_of<__float128>()
 }
 #endif
 
+#ifndef BOOST_MP_STANDALONE
 template <class Target, class Source>
 Target checked_lexical_cast(const Source& val)
 {
@@ -78,6 +79,7 @@ Target checked_lexical_cast(const Source& val)
    }
 #endif
 }
+#endif
 
 bool isfloat(float) { return true; }
 bool isfloat(double) { return true; }
