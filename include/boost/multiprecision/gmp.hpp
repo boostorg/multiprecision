@@ -3802,32 +3802,29 @@ namespace Eigen
          RequireInitialization = 1,
       };
 
-      #if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
-      static Real epsilon()
+      static Real highest() noexcept
       {
-         return std::numeric_limits<Real>::epsilon();
+         return boost::math::tools::max_value<Real>();
       }
-      static constexpr Real dummy_precision() noexcept
+      static Real lowest() noexcept
       {
-         return 1000 * epsilon();
+         return boost::math::tools::min_value<Real>();
       }
-      static constexpr Real highest() noexcept
-      {
-         return (std::numeric_limits<Real>::max)();
-      }
-      static constexpr Real lowest() noexcept
-      {
-         return (std::numeric_limits<Real>::min)();
-      }
-      static int digits()
+      static int digits() noexcept
       {
          return boost::math::tools::digits<Real>();
       }
-      #endif // Standalone config options
-
       static int digits10()
       {
          return Real::thread_default_precision();
+      }
+      static Real epsilon()
+      {
+         return ldexp(Real(1), 1 - digits());
+      }
+      static Real dummy_precision()
+      {
+         return 1000 * epsilon();
       }
       static constexpr long min_exponent() noexcept
       {
