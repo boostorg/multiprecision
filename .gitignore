@@ -6,6 +6,7 @@
 **/.temps/*
 build/*
 .vscode/*
+.idea/*
 
 # CMake Related Options
 *.a
@@ -16,3 +17,4 @@ Makefile
 **/CMakeFiles/**
 **CTestTestfile.cmake
 DartConfiguration.tcl
+cmake-build-debug/*

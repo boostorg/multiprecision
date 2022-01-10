@@ -4,10 +4,9 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include "standalone_test_arithmetic.hpp"
-
 #define BOOST_MP_STANDALONE
 
+#include "test_arithmetic.hpp"
 #include <boost/multiprecision/cpp_bin_float.hpp>
 
 template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinExponent, Exponent MaxExponent, boost::multiprecision::expression_template_option ET>

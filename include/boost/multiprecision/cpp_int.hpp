@@ -1270,7 +1270,10 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    {
       m_data = o.m_data;
    }
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void negate() noexcept((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void negate()
+   #if !defined(BOOST_NO_CXX17_IF_CONSTEXPR)
+   noexcept((Checked == unchecked))
+   #endif
    {
       BOOST_IF_CONSTEXPR(Checked == checked)
       {

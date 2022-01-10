@@ -1,11 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright 2011 John Maddock.
+//  Copyright 2021 Matt Borland. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_MATH_ER_GMP_BACKEND_HPP
 #define BOOST_MATH_ER_GMP_BACKEND_HPP
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
@@ -15,19 +17,28 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
+#include <type_traits>
+#include <memory>
+#include <utility>
 #include <cstdint>
 #include <cmath>
+#include <cctype>
+#include <limits>
+#include <climits>
+#include <cstdlib>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
+#if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#endif
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -43,11 +54,6 @@
 #else
 #define BOOST_MP_MPIR_VERSION 0
 #endif
-
-#include <cctype>
-#include <cmath>
-#include <limits>
-#include <climits>
 
 namespace boost {
 namespace multiprecision {
@@ -294,8 +300,10 @@ struct gmp_float_imp
          return *this;
       }
 
+      #ifndef BOOST_MP_STANDALONE
       BOOST_MP_ASSERT(!(boost::math::isinf)(a));
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      #endif
 
       int         e;
       F f, term;
@@ -539,6 +547,28 @@ struct gmp_float_imp
    {
       return get_default_options() >= variable_precision_options::preserve_source_precision;
    }
+};
+
+class gmp_char_ptr
+{
+private:
+   char* ptr_val;
+   void* (*alloc_func_ptr)(size_t);
+   void* (*realloc_func_ptr)(void*, size_t, size_t);
+   void  (*free_func_ptr)(void*, size_t);
+
+public:
+   gmp_char_ptr() = delete;
+   explicit gmp_char_ptr(char* val_) : ptr_val {val_}
+   {
+      mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
+   }
+   ~gmp_char_ptr() noexcept 
+   {
+      (*free_func_ptr)((void*)ptr_val, sizeof(*ptr_val));
+      ptr_val = nullptr;
+   }
+   inline char* get() noexcept { return ptr_val; }
 };
 
 } // namespace detail
@@ -1115,6 +1145,34 @@ inline void eval_convert_to(long* result, const gmp_float<digits10>& val) noexce
    else
       *result = (long)mpf_get_si(val.data());
 }
+#ifdef BOOST_MP_STANDALONE
+template <unsigned digits10>
+inline void eval_convert_to(long double* result, const gmp_float<digits10>& val) noexcept
+{
+   mp_exp_t exp = 0;
+
+   detail::gmp_char_ptr val_char_ptr {mpf_get_str(nullptr, &exp, 10, LDBL_DIG, val.data())};
+
+   auto temp_string = std::string(val_char_ptr.get());
+   if(exp > 0 && static_cast<std::size_t>(exp) < temp_string.size())
+   {
+      if(temp_string.front() == '-')
+      {
+         ++exp;
+      }
+
+      temp_string.insert(exp, 1, '.');
+   }
+
+   *result = std::strtold(temp_string.c_str(), nullptr);
+
+   if((temp_string.size() == 2ul && *result < 0.0l) ||
+      (static_cast<std::size_t>(exp) > temp_string.size()))
+   {
+      *result *= std::pow(10l, exp-1);
+   }
+}
+#endif // BOOST_MP_STANDALONE
 template <unsigned digits10>
 inline void eval_convert_to(double* result, const gmp_float<digits10>& val) noexcept
 {
@@ -1463,8 +1521,10 @@ struct gmp_int
          return *this;
       }
 
+      #ifndef BOOST_MP_STANDALONE
       BOOST_MP_ASSERT(!(boost::math::isinf)(a));
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      #endif
 
       int         e;
       F f, term;
@@ -1928,6 +1988,11 @@ inline void eval_convert_to(long* result, const gmp_int& val)
    }
    else
       *result = (signed long)mpz_get_si(val.data());
+}
+inline void eval_convert_to(long double* result, const gmp_int& val)
+{
+   detail::gmp_char_ptr val_char_ptr {mpz_get_str(nullptr, 10, val.data())};
+   *result = std::strtold(val_char_ptr.get(), nullptr);
 }
 inline void eval_convert_to(double* result, const gmp_int& val)
 {
@@ -2444,8 +2509,10 @@ struct gmp_rational
          return *this;
       }
 
+      #ifndef BOOST_MP_STANDALONE
       BOOST_MP_ASSERT(!(boost::math::isinf)(a));
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      #endif
 
       int         e;
       F f, term;
@@ -3734,35 +3801,36 @@ namespace Eigen
          IsSigned = std::numeric_limits<self_type>::is_specialized ? std::numeric_limits<self_type>::is_signed : true,
          RequireInitialization = 1,
       };
-      static Real epsilon()
-      {
-         return boost::math::tools::epsilon<Real>();
-      }
-      static Real dummy_precision()
-      {
-         return 1000 * epsilon();
-      }
-      static Real highest()
+
+      static Real highest() noexcept
       {
          return boost::math::tools::max_value<Real>();
       }
-      static Real lowest()
+      static Real lowest() noexcept
       {
          return boost::math::tools::min_value<Real>();
+      }
+      static int digits() noexcept
+      {
+         return boost::math::tools::digits<Real>();
       }
       static int digits10()
       {
          return Real::thread_default_precision();
       }
-      static int digits()
+      static Real epsilon()
       {
-         return boost::math::tools::digits<Real>();
+         return ldexp(Real(1), 1 - digits());
       }
-      static int min_exponent()
+      static Real dummy_precision()
+      {
+         return 1000 * epsilon();
+      }
+      static constexpr long min_exponent() noexcept
       {
          return LONG_MIN;
       }
-      static int max_exponent()
+      static constexpr long max_exponent() noexcept
       {
          return LONG_MAX;
       }

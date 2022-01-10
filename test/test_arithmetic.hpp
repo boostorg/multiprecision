@@ -7,12 +7,17 @@
 #include <vld.h>
 #endif
 
+#include <functional>
+#include <numeric>
+#include <type_traits>
+#include <typeinfo>
+#include "test.hpp"
+
+#ifndef BOOST_MP_STANDALONE
 #include <boost/math/special_functions/pow.hpp>
 #include <boost/integer/common_factor_rt.hpp>
-#include <boost/functional/hash.hpp>
 #include <boost/lexical_cast.hpp>
-#include <functional>
-#include "test.hpp"
+#endif
 
 template <class T>
 struct is_boost_rational : public std::integral_constant<bool, false>
@@ -55,6 +60,7 @@ inline const char* name_of<__float128>()
 }
 #endif
 
+#ifndef BOOST_MP_STANDALONE
 template <class Target, class Source>
 Target checked_lexical_cast(const Source& val)
 {
@@ -73,6 +79,7 @@ Target checked_lexical_cast(const Source& val)
    }
 #endif
 }
+#endif
 
 bool isfloat(float) { return true; }
 bool isfloat(double) { return true; }
@@ -300,7 +307,7 @@ void test_complement(Real a, Real b, Real c, const std::integral_constant<bool, 
    int i         = 1020304;
    int j         = 56789123;
    int sign_mask = ~0;
-   if (std::numeric_limits<Real>::is_signed)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_signed)
    {
       BOOST_CHECK_EQUAL(~a, (~i & sign_mask));
       c = a & ~b;
@@ -460,10 +467,18 @@ void test_signed_integer_ops(const std::integral_constant<bool, true>&)
 #endif
    a = 400;
    b = 45;
+   #ifndef BOOST_MP_STANDALONE
    BOOST_CHECK_EQUAL(gcd(a, -45), boost::integer::gcd(400, 45));
    BOOST_CHECK_EQUAL(lcm(a, -45), boost::integer::lcm(400, 45));
    BOOST_CHECK_EQUAL(gcd(-400, b), boost::integer::gcd(400, 45));
    BOOST_CHECK_EQUAL(lcm(-400, b), boost::integer::lcm(400, 45));
+   #elif __cpp_lib_gcd_lcm >= 201606L
+   BOOST_CHECK_EQUAL(gcd(a, -45), std::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, -45), std::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(-400, b), std::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(-400, b), std::lcm(400, 45));
+   #endif
+
    a = -20;
    BOOST_CHECK_EQUAL(abs(a), 20);
    BOOST_CHECK_EQUAL(abs(-a), 20);
@@ -474,12 +489,22 @@ void test_signed_integer_ops(const std::integral_constant<bool, true>&)
    BOOST_CHECK_EQUAL(abs(+a), 20);
    a = -400;
    b = 45;
+   #ifndef BOOST_MP_STANDALONE
    BOOST_CHECK_EQUAL(gcd(a, b), boost::integer::gcd(-400, 45));
    BOOST_CHECK_EQUAL(lcm(a, b), boost::integer::lcm(-400, 45));
    BOOST_CHECK_EQUAL(gcd(a, 45), boost::integer::gcd(-400, 45));
    BOOST_CHECK_EQUAL(lcm(a, 45), boost::integer::lcm(-400, 45));
    BOOST_CHECK_EQUAL(gcd(-400, b), boost::integer::gcd(-400, 45));
    BOOST_CHECK_EQUAL(lcm(-400, b), boost::integer::lcm(-400, 45));
+   #elif __cpp_lib_gcd_lcm >= 201606L
+   BOOST_CHECK_EQUAL(gcd(a, b), std::gcd(-400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, b), std::lcm(-400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, 45), std::gcd(-400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, 45), std::lcm(-400, 45));
+   BOOST_CHECK_EQUAL(gcd(-400, b), std::gcd(-400, 45));
+   BOOST_CHECK_EQUAL(lcm(-400, b), std::lcm(-400, 45));
+   #endif
+
    Real r;
    divide_qr(a, b, c, r);
    BOOST_CHECK_EQUAL(c, a / b);
@@ -538,7 +563,7 @@ inline Real negate_if_signed(Real r, const std::integral_constant<bool, false>&)
 template <class Real, class Int>
 void test_integer_overflow()
 {
-   if (std::numeric_limits<Real>::digits > std::numeric_limits<Int>::digits)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::digits > std::numeric_limits<Int>::digits)
    {
       Real m((std::numeric_limits<Int>::max)());
       Int  r;
@@ -575,7 +600,7 @@ void test_integer_overflow()
          BOOST_CHECK_EQUAL(r, 0);
       }
 
-      if (std::numeric_limits<Real>::is_signed && (boost::multiprecision::detail::is_signed<Int>::value))
+      BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_signed && (boost::multiprecision::detail::is_signed<Int>::value))
       {
          m = (std::numeric_limits<Int>::min)();
          --m;
@@ -603,9 +628,10 @@ void test_integer_overflow()
             BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::min)());
          }
       }
-      else if (std::numeric_limits<Real>::is_signed && !boost::multiprecision::detail::is_signed<Int>::value)
+      else BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_signed && !boost::multiprecision::detail::is_signed<Int>::value)
       {
          // signed to unsigned converison with overflow, it's really not clear what should happen here!
+         #if 0
          m = (std::numeric_limits<Int>::max)();
          ++m;
          m = negate_if_signed(m, std::integral_constant<bool, std::numeric_limits<Real>::is_signed>());
@@ -615,6 +641,7 @@ void test_integer_overflow()
          m = pow(m, (std::min)(std::numeric_limits<Real>::digits - 1, 1000));
          m = negate_if_signed(m, std::integral_constant<bool, std::numeric_limits<Real>::is_signed>());
          BOOST_CHECK_THROW(m.template convert_to<Int>(), std::range_error);
+         #endif
       }
    }
 }
@@ -622,12 +649,12 @@ void test_integer_overflow()
 template <class Real, class Int>
 void test_integer_round_trip()
 {
-   if (std::numeric_limits<Real>::digits >= std::numeric_limits<Int>::digits)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::digits >= std::numeric_limits<Int>::digits)
    {
       Real m((std::numeric_limits<Int>::max)());
       Int  r = m.template convert_to<Int>();
       BOOST_CHECK_EQUAL(m, r);
-      if (std::numeric_limits<Real>::is_signed && (std::numeric_limits<Real>::digits > std::numeric_limits<Int>::digits))
+      BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_signed && (std::numeric_limits<Real>::digits > std::numeric_limits<Int>::digits))
       {
          m = (std::numeric_limits<Int>::min)();
          r = m.template convert_to<Int>();
@@ -834,6 +861,7 @@ void test_integer_ops(const std::integral_constant<int, boost::multiprecision::n
    //
    a = 400;
    b = 45;
+   #ifndef BOOST_MP_STANDALONE
    BOOST_CHECK_EQUAL(gcd(a, b), boost::integer::gcd(400, 45));
    BOOST_CHECK_EQUAL(lcm(a, b), boost::integer::lcm(400, 45));
    BOOST_CHECK_EQUAL(gcd(a, 45), boost::integer::gcd(400, 45));
@@ -844,8 +872,20 @@ void test_integer_ops(const std::integral_constant<int, boost::multiprecision::n
    BOOST_CHECK_EQUAL(lcm(400, b), boost::integer::lcm(400, 45));
    BOOST_CHECK_EQUAL(gcd(400u, b), boost::integer::gcd(400, 45));
    BOOST_CHECK_EQUAL(lcm(400u, b), boost::integer::lcm(400, 45));
+   #elif __cpp_lib_gcd_lcm >= 201606L
+   BOOST_CHECK_EQUAL(gcd(a, b), std::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, b), std::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, 45), std::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, 45), std::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, 45u), std::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, 45u), std::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(400, b), std::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(400, b), std::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(400u, b), std::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(400u, b), std::lcm(400, 45));
+   #endif
 
-   if (std::numeric_limits<Real>::is_bounded)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_bounded)
    {
       // Fixed precision integer:
       a = (std::numeric_limits<Real>::max)() - 1;
@@ -1181,7 +1221,7 @@ void test_float_funcs(const std::integral_constant<bool, true>&)
    BOOST_CHECK_EQUAL(b > 0, a > 0);
    BOOST_CHECK_EQUAL(c > 0, a > 0);
 
-   if (std::numeric_limits<Real>::has_infinity)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::has_infinity)
    {
       a = std::numeric_limits<Real>::infinity();
       b = modf(a, &c);
@@ -1192,12 +1232,14 @@ void test_float_funcs(const std::integral_constant<bool, true>&)
       BOOST_CHECK_EQUAL(a, c);
       BOOST_CHECK_EQUAL(b, 0);
    }
-   if (std::numeric_limits<Real>::has_quiet_NaN)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::has_quiet_NaN)
    {
       a = std::numeric_limits<Real>::quiet_NaN();
       b = modf(a, &c);
+      #ifndef BOOST_MP_STANDALONE
       BOOST_CHECK((boost::math::isnan)(b));
       BOOST_CHECK((boost::math::isnan)(c));
+      #endif
    }
 
    a = 4;
@@ -1328,7 +1370,7 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
    // scalbn and logb, these are the same as ldexp and frexp unless the radix is
    // something other than 2:
    //
-   if (std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::radix)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::radix)
    {
       BOOST_CHECK_EQUAL(scalbn(Real(2), 5), 2 * pow(double(std::numeric_limits<Real>::radix), 5));
       BOOST_CHECK_EQUAL(scalbn(Real(2), -5), Real(2) / pow(double(std::numeric_limits<Real>::radix), 5));
@@ -1350,6 +1392,7 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
    //
    // pow and exponent:
    //
+   #ifndef BOOST_MP_STANDALONE
    v = 3.25;
    r = pow(v, 0);
    BOOST_CHECK_EQUAL(r, 1);
@@ -1367,17 +1410,20 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
    BOOST_CHECK_EQUAL(r, boost::math::pow<6>(3.25));
    r = pow(v, 25);
    BOOST_CHECK_EQUAL(r, boost::math::pow<25>(Real(3.25)));
+   #endif
 
 #ifndef BOOST_NO_EXCEPTIONS
    //
    // Things that are expected errors:
    //
    BOOST_CHECK_THROW(Real("3.14L"), std::runtime_error);
-   if (std::numeric_limits<Real>::is_specialized)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_specialized)
    {
-      if (std::numeric_limits<Real>::has_infinity)
+      BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::has_infinity)
       {
+         #ifndef BOOST_MP_STANDALONE
          BOOST_CHECK((boost::math::isinf)(Real(20) / 0u));
+         #endif
       }
       else
       {
@@ -1388,7 +1434,7 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
    //
    // Comparisons of NaN's should always fail:
    //
-   if (std::numeric_limits<Real>::has_quiet_NaN)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::has_quiet_NaN)
    {
       r = v = std::numeric_limits<Real>::quiet_NaN();
       compare_NaNs(r, v);
@@ -1406,7 +1452,7 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
       //
       compare_NaNs(v, 0.5);
       compare_NaNs(0.5, v);
-      if (std::numeric_limits<double>::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR (std::numeric_limits<double>::has_quiet_NaN)
       {
          compare_NaNs(r, std::numeric_limits<double>::quiet_NaN());
          compare_NaNs(std::numeric_limits<double>::quiet_NaN(), r);
@@ -1416,8 +1462,9 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
    //
    // Operations involving NaN's as one argument:
    //
-   if (std::numeric_limits<Real>::has_quiet_NaN)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::has_quiet_NaN)
    {
+      #ifndef BOOST_MP_STANDALONE
       v = 20.25;
       r = std::numeric_limits<Real>::quiet_NaN();
       BOOST_CHECK((boost::math::isnan)(v + r));
@@ -1444,23 +1491,29 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
       BOOST_CHECK((boost::math::isnan)(t /= v));
       t = v;
       BOOST_CHECK((boost::math::isnan)(t /= r));
+      #endif
    }
    //
    // Operations involving infinities as one argument:
    //
-   if (std::numeric_limits<Real>::has_infinity)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::has_infinity)
    {
       v = 20.25;
       r = std::numeric_limits<Real>::infinity();
+      
+      #ifndef BOOST_MP_STANDALONE
       BOOST_CHECK((boost::math::isinf)(v + r));
       BOOST_CHECK((boost::math::isinf)(r + v));
       BOOST_CHECK((boost::math::isinf)(r - v));
       BOOST_CHECK((boost::math::isinf)(v - r));
-      BOOST_CHECK_LT(v - r, 0);
       BOOST_CHECK((boost::math::isinf)(r * v));
       BOOST_CHECK((boost::math::isinf)(v * r));
       BOOST_CHECK((boost::math::isinf)(r / v));
+      #endif
+
+      BOOST_CHECK_LT(v - r, 0);
       BOOST_CHECK_EQUAL(v / r, 0);
+      #ifndef BOOST_MP_STANDALONE
       Real t = v;
       BOOST_CHECK((boost::math::isinf)(t += r));
       t = r;
@@ -1479,21 +1532,27 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
       BOOST_CHECK((boost::math::isinf)(t /= v));
       t = v;
       BOOST_CHECK((t /= r) == 0);
+      #endif
    }
    //
    // Operations that should produce NaN as a result:
    //
-   if (std::numeric_limits<Real>::has_quiet_NaN)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::has_quiet_NaN)
    {
       v = r  = 0;
       Real t = v / r;
+
+      #ifndef BOOST_MP_STANDALONE
       BOOST_CHECK((boost::math::isnan)(t));
       v /= r;
       BOOST_CHECK((boost::math::isnan)(v));
       t = v / 0;
       BOOST_CHECK((boost::math::isnan)(v));
-      if (std::numeric_limits<Real>::has_infinity)
+      #endif
+
+      BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::has_infinity)
       {
+         #ifndef BOOST_MP_STANDALONE
          v = 0;
          r = std::numeric_limits<Real>::infinity();
          t = v * r;
@@ -1506,6 +1565,7 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
          v = r;
          t = r / v;
          BOOST_CHECK((boost::math::isnan)(t));
+         #endif
       }
    }
 
@@ -1559,6 +1619,7 @@ void test_negative_mixed_minmax(std::integral_constant<bool, false> const&)
 template <class Real, class Num>
 void test_negative_mixed_numeric_limits(std::integral_constant<bool, true> const&)
 {
+   #ifndef BOOST_MP_STANDALONE
    typedef typename lexical_cast_target_type<Num>::type target_type;
 #if defined(TEST_MPFR)
    Num tol = 10 * std::numeric_limits<Num>::epsilon();
@@ -1574,13 +1635,14 @@ void test_negative_mixed_numeric_limits(std::integral_constant<bool, true> const
    int                     digits_to_print = std::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized
                              ? std::numeric_limits<Num>::digits10 + 5
                              : 0;
-   if (std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
    {
       BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
    }
    BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
    BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
    BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
+   #endif
 }
 
 template <class Real, class Num>
@@ -1892,7 +1954,11 @@ void test_mixed(const std::integral_constant<bool, false>&)
 template <class Real>
 inline bool check_is_nan(const Real& val, const std::integral_constant<bool, true>&)
 {
+   #ifndef BOOST_MP_STANDALONE
    return (boost::math::isnan)(val);
+   #else
+   return true; // Avoids warnings. This functionality is never used in standalone mode
+   #endif
 }
 template <class Real>
 inline bool check_is_nan(const Real&, const std::integral_constant<bool, false>&)
@@ -1913,6 +1979,7 @@ inline Real negate_value(const Real& val, const std::integral_constant<bool, fal
 template <class Real, class Num>
 void test_mixed_numeric_limits(const std::integral_constant<bool, true>&)
 {
+   #ifndef BOOST_MP_STANDALONE
    typedef typename lexical_cast_target_type<Num>::type target_type;
 #if defined(TEST_MPFR)
    Num tol = 10 * std::numeric_limits<Num>::epsilon();
@@ -1921,19 +1988,21 @@ void test_mixed_numeric_limits(const std::integral_constant<bool, true>&)
 #endif
 
    Real d;
-   if (std::numeric_limits<Real>::has_infinity && std::numeric_limits<Num>::has_infinity)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::has_infinity && std::numeric_limits<Num>::has_infinity)
    {
       d = static_cast<Real>(std::numeric_limits<Num>::infinity());
       BOOST_CHECK_GT(d, (std::numeric_limits<Real>::max)());
       d = static_cast<Real>(negate_value(std::numeric_limits<Num>::infinity(), std::integral_constant<bool, std::numeric_limits<Num>::is_signed>()));
       BOOST_CHECK_LT(d, negate_value((std::numeric_limits<Real>::max)(), std::integral_constant<bool, std::numeric_limits<Real>::is_signed>()));
    }
-   if (std::numeric_limits<Real>::has_quiet_NaN && std::numeric_limits<Num>::has_quiet_NaN)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::has_quiet_NaN && std::numeric_limits<Num>::has_quiet_NaN)
    {
+      #ifndef BOOST_MP_STANDALONE
       d = static_cast<Real>(std::numeric_limits<Num>::quiet_NaN());
       BOOST_CHECK(check_is_nan(d, std::integral_constant<bool, std::numeric_limits<Real>::has_quiet_NaN>()));
       d = static_cast<Real>(negate_value(std::numeric_limits<Num>::quiet_NaN(), std::integral_constant<bool, std::numeric_limits<Num>::is_signed>()));
       BOOST_CHECK(check_is_nan(d, std::integral_constant<bool, std::numeric_limits<Real>::has_quiet_NaN>()));
+      #endif
    }
 
    static const int left_shift = std::numeric_limits<Num>::digits - 1;
@@ -1946,13 +2015,14 @@ void test_mixed_numeric_limits(const std::integral_constant<bool, true>&)
    int                     digits_to_print = std::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized
                              ? std::numeric_limits<Num>::digits10 + 5
                              : 0;
-   if (std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
    {
       BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
    }
    BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
    BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
    BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
+   #endif // BOOST_MP_STANDALONE
 }
 template <class Real, class Num>
 void test_mixed_numeric_limits(const std::integral_constant<bool, false>&)
@@ -1982,7 +2052,7 @@ void test_mixed(const std::integral_constant<bool, true>&)
        Num,
        Real>::type simple_cast_type;
 
-   if (std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::is_bounded && std::numeric_limits<Real>::digits < std::numeric_limits<Num>::digits)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::is_bounded && std::numeric_limits<Real>::digits < std::numeric_limits<Num>::digits)
       return;
 
    std::cout << "Testing mixed arithmetic with type: " << name_of<Real>() << " and " << name_of<Num>() << std::endl;
@@ -2594,7 +2664,7 @@ typename std::enable_if<boost::multiprecision::number_category<Real>::value != b
    Real b = 30;
    BOOST_CHECK(a.sign() > 0);
    BOOST_CHECK(!a.is_zero());
-   if (std::numeric_limits<Real>::is_signed)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_signed)
    {
       a = -20;
       BOOST_CHECK(a.sign() < 0);
@@ -3081,7 +3151,7 @@ void test()
    ac -= +a;
    BOOST_CHECK_EQUAL(ac, 0);
    ac = a;
-   if (std::numeric_limits<Real>::is_signed || is_twos_complement_integer<Real>::value)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_signed || is_twos_complement_integer<Real>::value)
    {
       ac = a;
       ac -= c - b;
@@ -3093,7 +3163,7 @@ void test()
    ac = a;
    ac += ac * b;
    BOOST_CHECK_EQUAL(ac, 8 + 8 * 64);
-   if (std::numeric_limits<Real>::is_signed || is_twos_complement_integer<Real>::value)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<Real>::is_signed || is_twos_complement_integer<Real>::value)
    {
       ac = a;
       ac -= ac * b;
@@ -3252,7 +3322,7 @@ void test()
    //
    // Test hashing:
    //
-   boost::hash<Real> hasher;
+   std::hash<Real> hasher;
    std::size_t       s = hasher(a);
    BOOST_CHECK_NE(s, 0);
    std::hash<Real> hasher2;

@@ -220,7 +220,7 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
       }
       // Perform rounding:
       bits -= 1 + std::numeric_limits<R>::digits;
-      if (eval_bit_test(backend, (unsigned)bits))
+      if (eval_bit_test(backend, static_cast<unsigned>(bits)))
       {
          if ((eval_lsb_imp(backend) < (std::size_t)bits) || eval_bit_test(backend, (std::size_t)(bits + 1)))
             *result = boost::math::float_next(*result);

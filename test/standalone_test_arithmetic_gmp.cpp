@@ -8,10 +8,9 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include "standalone_test_arithmetic.hpp"
-
 #define BOOST_MP_STANDALONE
 
+#include "test_arithmetic.hpp"
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 

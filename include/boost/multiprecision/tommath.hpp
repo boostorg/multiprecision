@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright 2011 John Maddock. 
+//  Copyright 2021 Matt Borland. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,7 +13,6 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdint>
 #include <tommath.h>
 #include <cctype>
@@ -21,6 +21,11 @@
 #include <climits>
 #include <cstddef>
 #include <cstdlib>
+#include <string>
+
+#if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
+#include <boost/math/special_functions/fpclassify.hpp>
+#endif
 
 namespace boost {
 namespace multiprecision {
@@ -240,8 +245,10 @@ struct tommath_int
          return *this;
       }
 
+      #if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
       BOOST_MP_ASSERT(!(boost::math::isinf)(a));
       BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      #endif
 
       int         e;
       F f, term;
