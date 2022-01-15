@@ -402,6 +402,20 @@ void eval_cos(T& result, const T& x)
    {
       eval_divide(t, xx, half_pi);
       eval_trunc(n_pi, t);
+      //
+      // If n_pi is > 1/epsilon, then it is no longer an exact integer value
+      // but an approximation.  As a result we can no longer reliably reduce
+      // xx to 0 <= xx < pi/2, nor can we tell the sign of the result as we need
+      // n_pi % 4 for that, but that will always be zero in this situation.
+      // We could use a higher precision type for n_pi, along with division at
+      // higher precision, but that's rather expensive.  So for now we do not support
+      // this, and will see if anyone complains and has a legitimate use case.
+      //
+      if (n_pi.compare(get_constant_one_over_epsilon<T>()) > 0)
+      {
+         result = ui_type(1);
+         return;
+      }
       BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
       t = ui_type(4);
       eval_fmod(t, n_pi, t);
@@ -427,20 +441,6 @@ void eval_cos(T& result, const T& x)
 
       if (b_go_down)
          eval_increment(n_pi);
-      //
-      // If n_pi is > 1/epsilon, then it is no longer an exact integer value
-      // but an approximation.  As a result we can no longer reliably reduce
-      // xx to 0 <= xx < pi/2, nor can we tell the sign of the result as we need
-      // n_pi % 4 for that, but that will always be zero in this situation.
-      // We could use a higher precision type for n_pi, along with division at
-      // higher precision, but that's rather expensive.  So for now we do not support
-      // this, and will see if anyone complains and has a legitimate use case.
-      //
-      if (n_pi.compare(get_constant_one_over_epsilon<T>()) > 0)
-      {
-         result = ui_type(1);
-         return;
-      }
 
       reduce_n_half_pi(xx, n_pi, b_go_down);
       //
