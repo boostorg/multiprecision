@@ -36,6 +36,11 @@ namespace backends {
 #pragma warning(disable : 4127) // conditional expression is constant
 #pragma warning(disable : 4702) // Unreachable code (reachability depends on template params)
 #endif
+#ifdef __GNUC__
+   // see https://github.com/boostorg/multiprecision/issues/413
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 
 template <std::size_t MinBits = 0, std::size_t MaxBits = 0, boost::multiprecision::cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = typename std::conditional<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type>
 struct cpp_int_backend;
@@ -2313,6 +2318,9 @@ using checked_int256_t = number<cpp_int_backend<256, 256, signed_magnitude, chec
 using checked_int512_t = number<cpp_int_backend<512, 512, signed_magnitude, checked, void> >  ;
 using checked_int1024_t = number<cpp_int_backend<1024, 1024, signed_magnitude, checked, void> >;
 
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
