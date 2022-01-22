@@ -2041,6 +2041,43 @@ struct is_definitely_unsigned_int<unsigned __int128>
 #endif
 
 template <class Real, class Num>
+void test_mixed_rational(const std::true_type&)
+{
+   Real rat(2, 3);
+   Num  zero(0);
+   BOOST_CHECK_EQUAL(rat * zero, zero);
+   rat *= zero;
+   BOOST_CHECK_EQUAL(rat, zero);
+   rat = Real(2, 3);
+   BOOST_IF_CONSTEXPR(std::is_floating_point<Num>::value)
+   {
+      Real rat2;
+      Num  f = 0.5f;
+      rat2   = rat * f;
+      BOOST_CHECK_EQUAL(rat2, rat * Real(1, 2));
+      rat2   = f * rat;
+      BOOST_CHECK_EQUAL(rat2, rat * Real(1, 2));
+      rat2   = rat / f;
+      BOOST_CHECK_EQUAL(rat2, rat / Real(1, 2));
+      rat2   = f / rat;
+      BOOST_CHECK_EQUAL(rat2, Real(1, 2) / rat);
+      rat2 = rat + f;
+      BOOST_CHECK_EQUAL(rat2, rat + Real(1, 2));
+      rat2 = f + rat;
+      BOOST_CHECK_EQUAL(rat2, rat + Real(1, 2));
+      rat2 = rat - f;
+      BOOST_CHECK_EQUAL(rat2, rat - Real(1, 2));
+      f    = 1.5f;
+      rat2 = f - rat;
+      BOOST_CHECK_EQUAL(rat2, Real(3, 2) - rat);
+   }
+}
+template <class Real, class Num>
+void test_mixed_rational(const std::false_type&)
+{
+}
+
+template <class Real, class Num>
 void test_mixed(const std::integral_constant<bool, true>&)
 {
    typedef typename std::conditional<
@@ -2223,6 +2260,7 @@ void test_mixed(const std::integral_constant<bool, true>&)
    BOOST_CHECK_EQUAL(d, 3 * 4 - 2);
 
    test_mixed_numeric_limits<Real, Num>(std::integral_constant < bool, std::numeric_limits<Real>::is_specialized && std::numeric_limits<Num>::is_specialized > ());
+   test_mixed_rational<Real, Num>(std::integral_constant<bool, boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_rational>());
 }
 
 template <class Real>
