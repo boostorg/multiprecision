@@ -17,6 +17,7 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <type_traits>
 #include <memory>
 #include <utility>
@@ -30,14 +31,13 @@
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
-#if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
+#ifdef BOOST_MP_MATH_AVAILABLE
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #endif
 
 #ifdef BOOST_MSVC
@@ -300,10 +300,8 @@ struct gmp_float_imp
          return *this;
       }
 
-      #ifndef BOOST_MP_STANDALONE
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
-      #endif
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(a));
 
       int         e;
       F f, term;
@@ -1521,10 +1519,8 @@ struct gmp_int
          return *this;
       }
 
-      #ifndef BOOST_MP_STANDALONE
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
-      #endif
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(a));
 
       int         e;
       F f, term;
@@ -2509,10 +2505,8 @@ struct gmp_rational
          return *this;
       }
 
-      #ifndef BOOST_MP_STANDALONE
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
-      #endif
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(a));
 
       int         e;
       F f, term;
