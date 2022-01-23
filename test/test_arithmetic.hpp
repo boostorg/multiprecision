@@ -2049,6 +2049,7 @@ void test_mixed_rational(const std::true_type&)
    rat *= zero;
    BOOST_CHECK_EQUAL(rat, zero);
    rat = Real(2, 3);
+#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
    BOOST_IF_CONSTEXPR(std::is_floating_point<Num>::value)
    {
       Real rat2;
@@ -2071,6 +2072,7 @@ void test_mixed_rational(const std::true_type&)
       rat2 = f - rat;
       BOOST_CHECK_EQUAL(rat2, Real(3, 2) - rat);
    }
+#endif
 }
 template <class Real, class Num>
 void test_mixed_rational(const std::false_type&)
