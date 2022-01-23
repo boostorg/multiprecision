@@ -6,11 +6,14 @@
 #ifndef BOOST_MATH_CPP_BIN_FLOAT_HPP
 #define BOOST_MATH_CPP_BIN_FLOAT_HPP
 
+#include <cmath>
+#include <cstdint>
 #include <limits>
 #include <type_traits>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/integer.hpp>
-#include <boost/math/special_functions/trunc.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
@@ -21,12 +24,15 @@
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
+#ifdef BOOST_MP_MATH_AVAILABLE
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/special_functions/trunc.hpp>
+#endif
 
 #ifdef BOOST_HAS_FLOAT128
 #include <quadmath.h>
@@ -361,15 +367,22 @@ class cpp_bin_float
    typename std::enable_if<std::is_floating_point<Float>::value, cpp_bin_float&>::type assign_float(Float f)
 #endif
    {
-      BOOST_MATH_STD_USING
+      using std::frexp;
+      using std::ldexp;
       using default_ops::eval_add;
       using bf_int_type = typename boost::multiprecision::detail::canonical<int, cpp_bin_float>::type;
 
-      switch ((boost::math::fpclassify)(f))
+      switch (boost::multiprecision::detail::fpclassify(f))
       {
       case FP_ZERO:
          m_data     = limb_type(0);
+
+         #ifdef BOOST_MP_MATH_AVAILABLE
          m_sign     = ((boost::math::signbit)(f) > 0);
+         #else
+         m_sign     = (f < 0);
+         #endif
+
          m_exponent = exponent_zero;
          return *this;
       case FP_NAN:
@@ -396,13 +409,13 @@ class cpp_bin_float
       m_exponent = 0;
 
       constexpr const std::ptrdiff_t bits = sizeof(int) * CHAR_BIT - 1;
-      int              e;
+      int e;
       f = frexp(f, &e);
       while (f)
       {
          f = ldexp(f, bits);
          e -= bits;
-#ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
+#if !defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS) && defined(BOOST_MP_MATH_AVAILABLE)
          int ipart = itrunc(f);
 #else
          int ipart = static_cast<int>(f);
@@ -423,7 +436,6 @@ class cpp_bin_float
        cpp_bin_float&>::type
    assign_float(Float f)
    {
-      BOOST_MATH_STD_USING
       using default_ops::eval_add;
       using default_ops::eval_convert_to;
       using default_ops::eval_get_sign;

@@ -9,6 +9,7 @@
 #include <cmath>
 #include <limits>
 #include <boost/multiprecision/detail/standalone_config.hpp>
+#include <boost/multiprecision/detail/number_base.hpp>
 
 #ifdef BOOST_MP_MATH_AVAILABLE
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -39,12 +40,6 @@ inline int fpclassify(const T val)
 
 namespace boost { namespace multiprecision { namespace detail {
 
-template <typename T>
-inline constexpr T abs(const T val) noexcept
-{
-    return val > 0 ? val : -val;
-}
-
 // Assume IEEE 754 compliance and compiler optimizations do not affect this
 template <typename T>
 inline constexpr bool isnan(const T val) noexcept
@@ -61,10 +56,10 @@ inline constexpr bool isinf(const T val) noexcept
 template <typename T>
 inline constexpr int fpclassify(const T val) noexcept
 {
-    return boost::multiprecision::detail::isnan(x) ? FP_NAN :
-           boost::multiprecision::detail::isinf(x) ? FP_INFINITE :
-           boost::multiprecision::detail::abs(x) == T(0) ? FP_ZERO :
-           boost::multiprecision::detail::abs(x) > 0 && boost::multiprecision::detail::abs(x) < (std::numeric_limits<T>::min)() ? FP_SUBNORMAL : FP_NORMAL;
+    return boost::multiprecision::detail::isnan(val) ? FP_NAN :
+           boost::multiprecision::detail::isinf(val) ? FP_INFINITE :
+           boost::multiprecision::detail::abs(val) == T(0) ? FP_ZERO :
+           boost::multiprecision::detail::abs(val) > 0 && boost::multiprecision::detail::abs(val) < (std::numeric_limits<T>::min)() ? FP_SUBNORMAL : FP_NORMAL;
 }
 
 }}} // Namespaces
