@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <type_traits>
 #include <string>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/endian.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
@@ -25,6 +26,7 @@
 #include <boost/multiprecision/detail/empty_value.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -1624,7 +1626,7 @@ private:
          *this = static_cast<limb_type>(1u);
       }
 
-      if ((boost::math::isinf)(a) || (boost::math::isnan)(a))
+      if (boost::multiprecision::detail::isinf(a) || boost::multiprecision::detail::isnan(a))
       {
          BOOST_MP_THROW_EXCEPTION(std::runtime_error("Cannot convert a non-finite number to an integer."));
       }
