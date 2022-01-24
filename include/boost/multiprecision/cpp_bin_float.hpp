@@ -416,7 +416,7 @@ class cpp_bin_float
          f = ldexp(f, bits);
          e -= bits;
 #if !defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS) && defined(BOOST_MP_MATH_AVAILABLE)
-         int ipart = itrunc(f);
+         int ipart = boost::math::itrunc(f);
 #else
          int ipart = static_cast<int>(f);
 #endif
