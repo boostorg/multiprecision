@@ -2860,7 +2860,7 @@ inline void eval_multiply(gmp_rational& result, gmp_rational const& a, unsigned 
    unsigned long g = mpz_gcd_ui(nullptr, mpq_denref(a.data()), b);
    if (g != 1)
    {
-      BOOST_ASSERT(g);
+      BOOST_MP_ASSERT(g);
       b /= g;
       mpz_mul_ui(mpq_numref(result.data()), mpq_numref(a.data()), b);
       mpz_divexact_ui(mpq_denref(result.data()), mpq_denref(a.data()), g);
