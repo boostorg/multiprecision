@@ -867,6 +867,52 @@ test-suite cpp_int_tests :
            : # requirements
             [ check-target-builds ../config//has_gmp : : <build>no ]
             release  # otherwise    [ runtime is too slow!!
+            <define>TEST1
+            ]
+
+      [ run test_cpp_rational.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST2
+            ]
+
+      [ run test_cpp_rational.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST3
+            ]
+
+      [ run test_cpp_rational.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST4
+            ]
+
+      [ run test_cpp_rational.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST5
+            ]
+
+      [ run test_cpp_rational.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST6
             ]
 
       [ run test_cpp_int_karatsuba.cpp gmp no_eh_support

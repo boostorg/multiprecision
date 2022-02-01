@@ -1182,12 +1182,29 @@ struct tester
          c1 = static_cast<test_type>(c.str());
          d1 = static_cast<test_type>(d.str());
 
+         #if defined(TEST1)
          t1();
+         #endif
+
+         #if defined(TEST2)
          t2();
+         #endif
+
+         #if defined(TEST3)
          t3();
+         #endif
+
+         #if defined(TEST4)
          t4();
+         #endif
+
+         #if defined(TEST5)
          t5();
+         #endif
+
+         #if defined(TEST6)
          t6();
+         #endif
 
          if (last_error_count != (unsigned)boost::detail::test_errors())
          {
