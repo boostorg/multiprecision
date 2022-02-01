@@ -865,54 +865,60 @@ test-suite cpp_int_tests :
            : # command line
            : # input files
            : # requirements
-            [ check-target-builds ../config//has_gmp : : <build>no ]
-            release  # otherwise    [ runtime is too slow!!
             <define>TEST1
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            : test_cpp_rational_1
             ]
 
       [ run test_cpp_rational.cpp gmp no_eh_support
            : # command line
            : # input files
            : # requirements
-            [ check-target-builds ../config//has_gmp : : <build>no ]
-            release  # otherwise    [ runtime is too slow!!
             <define>TEST2
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            : test_cpp_rational_2
             ]
 
       [ run test_cpp_rational.cpp gmp no_eh_support
            : # command line
            : # input files
            : # requirements
-            [ check-target-builds ../config//has_gmp : : <build>no ]
-            release  # otherwise    [ runtime is too slow!!
             <define>TEST3
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            : test_cpp_rational_3
             ]
 
       [ run test_cpp_rational.cpp gmp no_eh_support
            : # command line
            : # input files
            : # requirements
-            [ check-target-builds ../config//has_gmp : : <build>no ]
-            release  # otherwise    [ runtime is too slow!!
             <define>TEST4
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            : test_cpp_rational_4
             ]
 
       [ run test_cpp_rational.cpp gmp no_eh_support
            : # command line
            : # input files
            : # requirements
-            [ check-target-builds ../config//has_gmp : : <build>no ]
-            release  # otherwise    [ runtime is too slow!!
             <define>TEST5
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            : test_cpp_rational_5
             ]
 
       [ run test_cpp_rational.cpp gmp no_eh_support
            : # command line
            : # input files
            : # requirements
+            <define>TEST6
             [ check-target-builds ../config//has_gmp : : <build>no ]
             release  # otherwise    [ runtime is too slow!!
-            <define>TEST6
+            : test_cpp_rational_6
             ]
 
       [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
