@@ -1166,8 +1166,16 @@ struct tester
 
       BOOST_CHECK_EQUAL(Number(), 0);
 
-      for (int i = 0; i < 10000; ++i)
+      #ifndef CI_SUPPRESS_KNOWN_ISSUES
+      constexpr auto ilim = 120;
+      #else
+      constexpr auto ilim = 40;
+      #endif
+
+      for (int i = 0; i < ilim; ++i)
       {
+         std::cout << "i: " << i << std::endl;
+
          a = generate_random<mpz_int>(1000);
          b = generate_random<mpz_int>(1000);
          c = generate_random<mpz_int>(1000);
@@ -1248,9 +1256,9 @@ struct tester
          // so don't get too close to that:
          //
 #ifndef CI_SUPPRESS_KNOWN_ISSUES
-         if (tim.elapsed() > 200)
+         if (tim.elapsed() > 200.0)
 #else
-         if (tim.elapsed() > 25)
+         if (tim.elapsed() > 25.0)
 #endif
          {
             std::cout << "Timeout reached, aborting tests now....\n";
