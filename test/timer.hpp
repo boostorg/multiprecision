@@ -9,10 +9,7 @@
 #ifndef BOOST_MP_TIMER_HPP
 #define BOOST_MP_TIMER_HPP
 
-#include <algorithm>
 #include <chrono>
-#include <ctime>
-#include <limits>
 
 // This file now reflects the 2022 work-over. We have replaced the
 // original timer facility (which had been based on std::clock())
@@ -29,10 +26,10 @@ public:
 
    using duration_type = typename clock_type::duration;
 
-   constexpr stopwatch() : m_start(clock_type::now()) { }
+   stopwatch() : m_start(clock_type::now()) { }
 
-   constexpr stopwatch(const stopwatch& other) : m_start(other.m_start) { }
-   constexpr stopwatch(stopwatch&& other) noexcept : m_start(other.m_start) { }
+   stopwatch(const stopwatch& other) : m_start(other.m_start) { }
+   stopwatch(stopwatch&& other) noexcept : m_start(other.m_start) { }
 
    auto operator=(const stopwatch& other) -> stopwatch&
    {
@@ -53,16 +50,14 @@ public:
 
    ~stopwatch() { }
 
-   constexpr auto elapsed() const -> duration_type
+   auto elapsed() const -> duration_type
    {
       return (clock_type::now() - m_start);
    }
 
    auto elapsed_max() const -> duration_type
    {
-      constexpr auto latest_possible_time_point = (std::chrono::time_point<clock_type>::max)();
-
-      return latest_possible_time_point - m_start;
+      return (std::chrono::time_point<clock_type>::max)() - m_start;
    }
 
    static constexpr auto elapsed_min() -> duration_type
@@ -87,17 +82,19 @@ private:
 public:
    using value_type = double;
 
-   constexpr timer() { }
+   timer() { }
+
+   ~timer() { }
 
    void restart() { base_class_type::reset(); }
 
-   constexpr auto elapsed() const -> value_type
+   auto elapsed() const -> value_type
    {
       // Return the elapsed time in seconds.
       return std::chrono::duration_cast<std::chrono::duration<value_type>>(base_class_type::elapsed()).count();
    }
 
-   constexpr auto elapsed_max() const -> value_type
+   auto elapsed_max() const -> value_type
    {
       return std::chrono::duration_cast<std::chrono::duration<value_type>>(base_class_type::elapsed_max()).count();
    }
