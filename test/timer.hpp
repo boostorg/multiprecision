@@ -10,6 +10,7 @@
 #define BOOST_MP_TIMER_HPP
 
 #include <algorithm>
+#include <chrono>
 #include <ctime>
 #include <limits>
 
@@ -84,24 +85,26 @@ private:
    using base_class_type = stopwatch<>;
 
 public:
+   using value_type = double;
+
    constexpr timer() { }
 
    void restart() { base_class_type::reset(); }
 
-   constexpr auto elapsed() const -> double
+   constexpr auto elapsed() const -> value_type
    {
       // Return the elapsed time in seconds.
-      return std::chrono::duration_cast<std::chrono::duration<double>>(base_class_type::elapsed()).count();
+      return std::chrono::duration_cast<std::chrono::duration<value_type>>(base_class_type::elapsed()).count();
    }
 
-   constexpr auto elapsed_max() const -> double
+   constexpr auto elapsed_max() const -> value_type
    {
-      return std::chrono::duration_cast<std::chrono::duration<double>>(base_class_type::elapsed_max()).count();
+      return std::chrono::duration_cast<std::chrono::duration<value_type>>(base_class_type::elapsed_max()).count();
    }
 
-   static constexpr auto elapsed_min() -> double
+   static constexpr auto elapsed_min() -> value_type
    {
-      return std::chrono::duration_cast<std::chrono::duration<double>>(base_class_type::elapsed_min()).count();
+      return std::chrono::duration_cast<std::chrono::duration<value_type>>(base_class_type::elapsed_min()).count();
    }
 };
 
