@@ -1,63 +1,108 @@
 ///////////////////////////////////////////////////////////////
 //  Copyright Beman Dawes 1994-99.
-//  Copyright 2020 John Maddock. Distributed under the Boost
+//  Copyright 2020 John Maddock.
+//  Copyright 2022 Christopher Kormanyos.
+//  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+
+#ifndef BOOST_MP_TIMER_HPP
+#define BOOST_MP_TIMER_HPP
 
 #include <algorithm>
 #include <ctime>
 #include <limits>
 
-//
-// This file archives the old (now deprecated) Boost.Timer.
-// It is however, all that we need for a simple timeout.
-//
-// TODO: replace with std::chrono once we remove C++03
-// support in 2021.
-//
+// This file now reflects the 2022 work-over. We have replaced the
+// original timer facility (which had been based on std::clock())
+// with C++11's equivalent <chrono> counterparts.
 
-class timer
+template <class ClockType = std::chrono::high_resolution_clock>
+struct stopwatch;
+
+template <class ClockType>
+struct stopwatch
 {
- public:
-   timer() : _start_time(std::clock()) { }          // postcondition: elapsed()==0
-                                                    //         timer( const timer& src );      // post: elapsed()==src.elapsed()
-                                                    //        ~timer(){}
-                                                    //  timer& operator=( const timer& src );  // post: elapsed()==src.elapsed()
-   void   restart() { _start_time = std::clock(); } // post: elapsed()==0
-   double elapsed() const                           // return elapsed time in seconds
-   {
-      const auto delta =
-         static_cast<std::clock_t>
-         (
-            std::clock() - _start_time
-         );
+public:
+   using clock_type = ClockType;
 
-      return static_cast<double>(static_cast<double>(delta) / safe_demominator());
+   using duration_type = typename clock_type::duration;
+
+   constexpr stopwatch() : m_start(clock_type::now()) { }
+
+   constexpr stopwatch(const stopwatch& other) : m_start(other.m_start) { }
+   constexpr stopwatch(stopwatch&& other) noexcept : m_start(other.m_start) { }
+
+   auto operator=(const stopwatch& other) -> stopwatch&
+   {
+      if(this != &other)
+      {
+         m_start = other.m_start;
+      }
+
+      return *this;
    }
 
-   double elapsed_max() const // return estimated maximum value for elapsed()
-   // Portability warning: elapsed_max() may return too high a value on systems
-   // where std::clock_t overflows or resets at surprising values.
+   auto operator=(stopwatch&& other) noexcept -> stopwatch&
    {
-      const auto delta_max =
-         static_cast<std::clock_t>
-         (
-            (std::numeric_limits<std::clock_t>::max)() - _start_time
-         );
+      m_start = other.m_start;
 
-      return static_cast<double>(static_cast<double>(delta_max) / safe_demominator());
+      return *this;
    }
 
-   double elapsed_min() const // return minimum value for elapsed()
+   ~stopwatch() { }
+
+   constexpr auto elapsed() const -> duration_type
    {
-      return static_cast<double>(1.0 / safe_demominator());
+      return (clock_type::now() - m_start);
    }
 
- private:
-   std::clock_t _start_time;
-
-   static double safe_demominator()
+   auto elapsed_max() const -> duration_type
    {
-      return (std::max)(10.0, static_cast<double>(CLOCKS_PER_SEC));
+      constexpr auto latest_possible_time_point = (std::chrono::time_point<clock_type>::max)();
+
+      return latest_possible_time_point - m_start;
    }
-}; // timer
+
+   static constexpr auto elapsed_min() -> duration_type
+   {
+      return (std::chrono::time_point<clock_type>::min)() -  std::chrono::time_point<clock_type>();
+   }
+
+   void reset()
+   {
+      m_start = clock_type::now();
+   }
+
+private:
+   typename clock_type::time_point m_start;
+};
+
+class timer : public stopwatch<>
+{
+private:
+   using base_class_type = stopwatch<>;
+
+public:
+   constexpr timer() { }
+
+   void restart() { base_class_type::reset(); }
+
+   constexpr auto elapsed() const -> double
+   {
+      // Return the elapsed time in seconds.
+      return std::chrono::duration_cast<std::chrono::duration<double>>(base_class_type::elapsed()).count();
+   }
+
+   constexpr auto elapsed_max() const -> double
+   {
+      return std::chrono::duration_cast<std::chrono::duration<double>>(base_class_type::elapsed_max()).count();
+   }
+
+   static constexpr auto elapsed_min() -> double
+   {
+      return std::chrono::duration_cast<std::chrono::duration<double>>(base_class_type::elapsed_min()).count();
+   }
+};
+
+#endif // BOOST_MP_TIMER_HPP
