@@ -1195,7 +1195,8 @@ struct tester
       constexpr int large_ui_digits_to_get = double_limb_type_digit_counter();
 
       // Ensure at compile-time that the amount of digits to get for large_ui is OK.
-      static_assert(large_ui_digits_to_get >= std::numeric_limits<unsigned>::digits);
+      static_assert(large_ui_digits_to_get >= std::numeric_limits<unsigned>::digits,
+                    "Error: Ensure that the amount of digits to get for large_ui is really correct.");
 
       for (auto i = 0; i < ilim; ++i)
       {
