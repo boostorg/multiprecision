@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2021 John Maddock. Distributed under the Boost
+//  Copyright 2021 John Maddock.
+//  Copyright 2022 Christopher Kormanyos.
+//  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
@@ -11,10 +13,10 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
+#include <random>
+
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
 #include "timer.hpp"
 #include "test.hpp"
 
@@ -31,12 +33,22 @@
 #define TEST6
 #endif
 
+namespace local_random
+{
+
+using generator_type = std::mt19937;
+using random_type    = typename generator_type::result_type;
+
+generator_type& my_generator()
+{
+  static generator_type generator_instance;
+
+  return generator_instance;
+}
+
 template <class T>
 T generate_random(unsigned bits_wanted)
 {
-   static boost::random::mt19937               gen;
-   typedef boost::random::mt19937::result_type random_type;
-
    T        max_val;
    unsigned digits;
    if (std::numeric_limits<T>::is_bounded && (bits_wanted == (unsigned)std::numeric_limits<T>::digits))
@@ -51,7 +63,7 @@ T generate_random(unsigned bits_wanted)
    }
 
    unsigned bits_per_r_val = std::numeric_limits<random_type>::digits - 1;
-   while ((random_type(1) << bits_per_r_val) > (gen.max)())
+   while ((random_type(1) << bits_per_r_val) > (my_generator().max)())
       --bits_per_r_val;
 
    unsigned terms_needed = digits / bits_per_r_val + 1;
@@ -59,27 +71,35 @@ T generate_random(unsigned bits_wanted)
    T val = 0;
    for (unsigned i = 0; i < terms_needed; ++i)
    {
-      val *= (gen.max)();
-      val += gen();
+      val *= (my_generator().max)();
+      val += my_generator()();
    }
    val %= max_val;
    return val;
 }
 
+}
+
 template <class Number>
 struct tester
 {
-   typedef Number                                         test_type;
-   typedef typename test_type::backend_type::checked_type checked;
+   using test_type  = Number;
+   using checked    = typename test_type::backend_type::checked_type;
+   using timer_type = boost::multiprecision::test_detail::timer_template<int, std::chrono::high_resolution_clock>;
 
-   unsigned     last_error_count;
-   timer tim;
+   unsigned   last_error_count;
+   timer_type tim;
 
    boost::multiprecision::mpz_int a, b, c, d;
    int                            si;
    unsigned                       ui;
    boost::multiprecision::double_limb_type large_ui;
    test_type                      a1, b1, c1, d1;
+
+   static constexpr int double_limb_type_digit_counter()
+   {
+      return static_cast<int>(sizeof(boost::multiprecision::double_limb_type)) * 8;
+   }
 
    void t1()
    {
@@ -930,7 +950,7 @@ struct tester
       boost::multiprecision::mpq_rational x(a, b), y(c, d), z;
       boost::multiprecision::cpp_rational x1(a1, b1), y1(c1, d1), z1;
 
-      boost::multiprecision::mpz_int bi = generate_random<boost::multiprecision::mpz_int>(1000);
+      boost::multiprecision::mpz_int bi = local_random::generate_random<boost::multiprecision::mpz_int>(1000);
       boost::multiprecision::cpp_int bi1(bi.str());
 
       BOOST_CHECK_EQUAL(x.str(), x1.str());
@@ -1166,30 +1186,72 @@ struct tester
 
       BOOST_CHECK_EQUAL(Number(), 0);
 
-      for (int i = 0; i < 10000; ++i)
+      constexpr auto ilim = 10000;
+
+      constexpr auto large_ui_digits_to_get = double_limb_type_digit_counter();
+
+      // Ensure at compile-time that the amount of digits to get for large_ui is OK.
+      static_assert(large_ui_digits_to_get >= std::numeric_limits<unsigned>::digits,
+                    "Error: Ensure that the amount of digits to get for large_ui is really correct.");
+
+      for (auto i = 0; i < ilim; ++i)
       {
-         a = generate_random<mpz_int>(1000);
-         b = generate_random<mpz_int>(1000);
-         c = generate_random<mpz_int>(1000);
-         d = generate_random<mpz_int>(1000);
+         a = local_random::generate_random<mpz_int>(1000);
+         b = local_random::generate_random<mpz_int>(1000);
+         c = local_random::generate_random<mpz_int>(1000);
+         d = local_random::generate_random<mpz_int>(1000);
 
-         si       = generate_random<int>(std::numeric_limits<int>::digits - 2);
-         ui       = generate_random<unsigned>(std::numeric_limits<unsigned>::digits - 2);
-         large_ui = generate_random<boost::multiprecision::double_limb_type>(std::numeric_limits<boost::multiprecision::double_limb_type>::digits - 2);
+         si = local_random::generate_random<int>
+              (
+                 static_cast<unsigned>(std::numeric_limits<int>::digits - 2)
+              );
 
-         a1 = static_cast<test_type>(a.str());
-         b1 = static_cast<test_type>(b.str());
-         c1 = static_cast<test_type>(c.str());
-         d1 = static_cast<test_type>(d.str());
+         ui = local_random::generate_random<unsigned>
+              (
+                 static_cast<unsigned>(std::numeric_limits<unsigned>::digits - 2)
+              );
 
+         large_ui =
+              local_random::generate_random<boost::multiprecision::double_limb_type>
+              (
+                 static_cast<unsigned>(large_ui_digits_to_get - 2)
+              );
+
+         const auto a_represented_as_string = a.str();
+         const auto b_represented_as_string = b.str();
+         const auto c_represented_as_string = c.str();
+         const auto d_represented_as_string = d.str();
+
+         a1 = static_cast<test_type>(a_represented_as_string);
+         b1 = static_cast<test_type>(b_represented_as_string);
+         c1 = static_cast<test_type>(c_represented_as_string);
+         d1 = static_cast<test_type>(d_represented_as_string);
+
+         #if defined(TEST1)
          t1();
-         t2();
-         t3();
-         t4();
-         t5();
-         t6();
+         #endif
 
-         if (last_error_count != (unsigned)boost::detail::test_errors())
+         #if defined(TEST2)
+         t2();
+         #endif
+
+         #if defined(TEST3)
+         t3();
+         #endif
+
+         #if defined(TEST4)
+         t4();
+         #endif
+
+         #if defined(TEST5)
+         t5();
+         #endif
+
+         #if defined(TEST6)
+         t6();
+         #endif
+
+         if (last_error_count != static_cast<unsigned>(boost::detail::test_errors()))
          {
             last_error_count = boost::detail::test_errors();
             std::cout << std::hex << std::showbase;
@@ -1231,12 +1293,13 @@ struct tester
          // so don't get too close to that:
          //
 #ifndef CI_SUPPRESS_KNOWN_ISSUES
-         if (tim.elapsed() > 200)
+         if (tim.elapsed() > timer_type::seconds(180))
 #else
-         if (tim.elapsed() > 25)
+         if (tim.elapsed() > timer_type::seconds(20))
 #endif
          {
             std::cout << "Timeout reached, aborting tests now....\n";
+            std::cout << "Loop count reached is i: " << i << "\n";
             break;
          }
       }
