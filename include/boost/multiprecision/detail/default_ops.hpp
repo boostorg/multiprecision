@@ -1328,6 +1328,11 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_remquo(T& result, const T& a, const T&
    eval_convert_to(pi, n);
    eval_multiply(n, b);
    eval_subtract(result, a, n);
+   if (eval_is_zero(result))
+   {
+      if (eval_signbit(a))
+         result.negate();
+   }
 }
 template <class T, class A>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_remquo(T& result, const T& x, const A& a, int* pi)
@@ -2203,16 +2208,16 @@ inline BOOST_MP_CXX14_CONSTEXPR int sign BOOST_PREVENT_MACRO_SUBSTITUTION(const 
 }
 
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+inline BOOST_MP_CXX14_CONSTEXPR bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
    using default_ops::eval_signbit;
-   return eval_signbit(arg.backend());
+   return static_cast<bool>(eval_signbit(arg.backend()));
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline BOOST_MP_CXX14_CONSTEXPR int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+inline BOOST_MP_CXX14_CONSTEXPR bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
-   return signbit                                                                        BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
+   return static_cast<bool>(signbit BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg)));
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> changesign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
