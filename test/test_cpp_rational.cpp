@@ -1186,13 +1186,9 @@ struct tester
 
       BOOST_CHECK_EQUAL(Number(), 0);
 
-      #ifndef CI_SUPPRESS_KNOWN_ISSUES
       constexpr auto ilim = 10000;
-      #else
-      constexpr auto ilim =  1000;
-      #endif
 
-      constexpr int large_ui_digits_to_get = double_limb_type_digit_counter();
+      constexpr auto large_ui_digits_to_get = double_limb_type_digit_counter();
 
       // Ensure at compile-time that the amount of digits to get for large_ui is OK.
       static_assert(large_ui_digits_to_get >= std::numeric_limits<unsigned>::digits,
@@ -1205,9 +1201,21 @@ struct tester
          c = local_random::generate_random<mpz_int>(1000);
          d = local_random::generate_random<mpz_int>(1000);
 
-         si       = local_random::generate_random<int>(std::numeric_limits<int>::digits - 2);
-         ui       = local_random::generate_random<unsigned>(std::numeric_limits<unsigned>::digits - 2);
-         large_ui = local_random::generate_random<boost::multiprecision::double_limb_type>(static_cast<unsigned>(large_ui_digits_to_get - 2));
+         si = local_random::generate_random<int>
+              (
+                 static_cast<unsigned>(std::numeric_limits<int>::digits - 2)
+              );
+
+         ui = local_random::generate_random<unsigned>
+              (
+                 static_cast<unsigned>(std::numeric_limits<unsigned>::digits - 2)
+              );
+
+         large_ui =
+              local_random::generate_random<boost::multiprecision::double_limb_type>
+              (
+                 static_cast<unsigned>(large_ui_digits_to_get - 2)
+              );
 
          const auto a_represented_as_string = a.str();
          const auto b_represented_as_string = b.str();
@@ -1243,7 +1251,7 @@ struct tester
          t6();
          #endif
 
-         if (last_error_count != (unsigned)boost::detail::test_errors())
+         if (last_error_count != static_cast<unsigned>(boost::detail::test_errors()))
          {
             last_error_count = boost::detail::test_errors();
             std::cout << std::hex << std::showbase;
@@ -1285,12 +1293,13 @@ struct tester
          // so don't get too close to that:
          //
 #ifndef CI_SUPPRESS_KNOWN_ISSUES
-         if (tim.elapsed() > static_cast<timer_type::result_type>(120))
+         if (tim.elapsed() > timer_type::seconds(180))
 #else
-         if (tim.elapsed() > static_cast<timer_type::result_type>(20))
+         if (tim.elapsed() > timer_type::seconds(20))
 #endif
          {
             std::cout << "Timeout reached, aborting tests now....\n";
+            std::cout << "Loop count reached is i: " << i << "\n";
             break;
          }
       }

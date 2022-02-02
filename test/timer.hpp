@@ -114,6 +114,9 @@ public:
    {
       return std::chrono::duration_cast<std::chrono::duration<result_type>>(base_class_type::elapsed_min()).count();
    }
+
+   static constexpr result_type seconds(result_type s) { return static_cast<result_type>(s * static_cast<result_type>(1)); }
+
 };
 
 } // namespace test_detail
