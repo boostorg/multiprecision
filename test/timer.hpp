@@ -15,15 +15,22 @@
 // original timer facility (which had been based on std::clock())
 // with C++11's equivalent <chrono> counterparts.
 
+namespace boost { namespace multiprecision { namespace test { namespace detail {
+
 template <class ClockType = std::chrono::high_resolution_clock>
 struct stopwatch;
+
+template <class ResultType,
+          class ClockType = std::chrono::high_resolution_clock>
+class timer_template;
 
 template <class ClockType>
 struct stopwatch
 {
-public:
+private:
    using clock_type = ClockType;
 
+public:
    using duration_type = typename clock_type::duration;
 
    stopwatch() : m_start(clock_type::now()) { }
@@ -74,35 +81,49 @@ private:
    typename clock_type::time_point m_start;
 };
 
-class timer : public stopwatch<>
+
+template <class ResultType,
+          class ClockType>
+class timer_template : public stopwatch<ClockType>
 {
 private:
-   using base_class_type = stopwatch<>;
+   using clock_type      = ClockType;
+   using base_class_type = stopwatch<clock_type>;
 
 public:
-   using value_type = double;
+   using result_type = ResultType;
 
-   timer() { }
+   timer_template() { }
 
-   ~timer() { }
+   ~timer_template() { }
 
    void restart() { base_class_type::reset(); }
 
-   auto elapsed() const -> value_type
+   auto elapsed() const -> result_type
    {
       // Return the elapsed time in seconds.
-      return std::chrono::duration_cast<std::chrono::duration<value_type>>(base_class_type::elapsed()).count();
+      return std::chrono::duration_cast<std::chrono::duration<result_type>>(base_class_type::elapsed()).count();
    }
 
-   auto elapsed_max() const -> value_type
+   auto elapsed_max() const -> result_type
    {
-      return std::chrono::duration_cast<std::chrono::duration<value_type>>(base_class_type::elapsed_max()).count();
+      return std::chrono::duration_cast<std::chrono::duration<result_type>>(base_class_type::elapsed_max()).count();
    }
 
-   static constexpr auto elapsed_min() -> value_type
+   static constexpr auto elapsed_min() -> result_type
    {
-      return std::chrono::duration_cast<std::chrono::duration<value_type>>(base_class_type::elapsed_min()).count();
+      return std::chrono::duration_cast<std::chrono::duration<result_type>>(base_class_type::elapsed_min()).count();
    }
 };
+
+} // namespace detail
+} // namespace test
+} // namespace multiprecision
+} // namespace boost
+
+// TODO: Might prefer to have the relatively common
+// name "timer" to be shielded with a namespace.
+
+using timer = boost::multiprecision::test::detail::timer_template<double, std::chrono::high_resolution_clock>;
 
 #endif // BOOST_MP_TIMER_HPP
