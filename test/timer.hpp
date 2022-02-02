@@ -15,7 +15,7 @@
 // original timer facility (which had been based on std::clock())
 // with C++11's equivalent <chrono> counterparts.
 
-namespace boost { namespace multiprecision { namespace test { namespace detail {
+namespace boost { namespace multiprecision { namespace test_detail {
 
 template <class ClockType = std::chrono::high_resolution_clock>
 struct stopwatch;
@@ -116,14 +116,13 @@ public:
    }
 };
 
-} // namespace detail
-} // namespace test
+} // namespace test_detail
 } // namespace multiprecision
 } // namespace boost
 
 // TODO: Might prefer to have the relatively common
 // name "timer" to be shielded with a namespace.
 
-using timer = boost::multiprecision::test::detail::timer_template<double, std::chrono::high_resolution_clock>;
+using timer = boost::multiprecision::test_detail::timer_template<double, std::chrono::high_resolution_clock>;
 
 #endif // BOOST_MP_TIMER_HPP

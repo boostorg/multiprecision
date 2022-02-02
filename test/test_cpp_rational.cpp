@@ -85,7 +85,7 @@ struct tester
 {
    using test_type  = Number;
    using checked    = typename test_type::backend_type::checked_type;
-   using timer_type = boost::multiprecision::test::detail::timer_template<int, std::chrono::high_resolution_clock>;
+   using timer_type = boost::multiprecision::test_detail::timer_template<int, std::chrono::high_resolution_clock>;
 
    unsigned   last_error_count;
    timer_type tim;
@@ -95,6 +95,11 @@ struct tester
    unsigned                       ui;
    boost::multiprecision::double_limb_type large_ui;
    test_type                      a1, b1, c1, d1;
+
+   static constexpr int double_limb_type_digit_counter()
+   {
+      return static_cast<int>(sizeof(boost::multiprecision::double_limb_type)) * 8;
+   }
 
    void t1()
    {
@@ -1182,51 +1187,59 @@ struct tester
       BOOST_CHECK_EQUAL(Number(), 0);
 
       #ifndef CI_SUPPRESS_KNOWN_ISSUES
-      constexpr auto ilim = 200;
+      constexpr auto ilim = 10000;
       #else
-      constexpr auto ilim =  40;
+      constexpr auto ilim =  1000;
       #endif
 
-      for (int i = 0; i < ilim; ++i)
-      {
-         std::cout << "reached point to print i: " << i << std::endl;
+      constexpr int large_ui_digits_to_get = double_limb_type_digit_counter();
 
-         a = local_random::generate_random<mpz_int>(1000); std::cout << "reached point to print a" << std::endl;
-         b = local_random::generate_random<mpz_int>(1000); std::cout << "reached point to print b" << std::endl;
-         c = local_random::generate_random<mpz_int>(1000); std::cout << "reached point to print c" << std::endl;
-         d = local_random::generate_random<mpz_int>(1000); std::cout << "reached point to print d" << std::endl;
+      // Ensure at compile-time that the amount of digits to get for large_ui is OK.
+      static_assert(large_ui_digits_to_get >= std::numeric_limits<unsigned>::digits);
+
+      for (auto i = 0; i < ilim; ++i)
+      {
+         a = local_random::generate_random<mpz_int>(1000);
+         b = local_random::generate_random<mpz_int>(1000);
+         c = local_random::generate_random<mpz_int>(1000);
+         d = local_random::generate_random<mpz_int>(1000);
 
          si       = local_random::generate_random<int>(std::numeric_limits<int>::digits - 2);
          ui       = local_random::generate_random<unsigned>(std::numeric_limits<unsigned>::digits - 2);
-         large_ui = local_random::generate_random<boost::multiprecision::double_limb_type>(std::numeric_limits<boost::multiprecision::double_limb_type>::digits - 2);
+         large_ui = local_random::generate_random<boost::multiprecision::double_limb_type>(static_cast<unsigned>(large_ui_digits_to_get - 2));
 
-         a1 = static_cast<test_type>(a.str()); std::cout << "reached point to print a1" << std::endl;
-         b1 = static_cast<test_type>(b.str()); std::cout << "reached point to print b1" << std::endl;
-         c1 = static_cast<test_type>(c.str()); std::cout << "reached point to print c1" << std::endl;
-         d1 = static_cast<test_type>(d.str()); std::cout << "reached point to print d1" << std::endl;
+         const auto a_represented_as_string = a.str();
+         const auto b_represented_as_string = b.str();
+         const auto c_represented_as_string = c.str();
+         const auto d_represented_as_string = d.str();
+
+         a1 = static_cast<test_type>(a_represented_as_string);
+         b1 = static_cast<test_type>(b_represented_as_string);
+         c1 = static_cast<test_type>(c_represented_as_string);
+         d1 = static_cast<test_type>(d_represented_as_string);
 
          #if defined(TEST1)
-         t1(); std::cout << "reached point to print t1" << std::endl;
+         t1();
          #endif
 
          #if defined(TEST2)
-         t2(); std::cout << "reached point to print t2" << std::endl;
+         t2();
          #endif
 
          #if defined(TEST3)
-         t3(); std::cout << "reached point to print t3" << std::endl;
+         t3();
          #endif
 
          #if defined(TEST4)
-         t4(); std::cout << "reached point to print t4" << std::endl;
+         t4();
          #endif
 
          #if defined(TEST5)
-         t5(); std::cout << "reached point to print t5" << std::endl;
+         t5();
          #endif
 
          #if defined(TEST6)
-         t6(); std::cout << "reached point to print t6" << std::endl;
+         t6();
          #endif
 
          if (last_error_count != (unsigned)boost::detail::test_errors())
@@ -1271,9 +1284,9 @@ struct tester
          // so don't get too close to that:
          //
 #ifndef CI_SUPPRESS_KNOWN_ISSUES
-         if (tim.elapsed() > static_cast<timer_type::result_type>(100))
+         if (tim.elapsed() > static_cast<timer_type::result_type>(120))
 #else
-         if (tim.elapsed() > static_cast<timer_type::result_type>(40))
+         if (tim.elapsed() > static_cast<timer_type::result_type>(20))
 #endif
          {
             std::cout << "Timeout reached, aborting tests now....\n";
