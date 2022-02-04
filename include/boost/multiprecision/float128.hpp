@@ -278,7 +278,7 @@ struct float128_backend
       }
       return buf;
 #else
-      return boost::multiprecision::detail::convert_to_string(*this, digits ? digits : 37, f);
+      return boost::multiprecision::detail::convert_to_string(*this, digits ? digits : 36, f);
 #endif
    }
    BOOST_MP_CXX14_CONSTEXPR void negate() noexcept
