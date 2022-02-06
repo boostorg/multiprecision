@@ -36,8 +36,9 @@ namespace backends {
 #pragma warning(disable : 4127) // conditional expression is constant
 #pragma warning(disable : 4702) // Unreachable code (reachability depends on template params)
 #endif
-#ifdef __GNUC__
-   // see https://github.com/boostorg/multiprecision/issues/413
+#if defined(__GNUC__) && !defined(__clang__)
+// see https://github.com/boostorg/multiprecision/issues/413
+// and https://github.com/boostorg/multiprecision/issues/431
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
@@ -2318,7 +2319,9 @@ using checked_int256_t = number<cpp_int_backend<256, 256, signed_magnitude, chec
 using checked_int512_t = number<cpp_int_backend<512, 512, signed_magnitude, checked, void> >  ;
 using checked_int1024_t = number<cpp_int_backend<1024, 1024, signed_magnitude, checked, void> >;
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
+// see https://github.com/boostorg/multiprecision/issues/413
+// and https://github.com/boostorg/multiprecision/issues/431
 #pragma GCC diagnostic pop
 #endif
 #ifdef _MSC_VER
