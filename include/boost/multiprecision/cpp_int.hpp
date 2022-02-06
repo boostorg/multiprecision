@@ -1382,7 +1382,7 @@ struct cpp_int_backend
 
  private:
    template <std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, std::integral_constant<bool, true> const&, std::integral_constant<bool, true> const&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, std::true_type const&, std::true_type const&)
    {
       // Assigning trivial type to trivial type:
       this->check_in_range(*other.limbs());
@@ -1391,7 +1391,7 @@ struct cpp_int_backend
       this->normalize();
    }
    template <std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, std::integral_constant<bool, true> const&, std::integral_constant<bool, false> const&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, std::true_type const&, std::false_type const&)
    {
       // non-trivial to trivial narrowing conversion:
       double_limb_type v = *other.limbs();
@@ -1411,7 +1411,7 @@ struct cpp_int_backend
       this->normalize();
    }
    template <std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, std::integral_constant<bool, false> const&, std::integral_constant<bool, true> const&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, std::false_type const&, std::true_type const&)
    {
       // trivial to non-trivial, treat the trivial argument as if it were an unsigned arithmetic type, then set the sign afterwards:
       *this = static_cast<
@@ -1421,7 +1421,7 @@ struct cpp_int_backend
       this->sign(other.sign());
    }
    template <std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, std::integral_constant<bool, false> const&, std::integral_constant<bool, false> const&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, std::false_type const&, std::false_type const&)
    {
       // regular non-trivial to non-trivial assign:
       this->resize(other.size(), other.size());
@@ -1440,7 +1440,10 @@ struct cpp_int_backend
       }
       else
 #endif
-         std::memcpy(this->limbs(), other.limbs(), (std::min)(other.size(), this->size()) * sizeof(this->limbs()[0]));
+      {
+         static_assert(sizeof(other.limbs()[0]) == sizeof(this->limbs()[0]), "This method requires equal limb sizes");
+         std::memcpy(this->limbs(), other.limbs(), (std::min)(other.size() * sizeof(other.limbs()[0]), this->size() * sizeof(this->limbs()[0])));
+      }
 #endif
       this->sign(other.sign());
       this->normalize();
