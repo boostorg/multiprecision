@@ -154,13 +154,13 @@ struct number_category<float128_type> : public std::integral_constant<int, numbe
 using float128 = number<float128_backend, et_off>;
 
 namespace quad_constants {
-constexpr __float128 quad_min = static_cast<__float128>(1) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) / 1073741824;
+constexpr float128_type quad_min = static_cast<float128_type>(1) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) / 1073741824;
 
-constexpr __float128 quad_denorm_min = static_cast<__float128>(1) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) / 5.5751862996326557854e+42;
+constexpr float128_type quad_denorm_min = static_cast<float128_type>(1) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) / 5.5751862996326557854e+42;
 
 constexpr double     dbl_mult = 8.9884656743115795386e+307;                                              // This has one bit set only.
-constexpr __float128 quad_max = (static_cast<__float128>(1) - 9.62964972193617926527988971292463659e-35) // This now has all bits sets to 1
-                                * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * 65536;
+constexpr float128_type quad_max = (static_cast<float128_type>(1) - 9.62964972193617926527988971292463659e-35) // This now has all bits sets to 1
+                                * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * 65536;
 } // namespace quad_constants
 
 #define BOOST_MP_QUAD_MIN boost::multiprecision::quad_constants::quad_min
@@ -200,14 +200,14 @@ struct float128_backend
    BOOST_MP_CXX14_CONSTEXPR float128_backend(long double const& f) : m_value(f)
    {
       if (::fabsl(f) > LDBL_MAX)
-         m_value = (f < 0) ? -static_cast<__float128>(HUGE_VAL) : static_cast<__float128>(HUGE_VAL);
+         m_value = (f < 0) ? -static_cast<float128_type>(HUGE_VAL) : static_cast<float128_type>(HUGE_VAL);
    }
    BOOST_MP_CXX14_CONSTEXPR float128_backend& operator=(long double const& f)
    {
       if (f > LDBL_MAX)
-         m_value = static_cast<__float128>(HUGE_VAL);
+         m_value = static_cast<float128_type>(HUGE_VAL);
       else if (-f > LDBL_MAX)
-         m_value = -static_cast<__float128>(HUGE_VAL);
+         m_value = -static_cast<float128_type>(HUGE_VAL);
       else
          m_value = f;
       return *this;
@@ -278,7 +278,7 @@ struct float128_backend
       }
       return buf;
 #else
-      return boost::multiprecision::detail::convert_to_string(*this, digits ? digits : 37, f);
+      return boost::multiprecision::detail::convert_to_string(*this, digits ? digits : 36, f);
 #endif
    }
    BOOST_MP_CXX14_CONSTEXPR void negate() noexcept
