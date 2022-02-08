@@ -1416,7 +1416,7 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
    if (neg)
       str.erase(0, 1);
 
-   if (digits == 0)
+   if (digits == 0 && !fixed)
    {
       digits = (std::max)(str.size(), size_type(16));
    }
@@ -1428,8 +1428,11 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
       str = "0";
       if (scientific || fixed)
       {
-         str.append(1, '.');
-         str.append(size_type(digits), '0');
+         if (showpoint || digits > 0) {
+            str.append(1, '.');
+            if (digits > 0)
+               str.append(size_type(digits), '0');
+         }
          if (scientific)
             str.append("e+00");
       }
@@ -1485,7 +1488,7 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
       {
          // Just pad out the end with zeros:
          str.append(static_cast<std::string::size_type>(1 + my_exp - str.size()), '0');
-         if (showpoint || fixed)
+         if (showpoint || (fixed && digits > 0))
             str.append(".");
       }
       else if (my_exp + 1 < static_cast<std::intmax_t>(str.size()))
@@ -1501,16 +1504,19 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
             str.insert(static_cast<std::string::size_type>(my_exp + 1), 1, '.');
          }
       }
-      else if (showpoint || fixed) // we have exactly the digits we require to left of the point
+      else if (showpoint || (fixed && digits > 0)) // we have exactly the digits we require to left of the point
          str += ".";
 
       if (fixed)
       {
          // We may need to add trailing zeros:
-         std::intmax_t l = str.find('.') + 1;
-         l                 = digits - (str.size() - l);
-         if (l > 0)
-            str.append(size_type(l), '0');
+         auto pos = str.find('.');
+         if (pos != str.npos) { // this test is probably redundant, but just to be safe and for clarity
+            boost::intmax_t l = pos + 1;
+            l                 = digits - (str.size() - l);
+            if (l > 0)
+               str.append(size_type(l), '0');
+         }
       }
    }
    else
