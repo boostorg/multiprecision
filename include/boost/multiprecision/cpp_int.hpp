@@ -1630,7 +1630,7 @@ private:
          *this = static_cast<limb_type>(1u);
       }
 
-      if (boost::multiprecision::detail::isinf(a) || boost::multiprecision::detail::isnan(a))
+      if ((boost::multiprecision::detail::isinf)(a) || (boost::multiprecision::detail::isnan)(a))
       {
          BOOST_MP_THROW_EXCEPTION(std::runtime_error("Cannot convert a non-finite number to an integer."));
       }

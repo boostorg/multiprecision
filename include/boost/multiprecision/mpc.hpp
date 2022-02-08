@@ -1372,11 +1372,11 @@ inline void assign_components(mpc_complex_backend<D1>& result, long long a, long
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
 inline void assign_components(mpc_complex_backend<D1>& result, double a, double b)
 {
-   if (boost::multiprecision::detail::isnan(a))
+   if ((boost::multiprecision::detail::isnan)(a))
    {
       mpc_set_d(result.data(), a, GMP_RNDN);
    }
-   else if (boost::multiprecision::detail::isnan(a))
+   else if ((boost::multiprecision::detail::isnan)(a))
    {
       mpc_set_d(result.data(), b, GMP_RNDN);
    }
@@ -1389,11 +1389,11 @@ inline void assign_components(mpc_complex_backend<D1>& result, double a, double 
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
 inline void assign_components(mpc_complex_backend<D1>& result, long double a, long double b)
 {
-   if (boost::multiprecision::detail::isnan(a))
+   if ((boost::multiprecision::detail::isnan)(a))
    {
       mpc_set_d(result.data(), a, GMP_RNDN);
    }
-   else if (boost::multiprecision::detail::isnan(a))
+   else if ((boost::multiprecision::detail::isnan)(a))
    {
       mpc_set_d(result.data(), b, GMP_RNDN);
    }

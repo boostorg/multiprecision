@@ -372,7 +372,7 @@ class cpp_bin_float
       using default_ops::eval_add;
       using bf_int_type = typename boost::multiprecision::detail::canonical<int, cpp_bin_float>::type;
 
-      switch (boost::multiprecision::detail::fpclassify(f))
+      switch ((boost::multiprecision::detail::fpclassify)(f))
       {
       case FP_ZERO:
          m_data     = limb_type(0);

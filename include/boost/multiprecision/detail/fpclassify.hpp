@@ -17,19 +17,19 @@
 namespace boost { namespace multiprecision { namespace detail {
 
 template <typename T>
-inline bool isnan(const T val)
+inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (const T val)
 {
     return boost::math::isnan(val);
 }
 
 template <typename T>
-inline bool isinf(const T val)
+inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (const T val)
 {
     return boost::math::isinf(val);
 }
 
 template <typename T>
-inline int fpclassify(const T val)
+inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION (const T val)
 {
     return boost::math::fpclassify(val);
 }
@@ -42,22 +42,22 @@ namespace boost { namespace multiprecision { namespace detail {
 
 // Assume IEEE 754 compliance and compiler optimizations do not affect this
 template <typename T>
-inline constexpr bool isnan(const T val) noexcept
+inline constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (const T val) noexcept
 {
     return val != val;
 }
 
 template <typename T>
-inline constexpr bool isinf(const T val) noexcept
+inline constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (const T val) noexcept
 {
     return val == std::numeric_limits<T>::infinity() || -val == std::numeric_limits<T>::infinity();
 }
 
 template <typename T>
-inline constexpr int fpclassify(const T val) noexcept
+inline constexpr int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION (const T val) noexcept
 {
-    return boost::multiprecision::detail::isnan(val) ? FP_NAN :
-           boost::multiprecision::detail::isinf(val) ? FP_INFINITE :
+    return (boost::multiprecision::detail::isnan)(val) ? FP_NAN :
+           (boost::multiprecision::detail::isinf)(val) ? FP_INFINITE :
            boost::multiprecision::detail::abs(val) == T(0) ? FP_ZERO :
            boost::multiprecision::detail::abs(val) > 0 && boost::multiprecision::detail::abs(val) < (std::numeric_limits<T>::min)() ? FP_SUBNORMAL : FP_NORMAL;
 }
