@@ -381,7 +381,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void left_shift_limb(Int& result, double_limb_ty
    for (; i < ors; ++i)
       pr[rs - 1 - i] = pr[ors - 1 - i];
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-   if (BOOST_MP_IS_CONST_EVALUATED(result.size()))
+   if (BOOST_MP_IS_CONST_EVALUATED(s))
    {
       for (; i < rs; ++i)
          pr[rs - 1 - i] = 0;
@@ -447,7 +447,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void left_shift_generic(Int& result, double_limb
       ++i;
    }
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-   if (BOOST_MP_IS_CONST_EVALUATED(result.size()))
+   if (BOOST_MP_IS_CONST_EVALUATED(s))
    {
       for (; i < rs; ++i)
          pr[rs - 1 - i] = 0;
