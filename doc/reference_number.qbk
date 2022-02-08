@@ -199,7 +199,7 @@
    bool                                      isinf      (const ``['number-or-expression-template-type]``&);
    bool                                      isnan      (const ``['number-or-expression-template-type]``&);
    bool                                      isnormal   (const ``['number-or-expression-template-type]``&);
-   int                                       signbit    (const ``['number-or-expression-template-type]``&);
+   bool                                      signbit    (const ``['number-or-expression-template-type]``&);
 
    bool                                      isgreater  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    bool                                      isgreaterequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
@@ -623,7 +623,7 @@ that allows arithmetic to be performed on native integer types producing an exte
    bool                                      isinf      (const ``['number-or-expression-template-type]``&);
    bool                                      isnan      (const ``['number-or-expression-template-type]``&);
    bool                                      isnormal   (const ``['number-or-expression-template-type]``&);
-   int                                       signbit    (const ``['number-or-expression-template-type]``&);
+   bool                                      signbit    (const ``['number-or-expression-template-type]``&);
 
    bool                                      isgreater  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    bool                                      isgreaterequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
