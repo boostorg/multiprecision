@@ -6,12 +6,11 @@
 #ifndef BOOST_MATH_BN_MPFR_HPP
 #define BOOST_MATH_BN_MPFR_HPP
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/multiprecision/logged_adaptor.hpp>
 #include <boost/multiprecision/gmp.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <cstdint>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
@@ -19,12 +18,19 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <mpfr.h>
 #include <cmath>
+#include <cstdint>
 #include <algorithm>
 #include <utility>
 #include <type_traits>
 #include <atomic>
+
+#ifdef BOOST_MP_MATH_AVAILABLE
+#include <boost/math/constants/constants.hpp>
+#include <boost/math/special_functions/gamma.hpp>
+#endif
 
 #ifndef BOOST_MULTIPRECISION_MPFR_DEFAULT_PRECISION
 #define BOOST_MULTIPRECISION_MPFR_DEFAULT_PRECISION 20
@@ -317,8 +323,8 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
          return *this;
       }
 
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(a));
 
       int        e;
       float128_type f, term;
@@ -728,8 +734,8 @@ struct mpfr_float_imp<digits10, allocate_stack>
          return *this;
       }
 
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(a));
 
       int        e;
       float128_type f, term;
@@ -2877,6 +2883,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D
    return expm1(arg, policies::policy<>());
 }
 
+#ifdef BOOST_MP_MATH_AVAILABLE
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates, class Policy>
 inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> lgamma BOOST_PREVENT_MACRO_SUBSTITUTION(boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> arg, int* sign, const Policy& pol)
 {
@@ -2934,6 +2941,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D
 {
    return lgamma(arg, 0, policies::policy<>());
 }
+#endif // BOOST_MP_MATH_AVAILABLE
 
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates, class Policy>
 inline typename std::enable_if<boost::math::policies::is_policy<Policy>::value, boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >::type tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg, const Policy& pol)

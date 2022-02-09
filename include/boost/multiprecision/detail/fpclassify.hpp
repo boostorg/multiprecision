@@ -19,19 +19,19 @@ namespace boost { namespace multiprecision { namespace detail {
 template <typename T>
 inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (const T val)
 {
-    return boost::math::isnan(val);
+    return (boost::math::isnan)(val);
 }
 
 template <typename T>
 inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (const T val)
 {
-    return boost::math::isinf(val);
+    return (boost::math::isinf)(val);
 }
 
 template <typename T>
 inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION (const T val)
 {
-    return boost::math::fpclassify(val);
+    return (boost::math::fpclassify)(val);
 }
 
 }}} // Namespaces
