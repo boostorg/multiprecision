@@ -19,6 +19,7 @@
 #pragma warning(disable : 4319)
 #endif
 
+
 namespace boost { namespace multiprecision { namespace backends {
 
 template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
@@ -379,8 +380,17 @@ inline BOOST_MP_CXX14_CONSTEXPR void left_shift_limb(Int& result, double_limb_ty
    std::size_t i = rs - result.size();
    for (; i < ors; ++i)
       pr[rs - 1 - i] = pr[ors - 1 - i];
-   for (; i < rs; ++i)
-      pr[rs - 1 - i] = 0;
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   if (BOOST_MP_IS_CONST_EVALUATED(s))
+   {
+      for (; i < rs; ++i)
+         pr[rs - 1 - i] = 0;
+   }
+   else
+#endif
+   {
+      std::memset(pr, 0, (rs - i) * sizeof(*pr));
+   }
 }
 
 template <class Int>
@@ -436,8 +446,17 @@ inline BOOST_MP_CXX14_CONSTEXPR void left_shift_generic(Int& result, double_limb
       pr[rs - 1 - i] = pr[rs - 1 - i - offset] << shift;
       ++i;
    }
-   for (; i < rs; ++i)
-      pr[rs - 1 - i] = 0;
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   if (BOOST_MP_IS_CONST_EVALUATED(s))
+   {
+      for (; i < rs; ++i)
+         pr[rs - 1 - i] = 0;
+   }
+   else
+#endif
+   {
+      std::memset(pr, 0, (rs - i) * sizeof(*pr));
+   }
 }
 
 template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
