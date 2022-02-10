@@ -7,6 +7,8 @@
 #ifndef BOOST_MATH_MP_TOMMATH_BACKEND_HPP
 #define BOOST_MATH_MP_TOMMATH_BACKEND_HPP
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
@@ -22,10 +24,6 @@
 #include <cstddef>
 #include <cstdlib>
 #include <string>
-
-#if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
-#include <boost/math/special_functions/fpclassify.hpp>
-#endif
 
 namespace boost {
 namespace multiprecision {
@@ -245,10 +243,8 @@ struct tommath_int
          return *this;
       }
 
-      #if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
-      #endif
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(a));
 
       int         e;
       F f, term;
