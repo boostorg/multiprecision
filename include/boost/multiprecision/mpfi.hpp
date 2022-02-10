@@ -10,9 +10,9 @@
 #include <cmath>
 #include <cstdint>
 #include <type_traits>
-
+#include <boost/multiprecision/detail/standalone_config.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/number.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/precision.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
@@ -284,8 +284,8 @@ struct mpfi_float_imp
          return *this;
       }
 
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isinf)(a));
+      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(a));
 
       int        e;
       float128_type f, term;
