@@ -1512,8 +1512,8 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
          // We may need to add trailing zeros:
          auto pos = str.find('.');
          if (pos != str.npos) { // this test is probably redundant, but just to be safe and for clarity
-            boost::intmax_t l = pos + 1;
-            l                 = digits - (str.size() - l);
+            std::intmax_t l = pos + 1;
+            l               = digits - (str.size() - l);
             if (l > 0)
                str.append(size_type(l), '0');
          }

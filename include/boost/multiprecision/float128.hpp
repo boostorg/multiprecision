@@ -243,7 +243,7 @@ struct float128_backend
       if (f & std::ios_base::showpoint)
          format += "#";
       format += ".*";
-      if (digits == 0)
+      if ((digits == 0) && !(f & std::ios_base::fixed))
          digits = 36;
       format += "Q";
 

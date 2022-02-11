@@ -1908,7 +1908,7 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
    std::intmax_t org_digits(number_of_digits);
    exponent_type    my_exp = order();
 
-   if (number_of_digits == 0)
+   if (!(f & std::ios_base::fixed) && (number_of_digits == 0))
       number_of_digits = cpp_dec_float_max_digits10;
 
    if (f & std::ios_base::fixed)
@@ -1941,8 +1941,11 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
       // We only get here if the output format is "fixed" and we just need to
       // round the first non-zero digit.
       number_of_digits -= my_exp + 1; // reset to original value
-      str.insert(static_cast<std::string::size_type>(0), std::string::size_type(number_of_digits), '0');
-      have_leading_zeros = true;
+      if (number_of_digits)
+      {
+         str.insert(static_cast<std::string::size_type>(0), std::string::size_type(number_of_digits), '0');
+         have_leading_zeros = true;
+      }
    }
 
    if (number_of_digits < 0)
@@ -1965,7 +1968,7 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
 
          if (round == 5u)
          {
-            const std::uint32_t ix = static_cast<std::uint32_t>(static_cast<std::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits - 1)]) - static_cast<std::uint32_t>('0'));
+            const std::uint32_t ix = number_of_digits == 0 ? 0 : static_cast<std::uint32_t>(static_cast<std::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits - 1)]) - static_cast<std::uint32_t>('0'));
             if ((ix & 1u) == 0)
             {
                // We have an even digit followed by a 5, so we might not actually need to round up
@@ -1993,34 +1996,42 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
 
          if (need_round_up)
          {
-            std::size_t ix = static_cast<std::size_t>(str.length() - 1u);
-
-            // Every trailing 9 must be rounded up
-            while (ix && (static_cast<std::int32_t>(str.at(ix)) - static_cast<std::int32_t>('0') == static_cast<std::int32_t>(9)))
+            if (str.size())
             {
-               str.at(ix) = static_cast<char>('0');
-               --ix;
-            }
+               std::size_t ix = static_cast<std::size_t>(str.length() - 1u);
 
-            if (!ix)
-            {
-               // There were nothing but trailing nines.
-               if (static_cast<std::int32_t>(static_cast<std::int32_t>(str.at(ix)) - static_cast<std::int32_t>(0x30)) == static_cast<std::int32_t>(9))
+               // Every trailing 9 must be rounded up
+               while (ix && (static_cast<std::int32_t>(str.at(ix)) - static_cast<std::int32_t>('0') == static_cast<std::int32_t>(9)))
                {
-                  // Increment up to the next order and adjust exponent.
-                  str.at(ix) = static_cast<char>('1');
-                  ++my_exp;
+                  str.at(ix) = static_cast<char>('0');
+                  --ix;
+               }
+
+               if (!ix)
+               {
+                  // There were nothing but trailing nines.
+                  if (static_cast<std::int32_t>(static_cast<std::int32_t>(str.at(ix)) - static_cast<std::int32_t>(0x30)) == static_cast<std::int32_t>(9))
+                  {
+                     // Increment up to the next order and adjust exponent.
+                     str.at(ix) = static_cast<char>('1');
+                     ++my_exp;
+                  }
+                  else
+                  {
+                     // Round up this digit.
+                     ++str.at(ix);
+                  }
                }
                else
                {
-                  // Round up this digit.
-                  ++str.at(ix);
+                  // Round up the last digit.
+                  ++str[ix];
                }
             }
             else
             {
-               // Round up the last digit.
-               ++str[ix];
+               str = "1";
+               ++my_exp;
             }
          }
       }

@@ -399,85 +399,90 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
          else
             result = "0";
       }
-      else
+      else if (fixed)
       {
+         // We actually need a different number of digits to what one might expect:
          char* ps = mpfr_get_str(0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
-         --e; // To match with what our formatter expects.
-         if (fixed && e != -1)
+         --e;
+         mpfr_free_str(ps);
+         digits += e + 1;
+         if (digits == 0)
          {
-            // Oops we actually need a different number of digits to what we asked for:
-            mpfr_free_str(ps);
-            digits += e + 1;
-            if (digits == 0)
+            // We need to get *all* the digits and then possibly round up,
+            // we end up with either "0" or "1" as the result.
+            ps = mpfr_get_str(0, &e, 10, 0, m_data, GMP_RNDN);
+            --e;
+            unsigned offset = *ps == '-' ? 1 : 0;
+            if (ps[offset] > '5')
             {
-               // We need to get *all* the digits and then possibly round up,
-               // we end up with either "0" or "1" as the result.
-               ps = mpfr_get_str(0, &e, 10, 0, m_data, GMP_RNDN);
-               --e;
-               unsigned offset = *ps == '-' ? 1 : 0;
-               if (ps[offset] > '5')
+               ++e;
+               ps[offset] = '1';
+               ps[offset + 1] = 0;
+            }
+            else if (ps[offset] == '5')
+            {
+               unsigned i = offset + 1;
+               bool     round_up = false;
+               while (ps[i] != 0)
+               {
+                  if (ps[i] != '0')
+                  {
+                     round_up = true;
+                     break;
+                  }
+                  ++i;
+               }
+               if (round_up)
                {
                   ++e;
-                  ps[offset]     = '1';
+                  ps[offset] = '1';
                   ps[offset + 1] = 0;
-               }
-               else if (ps[offset] == '5')
-               {
-                  unsigned i        = offset + 1;
-                  bool     round_up = false;
-                  while (ps[i] != 0)
-                  {
-                     if (ps[i] != '0')
-                     {
-                        round_up = true;
-                        break;
-                     }
-                     ++i;
-                  }
-                  if (round_up)
-                  {
-                     ++e;
-                     ps[offset]     = '1';
-                     ps[offset + 1] = 0;
-                  }
-                  else
-                  {
-                     ps[offset]     = '0';
-                     ps[offset + 1] = 0;
-                  }
                }
                else
                {
-                  ps[offset]     = '0';
+                  ps[offset] = '0';
                   ps[offset + 1] = 0;
-               }
-            }
-            else if (digits > 0)
-            {
-               mp_exp_t old_e = e;
-               ps             = mpfr_get_str(0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
-               --e; // To match with what our formatter expects.
-               if (old_e > e)
-               {
-                  // in some cases, when we ask for more digits of precision, it will
-                  // change the number of digits to the left of the decimal, if that
-                  // happens, account for it here.
-                  // example: cout << fixed << setprecision(3) << mpf_float_50("99.9809")
-                  mpfr_free_str(ps);
-                  digits -= old_e - e;
-                  ps = mpfr_get_str(0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
-                  --e; // To match with what our formatter expects.
                }
             }
             else
             {
-               ps = mpfr_get_str(0, &e, 10, 1, m_data, GMP_RNDN);
-               --e;
-               unsigned offset = *ps == '-' ? 1 : 0;
-               ps[offset]      = '0';
-               ps[offset + 1]  = 0;
+               ps[offset] = '0';
+               ps[offset + 1] = 0;
             }
          }
+         else if (digits > 0)
+         {
+            mp_exp_t old_e = e;
+            ps = mpfr_get_str(0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
+            --e; // To match with what our formatter expects.
+            if (old_e > e)
+            {
+               // in some cases, when we ask for more digits of precision, it will
+               // change the number of digits to the left of the decimal, if that
+               // happens, account for it here.
+               // example: cout << fixed << setprecision(3) << mpf_float_50("99.9809")
+               mpfr_free_str(ps);
+               digits -= old_e - e;
+               ps = mpfr_get_str(0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
+               --e; // To match with what our formatter expects.
+            }
+         }
+         else
+         {
+            ps = mpfr_get_str(0, &e, 10, 1, m_data, GMP_RNDN);
+            --e;
+            unsigned offset = *ps == '-' ? 1 : 0;
+            ps[offset] = '0';
+            ps[offset + 1] = 0;
+         }
+         result = ps ? ps : "0";
+         if (ps)
+            mpfr_free_str(ps);
+      }
+      else
+      {
+         char* ps = mpfr_get_str(0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
+         --e; // To match with what our formatter expects.
          result = ps ? ps : "0";
          if (ps)
             mpfr_free_str(ps);
