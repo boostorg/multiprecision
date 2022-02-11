@@ -6,9 +6,11 @@
 #ifndef BOOST_MP_GENERIC_INTERCONVERT_HPP
 #define BOOST_MP_GENERIC_INTERCONVERT_HPP
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/default_ops.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
+#include <boost/multiprecision/detail/functions/trunc.hpp>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -418,7 +420,7 @@ void generic_interconvert_float2rational(To& to, const From& from, const std::in
    {
       val = ldexp(val, shift);
       e -= shift;
-      long long ll = boost::math::lltrunc(val);
+      long long ll = boost::multiprecision::detail::lltrunc(val);
       val -= ll;
       num <<= shift;
       num += ll;
@@ -454,7 +456,7 @@ void generic_interconvert_float2rational(To& to, const From& from, const std::in
    val = scalbn(val, -e);
    while (val)
    {
-      long long ll = boost::math::lltrunc(val);
+      long long ll = boost::multiprecision::detail::lltrunc(val);
       val -= ll;
       val = scalbn(val, 1);
       num *= Radix;
@@ -506,7 +508,7 @@ void generic_interconvert_float2int(To& to, const From& from, const std::integra
       exponent_type s = (std::min)(e, shift);
       val             = ldexp(val, s);
       e -= s;
-      long long ll = boost::math::lltrunc(val);
+      long long ll = boost::multiprecision::detail::lltrunc(val);
       val -= ll;
       num <<= s;
       num += ll;
@@ -531,7 +533,7 @@ void generic_interconvert_float2int(To& to, const From& from, const std::integra
    val = scalbn(val, -e);
    while (e >= 0)
    {
-      long long ll = boost::math::lltrunc(val);
+      long long ll = boost::multiprecision::detail::lltrunc(val);
       val -= ll;
       val = scalbn(val, 1);
       num *= Radix;

@@ -11,6 +11,8 @@
 #include <numeric>
 #include <type_traits>
 #include <typeinfo>
+#include <iostream>
+#include <iomanip>
 #include "test.hpp"
 
 #ifndef BOOST_MP_STANDALONE

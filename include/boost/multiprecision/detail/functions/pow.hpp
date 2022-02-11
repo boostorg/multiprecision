@@ -760,9 +760,11 @@ void eval_exp2(T& result, const T& arg)
          return;
       }
    }
+   #ifdef BOOST_MP_MATH_AVAILABLE
    BOOST_MP_CATCH(const boost::math::rounding_error&)
    { /* Fallthrough */
    }
+   #endif
    BOOST_MP_CATCH(const std::runtime_error&)
    { /* Fallthrough */
    }
