@@ -182,6 +182,9 @@ void test_fixed_io()
 
 int main()
 {
+#ifdef BOOST_MSVC && (BOOST_MSVC < 1920)
+   std::cout << "MSVC prior to 14.2 does not perform bankers rounding for double IO, as a result all our test cases are incorrect, so there's nothing we can productively test here." << std::endl;
+#else
    using namespace boost::multiprecision;
 #ifdef TEST_BIN_FLOAT
    test_fixed_io<number<cpp_bin_float<113, digit_base_2, void, std::int16_t> > >();
@@ -197,6 +200,7 @@ int main()
 #endif
 #ifdef TEST_FLOAT128
    test_fixed_io<boost::multiprecision::float128>();
+#endif
 #endif
    return boost::report_errors();
 }
