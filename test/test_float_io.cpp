@@ -273,7 +273,7 @@ void do_round_trip(const T& val, std::ios_base::fmtflags f)
    ss << val;
    T new_val = static_cast<T>(ss.str());
    BOOST_CHECK_EQUAL(new_val, val);
-   new_val = static_cast<T>(val.str(0, f));
+   new_val = static_cast<T>(val.str(f & std::ios_base::fixed ? std::numeric_limits<T>::max_digits10 : 0, f));
    BOOST_CHECK_EQUAL(new_val, val);
 }
 

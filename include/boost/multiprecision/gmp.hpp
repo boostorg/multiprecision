@@ -387,7 +387,7 @@ struct gmp_float_imp
       {
          char* ps = mpf_get_str(0, &e, 10, static_cast<std::size_t>(digits), m_data);
          --e; // To match with what our formatter expects.
-         if (fixed && e != -1)
+         if (fixed)
          {
             // Oops we actually need a different number of digits to what we asked for:
             (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
