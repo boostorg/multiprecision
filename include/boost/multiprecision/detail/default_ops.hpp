@@ -1484,14 +1484,14 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_modf(T& result, T const& arg, T* pipar
 {
    using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
    int                                                                          c = eval_fpclassify(arg);
-   if (c == (int)FP_NAN)
+   if (c == static_cast<int>(FP_NAN))
    {
       if (pipart)
          *pipart = arg;
       result = arg;
       return;
    }
-   else if (c == (int)FP_INFINITE)
+   else if (c == static_cast<int>(FP_INFINITE))
    {
       if (pipart)
          *pipart = arg;
@@ -1517,13 +1517,13 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_round(T& result, const T& a)
    static_assert(number_category<T>::value == number_kind_floating_point, "The round function is only valid for floating point types.");
    using fp_type = typename boost::multiprecision::detail::canonical<float, T>::type;
    int                                                                       c = eval_fpclassify(a);
-   if (c == (int)FP_NAN)
+   if (c == static_cast<int>(FP_NAN))
    {
       result = a;
       errno  = EDOM;
       return;
    }
-   if ((c == FP_ZERO) || (c == (int)FP_INFINITE))
+   if ((c == FP_ZERO) || (c == static_cast<int>(FP_INFINITE)))
    {
       result = a;
    }
@@ -2150,7 +2150,7 @@ template <class Backend, multiprecision::expression_template_option ExpressionTe
 inline BOOST_MP_CXX14_CONSTEXPR bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
    int v = fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg);
-   return (v != (int)FP_INFINITE) && (v != (int)FP_NAN);
+   return (v != static_cast<int>(FP_INFINITE)) && (v != static_cast<int>(FP_NAN));
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
@@ -2161,7 +2161,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(c
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_NAN;
+   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == static_cast<int>(FP_NAN);
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
@@ -2172,7 +2172,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(cons
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_INFINITE;
+   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == static_cast<int>(FP_INFINITE);
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
@@ -2183,7 +2183,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(cons
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_NORMAL;
+   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == static_cast<int>(FP_NORMAL);
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)

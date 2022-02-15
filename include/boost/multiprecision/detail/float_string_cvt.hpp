@@ -68,19 +68,19 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
 
    int fpt = eval_fpclassify(b);
 
-   if (fpt == (int)FP_ZERO)
+   if (fpt == static_cast<int>(FP_ZERO))
    {
       result = "0";
       iszero = true;
    }
-   else if (fpt == (int)FP_INFINITE)
+   else if (fpt == static_cast<int>(FP_INFINITE))
    {
       if (b.compare(ui_type(0)) < 0)
          return "-inf";
       else
          return ((f & std::ios_base::showpos) == std::ios_base::showpos) ? "+inf" : "inf";
    }
-   else if (fpt == (int)FP_NAN)
+   else if (fpt == static_cast<int>(FP_NAN))
    {
       return "nan";
    }

@@ -1130,7 +1130,7 @@ inline void eval_convert_to(unsigned long* result, const gmp_float<digits10>& va
    if (0 == mpf_fits_ulong_p(val.data()))
       *result = (std::numeric_limits<unsigned long>::max)();
    else
-      *result = (unsigned long)mpf_get_ui(val.data());
+      *result = static_cast<unsigned long>(mpf_get_ui(val.data()));
 }
 template <unsigned digits10>
 inline void eval_convert_to(long* result, const gmp_float<digits10>& val) noexcept
@@ -1141,7 +1141,7 @@ inline void eval_convert_to(long* result, const gmp_float<digits10>& val) noexce
       *result *= mpf_sgn(val.data());
    }
    else
-      *result = (long)mpf_get_si(val.data());
+      *result = static_cast<long>(mpf_get_si(val.data()));
 }
 #ifdef BOOST_MP_STANDALONE
 template <unsigned digits10>
@@ -1204,7 +1204,7 @@ inline void eval_convert_to(long long* result, const gmp_float<digits10>& val)
       *result <<= digits;
       digits -= std::numeric_limits<unsigned long>::digits;
       mpf_mul_2exp(t.data(), t.data(), digits >= 0 ? std::numeric_limits<unsigned long>::digits : std::numeric_limits<unsigned long>::digits + digits);
-      unsigned long l = (unsigned long)mpf_get_ui(t.data());
+      unsigned long l = static_cast<unsigned long>(mpf_get_ui(t.data()));
       if (digits < 0)
          l >>= -digits;
       *result |= l;
@@ -1234,7 +1234,7 @@ inline void eval_convert_to(unsigned long long* result, const gmp_float<digits10
       *result <<= digits;
       digits -= std::numeric_limits<unsigned long>::digits;
       mpf_mul_2exp(t.data(), t.data(), digits >= 0 ? std::numeric_limits<unsigned long>::digits : std::numeric_limits<unsigned long>::digits + digits);
-      unsigned long l = (unsigned long)mpf_get_ui(t.data());
+      unsigned long l = static_cast<unsigned long>(mpf_get_ui(t.data()));
       if (digits < 0)
          l >>= -digits;
       *result |= l;
@@ -1974,7 +1974,7 @@ inline void eval_convert_to(unsigned long* result, const gmp_int& val)
       BOOST_MP_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
    }
    else
-      *result = (unsigned long)mpz_get_ui(val.data());
+      *result = static_cast<unsigned long>(mpz_get_ui(val.data()));
 }
 inline void eval_convert_to(long* result, const gmp_int& val)
 {
@@ -1983,7 +1983,7 @@ inline void eval_convert_to(long* result, const gmp_int& val)
       *result = mpz_sgn(val.data()) < 0 ? (std::numeric_limits<long>::min)() : (std::numeric_limits<long>::max)();
    }
    else
-      *result = (signed long)mpz_get_si(val.data());
+      *result = static_cast<long>(mpz_get_si(val.data()));
 }
 inline void eval_convert_to(long double* result, const gmp_int& val)
 {

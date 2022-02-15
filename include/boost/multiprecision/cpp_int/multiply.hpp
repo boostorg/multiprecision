@@ -382,7 +382,7 @@ eval_multiply_comba(
    if (carry || must_throw)
    {
       resize_for_carry(result, as + bs);
-      if ((int)result.size() >= as + bs)
+      if (static_cast<int>(result.size()) >= as + bs)
          *pr = static_cast<limb_type>(carry);
    }
 }

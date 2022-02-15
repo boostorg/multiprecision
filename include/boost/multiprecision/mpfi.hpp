@@ -343,11 +343,11 @@ struct mpfi_float_imp
             part.erase();
          b = part.c_str();
 
-         if (eval_fpclassify(a) == (int)FP_NAN)
+         if (eval_fpclassify(a) == static_cast<int>(FP_NAN))
          {
             mpfi_set_fr(this->data(), a.data());
          }
-         else if (eval_fpclassify(b) == (int)FP_NAN)
+         else if (eval_fpclassify(b) == static_cast<int>(FP_NAN))
          {
             mpfi_set_fr(this->data(), b.data());
          }
@@ -1056,11 +1056,11 @@ inline void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_b
    assign_components_set_precision(result, a, b);
 
    using default_ops::eval_fpclassify;
-   if (eval_fpclassify(a) == (int)FP_NAN)
+   if (eval_fpclassify(a) == static_cast<int>(FP_NAN))
    {
       mpfi_set_fr(result.data(), a.data());
    }
-   else if (eval_fpclassify(b) == (int)FP_NAN)
+   else if (eval_fpclassify(b) == static_cast<int>(FP_NAN))
    {
       mpfi_set_fr(result.data(), b.data());
    }

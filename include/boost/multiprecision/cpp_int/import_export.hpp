@@ -237,7 +237,7 @@ OutputIterator export_bits(
       *out = detail::extract_bits(val.backend(), bit_location, chunk_size, tag_type());
       ++out;
       bit_location += bit_step;
-   } while ((bit_location >= 0) && (bit_location < (int)bitcount));
+   } while ((bit_location >= 0) && (bit_location < static_cast<int>(bitcount)));
 
    return out;
 #ifdef _MSC_VER

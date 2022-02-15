@@ -161,17 +161,17 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
       //
       int c = eval_fpclassify(from);
 
-      if (c == (int)FP_ZERO)
+      if (c == static_cast<int>(FP_ZERO))
       {
          to = ui_type(0);
          return;
       }
-      else if (c == (int)FP_NAN)
+      else if (c == static_cast<int>(FP_NAN))
       {
          to = static_cast<const char*>("nan");
          return;
       }
-      else if (c == (int)FP_INFINITE)
+      else if (c == static_cast<int>(FP_INFINITE))
       {
          to = static_cast<const char*>("inf");
          if (eval_get_sign(from) < 0)
@@ -265,7 +265,7 @@ R safe_convert_to_float(const LargeInteger& i)
       std::size_t mb = msb(val);
       if (mb >= std::numeric_limits<R>::max_exponent)
       {
-         int scale_factor = (int)mb + 1 - std::numeric_limits<R>::max_exponent;
+         int scale_factor = static_cast<int>(mb) + 1 - std::numeric_limits<R>::max_exponent;
          BOOST_MP_ASSERT(scale_factor >= 1);
          val >>= scale_factor;
          R result = val.template convert_to<R>();
@@ -371,7 +371,7 @@ generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, 
    }
    using std::ldexp;
    result = do_cast<To>(q);
-   result = ldexp(result, (int)-shift);
+   result = ldexp(result, static_cast<int>(-shift));
    if (s)
       result = -result;
 }

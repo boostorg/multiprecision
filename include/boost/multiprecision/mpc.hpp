@@ -276,11 +276,11 @@ struct mpc_complex_imp
          b = 0uL;
       }
 
-      if (eval_fpclassify(a) == (int)FP_NAN)
+      if (eval_fpclassify(a) == static_cast<int>(FP_NAN))
       {
          mpc_set_fr(this->data(), a.data(), GMP_RNDN);
       }
-      else if (eval_fpclassify(b) == (int)FP_NAN)
+      else if (eval_fpclassify(b) == static_cast<int>(FP_NAN))
       {
          mpc_set_fr(this->data(), b.data(), GMP_RNDN);
       }
@@ -343,7 +343,7 @@ struct mpc_complex_imp
          d = i;
          return compare(d);
       }
-      return mpc_cmp_si(m_data, (long)i);
+      return mpc_cmp_si(m_data, static_cast<long>(i));
    }
    template <class V>
    int compare(const V& v) const noexcept
@@ -1329,11 +1329,11 @@ inline void assign_components(mpc_complex_backend<D1>& result, const mpfr_float_
    //
    assign_components_set_precision(result, a, b);
    using default_ops::eval_fpclassify;
-   if (eval_fpclassify(a) == (int)FP_NAN)
+   if (eval_fpclassify(a) == static_cast<int>(FP_NAN))
    {
       mpc_set_fr(result.data(), a.data(), GMP_RNDN);
    }
-   else if (eval_fpclassify(b) == (int)FP_NAN)
+   else if (eval_fpclassify(b) == static_cast<int>(FP_NAN))
    {
       mpc_set_fr(result.data(), b.data(), GMP_RNDN);
    }

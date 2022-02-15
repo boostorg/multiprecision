@@ -69,7 +69,7 @@ struct is_cpp_bin_float_implicitly_constructible_from_type
 template <class Float, std::ptrdiff_t bit_count>
 struct is_cpp_bin_float_implicitly_constructible_from_type<Float, bit_count, true>
 {
-   static constexpr const bool value = (std::numeric_limits<Float>::digits <= (int)bit_count) && (std::numeric_limits<Float>::radix == 2) && std::numeric_limits<Float>::is_specialized
+   static constexpr const bool value = (std::numeric_limits<Float>::digits <= static_cast<int>(bit_count)) && (std::numeric_limits<Float>::radix == 2) && std::numeric_limits<Float>::is_specialized
 #ifdef BOOST_HAS_FLOAT128
                              && !std::is_same<Float, float128_type>::value
 #endif
@@ -85,7 +85,7 @@ struct is_cpp_bin_float_explicitly_constructible_from_type
 template <class Float, std::ptrdiff_t bit_count>
 struct is_cpp_bin_float_explicitly_constructible_from_type<Float, bit_count, true>
 {
-   static constexpr const bool value = (std::numeric_limits<Float>::digits > (int)bit_count) && (std::numeric_limits<Float>::radix == 2) && std::numeric_limits<Float>::is_specialized
+   static constexpr const bool value = (std::numeric_limits<Float>::digits > static_cast<int>(bit_count)) && (std::numeric_limits<Float>::radix == 2) && std::numeric_limits<Float>::is_specialized
 #ifdef BOOST_HAS_FLOAT128
                              && !std::is_same<Float, float128_type>::value
 #endif
@@ -175,7 +175,7 @@ class cpp_bin_float
    template <class Float>
    cpp_bin_float(const Float& f,
                  typename std::enable_if<
-                     std::is_same<Float, float128_type>::value && ((int)bit_count >= 113)>::type const* = nullptr)
+                     std::is_same<Float, float128_type>::value && (static_cast<int>(bit_count) >= 113)>::type const* = nullptr)
        : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
@@ -183,7 +183,7 @@ class cpp_bin_float
    template <class Float>
    explicit cpp_bin_float(const Float& f,
                           typename std::enable_if<
-                              std::is_same<Float, float128_type>::value && ((int)bit_count < 113)>::type const* = nullptr)
+                              std::is_same<Float, float128_type>::value && (static_cast<int>(bit_count) < 113)>::type const* = nullptr)
        : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
@@ -285,7 +285,7 @@ class cpp_bin_float
    template <class Float>
    typename std::enable_if<
        (number_category<Float>::value == number_kind_floating_point)
-           //&& (std::numeric_limits<Float>::digits <= (int)bit_count)
+           //&& (std::numeric_limits<Float>::digits <= static_cast<int>(bit_count))
            && ((std::numeric_limits<Float>::radix == 2) || (std::is_same<Float, float128_type>::value)),
        cpp_bin_float&>::type
    operator=(const Float& f)
@@ -293,7 +293,7 @@ class cpp_bin_float
    template <class Float>
    typename std::enable_if<
        (number_category<Float>::value == number_kind_floating_point)
-           //&& (std::numeric_limits<Float>::digits <= (int)bit_count)
+           //&& (std::numeric_limits<Float>::digits <= static_cast<int>(bit_count))
            && (std::numeric_limits<Float>::radix == 2),
        cpp_bin_float&>::type
    operator=(const Float& f)
@@ -348,7 +348,7 @@ class cpp_bin_float
       {
          f = ldexpq(f, bits);
          e -= bits;
-         int ipart = (int)truncq(f);
+         int ipart = static_cast<int>(truncq(f));
          f -= ipart;
          m_exponent += bits;
          cpp_bin_float t;
@@ -2124,7 +2124,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
          using ui_type = typename std::tuple_element<0, typename number_type::backend_type::unsigned_types>::type;
          value.first            = true;
          value.second.backend() = ui_type(1u);
-         value.second           = ldexp(value.second, 1 - (int)digits);
+         value.second           = ldexp(value.second, 1 - static_cast<int>(digits));
       }
       return value.second;
    }
