@@ -323,8 +323,8 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
          return *this;
       }
 
-      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISINF(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(a));
 
       int        e;
       float128_type f, term;
@@ -734,8 +734,8 @@ struct mpfr_float_imp<digits10, allocate_stack>
          return *this;
       }
 
-      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISINF(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(a));
 
       int        e;
       float128_type f, term;

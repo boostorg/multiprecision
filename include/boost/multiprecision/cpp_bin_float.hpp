@@ -20,6 +20,7 @@
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 #include <boost/multiprecision/detail/float128_functions.hpp>
+#include <boost/multiprecision/detail/functions/trunc.hpp>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
@@ -31,7 +32,6 @@
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <boost/math/special_functions/trunc.hpp>
 #endif
 
 #ifdef BOOST_HAS_FLOAT128
@@ -369,20 +369,15 @@ class cpp_bin_float
    {
       using std::frexp;
       using std::ldexp;
+      using std::signbit;
       using default_ops::eval_add;
       using bf_int_type = typename boost::multiprecision::detail::canonical<int, cpp_bin_float>::type;
 
-      switch ((boost::multiprecision::detail::fpclassify)(f))
+      switch (BOOST_MP_FPCLASSIFY(f))
       {
       case FP_ZERO:
          m_data     = limb_type(0);
-
-         #ifdef BOOST_MP_MATH_AVAILABLE
-         m_sign     = ((boost::math::signbit)(f) > 0);
-         #else
-         m_sign     = (f < 0);
-         #endif
-
+         m_sign     = ((signbit)(f) > 0);
          m_exponent = exponent_zero;
          return *this;
       case FP_NAN:
@@ -415,11 +410,7 @@ class cpp_bin_float
       {
          f = ldexp(f, bits);
          e -= bits;
-#if !defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS) && defined(BOOST_MP_MATH_AVAILABLE)
-         int ipart = boost::math::itrunc(f);
-#else
-         int ipart = static_cast<int>(f);
-#endif
+         int ipart = boost::multiprecision::detail::itrunc(f);
          f -= ipart;
          m_exponent += bits;
          cpp_bin_float t;

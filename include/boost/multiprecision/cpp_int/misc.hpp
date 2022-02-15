@@ -234,14 +234,7 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
             #ifdef BOOST_MP_MATH_AVAILABLE
             *result = boost::math::float_next(*result);
             #else
-            if (std::is_floating_point<R>::value)
-            {
-               *result = std::nextafter(*result, *result * 2);
-            }
-            else
-            {
-               BOOST_MP_ASSERT_MSG(sizeof(R) == 1, "This functionality can not be used in standalone mode. Please disable and try again");
-            }
+            *result = std::nextafter(*result, *result * 2);
             #endif
          }
       }

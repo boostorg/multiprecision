@@ -153,7 +153,7 @@ inline
    else
 #endif
    {
-      return (boost::multiprecision::detail::isnan)(a);
+      return BOOST_MP_ISNAN(a);
    }
 }
 

@@ -6,6 +6,8 @@
 #ifndef BOOST_MP_GENERIC_INTERCONVERT_HPP
 #define BOOST_MP_GENERIC_INTERCONVERT_HPP
 
+#include <cmath>
+#include <limits>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/default_ops.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
@@ -410,11 +412,13 @@ inline void generic_interconvert(To& to, const From& from, const std::integral_c
 template <class To, class From>
 void generic_interconvert_float2rational(To& to, const From& from, const std::integral_constant<int, 2>& /*radix*/)
 {
+   using std::ldexp;
+   using std::frexp;
    using ui_type = typename std::tuple_element<0, typename To::unsigned_types>::type;
-   constexpr const int                                                       shift = std::numeric_limits<long long>::digits;
-   typename From::exponent_type                                   e;
-   typename component_type<number<To> >::type                     num, denom;
-   number<From>                                                   val(from);
+   constexpr const int shift = std::numeric_limits<long long>::digits;
+   typename From::exponent_type e;
+   typename component_type<number<To>>::type num, denom;
+   number<From> val(from);
    val = frexp(val, &e);
    while (val)
    {
@@ -436,15 +440,19 @@ void generic_interconvert_float2rational(To& to, const From& from, const std::in
 template <class To, class From, int Radix>
 void generic_interconvert_float2rational(To& to, const From& from, const std::integral_constant<int, Radix>& /*radix*/)
 {
+   using std::ilogb;
+   using std::scalbn;
+   using std::pow;
+   using std::abs;
    //
    // This is almost the same as the binary case above, but we have to use
    // scalbn and ilogb rather than ldexp and frexp, we also only extract
    // one Radix digit at a time which is terribly inefficient!
    //
    using ui_type = typename std::tuple_element<0, typename To::unsigned_types>::type;
-   typename From::exponent_type                                   e;
-   typename component_type<number<To> >::type                     num, denom;
-   number<From>                                                   val(from);
+   typename From::exponent_type e;
+   typename component_type<number<To>>::type num, denom;
+   number<From> val(from);
 
    if (!val)
    {
@@ -491,6 +499,9 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
 template <class To, class From>
 void generic_interconvert_float2int(To& to, const From& from, const std::integral_constant<int, 2>& /*radix*/)
 {
+   using std::frexp;
+   using std::ldexp;
+   
    using exponent_type = typename From::exponent_type;
    constexpr const exponent_type        shift = std::numeric_limits<long long>::digits;
    exponent_type                        e;
@@ -521,6 +532,8 @@ void generic_interconvert_float2int(To& to, const From& from, const std::integra
 template <class To, class From, int Radix>
 void generic_interconvert_float2int(To& to, const From& from, const std::integral_constant<int, Radix>& /*radix*/)
 {
+   using std::ilogb;
+   using std::scalbn;
    //
    // This is almost the same as the binary case above, but we have to use
    // scalbn and ilogb rather than ldexp and frexp, we also only extract

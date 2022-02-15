@@ -284,8 +284,8 @@ struct mpfi_float_imp
          return *this;
       }
 
-      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISINF(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(a));
 
       int        e;
       float128_type f, term;

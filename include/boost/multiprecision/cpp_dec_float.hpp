@@ -2430,7 +2430,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
    if (a == 1)
       return *this = one();
 
-   if ((boost::multiprecision::detail::isinf)(a))
+   if (BOOST_MP_ISINF(a))
    {
       *this = inf();
       if (a < 0)
@@ -2438,7 +2438,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
       return *this;
    }
 
-   if ((boost::multiprecision::detail::isnan)(a))
+   if (BOOST_MP_ISNAN(a))
       return *this = nan();
 
    int         e;
@@ -2447,7 +2447,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
 
    f = frexp(a, &e);
    // See https://svn.boost.org/trac/boost/ticket/10924 for an example of why this may go wrong:
-   BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(f) && !(boost::multiprecision::detail::isinf)(f));
+   BOOST_MP_ASSERT(!BOOST_MP_ISNAN(f) && !BOOST_MP_ISINF(f));
 
    constexpr const int shift = std::numeric_limits<int>::digits - 1;
 
@@ -2455,7 +2455,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
    {
       // extract int sized bits from f:
       f = ldexp(f, shift);
-      BOOST_MP_ASSERT(!(boost::multiprecision::detail::isnan)(f) && !(boost::multiprecision::detail::isinf)(f));
+      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(f) && !BOOST_MP_ISINF(f));
       term = floor(f);
       e -= shift;
       *this *= pow2(shift);

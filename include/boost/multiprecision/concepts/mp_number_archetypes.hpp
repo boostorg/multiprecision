@@ -209,7 +209,7 @@ inline void eval_sqrt(number_backend_float_architype& result, const number_backe
 
 inline int eval_fpclassify(const number_backend_float_architype& arg)
 {
-   return (boost::multiprecision::detail::fpclassify)(arg.m_value);
+   return BOOST_MP_FPCLASSIFY(arg.m_value);
 }
 
 inline std::size_t hash_value(const number_backend_float_architype& v)
