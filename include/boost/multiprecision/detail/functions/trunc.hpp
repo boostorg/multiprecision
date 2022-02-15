@@ -21,47 +21,6 @@ namespace boost { namespace multiprecision { namespace detail {
 namespace impl {
 
 template <typename T>
-inline T floor BOOST_PREVENT_MACRO_SUBSTITUTION (const T arg)
-{
-    T result = 1;
-
-    if(result < arg)
-    {
-        while(result < arg)
-        {
-            result *= 2;
-        }
-        while(result > arg)
-        {
-            --result;
-        }
-
-        return result;
-    }
-    else
-    {
-        return T(0);
-    }
-}
-
-template <typename T>
-inline T ceil BOOST_PREVENT_MACRO_SUBSTITUTION (const T arg)
-{
-    using std::floor;
-    
-    T result = floor(arg);
-
-    if(result == arg)
-    {
-        return result;
-    }
-    else
-    {
-        return result + 1;
-    }
-}
-
-template <typename T>
 inline T trunc BOOST_PREVENT_MACRO_SUBSTITUTION (const T arg)
 {
     using std::floor;
