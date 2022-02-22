@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cstdint>
 #include <type_traits>
+#include <string>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/number.hpp>
@@ -22,8 +23,11 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
-#include <boost/math/constants/constants.hpp>
 #include <mpfi.h>
+
+#ifdef BOOST_MP_MATH_AVAILABLE
+#include <boost/math/constants/constants.hpp>
+#endif
 
 #ifndef BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION
 #define BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION 20

@@ -3587,6 +3587,7 @@ constexpr float_round_style numeric_limits<boost::multiprecision::number<boost::
 
 } // namespace std
 
+#ifdef BOOST_MP_MATH_AVAILABLE
 namespace boost {
 namespace math {
 
@@ -3612,6 +3613,7 @@ struct precision<boost::multiprecision::number<boost::multiprecision::cpp_dec_fl
 }
 
 }} // namespace boost::math::policies
+#endif
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

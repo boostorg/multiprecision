@@ -52,6 +52,10 @@ namespace boost { namespace multiprecision {
 #  define BOOST_MP_MATH_AVAILABLE
 #endif
 
+#ifndef BOOST_MP_MATH_AVAILABLE
+#  define BOOST_MATH_INSTRUMENT_CODE(x) 
+#endif
+
 // Prevent Macro sub
 #ifndef BOOST_PREVENT_MACRO_SUBSTITUTION
 #  define BOOST_PREVENT_MACRO_SUBSTITUTION

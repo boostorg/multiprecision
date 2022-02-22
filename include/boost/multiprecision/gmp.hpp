@@ -27,6 +27,7 @@
 #include <limits>
 #include <climits>
 #include <cstdlib>
+#include <cfloat>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
@@ -3258,6 +3259,19 @@ using mpq_rational = number<gmp_rational>    ;
 } // namespace multiprecision
 
 namespace math { namespace tools {
+
+#ifndef BOOST_MP_MATH_AVAILABLE
+
+template <typename T>
+inline int digits();
+
+template <typename T>
+inline T max_value();
+
+template <typename T>
+inline T min_value();
+
+#endif // BOOST_MP_MATH_AVAILABLE
 
 inline void set_output_precision(const boost::multiprecision::mpf_float& val, std::ostream& os)
 {

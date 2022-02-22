@@ -2029,6 +2029,19 @@ using boost::multiprecision::signbit;
 
 namespace tools {
 
+#ifndef BOOST_MP_MATH_AVAILABLE
+
+template <typename T>
+inline int digits();
+
+template <typename T>
+inline T max_value();
+
+template <typename T>
+inline T min_value();
+
+#endif
+
 inline void set_output_precision(const boost::multiprecision::mpfr_float& val, std::ostream& os)
 {
    os << std::setprecision(val.precision());
@@ -3298,7 +3311,13 @@ namespace Eigen
       };
       static Real epsilon()
       {
+         #ifdef BOOST_MP_MATH_AVAILABLE
          return boost::math::tools::epsilon< boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0, AllocateType>, ExpressionTemplates>>();
+         #else
+         self_type result{1};
+         mpfr_div_2exp(result.backend().data(), result.backend().data(), std::numeric_limits<self_type>::digits - 1, GMP_RNDN);
+         return result;
+         #endif
       }
       static Real dummy_precision()
       {
@@ -3306,11 +3325,21 @@ namespace Eigen
       }
       static Real highest()
       {
+         #ifdef BOOST_MP_MATH_AVAILABLE
          return boost::math::tools::max_value<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0, AllocateType>, ExpressionTemplates>>();
+         #else
+         self_type value(0.5);
+         mpfr_mul_2exp(value.backend().data(), value.backend().data(), mpfr_get_emax(), GMP_RNDN);
+         return value;
+         #endif
       }
       static Real lowest()
       {
+         #ifdef BOOST_MP_MATH_AVAILABLE
          return boost::math::tools::min_value<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0, AllocateType>, ExpressionTemplates>>();
+         #else
+         return -(highest)();
+         #endif
       }
       static int digits10()
       {

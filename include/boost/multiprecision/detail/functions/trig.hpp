@@ -12,6 +12,7 @@
 // This file has no include guards or namespaces - it's expanded inline inside default_ops.hpp
 //
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 
@@ -136,6 +137,7 @@ void reduce_n_half_pi(T& arg, const T& n, bool go_down)
    reduction_type reduction = get_constant_pi<reduction_type>();
    eval_ldexp(reduction, reduction, -1); // divide by 2
    eval_multiply(reduction, n);
+
    BOOST_MATH_INSTRUMENT_CODE(big_arg.str(10, std::ios_base::scientific));
    BOOST_MATH_INSTRUMENT_CODE(reduction.str(10, std::ios_base::scientific));
 

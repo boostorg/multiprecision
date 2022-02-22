@@ -720,7 +720,7 @@ inline void eval_convert_to(unsigned long long* result, const tommath_int& val)
 {
    if (mp_isneg(&val.data()))
    {
-      BOOST_THROW_EXCEPTION(std::range_error("Converting negative arbitrary precision value to unsigned."));
+      BOOST_MP_THROW_EXCEPTION(std::range_error("Converting negative arbitrary precision value to unsigned."));
    }
 #ifdef MP_DEPRECATED
    *result = mp_get_ull(&val.data());

@@ -7,6 +7,7 @@
 #define BOOST_MP_CPP_INT_HPP
 
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <iomanip>
 #include <type_traits>

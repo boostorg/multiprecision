@@ -6,6 +6,7 @@
 #ifndef BOOST_MATH_LOGGED_ADAPTER_HPP
 #define BOOST_MATH_LOGGED_ADAPTER_HPP
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/traits/extract_exponent_type.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
 
@@ -814,6 +815,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
 
 } // namespace std
 
+#ifdef BOOST_MP_MATH_AVAILABLE
 namespace boost {
 namespace math {
 
@@ -827,6 +829,7 @@ struct precision<boost::multiprecision::number<boost::multiprecision::logged_ada
 }
 
 }} // namespace boost::math::policies
+#endif // BOOST_MP_MATH_AVAILABLE
 
 #undef NON_MEMBER_OP1
 #undef NON_MEMBER_OP2
