@@ -16,6 +16,7 @@
 #ifndef BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 #define BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 
+#include <cmath>
 #include <cstdint>
 #include <cstdlib>
 #include <algorithm>
@@ -27,7 +28,7 @@
 #include <stdexcept>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
-
+#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/detail/dynamic_array.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/float128_functions.hpp>
@@ -37,6 +38,7 @@
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 
+#ifdef BOOST_MP_MATH_AVAILABLE
 //
 // Headers required for Boost.Math integration:
 //
@@ -50,6 +52,7 @@
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
+#endif
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -2427,7 +2430,10 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
 {
    // Christopher Kormanyos's original code used a cast to long long here, but that fails
    // when long double has more digits than a long long.
-   BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
+   BOOST_MP_FLOAT128_USING
+   using std::floor;
+   using std::frexp; 
+   using std::ldexp;
 
    if (a == 0)
       return *this = zero();
@@ -2435,7 +2441,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
    if (a == 1)
       return *this = one();
 
-   if ((boost::math::isinf)(a))
+   if (BOOST_MP_ISINF(a))
    {
       *this = inf();
       if (a < 0)
@@ -2443,7 +2449,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
       return *this;
    }
 
-   if ((boost::math::isnan)(a))
+   if (BOOST_MP_ISNAN(a))
       return *this = nan();
 
    int         e;
@@ -2452,15 +2458,15 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
 
    f = frexp(a, &e);
    // See https://svn.boost.org/trac/boost/ticket/10924 for an example of why this may go wrong:
-   BOOST_MP_ASSERT((boost::math::isfinite)(f));
+   BOOST_MP_ASSERT(!BOOST_MP_ISNAN(f) && !BOOST_MP_ISINF(f));
 
-   constexpr int shift = std::numeric_limits<int>::digits - 1;
+   constexpr const int shift = std::numeric_limits<int>::digits - 1;
 
    while (f)
    {
       // extract int sized bits from f:
       f = ldexp(f, shift);
-      BOOST_MP_ASSERT((boost::math::isfinite)(f));
+      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(f) && !BOOST_MP_ISINF(f));
       term = floor(f);
       e -= shift;
       *this *= pow2(shift);
@@ -3592,6 +3598,7 @@ constexpr float_round_style numeric_limits<boost::multiprecision::number<boost::
 
 } // namespace std
 
+#ifdef BOOST_MP_MATH_AVAILABLE
 namespace boost {
 namespace math {
 
@@ -3617,6 +3624,7 @@ struct precision<boost::multiprecision::number<boost::multiprecision::cpp_dec_fl
 }
 
 }} // namespace boost::math::policies
+#endif
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

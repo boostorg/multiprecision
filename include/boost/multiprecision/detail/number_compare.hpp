@@ -7,6 +7,7 @@
 #define BOOST_MP_COMPARE_HPP
 
 #include <boost/multiprecision/traits/is_backend.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 
 //
 // Comparison operators for number.
@@ -152,7 +153,7 @@ inline
    else
 #endif
    {
-      return (boost::math::isnan)(a);
+      return BOOST_MP_ISNAN(a);
    }
 }
 

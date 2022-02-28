@@ -7,6 +7,8 @@
 #ifndef BOOST_MATH_MP_TOMMATH_BACKEND_HPP
 #define BOOST_MATH_MP_TOMMATH_BACKEND_HPP
 
+#include <boost/multiprecision/detail/standalone_config.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
@@ -22,10 +24,6 @@
 #include <cstddef>
 #include <cstdlib>
 #include <string>
-
-#if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
-#include <boost/math/special_functions/fpclassify.hpp>
-#endif
 
 namespace boost {
 namespace multiprecision {
@@ -245,10 +243,8 @@ struct tommath_int
          return *this;
       }
 
-      #if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
-      #endif
+      BOOST_MP_ASSERT(!BOOST_MP_ISINF(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(a));
 
       int         e;
       F f, term;
@@ -724,7 +720,7 @@ inline void eval_convert_to(unsigned long long* result, const tommath_int& val)
 {
    if (mp_isneg(&val.data()))
    {
-      BOOST_THROW_EXCEPTION(std::range_error("Converting negative arbitrary precision value to unsigned."));
+      BOOST_MP_THROW_EXCEPTION(std::range_error("Converting negative arbitrary precision value to unsigned."));
    }
 #ifdef MP_DEPRECATED
    *result = mp_get_ull(&val.data());

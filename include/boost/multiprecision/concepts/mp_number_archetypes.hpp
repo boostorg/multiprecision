@@ -14,9 +14,10 @@
 #include <iomanip>
 #include <tuple>
 #include <functional>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -208,7 +209,7 @@ inline void eval_sqrt(number_backend_float_architype& result, const number_backe
 
 inline int eval_fpclassify(const number_backend_float_architype& arg)
 {
-   return (boost::math::fpclassify)(arg.m_value);
+   return BOOST_MP_FPCLASSIFY(arg.m_value);
 }
 
 inline std::size_t hash_value(const number_backend_float_architype& v)

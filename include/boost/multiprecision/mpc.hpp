@@ -6,8 +6,10 @@
 #ifndef BOOST_MULTIPRECISION_MPC_HPP
 #define BOOST_MULTIPRECISION_MPC_HPP
 
-#include <boost/multiprecision/number.hpp>
 #include <cstdint>
+#include <boost/multiprecision/detail/standalone_config.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
+#include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
 #include <boost/multiprecision/traits/is_variable_precision.hpp>
@@ -274,11 +276,11 @@ struct mpc_complex_imp
          b = 0uL;
       }
 
-      if (eval_fpclassify(a) == (int)FP_NAN)
+      if (eval_fpclassify(a) == static_cast<int>(FP_NAN))
       {
          mpc_set_fr(this->data(), a.data(), GMP_RNDN);
       }
-      else if (eval_fpclassify(b) == (int)FP_NAN)
+      else if (eval_fpclassify(b) == static_cast<int>(FP_NAN))
       {
          mpc_set_fr(this->data(), b.data(), GMP_RNDN);
       }
@@ -341,7 +343,7 @@ struct mpc_complex_imp
          d = i;
          return compare(d);
       }
-      return mpc_cmp_si(m_data, (long)i);
+      return mpc_cmp_si(m_data, static_cast<long>(i));
    }
    template <class V>
    int compare(const V& v) const noexcept
@@ -1327,11 +1329,11 @@ inline void assign_components(mpc_complex_backend<D1>& result, const mpfr_float_
    //
    assign_components_set_precision(result, a, b);
    using default_ops::eval_fpclassify;
-   if (eval_fpclassify(a) == (int)FP_NAN)
+   if (eval_fpclassify(a) == static_cast<int>(FP_NAN))
    {
       mpc_set_fr(result.data(), a.data(), GMP_RNDN);
    }
-   else if (eval_fpclassify(b) == (int)FP_NAN)
+   else if (eval_fpclassify(b) == static_cast<int>(FP_NAN))
    {
       mpc_set_fr(result.data(), b.data(), GMP_RNDN);
    }
@@ -1370,11 +1372,11 @@ inline void assign_components(mpc_complex_backend<D1>& result, long long a, long
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
 inline void assign_components(mpc_complex_backend<D1>& result, double a, double b)
 {
-   if ((boost::math::isnan)(a))
+   if (BOOST_MP_ISNAN(a))
    {
       mpc_set_d(result.data(), a, GMP_RNDN);
    }
-   else if ((boost::math::isnan)(b))
+   else if (BOOST_MP_ISNAN(b))
    {
       mpc_set_d(result.data(), b, GMP_RNDN);
    }
@@ -1387,11 +1389,11 @@ inline void assign_components(mpc_complex_backend<D1>& result, double a, double 
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
 inline void assign_components(mpc_complex_backend<D1>& result, long double a, long double b)
 {
-   if ((boost::math::isnan)(a))
+   if (BOOST_MP_ISNAN(a))
    {
       mpc_set_d(result.data(), a, GMP_RNDN);
    }
-   else if ((boost::math::isnan)(b))
+   else if (BOOST_MP_ISNAN(b))
    {
       mpc_set_d(result.data(), b, GMP_RNDN);
    }

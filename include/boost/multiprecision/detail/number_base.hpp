@@ -12,7 +12,7 @@
 #include <limits>
 #include <type_traits>
 #include <stdexcept>
-#include <boost/math/tools/complex.hpp>
+#include <tuple>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/traits/transcendental_reduction_type.hpp>
 #include <boost/multiprecision/traits/std_integer_traits.hpp>
@@ -27,6 +27,10 @@
 #ifndef BOOST_MP_STANDALONE
 #include <boost/lexical_cast.hpp>
 #include <boost/core/nvp.hpp>
+#endif
+
+#ifdef BOOST_MP_MATH_AVAILABLE
+#include <boost/math/tools/complex.hpp>
 #endif
 
 //
@@ -1693,6 +1697,7 @@ struct is_equivalent_number_type<number<Backend, ExpressionTemplates>, number<Ba
 }
 } // namespace boost
 
+#ifdef BOOST_MP_MATH_AVAILABLE
 namespace boost { namespace math {
    namespace tools {
 
@@ -1737,6 +1742,7 @@ struct is_explicitly_convertible_from_string<boost::multiprecision::number<B, ET
 } // namespace constants
 
 }} // namespace boost::math
+#endif
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

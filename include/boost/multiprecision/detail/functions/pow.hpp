@@ -212,13 +212,13 @@ void eval_exp(T& result, const T& x)
    // Handle special arguments.
    int  type  = eval_fpclassify(x);
    bool isneg = eval_get_sign(x) < 0;
-   if (type == (int)FP_NAN)
+   if (type == static_cast<int>(FP_NAN))
    {
       result = x;
       errno  = EDOM;
       return;
    }
-   else if (type == (int)FP_INFINITE)
+   else if (type == static_cast<int>(FP_INFINITE))
    {
       if (isneg)
          result = ui_type(0u);
@@ -226,7 +226,7 @@ void eval_exp(T& result, const T& x)
          result = x;
       return;
    }
-   else if (type == (int)FP_ZERO)
+   else if (type == static_cast<int>(FP_ZERO))
    {
       result = ui_type(1);
       return;
@@ -760,9 +760,11 @@ void eval_exp2(T& result, const T& arg)
          return;
       }
    }
+   #ifdef BOOST_MP_MATH_AVAILABLE
    BOOST_MP_CATCH(const boost::math::rounding_error&)
    { /* Fallthrough */
    }
+   #endif
    BOOST_MP_CATCH(const std::runtime_error&)
    { /* Fallthrough */
    }

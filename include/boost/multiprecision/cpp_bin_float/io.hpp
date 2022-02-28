@@ -96,16 +96,16 @@ inline int get_round_mode(const cpp_int& what, std::int64_t location, std::int64
    BOOST_MP_ASSERT(location >= 0);
    BOOST_MP_ASSERT(location < INT_MAX);
    std::int64_t error_radius = error & 1 ? (1 + error) / 2 : error / 2;
-   if (error_radius && ((int)msb(error_radius) >= location))
+   if (error_radius && (static_cast<int>(msb(error_radius)) >= location))
       return -1;
    if (bit_test(what, static_cast<unsigned>(location)))
    {
-      if ((int)lsb(what) == location)
+      if (static_cast<int>(lsb(what)) == location)
          return error ? -1 : 1; // Either a tie or can't round depending on whether we have any error
       if (!error)
          return 2; // no error, round up.
       cpp_int t = what - error_radius;
-      if ((int)lsb(t) >= location)
+      if (static_cast<int>(lsb(t)) >= location)
          return -1;
       return 2;
    }
@@ -362,7 +362,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
       {
          cpp_int d;
          calc_exp       = boost::multiprecision::cpp_bf_io_detail::restricted_pow(d, cpp_int(5), -decimal_exp, max_bits, error);
-         std::ptrdiff_t shift      = (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - msb(n) + msb(d);
+         std::ptrdiff_t shift      = static_cast<int>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) - msb(n) + msb(d);
          final_exponent = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1 + decimal_exp - calc_exp;
          if (shift > 0)
          {
@@ -383,11 +383,11 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
             // Exactly the right number of bits, use the remainder to round:
             roundup = boost::multiprecision::cpp_bf_io_detail::get_round_mode(r, d, error, q);
          }
-         else if (bit_test(q, gb - (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) && ((int)lsb(q) == (gb - (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)))
+         else if (bit_test(q, gb - static_cast<int>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)) && (static_cast<int>(lsb(q)) == (gb - static_cast<int>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count))))
          {
             // Too many bits in q and the bits in q indicate a tie, but we can break that using r,
             // note that the radius of error in r is error/2 * q:
-            std::ptrdiff_t lshift = gb - (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + 1;
+            std::ptrdiff_t lshift = gb - static_cast<int>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) + 1;
             q >>= lshift;
             final_exponent += static_cast<Exponent>(lshift);
             BOOST_MP_ASSERT((msb(q) >= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));

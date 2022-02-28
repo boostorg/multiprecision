@@ -6,27 +6,33 @@
 #ifndef BOOST_MATH_CPP_BIN_FLOAT_HPP
 #define BOOST_MATH_CPP_BIN_FLOAT_HPP
 
+#include <cmath>
+#include <cstdint>
 #include <limits>
 #include <type_traits>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/integer.hpp>
-#include <boost/math/special_functions/trunc.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 #include <boost/multiprecision/detail/float128_functions.hpp>
+#include <boost/multiprecision/detail/functions/trunc.hpp>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
+#ifdef BOOST_MP_MATH_AVAILABLE
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
+#endif
 
 #ifdef BOOST_HAS_FLOAT128
 #include <quadmath.h>
@@ -63,7 +69,7 @@ struct is_cpp_bin_float_implicitly_constructible_from_type
 template <class Float, std::ptrdiff_t bit_count>
 struct is_cpp_bin_float_implicitly_constructible_from_type<Float, bit_count, true>
 {
-   static constexpr const bool value = (std::numeric_limits<Float>::digits <= (int)bit_count) && (std::numeric_limits<Float>::radix == 2) && std::numeric_limits<Float>::is_specialized
+   static constexpr const bool value = (std::numeric_limits<Float>::digits <= static_cast<int>(bit_count)) && (std::numeric_limits<Float>::radix == 2) && std::numeric_limits<Float>::is_specialized
 #ifdef BOOST_HAS_FLOAT128
                              && !std::is_same<Float, float128_type>::value
 #endif
@@ -79,7 +85,7 @@ struct is_cpp_bin_float_explicitly_constructible_from_type
 template <class Float, std::ptrdiff_t bit_count>
 struct is_cpp_bin_float_explicitly_constructible_from_type<Float, bit_count, true>
 {
-   static constexpr const bool value = (std::numeric_limits<Float>::digits > (int)bit_count) && (std::numeric_limits<Float>::radix == 2) && std::numeric_limits<Float>::is_specialized
+   static constexpr const bool value = (std::numeric_limits<Float>::digits > static_cast<int>(bit_count)) && (std::numeric_limits<Float>::radix == 2) && std::numeric_limits<Float>::is_specialized
 #ifdef BOOST_HAS_FLOAT128
                              && !std::is_same<Float, float128_type>::value
 #endif
@@ -169,7 +175,7 @@ class cpp_bin_float
    template <class Float>
    cpp_bin_float(const Float& f,
                  typename std::enable_if<
-                     std::is_same<Float, float128_type>::value && ((int)bit_count >= 113)>::type const* = nullptr)
+                     std::is_same<Float, float128_type>::value && (static_cast<int>(bit_count) >= 113)>::type const* = nullptr)
        : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
@@ -177,7 +183,7 @@ class cpp_bin_float
    template <class Float>
    explicit cpp_bin_float(const Float& f,
                           typename std::enable_if<
-                              std::is_same<Float, float128_type>::value && ((int)bit_count < 113)>::type const* = nullptr)
+                              std::is_same<Float, float128_type>::value && (static_cast<int>(bit_count) < 113)>::type const* = nullptr)
        : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
@@ -279,7 +285,7 @@ class cpp_bin_float
    template <class Float>
    typename std::enable_if<
        (number_category<Float>::value == number_kind_floating_point)
-           //&& (std::numeric_limits<Float>::digits <= (int)bit_count)
+           //&& (std::numeric_limits<Float>::digits <= static_cast<int>(bit_count))
            && ((std::numeric_limits<Float>::radix == 2) || (std::is_same<Float, float128_type>::value)),
        cpp_bin_float&>::type
    operator=(const Float& f)
@@ -287,7 +293,7 @@ class cpp_bin_float
    template <class Float>
    typename std::enable_if<
        (number_category<Float>::value == number_kind_floating_point)
-           //&& (std::numeric_limits<Float>::digits <= (int)bit_count)
+           //&& (std::numeric_limits<Float>::digits <= static_cast<int>(bit_count))
            && (std::numeric_limits<Float>::radix == 2),
        cpp_bin_float&>::type
    operator=(const Float& f)
@@ -342,7 +348,7 @@ class cpp_bin_float
       {
          f = ldexpq(f, bits);
          e -= bits;
-         int ipart = (int)truncq(f);
+         int ipart = static_cast<int>(truncq(f));
          f -= ipart;
          m_exponent += bits;
          cpp_bin_float t;
@@ -361,15 +367,17 @@ class cpp_bin_float
    typename std::enable_if<std::is_floating_point<Float>::value, cpp_bin_float&>::type assign_float(Float f)
 #endif
    {
-      BOOST_MATH_STD_USING
+      using std::frexp;
+      using std::ldexp;
+      using std::signbit;
       using default_ops::eval_add;
       using bf_int_type = typename boost::multiprecision::detail::canonical<int, cpp_bin_float>::type;
 
-      switch ((boost::math::fpclassify)(f))
+      switch (BOOST_MP_FPCLASSIFY(f))
       {
       case FP_ZERO:
          m_data     = limb_type(0);
-         m_sign     = ((boost::math::signbit)(f) > 0);
+         m_sign     = ((signbit)(f) > 0);
          m_exponent = exponent_zero;
          return *this;
       case FP_NAN:
@@ -396,17 +404,13 @@ class cpp_bin_float
       m_exponent = 0;
 
       constexpr const std::ptrdiff_t bits = sizeof(int) * CHAR_BIT - 1;
-      int              e;
+      int e;
       f = frexp(f, &e);
       while (f)
       {
          f = ldexp(f, bits);
          e -= bits;
-#ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
-         int ipart = itrunc(f);
-#else
-         int ipart = static_cast<int>(f);
-#endif
+         int ipart = boost::multiprecision::detail::itrunc(f);
          f -= ipart;
          m_exponent += bits;
          cpp_bin_float t;
@@ -423,7 +427,6 @@ class cpp_bin_float
        cpp_bin_float&>::type
    assign_float(Float f)
    {
-      BOOST_MATH_STD_USING
       using default_ops::eval_add;
       using default_ops::eval_convert_to;
       using default_ops::eval_get_sign;
@@ -2121,7 +2124,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
          using ui_type = typename std::tuple_element<0, typename number_type::backend_type::unsigned_types>::type;
          value.first            = true;
          value.second.backend() = ui_type(1u);
-         value.second           = ldexp(value.second, 1 - (int)digits);
+         value.second           = ldexp(value.second, 1 - static_cast<int>(digits));
       }
       return value.second;
    }

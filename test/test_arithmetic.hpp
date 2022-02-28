@@ -11,12 +11,18 @@
 #include <numeric>
 #include <type_traits>
 #include <typeinfo>
+#include <iostream>
+#include <iomanip>
 #include "test.hpp"
+#include <boost/multiprecision/detail/standalone_config.hpp>
 
 #ifndef BOOST_MP_STANDALONE
-#include <boost/math/special_functions/pow.hpp>
 #include <boost/integer/common_factor_rt.hpp>
 #include <boost/lexical_cast.hpp>
+#endif
+
+#ifdef BOOST_MP_MATH_AVAILABLE
+#include <boost/math/special_functions/pow.hpp>
 #endif
 
 template <class T>
@@ -1276,12 +1282,14 @@ void test_float_funcs(const std::integral_constant<bool, true>&)
    //
    // Complex number functions on scalars:
    //
+   #ifdef BOOST_MP_MATH_AVAILABLE
    a = 40;
    BOOST_CHECK_EQUAL(Real(arg(a)), 0);
    BOOST_CHECK_EQUAL(Real(arg(a + 0)), 0);
    a - 20;
    BOOST_CHECK_EQUAL(Real(arg(a)), 0);
    BOOST_CHECK_EQUAL(Real(arg(a - 20)), 0);
+   #endif
 }
 
 template <class T, class U>

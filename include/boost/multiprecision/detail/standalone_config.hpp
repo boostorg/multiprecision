@@ -43,7 +43,18 @@ namespace boost { namespace multiprecision {
 }}
 #endif
 
+// Boost.Math available by default
+#define BOOST_MP_MATH_AVAILABLE
+
 #else // Standalone mode
+
+#ifdef BOOST_MATH_STANDALONE
+#  define BOOST_MP_MATH_AVAILABLE
+#endif
+
+#ifndef BOOST_MP_MATH_AVAILABLE
+#  define BOOST_MATH_INSTRUMENT_CODE(x) 
+#endif
 
 // Prevent Macro sub
 #ifndef BOOST_PREVENT_MACRO_SUBSTITUTION

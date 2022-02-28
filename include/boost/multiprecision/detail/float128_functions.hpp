@@ -61,7 +61,7 @@ namespace math {
 
 }}
 
-#define BOOST_MP_FLOAT128_USING using boost::multiprecision::float128_procs::ldexp; using boost::multiprecision::float128_procs::frexp; using boost::multiprecision::float128_procs::floor;
+#define BOOST_MP_FLOAT128_USING using boost::multiprecision::float128_procs::ldexp; using boost::multiprecision::float128_procs::frexp; using boost::multiprecision::float128_procs::floor; using boost::math::isinf; using boost::math::isnan;
 
 #else
 #define BOOST_MP_FLOAT128_USING

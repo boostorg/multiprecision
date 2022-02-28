@@ -10,9 +10,10 @@
 #include <cmath>
 #include <cstdint>
 #include <type_traits>
-
+#include <string>
+#include <boost/multiprecision/detail/standalone_config.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/number.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/precision.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
@@ -22,8 +23,11 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
-#include <boost/math/constants/constants.hpp>
 #include <mpfi.h>
+
+#ifdef BOOST_MP_MATH_AVAILABLE
+#include <boost/math/constants/constants.hpp>
+#endif
 
 #ifndef BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION
 #define BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION 20
@@ -284,8 +288,8 @@ struct mpfi_float_imp
          return *this;
       }
 
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISINF(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(a));
 
       int        e;
       float128_type f, term;
@@ -343,11 +347,11 @@ struct mpfi_float_imp
             part.erase();
          b = part.c_str();
 
-         if (eval_fpclassify(a) == (int)FP_NAN)
+         if (eval_fpclassify(a) == static_cast<int>(FP_NAN))
          {
             mpfi_set_fr(this->data(), a.data());
          }
-         else if (eval_fpclassify(b) == (int)FP_NAN)
+         else if (eval_fpclassify(b) == static_cast<int>(FP_NAN))
          {
             mpfi_set_fr(this->data(), b.data());
          }
@@ -1056,11 +1060,11 @@ inline void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_b
    assign_components_set_precision(result, a, b);
 
    using default_ops::eval_fpclassify;
-   if (eval_fpclassify(a) == (int)FP_NAN)
+   if (eval_fpclassify(a) == static_cast<int>(FP_NAN))
    {
       mpfi_set_fr(result.data(), a.data());
    }
-   else if (eval_fpclassify(b) == (int)FP_NAN)
+   else if (eval_fpclassify(b) == static_cast<int>(FP_NAN))
    {
       mpfi_set_fr(result.data(), b.data());
    }

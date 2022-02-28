@@ -9,16 +9,21 @@
 
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
-#include <boost/math/policies/error_handling.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 #include <boost/multiprecision/traits/is_backend.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
+#include <cstdint>
+#include <complex>
+#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
+#include <string_view>
+#endif
+
+#ifdef BOOST_MP_MATH_AVAILABLE
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/special_functions/next.hpp>
 #include <boost/math/special_functions/hypot.hpp>
-#include <cstdint>
-#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
-#include <string_view>
+#include <boost/math/policies/error_handling.hpp>
 #endif
 
 #ifndef INSTRUMENT_BACKEND
@@ -1404,7 +1409,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::d
    using arithmetic_type = typename boost::multiprecision::detail::canonical<A, T>::type       ;
    const ui_type                                                                zero        = 0u;
    arithmetic_type                                                              canonical_b = b;
-   switch ((::boost::math::fpclassify)(b))
+   switch (BOOST_MP_FPCLASSIFY(b))
    {
    case FP_NAN:
    case FP_INFINITE:
@@ -1442,7 +1447,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::d
       result = zero;
       return;
    }
-   switch ((::boost::math::fpclassify)(a))
+   switch (BOOST_MP_FPCLASSIFY(a))
    {
    case FP_NAN:
       result = zero;
@@ -1484,14 +1489,14 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_modf(T& result, T const& arg, T* pipar
 {
    using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
    int                                                                          c = eval_fpclassify(arg);
-   if (c == (int)FP_NAN)
+   if (c == static_cast<int>(FP_NAN))
    {
       if (pipart)
          *pipart = arg;
       result = arg;
       return;
    }
-   else if (c == (int)FP_INFINITE)
+   else if (c == static_cast<int>(FP_INFINITE))
    {
       if (pipart)
          *pipart = arg;
@@ -1517,13 +1522,13 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_round(T& result, const T& a)
    static_assert(number_category<T>::value == number_kind_floating_point, "The round function is only valid for floating point types.");
    using fp_type = typename boost::multiprecision::detail::canonical<float, T>::type;
    int                                                                       c = eval_fpclassify(a);
-   if (c == (int)FP_NAN)
+   if (c == static_cast<int>(FP_NAN))
    {
       result = a;
       errno  = EDOM;
       return;
    }
-   if ((c == FP_ZERO) || (c == (int)FP_INFINITE))
+   if ((c == FP_ZERO) || (c == static_cast<int>(FP_INFINITE)))
    {
       result = a;
    }
@@ -1935,7 +1940,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val, std::integral_cons
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val, std::integral_constant<bool, false> const&, const std::integral_constant<bool, true>&)
 {
-   return (boost::math::isnan)(val);
+   return BOOST_MP_ISNAN(val);
 }
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T&, std::integral_constant<bool, false> const&, const std::integral_constant<bool, false>&)
@@ -2150,7 +2155,7 @@ template <class Backend, multiprecision::expression_template_option ExpressionTe
 inline BOOST_MP_CXX14_CONSTEXPR bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
    int v = fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg);
-   return (v != (int)FP_INFINITE) && (v != (int)FP_NAN);
+   return (v != static_cast<int>(FP_INFINITE)) && (v != static_cast<int>(FP_NAN));
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
@@ -2161,7 +2166,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(c
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_NAN;
+   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == static_cast<int>(FP_NAN);
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
@@ -2172,7 +2177,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(cons
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_INFINITE;
+   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == static_cast<int>(FP_INFINITE);
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
@@ -2183,7 +2188,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(cons
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_NORMAL;
+   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == static_cast<int>(FP_NORMAL);
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
@@ -2299,6 +2304,7 @@ imag(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 // Complex number functions, these are overloaded at the Backend level, we just provide the
 // expression template versions here, plus overloads for non-complex types:
 //
+#ifdef BOOST_MP_MATH_AVAILABLE
 template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates>>>::type::type
 abs(const number<T, ExpressionTemplates>& v)
@@ -2332,6 +2338,7 @@ arg(const detail::expression<tag, A1, A2, A3, A4>& v)
    using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
    return std::move(arg(static_cast<number_type>(v)));
 }
+#endif // BOOST_MP_MATH_AVAILABLE
 
 template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates>>>::type::type
@@ -2435,10 +2442,49 @@ using boost::multiprecision::isnormal;
 using boost::multiprecision::sign;
 using boost::multiprecision::signbit;
 
+#ifndef BOOST_MP_MATH_AVAILABLE
+namespace policies {
+
+template <typename... Args>
+class policy {};
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5>
+void raise_rounding_error(T1, T2, T3, T4, T5)
+{
+   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Rounding error"));
+}
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5>
+void raise_overflow_error(T1, T2, T3, T4, T5)
+{
+   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Overflow error"));
+}
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5>
+void raise_evaluation_error(T1, T2, T3, T4, T5)
+{
+   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Evaluation error"));
+}
+
+template <typename T, typename... Args>
+struct is_policy
+{
+   static constexpr bool value = false;
+};
+
+template <typename... Args>
+struct is_policy<policy<Args...>>
+{
+   static constexpr bool value = true;
+};
+
+} // namespace policies
+#endif
+
 } // namespace math
 
 namespace multiprecision {
-
+#ifdef BOOST_MP_MATH_AVAILABLE
 using c99_error_policy = ::boost::math::policies::policy<
     ::boost::math::policies::domain_error< ::boost::math::policies::errno_on_error>,
     ::boost::math::policies::pole_error< ::boost::math::policies::errno_on_error>,
@@ -2674,6 +2720,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename multiprecision::detail::expression<tag,
    detail::scoped_default_precision<value_type>                                          precision_guard(a, b);
    return nexttoward                                                                     BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
 }
+#endif // BOOST_MP_MATH_AVAILABLE
 
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
 inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& add(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
@@ -2757,7 +2804,7 @@ inline BOOST_MP_CXX14_CONSTEXPR int itrunc(const detail::expression<tag, A1, A2,
 {
    using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
    number_type                                                           r(trunc(v, pol));
-   if ((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::itrunc<%1%>(%1%)", 0, number_type(v), 0, pol);
    return r.template convert_to<int>();
 }
@@ -2770,7 +2817,7 @@ template <class Backend, expression_template_option ExpressionTemplates, class P
 inline BOOST_MP_CXX14_CONSTEXPR int itrunc(const number<Backend, ExpressionTemplates>& v, const Policy& pol)
 {
    number<Backend, ExpressionTemplates> r(trunc(v, pol));
-   if ((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::itrunc<%1%>(%1%)", 0, v, 0, pol);
    return r.template convert_to<int>();
 }
@@ -2784,7 +2831,7 @@ inline BOOST_MP_CXX14_CONSTEXPR long ltrunc(const detail::expression<tag, A1, A2
 {
    using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
    number_type                                                           r(trunc(v, pol));
-   if ((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::ltrunc<%1%>(%1%)", 0, number_type(v), 0L, pol);
    return r.template convert_to<long>();
 }
@@ -2797,7 +2844,7 @@ template <class T, expression_template_option ExpressionTemplates, class Policy>
 inline BOOST_MP_CXX14_CONSTEXPR long ltrunc(const number<T, ExpressionTemplates>& v, const Policy& pol)
 {
    number<T, ExpressionTemplates> r(trunc(v, pol));
-   if ((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::ltrunc<%1%>(%1%)", 0, v, 0L, pol);
    return r.template convert_to<long>();
 }
@@ -2812,7 +2859,7 @@ inline BOOST_MP_CXX14_CONSTEXPR long long lltrunc(const detail::expression<tag, 
 {
    using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
    number_type                                                           r(trunc(v, pol));
-   if ((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lltrunc<%1%>(%1%)", 0, number_type(v), 0LL, pol);
    return r.template convert_to<long long>();
 }
@@ -2825,7 +2872,7 @@ template <class T, expression_template_option ExpressionTemplates, class Policy>
 inline BOOST_MP_CXX14_CONSTEXPR long long lltrunc(const number<T, ExpressionTemplates>& v, const Policy& pol)
 {
    number<T, ExpressionTemplates> r(trunc(v, pol));
-   if ((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lltrunc<%1%>(%1%)", 0, v, 0LL, pol);
    return r.template convert_to<long long>();
 }
@@ -2856,7 +2903,7 @@ inline BOOST_MP_CXX14_CONSTEXPR int iround(const detail::expression<tag, A1, A2,
 {
    using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
    number_type                                                           r(round(v, pol));
-   if ((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, number_type(v), 0, pol);
    return r.template convert_to<int>();
 }
@@ -2869,7 +2916,7 @@ template <class T, expression_template_option ExpressionTemplates, class Policy>
 inline BOOST_MP_CXX14_CONSTEXPR int iround(const number<T, ExpressionTemplates>& v, const Policy& pol)
 {
    number<T, ExpressionTemplates> r(round(v, pol));
-   if ((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, v, 0, pol);
    return r.template convert_to<int>();
 }
@@ -2883,7 +2930,7 @@ inline BOOST_MP_CXX14_CONSTEXPR long lround(const detail::expression<tag, A1, A2
 {
    using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
    number_type                                                           r(round(v, pol));
-   if ((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lround<%1%>(%1%)", 0, number_type(v), 0L, pol);
    return r.template convert_to<long>();
 }
@@ -2896,7 +2943,7 @@ template <class T, expression_template_option ExpressionTemplates, class Policy>
 inline BOOST_MP_CXX14_CONSTEXPR long lround(const number<T, ExpressionTemplates>& v, const Policy& pol)
 {
    number<T, ExpressionTemplates> r(round(v, pol));
-   if ((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lround<%1%>(%1%)", 0, v, 0L, pol);
    return r.template convert_to<long>();
 }
@@ -2911,7 +2958,7 @@ inline BOOST_MP_CXX14_CONSTEXPR long long llround(const detail::expression<tag, 
 {
    using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
    number_type                                                           r(round(v, pol));
-   if ((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, number_type(v), 0LL, pol);
    return r.template convert_to<long long>();
 }
@@ -2924,7 +2971,7 @@ template <class T, expression_template_option ExpressionTemplates, class Policy>
 inline BOOST_MP_CXX14_CONSTEXPR long long llround(const number<T, ExpressionTemplates>& v, const Policy& pol)
 {
    number<T, ExpressionTemplates> r(round(v, pol));
-   if ((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !(boost::math::isfinite)(v))
+   if ((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !BOOST_MP_ISFINITE(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, v, 0LL, pol);
    return r.template convert_to<long long>();
 }

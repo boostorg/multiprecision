@@ -17,6 +17,7 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <type_traits>
 #include <memory>
 #include <utility>
@@ -26,18 +27,18 @@
 #include <limits>
 #include <climits>
 #include <cstdlib>
+#include <cfloat>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
-#if !defined(BOOST_MP_STANDALONE) || defined(BOOST_MATH_STANDALONE)
+#ifdef BOOST_MP_MATH_AVAILABLE
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #endif
 
 #ifdef BOOST_MSVC
@@ -300,10 +301,8 @@ struct gmp_float_imp
          return *this;
       }
 
-      #ifndef BOOST_MP_STANDALONE
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
-      #endif
+      BOOST_MP_ASSERT(!BOOST_MP_ISINF(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(a));
 
       int         e;
       F f, term;
@@ -1132,7 +1131,7 @@ inline void eval_convert_to(unsigned long* result, const gmp_float<digits10>& va
    if (0 == mpf_fits_ulong_p(val.data()))
       *result = (std::numeric_limits<unsigned long>::max)();
    else
-      *result = (unsigned long)mpf_get_ui(val.data());
+      *result = static_cast<unsigned long>(mpf_get_ui(val.data()));
 }
 template <unsigned digits10>
 inline void eval_convert_to(long* result, const gmp_float<digits10>& val) noexcept
@@ -1143,7 +1142,7 @@ inline void eval_convert_to(long* result, const gmp_float<digits10>& val) noexce
       *result *= mpf_sgn(val.data());
    }
    else
-      *result = (long)mpf_get_si(val.data());
+      *result = static_cast<long>(mpf_get_si(val.data()));
 }
 #ifdef BOOST_MP_STANDALONE
 template <unsigned digits10>
@@ -1206,7 +1205,7 @@ inline void eval_convert_to(long long* result, const gmp_float<digits10>& val)
       *result <<= digits;
       digits -= std::numeric_limits<unsigned long>::digits;
       mpf_mul_2exp(t.data(), t.data(), digits >= 0 ? std::numeric_limits<unsigned long>::digits : std::numeric_limits<unsigned long>::digits + digits);
-      unsigned long l = (unsigned long)mpf_get_ui(t.data());
+      unsigned long l = static_cast<unsigned long>(mpf_get_ui(t.data()));
       if (digits < 0)
          l >>= -digits;
       *result |= l;
@@ -1236,7 +1235,7 @@ inline void eval_convert_to(unsigned long long* result, const gmp_float<digits10
       *result <<= digits;
       digits -= std::numeric_limits<unsigned long>::digits;
       mpf_mul_2exp(t.data(), t.data(), digits >= 0 ? std::numeric_limits<unsigned long>::digits : std::numeric_limits<unsigned long>::digits + digits);
-      unsigned long l = (unsigned long)mpf_get_ui(t.data());
+      unsigned long l = static_cast<unsigned long>(mpf_get_ui(t.data()));
       if (digits < 0)
          l >>= -digits;
       *result |= l;
@@ -1521,10 +1520,8 @@ struct gmp_int
          return *this;
       }
 
-      #ifndef BOOST_MP_STANDALONE
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
-      #endif
+      BOOST_MP_ASSERT(!BOOST_MP_ISINF(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(a));
 
       int         e;
       F f, term;
@@ -1978,7 +1975,7 @@ inline void eval_convert_to(unsigned long* result, const gmp_int& val)
       BOOST_MP_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
    }
    else
-      *result = (unsigned long)mpz_get_ui(val.data());
+      *result = static_cast<unsigned long>(mpz_get_ui(val.data()));
 }
 inline void eval_convert_to(long* result, const gmp_int& val)
 {
@@ -1987,7 +1984,7 @@ inline void eval_convert_to(long* result, const gmp_int& val)
       *result = mpz_sgn(val.data()) < 0 ? (std::numeric_limits<long>::min)() : (std::numeric_limits<long>::max)();
    }
    else
-      *result = (signed long)mpz_get_si(val.data());
+      *result = static_cast<long>(mpz_get_si(val.data()));
 }
 inline void eval_convert_to(long double* result, const gmp_int& val)
 {
@@ -2509,10 +2506,8 @@ struct gmp_rational
          return *this;
       }
 
-      #ifndef BOOST_MP_STANDALONE
-      BOOST_MP_ASSERT(!(boost::math::isinf)(a));
-      BOOST_MP_ASSERT(!(boost::math::isnan)(a));
-      #endif
+      BOOST_MP_ASSERT(!BOOST_MP_ISINF(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(a));
 
       int         e;
       F f, term;
@@ -3264,6 +3259,19 @@ using mpq_rational = number<gmp_rational>    ;
 } // namespace multiprecision
 
 namespace math { namespace tools {
+
+#ifndef BOOST_MP_MATH_AVAILABLE
+
+template <typename T>
+inline int digits();
+
+template <typename T>
+inline T max_value();
+
+template <typename T>
+inline T min_value();
+
+#endif // BOOST_MP_MATH_AVAILABLE
 
 inline void set_output_precision(const boost::multiprecision::mpf_float& val, std::ostream& os)
 {

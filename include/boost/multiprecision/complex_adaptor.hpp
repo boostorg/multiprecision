@@ -157,7 +157,7 @@ struct complex_adaptor
          else
             imag_data() = zero;
 
-         if (eval_fpclassify(imag_data()) == (int)FP_NAN)
+         if (eval_fpclassify(imag_data()) == static_cast<int>(FP_NAN))
          {
             real_data() = imag_data();
          }

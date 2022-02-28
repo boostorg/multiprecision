@@ -7,10 +7,12 @@
 #define BOOST_MP_CPP_INT_HPP
 
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <iomanip>
 #include <type_traits>
 #include <string>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/endian.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
@@ -25,6 +27,7 @@
 #include <boost/multiprecision/detail/empty_value.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -979,7 +982,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 
  protected:
    template <class T>
-   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!boost::multiprecision::detail::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)))>::type
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(!boost::multiprecision::detail::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= static_cast<int>(MinBits))))>::type
    check_in_range(T val, const std::integral_constant<int, checked>&)
    {
       using common_type = typename std::common_type<typename boost::multiprecision::detail::make_unsigned<T>::type, local_limb_type>::type;
@@ -988,7 +991,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
          BOOST_MP_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
    }
    template <class T>
-   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(boost::multiprecision::detail::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)))>::type
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!(boost::multiprecision::detail::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= static_cast<int>(MinBits))))>::type
    check_in_range(T val, const std::integral_constant<int, checked>&)
    {
       using std::abs;
@@ -1162,7 +1165,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
 
  protected:
    template <class T>
-   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !(std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits))>::type
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !(std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= static_cast<int>(MinBits)))>::type
    check_in_range(T val, const std::integral_constant<int, checked>&, const std::integral_constant<bool, false>&)
    {
       using common_type = typename std::common_type<T, local_limb_type>::type;
@@ -1628,7 +1631,7 @@ private:
          *this = static_cast<limb_type>(1u);
       }
 
-      if ((boost::math::isinf)(a) || (boost::math::isnan)(a))
+      if (!BOOST_MP_ISFINITE(a))
       {
          BOOST_MP_THROW_EXCEPTION(std::runtime_error("Cannot convert a non-finite number to an integer."));
       }
