@@ -377,7 +377,7 @@ class cpp_bin_float
       {
       case FP_ZERO:
          m_data     = limb_type(0);
-         m_sign     = ((signbit)(f) > 0);
+         m_sign     = ((signbit)(f));
          m_exponent = exponent_zero;
          return *this;
       case FP_NAN:
