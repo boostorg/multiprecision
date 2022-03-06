@@ -211,7 +211,7 @@ template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, c
 OutputIterator export_bits(
     const number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>& val, OutputIterator out, std::size_t chunk_size, bool msv_first = true)
 {
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4244)
 #endif
@@ -240,7 +240,7 @@ OutputIterator export_bits(
    } while ((bit_location >= 0) && (bit_location < static_cast<int>(bitcount)));
 
    return out;
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 }

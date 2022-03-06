@@ -18,7 +18,7 @@
 
 namespace boost { namespace multiprecision { namespace backends {
 
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
@@ -839,7 +839,7 @@ eval_multiply(
    result = static_cast<double_limb_type>(a) * static_cast<double_limb_type>(b);
 }
 
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 

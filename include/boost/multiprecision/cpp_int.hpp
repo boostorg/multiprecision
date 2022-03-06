@@ -2330,7 +2330,7 @@ using checked_int1024_t = number<cpp_int_backend<1024, 1024, signed_magnitude, c
 // and https://github.com/boostorg/multiprecision/issues/431
 #pragma GCC diagnostic pop
 #endif
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 
