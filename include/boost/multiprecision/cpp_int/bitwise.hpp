@@ -14,7 +14,7 @@
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4319)
 #endif
@@ -882,7 +882,7 @@ eval_bitwise_xor(
 
 }}} // namespace boost::multiprecision::backends
 
-#ifdef _MSC_VER
+#ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 
