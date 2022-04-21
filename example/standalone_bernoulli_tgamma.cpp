@@ -32,6 +32,7 @@
 // cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
 // g++ -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow -Wundef -O3 -std=c++11 -I/mnt/c/boost/modular_boost/boost/libs/multiprecision/include -I/mnt/c/boost/modular_boost/boost/libs/config/include standalone_bernoulli_tgamma.cpp -o standalone_bernoulli_tgamma.exe
 
+// D:\MinGW_nuwen\MinGW\bin\g++ -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow -Wundef -O3 -std=c++11 -IC:\boost\modular_boost\boost\libs\multiprecision\include -IC:\boost\modular_boost\boost\libs\config\include test.cpp -o test.exe
 namespace example008_bernoulli
 {
   constexpr std::int32_t wide_decimal_digits10 = INT32_C(1001);

@@ -231,11 +231,11 @@ private:
 
       constexpr data_type() noexcept : first(0) {}
       constexpr data_type(limb_type i) noexcept : first(i) {}
-      constexpr data_type(signed_limb_type i) noexcept : first(i < 0 ? static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : i) {}
+      constexpr data_type(signed_limb_type i) noexcept : first(i < 0 ? static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : static_cast<limb_type>(i)) {}
 #if BOOST_MP_ENDIAN_LITTLE_BYTE
       constexpr data_type(double_limb_type i) noexcept : double_first(i)
       {}
-      constexpr data_type(signed_double_limb_type i) noexcept : double_first(i < 0 ? static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : i) {}
+      constexpr data_type(signed_double_limb_type i) noexcept : double_first(i < 0 ? static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : static_cast<double_limb_type>(i)) {}
 #endif
 #if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) && !(defined(BOOST_MSVC) && (BOOST_MSVC < 1900))
       constexpr data_type(limb_type* limbs, std::size_t len) noexcept : ld{ len, limbs }
@@ -2236,7 +2236,7 @@ public:
       }
       typename base_type::const_limb_pointer pa = this->limbs();
       typename base_type::const_limb_pointer pb = o.limbs();
-      for (std::ptrdiff_t i = this->size() - 1; i >= 0; --i)
+      for (std::ptrdiff_t i = static_cast<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(this->size()) - 1); i >= 0; --i)
       {
          if (pa[i] != pb[i])
             return pa[i] > pb[i] ? 1 : -1;
