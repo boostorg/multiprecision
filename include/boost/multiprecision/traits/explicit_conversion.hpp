@@ -47,7 +47,7 @@ template <typename S, typename T>
 struct is_explicitly_convertible_imp
 {
    template <typename S1, typename T1>
-   static int selector(dummy_size<sizeof(new T1(std::declval<S1>()))>*);
+   static int selector(dummy_size<static_cast<unsigned int>(sizeof(new T1(std::declval<S1>())))>*);
 
    template <typename S1, typename T1>
    static char selector(...);

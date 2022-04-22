@@ -1,7 +1,9 @@
-///////////////////////////////////////////////////////////////
-//  Copyright 2013 John Maddock. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+////////////////////////////////////////////////////////////////
+//  Copyright 2013 - 2022 John Maddock.
+//  Copyright 2022 Christopher Kormanyos.
+//  Distributed under the Boost Software License,
+//  Version 1.0. (See accompanying file LICENSE_1_0.txt
+//  or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_MATH_CPP_BIN_FLOAT_HPP
 #define BOOST_MATH_CPP_BIN_FLOAT_HPP
@@ -409,10 +411,10 @@ class cpp_bin_float
       while (f)
       {
          f = ldexp(f, bits);
-         e -= bits;
+         e -= static_cast<int>(bits);
          int ipart = boost::multiprecision::detail::itrunc(f);
          f -= static_cast<Float>(ipart);
-         m_exponent += bits;
+         m_exponent += static_cast<exponent_type>(bits);
          cpp_bin_float t;
          t = static_cast<bf_int_type>(ipart);
          eval_add(*this, t);
@@ -1488,7 +1490,7 @@ inline void convert_to_signed_int(I* res, const cpp_bin_float<Digits, DigitBase,
 
    if (shift < 0)
    {
-      if (cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - shift <= digits)
+      if (static_cast<int>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) - static_cast<int>(shift) <= digits)
       {
          // We have more bits in long_long_type than the float, so it's OK to left shift:
          eval_convert_to(res, man);
@@ -1502,7 +1504,7 @@ inline void convert_to_signed_int(I* res, const cpp_bin_float<Digits, DigitBase,
    }
    else
    {
-      eval_right_shift(man, shift);
+      eval_right_shift(man, static_cast<double_limb_type>(shift));
       eval_convert_to(res, man);
    }
    if (arg.sign())
@@ -1602,7 +1604,7 @@ inline typename std::enable_if<std::is_floating_point<Float>::value>::type eval_
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
       BOOST_IF_CONSTEXPR(boost::multiprecision::detail::is_float128<Float>::value)
       {
-         *res = std::numeric_limits<double>::quiet_NaN();
+         *res = static_cast<Float>(std::numeric_limits<double>::quiet_NaN());
       }
       else
       {
@@ -1612,7 +1614,7 @@ inline typename std::enable_if<std::is_floating_point<Float>::value>::type eval_
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
       BOOST_IF_CONSTEXPR(boost::multiprecision::detail::is_float128<Float>::value)
       {
-         *res = (std::numeric_limits<double>::infinity)();
+         *res = static_cast<Float>((std::numeric_limits<double>::infinity)());
       }
       else
       {
@@ -1627,9 +1629,9 @@ inline typename std::enable_if<std::is_floating_point<Float>::value>::type eval_
    //
    if (original_arg.exponent() > (boost::multiprecision::detail::is_float128<Float>::value ? 16384 : std::numeric_limits<Float>::max_exponent))
    {
-      BOOST_IF_CONSTEXPR(boost::multiprecision::detail::is_float128<Float>::value) 
+      BOOST_IF_CONSTEXPR(boost::multiprecision::detail::is_float128<Float>::value)
       {
-         *res = std::numeric_limits<double>::infinity();
+         *res = static_cast<Float>(std::numeric_limits<double>::infinity());
       }
       else
       {
@@ -1666,7 +1668,7 @@ inline typename std::enable_if<std::is_floating_point<Float>::value>::type eval_
    arg.exponent() = original_arg.exponent();
    copy_and_round(arg, bits, (std::ptrdiff_t)digits_to_round_to);
    common_exp_type e = arg.exponent();
-   e -= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1;
+   e -= static_cast<common_exp_type>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) - 1;
    constexpr const std::size_t limbs_needed      = static_cast<std::size_t>(float_digits) / (sizeof(*arg.bits().limbs()) * CHAR_BIT) + (static_cast<std::size_t>(float_digits) % (sizeof(*arg.bits().limbs()) * CHAR_BIT) ? 1 : 0);
    std::size_t                 first_limb_needed = arg.bits().size() - limbs_needed;
    *res                                          = 0;
@@ -1675,7 +1677,7 @@ inline typename std::enable_if<std::is_floating_point<Float>::value>::type eval_
    {
       *res += ldexp(static_cast<Float>(arg.bits().limbs()[first_limb_needed]), static_cast<int>(e));
       ++first_limb_needed;
-      e += sizeof(*arg.bits().limbs()) * CHAR_BIT;
+      e += static_cast<common_exp_type>(sizeof(*arg.bits().limbs()) * CHAR_BIT);
    }
    if (original_arg.sign())
       *res = -*res;
@@ -1894,7 +1896,11 @@ inline void eval_floor(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Min
    if (fractional && res.sign())
    {
       eval_increment(res.bits());
-      if ((std::ptrdiff_t)eval_msb(res.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1 - shift)
+
+      const std::ptrdiff_t shift_check =
+         static_cast<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) - 1 - static_cast<std::ptrdiff_t>(shift));
+
+      if (static_cast<std::ptrdiff_t>(eval_msb(res.bits())) != shift_check)
       {
          // Must have extended result by one bit in the increment:
          --shift;
@@ -2112,9 +2118,9 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
       return -(max)();
    }
    static constexpr int digits   = boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count;
-   static constexpr int digits10 = boost::multiprecision::detail::calc_digits10<static_cast<std::size_t>(digits)>::value;
+   static constexpr int digits10 = boost::multiprecision::detail::calc_digits10<static_cast<unsigned>(digits)>::value;
    // Is this really correct???
-   static constexpr int  max_digits10 = boost::multiprecision::detail::calc_max_digits10<static_cast<std::size_t>(digits)>::value;
+   static constexpr int  max_digits10 = boost::multiprecision::detail::calc_max_digits10<static_cast<unsigned>(digits)>::value;
    static constexpr bool is_signed    = true;
    static constexpr bool is_integer   = false;
    static constexpr bool is_exact     = false;

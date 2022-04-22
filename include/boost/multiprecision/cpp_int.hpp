@@ -1,7 +1,9 @@
 ////////////////////////////////////////////////////////////////
-//  Copyright 2012 John Maddock. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+//  Copyright 2012 - 2022 John Maddock.
+//  Copyright 2022 Christopher Kormanyos.
+//  Distributed under the Boost Software License,
+//  Version 1.0. (See accompanying file LICENSE_1_0.txt
+//  or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_MP_CPP_INT_HPP
 #define BOOST_MP_CPP_INT_HPP
@@ -956,7 +958,7 @@ struct trivial_limb_type : public trivial_limb_type_imp<N, N <= sizeof(long long
 template <std::size_t MinBits, cpp_int_check_type Checked>
 struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 {
-   using local_limb_type = typename trivial_limb_type<MinBits>::type;
+   using local_limb_type = typename trivial_limb_type<static_cast<unsigned>(MinBits)>::type;
    using limb_pointer = local_limb_type*;
    using const_limb_pointer = const local_limb_type*;
    using checked_type = std::integral_constant<int, Checked>;
@@ -1139,7 +1141,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 template <std::size_t MinBits, cpp_int_check_type Checked>
 struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
 {
-   using local_limb_type = typename trivial_limb_type<MinBits>::type;
+   using local_limb_type = typename trivial_limb_type<static_cast<unsigned>(MinBits)>::type;
    using limb_pointer = local_limb_type*                         ;
    using const_limb_pointer = const local_limb_type*                   ;
 
@@ -1721,13 +1723,13 @@ public:
          while (*s)
          {
             if (*s >= '0' && *s <= '9')
-               val = *s - '0';
+               val = static_cast<unsigned>(*s - '0');
             else if (*s >= 'a' && *s <= 'f')
-               val = 10 + *s - 'a';
+               val = 10u + static_cast<unsigned>(*s - 'a');
             else if (*s >= 'A' && *s <= 'F')
-               val = 10 + *s - 'A';
+               val = 10u + static_cast<unsigned>(*s - 'A');
             else
-               val = radix + 1;
+               val = radix + 1u;
             if (val >= radix)
             {
                BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
@@ -1793,11 +1795,11 @@ public:
             while (*s)
             {
                if (*s >= '0' && *s <= '9')
-                  val = *s - '0';
+                  val = static_cast<unsigned>(*s - '0');
                else if (*s >= 'a' && *s <= 'f')
-                  val = 10 + *s - 'a';
+                  val = 10u + static_cast<unsigned>(*s - 'a');
                else if (*s >= 'A' && *s <= 'F')
-                  val = 10 + *s - 'A';
+                  val = 10u + static_cast<unsigned>(*s - 'A');
                else
                {
                   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
@@ -1831,7 +1833,7 @@ public:
             while (*s)
             {
                if (*s >= '0' && *s <= '7')
-                  val = *s - '0';
+                  val = static_cast<unsigned>(*s - '0');
                else
                {
                   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
@@ -1874,7 +1876,7 @@ public:
                {
                   limb_type val;
                   if (*s >= '0' && *s <= '9')
-                     val = *s - '0';
+                     val = static_cast<unsigned>(*s - '0');
                   else
                      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected character encountered in input."));
                   block *= 10;

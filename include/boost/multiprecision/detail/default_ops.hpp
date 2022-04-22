@@ -1164,6 +1164,9 @@ inline void last_chance_eval_convert_to(terminal<R>*, const B&, const std::integ
 template <class R, class B>
 inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const std::integral_constant<bool, true>&)
 {
+   static_cast<void>(result);
+   static_cast<void>(backend);
+
    static_assert(sizeof(R) == 1, "This type can not be used in standalone mode. Please de-activate and file a bug at https://github.com/boostorg/multiprecision/");
 }
 #endif
@@ -1631,7 +1634,9 @@ inline BOOST_MP_CXX14_CONSTEXPR std::ptrdiff_t eval_msb(const T& val)
       eval_right_shift(t, 1);
       ++result;
    }
-   return --result;
+   --result;
+
+   return static_cast<std::ptrdiff_t>(result);
 }
 
 template <class T>
