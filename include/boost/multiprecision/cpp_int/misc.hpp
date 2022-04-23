@@ -214,7 +214,7 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
             {
                const std::ptrdiff_t left_shift_amount = static_cast<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits) - bits_to_keep);
 
-               mask = static_cast<limb_type>(mask << left_shift_amount);
+               mask <<= left_shift_amount;
             }
             else
             {

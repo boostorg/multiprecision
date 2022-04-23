@@ -233,11 +233,11 @@ private:
 
       constexpr data_type() noexcept : first(0) {}
       constexpr data_type(limb_type i) noexcept : first(i) {}
-      constexpr data_type(signed_limb_type i) noexcept : first(i < 0 ? static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : static_cast<limb_type>(i)) {}
+      constexpr data_type(signed_limb_type i) noexcept : first(static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i))) {}
 #if BOOST_MP_ENDIAN_LITTLE_BYTE
       constexpr data_type(double_limb_type i) noexcept : double_first(i)
       {}
-      constexpr data_type(signed_double_limb_type i) noexcept : double_first(i < 0 ? static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : static_cast<double_limb_type>(i)) {}
+      constexpr data_type(signed_double_limb_type i) noexcept : double_first(static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i))) {}
 #endif
 #if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) && !(defined(BOOST_MSVC) && (BOOST_MSVC < 1900))
       constexpr data_type(limb_type* limbs, std::size_t len) noexcept : ld{ len, limbs }
@@ -803,8 +803,8 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
        : m_wrapper(i),
          m_limbs(1) {}
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(signed_limb_type i) noexcept((Checked == unchecked))
-       : m_wrapper(i < 0 ? static_cast<limb_type>(-static_cast<signed_double_limb_type>(i)) : static_cast<limb_type>(i)),
-         m_limbs  (1)
+       : m_wrapper(static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i))),
+         m_limbs(1)
    {
       if (i < 0)
          negate();
@@ -1877,7 +1877,7 @@ public:
                {
                   limb_type val;
                   if (*s >= '0' && *s <= '9')
-                     val = static_cast<unsigned>(*s - '0');
+                     val = static_cast<limb_type>(*s - '0');
                   else
                      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected character encountered in input."));
                   block *= 10;
