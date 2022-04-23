@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011-21 John Maddock.
 //  Copyright 2021 Iskandarov Lev. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
@@ -1779,7 +1779,7 @@ void BOOST_MP_CXX14_CONSTEXPR eval_integer_sqrt_bitwise(B& s, B& r, const B& x)
       r = ui_type(0u);
       return;
    }
-   std::ptrdiff_t g = eval_msb(x);
+   std::ptrdiff_t g = static_cast<std::ptrdiff_t>(eval_msb(x));
    if (g <= 1)
    {
       s = ui_type(1);
@@ -1791,28 +1791,28 @@ void BOOST_MP_CXX14_CONSTEXPR eval_integer_sqrt_bitwise(B& s, B& r, const B& x)
    r = x;
    g /= 2;
    std::ptrdiff_t org_g = g;
-   eval_bit_set(s, g);
-   eval_bit_set(t, 2 * g);
+   eval_bit_set(s, static_cast<std::size_t>(g));
+   eval_bit_set(t, static_cast<std::size_t>(2 * g));
    eval_subtract(r, x, t);
    --g;
    if (eval_get_sign(r) == 0)
       return;
-   std::ptrdiff_t msbr = eval_msb(r);
+   std::ptrdiff_t msbr = static_cast<std::ptrdiff_t>(eval_msb(r));
    do
    {
       if (msbr >= org_g + g + 1)
       {
          t = s;
-         eval_left_shift(t, g + 1);
-         eval_bit_set(t, 2 * g);
+         eval_left_shift(t, static_cast<std::size_t>(g + 1));
+         eval_bit_set(t, static_cast<std::size_t>(2 * g));
          if (t.compare(r) <= 0)
          {
             BOOST_MP_ASSERT(g >= 0);
-            eval_bit_set(s, g);
+            eval_bit_set(s, static_cast<std::size_t>(g));
             eval_subtract(r, t);
             if (eval_get_sign(r) == 0)
                return;
-            msbr = eval_msb(r);
+            msbr = static_cast<std::ptrdiff_t>(eval_msb(r));
          }
       }
       --g;

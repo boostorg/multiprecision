@@ -569,7 +569,7 @@ eval_modulus(
    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
    signed_limb_type                                                            b)
 {
-   const limb_type t = b < 0 ? -b : b;
+   const limb_type t = b < 0 ? static_cast<limb_type>(-b) : static_cast<limb_type>(b);
    eval_modulus(result, a, t);
    result.sign(a.sign());
 }

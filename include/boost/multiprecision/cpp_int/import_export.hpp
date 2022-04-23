@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////
 //  Copyright 2015 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
@@ -227,8 +227,8 @@ OutputIterator export_bits(
    if (bitcount % chunk_size)
       ++chunks;
 
-   std::ptrdiff_t bit_location = msv_first ? bitcount - chunk_size : 0;
-   std::ptrdiff_t bit_step     = msv_first ? -static_cast<int>(chunk_size) : chunk_size;
+         std::ptrdiff_t bit_location = msv_first ? static_cast<std::ptrdiff_t>(bitcount - chunk_size) : 0;
+   const std::ptrdiff_t bit_step     = msv_first ? static_cast<std::ptrdiff_t>(-static_cast<std::ptrdiff_t>(chunk_size)) : static_cast<std::ptrdiff_t>(chunk_size);
    while (bit_location % bit_step)
       ++bit_location;
 

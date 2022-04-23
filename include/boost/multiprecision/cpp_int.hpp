@@ -1945,14 +1945,15 @@ public:
          limb_type                           mask  = static_cast<limb_type>((1u << shift) - 1);
          typename base_type::local_limb_type v     = *this->limbs();
          result.assign(Bits / shift + (Bits % shift ? 1 : 0), '0');
-         std::string::difference_type pos      = result.size() - 1;
+         std::string::difference_type pos      = static_cast<std::string::difference_type>(result.size() - 1u);
          char                         letter_a = f & std::ios_base::uppercase ? 'A' : 'a';
          for (std::size_t i = 0; i < Bits / shift; ++i)
          {
             char c = '0' + static_cast<char>(v & mask);
             if (c > '9')
                c += letter_a - '9' - 1;
-            result[pos--] = c;
+            result[static_cast<std::size_t>(pos)] = c;
+            --pos;
             v >>= shift;
          }
          if (Bits % shift)
@@ -1961,7 +1962,7 @@ public:
             char c = '0' + static_cast<char>(v & mask);
             if (c > '9')
                c += letter_a - '9';
-            result[pos] = c;
+            result[static_cast<std::size_t>(pos)] = c;
          }
          //
          // Get rid of leading zeros:
@@ -1979,7 +1980,7 @@ public:
       else
       {
          result.assign(Bits / 3 + 1, '0');
-         std::string::difference_type        pos = result.size() - 1;
+         std::string::difference_type        pos = static_cast<std::string::difference_type>(result.size() - 1u);
          typename base_type::local_limb_type v(*this->limbs());
          bool                                neg = false;
          if (this->sign())
@@ -2031,14 +2032,15 @@ public:
          limb_type       mask  = static_cast<limb_type>((1u << shift) - 1);
          cpp_int_backend t(*this);
          result.assign(Bits / shift + ((Bits % shift) ? 1 : 0), '0');
-         std::string::difference_type pos      = result.size() - 1;
+         std::string::difference_type pos      = static_cast<std::string::difference_type>(result.size() - 1u);
          char                         letter_a = f & std::ios_base::uppercase ? 'A' : 'a';
          for (std::size_t i = 0; i < Bits / shift; ++i)
          {
             char c = '0' + static_cast<char>(t.limbs()[0] & mask);
             if (c > '9')
                c += letter_a - '9' - 1;
-            result[pos--] = c;
+            result[static_cast<std::size_t>(pos)] = c;
+            --pos;
             eval_right_shift(t, shift);
          }
          if (Bits % shift)
@@ -2047,7 +2049,7 @@ public:
             char c = '0' + static_cast<char>(t.limbs()[0] & mask);
             if (c > '9')
                c += letter_a - '9';
-            result[pos] = c;
+            result[static_cast<std::size_t>(pos)] = c;
          }
          //
          // Get rid of leading zeros:
@@ -2065,7 +2067,7 @@ public:
       else
       {
          result.assign(Bits / 3 + 1, '0');
-         std::string::difference_type pos = result.size() - 1;
+         std::string::difference_type pos = static_cast<std::string::difference_type>(result.size() - 1u);
          cpp_int_backend              t(*this);
          cpp_int_backend              r;
          bool                         neg = false;
@@ -2092,8 +2094,8 @@ public:
                {
                   char c = '0' + v % 10;
                   v /= 10;
-                  result[pos] = c;
-                  if (pos-- == 0)
+                  result[static_cast<std::size_t>(pos)] = c;
+                  if (pos-- == 0u)
                      break;
                }
             }

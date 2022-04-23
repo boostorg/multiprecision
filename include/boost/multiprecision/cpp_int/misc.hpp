@@ -951,7 +951,7 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
    //
    while (true)
    {
-      double_limb_type q = 1;
+      double_limb_type q = 1u;
       double_limb_type tt = u;
       divide_subtract(q, u, v);
       std::swap(u, v);
@@ -965,8 +965,8 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
          ++i;
          break;
       }
-      x[2] = x[0] + q * x[1];
-      y[2] = tt;
+      x[2] = static_cast<limb_type>(x[0] + static_cast<double_limb_type>(q * x[1]));
+      y[2] = static_cast<limb_type>(tt);
       ++i;
       if ((i & 1u) == 0)
       {

@@ -726,9 +726,9 @@ eval_multiply(
       s = !s;
    }
    double_limb_type w = a & mask;
-   double_limb_type x = a >> limb_bits;
+   double_limb_type x = static_cast<double_limb_type>(a >> limb_bits);
    double_limb_type y = b & mask;
-   double_limb_type z = b >> limb_bits;
+   double_limb_type z = static_cast<double_limb_type>(b >> limb_bits);
 
    result.resize(4, 4);
    limb_type* pr = result.limbs();
