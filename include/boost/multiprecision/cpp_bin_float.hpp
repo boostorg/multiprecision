@@ -408,7 +408,7 @@ class cpp_bin_float
       constexpr const std::ptrdiff_t bits = sizeof(int) * CHAR_BIT - 1;
       int e;
       f = frexp(f, &e);
-      while (f)
+      while (f != static_cast<Float>(0.0F))
       {
          f = ldexp(f, bits);
          e -= static_cast<int>(bits);

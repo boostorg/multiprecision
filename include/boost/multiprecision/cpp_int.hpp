@@ -803,7 +803,8 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
        : m_wrapper(i),
          m_limbs(1) {}
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(signed_limb_type i) noexcept((Checked == unchecked))
-       : m_wrapper(limb_type(i < 0 ? static_cast<limb_type>(-static_cast<signed_double_limb_type>(i)) : i)), m_limbs(1)
+       : m_wrapper(i < 0 ? static_cast<limb_type>(-static_cast<signed_double_limb_type>(i)) : static_cast<limb_type>(i)),
+         m_limbs  (1)
    {
       if (i < 0)
          negate();
@@ -1654,12 +1655,12 @@ private:
             ? std::numeric_limits<double>::digits : std::numeric_limits<limb_type>::digits;
 #endif
 
-      while (f)
+      while (f != static_cast<F>(0.0f))
       {
          // extract int sized bits from f:
          f    = ldexp(f, shift);
          term = floor(f);
-         e -= shift;
+         e = e - static_cast<int>(shift);
          eval_left_shift(*this, shift);
 #if !(defined(__clang__) && (__clang_major__ <= 7))
          if (term > 0)
@@ -1676,9 +1677,9 @@ private:
          f -= term;
       }
       if (e > 0)
-         eval_left_shift(*this, e);
+         eval_left_shift(*this, static_cast<unsigned int>(e));
       else if (e < 0)
-         eval_right_shift(*this, -e);
+         eval_right_shift(*this, static_cast<unsigned int>(-e));
    }
 public:
    template <class A>
@@ -1949,9 +1950,9 @@ public:
          char                         letter_a = f & std::ios_base::uppercase ? 'A' : 'a';
          for (std::size_t i = 0; i < Bits / shift; ++i)
          {
-            char c = '0' + static_cast<char>(v & mask);
+            char c = static_cast<char>('0' + static_cast<char>(v & mask));
             if (c > '9')
-               c += letter_a - '9' - 1;
+               c = static_cast<char>(c + letter_a - '9' - 1);
             result[static_cast<std::size_t>(pos)] = c;
             --pos;
             v >>= shift;
@@ -1959,9 +1960,9 @@ public:
          if (Bits % shift)
          {
             mask   = static_cast<limb_type>((1u << (Bits % shift)) - 1);
-            char c = '0' + static_cast<char>(v & mask);
+            char c = static_cast<char>('0' + static_cast<char>(v & mask));
             if (c > '9')
-               c += letter_a - '9';
+               c = static_cast<char>(c + letter_a - '9');
             result[static_cast<std::size_t>(pos)] = c;
          }
          //
@@ -1989,7 +1990,7 @@ public:
          }
          while (v)
          {
-            result[pos] = (v % 10) + '0';
+            result[static_cast<std::string::size_type>(pos)] = static_cast<char>(static_cast<char>(v % 10) + '0');
             --pos;
             v /= 10;
          }
@@ -2036,9 +2037,9 @@ public:
          char                         letter_a = f & std::ios_base::uppercase ? 'A' : 'a';
          for (std::size_t i = 0; i < Bits / shift; ++i)
          {
-            char c = '0' + static_cast<char>(t.limbs()[0] & mask);
+            char c = static_cast<char>('0' + static_cast<char>(t.limbs()[0] & mask));
             if (c > '9')
-               c += letter_a - '9' - 1;
+               c = static_cast<char>(c + letter_a - '9' - 1);
             result[static_cast<std::size_t>(pos)] = c;
             --pos;
             eval_right_shift(t, shift);
@@ -2046,9 +2047,9 @@ public:
          if (Bits % shift)
          {
             mask   = static_cast<limb_type>((1u << (Bits % shift)) - 1);
-            char c = '0' + static_cast<char>(t.limbs()[0] & mask);
+            char c = static_cast<char>('0' + static_cast<char>(t.limbs()[0] & mask));
             if (c > '9')
-               c += letter_a - '9';
+               c = static_cast<char>(c + letter_a - '9');
             result[static_cast<std::size_t>(pos)] = c;
          }
          //
@@ -2092,7 +2093,7 @@ public:
                limb_type v = r.limbs()[0];
                for (std::size_t i = 0; i < digits_per_block_10; ++i)
                {
-                  char c = '0' + v % 10;
+                  char c = static_cast<char>('0' + static_cast<char>(v % 10));
                   v /= 10;
                   result[static_cast<std::size_t>(pos)] = c;
                   if (pos-- == 0u)

@@ -547,12 +547,12 @@ eval_modulus(
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
     const limb_type                                                             mod)
 {
-   const std::ptrdiff_t n = a.size();
+   const std::ptrdiff_t n = static_cast<std::ptrdiff_t>(a.size());
    const double_limb_type two_n_mod = static_cast<limb_type>(1u) + (~static_cast<limb_type>(0u) - mod) % mod;
    limb_type              res       = a.limbs()[n - 1] % mod;
 
    for (std::ptrdiff_t i = n - 2; i >= 0; --i)
-      res = (res * two_n_mod + a.limbs()[i]) % mod;
+      res = static_cast<limb_type>(static_cast<double_limb_type>(static_cast<double_limb_type>(res * two_n_mod) + a.limbs()[i]) % mod);
    //
    // We must not modify result until here in case
    // result and a are the same object:

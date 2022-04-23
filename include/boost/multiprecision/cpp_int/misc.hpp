@@ -142,9 +142,12 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
       //
       if (i < backend.size())
       {
-         const limb_type mask = numeric_limits_workaround<R>::digits - shift == cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits ? ~static_cast<limb_type>(0) : (static_cast<limb_type>(1u) << (numeric_limits_workaround<R>::digits - shift)) - 1;
-         *result += (static_cast<R>(backend.limbs()[i]) & mask) << shift;
-         if ((static_cast<R>(backend.limbs()[i]) & static_cast<limb_type>(~mask)) || (i + 1 < backend.size()))
+         const limb_type mask                 = ((numeric_limits_workaround<R>::digits - shift) == cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits) ? ~static_cast<limb_type>(0) : static_cast<limb_type>(static_cast<limb_type>(1u) << (numeric_limits_workaround<R>::digits - shift)) - 1u;
+         const limb_type limb_at_index_masked = static_cast<limb_type>(backend.limbs()[i] & mask);
+
+         *result = static_cast<R>(*result + static_cast<R>(static_cast<R>(limb_at_index_masked) << shift));
+
+         if ((backend.limbs()[i] & static_cast<limb_type>(~mask)) || (i + 1 < backend.size()))
          {
             // Overflow:
             if (backend.sign())
@@ -189,11 +192,11 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
    }
 
 #ifdef BOOST_HAS_FLOAT128
-   std::ptrdiff_t bits_to_keep = std::is_same<R, float128_type>::value ? 113 : std::numeric_limits<R>::digits;
+   std::ptrdiff_t bits_to_keep = static_cast<std::ptrdiff_t>(std::is_same<R, float128_type>::value ? 113 : std::numeric_limits<R>::digits);
 #else
-   std::ptrdiff_t bits_to_keep = std::numeric_limits<R>::digits;
+   std::ptrdiff_t bits_to_keep = static_cast<std::ptrdiff_t>(std::numeric_limits<R>::digits);
 #endif
-   std::ptrdiff_t bits = eval_msb_imp(backend) + 1;
+   std::ptrdiff_t bits = static_cast<std::ptrdiff_t>(eval_msb_imp(backend) + 1);
 
    if (bits > bits_to_keep)
    {
@@ -208,10 +211,14 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
          if (bits_to_keep < (std::ptrdiff_t)cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
          {
             if(index != backend.size() - 1)
-               mask <<= cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - bits_to_keep;
+            {
+               const std::ptrdiff_t left_shift_amount = static_cast<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits) - bits_to_keep);
+
+               mask = static_cast<limb_type>(mask << left_shift_amount);
+            }
             else
             {
-               std::ptrdiff_t bits_in_first_limb = bits % cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
+               std::ptrdiff_t bits_in_first_limb = static_cast<std::ptrdiff_t>(bits % static_cast<std::ptrdiff_t>(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits));
                if (bits_in_first_limb == 0)
                   bits_in_first_limb = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
                if (bits_in_first_limb > bits_to_keep)
@@ -220,9 +227,12 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
          }
          *result += ldexp(static_cast<R>(p[index] & mask), static_cast<int>(shift));
          shift -= cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
-         bits_to_keep -= (index == backend.size() - 1) && (bits % cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
-            ? bits % cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits 
-            : cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
+
+         const bool bits_has_non_zero_remainder = (bits % static_cast<std::ptrdiff_t>(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits) != 0);
+
+         bits_to_keep -= ((index == backend.size() - 1) && bits_has_non_zero_remainder)
+            ? bits % static_cast<std::ptrdiff_t>(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
+            :        static_cast<std::ptrdiff_t>(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits);
          --index;
       }
       // Perform rounding:
