@@ -31,16 +31,16 @@ inline void round_string_up_at(std::string& s, std::ptrdiff_t pos, I& expon)
       s.erase(s.size() - 1);
       ++expon;
    }
-   else if (s[pos] == '9')
+   else if (s[static_cast<std::size_t>(pos)] == '9')
    {
-      s[pos] = '0';
+      s[static_cast<std::size_t>(pos)] = '0';
       round_string_up_at(s, pos - 1, expon);
    }
    else
    {
-      if ((pos == 0) && (s[pos] == '0') && (s.size() == 1))
+      if ((pos == 0) && (s[static_cast<std::size_t>(pos)] == '0') && (s.size() == 1))
          ++expon;
-      ++s[pos];
+      ++s[static_cast<std::size_t>(pos)];
    }
 }
 

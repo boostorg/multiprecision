@@ -48,7 +48,7 @@ inline BOOST_CXX14_CONSTEXPR OutputIterator copy(InputIterator first, InputItera
       if constexpr (std::is_pointer<InputIterator>::value && std::is_pointer<OutputIterator>::value && std::is_trivially_copyable<typename std::remove_reference<decltype(*first)>::type>::value)
       {
          // The normal runtime branch:
-         std::memcpy(result, first, (last - first) * sizeof(*first));
+         std::memcpy(result, first, static_cast<std::size_t>(static_cast<std::size_t>(last - first) * sizeof(*first)));
          return result + (last - first);
       }
       else

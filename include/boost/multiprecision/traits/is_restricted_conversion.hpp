@@ -15,13 +15,21 @@ namespace boost { namespace multiprecision { namespace detail {
 template <class From, class To>
 struct is_lossy_conversion
 {
-   using type = typename std::conditional<
-       ((number_category<From>::value == number_kind_floating_point) && (number_category<To>::value == number_kind_integer))
-           /* || ((number_category<From>::value == number_kind_floating_point) && (number_category<To>::value == number_kind_rational))*/
-           || ((number_category<From>::value == number_kind_rational) && (number_category<To>::value == number_kind_integer)) || ((number_category<From>::value == number_kind_fixed_point) && (number_category<To>::value == number_kind_integer)) || (number_category<From>::value == number_kind_unknown) || (number_category<To>::value == number_kind_unknown),
-       std::integral_constant<bool, true>,
-       std::integral_constant<bool, false>>::type;
-   static constexpr const bool                     value = type::value;
+   static constexpr bool category_conditional_is_true =
+         (   (static_cast<boost::multiprecision::number_category_type>(number_category<From>::value) == number_kind_floating_point)
+          && (static_cast<boost::multiprecision::number_category_type>(number_category<To  >::value) == number_kind_integer))
+      || (   (static_cast<boost::multiprecision::number_category_type>(number_category<From>::value) == number_kind_rational)
+          && (static_cast<boost::multiprecision::number_category_type>(number_category<To  >::value) == number_kind_integer))
+      || (   (static_cast<boost::multiprecision::number_category_type>(number_category<From>::value) == number_kind_fixed_point)
+          && (static_cast<boost::multiprecision::number_category_type>(number_category<To  >::value) == number_kind_integer))
+      ||     (static_cast<boost::multiprecision::number_category_type>(number_category<From>::value) == number_kind_unknown)
+      ||     (static_cast<boost::multiprecision::number_category_type>(number_category<To  >::value) == number_kind_unknown);
+
+   using type = typename std::conditional<category_conditional_is_true,
+                                          std::integral_constant<bool, true>,
+                                          std::integral_constant<bool, false>>::type;
+
+   static constexpr bool value = type::value;
 };
 
 template <typename From, typename To>

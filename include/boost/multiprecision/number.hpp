@@ -2227,9 +2227,9 @@ inline std::ostream& operator<<(std::ostream& os, const number<Backend, Expressi
    {
       char fill = os.fill();
       if ((os.flags() & std::ios_base::left) == std::ios_base::left)
-         s.append(static_cast<std::string::size_type>(ss - s.size()), fill);
+         s.append(static_cast<std::string::size_type>(ss - static_cast<std::streamsize>(s.size())), fill);
       else
-         s.insert(static_cast<std::string::size_type>(0), static_cast<std::string::size_type>(ss - s.size()), fill);
+         s.insert(static_cast<std::string::size_type>(0), static_cast<std::string::size_type>(ss - static_cast<std::streamsize>(s.size())), fill);
    }
    return os << s;
 }
