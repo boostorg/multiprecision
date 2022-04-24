@@ -1422,7 +1422,7 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
 
    if (digits == 0 && !fixed)
    {
-      digits = (std::max)(str.size(), size_type(16));
+      digits = static_cast<std::intmax_t>((std::max)(str.size(), size_type(16)));
    }
 
    if (iszero || str.empty() || (str.find_first_not_of('0') == S::npos))
@@ -1476,7 +1476,7 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
       //
       // Pad out the end with zero's if we need to:
       //
-      std::intmax_t chars = str.size();
+      std::intmax_t chars = static_cast<std::intmax_t>(str.size());
       chars                 = digits - chars;
       if (scientific)
          ++chars;
@@ -1491,7 +1491,7 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
       if (1 + my_exp > static_cast<std::intmax_t>(str.size()))
       {
          // Just pad out the end with zeros:
-         str.append(static_cast<std::string::size_type>(1 + my_exp - str.size()), '0');
+         str.append(static_cast<std::string::size_type>(1 + my_exp - static_cast<std::intmax_t>(str.size())), '0');
          if (showpoint || (fixed && digits > 0))
             str.append(".");
       }
@@ -1516,8 +1516,8 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
          // We may need to add trailing zeros:
          auto pos = str.find('.');
          if (pos != str.npos) { // this test is probably redundant, but just to be safe and for clarity
-            std::intmax_t l = pos + 1;
-            l               = digits - (str.size() - l);
+            std::intmax_t l = static_cast<std::intmax_t>(pos + 1);
+            l               = static_cast<std::intmax_t>(digits - (static_cast<std::intmax_t>(str.size()) - l));
             if (l > 0)
                str.append(size_type(l), '0');
          }
