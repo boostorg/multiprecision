@@ -1304,9 +1304,9 @@ template <unsigned Digits10>
 inline void eval_ldexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long e)
 {
    if (e > 0)
-      mpf_mul_2exp(result.data(), val.data(), e);
+      mpf_mul_2exp(result.data(), val.data(), static_cast<mp_bitcnt_t>(e));
    else if (e < 0)
-      mpf_div_2exp(result.data(), val.data(), -e);
+      mpf_div_2exp(result.data(), val.data(), static_cast<mp_bitcnt_t>(-e));
    else
       result = val;
 }
@@ -1543,7 +1543,7 @@ struct gmp_int
 
       constexpr const int shift = std::numeric_limits<int>::digits - 1;
 
-      while (f)
+      while (f != static_cast<F>(0.0f))
       {
          // extract int sized bits from f:
          f    = ldexp(f, shift);
@@ -1557,9 +1557,9 @@ struct gmp_int
          f -= term;
       }
       if (e > 0)
-         mpz_mul_2exp(m_data, m_data, e);
+         mpz_mul_2exp(m_data, m_data, static_cast<mp_bitcnt_t>(e));
       else if (e < 0)
-         mpz_div_2exp(m_data, m_data, -e);
+         mpz_div_2exp(m_data, m_data, static_cast<mp_bitcnt_t>(-e));
       return *this;
    }
    gmp_int& operator=(long double a)
@@ -1939,7 +1939,7 @@ inline void eval_add(gmp_int& t, const gmp_int& p, long i)
 
    if (i > 0)
       mpz_add_ui(t.data(), p.data(), static_cast<local_uint_type>(i));
-   else if (i < 0)
+   else
       mpz_sub_ui(t.data(), p.data(), static_cast<local_uint_type>(-i));
 }
 inline void eval_subtract(gmp_int& t, const gmp_int& p, long i)
@@ -1948,7 +1948,7 @@ inline void eval_subtract(gmp_int& t, const gmp_int& p, long i)
 
    if (i > 0)
       mpz_sub_ui(t.data(), p.data(), static_cast<local_uint_type>(i));
-   else if (i < 0)
+   else
       mpz_add_ui(t.data(), p.data(), static_cast<local_uint_type>(-i));
 }
 inline void eval_multiply(gmp_int& t, const gmp_int& p, long i)
@@ -2557,9 +2557,9 @@ struct gmp_rational
          f -= term;
       }
       if (e > 0)
-         mpq_mul_2exp(m_data, m_data, e);
+         mpq_mul_2exp(m_data, m_data, static_cast<mp_bitcnt_t>(e));
       else if (e < 0)
-         mpq_div_2exp(m_data, m_data, -e);
+         mpq_div_2exp(m_data, m_data, static_cast<mp_bitcnt_t>(-e));
       return *this;
    }
    gmp_rational& operator=(long double a)
@@ -3307,7 +3307,7 @@ inline T min_value();
 
 inline void set_output_precision(const boost::multiprecision::mpf_float& val, std::ostream& os)
 {
-   const std::streamsize sz_prec = static_cast<std::streamsize>(val.precision());
+   const int sz_prec = static_cast<int>(val.precision());
 
    os << std::setprecision(sz_prec);
 }
