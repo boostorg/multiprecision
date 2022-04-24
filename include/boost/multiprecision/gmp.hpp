@@ -182,7 +182,7 @@ struct gmp_float_imp
 #else
    gmp_float_imp& operator=(unsigned long long i)
    {
-      if (m_data[0]._mp_d == 0)
+      if (m_data[0]._mp_d == nullptr)
       {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
       }
@@ -206,7 +206,7 @@ struct gmp_float_imp
 #endif
    gmp_float_imp& operator=(long long i)
    {
-      if (m_data[0]._mp_d == 0)
+      if (m_data[0]._mp_d == nullptr)
       {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
       }
@@ -238,7 +238,7 @@ struct gmp_float_imp
 #ifdef BOOST_HAS_INT128
    gmp_float_imp& operator=(uint128_type i)
    {
-      if (m_data[0]._mp_d == 0)
+      if (m_data[0]._mp_d == nullptr)
       {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
       }
@@ -261,7 +261,7 @@ struct gmp_float_imp
    }
    gmp_float_imp& operator=(int128_type i)
    {
-      if (m_data[0]._mp_d == 0)
+      if (m_data[0]._mp_d == nullptr)
       {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
       }
@@ -286,7 +286,7 @@ struct gmp_float_imp
    {
       BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
 
-      if (m_data[0]._mp_d == 0)
+      if (m_data[0]._mp_d == nullptr)
       {
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : (unsigned)get_default_precision()));
       }
@@ -625,21 +625,21 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
    gmp_float& operator=(const gmp_rational& o);
    gmp_float& operator=(const mpf_t val)
    {
-      if (this->m_data[0]._mp_d == 0)
+      if (this->m_data[0]._mp_d == nullptr)
          mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpf_set(this->m_data, val);
       return *this;
    }
    gmp_float& operator=(const mpz_t val)
    {
-      if (this->m_data[0]._mp_d == 0)
+      if (this->m_data[0]._mp_d == nullptr)
          mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpf_set_z(this->m_data, val);
       return *this;
    }
    gmp_float& operator=(const mpq_t val)
    {
-      if (this->m_data[0]._mp_d == 0)
+      if (this->m_data[0]._mp_d == nullptr)
          mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpf_set_q(this->m_data, val);
       return *this;
@@ -743,7 +743,7 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    template <unsigned D>
    gmp_float& operator=(const gmp_float<D>& o)
    {
-      if (this->m_data[0]._mp_d == 0)
+      if (this->m_data[0]._mp_d == nullptr)
       {
          mpf_init2(this->m_data, preserve_related_precision() ? mpf_get_prec(o.data()) : multiprecision::detail::digits10_2_2(get_default_precision()));
       }
@@ -934,10 +934,12 @@ inline void eval_divide(gmp_float<digits10>& result, unsigned long i)
 template <unsigned digits10>
 inline void eval_add(gmp_float<digits10>& result, long i)
 {
+   using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
+
    if (i > 0)
-      mpf_add_ui(result.data(), result.data(), i);
-   else
-      mpf_sub_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
+      mpf_add_ui(result.data(), result.data(), static_cast<local_uint_type>(i));
+   else if (i < 0)
+      mpf_sub_ui(result.data(), result.data(), static_cast<local_uint_type>(-i));
 }
 template <unsigned digits10>
 inline void eval_subtract(gmp_float<digits10>& result, long i)
@@ -952,7 +954,10 @@ inline void eval_subtract(gmp_float<digits10>& result, long i)
 template <unsigned digits10>
 inline void eval_multiply(gmp_float<digits10>& result, long i)
 {
-   mpf_mul_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
+   using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
+
+   mpf_mul_ui(result.data(), result.data(), static_cast<local_uint_type>(boost::multiprecision::detail::unsigned_abs(i)));
+
    if (i < 0)
       mpf_neg(result.data(), result.data());
 }
@@ -961,7 +966,11 @@ inline void eval_divide(gmp_float<digits10>& result, long i)
 {
    if (i == 0)
       BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
-   mpf_div_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
+
+   using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
+
+   mpf_div_ui(result.data(), result.data(), static_cast<local_uint_type>(boost::multiprecision::detail::unsigned_abs(i)));
+
    if (i < 0)
       mpf_neg(result.data(), result.data());
 }
@@ -994,13 +1003,15 @@ inline void eval_add(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y)
 template <unsigned D1, unsigned D2>
 inline void eval_add(gmp_float<D1>& a, long x, const gmp_float<D2>& y)
 {
+   using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
+
    if (x < 0)
    {
-      mpf_ui_sub(a.data(), boost::multiprecision::detail::unsigned_abs(x), y.data());
+      mpf_ui_sub(a.data(), static_cast<local_uint_type>(-x), y.data());
       mpf_neg(a.data(), a.data());
    }
    else
-      mpf_add_ui(a.data(), y.data(), x);
+      mpf_add_ui(a.data(), y.data(), static_cast<local_uint_type>(x));
 }
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_subtract(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y)
@@ -1030,13 +1041,15 @@ inline void eval_subtract(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>
 template <unsigned D1, unsigned D2>
 inline void eval_subtract(gmp_float<D1>& a, long x, const gmp_float<D2>& y)
 {
+   using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
+
    if (x < 0)
    {
-      mpf_add_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x));
+      mpf_add_ui(a.data(), y.data(), static_cast<local_uint_type>(-x));
       mpf_neg(a.data(), a.data());
    }
    else
-      mpf_ui_sub(a.data(), x, y.data());
+      mpf_ui_sub(a.data(), static_cast<local_uint_type>(x), y.data());
 }
 
 template <unsigned D1, unsigned D2, unsigned D3>
@@ -1070,13 +1083,15 @@ inline void eval_multiply(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>
 template <unsigned D1, unsigned D2>
 inline void eval_multiply(gmp_float<D1>& a, long x, const gmp_float<D2>& y)
 {
+   using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
+
    if (x < 0)
    {
-      mpf_mul_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x));
+      mpf_mul_ui(a.data(), y.data(), static_cast<local_uint_type>(-x));
       mpf_neg(a.data(), a.data());
    }
    else
-      mpf_mul_ui(a.data(), y.data(), x);
+      mpf_mul_ui(a.data(), y.data(), static_cast<local_uint_type>(x));
 }
 
 template <unsigned D1, unsigned D2, unsigned D3>
@@ -1098,13 +1113,16 @@ inline void eval_divide(gmp_float<D1>& a, const gmp_float<D2>& x, long y)
 {
    if (y == 0)
       BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
+   using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
+
    if (y < 0)
    {
-      mpf_div_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y));
+      mpf_div_ui(a.data(), x.data(), static_cast<local_uint_type>(-y));
       a.negate();
    }
    else
-      mpf_div_ui(a.data(), x.data(), y);
+      mpf_div_ui(a.data(), x.data(), static_cast<local_uint_type>(y));
 }
 template <unsigned D1, unsigned D2>
 inline void eval_divide(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y)
@@ -1427,7 +1445,7 @@ struct gmp_int
 #else
    gmp_int& operator=(unsigned long long i)
    {
-      if (m_data[0]._mp_d == 0)
+      if (m_data[0]._mp_d == nullptr)
          mpz_init(this->m_data);
       unsigned long long mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
       unsigned               shift = 0;
@@ -1625,7 +1643,7 @@ struct gmp_int
    template <unsigned Digits10>
    gmp_int& operator=(const gmp_float<Digits10>& o)
    {
-      if (m_data[0]._mp_d == 0)
+      if (m_data[0]._mp_d == nullptr)
          mpz_init(this->m_data);
       mpz_set_f(this->m_data, o.data());
       return *this;
@@ -1838,18 +1856,25 @@ inline void eval_multiply(gmp_int& t, long i)
    using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
 
    mpz_mul_ui(t.data(), t.data(), static_cast<local_uint_type>(boost::multiprecision::detail::unsigned_abs(i)));
+
    if (i < 0)
       mpz_neg(t.data(), t.data());
 }
 inline void eval_modulus(gmp_int& t, long i)
 {
-   mpz_tdiv_r_ui(t.data(), t.data(), boost::multiprecision::detail::unsigned_abs(i));
+   using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
+
+   mpz_tdiv_r_ui(t.data(), t.data(), static_cast<local_uint_type>(boost::multiprecision::detail::unsigned_abs(i)));
 }
 inline void eval_divide(gmp_int& t, long i)
 {
    if (i == 0)
       BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
-   mpz_tdiv_q_ui(t.data(), t.data(), boost::multiprecision::detail::unsigned_abs(i));
+
+   using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
+
+   mpz_tdiv_q_ui(t.data(), t.data(), static_cast<local_uint_type>(boost::multiprecision::detail::unsigned_abs(i)));
+
    if (i < 0)
       mpz_neg(t.data(), t.data());
 }
@@ -2470,7 +2495,7 @@ struct gmp_rational
 #else
    gmp_rational& operator=(unsigned long long i)
    {
-      if (m_data[0]._mp_den._mp_d == 0)
+      if (m_data[0]._mp_den._mp_d == nullptr)
          mpq_init(m_data);
       gmp_int zi;
       zi = i;
@@ -2479,7 +2504,7 @@ struct gmp_rational
    }
    gmp_rational& operator=(long long i)
    {
-      if (m_data[0]._mp_den._mp_d == 0)
+      if (m_data[0]._mp_den._mp_d == nullptr)
          mpq_init(m_data);
       bool neg = i < 0;
       *this    = boost::multiprecision::detail::unsigned_abs(i);
@@ -3078,7 +3103,7 @@ template <unsigned Digits10>
 template <unsigned D>
 inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_float<D>& o)
 {
-   if (this->m_data[0]._mp_d == 0)
+   if (this->m_data[0]._mp_d == nullptr)
       mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(Digits10 ? Digits10 : (unsigned)this->get_default_precision()));
    mpf_set(this->m_data, o.data());
    return *this;
@@ -3086,7 +3111,7 @@ inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_float<D>& o
 template <unsigned Digits10>
 inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_int& o)
 {
-   if (this->m_data[0]._mp_d == 0)
+   if (this->m_data[0]._mp_d == nullptr)
       mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(Digits10 ? Digits10 : (unsigned)this->get_default_precision()));
    mpf_set_z(this->data(), o.data());
    return *this;
@@ -3094,7 +3119,7 @@ inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_int& o)
 template <unsigned Digits10>
 inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_rational& o)
 {
-   if (this->m_data[0]._mp_d == 0)
+   if (this->m_data[0]._mp_d == nullptr)
       mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(Digits10 ? Digits10 : (unsigned)this->get_default_precision()));
    mpf_set_q(this->data(), o.data());
    return *this;
