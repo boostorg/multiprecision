@@ -28,7 +28,7 @@
 #include <climits>
 #include <cstdlib>
 #include <cfloat>
-
+#include <iomanip>
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
