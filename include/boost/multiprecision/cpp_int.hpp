@@ -67,7 +67,7 @@ namespace detail {
    template <std::size_t Value1, std::size_t Value2>
    struct static_unsigned_max
    {
-      static constexpr const std::size_t value = (Value1 > Value2) ? Value1 : Value2;
+      static constexpr std::size_t value = (Value1 > Value2) ? Value1 : Value2;
    };
 } // Namespace detail
 
@@ -82,8 +82,8 @@ struct max_precision;
 template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct max_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
-   static constexpr const std::size_t value = std::is_void<Allocator>::value ? detail::static_unsigned_max<MinBits, MaxBits>::value
-                                                           : (((MaxBits >= MinBits) && MaxBits) ? MaxBits : SIZE_MAX);
+   static constexpr std::size_t value = std::is_void<Allocator>::value ? detail::static_unsigned_max<MinBits, MaxBits>::value
+                                                                       : (((MaxBits >= MinBits) && MaxBits) ? MaxBits : SIZE_MAX);
 };
 
 template <class T>
@@ -92,7 +92,7 @@ struct min_precision;
 template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct min_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
-   static constexpr const std::size_t value = (std::is_void<Allocator>::value ? detail::static_unsigned_max<MinBits, MaxBits>::value : MinBits);
+   static constexpr std::size_t value = (std::is_void<Allocator>::value ? detail::static_unsigned_max<MinBits, MaxBits>::value : MinBits);
 };
 //
 // Traits class determines whether the number of bits precision requested could fit in a native type,
@@ -101,20 +101,20 @@ struct min_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Alloca
 template <class T>
 struct is_trivial_cpp_int
 {
-   static constexpr const bool value = false;
+   static constexpr bool value = false;
 };
 
 template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
    using self = cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>;
-   static constexpr const bool                                             value = std::is_void<Allocator>::value && (max_precision<self>::value <= (sizeof(double_limb_type) * CHAR_BIT) - (SignType == signed_packed ? 1 : 0));
+   static constexpr bool value = std::is_void<Allocator>::value && (max_precision<self>::value <= (sizeof(double_limb_type) * CHAR_BIT) - (SignType == signed_packed ? 1 : 0));
 };
 
 template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
 struct is_trivial_cpp_int<cpp_int_base<MinBits, MaxBits, SignType, Checked, Allocator, true> >
 {
-   static constexpr const bool value = true;
+   static constexpr bool value = true;
 };
 
 } // namespace backends
@@ -138,9 +138,9 @@ struct is_implicit_cpp_int_conversion;
 template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 struct is_implicit_cpp_int_conversion<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >
 {
-   using t1 = cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>     ;
+   using t1 = cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>;
    using t2 = cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>;
-   static constexpr const bool                                                  value =
+   static constexpr bool value =
        (is_signed_number<t2>::value || !is_signed_number<t1>::value) && (max_precision<t1>::value <= max_precision<t2>::value);
 };
 
@@ -371,7 +371,7 @@ private:
    }
    void resize(std::size_t new_size, std::size_t min_size)
    {
-      constexpr const std::size_t max_limbs = MaxBits / (CHAR_BIT * sizeof(limb_type)) + ((MaxBits % (CHAR_BIT * sizeof(limb_type))) ? 1 : 0);
+      constexpr std::size_t max_limbs = MaxBits / (CHAR_BIT * sizeof(limb_type)) + ((MaxBits % (CHAR_BIT * sizeof(limb_type))) ? 1 : 0);
       // We never resize beyond MaxSize:
       if (new_size > max_limbs)
          new_size = max_limbs;
@@ -2289,7 +2289,7 @@ struct is_equivalent_number_type<backends::cpp_int_backend<MinBits, MaxBits, Sig
 template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
 struct expression_template_default<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> >
 {
-   static constexpr const expression_template_option value = et_off;
+   static constexpr expression_template_option value = et_off;
 };
 
 using boost::multiprecision::backends::cpp_int_backend;

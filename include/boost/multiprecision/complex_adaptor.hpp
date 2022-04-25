@@ -429,7 +429,7 @@ inline void eval_sqrt(complex_adaptor<Backend>& result, const complex_adaptor<Ba
 
    if (eval_is_zero(val.imag_data()) && (eval_get_sign(val.real_data()) >= 0))
    {
-      constexpr const typename std::tuple_element<0, typename Backend::unsigned_types>::type zero = 0u;
+      constexpr typename std::tuple_element<0, typename Backend::unsigned_types>::type zero = 0u;
       eval_sqrt(result.real_data(), val.real_data());
       result.imag_data() = zero;
       return;

@@ -443,8 +443,8 @@ eval_multiply(
       return;
    }
 
-   constexpr const double_limb_type limb_max = ~static_cast<limb_type>(0u);
-   constexpr const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
+   constexpr double_limb_type limb_max        = static_cast<double_limb_type>(~static_cast<limb_type>(0u));
+   constexpr double_limb_type double_limb_max = static_cast<double_limb_type>(~static_cast<double_limb_type>(0u));
 
    result.resize(as + bs, as + bs - 1);
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -711,8 +711,8 @@ eval_multiply(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
     signed_double_limb_type a, signed_double_limb_type b)
 {
-   constexpr const signed_double_limb_type mask = ~static_cast<limb_type>(0);
-   constexpr const std::size_t limb_bits = sizeof(limb_type) * CHAR_BIT;
+   constexpr signed_double_limb_type mask      = static_cast<signed_double_limb_type>(~static_cast<limb_type>(0));
+   constexpr std::size_t             limb_bits = static_cast<std::size_t>(sizeof(limb_type) * CHAR_BIT);
 
    bool s = false;
    if (a < 0)
@@ -764,8 +764,8 @@ eval_multiply(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
     double_limb_type a, double_limb_type b)
 {
-   constexpr const signed_double_limb_type mask = ~static_cast<limb_type>(0);
-   constexpr const std::size_t limb_bits = sizeof(limb_type) * CHAR_BIT;
+   constexpr signed_double_limb_type mask      = static_cast<signed_double_limb_type>(~static_cast<limb_type>(0));
+   constexpr std::size_t             limb_bits = static_cast<std::size_t>(sizeof(limb_type) * CHAR_BIT);
 
    double_limb_type w = a & mask;
    double_limb_type x = a >> limb_bits;

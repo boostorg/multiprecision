@@ -206,7 +206,7 @@ inline constexpr bool operator==(variable_precision_options a, variable_precisio
 template <class Backend>
 struct expression_template_default
 {
-   static constexpr const expression_template_option value = et_on;
+   static constexpr expression_template_option value = et_on;
 };
 
 template <class Backend, expression_template_option ExpressionTemplates = expression_template_default<Backend>::value>
@@ -296,7 +296,7 @@ template <class T>
 struct bits_of
 {
    static_assert(boost::multiprecision::detail::is_integral<T>::value || std::is_enum<T>::value || std::numeric_limits<T>::is_specialized, "Failed integer size check");
-   static constexpr const unsigned value =
+   static constexpr unsigned value =
        std::numeric_limits<T>::is_specialized ? std::numeric_limits<T>::digits
                                               : sizeof(T) * CHAR_BIT - (boost::multiprecision::detail::is_signed<T>::value ? 1 : 0);
 };
@@ -306,7 +306,7 @@ struct bits_of
 template <>
 struct bits_of<float128_type>
 {
-   static constexpr const unsigned value = 113;
+   static constexpr unsigned value = 113;
 };
 #endif
 
@@ -698,7 +698,7 @@ struct expression<tag, Arg1, void, void, void>
 
    BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const noexcept { return arg; }
 
-   static constexpr const unsigned depth = left_type::depth + 1;
+   static constexpr unsigned depth = left_type::depth + 1;
    template <class T
 #ifndef __SUNPRO_CC
              ,
@@ -848,7 +848,7 @@ struct expression<terminal, Arg1, void, void, void>
       return arg;
    }
 
-   static constexpr const unsigned depth = 0;
+   static constexpr unsigned depth = 0;
 
    template <class T
 #ifndef __SUNPRO_CC
@@ -1194,10 +1194,10 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
       return r.template convert_to<T>();
    }
 
-   static constexpr const unsigned left_depth   = left_type::depth + 1;
-   static constexpr const unsigned middle_depth = middle_type::depth + 1;
-   static constexpr const unsigned right_depth  = right_type::depth + 1;
-   static constexpr const unsigned depth        = left_depth > right_depth ? (left_depth > middle_depth ? left_depth : middle_depth) : (right_depth > middle_depth ? right_depth : middle_depth);
+   static constexpr unsigned left_depth   = left_type::depth + 1;
+   static constexpr unsigned middle_depth = middle_type::depth + 1;
+   static constexpr unsigned right_depth  = right_type::depth + 1;
+   static constexpr unsigned depth        = left_depth > right_depth ? (left_depth > middle_depth ? left_depth : middle_depth) : (right_depth > middle_depth ? right_depth : middle_depth);
 
  private:
    typename expression_storage<Arg1>::type arg1;
@@ -1368,15 +1368,15 @@ struct expression
       return r.template convert_to<T>();
    }
 
-   static constexpr const unsigned left_depth         = left_type::depth + 1;
-   static constexpr const unsigned left_middle_depth  = left_middle_type::depth + 1;
-   static constexpr const unsigned right_middle_depth = right_middle_type::depth + 1;
-   static constexpr const unsigned right_depth        = right_type::depth + 1;
+   static constexpr unsigned left_depth         = left_type::depth + 1;
+   static constexpr unsigned left_middle_depth  = left_middle_type::depth + 1;
+   static constexpr unsigned right_middle_depth = right_middle_type::depth + 1;
+   static constexpr unsigned right_depth        = right_type::depth + 1;
 
-   static constexpr const unsigned left_max_depth  = left_depth > left_middle_depth ? left_depth : left_middle_depth;
-   static constexpr const unsigned right_max_depth = right_depth > right_middle_depth ? right_depth : right_middle_depth;
+   static constexpr unsigned left_max_depth  = left_depth > left_middle_depth ? left_depth : left_middle_depth;
+   static constexpr unsigned right_max_depth = right_depth > right_middle_depth ? right_depth : right_middle_depth;
 
-   static constexpr const unsigned depth = left_max_depth > right_max_depth ? left_max_depth : right_max_depth;
+   static constexpr unsigned depth = left_max_depth > right_max_depth ? left_max_depth : right_max_depth;
 
  private:
    typename expression_storage<Arg1>::type arg1;
@@ -1393,7 +1393,7 @@ struct digits2
    static_assert((std::numeric_limits<T>::radix == 2) || (std::numeric_limits<T>::radix == 10), "Failed radix check");
    // If we really have so many digits that this fails, then we're probably going to hit other problems anyway:
    static_assert(LONG_MAX / 1000 > (std::numeric_limits<T>::digits + 1), "Too many digits to cope with here");
-   static constexpr const long  m_value = std::numeric_limits<T>::radix == 10 ? (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) : std::numeric_limits<T>::digits;
+   static constexpr long  m_value = std::numeric_limits<T>::radix == 10 ? (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) : std::numeric_limits<T>::digits;
    static inline constexpr long value() noexcept { return m_value; }
 };
 
@@ -1736,7 +1736,7 @@ struct is_explicitly_convertible_from_string;
 template <class B, boost::multiprecision::expression_template_option ET>
 struct is_explicitly_convertible_from_string<boost::multiprecision::number<B, ET> >
 {
-   static constexpr const bool value = true;
+   static constexpr bool value = true;
 };
 
 } // namespace constants

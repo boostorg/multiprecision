@@ -18,6 +18,7 @@
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 #include <boost/multiprecision/detail/fpclassify.hpp>
+#include <algorithm>
 #include <cctype>
 #include <cfloat>
 #include <climits>
@@ -26,6 +27,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iomanip>
+#include <iostream>
 #include <limits>
 #include <memory>
 #include <type_traits>
@@ -312,7 +314,7 @@ struct gmp_float_imp
 
       f = frexp(a, &e);
 
-      constexpr const int shift = std::numeric_limits<int>::digits - 1;
+      constexpr int shift = std::numeric_limits<int>::digits - 1;
 
       while (f)
       {
@@ -1559,7 +1561,7 @@ struct gmp_int
 
       f = frexp(a, &e);
 
-      constexpr const int shift = std::numeric_limits<int>::digits - 1;
+      constexpr int shift = std::numeric_limits<int>::digits - 1;
 
       while (f != static_cast<F>(0.0f))
       {
@@ -2143,8 +2145,8 @@ inline void eval_convert_to(int128_type* result, const gmp_int& val)
    //
    // Overflow check:
    //
-   constexpr const int128_type int128_max = static_cast<int128_type>((static_cast<uint128_type>(1u) << 127) - 1);
-   constexpr const int128_type int128_min = (static_cast<uint128_type>(1u) << 127);
+   constexpr int128_type int128_max = static_cast<int128_type>((static_cast<uint128_type>(1u) << 127) - 1);
+   constexpr int128_type int128_min = static_cast<int128_type>(static_cast<int128_type>(-int128_max) -1);
    bool overflow = false;
    if (mpz_sgn(t.data()))
    {
@@ -2568,7 +2570,7 @@ struct gmp_rational
 
       f = frexp(a, &e);
 
-      constexpr const int shift = std::numeric_limits<int>::digits - 1;
+      constexpr int shift = std::numeric_limits<int>::digits - 1;
 
       while (f != static_cast<F>(0.0f))
       {
@@ -3006,7 +3008,17 @@ inline void assign_components(gmp_rational& result, unsigned long v1, unsigned l
 }
 inline void assign_components(gmp_rational& result, long v1, long v2)
 {
-   mpq_set_si(result.data(), v1, v2);
+   using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
+
+   if(v2 < 0)
+   {
+     mpq_set_si(result.data(), -v1, static_cast<local_uint_type>(-v2));
+   }
+   else
+   {
+     mpq_set_si(result.data(), v1, static_cast<local_uint_type>(v2));
+   }
+
    mpq_canonicalize(result.data());
 }
 inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int const& v2)

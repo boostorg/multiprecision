@@ -2460,7 +2460,7 @@ typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digi
    // See https://svn.boost.org/trac/boost/ticket/10924 for an example of why this may go wrong:
    BOOST_MP_ASSERT(!BOOST_MP_ISNAN(f) && !BOOST_MP_ISINF(f));
 
-   constexpr const int shift = std::numeric_limits<int>::digits - 1;
+   constexpr int shift = std::numeric_limits<int>::digits - 1;
 
    while (f)
    {
