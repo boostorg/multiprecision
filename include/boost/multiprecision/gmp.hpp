@@ -1753,6 +1753,10 @@ inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::
    return a.compare(b) > 0;
 }
 
+inline bool eval_is_zero_move(gmp_int&& val)
+{
+   return mpz_sgn(val.data()) == 0;
+}
 inline bool eval_is_zero(const gmp_int& val)
 {
    return mpz_sgn(val.data()) == 0;
@@ -2380,6 +2384,9 @@ struct gmp_rational
    template <class T, class U>
    gmp_rational(const T& a, const U& b, typename std::enable_if<std::is_constructible<gmp_int, T>::value && std::is_constructible<gmp_int, U>::value>::type* = nullptr)
    {
+      if (b == static_cast<U>(0))
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
       gmp_int i(a), j(b);
       m_data[0]._mp_num = i.data()[0];
       m_data[0]._mp_den = j.data()[0];
@@ -2390,6 +2397,9 @@ struct gmp_rational
    template <class U>
    gmp_rational(const gmp_int& a, const U& b, typename std::enable_if<std::is_constructible<gmp_int, U>::value>::type* = nullptr)
    {
+      if (b == static_cast<U>(0))
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
       gmp_int j(b);
       mpz_init_set(&m_data[0]._mp_num, a.data());
       m_data[0]._mp_den = j.data()[0];
@@ -2400,6 +2410,9 @@ struct gmp_rational
    template <class U>
    gmp_rational(gmp_int&& a, const U& b, typename std::enable_if<std::is_constructible<gmp_int, U>::value>::type* = nullptr)
    {
+      if (b == static_cast<U>(0))
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
       gmp_int j(b);
       m_data[0]._mp_num = a.data()[0];
       m_data[0]._mp_den = j.data()[0];
@@ -2411,6 +2424,9 @@ struct gmp_rational
    template <class T>
    gmp_rational(const T& a, const gmp_int& b, typename std::enable_if<std::is_constructible<gmp_int, T>::value>::type* = nullptr)
    {
+      if (eval_is_zero(b))
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
       gmp_int i(a);
       m_data[0]._mp_num = i.data()[0];
       mpz_init_set(&m_data[0]._mp_den, b.data());
@@ -2421,6 +2437,9 @@ struct gmp_rational
    template <class T>
    gmp_rational(const T& a, gmp_int&& b, typename std::enable_if<std::is_constructible<gmp_int, T>::value>::type* = nullptr)
    {
+      if (eval_is_zero_move(static_cast<gmp_int&&>(b)))
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
       gmp_int i(a);
       m_data[0]._mp_num = i.data()[0];
       m_data[0]._mp_den = b.data()[0];
@@ -2431,12 +2450,18 @@ struct gmp_rational
    }
    gmp_rational(const gmp_int& a, const gmp_int& b)
    {
+      if (eval_is_zero(b))
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
       mpz_init_set(&m_data[0]._mp_num, a.data());
       mpz_init_set(&m_data[0]._mp_den, b.data());
       mpq_canonicalize(m_data);
    }
    gmp_rational(const gmp_int& a, gmp_int&& b)
    {
+      if (eval_is_zero_move(static_cast<gmp_int&&>(b)))
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
       mpz_init_set(&m_data[0]._mp_num, a.data());
       m_data[0]._mp_den = b.data()[0];
       mpq_canonicalize(m_data);
@@ -2444,6 +2469,9 @@ struct gmp_rational
    }
    gmp_rational(gmp_int&& a, const gmp_int& b)
    {
+      if (eval_is_zero(b))
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
       m_data[0]._mp_num = a.data()[0];
       mpz_init_set(&m_data[0]._mp_den, b.data());
       mpq_canonicalize(m_data);
@@ -2451,6 +2479,9 @@ struct gmp_rational
    }
    gmp_rational(gmp_int&& a, gmp_int&& b)
    {
+      if (eval_is_zero_move(static_cast<gmp_int&&>(b)))
+         BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
       m_data[0]._mp_num = a.data()[0];
       m_data[0]._mp_den = b.data()[0];
       mpq_canonicalize(m_data);
@@ -2911,7 +2942,7 @@ inline void eval_multiply(gmp_rational& result, gmp_rational const& a, unsigned 
       result = a;
       return;
    }
-   unsigned long g = mpz_gcd_ui(nullptr, mpq_denref(a.data()), b);
+   unsigned long g = static_cast<unsigned long>(mpz_gcd_ui(nullptr, mpq_denref(a.data()), b));
    if (g != 1)
    {
       BOOST_MP_ASSERT(g);
@@ -3003,26 +3034,31 @@ inline void eval_abs(gmp_rational& result, const gmp_rational& val)
 
 inline void assign_components(gmp_rational& result, unsigned long v1, unsigned long v2)
 {
+   if (v2 == 0u)
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
    mpq_set_ui(result.data(), v1, v2);
    mpq_canonicalize(result.data());
 }
 inline void assign_components(gmp_rational& result, long v1, long v2)
 {
+   if (v2 == 0)
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
    using local_uint_type = typename boost::multiprecision::detail::make_unsigned<long>::type;
 
-   if(v2 < 0)
-   {
-     mpq_set_si(result.data(), -v1, static_cast<local_uint_type>(-v2));
-   }
+   if (v2 < 0)
+      mpq_set_si(result.data(), -v1, static_cast<local_uint_type>(-v2));
    else
-   {
-     mpq_set_si(result.data(), v1, static_cast<local_uint_type>(v2));
-   }
+      mpq_set_si(result.data(), v1, static_cast<local_uint_type>(v2));
 
    mpq_canonicalize(result.data());
 }
 inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int const& v2)
 {
+   if (eval_is_zero(v2))
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
    mpz_set(mpq_numref(result.data()), v1.data());
    mpz_set(mpq_denref(result.data()), v2.data());
    mpq_canonicalize(result.data());
@@ -3030,6 +3066,9 @@ inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int c
 template <class T, class U>
 void assign_components(gmp_rational& result, const T& a, const U& b)
 {
+   if (b == static_cast<U>(0))
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
    gmp_int x, y;
    x = a;
    y = b;
@@ -3040,6 +3079,9 @@ void assign_components(gmp_rational& result, const T& a, const U& b)
 template <class U>
 void assign_components(gmp_rational& result, const gmp_int& a, const U& b)
 {
+   if (b == static_cast<U>(0))
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
    gmp_int y;
    y = b;
    mpz_set(&result.data()[0]._mp_num, a.data());
@@ -3049,6 +3091,9 @@ void assign_components(gmp_rational& result, const gmp_int& a, const U& b)
 template <class T>
 void assign_components(gmp_rational& result, const T& a, const gmp_int& b)
 {
+   if (eval_is_zero(b))
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
    gmp_int x;
    x = a;
    std::swap(result.data()[0]._mp_num, x.data()[0]);
