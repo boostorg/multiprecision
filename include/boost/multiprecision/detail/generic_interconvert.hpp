@@ -185,7 +185,7 @@ void generic_interconvert(To& to, const From& from, const std::integral_constant
 
       eval_frexp(f, from, &e);
 
-      constexpr const int shift = std::numeric_limits<std::intmax_t>::digits - 1;
+      constexpr int shift = std::numeric_limits<std::intmax_t>::digits - 1;
 
       while (!eval_is_zero(f))
       {
@@ -415,7 +415,7 @@ void generic_interconvert_float2rational(To& to, const From& from, const std::in
    using std::ldexp;
    using std::frexp;
    using ui_type = typename std::tuple_element<0, typename To::unsigned_types>::type;
-   constexpr const int shift = std::numeric_limits<long long>::digits;
+   constexpr int shift = std::numeric_limits<long long>::digits;
    typename From::exponent_type e;
    typename component_type<number<To>>::type num, denom;
    number<From> val(from);
@@ -503,7 +503,7 @@ void generic_interconvert_float2int(To& to, const From& from, const std::integra
    using std::ldexp;
    
    using exponent_type = typename From::exponent_type;
-   constexpr const exponent_type        shift = std::numeric_limits<long long>::digits;
+   constexpr exponent_type              shift = std::numeric_limits<long long>::digits;
    exponent_type                        e;
    number<To>                           num(0u);
    number<From>                         val(from);

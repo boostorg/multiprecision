@@ -58,13 +58,13 @@ struct debug_adaptor
       return *this;
    }
    template <class T>
-   debug_adaptor(const T& i, const typename std::enable_if<std::is_convertible<T, Backend>::value>::type* = 0)
+   debug_adaptor(const T& i, const typename std::enable_if<std::is_convertible<T, Backend>::value>::type* = nullptr)
        : m_value(i)
    {
       update_view();
    }
    template <class T>
-   debug_adaptor(const debug_adaptor<T>& i, const typename std::enable_if<std::is_convertible<T, Backend>::value>::type* = 0)
+   debug_adaptor(const debug_adaptor<T>& i, const typename std::enable_if<std::is_convertible<T, Backend>::value>::type* = nullptr)
        : m_value(i.value())
    {
       update_view();

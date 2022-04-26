@@ -172,11 +172,11 @@ namespace backends {
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
 cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::operator=(const char* s)
 {
-   cpp_int                      n;
-   std::intmax_t              decimal_exp     = 0;
-   std::intmax_t              digits_seen     = 0;
-   constexpr const std::intmax_t max_digits_seen = 4 + (cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count * 301L) / 1000;
-   bool                         ss              = false;
+             cpp_int       n;
+             std::intmax_t decimal_exp     = 0;
+             std::intmax_t digits_seen     = 0;
+   constexpr std::intmax_t max_digits_seen = 4 + (cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count * 301L) / 1000;
+             bool          ss              = false;
    //
    // Extract the sign:
    //
@@ -273,7 +273,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
       return *this;
    }
 
-   constexpr const std::size_t limb_bits = sizeof(limb_type) * CHAR_BIT;
+   constexpr std::size_t limb_bits = sizeof(limb_type) * CHAR_BIT;
    //
    // Set our working precision - this is heuristic based, we want
    // a value as small as possible > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count to avoid large computations
@@ -516,7 +516,7 @@ std::string cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::s
       shift -= power10;
       cpp_int               i;
       int                   roundup   = 0; // 0=no rounding, 1=tie, 2=up
-      constexpr const std::size_t limb_bits = sizeof(limb_type) * CHAR_BIT;
+      constexpr std::size_t limb_bits = sizeof(limb_type) * CHAR_BIT;
       //
       // Set our working precision - this is heuristic based, we want
       // a value as small as possible > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count to avoid large computations

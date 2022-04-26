@@ -52,7 +52,7 @@ struct is_explicitly_convertible_imp
    template <typename S1, typename T1>
    static char selector(...);
 
-   static constexpr const bool value = sizeof(selector<S, T>(0)) == sizeof(int);
+   static constexpr bool value = sizeof(selector<S, T>(nullptr)) == sizeof(int);
 
    using type = std::integral_constant<bool, value>;
 };

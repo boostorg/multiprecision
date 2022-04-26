@@ -24,7 +24,7 @@ struct calc_max_digits10
       //
       return static_cast<unsigned>(0.301029995663981195213738894724493026768189881462108541310 * d) + 2;
    }
-   static constexpr const unsigned value = max_digits_10(digits);
+   static constexpr unsigned value = max_digits_10(digits);
 };
 
 template <std::size_t digits>
@@ -41,7 +41,7 @@ struct calc_max_digits10_s
       //
       return static_cast<std::size_t>(static_cast<std::size_t>(0.301029995663981195213738894724493026768189881462108541310 * static_cast<double>(d)) + 2u);
    }
-   static constexpr const std::size_t value = max_digits_10(digits);
+   static constexpr std::size_t value = max_digits_10(digits);
 };
 
 template <unsigned digits>
@@ -56,7 +56,7 @@ struct calc_digits10
       //
       return static_cast<unsigned>(0.301029995663981195213738894724493026768189881462108541310 * static_cast<double>(d - 1u));
    }
-   static constexpr const unsigned value = digits_10(digits);
+   static constexpr unsigned value = digits_10(digits);
 };
 
 template <std::size_t digits>
@@ -71,7 +71,7 @@ struct calc_digits10_s
       //
       return static_cast<std::size_t>(0.301029995663981195213738894724493026768189881462108541310 * static_cast<double>(d - 1u));
    }
-   static constexpr const std::size_t value = digits_10(digits);
+   static constexpr std::size_t value = digits_10(digits);
 };
 
 }}} // namespace boost::multiprecision::detail

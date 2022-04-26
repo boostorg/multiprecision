@@ -212,13 +212,15 @@ void convert_from_string(Backend& b, const char* p)
    if (!p || (*p == 0))
       return;
 
-   bool                                                  is_neg       = false;
-   bool                                                  is_neg_expon = false;
-   constexpr const ui_type                               ten          = ui_type(10);
-   typename Backend::exponent_type                       expon        = 0;
-   int                                                   digits_seen  = 0;
-   using limits = std::numeric_limits<number<Backend, et_off> >;
-   constexpr const int                                   max_digits = limits::is_specialized ? limits::max_digits10 + 1 : INT_MAX;
+   bool                            is_neg       = false;
+   bool                            is_neg_expon = false;
+   constexpr ui_type               ten          = ui_type(10);
+   typename Backend::exponent_type expon        = 0;
+   int                             digits_seen  = 0;
+
+   using limits = std::numeric_limits<number<Backend, et_off>>;
+
+   constexpr int max_digits = limits::is_specialized ? limits::max_digits10 + 1 : INT_MAX;
 
    if (*p == '+')
       ++p;
