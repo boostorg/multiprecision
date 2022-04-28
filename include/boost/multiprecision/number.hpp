@@ -108,9 +108,10 @@ class number
       : number(static_cast<typename std::underlying_type<V>::type>(v))
    {}
 
-   BOOST_MP_FORCEINLINE constexpr number(const number& e, unsigned digits10)
+   template <class U>
+   BOOST_MP_FORCEINLINE constexpr number(const number& e, U digits10, typename std::enable_if<std::is_constructible<Backend, const Backend&, unsigned>::value && std::is_integral<U>::value && (std::numeric_limits<U>::digits <= std::numeric_limits<unsigned>::digits)>::type* = nullptr)
        noexcept(noexcept(Backend(std::declval<Backend const&>(), std::declval<unsigned>())))
-       : m_backend(e.m_backend, digits10) {}
+       : m_backend(e.m_backend, static_cast<unsigned>(digits10)) {}
    template <class V>
    explicit BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const V& v, typename std::enable_if<
                                                                                  (boost::multiprecision::detail::is_arithmetic<V>::value || std::is_same<std::string, V>::value || std::is_convertible<V, const char*>::value) && !detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = nullptr)
@@ -391,6 +392,7 @@ class number
    {
       number t(v, digits10_or_component);
       boost::multiprecision::detail::scoped_source_precision<self_type> scope;
+      (void)scope;
       return *this = t;
    }
    template <class Other, expression_template_option ET>
