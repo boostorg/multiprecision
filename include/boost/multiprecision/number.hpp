@@ -71,17 +71,20 @@ class number
 #endif
        : m_backend(canonical_value(v))
    {}
-   template <class V>
-   BOOST_MP_FORCEINLINE constexpr number(const V& v, unsigned digits10, 
+   template <class V, class U>
+   BOOST_MP_FORCEINLINE constexpr number(const V& v, U digits10, 
       typename std::enable_if<
       (boost::multiprecision::detail::is_convertible_arithmetic<V, Backend>::value 
          || std::is_same<std::string, V>::value 
          || std::is_convertible<V, const char*>::value) 
       && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value 
       && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_complex) 
-      && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational 
-         && std::is_same<self_type, value_type>::value)>::type* = nullptr)
-       : m_backend(canonical_value(v), digits10)
+      && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational)
+      && std::is_same<self_type, value_type>::value
+      && std::is_integral<U>::value
+      && (std::numeric_limits<U>::digits <= std::numeric_limits<unsigned>::digits)
+      && std::is_constructible<Backend, typename detail::canonical<V, Backend>::type const&, unsigned>::value>::type* = nullptr)
+       : m_backend(canonical_value(v), static_cast<unsigned>(digits10))
    {}
    //
    // Conversions from unscoped enum's are implicit:
