@@ -3071,6 +3071,10 @@ void assign_components(gmp_rational& result, const T& a, const U& b)
    gmp_int x, y;
    x = a;
    y = b;
+
+   if (eval_is_zero(y))
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
    std::swap(result.data()[0]._mp_num, x.data()[0]);
    std::swap(result.data()[0]._mp_den, y.data()[0]);
    mpq_canonicalize(result.data());
@@ -3082,6 +3086,10 @@ void assign_components(gmp_rational& result, const gmp_int& a, const U& b)
       BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
 
    gmp_int y;
+
+   if (eval_is_zero(y))
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
    y = b;
    mpz_set(&result.data()[0]._mp_num, a.data());
    std::swap(result.data()[0]._mp_den, y.data()[0]);
