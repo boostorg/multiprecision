@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////
 //  Copyright 2015 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
@@ -223,9 +223,6 @@ OutputIterator export_bits(
       return out;
    }
    std::size_t bitcount = boost::multiprecision::backends::eval_msb_imp(val.backend()) + 1;
-   std::size_t chunks   = bitcount / chunk_size;
-   if (bitcount % chunk_size)
-      ++chunks;
 
          std::ptrdiff_t bit_location = msv_first ? static_cast<std::ptrdiff_t>(bitcount - chunk_size) : 0;
    const std::ptrdiff_t bit_step     = msv_first ? static_cast<std::ptrdiff_t>(-static_cast<std::ptrdiff_t>(chunk_size)) : static_cast<std::ptrdiff_t>(chunk_size);

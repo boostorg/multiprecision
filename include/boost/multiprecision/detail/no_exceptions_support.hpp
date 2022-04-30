@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2004 - 2021 Pavel Vozenilek.
 //  Copyright 2021 Matt Borland. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
@@ -36,7 +36,7 @@
 #   endif
 #   define BOOST_MP_RETHROW
 #   define BOOST_MP_CATCH_END }
-#   define BOOST_MP_THROW_EXCEPTION(x) {(void)(x);}
+#   define BOOST_MP_THROW_EXCEPTION(x) {static_cast<void>(x);}
 #endif
 
 #else // Not standalone mode
