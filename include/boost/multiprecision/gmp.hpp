@@ -3065,6 +3065,9 @@ inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int c
 template <class T, class U>
 void assign_components(gmp_rational& result, const T& a, const U& b)
 {
+   if (b == static_cast<U>(0))
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
    gmp_int x, y;
    x = a;
    y = b;
@@ -3079,6 +3082,9 @@ void assign_components(gmp_rational& result, const T& a, const U& b)
 template <class U>
 void assign_components(gmp_rational& result, const gmp_int& a, const U& b)
 {
+   if (b == static_cast<U>(0))
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+
    gmp_int y;
 
    if (eval_is_zero(y))

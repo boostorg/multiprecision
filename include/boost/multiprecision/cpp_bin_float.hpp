@@ -160,7 +160,7 @@ class cpp_bin_float
    }
    template <class Float>
    cpp_bin_float(const Float& f,
-                 typename std::enable_if<detail::is_cpp_bin_float_implicitly_constructible_from_type<Float, bit_count>::value>::type const* = nullptr)
+                 typename std::enable_if<detail::is_cpp_bin_float_implicitly_constructible_from_type<Float, static_cast<std::ptrdiff_t>(bit_count)>::value>::type const* = nullptr)
        : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
@@ -168,7 +168,7 @@ class cpp_bin_float
 
    template <class Float>
    explicit cpp_bin_float(const Float& f,
-                          typename std::enable_if<detail::is_cpp_bin_float_explicitly_constructible_from_type<Float, bit_count>::value>::type const* = nullptr)
+                          typename std::enable_if<detail::is_cpp_bin_float_explicitly_constructible_from_type<Float, static_cast<std::ptrdiff_t>(bit_count)>::value>::type const* = nullptr)
        : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
@@ -690,7 +690,7 @@ inline void copy_and_round(cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
          // Normalize result when we're rounding to fewer bits than we can hold, only happens in conversions
          // to narrower types:
          eval_left_shift(arg, static_cast<double_limb_type>(static_cast<std::ptrdiff_t>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) - bits_to_keep));
-         res.exponent() -= static_cast<Exponent>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - bits_to_keep);
+         res.exponent() -= static_cast<Exponent>(static_cast<std::ptrdiff_t>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) - bits_to_keep);
       }
       res.bits() = arg;
    }
@@ -1463,6 +1463,7 @@ inline void convert_to_signed_int(I* res, const cpp_bin_float<Digits, DigitBase,
       return;
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
       BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+      return;
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
       *res = max_val;
       if (arg.sign())
