@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////
 //  Copyright 2012 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
@@ -539,7 +539,7 @@ eval_modulus(
    {
       using cpp_int_backend1_type = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>;
 
-      divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>*>(nullptr), a, b, result);
+      divide_unsigned_helper(static_cast<cpp_int_backend1_type*>(nullptr), a, b, result);
    }
    result.sign(s);
 }

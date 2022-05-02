@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock.
 //  Copyright 2021 Matt Borland. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
@@ -3065,11 +3065,10 @@ inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int c
 template <class T, class U>
 void assign_components(gmp_rational& result, const T& a, const U& b)
 {
-   if (b == static_cast<U>(0))
-      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+   gmp_int x, y;
 
-   gmp_int x = a;
-   gmp_int y = b;
+   x = a;
+   y = b;
 
    if (eval_is_zero(y))
       BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
@@ -3081,10 +3080,9 @@ void assign_components(gmp_rational& result, const T& a, const U& b)
 template <class U>
 void assign_components(gmp_rational& result, const gmp_int& a, const U& b)
 {
-   if (b == static_cast<U>(0))
-      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+   gmp_int y;
 
-   gmp_int y = b;
+   y = b;
 
    if (eval_is_zero(y))
       BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
