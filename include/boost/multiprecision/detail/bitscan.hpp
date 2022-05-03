@@ -160,15 +160,15 @@ BOOST_FORCEINLINE std::size_t find_lsb(unsigned long long mask, std::integral_co
 }
 BOOST_FORCEINLINE std::size_t find_msb(std::size_t mask, std::integral_constant<int, 1> const&)
 {
-   return static_cast<std::size_t>(static_cast<std::size_t>(sizeof(unsigned) * static_cast<std::size_t>(CHAR_BIT - 1)) - static_cast<std::size_t>(__builtin_clz(static_cast<unsigned int>(mask))));
+   return static_cast<std::size_t>(static_cast<std::size_t>(sizeof(unsigned) * static_cast<std::size_t>(CHAR_BIT) - 1u) - static_cast<std::size_t>(__builtin_clz(static_cast<unsigned int>(mask))));
 }
 BOOST_FORCEINLINE std::size_t find_msb(unsigned long mask, std::integral_constant<int, 2> const&)
 {
-   return static_cast<std::size_t>(static_cast<std::size_t>(sizeof(unsigned long) * static_cast<std::size_t>(CHAR_BIT - 1)) - static_cast<std::size_t>(__builtin_clzl(static_cast<unsigned long>(mask))));
+   return static_cast<std::size_t>(static_cast<std::size_t>(sizeof(unsigned long) * static_cast<std::size_t>(CHAR_BIT) - 1u) - static_cast<std::size_t>(__builtin_clzl(static_cast<unsigned long>(mask))));
 }
 BOOST_FORCEINLINE std::size_t find_msb(unsigned long long mask, std::integral_constant<int, 3> const&)
 {
-   return static_cast<std::size_t>(static_cast<std::size_t>(sizeof(unsigned long long) * static_cast<std::size_t>(CHAR_BIT - 1)) - static_cast<std::size_t>(__builtin_clzll(static_cast<unsigned long long>(mask))));
+   return static_cast<std::size_t>(static_cast<std::size_t>(sizeof(unsigned long long) * static_cast<std::size_t>(CHAR_BIT) - 1u) - static_cast<std::size_t>(__builtin_clzll(static_cast<unsigned long long>(mask))));
 }
 #ifdef BOOST_HAS_INT128
 
