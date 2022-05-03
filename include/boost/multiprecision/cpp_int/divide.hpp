@@ -536,7 +536,11 @@ eval_modulus(
    if (b.size() == 1)
       eval_modulus(result, a, *b.limbs());
    else
-      divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>*>(0), a, b, result);
+   {
+      using cpp_int_backend1_type = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>;
+
+      divide_unsigned_helper(static_cast<cpp_int_backend1_type*>(nullptr), a, b, result);
+   }
    result.sign(s);
 }
 

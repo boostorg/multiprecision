@@ -395,7 +395,7 @@ class number
    {
       number t(v, digits10_or_component);
       boost::multiprecision::detail::scoped_source_precision<self_type> scope;
-      (void)scope;
+      static_cast<void>(scope);
       return *this = t;
    }
    template <class Other, expression_template_option ET>
