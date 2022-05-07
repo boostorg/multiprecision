@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -45,8 +45,10 @@
 #ifdef BOOST_NO_CXX11_HDR_ARRAY
 #error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_ARRAY being set"
 #endif
+#if !(defined(__GNUC__) && (__GNUC__ < 5))
 #ifdef BOOST_NO_CXX11_HDR_TYPE_TRAITS
 #error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_TYPE_TRAITS being set"
+#endif
 #endif
 #ifdef BOOST_NO_CXX11_ALLOCATOR
 #error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_ALLOCATOR being set"
