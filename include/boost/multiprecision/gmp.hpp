@@ -3365,13 +3365,13 @@ struct is_variable_precision<backends::gmp_float<0> > : public std::integral_con
 {};
 } // namespace detail
 
-using mpf_float_50 = number<gmp_float<50> >  ;
-using mpf_float_100 = number<gmp_float<100> > ;
-using mpf_float_500 = number<gmp_float<500> > ;
+using mpf_float_50 = number<gmp_float<50> >;
+using mpf_float_100 = number<gmp_float<100> >;
+using mpf_float_500 = number<gmp_float<500> >;
 using mpf_float_1000 = number<gmp_float<1000> >;
-using mpf_float = number<gmp_float<0> >   ;
-using mpz_int = number<gmp_int>         ;
-using mpq_rational = number<gmp_rational>    ;
+using mpf_float = number<gmp_float<0> >;
+using mpz_int = number<gmp_int>;
+using mpq_rational = number<gmp_rational>;
 
 } // namespace multiprecision
 
