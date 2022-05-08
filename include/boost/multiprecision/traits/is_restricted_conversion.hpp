@@ -4,8 +4,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_MP_RESTRICTED_CONVERSION_HPP
-#define BOOST_MP_RESTRICTED_CONVERSION_HPP
+#ifndef BOOST_MP_IS_RESTRICTED_CONVERSION_HPP
+#define BOOST_MP_IS_RESTRICTED_CONVERSION_HPP
 
 #include <boost/multiprecision/traits/explicit_conversion.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
@@ -44,4 +44,4 @@ struct is_restricted_conversion
 
 }}} // namespace boost::multiprecision::detail
 
-#endif // BOOST_MP_RESTRICTED_CONVERSION_HPP
+#endif // BOOST_MP_IS_RESTRICTED_CONVERSION_HPP

@@ -13,8 +13,8 @@
 // at compile time, allowing for simple use of it here.
 //
 
-#ifndef BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
-#define BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
+#ifndef BOOST_MP_CPP_DEC_FLOAT_HPP
+#define BOOST_MP_CPP_DEC_FLOAT_HPP
 
 #include <cmath>
 #include <cstdint>

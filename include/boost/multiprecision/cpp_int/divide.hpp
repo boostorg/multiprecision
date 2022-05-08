@@ -5,8 +5,8 @@
 //
 // Comparison operators for cpp_int_backend:
 //
-#ifndef BOOST_MP_CPP_INT_DIV_HPP
-#define BOOST_MP_CPP_INT_DIV_HPP
+#ifndef BOOST_MP_CPP_INT_DIVIDE_HPP
+#define BOOST_MP_CPP_INT_DIVIDE_HPP
 
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>

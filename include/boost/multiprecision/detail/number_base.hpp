@@ -3,8 +3,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_MP_BIG_NUM_BASE_HPP
-#define BOOST_MP_BIG_NUM_BASE_HPP
+#ifndef BOOST_MP_NUMBER_BASE_HPP
+#define BOOST_MP_NUMBER_BASE_HPP
 
 #include <climits>
 #include <ios>
@@ -1696,4 +1696,4 @@ struct is_explicitly_convertible_from_string<boost::multiprecision::number<B, ET
 #pragma warning(pop)
 #endif
 
-#endif // BOOST_MP_BIG_NUM_BASE_HPP
+#endif // BOOST_MP_NUMBER_BASE_HPP
