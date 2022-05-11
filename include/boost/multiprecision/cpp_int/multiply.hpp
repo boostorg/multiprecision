@@ -7,8 +7,8 @@
 //
 // Comparison operators for cpp_int_backend:
 //
-#ifndef BOOST_MP_CPP_INT_MUL_HPP
-#define BOOST_MP_CPP_INT_MUL_HPP
+#ifndef BOOST_MP_CPP_INT_MULTIPLY_HPP
+#define BOOST_MP_CPP_INT_MULTIPLY_HPP
 
 #include <limits>
 #include <boost/multiprecision/detail/standalone_config.hpp>
