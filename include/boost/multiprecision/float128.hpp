@@ -15,6 +15,7 @@
 #error libquadmath only works on on i386, x86_64, IA-64, and hppa HP-UX, as well as on PowerPC GNU/Linux targets that enable the vector scalar (VSX) instruction set.
 #endif
 
+#include <memory>
 #include <tuple>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
