@@ -289,17 +289,24 @@ BOOST_MP_CXX14_CONSTEXPR Integer bitwise_sqrt(const Integer& x, Integer& r)
    // at some point.
    //
    Integer s = 0;
-   if (x == 0)
+   switch (x)
    {
+   case 0:
       r = 0;
       return s;
+   case 1:
+      r = 0;
+      return 1;
+   case 2:
+      r = 1;
+      return 1;
+   case 3:
+      r = 2;
+      return 1;
+   default:
+      // fall through:
    }
    std::ptrdiff_t g = msb(x);
-   if (g == 0)
-   {
-      r = 1;
-      return s;
-   }
 
    Integer t = 0;
    r = x;
