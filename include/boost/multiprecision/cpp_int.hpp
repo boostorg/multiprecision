@@ -2104,7 +2104,7 @@ public:
          std::string::size_type n = result.find_first_not_of('0');
          result.erase(0, n);
          if (result.empty())
-            result = "0";
+            result = std::string(static_cast<std::size_t>(1u), '0');
          if (neg)
             result.insert(static_cast<std::string::size_type>(0), 1, '-');
          else if (f & std::ios_base::showpos)
