@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <locale>
+#include <ios>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/fpclassify.hpp>
