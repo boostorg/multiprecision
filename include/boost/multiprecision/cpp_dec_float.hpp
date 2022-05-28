@@ -26,6 +26,8 @@
 #include <string>
 #include <limits>
 #include <stdexcept>
+#include <sstream>
+#include <locale>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/fpclassify.hpp>
@@ -1603,7 +1605,15 @@ double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_double() const
                      : -std::numeric_limits<double>::infinity());
    }
 
-   return std::strtod(str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific).c_str(), nullptr);
+   std::stringstream ss;
+   ss.imbue(std::locale::classic());
+
+   ss << str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific);
+
+   double d;
+   ss >> d;
+
+   return d;
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -1642,7 +1652,15 @@ long double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_long_doubl
                      : -std::numeric_limits<long double>::infinity());
    }
 
-   return std::strtold(str(std::numeric_limits<long double>::digits10 + (2 + 1), std::ios_base::scientific).c_str(), nullptr);
+   std::stringstream ss;
+   ss.imbue(std::locale::classic());
+
+   ss << str(std::numeric_limits<long double>::digits10 + (2 + 1), std::ios_base::scientific);
+
+   long double ld;
+   ss >> ld;
+
+   return ld;
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
