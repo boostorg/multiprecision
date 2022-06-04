@@ -333,7 +333,7 @@ struct mpfi_float_imp
          const char*                  p = ++s;
          while (*p && (*p != ',') && (*p != '}'))
             ++p;
-         part.assign(s + 1, p);
+         part.assign(s, p);
          a = part.c_str();
          s = p;
          if (*p && (*p != '}'))

@@ -2315,8 +2315,23 @@ inline std::istream& operator>>(std::istream& is, number<Backend, ExpressionTemp
       else
          s = detail::read_string_while(is, "+-0123456789");
       break;
+   case boost::multiprecision::number_kind_rational:
+      if (oct_format)
+         s = detail::read_string_while(is, "+-01234567/");
+      else if (hex_format)
+         s = detail::read_string_while(is, "+-xXabcdefABCDEF0123456789/");
+      else
+         s = detail::read_string_while(is, "+-0123456789/");
+      break;
    case boost::multiprecision::number_kind_floating_point:
-      s = detail::read_string_while(is, "+-eE.0123456789infINFnanNANinfinityINFINITY");
+      BOOST_IF_CONSTEXPR(std::is_same<number<Backend, ExpressionTemplates>, typename number<Backend, ExpressionTemplates>::value_type>::value)
+         s = detail::read_string_while(is, "+-eE.0123456789infINFnanNANinfinityINFINITY");
+      else
+         // Interval:
+         s = detail::read_string_while(is, "+-eE.0123456789infINFnanNANinfinityINFINITY{,}");
+      break;
+   case boost::multiprecision::number_kind_complex:
+      s = detail::read_string_while(is, "+-eE.0123456789infINFnanNANinfinityINFINITY,()");
       break;
    default:
       is >> s;
