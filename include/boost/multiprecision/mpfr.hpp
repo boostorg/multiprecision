@@ -1440,7 +1440,7 @@ template <unsigned digits10, mpfr_allocation_type AllocationType>
 inline void eval_subtract(mpfr_float_backend<digits10, AllocationType>& result, long i)
 {
    if (i > 0)
-      mpfr_sub_ui(result.data(), result.data(), static_cast<std::make_unsigned_t<long>>(i), GMP_RNDN);
+      mpfr_sub_ui(result.data(), result.data(), static_cast<typename std::make_unsigned<long>::type>(i), GMP_RNDN);
    else
       mpfr_add_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i), GMP_RNDN);
 }
@@ -1511,7 +1511,7 @@ inline void eval_subtract(mpfr_float_backend<D1, A1>& a, const mpfr_float_backen
    if (y < 0)
       mpfr_add_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDN);
    else
-      mpfr_sub_ui(a.data(), x.data(), static_cast<std::make_unsigned_t<long>>(y), GMP_RNDN);
+      mpfr_sub_ui(a.data(), x.data(), static_cast<typename std::make_unsigned<long>::type>(y), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, mpfr_allocation_type A1, mpfr_allocation_type A2>
 inline void eval_subtract(mpfr_float_backend<D1, A1>& a, unsigned long x, const mpfr_float_backend<D2, A2>& y)
@@ -2076,7 +2076,7 @@ inline boost::multiprecision::mpfr_float
 max_value<boost::multiprecision::mpfr_float>()
 {
    boost::multiprecision::mpfr_float result(0.5);
-   mpfr_mul_2exp(result.backend().data(), result.backend().data(), static_cast<std::make_unsigned_t<mpfr_exp_t>>(mpfr_get_emax()), GMP_RNDN);
+   mpfr_mul_2exp(result.backend().data(), result.backend().data(), static_cast<typename std::make_unsigned<mpfr_exp_t>::type>(mpfr_get_emax()), GMP_RNDN);
    BOOST_MP_ASSERT(mpfr_number_p(result.backend().data()));
    return result;
 }
@@ -2086,7 +2086,7 @@ inline boost::multiprecision::mpfr_float
 min_value<boost::multiprecision::mpfr_float>()
 {
    boost::multiprecision::mpfr_float result(0.5);
-   mpfr_div_2exp(result.backend().data(), result.backend().data(), static_cast<std::make_unsigned_t<mpfr_exp_t>>(-mpfr_get_emin()), GMP_RNDN);
+   mpfr_div_2exp(result.backend().data(), result.backend().data(), static_cast<typename std::make_unsigned<mpfr_exp_t>::type>(-mpfr_get_emin()), GMP_RNDN);
    BOOST_MP_ASSERT(mpfr_number_p(result.backend().data()));
    return result;
 }
@@ -2096,7 +2096,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0
 max_value<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> >()
 {
    boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> result(0.5);
-   mpfr_mul_2exp(result.backend().data(), result.backend().data(), static_cast<std::make_unsigned_t<mpfr_exp_t>>(mpfr_get_emax()), GMP_RNDN);
+   mpfr_mul_2exp(result.backend().data(), result.backend().data(), static_cast<typename std::make_unsigned<mpfr_exp_t>::type>(mpfr_get_emax()), GMP_RNDN);
    BOOST_MP_ASSERT(mpfr_number_p(result.backend().data()));
    return result;
 }
@@ -2106,7 +2106,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0
 min_value<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> >()
 {
    boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> result(0.5);
-   mpfr_div_2exp(result.backend().data(), result.backend().data(), static_cast<std::make_unsigned_t<mpfr_exp_t>>(-mpfr_get_emin()), GMP_RNDN);
+   mpfr_div_2exp(result.backend().data(), result.backend().data(), static_cast<typename std::make_unsigned<mpfr_exp_t>::type>(-mpfr_get_emin()), GMP_RNDN);
    BOOST_MP_ASSERT(mpfr_number_p(result.backend().data()));
    return result;
 }
