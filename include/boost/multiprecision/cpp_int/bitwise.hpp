@@ -5,8 +5,8 @@
 //
 // Comparison operators for cpp_int_backend:
 //
-#ifndef BOOST_MP_CPP_INT_BIT_HPP
-#define BOOST_MP_CPP_INT_BIT_HPP
+#ifndef BOOST_MP_CPP_INT_BITWISE_HPP
+#define BOOST_MP_CPP_INT_BITWISE_HPP
 
 #include <stdexcept>
 #include <type_traits>

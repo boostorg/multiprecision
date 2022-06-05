@@ -5,8 +5,8 @@
 //
 // Comparison operators for cpp_int_backend:
 //
-#ifndef BOOST_MP_CPP_INT_LIM_HPP
-#define BOOST_MP_CPP_INT_LIM_HPP
+#ifndef BOOST_MP_CPP_INT_LIMITS_HPP
+#define BOOST_MP_CPP_INT_LIMITS_HPP
 
 #include <boost/multiprecision/traits/max_digits10.hpp>
 

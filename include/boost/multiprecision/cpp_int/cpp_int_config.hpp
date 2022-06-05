@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_MP_CPP_INT_CORE_HPP
-#define BOOST_MP_CPP_INT_CORE_HPP
+#ifndef BOOST_MP_CPP_INT_CONFIG_HPP
+#define BOOST_MP_CPP_INT_CONFIG_HPP
 
 #include <cstdint>
 #include <type_traits>
@@ -173,4 +173,4 @@ enum cpp_int_check_type
 } // namespace multiprecision
 } // namespace boost
 
-#endif // BOOST_MP_CPP_INT_CORE_HPP
+#endif // BOOST_MP_CPP_INT_CONFIG_HPP

@@ -3,8 +3,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_MULTIPRECISION_RATIONAL_ADAPTOR_HPP
-#define BOOST_MULTIPRECISION_RATIONAL_ADAPTOR_HPP
+#ifndef BOOST_MP_RATIONAL_ADAPTOR_HPP
+#define BOOST_MP_RATIONAL_ADAPTOR_HPP
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/hash.hpp>

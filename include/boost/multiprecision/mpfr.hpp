@@ -3,8 +3,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_MATH_BN_MPFR_HPP
-#define BOOST_MATH_BN_MPFR_HPP
+#ifndef BOOST_MP_MPFR_HPP
+#define BOOST_MP_MPFR_HPP
 
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>

@@ -3,8 +3,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_MATH_DEBUG_ADAPTER_HPP
-#define BOOST_MATH_DEBUG_ADAPTER_HPP
+#ifndef BOOST_MP_DEBUG_ADAPTOR_HPP
+#define BOOST_MP_DEBUG_ADAPTOR_HPP
 
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/traits/extract_exponent_type.hpp>

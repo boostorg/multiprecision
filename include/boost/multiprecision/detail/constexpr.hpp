@@ -3,8 +3,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_MP_CONSTEXPR_HPP
-#define BOOST_MP_CONSTEXPR_HPP
+#ifndef BOOST_MP_DETAIL_CONSTEXPR_HPP
+#define BOOST_MP_DETAIL_CONSTEXPR_HPP
 
 #include <cstring>
 #include <boost/multiprecision/detail/standalone_config.hpp>

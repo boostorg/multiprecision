@@ -4,8 +4,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_MATH_BIG_NUM_DEF_OPS
-#define BOOST_MATH_BIG_NUM_DEF_OPS
+#ifndef BOOST_MP_DEFAULT_OPS
+#define BOOST_MP_DEFAULT_OPS
 
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>

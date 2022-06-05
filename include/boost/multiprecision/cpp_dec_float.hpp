@@ -13,8 +13,8 @@
 // at compile time, allowing for simple use of it here.
 //
 
-#ifndef BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
-#define BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
+#ifndef BOOST_MP_CPP_DEC_FLOAT_HPP
+#define BOOST_MP_CPP_DEC_FLOAT_HPP
 
 #include <cmath>
 #include <cstdint>
@@ -26,6 +26,9 @@
 #include <string>
 #include <limits>
 #include <stdexcept>
+#include <sstream>
+#include <locale>
+#include <ios>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/fpclassify.hpp>
@@ -734,27 +737,27 @@ class cpp_dec_float
 };
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
+constexpr std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_limit_lo;
+constexpr std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_limit_lo;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_limit_hi;
+constexpr std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10_limit_hi;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
+constexpr std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp;
+constexpr ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp;
+constexpr ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10;
+constexpr ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10;
+constexpr ExponentType cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_digits10;
+constexpr std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_digits10;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_number;
+constexpr std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_number;
 template <unsigned Digits10, class ExponentType, class Allocator>
-const std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_mask;
+constexpr std::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_elem_mask;
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, ExponentType, Allocator>::operator+=(const cpp_dec_float<Digits10, ExponentType, Allocator>& v)
@@ -1603,7 +1606,15 @@ double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_double() const
                      : -std::numeric_limits<double>::infinity());
    }
 
-   return std::strtod(str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific).c_str(), nullptr);
+   std::stringstream ss;
+   ss.imbue(std::locale::classic());
+
+   ss << str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific);
+
+   double d;
+   ss >> d;
+
+   return d;
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -1642,7 +1653,15 @@ long double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_long_doubl
                      : -std::numeric_limits<long double>::infinity());
    }
 
-   return std::strtold(str(std::numeric_limits<long double>::digits10 + (2 + 1), std::ios_base::scientific).c_str(), nullptr);
+   std::stringstream ss;
+   ss.imbue(std::locale::classic());
+
+   ss << str(std::numeric_limits<long double>::digits10 + (2 + 1), std::ios_base::scientific);
+
+   long double ld;
+   ss >> ld;
+
+   return ld;
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>

@@ -216,9 +216,9 @@ private:
    };
 
  public:
-   static constexpr std::size_t limb_bits = sizeof(limb_type) * CHAR_BIT;
-   static constexpr limb_type max_limb_value = ~static_cast<limb_type>(0u);
-   static constexpr limb_type sign_bit_mask = static_cast<limb_type>(1u) << (limb_bits - 1);
+   static constexpr std::size_t limb_bits           = sizeof(limb_type) * CHAR_BIT;
+   static constexpr limb_type   max_limb_value      = ~static_cast<limb_type>(0u);
+   static constexpr limb_type   sign_bit_mask       = static_cast<limb_type>(1u) << (limb_bits - 1);
    static constexpr std::size_t internal_limb_count =
                                        MinBits
                                            ? (MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0))
@@ -522,13 +522,13 @@ private:
 };
 
 template <std::size_t MinBits, std::size_t MaxBits, cpp_int_check_type Checked, class Allocator>
-const std::size_t cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::limb_bits;
+constexpr std::size_t cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::limb_bits;
 template <std::size_t MinBits, std::size_t MaxBits, cpp_int_check_type Checked, class Allocator>
-const limb_type cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::max_limb_value;
+constexpr limb_type cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::max_limb_value;
 template <std::size_t MinBits, std::size_t MaxBits, cpp_int_check_type Checked, class Allocator>
-const limb_type cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::sign_bit_mask;
+constexpr limb_type cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::sign_bit_mask;
 template <std::size_t MinBits, std::size_t MaxBits, cpp_int_check_type Checked, class Allocator>
-const std::size_t cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::internal_limb_count;
+constexpr std::size_t cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::internal_limb_count;
 
 template <std::size_t MinBits, std::size_t MaxBits, cpp_int_check_type Checked, class Allocator>
 struct cpp_int_base<MinBits, MaxBits, unsigned_magnitude, Checked, Allocator, false>
@@ -727,13 +727,13 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
 };
 
 template <std::size_t MinBits, cpp_int_check_type Checked>
-const std::size_t cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::limb_bits;
+constexpr std::size_t cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::limb_bits;
 template <std::size_t MinBits, cpp_int_check_type Checked>
-const limb_type cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::max_limb_value;
+constexpr limb_type cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::max_limb_value;
 template <std::size_t MinBits, cpp_int_check_type Checked>
-const limb_type cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::sign_bit_mask;
+constexpr limb_type cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::sign_bit_mask;
 template <std::size_t MinBits, cpp_int_check_type Checked>
-const std::size_t cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::internal_limb_count;
+constexpr std::size_t cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::internal_limb_count;
 //
 // Fixed precision (i.e. no allocator), unsigned type with limb-usage count:
 //
@@ -927,13 +927,13 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
 };
 
 template <std::size_t MinBits, cpp_int_check_type Checked>
-const std::size_t cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::limb_bits;
+constexpr std::size_t cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::limb_bits;
 template <std::size_t MinBits, cpp_int_check_type Checked>
-const limb_type cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::max_limb_value;
+constexpr limb_type cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::max_limb_value;
 template <std::size_t MinBits, cpp_int_check_type Checked>
-const limb_type cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::sign_bit_mask;
+constexpr limb_type cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::sign_bit_mask;
 template <std::size_t MinBits, cpp_int_check_type Checked>
-const std::size_t cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::internal_limb_count;
+constexpr std::size_t cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::internal_limb_count;
 //
 // Traits classes to figure out a native type with N bits, these vary from boost::uint_t<N> only
 // because some platforms have native integer types longer than long long, "really long long" anyone??
@@ -2104,7 +2104,7 @@ public:
          std::string::size_type n = result.find_first_not_of('0');
          result.erase(0, n);
          if (result.empty())
-            result = "0";
+            result = std::string(static_cast<std::size_t>(1u), '0');
          if (neg)
             result.insert(static_cast<std::string::size_type>(0), 1, '-');
          else if (f & std::ios_base::showpos)

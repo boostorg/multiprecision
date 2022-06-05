@@ -6,8 +6,8 @@
 // We deliberately use assert in here:
 //
 
-#ifndef BOOST_MP_TOOLS_FLOAT128_HPP
-#define BOOST_MP_TOOLS_FLOAT128_HPP
+#ifndef BOOST_MP_DETAIL_FLOAT128_FUNCTIONS_HPP
+#define BOOST_MP_DETAIL_FLOAT128_FUNCTIONS_HPP
 
 #include <boost/multiprecision/detail/standalone_config.hpp>
 
@@ -78,4 +78,4 @@ struct is_float128 : public std::false_type
 
 #endif
 
-#endif // BOOST_MP_TOOLS_FLOAT128_HPP
+#endif // BOOST_MP_DETAIL_FLOAT128_FUNCTIONS_HPP
