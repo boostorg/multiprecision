@@ -382,11 +382,18 @@ class cpp_dec_float
    {
       using default_ops::eval_add;
       using default_ops::eval_multiply;
-      static constexpr unsigned          bit_shift = sizeof(unsigned long long) * CHAR_BIT;
+
+      static constexpr unsigned     bit_shift = sizeof(unsigned long long) * CHAR_BIT;
       static constexpr uint128_type mask      = (static_cast<uint128_type>(1u) << bit_shift) - 1;
-      unsigned                           shift     = bit_shift;
-      *this                                        = static_cast<unsigned long long>(v & mask);
+
+      unsigned shift = bit_shift;
+
+      static_cast<void>(shift);
+
+      *this = static_cast<unsigned long long>(v & mask);
+
       v >>= bit_shift;
+
       while (v)
       {
          cpp_dec_float t(static_cast<unsigned long long>(v & mask));
