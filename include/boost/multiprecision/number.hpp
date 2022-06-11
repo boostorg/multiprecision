@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -323,7 +323,7 @@ class number
    BOOST_MP_CXX14_CONSTEXPR number& assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       using tag_type = std::integral_constant<bool, is_equivalent_number_type<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value>;
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                       precision_guard(e);
+
       //
       // If the current precision of *this differs from that of expression e, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -336,12 +336,16 @@ class number
       BOOST_IF_CONSTEXPR(std::is_same<self_type, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value)
       {
          BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-         if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
+         {
+            const detail::scoped_default_precision<number<Backend, ExpressionTemplates>> precision_guard(e);
+
+            if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
             {
                number t;
                t.assign(e);
                return *this = std::move(t);
             }
+         }
       }
       do_assign(e, tag_type());
       return *this;

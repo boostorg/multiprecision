@@ -255,11 +255,12 @@ inline typename std::enable_if<!is_signed_number<LargeInteger>::value>::type mak
 template <class R, class LargeInteger>
 R safe_convert_to_float(const LargeInteger& i)
 {
-   using std::ldexp;
    if (!i)
       return R(0);
    BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::max_exponent)
    {
+      using std::ldexp;
+
       LargeInteger val(i);
       make_positive(val);
       std::size_t mb = msb(val);

@@ -1055,7 +1055,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::d
    eval_convert_to(&n, backend);
    BOOST_IF_CONSTEXPR(!boost::multiprecision::detail::is_unsigned<R>::value && std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded)
    {
-      if(n > (next_type)(std::numeric_limits<R>::max)())
+      if(n > static_cast<next_type>((std::numeric_limits<R>::max)()))
       {
          *result = (std::numeric_limits<R>::max)();
          return;
@@ -1063,7 +1063,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::d
    }
    BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized&& std::numeric_limits<R>::is_bounded)
    {
-      if (n < (next_type)(std::numeric_limits<R>::min)())
+      if (n < static_cast<next_type>((std::numeric_limits<R>::min)()))
       {
          *result = (std::numeric_limits<R>::min)();
          return;

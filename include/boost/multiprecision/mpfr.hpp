@@ -3358,11 +3358,11 @@ namespace Eigen
       }
       static int min_exponent()
       {
-         return mpfr_get_emin();
+         return static_cast<int>(mpfr_get_emin());
       }
       static int max_exponent()
       {
-         return mpfr_get_emax();
+         return static_cast<int>(mpfr_get_emax());
       }
       static Real infinity()
       {
