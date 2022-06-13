@@ -11,7 +11,34 @@
 
 #include <boost/multiprecision/detail/standalone_config.hpp>
 
-#ifdef BOOST_HAS_FLOAT128
+#ifndef BOOST_MP_STANDALONE
+#include <boost/cstdfloat.hpp>
+#if defined(BOOST_MATH_USE_FLOAT128) && !defined(BOOST_CSTDFLOAT_NO_LIBQUADMATH_SUPPORT)
+#  define BOOST_MP_HAVE_CSTDFLOAT
+#endif
+#endif
+
+#ifdef BOOST_MP_HAVE_CSTDFLOAT
+
+namespace boost
+{
+   namespace multiprecision
+   {
+      namespace float128_procs
+      {
+         extern "C" __float128 ldexpq(__float128, int) throw();
+         extern "C" __float128 frexpq(__float128, int*) throw();
+         extern "C" __float128 floorq(__float128) throw();
+         extern "C" __float128 nextafterq(__float128, __float128) throw();
+         extern "C" int        isinfq(__float128) throw();
+         extern "C" int        isnanq(__float128) throw();
+         extern "C" __float128 strtoflt128(const char*, char**) throw();
+      }
+   }
+}
+#define BOOST_MP_FLOAT128_USING
+
+#elif defined(BOOST_HAS_FLOAT128)
 
 namespace boost 
 {
