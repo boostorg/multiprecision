@@ -34,6 +34,12 @@ namespace boost
          extern "C" int        isnanq(__float128) throw();
          extern "C" __float128 strtoflt128(const char*, char**) throw();
       }
+      namespace detail {
+
+         template <class T>
+         struct is_float128 : public std::is_same<__float128, T>
+         {};
+      }
    }
 }
 #define BOOST_MP_FLOAT128_USING
