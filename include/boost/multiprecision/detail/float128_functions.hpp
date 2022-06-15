@@ -18,33 +18,7 @@
 #endif
 #endif
 
-#ifdef BOOST_MP_HAVE_CSTDFLOAT
-
-namespace boost
-{
-   namespace multiprecision
-   {
-      namespace float128_procs
-      {
-         extern "C" __float128 ldexpq(__float128, int) throw();
-         extern "C" __float128 frexpq(__float128, int*) throw();
-         extern "C" __float128 floorq(__float128) throw();
-         extern "C" __float128 nextafterq(__float128, __float128) throw();
-         extern "C" int        isinfq(__float128) throw();
-         extern "C" int        isnanq(__float128) throw();
-         extern "C" __float128 strtoflt128(const char*, char**) throw();
-      }
-      namespace detail {
-
-         template <class T>
-         struct is_float128 : public std::is_same<__float128, T>
-         {};
-      }
-   }
-}
-#define BOOST_MP_FLOAT128_USING
-
-#elif defined(BOOST_HAS_FLOAT128)
+#if defined(BOOST_HAS_FLOAT128)
 
 namespace boost 
 {
@@ -60,10 +34,15 @@ extern "C" int        isinfq(__float128) throw();
 extern "C" int        isnanq(__float128) throw();
 extern "C" __float128 strtoflt128(const char*, char**) throw();
 
+#ifdef BOOST_MP_HAVE_CSTDFLOAT
+using std::ldexp;
+using std::frexp;
+using std::floor;
+#else
 inline __float128 ldexp(__float128 f, int i) throw() { return ldexpq(f, i); }
 inline __float128 frexp(__float128 f, int* p) throw() { return frexpq(f, p); }
 inline __float128 floor(__float128 f) throw() { return floorq(f); }
-
+#endif
 }
 
 namespace detail {
