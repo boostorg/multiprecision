@@ -13,7 +13,7 @@ template <class T, class U>
 BOOST_CXX14_CONSTEXPR T do_test_constexpr_add_subtract(T a, U b)
 {
    a = +b;
-   if constexpr(std::numeric_limits<U>::is_signed && std::numeric_limits<T>::is_signed)
+   if constexpr((std::numeric_limits<U>::is_signed || std::is_same<__float128, U>::value) && std::numeric_limits<T>::is_signed)
       b = -b;
    a += b;
    a += a;
@@ -26,13 +26,13 @@ BOOST_CXX14_CONSTEXPR T do_test_constexpr_add_subtract(T a, U b)
    a += bb--;
    a = a + b;
    a += a - b;
-   if constexpr(std::numeric_limits<U>::is_signed && std::numeric_limits<T>::is_signed)
+   if constexpr((std::numeric_limits<U>::is_signed || std::is_same<__float128, U>::value) && std::numeric_limits<T>::is_signed)
       a -= b - -a;
    a += b + a;
    if constexpr(std::numeric_limits<T>::is_signed)
    {
       a = -a;
-      if constexpr(std::numeric_limits<U>::is_signed)
+      if constexpr((std::numeric_limits<U>::is_signed || std::is_same<__float128, U>::value))
          a -= b;
    }
    return a;
