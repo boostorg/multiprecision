@@ -127,10 +127,12 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
    }
    else
       *result = static_cast<R>(backend.limbs()[0]);
-   std::size_t shift = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
-   std::size_t i     = 1;
+
    BOOST_IF_CONSTEXPR(numeric_limits_workaround<R>::digits > cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
    {
+     std::size_t shift = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
+     std::size_t i     = 1u;
+
       while ((i < backend.size()) && (shift < static_cast<unsigned>(numeric_limits_workaround<R>::digits - cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)))
       {
          *result += static_cast<R>(backend.limbs()[i]) << shift;
@@ -1280,9 +1282,10 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && std::is_convertible<typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type, R>::value>::type
 eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& val)
 {
-   using common_type = typename std::common_type<R, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type>::type;
    BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized)
    {
+      using common_type = typename std::common_type<R, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type>::type;
+
       if (static_cast<common_type>(*val.limbs()) > static_cast<common_type>((std::numeric_limits<R>::max)()))
       {
          if (val.isneg())
@@ -1324,9 +1327,10 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && std::is_convertible<typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type, R>::value>::type
 eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& val)
 {
-   using common_type = typename std::common_type<R, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type>::type;
    BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized)
    {
+      using common_type = typename std::common_type<R, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type>::type;
+
       if(static_cast<common_type>(*val.limbs()) > static_cast<common_type>((std::numeric_limits<R>::max)()))
       {
          conversion_overflow(typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
