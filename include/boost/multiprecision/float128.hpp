@@ -16,7 +16,10 @@
 #endif
 
 #include <memory>
+#include <climits>
+#include <cfloat>
 #include <tuple>
+#include <cstring>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
