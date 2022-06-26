@@ -721,7 +721,7 @@ class number
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
       if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
          {
-            number t(*this + v);
+            number t(*this * v);
             return *this = std::move(t);
          }
 
@@ -891,7 +891,7 @@ class number
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
       if (precision_guard.precision() != boost::multiprecision::detail::current_precision_of<self_type>(*this))
          {
-            number t(*this + v);
+            number t(*this / v);
             return *this = std::move(t);
          }
 
