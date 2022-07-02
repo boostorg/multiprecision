@@ -336,11 +336,12 @@ BOOST_MP_CXX14_CONSTEXPR Integer bitwise_sqrt(const Integer& x, Integer& r)
 template <class Integer>
 BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<Integer>::value, Integer>::type sqrt(const Integer& x, Integer& r)
 {
-   return detail::bitwise_sqrt(x, r);
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    // recursive Karatsuba sqrt can cause issues in constexpr context:
    if (BOOST_MP_IS_CONST_EVALUATED(x))
+   {
       return detail::bitwise_sqrt(x, r);
+   }
 #endif
    if (x == 0u) {
       r = 0u;
