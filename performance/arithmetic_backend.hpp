@@ -114,18 +114,29 @@ struct arithmetic_backend
 template <class R, class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_integral<R>::value>::type eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& backend)
 {
-   typedef typename std::common_type<R, Arithmetic>::type c_type;
-   constexpr const c_type                             max = static_cast<c_type>((std::numeric_limits<R>::max)());
-   constexpr const c_type                             min = static_cast<c_type>((std::numeric_limits<R>::min)());
-   c_type                                                   ct  = static_cast<c_type>(backend.data());
+   using c_type = typename std::common_type<R, Arithmetic>::type;
+
+   constexpr const c_type max = static_cast<c_type>((std::numeric_limits<R>::max)());
+   constexpr const c_type min = static_cast<c_type>((std::numeric_limits<R>::min)());
+   c_type ct  = static_cast<c_type>(backend.data());
+
    if ((backend.data() < 0) && !std::numeric_limits<R>::is_signed)
+   {
       BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative number to unsigned type."));
+   }
+
    if (ct > max)
-      *result = boost::multiprecision::detail::is_signed<R>::value ? (std::numeric_limits<R>::max)() : backend.data();
+   {
+      *result = boost::multiprecision::detail::is_signed<R>::value ? (std::numeric_limits<R>::max)() : static_cast<R>(backend.data());
+   }
    else if (std::numeric_limits<Arithmetic>::is_signed && (ct < min))
+   {
       *result = (std::numeric_limits<R>::min)();
+   }
    else
+   {
       *result = backend.data();
+   }
 }
 
 template <class R, class Arithmetic>
