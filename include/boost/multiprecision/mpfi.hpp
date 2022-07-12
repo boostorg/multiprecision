@@ -123,7 +123,7 @@ struct mpfi_float_imp
       if ((this->get_default_options() != variable_precision_options::preserve_target_precision) || (mpfi_get_prec(o.data()) == binary_default_precision))
       {
          m_data[0]                = o.m_data[0];
-         o.m_data[0].left._mpfr_d = 0;
+         o.m_data[0].left._mpfr_d = nullptr;
       }
       else
       {

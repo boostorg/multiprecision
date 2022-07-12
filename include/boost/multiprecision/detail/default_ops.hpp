@@ -3066,7 +3066,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<T>::valu
    using default_ops::eval_modf;
    detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates> > precision_guard(v);
    number<T, ExpressionTemplates>                                                    result;
-   eval_modf(result.backend(), v.backend(), pipart ? &pipart->backend() : 0);
+   eval_modf(result.backend(), v.backend(), pipart ? &pipart->backend() : nullptr);
    return result;
 }
 template <class T, expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
@@ -3075,7 +3075,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<T>::valu
    using default_ops::eval_modf;
    detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates> > precision_guard(v);
    number<T, ExpressionTemplates>                                                    result, arg(v);
-   eval_modf(result.backend(), arg.backend(), pipart ? &pipart->backend() : 0);
+   eval_modf(result.backend(), arg.backend(), pipart ? &pipart->backend() : nullptr);
    return result;
 }
 

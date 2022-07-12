@@ -1915,7 +1915,7 @@ inline void eval_log2(mpfr_float_backend<Digits10, AllocateType>& result, const 
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline void eval_modf(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& arg, mpfr_float_backend<Digits10, AllocateType>* pipart)
 {
-   if (0 == pipart)
+   if (pipart == nullptr)
    {
       mpfr_float_backend<Digits10, AllocateType> ipart;
       mpfr_modf(ipart.data(), result.data(), arg.data(), GMP_RNDN);
