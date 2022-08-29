@@ -31,8 +31,8 @@ int main()
 
    for (const auto msv_first : msv_values)
    {
-      static_cast<void>(import_bits(u, std::cbegin(bits), std::cend(bits), 8u, msv_first));
-      static_cast<void>(import_bits(v, std::cbegin(result_bits), std::cend(result_bits), 8u, msv_first));
+      static_cast<void>(import_bits(u, std::begin(bits), std::end(bits), 8u, msv_first));
+      static_cast<void>(import_bits(v, std::begin(result_bits), std::end(result_bits), 8u, msv_first));
 
       std::cout << std::hex << std::uppercase << u << std::endl;
 
