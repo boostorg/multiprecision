@@ -2382,7 +2382,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::backends
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       // C++11 thread safe static initialization:
-      static result_type result(std::integral_constant<int, 0>());
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2400,7 +2400,7 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::back
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       // C++11 thread safe static initialization:
-      static result_type result(std::integral_constant<int, 0>());
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2418,7 +2418,7 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::backe
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       // C++11 thread safe static initialization:
-      static result_type result(std::integral_constant<int, 0>());
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2436,7 +2436,7 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::bac
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       // C++11 thread safe static initialization:
-      static result_type result(std::integral_constant<int, 0>());
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
