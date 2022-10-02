@@ -2234,7 +2234,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::backends
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
       // C++11 thread safe static initialization:
-      static result_type result{get{std::integral_constant<int, 0>())};
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline result_type get(const std::integral_constant<int, 0>&)
