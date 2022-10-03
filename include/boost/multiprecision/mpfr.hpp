@@ -2381,13 +2381,8 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::backends
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static bool        has_init = false;
-      if (!has_init)
-      {
-         mpfr_const_pi(result.backend().value().data(), GMP_RNDN);
-         has_init = true;
-      }
+      // C++11 thread safe static initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2404,13 +2399,8 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::back
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static bool        init = false;
-      if (!init)
-      {
-         mpfr_const_log2(result.backend().value().data(), GMP_RNDN);
-         init = true;
-      }
+      // C++11 thread safe static initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2427,13 +2417,8 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::backe
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static bool        init = false;
-      if (!init)
-      {
-         mpfr_const_euler(result.backend().value().data(), GMP_RNDN);
-         init = true;
-      }
+      // C++11 thread safe static initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
@@ -2450,13 +2435,8 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::bac
    template <int N>
    static inline const result_type& get(const std::integral_constant<int, N>&)
    {
-      static result_type result;
-      static bool        init = false;
-      if (!init)
-      {
-         mpfr_const_catalan(result.backend().value().data(), GMP_RNDN);
-         init = true;
-      }
+      // C++11 thread safe static initialization:
+      static result_type result{get(std::integral_constant<int, 0>())};
       return result;
    }
    static inline const result_type get(const std::integral_constant<int, 0>&)
