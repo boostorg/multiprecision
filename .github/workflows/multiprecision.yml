@@ -27,7 +27,7 @@ jobs:
         standard: [ c++11, c++14, c++17, c++20, c++2b ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -89,7 +89,7 @@ jobs:
         standard: [ c++11, c++14, c++17, c++2a ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -151,7 +151,7 @@ jobs:
         standard: [ c++11, c++17, c++2a ]
         suite: [ specfun_mpfr, specfun_gmp, specfun_cpp_dec_float, specfun_cpp_bin_float, specfun_float128 ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -213,7 +213,7 @@ jobs:
         standard: [ c++11, c++14, c++17, c++20 ]
         suite: [ standalone ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -275,7 +275,7 @@ jobs:
         standard: [ c++17 ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -337,7 +337,7 @@ jobs:
         standard: [ c++17 ]
         suite: [ arithmetic_tests, functions_and_limits, misc ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -399,7 +399,7 @@ jobs:
         standard: [ c++11, c++14, c++17 ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -461,7 +461,7 @@ jobs:
         standard: [ c++11, c++14 ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -525,7 +525,7 @@ jobs:
         standard: [ 11, 14, 17 ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Checkout main boost
@@ -568,7 +568,7 @@ jobs:
         standard: [ 14, 17 ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Checkout main boost
@@ -611,7 +611,7 @@ jobs:
         standard: [ 14, 17, 20 ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Checkout main boost
@@ -649,7 +649,7 @@ jobs:
         standard: [ 11, 14, 17, 2a ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc, compile_fail, concepts, examples ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Checkout main boost
