@@ -2106,11 +2106,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       if (((pos = str.find('e')) != std::string::npos) || ((pos = str.find('E')) != std::string::npos))
       {
          // Remove the exponent part from the string.
-         #ifndef BOOST_MP_STANDALONE
-         exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(str.c_str() + (pos + 1u)));
-         #else
          exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
-         #endif
          
          str = str.substr(static_cast<std::size_t>(0u), pos);
       }
@@ -2373,11 +2369,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
 #ifndef BOOST_NO_EXCEPTIONS
    }
-   #ifndef BOOST_MP_STANDALONE
-   catch (const bad_lexical_cast&)
-   #else
    catch (const std::exception&)
-   #endif
    {
       // Rethrow with better error message:
       std::string msg = "Unable to parse the string \"";
