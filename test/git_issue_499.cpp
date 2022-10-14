@@ -5,11 +5,15 @@
 
 #include <iostream>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/core/lightweight_test.hpp>
 
 using boost::multiprecision::cpp_dec_float_50;
 
 int main()
 {
+    std::size_t counter {};
+    
+    // All character strings case
     try
     {
         cpp_dec_float_50 val {"wrong"};
@@ -18,11 +22,32 @@ int main()
     catch (const std::runtime_error& error)
     {
         std::cout << "std::runtime_error. what():" << error.what() << "\n";
-        return 0;
     }
     catch (const std::invalid_argument& error)
     {
         std::cout << "std::invalid_argument. what():" << error.what() << "\n";
+        ++counter;
+    }
+
+    // Malformed expressions
+    try
+    {
+        cpp_dec_float_50 malformed {"3.4e1a2"};
+        std::cout << "no exception. val=" << malformed << "\n";
+    }
+    catch (const std::runtime_error& e)
+    {
+        std::cout << "std::runtime_error. what():" << e.what() << "\n";
+    }
+    catch (...)
+    {
+        ++counter;
+    }
+
+    if (counter != 0)
+    {
         return 1;
     }
+    
+    return 0;
 }

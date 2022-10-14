@@ -2106,8 +2106,13 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       if (((pos = str.find('e')) != std::string::npos) || ((pos = str.find('E')) != std::string::npos))
       {
          // Remove the exponent part from the string.
-         exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
-         
+         std::size_t num_chars {};
+         exp = static_cast<exponent_type>(std::stoll(str.substr(pos + 1u), &num_chars));
+         if ((pos + num_chars + 1u) != str.size())
+         {
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Malformed expression"));
+         }
+
          str = str.substr(static_cast<std::size_t>(0u), pos);
       }
 
