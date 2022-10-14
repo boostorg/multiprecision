@@ -2095,6 +2095,34 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
       std::string str(s);
 
+      //
+      // Special cases for infinities and NaN's:
+      //
+      if ((str == "inf") || (str == "INF") || (str == "infinity") || (str == "INFINITY"))
+      {
+         if (neg)
+         {
+            *this = this->inf();
+            this->negate();
+         }
+         else
+            *this = this->inf();
+         return true;
+      }
+      if ((str.size() >= 3) && ((str.substr(0, 3) == "nan") || (str.substr(0, 3) == "NAN") || (str.substr(0, 3) == "NaN")))
+      {
+         *this = this->nan();
+         return true;
+      }
+
+      // See git issue 499
+      // Example: 12a3.4 should throw as malformed
+      std::size_t malformed = str.find_first_not_of("0123456789eElLfF.+-");
+      if (malformed != std::string::npos)
+      {
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Malformed expression"));
+      }
+
       // TBD: Using several regular expressions may significantly reduce
       // the code complexity (and perhaps the run-time) of rd_string().
 
@@ -2108,6 +2136,9 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          // Remove the exponent part from the string.
          std::size_t num_chars {};
          exp = static_cast<exponent_type>(std::stoll(str.substr(pos + 1u), &num_chars));
+         
+         // See git issue 499
+         // Example: 3.4e1a2 should throw as malformed
          if ((pos + num_chars + 1u) != str.size())
          {
             BOOST_MP_THROW_EXCEPTION(std::runtime_error("Malformed expression"));
@@ -2130,25 +2161,6 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          {
             str.erase(0, 1);
          }
-      }
-      //
-      // Special cases for infinities and NaN's:
-      //
-      if ((str == "inf") || (str == "INF") || (str == "infinity") || (str == "INFINITY"))
-      {
-         if (neg)
-         {
-            *this = this->inf();
-            this->negate();
-         }
-         else
-            *this = this->inf();
-         return true;
-      }
-      if ((str.size() >= 3) && ((str.substr(0, 3) == "nan") || (str.substr(0, 3) == "NAN") || (str.substr(0, 3) == "NaN")))
-      {
-         *this = this->nan();
-         return true;
       }
 
       // Remove the leading zeros for all input types.
