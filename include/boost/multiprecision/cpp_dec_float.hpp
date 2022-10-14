@@ -2095,6 +2095,22 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
       std::string str(s);
 
+      // Get a possible +/- sign and remove it.
+      neg = false;
+
+      if (str.size())
+      {
+         if (str[0] == '-')
+         {
+            neg = true;
+            str.erase(0, 1);
+         }
+         else if (str[0] == '+')
+         {
+            str.erase(0, 1);
+         }
+      }
+
       //
       // Special cases for infinities and NaN's:
       //
@@ -2145,22 +2161,6 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          }
 
          str = str.substr(static_cast<std::size_t>(0u), pos);
-      }
-
-      // Get a possible +/- sign and remove it.
-      neg = false;
-
-      if (str.size())
-      {
-         if (str[0] == '-')
-         {
-            neg = true;
-            str.erase(0, 1);
-         }
-         else if (str[0] == '+')
-         {
-            str.erase(0, 1);
-         }
       }
 
       // Remove the leading zeros for all input types.
