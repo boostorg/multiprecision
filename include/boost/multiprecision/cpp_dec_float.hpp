@@ -2133,8 +2133,15 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
       // See git issue 499
       // Example: 12a3.4 should throw as malformed
-      std::size_t malformed = str.find_first_not_of("0123456789eElLfF.+-");
+      std::size_t malformed = str.find_first_not_of("0123456789eE.+-");
       if (malformed != std::string::npos)
+      {
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Malformed expression"));
+      }
+
+      std::size_t literal = str.find_last_of("lLfF");
+      if (literal != std::string::npos &&
+          literal != str.size())
       {
          BOOST_MP_THROW_EXCEPTION(std::runtime_error("Malformed expression"));
       }

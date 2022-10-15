@@ -72,6 +72,34 @@ int main()
         ++counter;
     }
 
+    try
+    {
+        cpp_dec_float_50 val3{"12L3.4"};
+        std::cout << "no exception. val=" << val3 << "\n";
+    }
+    catch (const std::runtime_error& e)
+    {
+        std::cout << "std::runtime_error. what():" << e.what() << "\n";
+    }
+    catch (...)
+    {
+        ++counter;
+    }
+
+    try
+    {
+        cpp_dec_float_50 val4{"1.2f34"};
+        std::cout << "no exception. val=" << val4 << "\n";
+    }
+    catch (const std::runtime_error& e)
+    {
+        std::cout << "std::runtime_error. what():" << e.what() << "\n";
+    }
+    catch (...)
+    {
+        ++counter;
+    }
+
     if (counter != 0)
     {
         return 1;
