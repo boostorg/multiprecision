@@ -323,8 +323,16 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
          return *this;
       }
 
-      BOOST_MP_ASSERT(!BOOST_MP_ISINF(a));
-      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(a));
+      if (BOOST_MP_ISINF(a))
+      {
+         mpfr_set_inf(m_data, a < 0 ? -1 : 1);
+         return *this;
+      }
+      if (BOOST_MP_ISNAN(a))
+      {
+         mpfr_set_nan(m_data);
+         return *this;
+      }
 
       int        e;
       float128_type f, term;
@@ -739,8 +747,16 @@ struct mpfr_float_imp<digits10, allocate_stack>
          return *this;
       }
 
-      BOOST_MP_ASSERT(!BOOST_MP_ISINF(a));
-      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(a));
+      if (BOOST_MP_ISINF(a))
+      {
+         mpfr_set_inf(m_data, a < 0 ? -1 : 1);
+         return *this;
+      }
+      if (BOOST_MP_ISNAN(a))
+      {
+         mpfr_set_nan(m_data);
+         return *this;
+      }
 
       int        e;
       float128_type f, term;

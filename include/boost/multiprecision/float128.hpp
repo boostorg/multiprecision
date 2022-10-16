@@ -203,8 +203,10 @@ struct float128_backend
    }
    BOOST_MP_CXX14_CONSTEXPR float128_backend(long double const& f) : m_value(f)
    {
-      if (::fabsl(f) > LDBL_MAX)
-         m_value = (f < 0) ? -static_cast<float128_type>(HUGE_VAL) : static_cast<float128_type>(HUGE_VAL);
+      if (f > LDBL_MAX)
+         m_value = static_cast<float128_type>(HUGE_VAL);
+      else if (-f > LDBL_MAX)
+         m_value = -static_cast<float128_type>(HUGE_VAL);
    }
    BOOST_MP_CXX14_CONSTEXPR float128_backend& operator=(long double const& f)
    {
