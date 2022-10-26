@@ -2146,9 +2146,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
       static number_type value = get_max();
       return value;
    }
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
+
    static constexpr number_type lowest()
    {
       return -(max)();
