@@ -231,7 +231,7 @@ FloatingPointType log(const FloatingPointType& x)
   // remember (in this case) to negate the result below.
   const bool b_negate = (x < 1);
 
-  const FloatingPointType xx = ((b_negate == false) ? x : 1 / x);
+  const FloatingPointType xx = (b_negate ? 1 / x : x);
 
   // Set a0 = 1
   // Set b0 = 4 / (x * 2^m) = 1 / (x * 2^(m - 2))
