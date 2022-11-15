@@ -1647,3 +1647,10 @@ test-suite concepts : [ get_concept_checks ] ;
 
 test-suite examples : ../example//examples ;
 test-suite performance : ../performance//performance ;
+
+# Some aliases which group blocks of tests for CI testing:
+
+alias github_ci_block_1 : arithmetic_tests functions_and_limits conversions ;
+alias github_ci_block_2 : cpp_int_tests misc compile_fail concepts examples ;
+explicit github_ci_block_1 ;
+explicit github_ci_block_2 ;
