@@ -2134,7 +2134,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          return true;
       }
 
-      const std::regex valid {R"(/^(-?(0|[1-9]\d*)?(\.\d+)?(e-?(0|[1-9]\d*))?|0x[0-9a-f]+)$/i)"};
+      const std::regex valid {R"(/^(-?(0|[1-9]\d*)?(\.\d+)?(e-?(0|[0-9]\d*))?|0x[0-9a-f]+)$/i)"};
       if (!std::regex_search(str, valid))
       {
          BOOST_MP_THROW_EXCEPTION(std::invalid_argument("Malformed expression"));
