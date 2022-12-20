@@ -29,6 +29,7 @@
 #include <sstream>
 #include <locale>
 #include <ios>
+#include <regex>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/fpclassify.hpp>
@@ -2122,7 +2123,9 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
             this->negate();
          }
          else
+         {
             *this = this->inf();
+         }
          return true;
       }
       if ((str.size() >= 3) && ((str.substr(0, 3) == "nan") || (str.substr(0, 3) == "NAN") || (str.substr(0, 3) == "NaN")))
@@ -2131,19 +2134,10 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          return true;
       }
 
-      // See git issue 499
-      // Example: 12a3.4 should throw as malformed
-      std::size_t malformed = str.find_first_not_of("0123456789eE.+-");
-      if (malformed != std::string::npos)
+      const std::regex valid {R"(/^(-?(0|[1-9]\d*)?(\.\d+)?(e-?(0|[1-9]\d*))?|0x[0-9a-f]+)$/i)"};
+      if (!std::regex_search(str, valid))
       {
-         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Malformed expression"));
-      }
-
-      std::size_t literal = str.find_last_of("lLfF");
-      if (literal != std::string::npos &&
-          literal != str.size())
-      {
-         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Malformed expression"));
+         BOOST_MP_THROW_EXCEPTION(std::invalid_argument("Malformed expression"));
       }
 
       // TBD: Using several regular expressions may significantly reduce
@@ -2160,13 +2154,6 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          std::size_t num_chars {};
          exp = static_cast<exponent_type>(std::stoll(str.substr(pos + 1u), &num_chars));
          
-         // See git issue 499
-         // Example: 3.4e1a2 should throw as malformed
-         if ((pos + num_chars + 1u) != str.size())
-         {
-            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Malformed expression"));
-         }
-
          str = str.substr(static_cast<std::size_t>(0u), pos);
       }
 

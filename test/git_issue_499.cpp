@@ -100,6 +100,20 @@ int main()
         ++counter;
     }
 
+    try
+    {
+        cpp_dec_float_50 val5{"23.5-3e-26"};
+        std::cout << "no exception. val=" << val5 << "\n";
+    }
+    catch (const std::runtime_error& e)
+    {
+        std::cout << "std::runtime_error. what():" << e.what() << "\n";
+    }
+    catch (...)
+    {
+        ++counter;
+    }
+
     if (counter != 0)
     {
         return 1;
