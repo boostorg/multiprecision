@@ -12,6 +12,74 @@
 
 [section:hist History]
 
+[h4 Multiprecision-4.1.2 (Boost-1.81)]
+
+* Correct thread-safe static initialization of constants for __cpp_bin_float, see [@https://github.com/boostorg/multiprecision/issues/497 497].
+* Correct __cpp_int `import_bits` when just importing the leading few bits of the value, see [@https://github.com/boostorg/multiprecision/issues/488 488].
+* Remove some C++03 idioms, including use of `0` rather than `nullptr`.
+* Minor fixes for gcc-12 on Mingw.
+
+[h4 Multiprecision-4.1.1 (Boost-1.80)]
+
+* [*Mark C++11 support as deprecated]: from 2023 we will move to requiring C++14 as a minimum standard level.  That will drop support for
+GCC versions prior to 5 and MSVC prior to 14.1.
+* Fix conflict between `boost/cstdfloat.hpp` and this library.
+* Clean up lots of gcc and clang warnings.
+* Fix input streaming of composite types (complex, interval rational) where there is a trailing delimeter in the stream and no whitespace.
+* Fix `constexpr` integer square root where the input is 1, 2 or 3.
+* Add missing `#include` of `<memory>` to float128.hpp.
+* Correct 2-arg constructor for class `number` to prevent ambiguity in some cases.
+* Correct and make more consistent behaviour of divide-by-zero in gmp.hpp.
+
+
+[h4 Multiprecision-4.1.0 (Boost-1.79)]
+
+* Big update to support use of this library "standalone": ie without the rest of Boost.  A copy
+of Boost.Config is still required, and use of Boost.Math to provide the C99 special functions is optional.
+* Fix IO of floating point numbers when `std::ios_base::fixed` is in effect and the precision is zero.
+* Fix various spurious GCC warnings in cpp_int bitwise operators.
+* Use `float128_type` typedef throughout to suppress GCC/clang warnings about using a non-standard extension.
+* Correct conversion of Intel's _Quad type to string, see [@https://github.com/boostorg/multiprecision/issues/427 #427].
+* Correct usage of Intel intrinsics on GCC to avoid simply checking for the header, see [@https://github.com/boostorg/multiprecision/issues/419 #419].
+* Update `signbit` to match `std::signbit` and to return the correct sign when the result is zero, [@https://github.com/boostorg/multiprecision/issues/426 #426].
+* Fix over-large reductions in default sin/cos code.
+* Fix some mpq rational arithmetic errors: Multiplication by zero should not proceed via gcd, and multiplication by scalar should be restricted to integer types (not floats).
+* Support conversion to and from `__int128` and `__float128` everywhere, not just on an add-hock basis, [@https://github.com/boostorg/multiprecision/issues/237 #237].
+* Avoid unnecessary copying in cpp_int's add_unsigned, [@https://github.com/boostorg/multiprecision/issues/357 #357].
+* Change all bit counts to use `std::size_t` or `std::ptrdiff_t`, [@https://github.com/boostorg/multiprecision/issues/362 #362].
+* Bring Eigen traits classes up to date and add tests.
+* Fix `is_byte_container` to correctly handle Eigen types, [@https://github.com/boostorg/multiprecision/issues/398 #398].
+* Improve cpp_int to float conversion to be insensitive to floating point control flags, [@https://github.com/boostorg/multiprecision/issues/360 #360].
+* Correct interop between signed-zeros and complex number types, [@https://github.com/boostorg/multiprecision/issues/396 #396].
+
+
+[h4 Multiprecision-4.0.2 (Boost-1.78)]
+
+* Rework rational_adaptor to remove dependency on Boost.Rational and improve performance.
+* Fix issue with type_traits and clang, see [@https://github.com/boostorg/multiprecision/issues/383 #383].
+* Fixed buggy Lehmer's GCD routine, see [@https://github.com/boostorg/multiprecision/issues/370 #370].
+* Fix mpc_complex constructors so that lossy conversions are explicit, see [@https://github.com/boostorg/multiprecision/issues/363 #363].
+* Correct miscellaneous configuration issues (Intel intrinsic usage and Apple clang).
+* Correct some iostream operators for unsigned char types.
+* Correct mpq_rational conversions to integer types, see [@https://github.com/boostorg/multiprecision/issues/342 #342].
+
+[h4 Multiprecision-4.0.1 (Boost-1.77)]
+
+* Much improved Karatsuba sqrt for cpp_int/cpp_bin_float.
+* Added C++11 compatible `to_string` free function.
+* Fixed bug in Lehmer GCD code, see [@https://github.com/boostorg/multiprecision/issues/322 #322]. 
+* Fixed debug_adaptor/logged_adaptor to work better with complex, rational and interval types, see [@https://github.com/boostorg/multiprecision/issues/329 #329].
+* Big update to mixed-variable precision arithmetic code with better options and thread safety, see [link boost_multiprecision.tut.variable docs].
+* Fixed up hashing of bools and enums when creating hash values.
+* Improved conversions to and from enum types.
+* Restricted use of Intel intrinsics to when we really are building for Intel even though the header may be available, see [@https://github.com/boostorg/multiprecision/issues/321 #321].
+* Tidied up Lanczos approximation usage, in conjunction with Boost.Math this improves the reliability and accuracy of many special functions.
+* Fix use of libtommath deprecated features.
+* Fixed missing sqrt overload, see [@https://github.com/boostorg/multiprecision/issues/319 #319].
+* Added Karatsuba multiplication to cpp_dec_float to bring it into line with the other types in this library.
+* Added some minor optimizations to mpfr comparison operators.
+
+
 [h4 Multiprecision-4.0.0 (Boost-1.76)]
 
 * [*BREAKING CHANGE]: Massive refactoring and code simpification makes C++11 an absolute requirement.

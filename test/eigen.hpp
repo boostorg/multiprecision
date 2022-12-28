@@ -549,15 +549,6 @@ void test_float_type()
    example15<Num>();
    example16<Num>();
    example17<Num>();
-   /*
-   example18<Num>();
-   example19<Num>();
-   example20<Num>();
-   example21<Num>();
-   example22<Num>();
-   example23<Num>();
-   example24<Num>();
-   */
 }
 
 template <class Num>
@@ -572,11 +563,9 @@ void test_float_type_2()
    example18<Num>();
    example19<Num>();
    example20<Num>();
+#if EIGEN_VERSION_AT_LEAST(3, 4, 0) || (BOOST_CXX_VERSION <= 201703L)
    example21<Num>();
-
-   //example22<Num>();
-   //example23<Num>();
-   //example24<Num>();
+#endif
 }
 
 template <class Num>
@@ -620,7 +609,9 @@ void test_complex_type()
    example18a<Num>();
    example19<Num>();
    example20<Num>();
+#if EIGEN_VERSION_AT_LEAST(3, 4, 0) || (BOOST_CXX_VERSION <= 201703L)
    example21<Num>();
+#endif
    example22<Num>();
    // example23<Num>();  //requires comparisons.
    example24<Num>();

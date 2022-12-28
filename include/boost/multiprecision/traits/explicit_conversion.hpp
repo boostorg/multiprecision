@@ -4,10 +4,11 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_MP_EXPLICIT_CONVERTIBLE_HPP
-#define BOOST_MP_EXPLICIT_CONVERTIBLE_HPP
+#ifndef BOOST_MP_EXPLICIT_CONVERSION_HPP
+#define BOOST_MP_EXPLICIT_CONVERSION_HPP
 
-#include <boost/config.hpp>
+#include <type_traits>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/detail/number_base.hpp> // number_category
 
 namespace boost {
@@ -27,35 +28,33 @@ struct has_generic_interconversion
            number_category<S>::value == number_kind_integer,
            typename std::conditional<
                number_category<T>::value == number_kind_integer || number_category<T>::value == number_kind_floating_point || number_category<T>::value == number_kind_rational || number_category<T>::value == number_kind_fixed_point,
-               std::integral_constant<bool, true>,
-               std::integral_constant<bool, false> >::type,
+               std::true_type,
+               std::false_type >::type,
            typename std::conditional<
                number_category<S>::value == number_kind_rational,
                typename std::conditional<
                    number_category<T>::value == number_kind_rational || number_category<T>::value == number_kind_rational,
-                   std::integral_constant<bool, true>,
-                   std::integral_constant<bool, false> >::type,
+                   std::true_type,
+                   std::false_type >::type,
                typename std::conditional<
                    number_category<T>::value == number_kind_floating_point,
-                   std::integral_constant<bool, true>,
-                   std::integral_constant<bool, false> >::type>::type>::type,
-       std::integral_constant<bool, false> >::type;
+                   std::true_type,
+                   std::false_type >::type>::type>::type,
+       std::false_type >::type;
 };
 
 template <typename S, typename T>
 struct is_explicitly_convertible_imp
 {
    template <typename S1, typename T1>
-   static int selector(dummy_size<sizeof(new T1(std::declval<
-                                                                  S1
-                                                                  >()))>*);
+   static int selector(dummy_size<static_cast<unsigned int>(sizeof(new T1(std::declval<S1>())))>*);
 
    template <typename S1, typename T1>
    static char selector(...);
 
-   static constexpr const bool value = sizeof(selector<S, T>(0)) == sizeof(int);
+   static constexpr bool value = sizeof(selector<S, T>(nullptr)) == sizeof(int);
 
-   using type = boost::integral_constant<bool, value>;
+   using type = std::integral_constant<bool, value>;
 };
 
 template <typename From, typename To>

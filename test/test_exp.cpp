@@ -215,17 +215,19 @@ void test()
             BOOST_CHECK_LE(exp(bug_case), (std::numeric_limits<T>::min)());
          }
       }
-      // TBD: What's wrong here with double/quad-float?
-      // Do we have the wrong values of min/max in limits?
-      // Or do the little fractional parts in the arguments of the test cases
-      // need to be adapted?
-      #if !defined(TEST_CPP_DOUBLE_FLOAT) && !defined(TEST_CPP_QUAD_FLOAT)
+      // Adapt the fractional parts in the following test cases
+      // for TEST_CPP_DOUBLE_FLOAT and TEST_CPP_QUAD_FLOAT
+      #if defined(TEST_CPP_DOUBLE_FLOAT)
+      bug_case = log((std::numeric_limits<T>::max)()) / -1.3;
+      #elif defined(TEST_CPP_QUAD_FLOAT)
+      bug_case = log((std::numeric_limits<T>::max)()) / -1.005;
+      #else
       bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
+      #endif
       for (unsigned i = 0; i < 20; ++i, bug_case /= 1.05)
       {
          BOOST_CHECK_GE(exp(bug_case), (std::numeric_limits<T>::min)());
       }
-      #endif // !defined(TEST_CPP_DOUBLE_FLOAT)
    }
 }
 
@@ -269,7 +271,7 @@ int main()
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
    test<boost::multiprecision::cpp_double_float>();

@@ -98,7 +98,7 @@ void do_round_trip(const Float& val)
    Float                               t = frexp(val, &e);
    (void)t; // warning suppression
    e -= std::numeric_limits<Float>::digits + 2;
-   BOOST_ASSERT(val == (val + ldexp(Float(1), e)));
+   BOOST_MP_ASSERT(val == (val + ldexp(Float(1), e)));
    Rat                                                               delta, rounded;
    typedef typename boost::multiprecision::component_type<Rat>::type i_type;
    i_type                                                            i(1);

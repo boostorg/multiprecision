@@ -221,9 +221,8 @@ struct exact_arithmetic
       // If the above line gives an compilation error, replace the
       // line below it with the commented line
 
-      constexpr    float_type Splitter    = FloatingPointType((uintmax_t(1) << SplitBits) + 1);
-    //static const float_type Splitter    = std::ldexp(FloatingPointType(1), SplitBits) + 1;
-      const float_type     SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter * 2);
+      constexpr float_type Splitter       = FloatingPointType((uintmax_t(1) << SplitBits) + 1);
+      const     float_type SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter * 2);
 
       float_type temp, hi, lo;
 
@@ -501,13 +500,13 @@ class cpp_double_fp_backend
    // Constructors from other floating-point types.
    template <typename OtherFloatType,
              typename std::enable_if<(detail::is_floating_point_or_float128<OtherFloatType>::value == true) && (std::numeric_limits<OtherFloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
-   constexpr cpp_double_fp_backend(const OtherFloatType& f) : data(std::make_pair(f, (float_type)0)) {}
+   constexpr cpp_double_fp_backend(const OtherFloatType& f) : data(std::make_pair(f, (float_type)0)) { }
 
    template <typename OtherFloatType,
              typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatType>::value == true) && (std::numeric_limits<OtherFloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const OtherFloatType& f)
        : data(std::make_pair(static_cast<float_type>(f),
-                             static_cast<float_type>(f - (OtherFloatType) static_cast<float_type>(f)))) {}
+                             static_cast<float_type>(f - (OtherFloatType) static_cast<float_type>(f)))) { }
 
    // Constructor from other cpp_double_fp_backend<> objects.
    template <typename OtherFloatType,
@@ -520,37 +519,52 @@ class cpp_double_fp_backend
    }
 
    // Constructors from integers
-   template <typename IntegralType,
-             typename std::enable_if<((std::is_integral<IntegralType>::value == true) && (std::numeric_limits<IntegralType>::digits <= std::numeric_limits<FloatingPointType>::digits))>::type const* = nullptr>
-   constexpr cpp_double_fp_backend(const IntegralType& f) : data(std::make_pair(static_cast<float_type>(f), (float_type)0)) {}
+   template <typename SignedIntegralType,
+             typename std::enable_if<(   (std::is_integral<SignedIntegralType>::value == true)
+                                      && (std::is_unsigned<SignedIntegralType>::value == false)
+                                      && (std::numeric_limits<SignedIntegralType>::digits + 1 <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   constexpr cpp_double_fp_backend(const SignedIntegralType& n)
+      : data(std::make_pair(static_cast<float_type>(n), float_type(0.0F))) { }
+
+   template <typename UnsignedIntegralType,
+             typename std::enable_if<(   (std::is_integral<UnsignedIntegralType>::value == true)
+                                      && (std::is_unsigned<UnsignedIntegralType>::value == true)
+                                      && (std::numeric_limits<UnsignedIntegralType>::digits <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   constexpr cpp_double_fp_backend(const UnsignedIntegralType& u)
+      : data(std::make_pair(static_cast<float_type>(u), float_type(0.0F))) { }
 
    // Constructors from integers which hold more information than *this can contain
    template <typename SignedIntegralType,
-             typename std::enable_if<((std::is_integral<SignedIntegralType>::value == true) && (std::is_signed<SignedIntegralType>::value == true) && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   cpp_double_fp_backend(SignedIntegralType n)
-   {
-      data.first = static_cast<float_type>(n);
-      n -= static_cast<SignedIntegralType>(std::get<0>(data));
-
-      data.second = static_cast<float_type>(n);
-   }
+             typename std::enable_if<(   (std::is_integral<SignedIntegralType>::value == true)
+                                      && (std::is_unsigned<SignedIntegralType>::value == false)
+                                      && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   constexpr cpp_double_fp_backend(SignedIntegralType n)
+      : data
+        (
+           std::make_pair
+           (
+              static_cast<float_type>(n),
+              static_cast<float_type>(n - static_cast<SignedIntegralType>(static_cast<float_type>(n)))
+           )
+        ) { }
 
    template <typename UnsignedIntegralType,
-             typename std::enable_if<((std::is_integral<UnsignedIntegralType>::value == true) && (std::is_unsigned<UnsignedIntegralType>::value == true) && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   cpp_double_fp_backend(UnsignedIntegralType u)
-   {
-      typedef typename std::make_signed<UnsignedIntegralType>::type SignedIntegralType;
+             typename std::enable_if<(   (std::is_integral<UnsignedIntegralType>::value == true)
+                                      && (std::is_unsigned<UnsignedIntegralType>::value == true)
+                                      && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   constexpr cpp_double_fp_backend(UnsignedIntegralType u)
+      : data
+        (
+           std::make_pair
+           (
+              static_cast<float_type>(u),
+              static_cast<float_type>(typename std::make_signed<UnsignedIntegralType>::type(u - static_cast<UnsignedIntegralType>(static_cast<float_type>(u))))
+           )
+        ) { }
 
-      data.first = static_cast<float_type>(u);
+   constexpr cpp_double_fp_backend(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) { }
 
-      SignedIntegralType u_ = SignedIntegralType(u - static_cast<UnsignedIntegralType>(std::get<0>(data)));
-
-      data.second = static_cast<float_type>(u_);
-   }
-
-   constexpr cpp_double_fp_backend(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) {}
-
-   constexpr cpp_double_fp_backend(const std::pair<float_type, float_type>& p) : data(p) {}
+   constexpr cpp_double_fp_backend(const std::pair<float_type, float_type>& p) : data(p) { }
 
    cpp_double_fp_backend(const std::string& str)
    {
@@ -912,7 +926,7 @@ class cpp_double_fp_backend
    bool small_arg() const { return (order10() < (-my_digits10 / 6)); }
    bool near_one() const { return cpp_double_fp_backend(fabs(cpp_double_fp_backend(1U) - *this)).small_arg(); }
 
-   static cpp_double_fp_backend my_value_max() noexcept
+   static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_max() noexcept
    {
       using std::ldexp;
       using std::sqrt;
@@ -921,10 +935,23 @@ class cpp_double_fp_backend
       using boost::multiprecision::sqrt;
 #endif
 
-      return cpp_double_fp_backend(arithmetic::fast_sum((std::numeric_limits<float_type>::max)() * (1.0F - 1.5F * sqrt(std::numeric_limits<float_type>::epsilon())), ldexp((std::numeric_limits<float_type>::max)(), -(std::numeric_limits<float_type>::digits + 1))));
+      return
+      cpp_double_fp_backend
+      (
+         arithmetic::fast_sum
+         (
+            float_type(  (std::numeric_limits<float_type>::max)()
+                       * float_type(float_type(1.0F) - float_type(1.5F) * sqrt(std::numeric_limits<float_type>::epsilon()))),
+            ldexp
+            (
+                (std::numeric_limits<float_type>::max)(),
+               -(std::numeric_limits<float_type>::digits + 1)
+            )
+         )
+      );
    }
 
-   static cpp_double_fp_backend my_value_min() noexcept
+   static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_min() noexcept
    {
       using std::ldexp;
 #if defined(BOOST_MATH_USE_FLOAT128)
@@ -934,7 +961,7 @@ class cpp_double_fp_backend
       return cpp_double_fp_backend(ldexp(float_type(1), my_min_exponent));
    }
 
-   static cpp_double_fp_backend my_value_eps() noexcept
+   static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_eps() noexcept
    {
       using std::ldexp;
 #if defined(BOOST_MATH_USE_FLOAT128)
@@ -951,7 +978,7 @@ class cpp_double_fp_backend
       }();
    }
 
-   static constexpr cpp_double_fp_backend my_value_nan() noexcept
+   static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_nan() noexcept
    {
       return cpp_double_fp_backend(std::numeric_limits<float_type>::quiet_NaN());
    }
@@ -1179,19 +1206,37 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       eval_fabs(xx, x);
 
       // Check the range of the input.
-      // Will the result of exponentiation overflow/underflow?
-      static const local_float_type max_exp_input = []() -> local_float_type { using std::log; const local_float_type e_max = double_float_type::my_value_max().crep().first; return log(e_max); }();
-      static const local_float_type min_exp_input = []() -> local_float_type { using std::log; const local_float_type e_min = double_float_type::my_value_min().crep().first; return log(e_min); }();
+      static const double_float_type max_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_max().crep().first);
+         const double_float_type dx    =   double_float_type(double_float_type::my_value_max().crep().second)
+                                         / double_float_type(double_float_type::my_value_max().crep().first);
+
+         return lg_x0 + dx;
+      }();
+
+      static const double_float_type min_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_min().crep().first);
+
+         return lg_x0;
+      }();
 
       if (x_is_zero)
       {
          result = double_float_type(1U);
       }
-      else if (x.crep().first < min_exp_input)
+      else if (x < min_exp_input)
       {
          result = double_float_type(0U);
       }
-      else if (xx.crep().first > max_exp_input)
+      else if (xx > max_exp_input)
       {
          result = double_float_type(std::numeric_limits<local_float_type>::infinity());
       }
@@ -1299,19 +1344,37 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       eval_fabs(xx, x);
 
       // Check the range of the input.
-      // Will the result of exponentiation overflow/underflow?
-      static const local_float_type max_exp_input = []() -> local_float_type { using std::log; const local_float_type e_max = double_float_type::my_value_max().crep().first; return log(e_max); }();
-      static const local_float_type min_exp_input = []() -> local_float_type { using std::log; const local_float_type e_min = double_float_type::my_value_min().crep().first; return log(e_min); }();
+      static const double_float_type max_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_max().crep().first);
+         const double_float_type dx    =   double_float_type(double_float_type::my_value_max().crep().second)
+                                         / double_float_type(double_float_type::my_value_max().crep().first);
+
+         return lg_x0 + dx;
+      }();
+
+      static const double_float_type min_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_min().crep().first);
+
+         return lg_x0;
+      }();
 
       if (x_is_zero)
       {
          result = double_float_type(1U);
       }
-      else if (x.crep().first < min_exp_input)
+      else if (x < min_exp_input)
       {
          result = double_float_type(0U);
       }
-      else if (xx.crep().first > max_exp_input)
+      else if (xx > max_exp_input)
       {
          result = double_float_type(std::numeric_limits<local_float_type>::infinity());
       }
@@ -1419,19 +1482,37 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       eval_fabs(xx, x);
 
       // Check the range of the input.
-      // Will the result of exponentiation overflow/underflow?
-      static const local_float_type max_exp_input = []() -> local_float_type { using std::log; const local_float_type e_max = double_float_type::my_value_max().crep().first; return log(e_max); }();
-      static const local_float_type min_exp_input = []() -> local_float_type { using std::log; const local_float_type e_min = double_float_type::my_value_min().crep().first; return log(e_min); }();
+      static const double_float_type max_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_max().crep().first);
+         const double_float_type dx    =   double_float_type(double_float_type::my_value_max().crep().second)
+                                         / double_float_type(double_float_type::my_value_max().crep().first);
+
+         return lg_x0 + dx;
+      }();
+
+      static const double_float_type min_exp_input =
+      []() -> double_float_type
+      {
+         using std::log;
+
+         const double_float_type lg_x0 = log(double_float_type::my_value_min().crep().first);
+
+         return lg_x0;
+      }();
 
       if (x_is_zero)
       {
          result = double_float_type(1U);
       }
-      else if (x.crep().first < min_exp_input)
+      else if (x < min_exp_input)
       {
          result = double_float_type(0U);
       }
-      else if (xx.crep().first > max_exp_input)
+      else if (xx > max_exp_input)
       {
          result = double_float_type(std::numeric_limits<local_float_type>::infinity());
       }
@@ -1660,15 +1741,15 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    static constexpr int max_exponent10                 = inner_self_type::my_max_exponent10;
    static constexpr int min_exponent10                 = inner_self_type::my_min_exponent10;
 
-   static constexpr self_type(min)         () noexcept { return self_type(inner_self_type::my_value_min()); }
-   static constexpr self_type(max)         () noexcept { return self_type(inner_self_type::my_value_max()); }
-   static constexpr self_type lowest       () noexcept { return self_type(-(max)()); }
-   static constexpr self_type epsilon      () noexcept { return self_type(inner_self_type::my_value_eps()); }
-   static constexpr self_type round_error  () noexcept { return self_type(base_class_type::round_error()); }
-   static constexpr self_type denorm_min   () noexcept { return self_type((min)()); }
-   static constexpr self_type infinity     () noexcept { return self_type(base_class_type::infinity()); }
-   static constexpr self_type quiet_NaN    () noexcept { return self_type(base_class_type::quiet_NaN()); }
-   static constexpr self_type signaling_NaN() noexcept { return self_type(base_class_type::signaling_NaN()); }
+   static BOOST_MP_CXX14_CONSTEXPR self_type(min)         () noexcept { return self_type(inner_self_type::my_value_min()); }
+   static BOOST_MP_CXX14_CONSTEXPR self_type(max)         () noexcept { return self_type(inner_self_type::my_value_max()); }
+   static BOOST_MP_CXX14_CONSTEXPR self_type lowest       () noexcept { return self_type(-(max)()); }
+   static BOOST_MP_CXX14_CONSTEXPR self_type epsilon      () noexcept { return self_type(inner_self_type::my_value_eps()); }
+   static BOOST_MP_CXX14_CONSTEXPR self_type round_error  () noexcept { return self_type(base_class_type::round_error()); }
+   static BOOST_MP_CXX14_CONSTEXPR self_type denorm_min   () noexcept { return self_type((min)()); }
+   static BOOST_MP_CXX14_CONSTEXPR self_type infinity     () noexcept { return self_type(base_class_type::infinity()); }
+   static BOOST_MP_CXX14_CONSTEXPR self_type quiet_NaN    () noexcept { return self_type(base_class_type::quiet_NaN()); }
+   static BOOST_MP_CXX14_CONSTEXPR self_type signaling_NaN() noexcept { return self_type(base_class_type::signaling_NaN()); }
 };
 
 } // namespace std

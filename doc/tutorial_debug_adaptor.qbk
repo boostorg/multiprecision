@@ -17,6 +17,9 @@
    template <Backend>
    class debug_adaptor;
 
+   template <class Number>
+   using debug_adaptor_t = number<debug_adaptor<typename Number::backend_type>, Number::et>
+
    }} // namespaces
 
 The `debug_adaptor` type is used in conjunction with `number` and some other backend type: it acts as a thin wrapper around
@@ -42,6 +45,13 @@ Otherwise you will need to expand out the view and look at the "debug_value" mem
 It works for all the backend types equally too, here it is inspecting a `number<debug_adaptor<gmp_rational> >`:
 
 [$../debugger3.png]
+
+The template alias `debug_adaptor_t` is used as a shortcut for converting some other number type to it's debugged equivalent,
+for example:
+
+   using mpfr_float_debug = debug_adaptor_t<mpfr_float>;
+
+Defines `mpfr_float_debug` to be the debugged equivalent of `mpfr_float`.
 
 
 [endsect] [/section:debug_adaptor debug_adaptor]

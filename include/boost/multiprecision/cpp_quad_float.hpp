@@ -1094,18 +1094,38 @@ void eval_exp(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp_
       }
 
       // Check the range of the input.
+      static const quad_float_type max_exp_input =
+      []() -> quad_float_type
+      {
+         using std::log;
 
-      using std::log;
+         // TBD: Use more terms if needed.
+         const quad_float_type lg_x0 = log(std::get<0>(quad_float_type::my_value_max().crep()));
+         const quad_float_type dx    =   quad_float_type(std::get<1>(quad_float_type::my_value_max().crep()))
+                                       / quad_float_type(std::get<0>(quad_float_type::my_value_max().crep()));
+
+         return lg_x0 + dx;
+      }();
+
+      static const quad_float_type min_exp_input =
+      []() -> quad_float_type
+      {
+         using std::log;
+
+         const quad_float_type lg_x0 = log(std::get<0>(quad_float_type::my_value_min().crep()));
+
+         return lg_x0;
+      }();
 
       if (x_is_zero)
       {
          result = quad_float_type(1U);
       }
-      else if (std::get<0>(x.crep()) < log(std::get<0>(quad_float_type::my_value_min().crep())))
+      else if (x < min_exp_input)
       {
          result = quad_float_type(0U);
       }
-      else if (std::get<0>(x.crep()) > log(std::get<0>(quad_float_type::my_value_max().crep())))
+      else if (xx > max_exp_input)
       {
          result = quad_float_type(std::numeric_limits<local_float_type>::infinity());
       }

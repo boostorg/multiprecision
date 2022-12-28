@@ -26,6 +26,8 @@
       typedef          Backend                          backend_type;
       typedef typename component_type<self_type>::type  value_type;
 
+      static constexpr expression_template_option et = ExpressionTemplates;
+
       number();
       number(see-below);
       number& operator=(see-below);
@@ -117,6 +119,10 @@
    template <class Backend, expression_template_option ExpressionTemplates>
    std::istream& operator >> (std::istream& is, number<Backend, ExpressionTemplates>& r);
 
+   // to_string support:
+   template <class Backend, expression_template_option ExpressionTemplates>
+   std::string to_string(const number<Backend, ExpressionTemplates>& val);
+
    // Arithmetic with a higher precision result:
    template <class ResultType, class Source1 class Source2>
    ResultType& add(ResultType& result, const Source1& a, const Source2& b);
@@ -193,7 +199,7 @@
    bool                                      isinf      (const ``['number-or-expression-template-type]``&);
    bool                                      isnan      (const ``['number-or-expression-template-type]``&);
    bool                                      isnormal   (const ``['number-or-expression-template-type]``&);
-   int                                       signbit    (const ``['number-or-expression-template-type]``&);
+   bool                                      signbit    (const ``['number-or-expression-template-type]``&);
 
    bool                                      isgreater  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    bool                                      isgreaterequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
@@ -349,6 +355,8 @@ two argument constructor:
    number(arg1, arg2);
 
 Where the two args must either be arithmetic types, or types that are convertible to the two components of `this`.
+Rvalue forwarding overloads are provided so either one or both arguments may be rvalue-references which will be moved
+into the result, if the backend is able to make use of them.
 
 Finally, when the type has a variable precision, then there are constructors:
 
@@ -522,6 +530,14 @@ These operators provided formatted input-output operations on `number` types, an
 It's down to the back-end type to actually implement string conversion.  However, the back-ends provided with
 this library support all of the iostream formatting flags, field width and precision settings.
 
+In addition, the C++11 `to_string` function is provided for use in generic code:
+
+      template <class Backend, expression_template_option ExpressionTemplates>
+      std::string to_string(const number<Backend, ExpressionTemplates>& val);
+
+This a string with 6 digits of accuracy past the decimal point, matching the behavior of `std::to_string`.
+Note that this is a /fixed precision/ representation, and hence monstrous strings can be returned.
+
 [h4 Arithmetic with a higher precision result]
 
    template <class ResultType, class Source1 class Source2>
@@ -607,7 +623,7 @@ that allows arithmetic to be performed on native integer types producing an exte
    bool                                      isinf      (const ``['number-or-expression-template-type]``&);
    bool                                      isnan      (const ``['number-or-expression-template-type]``&);
    bool                                      isnormal   (const ``['number-or-expression-template-type]``&);
-   int                                       signbit    (const ``['number-or-expression-template-type]``&);
+   bool                                      signbit    (const ``['number-or-expression-template-type]``&);
 
    bool                                      isgreater  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    bool                                      isgreaterequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);

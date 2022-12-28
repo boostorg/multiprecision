@@ -19,7 +19,7 @@ There are some traits classes which authors of new backends should be aware of:
 
    }}}
 
-Inherits from `boost::integral_constant<bool,true>` if type `From` has an explicit conversion from `To`.
+Inherits from `std::integral_constant<bool,true>` if type `From` has an explicit conversion from `To`.
 
    template <class From, class To>
    struct is_lossy_conversion
