@@ -1,19 +1,29 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2011-9 John Maddock. Distributed under the Boost
+//  Copyright 2011-21 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#define TEST_CPP_DOUBLE_FLOAT
-//#define TEST_CPP_QUAD_FLOAT
-#define TEST_CPP_BIN_FLOAT
-
-constexpr int TestBits = 1U << 16;
-
-#if defined(TEST_CPP_QUAD_FLOAT) && defined(TEST_CPP_DOUBLE_FLOAT)
-#error "Cannot test both cpp_quad_fp_backend and cpp_double_fp_backend at the same time!"
-#endif
-
-// g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/performance -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/test -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DTEST_CPP_QUAD_FLOAT test.cpp -o test_perf.exe
+//
+// This is the main entry point for our operator performance test suite.
+// In order to build this program, you must compile and link this file against
+// all the libs/multiprecision/performance/performance_test_files/*.cpp files.
+// 
+// The default behaviour is to "test everything", which is probably not what you want.
+// In order to restict testing to a specific selection of backends, you will need to
+// define one or more of the following macros when building:
+// 
+// TEST_MPF
+// TEST_MPZ
+// TEST_CPP_DEC_FLOAT
+// TEST_MPFR
+// TEST_MPQ
+// TEST_TOMMATH
+// TEST_TOMMATH_BOOST_RATIONAL
+// TEST_MPZ_BOOST_RATIONAL
+// TEST_CPP_INT
+// TEST_CPP_INT_RATIONAL
+// TEST_CPP_BIN_FLOAT
+//
 
 #include "performance_test.hpp"
 
@@ -24,8 +34,6 @@ constexpr int TestBits = 1U << 16;
 #include <mpfr.h>
 #endif
 #include <boost/version.hpp>
-
-#include <boost/multiprecision/traits/max_digits10.hpp>
 
 //
 // Keys in order are:
@@ -39,7 +47,7 @@ std::map<std::string, std::map<std::string, std::map<std::string, std::map<int, 
 
 unsigned bits_wanted; // for integer types
 
-static void quickbook_results()
+void quickbook_results()
 {
    //
    // Keys in order are:
@@ -113,15 +121,15 @@ static void quickbook_results()
    }
 }
 
-//#if defined(__HAS_INCLUDE)
-//#if __has_include(<sys/utsname.h>)
-//#define HAS_UTSNAME
-//#include <sys/utsname.h>
-//#endif
-//#endif
-//#ifdef _WIN32
-//#include <windows.h>
-//#endif
+#if defined(__HAS_INCLUDE)
+#if __has_include(<sys/utsname.h>)
+#define HAS_UTSNAME
+#include <sys/utsname.h>
+#endif
+#endif
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 void quickbook_platform_details()
 {
@@ -155,82 +163,58 @@ int main()
 {
    quickbook_platform_details();
 
-   #if defined(TEST_CPP_QUAD_FLOAT)
-   test53();
-   #endif
-   #if defined(TEST_CPP_DOUBLE_FLOAT)
-   test43();
-   #endif
-   #if defined(TEST_CPP_BIN_FLOAT)
+   test01();
+   test02();
+   test03();
+   test04();
+   test05();
+   test06();
+   test07();
+   test08();
+   test09();
+   test10();
+   test11();
+   test12();
+   test13();
+   test14();
+   test15();
+   test16();
+   test17();
+   test18();
+   test19();
+   test20();
+   test21();
+   test22();
+   test23();
+   test24();
+   test25();
+   test26();
+   test27();
+   test28();
+   test29();
+   test30();
+   test31();
+   test32();
    test33();
-   #endif
+   test34();
+   test35();
+   test36();
+   test37();
+   test38();
+   test39();
+   test40();
+   test41();
+   test42();
+   test43();
+   test44();
+   test45();
+   test46();
+   test47();
+   test48();
+   test49();
+   test50();
+   test51();
 
    quickbook_results();
-
-   std::cin.get();
-
    return 0;
 }
-
-using local_float_constituent_type = double;
-
-#if defined(TEST_CPP_QUAD_FLOAT)
-
-///////////////////////////////////////////////////////////////
-//  Copyright 2019 John Maddock. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
-
-#include <boost/multiprecision/cpp_quad_float.hpp>
-
-void test53()
-{
-   using quad_float_backend_type   = boost::multiprecision::backends::cpp_quad_fp_backend<local_float_constituent_type>;
-   using quad_float_of_double_type = boost::multiprecision::number<quad_float_backend_type, boost::multiprecision::et_off>;
-
-   test<quad_float_of_double_type>("cpp_quad_fp_backend: ", TestBits);
-}
-#endif
-
-#if defined(TEST_CPP_DOUBLE_FLOAT)
-
-///////////////////////////////////////////////////////////////
-//  Copyright 2019 John Maddock. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
-
-#include <boost/multiprecision/cpp_double_float.hpp>
-
-void test43()
-{
-   using double_float_backend_type   = boost::multiprecision::backends::cpp_double_fp_backend<local_float_constituent_type>;
-   using double_float_of_double_type = boost::multiprecision::number<double_float_backend_type, boost::multiprecision::et_off>;
-
-   test<double_float_of_double_type>("cpp_double_fp_backend: ", TestBits);
-}
-#endif
-
-#if defined(TEST_CPP_BIN_FLOAT)
-
-///////////////////////////////////////////////////////////////
-//  Copyright 2019 John Maddock. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
-
-#include <boost/multiprecision/cpp_bin_float.hpp>
-
-void test33()
-{
-  #ifdef TEST_CPP_DOUBLE_FLOAT
-   constexpr int my_digits10 = (int) boost::multiprecision::detail::calc_digits10<std::numeric_limits<local_float_constituent_type>::digits * 2>::value;
-  #elif defined(TEST_CPP_QUAD_FLOAT)
-   constexpr int my_digits10 = (int) boost::multiprecision::detail::calc_digits10<std::numeric_limits<local_float_constituent_type>::digits * 4>::value;
-  #endif
-
-   using cpp_bin_float_backend_type = boost::multiprecision::cpp_bin_float<my_digits10>;
-   using cpp_bin_float_type         = boost::multiprecision::number<cpp_bin_float_backend_type, boost::multiprecision::et_off>;
-
-   test<cpp_bin_float_type>("cpp_bin_float: ", TestBits);
-}
-
-#endif

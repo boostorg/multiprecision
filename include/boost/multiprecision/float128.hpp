@@ -6,10 +6,24 @@
 #ifndef BOOST_MP_FLOAT128_HPP
 #define BOOST_MP_FLOAT128_HPP
 
+// https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+#if !defined(__amd64__) && !defined(__amd64) && !defined(__x86_64__) && !defined(__x86_64) && !defined(_M_X64) && !defined(_M_AMD64) && \
+    !defined(i386) && !defined(__i386) && !defined(__i386__) && !defined(_M_IX86) && !defined(__X86__) && !defined(_X86_) && !defined(__I86__) && \
+    !defined(__ia64__) && !defined(_IA64) && !defined(__IA64__) && !defined(__ia64) && !defined(_M_IA64) && !defined(__itanium__) && \
+    !defined(__hppa__) && !defined(__HPPA__) && !defined(__hppa) && \
+    !defined(__powerpc) && !defined(_M_PPC) && !defined(_ARCH_PPC) && !defined(_ARCH_PPC64) && !defined(__PPCBROADWAY__)
+#error libquadmath only works on on i386, x86_64, IA-64, and hppa HP-UX, as well as on PowerPC GNU/Linux targets that enable the vector scalar (VSX) instruction set.
+#endif
+
+#include <memory>
+#include <climits>
+#include <cfloat>
 #include <tuple>
-#include <boost/config.hpp>
+#include <cstring>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 
 #if defined(BOOST_INTEL) && !defined(BOOST_MP_USE_FLOAT128) && !defined(BOOST_MP_USE_QUAD)
 #if defined(BOOST_INTEL_CXX_VERSION) && (BOOST_INTEL_CXX_VERSION >= 1310) && defined(__GNUC__)
@@ -144,13 +158,13 @@ struct number_category<float128_type> : public std::integral_constant<int, numbe
 using float128 = number<float128_backend, et_off>;
 
 namespace quad_constants {
-constexpr __float128 quad_min = static_cast<__float128>(1) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) / 1073741824;
+constexpr float128_type quad_min = static_cast<float128_type>(1) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) / 1073741824;
 
-constexpr __float128 quad_denorm_min = static_cast<__float128>(1) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) * static_cast<__float128>(DBL_MIN) / 5.5751862996326557854e+42;
+constexpr float128_type quad_denorm_min = static_cast<float128_type>(1) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) * static_cast<float128_type>(DBL_MIN) / 5.5751862996326557854e+42;
 
 constexpr double     dbl_mult = 8.9884656743115795386e+307;                                              // This has one bit set only.
-constexpr __float128 quad_max = (static_cast<__float128>(1) - 9.62964972193617926527988971292463659e-35) // This now has all bits sets to 1
-                                * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * static_cast<__float128>(dbl_mult) * 65536;
+constexpr float128_type quad_max = (static_cast<float128_type>(1) - 9.62964972193617926527988971292463659e-35) // This now has all bits sets to 1
+                                * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * static_cast<float128_type>(dbl_mult) * 65536;
 } // namespace quad_constants
 
 #define BOOST_MP_QUAD_MIN boost::multiprecision::quad_constants::quad_min
@@ -162,8 +176,8 @@ namespace backends {
 
 struct float128_backend
 {
-   using signed_types = std::tuple<signed char, short, int, long, boost::long_long_type>;
-   using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, boost::ulong_long_type>;
+   using signed_types = std::tuple<signed char, short, int, long, long long>;
+   using unsigned_types = std::tuple<unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long>;
    using float_types = std::tuple<float, double, long double>;
    using exponent_type = int                                  ;
 
@@ -179,7 +193,7 @@ struct float128_backend
       return *this;
    }
    template <class T>
-   constexpr float128_backend(const T& i, const typename std::enable_if<std::is_convertible<T, float128_type>::value>::type* = 0) noexcept(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
+   constexpr float128_backend(const T& i, const typename std::enable_if<std::is_convertible<T, float128_type>::value>::type* = nullptr) noexcept(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
        : m_value(i) {}
    template <class T>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value || std::is_convertible<T, float128_type>::value, float128_backend&>::type operator=(const T& i) noexcept(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
@@ -189,15 +203,17 @@ struct float128_backend
    }
    BOOST_MP_CXX14_CONSTEXPR float128_backend(long double const& f) : m_value(f)
    {
-      if (::fabsl(f) > LDBL_MAX)
-         m_value = (f < 0) ? -static_cast<__float128>(HUGE_VAL) : static_cast<__float128>(HUGE_VAL);
+      if (f > LDBL_MAX)
+         m_value = static_cast<float128_type>(HUGE_VAL);
+      else if (-f > LDBL_MAX)
+         m_value = -static_cast<float128_type>(HUGE_VAL);
    }
    BOOST_MP_CXX14_CONSTEXPR float128_backend& operator=(long double const& f)
    {
       if (f > LDBL_MAX)
-         m_value = static_cast<__float128>(HUGE_VAL);
+         m_value = static_cast<float128_type>(HUGE_VAL);
       else if (-f > LDBL_MAX)
-         m_value = -static_cast<__float128>(HUGE_VAL);
+         m_value = -static_cast<float128_type>(HUGE_VAL);
       else
          m_value = f;
       return *this;
@@ -209,7 +225,7 @@ struct float128_backend
       m_value = strtoflt128(s, &p_end);
       if (p_end - s != (std::ptrdiff_t)std::strlen(s))
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error("Unable to interpret input string as a floating point value"));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unable to interpret input string as a floating point value"));
       }
 #else
       boost::multiprecision::detail::convert_from_string(*this, s);
@@ -233,7 +249,7 @@ struct float128_backend
       if (f & std::ios_base::showpoint)
          format += "#";
       format += ".*";
-      if (digits == 0)
+      if ((digits == 0) && !(f & std::ios_base::fixed))
          digits = 36;
       format += "Q";
 
@@ -262,13 +278,13 @@ struct float128_backend
          v = quadmath_snprintf(&buf2[0], v_max + 3, format.c_str(), digits, m_value);
          if (v >= v_max + 3)
          {
-            BOOST_THROW_EXCEPTION(std::runtime_error("Formatting of float128_type failed."));
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Formatting of float128_type failed."));
          }
          return &buf2[0];
       }
       return buf;
 #else
-      return boost::multiprecision::detail::convert_to_string(*this, digits ? digits : 37, f);
+      return boost::multiprecision::detail::convert_to_string(*this, digits ? digits : 36, f);
 #endif
    }
    BOOST_MP_CXX14_CONSTEXPR void negate() noexcept
@@ -404,11 +420,12 @@ inline void eval_rsqrt(float128_backend& result, const float128_backend& arg)
    // error: __float128 and long double cannot be used in the same expression
    result.value() = 1 / sqrtq(arg.value());
 #else
-   using std::sqrt;
    if (arg.value() < std::numeric_limits<long double>::denorm_min() || arg.value() > (std::numeric_limits<long double>::max)()) {
       result.value() = 1/sqrtq(arg.value());
       return;
    }
+
+   using std::sqrt;
    float128_backend xk = 1/sqrt(static_cast<long double>(arg.value()));
 
    // Newton iteration for f(x) = arg.value() - 1/x^2.
@@ -425,7 +442,7 @@ inline void eval_rsqrt(float128_backend& result, const float128_backend& arg)
 #endif
 }
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-inline BOOST_MP_CXX14_CONSTEXPR 
+inline BOOST_MP_CXX14_CONSTEXPR
 #else
 inline
 #endif
@@ -541,7 +558,7 @@ inline void eval_trunc(float128_backend& result, const float128_backend& arg)
    result.value() = truncq(arg.value());
 }
 /*
-// 
+//
 // This doesn't actually work... rely on our own default version instead.
 //
 inline void eval_round(float128_backend& result, const float128_backend& arg)
@@ -549,9 +566,9 @@ inline void eval_round(float128_backend& result, const float128_backend& arg)
    if(isnanq(arg.value()) || isinf(arg.value()))
    {
       result = boost::math::policies::raise_rounding_error(
-            "boost::multiprecision::trunc<%1%>(%1%)", 0, 
-            number<float128_backend, et_off>(arg), 
-            number<float128_backend, et_off>(arg), 
+            "boost::multiprecision::trunc<%1%>(%1%)", nullptr,
+            number<float128_backend, et_off>(arg),
+            number<float128_backend, et_off>(arg),
             boost::math::policies::policy<>()).backend();
       return;
    }
@@ -713,6 +730,8 @@ inline boost::multiprecision::number<boost::multiprecision::backends::float128_b
    return ::copysignq(a.backend().value(), b.backend().value());
 }
 
+namespace backends {
+
 inline void eval_remainder(float128_backend& result, const float128_backend& a, const float128_backend& b)
 {
    result.value() = remainderq(a.value(), b.value());
@@ -721,6 +740,8 @@ inline void eval_remainder(float128_backend& result, const float128_backend& a, 
 {
    result.value() = remquoq(a.value(), b.value(), pi);
 }
+} // namespace backends
+
 #endif
 
 } // namespace multiprecision
@@ -734,6 +755,7 @@ using boost::multiprecision::signbit;
 
 } // namespace boost
 
+#ifndef BOOST_MP_STANDALONE
 namespace boost {
 namespace archive {
 
@@ -793,6 +815,7 @@ void serialize(Archive& ar, boost::multiprecision::backends::float128_backend& v
 } // namespace serialization
 
 } // namespace boost
+#endif // BOOST_MP_STANDALONE
 
 namespace std {
 
@@ -825,7 +848,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    static constexpr float_denorm_style has_denorm      = denorm_present;
    static constexpr bool               has_denorm_loss = true;
    static BOOST_MP_CXX14_CONSTEXPR number_type                        infinity() { return HUGE_VAL; /* conversion from double infinity OK */ }
-   static BOOST_MP_CXX14_CONSTEXPR number_type                        quiet_NaN() { return number_type("nan"); }
+   static BOOST_MP_CXX14_CONSTEXPR number_type                        quiet_NaN() { return number_type(NAN); }
    static BOOST_MP_CXX14_CONSTEXPR number_type                        signaling_NaN() { return 0; }
    static BOOST_MP_CXX14_CONSTEXPR number_type                        denorm_min() { return number_type(BOOST_MP_QUAD_DENORM_MIN); }
    static constexpr bool               is_iec559       = true;

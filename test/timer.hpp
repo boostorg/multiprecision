@@ -1,45 +1,131 @@
 ///////////////////////////////////////////////////////////////
 //  Copyright Beman Dawes 1994-99.
-//  Copyright 2020 John Maddock. Distributed under the Boost
+//  Copyright 2020 John Maddock.
+//  Copyright 2022 Christopher Kormanyos.
+//  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include <ctime>
-#include <limits>
+#ifndef BOOST_MP_TIMER_HPP
+#define BOOST_MP_TIMER_HPP
 
-//
-// This file archives the old (now deprecated) Boost.Timer.
-// It is however, all that we need for a simple timeout.
-//
-// TODO: replace with std::chrono once we remove C++03
-// support in 2021.
-//
+#include <chrono>
 
-class timer
+// This file now reflects the 2022 work-over. We have replaced the
+// original timer facility (which had been based on std::clock())
+// with C++11's equivalent <chrono> counterparts.
+
+namespace boost { namespace multiprecision { namespace test_detail {
+
+template <class ClockType = std::chrono::high_resolution_clock>
+struct stopwatch;
+
+template <class ResultType,
+          class ClockType = std::chrono::high_resolution_clock>
+class timer_template;
+
+template <class ClockType>
+struct stopwatch
 {
- public:
-   timer() { _start_time = std::clock(); }          // postcondition: elapsed()==0
-                                                    //         timer( const timer& src );      // post: elapsed()==src.elapsed()
-                                                    //        ~timer(){}
-                                                    //  timer& operator=( const timer& src );  // post: elapsed()==src.elapsed()
-   void   restart() { _start_time = std::clock(); } // post: elapsed()==0
-   double elapsed() const                           // return elapsed time in seconds
+private:
+   using clock_type = ClockType;
+
+public:
+   using duration_type = typename clock_type::duration;
+
+   stopwatch() : m_start(clock_type::now()) { }
+
+   stopwatch(const stopwatch& other) : m_start(other.m_start) { }
+   stopwatch(stopwatch&& other) noexcept : m_start(other.m_start) { }
+
+   auto operator=(const stopwatch& other) -> stopwatch&
    {
-      return double(std::clock() - _start_time) / CLOCKS_PER_SEC;
+      if(this != &other)
+      {
+         m_start = other.m_start;
+      }
+
+      return *this;
    }
 
-   double elapsed_max() const // return estimated maximum value for elapsed()
-   // Portability warning: elapsed_max() may return too high a value on systems
-   // where std::clock_t overflows or resets at surprising values.
+   auto operator=(stopwatch&& other) noexcept -> stopwatch&
    {
-      return (double((std::numeric_limits<std::clock_t>::max)()) - double(_start_time)) / double(CLOCKS_PER_SEC);
+      m_start = other.m_start;
+
+      return *this;
    }
 
-   double elapsed_min() const // return minimum value for elapsed()
+   ~stopwatch() { }
+
+   auto elapsed() const -> duration_type
    {
-      return double(1) / double(CLOCKS_PER_SEC);
+      return (clock_type::now() - m_start);
    }
 
- private:
-   std::clock_t _start_time;
-}; // timer
+   auto elapsed_max() const -> duration_type
+   {
+      return (std::chrono::time_point<clock_type>::max)() - m_start;
+   }
+
+   static constexpr auto elapsed_min() -> duration_type
+   {
+      return (std::chrono::time_point<clock_type>::min)() -  std::chrono::time_point<clock_type>();
+   }
+
+   void reset()
+   {
+      m_start = clock_type::now();
+   }
+
+private:
+   typename clock_type::time_point m_start;
+};
+
+
+template <class ResultType,
+          class ClockType>
+class timer_template : public stopwatch<ClockType>
+{
+private:
+   using clock_type      = ClockType;
+   using base_class_type = stopwatch<clock_type>;
+
+public:
+   using result_type = ResultType;
+
+   timer_template() { }
+
+   ~timer_template() { }
+
+   void restart() { base_class_type::reset(); }
+
+   auto elapsed() const -> result_type
+   {
+      // Return the elapsed time in seconds.
+      return std::chrono::duration_cast<std::chrono::duration<result_type>>(base_class_type::elapsed()).count();
+   }
+
+   auto elapsed_max() const -> result_type
+   {
+      return std::chrono::duration_cast<std::chrono::duration<result_type>>(base_class_type::elapsed_max()).count();
+   }
+
+   static constexpr auto elapsed_min() -> result_type
+   {
+      return std::chrono::duration_cast<std::chrono::duration<result_type>>(base_class_type::elapsed_min()).count();
+   }
+
+   static constexpr result_type seconds(result_type s) { return static_cast<result_type>(s * static_cast<result_type>(1)); }
+
+};
+
+} // namespace test_detail
+} // namespace multiprecision
+} // namespace boost
+
+// TODO: Might prefer to have the relatively common
+// name "timer" to be shielded with a namespace.
+
+using timer = boost::multiprecision::test_detail::timer_template<double, std::chrono::high_resolution_clock>;
+
+#endif // BOOST_MP_TIMER_HPP

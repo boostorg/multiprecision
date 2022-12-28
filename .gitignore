@@ -1,11 +1,20 @@
-# /boost/libs/multiprecision/.gitignore# Use of manifest is unclear, so add to .gitignore./doc/html/standalone_HTML.manifest
-/.vs/multiprecision/v16
-/Debug
-/multiprecision.vcxproj.user
-/multiprecision.vcxproj.filters
-/multiprecision.vcxproj
-/multiprecision.sln
-/x64/Debug
-/test/a.out
-/dummy.cpp
-/x64/Release
+# /boost/libs/multiprecision/.gitignore
+# Use of manifest is unclear, so add to .gitignore.
+/doc/html/standalone_HTML.manifest
+*.DS_Store
+/**/*.dSYM/
+**/.temps/*
+build/*
+.vscode/*
+.idea/*
+
+# CMake Related Options
+*.a
+*.o
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+**/CMakeFiles/**
+**CTestTestfile.cmake
+DartConfiguration.tcl
+cmake-build-debug/*

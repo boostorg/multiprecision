@@ -51,9 +51,10 @@ void test()
    {
       require_digits = std::numeric_limits<test_type>::digits <= 2 * max_digits ? std::numeric_limits<test_type>::digits / 2 : max_digits
    };
-   typedef typename boost::uint_t<require_digits>::least                                                     uint_least;
-   typedef typename boost::int_t<require_digits>::least                                                      int_least;
-   typedef typename std::conditional<std::numeric_limits<test_type>::is_signed, int_least, uint_least>::type i_type;
+
+   using uint_least = typename boost::multiprecision::detail::uint_t<require_digits>::least;
+   using int_least = typename boost::multiprecision::detail::int_t<require_digits>::least;
+   using i_type = typename std::conditional<std::numeric_limits<test_type>::is_signed, int_least, uint_least>::type;
 
    i_type ih = (std::numeric_limits<i_type>::max)();
    i_type il = (std::numeric_limits<i_type>::max)();

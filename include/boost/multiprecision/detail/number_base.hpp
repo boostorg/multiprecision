@@ -3,77 +3,38 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_MATH_BIG_NUM_BASE_HPP
-#define BOOST_MATH_BIG_NUM_BASE_HPP
+#ifndef BOOST_MP_NUMBER_BASE_HPP
+#define BOOST_MP_NUMBER_BASE_HPP
 
+#include <climits>
+#include <ios>
+#include <string>
 #include <limits>
 #include <type_traits>
-#include <boost/core/nvp.hpp>
-#include <boost/math/tools/complex.hpp>
+#include <stdexcept>
+#include <tuple>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/traits/transcendental_reduction_type.hpp>
 #include <boost/multiprecision/traits/std_integer_traits.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
+
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4307)
-#endif
-#include <boost/lexical_cast.hpp>
-#ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
-//
-// We now require C++11, if something we use is not supported, then error and say why:
-//
-#ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_RVALUE_REFERENCES being set"
+
+#ifndef BOOST_MP_STANDALONE
+#include <boost/lexical_cast.hpp>
+#include <boost/core/nvp.hpp>
 #endif
-#ifdef BOOST_NO_CXX11_TEMPLATE_ALIASES
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_TEMPLATE_ALIASES being set"
+
+#ifdef BOOST_MP_MATH_AVAILABLE
+#include <boost/math/tools/complex.hpp>
 #endif
-#ifdef BOOST_NO_CXX11_HDR_ARRAY
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_ARRAY being set"
-#endif
-#ifdef BOOST_NO_CXX11_HDR_TYPE_TRAITS
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_TYPE_TRAITS being set"
-#endif
-#ifdef BOOST_NO_CXX11_ALLOCATOR
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_ALLOCATOR being set"
-#endif
-#ifdef BOOST_NO_CXX11_CONSTEXPR
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_CONSTEXPR being set"
-#endif
-#ifdef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS being set"
-#endif
-#ifdef BOOST_NO_CXX11_REF_QUALIFIERS
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_REF_QUALIFIERS being set"
-#endif
-#ifdef BOOST_NO_CXX11_HDR_FUNCTIONAL
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_FUNCTIONAL being set"
-#endif
-#ifdef BOOST_NO_CXX11_VARIADIC_TEMPLATES
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_VARIADIC_TEMPLATES being set"
-#endif
-#ifdef BOOST_NO_CXX11_USER_DEFINED_LITERALS
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_USER_DEFINED_LITERALS being set"
-#endif
-#ifdef BOOST_NO_CXX11_DECLTYPE
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_DECLTYPE being set"
-#endif
-#ifdef BOOST_NO_CXX11_STATIC_ASSERT
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_STATIC_ASSERT being set"
-#endif
-#ifdef BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_DEFAULTED_FUNCTIONS being set"
-#endif
-#ifdef BOOST_NO_CXX11_NOEXCEPT
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_NOEXCEPT being set"
-#endif
-#ifdef BOOST_NO_CXX11_REF_QUALIFIERS
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_REF_QUALIFIERS being set"
-#endif
-#ifdef BOOST_NO_CXX11_USER_DEFINED_LITERALS
-#error "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_USER_DEFINED_LITERALS being set"
-#endif
+
+// We now require C++11.
+#include <boost/multiprecision/detail/check_cpp11_config.hpp>
 
 #if defined(NDEBUG) && !defined(_DEBUG)
 #define BOOST_MP_FORCEINLINE BOOST_FORCEINLINE
@@ -85,7 +46,9 @@
 // Thread local storage:
 // Note fails on Mingw, see https://sourceforge.net/p/mingw-w64/bugs/527/
 //
-#if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !(defined(__MINGW32__) && (__GNUC__ < 9) && !defined(__clang__))
+#if defined(BOOST_NO_CXX11_THREAD_LOCAL)
+#define BOOST_MP_THREAD_LOCAL
+#elif !(defined(__MINGW32__) && (defined(__GNUC__) && (__GNUC__ < 9)) && !defined(__clang__))
 #define BOOST_MP_THREAD_LOCAL thread_local
 #define BOOST_MP_USING_THREAD_LOCAL
 #else
@@ -173,10 +136,25 @@ enum expression_template_option
    et_on  = 1
 };
 
+enum struct variable_precision_options : signed char
+{
+   assume_uniform_precision = -1,
+   preserve_target_precision = 0,
+   preserve_source_precision = 1,
+   preserve_component_precision = 2,
+   preserve_related_precision = 3,
+   preserve_all_precision = 4,
+};
+
+inline constexpr bool operator==(variable_precision_options a, variable_precision_options b)
+{
+   return static_cast<unsigned>(a) == static_cast<unsigned>(b);
+}
+
 template <class Backend>
 struct expression_template_default
 {
-   static constexpr const expression_template_option value = et_on;
+   static constexpr expression_template_option value = et_on;
 };
 
 template <class Backend, expression_template_option ExpressionTemplates = expression_template_default<Backend>::value>
@@ -230,13 +208,13 @@ struct is_compatible_arithmetic_type
 
 namespace detail {
 //
-// Workaround for missing abs(boost::long_long_type) and abs(__int128) on some compilers:
+// Workaround for missing abs(long long) and abs(__int128) on some compilers:
 //
 template <class T>
 constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), T>::type abs(T t) noexcept
 {
    // This strange expression avoids a hardware trap in the corner case
-   // that val is the most negative value permitted in boost::long_long_type.
+   // that val is the most negative value permitted in long long.
    // See https://svn.boost.org/trac/boost/ticket/9740.
    return t < 0 ? T(1u) + T(-(t + 1)) : t;
 }
@@ -252,7 +230,7 @@ template <class T>
 constexpr typename std::enable_if<(boost::multiprecision::detail::is_signed<T>::value || std::is_floating_point<T>::value), typename boost::multiprecision::detail::make_unsigned<T>::type>::type unsigned_abs(T t) noexcept
 {
    // This strange expression avoids a hardware trap in the corner case
-   // that val is the most negative value permitted in boost::long_long_type.
+   // that val is the most negative value permitted in long long.
    // See https://svn.boost.org/trac/boost/ticket/9740.
    return t < 0 ? static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(1u) + static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(-(t + 1)) : static_cast<typename boost::multiprecision::detail::make_unsigned<T>::type>(t);
 }
@@ -266,7 +244,7 @@ template <class T>
 struct bits_of
 {
    static_assert(boost::multiprecision::detail::is_integral<T>::value || std::is_enum<T>::value || std::numeric_limits<T>::is_specialized, "Failed integer size check");
-   static constexpr const unsigned value =
+   static constexpr unsigned value =
        std::numeric_limits<T>::is_specialized ? std::numeric_limits<T>::digits
                                               : sizeof(T) * CHAR_BIT - (boost::multiprecision::detail::is_signed<T>::value ? 1 : 0);
 };
@@ -274,9 +252,9 @@ struct bits_of
 #if defined(_GLIBCXX_USE_FLOAT128) && defined(BOOST_GCC) && !defined(__STRICT_ANSI__)
 #define BOOST_MP_BITS_OF_FLOAT128_DEFINED
 template <>
-struct bits_of<__float128>
+struct bits_of<float128_type>
 {
-   static constexpr const unsigned value = 113;
+   static constexpr unsigned value = 113;
 };
 #endif
 
@@ -291,7 +269,7 @@ struct has_enough_bits
 template <class Tuple, int i, int digits, bool = (i >= std::tuple_size<Tuple>::value)>
 struct find_index_of_large_enough_type
 {
-   static constexpr int value = bits_of<typename std::tuple_element<i, Tuple>::type>::value >= digits ? i : find_index_of_large_enough_type<Tuple, i + 1, digits>::value;
+   static constexpr int value = bits_of<typename std::tuple_element<static_cast<std::size_t>(i), Tuple>::type>::value >= digits ? i : find_index_of_large_enough_type<Tuple, i + 1, digits>::value;
 };
 template <class Tuple, int i, int digits>
 struct find_index_of_large_enough_type<Tuple, i, digits, true>
@@ -302,7 +280,7 @@ struct find_index_of_large_enough_type<Tuple, i, digits, true>
 template <int index, class Tuple, class Fallback, bool = (std::tuple_size<Tuple>::value <= index)>
 struct dereference_tuple
 {
-   using type = typename std::tuple_element<index, Tuple>::type;
+   using type = typename std::tuple_element<static_cast<std::size_t>(index), Tuple>::type;
 };
 template <int index, class Tuple, class Fallback>
 struct dereference_tuple<index, Tuple, Fallback, true>
@@ -360,6 +338,13 @@ struct canonical_imp<Val, Backend, std::integral_constant<int, 3> >
 {
    using type = const char*;
 };
+template <class Val, class Backend>
+struct canonical_imp<Val, Backend, std::integral_constant<int, 4> >
+{
+   using underlying = typename std::underlying_type<Val>::type;
+   using tag = typename std::conditional<boost::multiprecision::detail::is_signed<Val>::value, std::integral_constant<int, 0>, std::integral_constant<int, 1>>::type;
+   using type = typename canonical_imp<underlying, Backend, tag>::type;
+};
 
 template <class Val, class Backend>
 struct canonical
@@ -376,7 +361,10 @@ struct canonical
                typename std::conditional<
                    (std::is_convertible<Val, const char*>::value || std::is_same<Val, std::string>::value),
                    std::integral_constant<int, 3>,
-                   std::integral_constant<int, 4> >::type>::type>::type>::type;
+                   typename std::conditional<
+                     std::is_enum<Val>::value,
+                     std::integral_constant<int, 4>,
+                     std::integral_constant<int, 5> >::type>::type>::type>::type>::type;
 
    using type = typename canonical_imp<Val, Backend, tag_type>::type;
 };
@@ -494,7 +482,7 @@ struct arg_type<expression<Tag, Arg1, Arg2, Arg3, Arg4> >
 
 struct unmentionable
 {
-   unmentionable* proc() { return 0; }
+   unmentionable* proc() { return nullptr; }
 };
 
 typedef unmentionable* (unmentionable::*unmentionable_type)();
@@ -658,7 +646,7 @@ struct expression<tag, Arg1, void, void, void>
 
    BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const noexcept { return arg; }
 
-   static constexpr const unsigned depth = left_type::depth + 1;
+   static constexpr unsigned depth = left_type::depth + 1;
    template <class T
 #ifndef __SUNPRO_CC
              ,
@@ -808,7 +796,7 @@ struct expression<terminal, Arg1, void, void, void>
       return arg;
    }
 
-   static constexpr const unsigned depth = 0;
+   static constexpr unsigned depth = 0;
 
    template <class T
 #ifndef __SUNPRO_CC
@@ -1154,10 +1142,10 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
       return r.template convert_to<T>();
    }
 
-   static constexpr const unsigned left_depth   = left_type::depth + 1;
-   static constexpr const unsigned middle_depth = middle_type::depth + 1;
-   static constexpr const unsigned right_depth  = right_type::depth + 1;
-   static constexpr const unsigned depth        = left_depth > right_depth ? (left_depth > middle_depth ? left_depth : middle_depth) : (right_depth > middle_depth ? right_depth : middle_depth);
+   static constexpr unsigned left_depth   = left_type::depth + 1;
+   static constexpr unsigned middle_depth = middle_type::depth + 1;
+   static constexpr unsigned right_depth  = right_type::depth + 1;
+   static constexpr unsigned depth        = left_depth > right_depth ? (left_depth > middle_depth ? left_depth : middle_depth) : (right_depth > middle_depth ? right_depth : middle_depth);
 
  private:
    typename expression_storage<Arg1>::type arg1;
@@ -1328,15 +1316,15 @@ struct expression
       return r.template convert_to<T>();
    }
 
-   static constexpr const unsigned left_depth         = left_type::depth + 1;
-   static constexpr const unsigned left_middle_depth  = left_middle_type::depth + 1;
-   static constexpr const unsigned right_middle_depth = right_middle_type::depth + 1;
-   static constexpr const unsigned right_depth        = right_type::depth + 1;
+   static constexpr unsigned left_depth         = left_type::depth + 1;
+   static constexpr unsigned left_middle_depth  = left_middle_type::depth + 1;
+   static constexpr unsigned right_middle_depth = right_middle_type::depth + 1;
+   static constexpr unsigned right_depth        = right_type::depth + 1;
 
-   static constexpr const unsigned left_max_depth  = left_depth > left_middle_depth ? left_depth : left_middle_depth;
-   static constexpr const unsigned right_max_depth = right_depth > right_middle_depth ? right_depth : right_middle_depth;
+   static constexpr unsigned left_max_depth  = left_depth > left_middle_depth ? left_depth : left_middle_depth;
+   static constexpr unsigned right_max_depth = right_depth > right_middle_depth ? right_depth : right_middle_depth;
 
-   static constexpr const unsigned depth = left_max_depth > right_max_depth ? left_max_depth : right_max_depth;
+   static constexpr unsigned depth = left_max_depth > right_max_depth ? left_max_depth : right_max_depth;
 
  private:
    typename expression_storage<Arg1>::type arg1;
@@ -1353,7 +1341,7 @@ struct digits2
    static_assert((std::numeric_limits<T>::radix == 2) || (std::numeric_limits<T>::radix == 10), "Failed radix check");
    // If we really have so many digits that this fails, then we're probably going to hit other problems anyway:
    static_assert(LONG_MAX / 1000 > (std::numeric_limits<T>::digits + 1), "Too many digits to cope with here");
-   static constexpr const long  m_value = std::numeric_limits<T>::radix == 10 ? (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) : std::numeric_limits<T>::digits;
+   static constexpr long  m_value = std::numeric_limits<T>::radix == 10 ? (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) : std::numeric_limits<T>::digits;
    static inline constexpr long value() noexcept { return m_value; }
 };
 
@@ -1369,19 +1357,20 @@ template <class S>
 void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std::ios_base::fmtflags f, bool iszero)
 {
    using size_type = typename S::size_type;
-   bool                          scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
-   bool                          fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
-   bool                          showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
-   bool                          showpos    = (f & std::ios_base::showpos) == std::ios_base::showpos;
+
+   bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
+   bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
+   bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
+   bool showpos    = (f & std::ios_base::showpos) == std::ios_base::showpos;
 
    bool neg = str.size() && (str[0] == '-');
 
    if (neg)
       str.erase(0, 1);
 
-   if (digits == 0)
+   if (digits == 0 && !fixed)
    {
-      digits = (std::max)(str.size(), size_type(16));
+      digits = static_cast<std::intmax_t>((std::max)(str.size(), size_type(16)));
    }
 
    if (iszero || str.empty() || (str.find_first_not_of('0') == S::npos))
@@ -1391,8 +1380,11 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
       str = "0";
       if (scientific || fixed)
       {
-         str.append(1, '.');
-         str.append(size_type(digits), '0');
+         if (showpoint || digits > 0) {
+            str.append(1, '.');
+            if (digits > 0)
+               str.append(size_type(digits), '0');
+         }
          if (scientific)
             str.append("e+00");
       }
@@ -1432,7 +1424,7 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
       //
       // Pad out the end with zero's if we need to:
       //
-      std::intmax_t chars = str.size();
+      std::intmax_t chars = static_cast<std::intmax_t>(str.size());
       chars                 = digits - chars;
       if (scientific)
          ++chars;
@@ -1447,8 +1439,8 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
       if (1 + my_exp > static_cast<std::intmax_t>(str.size()))
       {
          // Just pad out the end with zeros:
-         str.append(static_cast<std::string::size_type>(1 + my_exp - str.size()), '0');
-         if (showpoint || fixed)
+         str.append(static_cast<std::string::size_type>(1 + my_exp - static_cast<std::intmax_t>(str.size())), '0');
+         if (showpoint || (fixed && digits > 0))
             str.append(".");
       }
       else if (my_exp + 1 < static_cast<std::intmax_t>(str.size()))
@@ -1464,16 +1456,19 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
             str.insert(static_cast<std::string::size_type>(my_exp + 1), 1, '.');
          }
       }
-      else if (showpoint || fixed) // we have exactly the digits we require to left of the point
+      else if (showpoint || (fixed && digits > 0)) // we have exactly the digits we require to left of the point
          str += ".";
 
       if (fixed)
       {
          // We may need to add trailing zeros:
-         std::intmax_t l = str.find('.') + 1;
-         l                 = digits - (str.size() - l);
-         if (l > 0)
-            str.append(size_type(l), '0');
+         auto pos = str.find('.');
+         if (pos != str.npos) { // this test is probably redundant, but just to be safe and for clarity
+            std::intmax_t l = static_cast<std::intmax_t>(pos + 1);
+            l               = static_cast<std::intmax_t>(digits - (static_cast<std::intmax_t>(str.size()) - l));
+            if (l > 0)
+               str.append(size_type(l), '0');
+         }
       }
    }
    else
@@ -1483,7 +1478,23 @@ void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std
       if (showpoint || (str.size() > 1))
          str.insert(static_cast<std::string::size_type>(1u), 1, '.');
       str.append(static_cast<std::string::size_type>(1u), 'e');
-      S e = boost::lexical_cast<S>(abs(my_exp));
+
+      S e;
+
+      #ifndef BOOST_MP_STANDALONE
+      e = boost::lexical_cast<S>(abs(my_exp));
+      #else
+      BOOST_IF_CONSTEXPR(std::is_same<S, std::string>::value)
+      {
+         e = std::to_string(abs(my_exp));
+      }
+      else
+      {
+         const std::string str_local_exp = std::to_string(abs(my_exp));
+         e = S(str_local_exp.cbegin(), str_local_exp.cend());
+      }
+      #endif
+
       if (e.size() < BOOST_MP_MIN_EXPONENT_DIGITS)
          e.insert(static_cast<std::string::size_type>(0), BOOST_MP_MIN_EXPONENT_DIGITS - e.size(), '0');
       if (my_exp < 0)
@@ -1502,29 +1513,39 @@ template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, true>&)
 {
    if (val > (std::numeric_limits<std::size_t>::max)())
-      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
    if (val < 0)
-      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, false>&, const std::integral_constant<bool, true>&)
 {
    if (val < 0)
-      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&, const std::integral_constant<bool, false>&)
 {
    if (val > (std::numeric_limits<std::size_t>::max)())
-      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+      BOOST_MP_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
 }
 template <class V>
 BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V, const std::integral_constant<bool, false>&, const std::integral_constant<bool, false>&) noexcept {}
 
 template <class T>
 BOOST_MP_CXX14_CONSTEXPR const T& evaluate_if_expression(const T& val) { return val; }
+template <class T>
+BOOST_MP_CXX14_CONSTEXPR T&& evaluate_if_expression(T&& val) { return static_cast<T&&>(val); }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 BOOST_MP_CXX14_CONSTEXPR typename expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type evaluate_if_expression(const expression<tag, Arg1, Arg2, Arg3, Arg4>& val) { return val; }
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+BOOST_MP_CXX14_CONSTEXPR typename expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type evaluate_if_expression(expression<tag, Arg1, Arg2, Arg3, Arg4>&& val) { return val; }
+
+template <class T>
+struct convertible_to
+{
+   operator T () const;
+};
 
 } // namespace detail
 
@@ -1561,15 +1582,15 @@ struct number_category<detail::expression<tag, A1, A2, A3, A4> > : public number
 //
 #ifdef BOOST_HAS_INT128
 template <>
-struct number_category<boost::int128_type> : public std::integral_constant<int, number_kind_integer>
+struct number_category<boost::multiprecision::int128_type> : public std::integral_constant<int, number_kind_integer>
 {};
 template <>
-struct number_category<boost::uint128_type> : public std::integral_constant<int, number_kind_integer>
+struct number_category<boost::multiprecision::uint128_type> : public std::integral_constant<int, number_kind_integer>
 {};
 #endif
 #ifdef BOOST_HAS_FLOAT128
 template <>
-struct number_category<__float128> : public std::integral_constant<int, number_kind_floating_point>
+struct number_category<boost::multiprecision::float128_type> : public std::integral_constant<int, number_kind_floating_point>
 {};
 #endif
 
@@ -1624,6 +1645,7 @@ struct is_equivalent_number_type<number<Backend, ExpressionTemplates>, number<Ba
 }
 } // namespace boost
 
+#ifdef BOOST_MP_MATH_AVAILABLE
 namespace boost { namespace math {
    namespace tools {
 
@@ -1662,15 +1684,16 @@ struct is_explicitly_convertible_from_string;
 template <class B, boost::multiprecision::expression_template_option ET>
 struct is_explicitly_convertible_from_string<boost::multiprecision::number<B, ET> >
 {
-   static constexpr const bool value = true;
+   static constexpr bool value = true;
 };
 
 } // namespace constants
 
 }} // namespace boost::math
+#endif
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 
-#endif // BOOST_MATH_BIG_NUM_BASE_HPP
+#endif // BOOST_MP_NUMBER_BASE_HPP
