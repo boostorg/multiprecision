@@ -34,6 +34,9 @@
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">debug_adaptor</span><span class="special">;</span>
 
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Number</span><span class="special">&gt;</span>
+<span class="keyword">using</span> <span class="identifier">debug_adaptor_t</span> <span class="special">=</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">debug_adaptor</span><span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">Number</span><span class="special">::</span><span class="identifier">backend_type</span><span class="special">&gt;,</span> <span class="identifier">Number</span><span class="special">::</span><span class="identifier">et</span><span class="special">&gt;</span>
+
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
@@ -82,6 +85,17 @@
         </p>
 <p>
           <span class="inlinemediaobject"><img src="../../../../debugger3.png"></span>
+        </p>
+<p>
+          The template alias <code class="computeroutput"><span class="identifier">debug_adaptor_t</span></code>
+          is used as a shortcut for converting some other number type to it's debugged
+          equivalent, for example:
+        </p>
+<pre class="programlisting"><span class="keyword">using</span> <span class="identifier">mpfr_float_debug</span> <span class="special">=</span> <span class="identifier">debug_adaptor_t</span><span class="special">&lt;</span><span class="identifier">mpfr_float</span><span class="special">&gt;;</span>
+</pre>
+<p>
+          Defines <code class="computeroutput"><span class="identifier">mpfr_float_debug</span></code>
+          to be the debugged equivalent of <code class="computeroutput"><span class="identifier">mpfr_float</span></code>.
         </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

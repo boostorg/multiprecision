@@ -3,6 +3,13 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
+#if defined(__GNUC__) && defined(_WIN32)
+//
+// Without this, our object files get to big!
+//
+#define SLOW_COMPILER
+#endif
+
 #include <boost/multiprecision/cpp_bin_float.hpp>
 
 #include "libs/multiprecision/test/test_arithmetic.hpp"

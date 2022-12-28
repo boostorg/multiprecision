@@ -5,6 +5,7 @@
 
 //[safe_prime
 
+#include <boost/random.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/miller_rabin.hpp>
 #include <iostream>

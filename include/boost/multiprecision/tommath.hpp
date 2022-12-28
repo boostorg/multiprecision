@@ -1,23 +1,32 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright 2011 John Maddock.
+//  Copyright 2021 Matt Borland. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_MATH_MP_TOMMATH_BACKEND_HPP
-#define BOOST_MATH_MP_TOMMATH_BACKEND_HPP
+#ifndef BOOST_MP_TOMMATH_HPP
+#define BOOST_MP_TOMMATH_HPP
 
+#include <cctype>
+#include <climits>
+#include <cmath>
+#include <cstdint>
+#include <cstddef>
+#include <cstdlib>
+#include <limits>
+#include <memory>
+#include <string>
+
+#include <tommath.h>
+
+#include <boost/multiprecision/detail/standalone_config.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <cstdint>
-#include <tommath.h>
-#include <cctype>
-#include <cmath>
-#include <limits>
-#include <climits>
-#include <cstddef>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -30,7 +39,7 @@ inline void check_tommath_result(ErrType v)
 {
    if (v != MP_OKAY)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error(mp_error_to_string(v)));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error(mp_error_to_string(v)));
    }
 }
 
@@ -43,8 +52,8 @@ void eval_add(tommath_int& t, const tommath_int& o);
 
 struct tommath_int
 {
-   using signed_types = std::tuple<std::int32_t, boost::long_long_type>  ;
-   using unsigned_types = std::tuple<std::uint32_t, boost::ulong_long_type>;
+   using signed_types = std::tuple<std::int32_t, long long>  ;
+   using unsigned_types = std::tuple<std::uint32_t, unsigned long long>;
    using float_types = std::tuple<long double>                            ;
 
    tommath_int()
@@ -68,7 +77,7 @@ struct tommath_int
    }
    tommath_int& operator=(const tommath_int& o)
    {
-      if (m_data.dp == 0)
+      if (m_data.dp == nullptr)
          detail::check_tommath_result(mp_init(&m_data));
       if (o.m_data.dp)
          detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
@@ -76,11 +85,11 @@ struct tommath_int
    }
 #ifndef mp_get_u64
    // Pick off 32 bit chunks for mp_set_int:
-   tommath_int& operator=(boost::ulong_long_type i)
+   tommath_int& operator=(unsigned long long i)
    {
-      if (m_data.dp == 0)
+      if (m_data.dp == nullptr)
          detail::check_tommath_result(mp_init(&m_data));
-      boost::ulong_long_type mask = ((1uLL << 32) - 1);
+      unsigned long long mask = ((1uLL << 32) - 1);
       unsigned shift = 0;
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
@@ -98,24 +107,24 @@ struct tommath_int
       return *this;
    }
 #elif !defined(ULLONG_MAX) || (ULLONG_MAX != 18446744073709551615uLL)
-   // Pick off 64 bit chunks for mp_set_i64:
-   tommath_int& operator=(boost::ulong_long_type i)
+   // Pick off 64 bit chunks for mp_set_u64:
+   tommath_int& operator=(unsigned long long i)
    {
-      if (m_data.dp == 0)
+      if (m_data.dp == nullptr)
          detail::check_tommath_result(mp_init(&m_data));
-      if(sizeof(boost::ulong_long_type) * CHAR_BIT == 64)
+      if(sizeof(unsigned long long) * CHAR_BIT == 64)
       {
          mp_set_u64(&m_data, i);
          return *this;
       }
-      boost::ulong_long_type mask = ((1uLL << 64) - 1);
+      unsigned long long mask = ((1uLL << 64) - 1);
       unsigned shift = 0;
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
       mp_zero(&m_data);
       while (i)
       {
-         detail::check_tommath_result(mp_set_i64(&t, static_cast<std::uint64_t>(i & mask)));
+         detail::check_tommath_result(mp_set_u64(&t, static_cast<std::uint64_t>(i & mask)));
          if (shift)
             detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
          detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
@@ -126,17 +135,17 @@ struct tommath_int
       return *this;
    }
 #else
-   tommath_int& operator=(boost::ulong_long_type i)
+   tommath_int& operator=(unsigned long long i)
    {
-      if (m_data.dp == 0)
+      if (m_data.dp == nullptr)
          detail::check_tommath_result(mp_init(&m_data));
       mp_set_u64(&m_data, i);
       return *this;
    }
 #endif
-   tommath_int& operator=(boost::long_long_type i)
+   tommath_int& operator=(long long i)
    {
-      if (m_data.dp == 0)
+      if (m_data.dp == nullptr)
          detail::check_tommath_result(mp_init(&m_data));
       bool neg = i < 0;
       *this    = boost::multiprecision::detail::unsigned_abs(i);
@@ -144,6 +153,45 @@ struct tommath_int
          detail::check_tommath_result(mp_neg(&m_data, &m_data));
       return *this;
    }
+#ifdef BOOST_HAS_INT128
+   // Pick off 64 bit chunks for mp_set_u64:
+   tommath_int& operator=(uint128_type i)
+   {
+      if (m_data.dp == nullptr)
+         detail::check_tommath_result(mp_init(&m_data));
+
+      int128_type  mask  = ((static_cast<uint128_type>(1u) << 64) - 1);
+      unsigned           shift = 0;
+      ::mp_int           t;
+      detail::check_tommath_result(mp_init(&t));
+      mp_zero(&m_data);
+      while (i)
+      {
+#ifndef mp_get_u32
+         detail::check_tommath_result(mp_set_long_long(&t, static_cast<std::uint64_t>(i & mask)));
+#else
+         mp_set_u64(&t, static_cast<std::uint64_t>(i & mask));
+#endif
+         if (shift)
+            detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
+         detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
+         shift += 64;
+         i >>= 64;
+      }
+      mp_clear(&t);
+      return *this;
+   }
+   tommath_int& operator=(int128_type i)
+   {
+      if (m_data.dp == nullptr)
+         detail::check_tommath_result(mp_init(&m_data));
+      bool neg = i < 0;
+      *this    = boost::multiprecision::detail::unsigned_abs(i);
+      if (neg)
+         detail::check_tommath_result(mp_neg(&m_data, &m_data));
+      return *this;
+   }
+#endif
    //
    // Note that although mp_set_int takes an unsigned long as an argument
    // it only sets the first 32-bits to the result, and ignores the rest.
@@ -151,7 +199,7 @@ struct tommath_int
    //
    tommath_int& operator=(std::uint32_t i)
    {
-      if (m_data.dp == 0)
+      if (m_data.dp == nullptr)
          detail::check_tommath_result(mp_init(&m_data));
 #ifndef mp_get_u32
       detail::check_tommath_result((mp_set_int(&m_data, i)));
@@ -162,7 +210,7 @@ struct tommath_int
    }
    tommath_int& operator=(std::int32_t i)
    {
-      if (m_data.dp == 0)
+      if (m_data.dp == nullptr)
          detail::check_tommath_result(mp_init(&m_data));
       bool neg = i < 0;
       *this    = boost::multiprecision::detail::unsigned_abs(i);
@@ -170,13 +218,12 @@ struct tommath_int
          detail::check_tommath_result(mp_neg(&m_data, &m_data));
       return *this;
    }
-   tommath_int& operator=(long double a)
+   template <class F>
+   tommath_int& assign_float(F a)
    {
-      using std::floor;
-      using std::frexp;
-      using std::ldexp;
+      BOOST_MP_FLOAT128_USING using std::floor; using std::frexp; using std::ldexp;
 
-      if (m_data.dp == 0)
+      if (m_data.dp == nullptr)
          detail::check_tommath_result(mp_init(&m_data));
 
       if (a == 0)
@@ -199,11 +246,11 @@ struct tommath_int
          return *this;
       }
 
-      BOOST_ASSERT(!(boost::math::isinf)(a));
-      BOOST_ASSERT(!(boost::math::isnan)(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISINF(a));
+      BOOST_MP_ASSERT(!BOOST_MP_ISNAN(a));
 
       int         e;
-      long double f, term;
+      F f, term;
 #ifndef mp_get_u32
       detail::check_tommath_result(mp_set_int(&m_data, 0u));
 #else
@@ -259,12 +306,22 @@ struct tommath_int
       mp_clear(&t);
       return *this;
    }
+   tommath_int& operator=(long double a)
+   {
+      return assign_float(a);
+   }
+#ifdef BOOST_HAS_FLOAT128
+   tommath_int& operator= (float128_type a)
+   {
+      return assign_float(a);
+   }
+#endif
    tommath_int& operator=(const char* s)
    {
       //
       // We don't use libtommath's own routine because it doesn't error check the input :-(
       //
-      if (m_data.dp == 0)
+      if (m_data.dp == nullptr)
          detail::check_tommath_result(mp_init(&m_data));
       std::size_t n  = s ? std::strlen(s) : 0;
       *this          = static_cast<std::uint32_t>(0u);
@@ -301,7 +358,7 @@ struct tommath_int
             unsigned block_count = MP_DIGIT_BIT / shift;
 #endif
             unsigned               block_shift = shift * block_count;
-            boost::ulong_long_type val, block;
+            unsigned long long val, block;
             while (*s)
             {
                block = 0;
@@ -317,7 +374,7 @@ struct tommath_int
                      val = 400;
                   if (val > radix)
                   {
-                     BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
+                     BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
                   }
                   block <<= shift;
                   block |= val;
@@ -349,7 +406,7 @@ struct tommath_int
                   if (*s >= '0' && *s <= '9')
                      val = *s - '0';
                   else
-                     BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected character encountered in input."));
+                     BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected character encountered in input."));
                   block *= 10;
                   block += val;
                   if (!*++s)
@@ -373,7 +430,7 @@ struct tommath_int
    }
    std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f) const
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       int base = 10;
       if ((f & std::ios_base::oct) == std::ios_base::oct)
          base = 8;
@@ -383,8 +440,8 @@ struct tommath_int
       // sanity check, bases 8 and 16 are only available for positive numbers:
       //
       if ((base != 10) && m_data.sign)
-         BOOST_THROW_EXCEPTION(std::runtime_error("Formatted output in bases 8 or 16 is only available for positive numbers"));
-      
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Formatted output in bases 8 or 16 is only available for positive numbers"));
+
       int s;
       detail::check_tommath_result(mp_radix_size(const_cast< ::mp_int*>(&m_data), base, &s));
       std::unique_ptr<char[]> a(new char[s + 1]);
@@ -420,12 +477,12 @@ struct tommath_int
    }
    void negate()
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       detail::check_tommath_result(mp_neg(&m_data, &m_data));
    }
    int compare(const tommath_int& o) const
    {
-      BOOST_ASSERT(m_data.dp && o.m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp && o.m_data.dp);
       return mp_cmp(const_cast< ::mp_int*>(&m_data), const_cast< ::mp_int*>(&o.m_data));
    }
    template <class V>
@@ -439,12 +496,12 @@ struct tommath_int
    }
    ::mp_int& data()
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       return m_data;
    }
    const ::mp_int& data() const
    {
-      BOOST_ASSERT(m_data.dp);
+      BOOST_MP_ASSERT(m_data.dp);
       return m_data;
    }
    void swap(tommath_int& o) noexcept
@@ -459,11 +516,11 @@ struct tommath_int
 #ifndef mp_isneg
 #define BOOST_MP_TOMMATH_BIT_OP_CHECK(x) \
    if (SIGN(&x.data()))                  \
-   BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
+   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
 #else
 #define BOOST_MP_TOMMATH_BIT_OP_CHECK(x) \
    if (mp_isneg(&x.data()))              \
-   BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
+   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
 #endif
 
 int eval_get_sign(const tommath_int& val);
@@ -485,14 +542,14 @@ inline void eval_divide(tommath_int& t, const tommath_int& o)
    using default_ops::eval_is_zero;
    tommath_int temp;
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    detail::check_tommath_result(mp_div(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data(), &temp.data()));
 }
 inline void eval_modulus(tommath_int& t, const tommath_int& o)
 {
    using default_ops::eval_is_zero;
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    bool neg  = eval_get_sign(t) < 0;
    bool neg2 = eval_get_sign(o) < 0;
    detail::check_tommath_result(mp_mod(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
@@ -576,14 +633,14 @@ inline void eval_divide(tommath_int& t, const tommath_int& p, const tommath_int&
    using default_ops::eval_is_zero;
    tommath_int d;
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    detail::check_tommath_result(mp_div(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data(), &d.data()));
 }
 inline void eval_modulus(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
    using default_ops::eval_is_zero;
    if (eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    bool neg  = eval_get_sign(p) < 0;
    bool neg2 = eval_get_sign(o) < 0;
    detail::check_tommath_result(mp_mod(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
@@ -638,13 +695,13 @@ inline void eval_complement(tommath_int& result, const tommath_int& u)
    //
    unsigned shift = result.data().used * DIGIT_BIT;    // How many bits we're actually using
    // How many bits we actually need, reduced by one to account for a mythical sign bit:
-   int padding = result.data().used * std::numeric_limits<mp_digit>::digits - shift - 1; 
-   while(padding >= std::numeric_limits<mp_digit>::digits) 
+   int padding = result.data().used * std::numeric_limits<mp_digit>::digits - shift - 1;
+   while(padding >= std::numeric_limits<mp_digit>::digits)
       padding -= std::numeric_limits<mp_digit>::digits;
 
    // Create a mask providing the extra bits we need and add to result:
    tommath_int mask;
-   mask = static_cast<boost::long_long_type>((1u << padding) - 1);
+   mask = static_cast<long long>((1u << padding) - 1);
    eval_left_shift(mask, shift);
    add(result, mask);
 }
@@ -661,25 +718,103 @@ inline int eval_get_sign(const tommath_int& val)
    return mp_iszero(&val.data()) ? 0 : mp_isneg(&val.data()) ? -1 : 1;
 #endif
 }
-/*
-template <class A>
-inline void eval_convert_to(A* result, const tommath_int& val)
+
+inline void eval_convert_to(unsigned long long* result, const tommath_int& val)
 {
-   *result = boost::lexical_cast<A>(val.str(0, std::ios_base::fmtflags(0)));
+   if (mp_isneg(&val.data()))
+   {
+      BOOST_MP_THROW_EXCEPTION(std::range_error("Converting negative arbitrary precision value to unsigned."));
+   }
+#ifdef MP_DEPRECATED
+   *result = mp_get_ull(&val.data());
+#else
+   *result = mp_get_long_long(const_cast<mp_int*>(&val.data()));
+#endif
 }
-inline void eval_convert_to(char* result, const tommath_int& val)
+
+inline void eval_convert_to(long long* result, const tommath_int& val)
 {
-   *result = static_cast<char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
+   if (!mp_iszero(&val.data()) && (mp_count_bits(const_cast<::mp_int*>(&val.data())) > std::numeric_limits<long long>::digits))
+   {
+      *result = mp_isneg(&val.data()) ? (std::numeric_limits<long long>::min)() : (std::numeric_limits<long long>::max)();
+      return;
+   }
+#ifdef MP_DEPRECATED
+   unsigned long long r = mp_get_mag_ull(&val.data());
+#else
+   unsigned long long r = mp_get_long_long(const_cast<mp_int*>(&val.data()));
+#endif
+   if (mp_isneg(&val.data()))
+      *result = -static_cast<long long>(r);
+   else
+      *result = r;
 }
-inline void eval_convert_to(unsigned char* result, const tommath_int& val)
+
+#ifdef BOOST_HAS_INT128
+inline void eval_convert_to(uint128_type* result, const tommath_int& val)
 {
-   *result = static_cast<unsigned char>(boost::lexical_cast<unsigned>(val.str(0, std::ios_base::fmtflags(0))));
+#ifdef MP_DEPRECATED
+   if (mp_ubin_size(&val.data()) > sizeof(uint128_type))
+   {
+      *result = ~static_cast<uint128_type>(0);
+      return;
+   }
+   unsigned char buf[sizeof(uint128_type)];
+   std::size_t   len;
+   detail::check_tommath_result(mp_to_ubin(&val.data(), buf, sizeof(buf), &len));
+   *result = 0;
+   for (std::size_t i = 0; i < len; ++i)
+   {
+      *result <<= CHAR_BIT;
+      *result |= buf[i];
+   }
+#else
+   std::size_t len = mp_unsigned_bin_size(const_cast<mp_int*>(&val.data()));
+   if (len > sizeof(uint128_type))
+   {
+      *result = ~static_cast<uint128_type>(0);
+      return;
+   }
+   unsigned char buf[sizeof(uint128_type)];
+   detail::check_tommath_result(mp_to_unsigned_bin(const_cast<mp_int*>(&val.data()), buf));
+   *result = 0;
+   for (std::size_t i = 0; i < len; ++i)
+   {
+      *result <<= CHAR_BIT;
+      *result |= buf[i];
+   }
+#endif
 }
-inline void eval_convert_to(signed char* result, const tommath_int& val)
+inline void eval_convert_to(int128_type* result, const tommath_int& val)
 {
-   *result = static_cast<signed char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
+   uint128_type r;
+   eval_convert_to(&r, val);
+   if (mp_isneg(&val.data()))
+      *result = -static_cast<int128_type>(r);
+   else
+      *result = r;
 }
-*/
+#endif
+#if defined(BOOST_HAS_FLOAT128)
+inline void eval_convert_to(float128_type* result, const tommath_int& val) noexcept
+{
+   *result = float128_procs::strtoflt128(val.str(0, std::ios_base::scientific).c_str(), nullptr);
+}
+#endif
+inline void eval_convert_to(long double* result, const tommath_int& val) noexcept
+{
+   *result = std::strtold(val.str(0, std::ios_base::scientific).c_str(), nullptr);
+}
+inline void eval_convert_to(double* result, const tommath_int& val) noexcept
+{
+   *result = std::strtod(val.str(0, std::ios_base::scientific).c_str(), nullptr);
+}
+inline void eval_convert_to(float* result, const tommath_int& val) noexcept
+{
+   *result = std::strtof(val.str(0, std::ios_base::scientific).c_str(), nullptr);
+}
+
+
 inline void eval_abs(tommath_int& result, const tommath_int& val)
 {
    detail::check_tommath_result(mp_abs(const_cast< ::mp_int*>(&val.data()), &result.data()));
@@ -696,7 +831,7 @@ inline void eval_powm(tommath_int& result, const tommath_int& base, const tommat
 {
    if (eval_get_sign(p) < 0)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
    detail::check_tommath_result(mp_exptmod(const_cast< ::mp_int*>(&base.data()), const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&m.data()), &result.data()));
 }
@@ -707,30 +842,30 @@ inline void eval_qr(const tommath_int& x, const tommath_int& y,
    detail::check_tommath_result(mp_div(const_cast< ::mp_int*>(&x.data()), const_cast< ::mp_int*>(&y.data()), &q.data(), &r.data()));
 }
 
-inline unsigned eval_lsb(const tommath_int& val)
+inline std::size_t eval_lsb(const tommath_int& val)
 {
    int c = eval_get_sign(val);
    if (c == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (c < 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    return mp_cnt_lsb(const_cast< ::mp_int*>(&val.data()));
 }
 
-inline unsigned eval_msb(const tommath_int& val)
+inline std::size_t eval_msb(const tommath_int& val)
 {
    int c = eval_get_sign(val);
    if (c == 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (c < 0)
    {
-      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_MP_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    return mp_count_bits(const_cast< ::mp_int*>(&val.data())) - 1;
 }

@@ -31,6 +31,9 @@
    template <Backend>
    class logged_adaptor;
 
+   template <class Number>
+   using logged_adaptor_t = number<logged_adaptor<typename Number::backend_type>, Number::et>;
+
    }} // namespaces
 
 The `logged_adaptor` type is used in conjunction with `number` and some other backend type: it acts as a thin wrapper around
@@ -45,6 +48,8 @@ The default versions of `log_prefix_event` and `log_postfix_event` do nothing, i
 for the particular backend being observed.
 
 This type provides `numeric_limits` support whenever the template argument Backend does so.
+
+Template alias `logged_adaptor_t` can be used as a shortcut for converting some instantiation of `number<>` to it's logged euqivalent.
 
 This type is particularly useful when combined with an interval number type - in this case we can use `log_postfix_event`
 to monitor the error accumulated after each operation.  We could either set some kind of trap whenever the accumulated error

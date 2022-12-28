@@ -29,6 +29,7 @@ In order to use this library you need to make two choices:
 [include tutorial_import_export.qbk]
 [include tutorial_rounding.qbk]
 [include tutorial_mixed_precision.qbk]
+[include tutorial_variable_precision.qbk]
 [include tutorial_integer_ops.qbk]
 [include tutorial_serialization.qbk]
 [include tutorial_numeric_limits.qbk]

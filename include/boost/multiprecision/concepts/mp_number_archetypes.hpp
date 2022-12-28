@@ -3,18 +3,21 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_MATH_CONCEPTS_ER_HPP
-#define BOOST_MATH_CONCEPTS_ER_HPP
+#ifndef BOOST_MP_MP_NUMBER_ARCHETYPES_HPP
+#define BOOST_MP_MP_NUMBER_ARCHETYPES_HPP
 
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <tuple>
 #include <functional>
-#include <cmath>
-#include <cstdint>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/fpclassify.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -27,10 +30,10 @@ namespace concepts {
 
 struct number_backend_float_architype
 {
-   using signed_types = std::tuple<boost::long_long_type> ;
-   using unsigned_types = std::tuple<boost::ulong_long_type>;
-   using float_types = std::tuple<long double>           ;
-   using exponent_type = int                              ;
+   using signed_types = std::tuple<long long> ;
+   using unsigned_types = std::tuple<unsigned long long>;
+   using float_types = std::tuple<long double>;
+   using exponent_type = int;
 
    number_backend_float_architype()
    {
@@ -48,13 +51,13 @@ struct number_backend_float_architype
       std::cout << "Assignment (" << m_value << ")" << std::endl;
       return *this;
    }
-   number_backend_float_architype& operator=(boost::ulong_long_type i)
+   number_backend_float_architype& operator=(unsigned long long i)
    {
       m_value = i;
       std::cout << "UInt Assignment (" << i << ")" << std::endl;
       return *this;
    }
-   number_backend_float_architype& operator=(boost::long_long_type i)
+   number_backend_float_architype& operator=(long long i)
    {
       m_value = i;
       std::cout << "Int Assignment (" << i << ")" << std::endl;
@@ -72,12 +75,21 @@ struct number_backend_float_architype
       try
       {
 #endif
+         #ifndef BOOST_MP_STANDALONE
          m_value = boost::lexical_cast<long double>(s);
+         #else
+         m_value = std::strtold(s, nullptr);
+
+         if(m_value == HUGE_VALL || m_value == 0)
+         {
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Value can not be assigned in standalone mode. Please disable and try again."));
+         }
+         #endif
 #ifndef BOOST_NO_EXCEPTIONS
       }
       catch (const std::exception&)
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse input string: \"") + s + std::string("\" as a valid floating point number.")));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse input string: \"") + s + std::string("\" as a valid floating point number.")));
       }
 #endif
       std::cout << "const char* Assignment (" << s << ")" << std::endl;
@@ -118,12 +130,12 @@ struct number_backend_float_architype
       std::cout << "Comparison" << std::endl;
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
-   int compare(boost::long_long_type i) const
+   int compare(long long i) const
    {
       std::cout << "Comparison with int" << std::endl;
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
    }
-   int compare(boost::ulong_long_type i) const
+   int compare(unsigned long long i) const
    {
       std::cout << "Comparison with unsigned" << std::endl;
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
@@ -157,13 +169,13 @@ inline void eval_divide(number_backend_float_architype& result, const number_bac
    result.m_value /= o.m_value;
 }
 
-inline void eval_convert_to(boost::ulong_long_type* result, const number_backend_float_architype& val)
+inline void eval_convert_to(unsigned long long* result, const number_backend_float_architype& val)
 {
-   *result = static_cast<boost::ulong_long_type>(val.m_value);
+   *result = static_cast<unsigned long long>(val.m_value);
 }
-inline void eval_convert_to(boost::long_long_type* result, const number_backend_float_architype& val)
+inline void eval_convert_to(long long* result, const number_backend_float_architype& val)
 {
-   *result = static_cast<boost::long_long_type>(val.m_value);
+   *result = static_cast<long long>(val.m_value);
 }
 inline void eval_convert_to(long double* result, number_backend_float_architype& val)
 {
@@ -197,7 +209,7 @@ inline void eval_sqrt(number_backend_float_architype& result, const number_backe
 
 inline int eval_fpclassify(const number_backend_float_architype& arg)
 {
-   return (boost::math::fpclassify)(arg.m_value);
+   return BOOST_MP_FPCLASSIFY(arg.m_value);
 }
 
 inline std::size_t hash_value(const number_backend_float_architype& v)

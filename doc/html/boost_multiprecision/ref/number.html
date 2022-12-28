@@ -44,6 +44,8 @@
    <span class="keyword">typedef</span>          <span class="identifier">Backend</span>                          <span class="identifier">backend_type</span><span class="special">;</span>
    <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="identifier">component_type</span><span class="special">&lt;</span><span class="identifier">self_type</span><span class="special">&gt;::</span><span class="identifier">type</span>  <span class="identifier">value_type</span><span class="special">;</span>
 
+   <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="identifier">expression_template_option</span> <span class="identifier">et</span> <span class="special">=</span> <span class="identifier">ExpressionTemplates</span><span class="special">;</span>
+
    <span class="identifier">number</span><span class="special">();</span>
    <span class="identifier">number</span><span class="special">(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
    <span class="identifier">number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
@@ -135,6 +137,10 @@
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&gt;&gt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="identifier">is</span><span class="special">,</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
 
+<span class="comment">// to_string support:</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">to_string</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">val</span><span class="special">);</span>
+
 <span class="comment">// Arithmetic with a higher precision result:</span>
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">ResultType</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Source1</span> <span class="keyword">class</span> <span class="identifier">Source2</span><span class="special">&gt;</span>
 <span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">add</span><span class="special">(</span><span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">result</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source1</span><span class="special">&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source2</span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">);</span>
@@ -211,7 +217,7 @@
 <span class="keyword">bool</span>                                      <span class="identifier">isinf</span>      <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">isnan</span>      <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">isnormal</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
-<span class="keyword">int</span>                                       <span class="identifier">signbit</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span>                                      <span class="identifier">signbit</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 
 <span class="keyword">bool</span>                                      <span class="identifier">isgreater</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">isgreaterequal</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
@@ -427,6 +433,9 @@
 <p>
         Where the two args must either be arithmetic types, or types that are convertible
         to the two components of <code class="computeroutput"><span class="keyword">this</span></code>.
+        Rvalue forwarding overloads are provided so either one or both arguments
+        may be rvalue-references which will be moved into the result, if the backend
+        is able to make use of them.
       </p>
 <p>
         Finally, when the type has a variable precision, then there are constructors:
@@ -696,6 +705,18 @@
         the back-ends provided with this library support all of the iostream formatting
         flags, field width and precision settings.
       </p>
+<p>
+        In addition, the C++11 <code class="computeroutput"><span class="identifier">to_string</span></code>
+        function is provided for use in generic code:
+      </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">to_string</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">val</span><span class="special">);</span>
+</pre>
+<p>
+        This a string with 6 digits of accuracy past the decimal point, matching
+        the behavior of <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">to_string</span></code>. Note that this is a <span class="emphasis"><em>fixed
+        precision</em></span> representation, and hence monstrous strings can be returned.
+      </p>
 <h5>
 <a name="boost_multiprecision.ref.number.h5"></a>
         <span class="phrase"><a name="boost_multiprecision.ref.number.arithmetic_with_a_higher_precisi"></a></span><a class="link" href="number.html#boost_multiprecision.ref.number.arithmetic_with_a_higher_precisi">Arithmetic
@@ -796,7 +817,7 @@
 <span class="keyword">bool</span>                                      <span class="identifier">isinf</span>      <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">isnan</span>      <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">isnormal</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
-<span class="keyword">int</span>                                       <span class="identifier">signbit</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span>                                      <span class="identifier">signbit</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 
 <span class="keyword">bool</span>                                      <span class="identifier">isgreater</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">isgreaterequal</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>

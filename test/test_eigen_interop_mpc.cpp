@@ -11,5 +11,6 @@ int main()
 {
    using namespace boost::multiprecision;
    test_complex_type<mpc_complex>();
+   test_complex_type<mpc_complex_50>();
    return 0;
 }

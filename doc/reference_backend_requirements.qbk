@@ -452,7 +452,7 @@ are either trivial or are forwarded to the Boost.Math implementations by default
 The full list of these functions is:
 
    int           sign       (const ``['number-or-expression-template-type]``&);
-   int           signbit    (const ``['number-or-expression-template-type]``&);
+   bool          signbit    (const ``['number-or-expression-template-type]``&);
    ``['number]``        changesign (const ``['number-or-expression-template-type]``&);
    ``['number]``        copysign   (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    ``['number]``        asinh      (const ``['number-or-expression-template-type]``&);

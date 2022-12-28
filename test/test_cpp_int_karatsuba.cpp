@@ -70,7 +70,7 @@ T generate_random(unsigned bits_wanted)
 template <class T>
 struct is_checked_cpp_int : public std::integral_constant<bool, false>
 {};
-template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, class Allocator, boost::multiprecision::expression_template_option ET>
+template <std::size_t MinBits, std::size_t MaxBits, boost::multiprecision::cpp_integer_type SignType, class Allocator, boost::multiprecision::expression_template_option ET>
 struct is_checked_cpp_int<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ET> > : public std::integral_constant<bool, true>
 {};
 
