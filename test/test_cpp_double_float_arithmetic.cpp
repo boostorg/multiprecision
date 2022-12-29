@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2021 Fahad Syed.
-//  Copyright 2021 Christopher Kormanyos.
+//  Copyright 2021 - 2023 Christopher Kormanyos.
 //  Copyright 2021 Janek Kozicki.
 //  Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
@@ -9,10 +9,10 @@
 // Test for correctness of arithmetic operators of cpp_double_fp_backend<>
 
 // cd /mnt/c/Users/User/Documents/Ks/PC_Software/Test
-// g++ -O3 -Wall -march=native -std=c++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 test.cpp -o test_double_float.exe
+// g++-10 -O3 -Wall -Wextra -Wconversion -march=native -std=c++14   -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_81_0 test.cpp -o test_double_float.exe
 
 // Handle interaction with Boost's wrap of libquadmath __float128.
-// g++ -O3 -Wall -march=native -std=gnu++11 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_76_0 -DBOOST_MATH_USE_FLOAT128 test.cpp -lquadmath -o test_double_float.exe
+// g++-10 -O3 -Wall -Wextra -Wconversion -march=native -std=gnu++14 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/boost/boost_1_81_0 -DBOOST_MATH_USE_FLOAT128 test.cpp -lquadmath -o test_double_float.exe
 
 #include <iomanip>
 #include <iostream>
@@ -24,7 +24,7 @@
 #ifdef BOOST_MATH_USE_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
-#include <boost/multiprecision/cpp_double_float.hpp>
+#include <boost/multiprecision/cpp_double_fp_backend.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/core/demangle.hpp>
 

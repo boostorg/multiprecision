@@ -25,7 +25,7 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
-#include <boost/multiprecision/cpp_double_float.hpp>
+#include <boost/multiprecision/cpp_double_fp_backend.hpp>
 #include <boost/type_traits/common_type.hpp>
 
 namespace boost { namespace multiprecision { namespace backends {

@@ -14,7 +14,7 @@
 #ifdef BOOST_MATH_USE_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
-#include <boost/multiprecision/cpp_double_float.hpp>
+#include <boost/multiprecision/cpp_double_fp_backend.hpp>
 #include <boost/multiprecision/cpp_quad_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
