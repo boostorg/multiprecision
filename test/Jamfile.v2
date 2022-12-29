@@ -86,6 +86,7 @@ project : requirements
       cxx11_hdr_functional cxx11_variadic_templates cxx11_user_defined_literals cxx11_decltype cxx11_static_assert cxx11_defaulted_functions
       cxx11_noexcept cxx11_ref_qualifiers cxx11_user_defined_literals cxx11_hdr_type_traits
       ]
+   [ requires cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction cxx14_variable_templates cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction ]
    ;
 
 local enable-specfun = [ MATCH (--enable-specfun) : [ modules.peek : ARGV ] ] ;
