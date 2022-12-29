@@ -212,12 +212,13 @@ struct exact_arithmetic
                     "Error: exact_arithmetic<>::split invoked with unknown floating-point type");
 
       // TODO Replace bit shifts with constexpr funcs or ldexp for better compaitibility
-      constexpr int        MantissaBits   = std::numeric_limits<float_type>::digits;
-      constexpr int        SplitBits      = MantissaBits / 2 + 1;
-      
+      constexpr int MantissaBits = std::numeric_limits<float_type>::digits;
+      constexpr int SplitBits    = MantissaBits / 2 + 1;
+
       // Check if the integer is wide enough to hold the Splitter.
       static_assert(std::numeric_limits<uintmax_t>::digits > SplitBits,
-        "Inadequate integer width for binary shifting needed in split(), try using ldexp instead");
+                    "Inadequate integer width for binary shifting needed in split(), try using ldexp instead");
+
       // If the above line gives an compilation error, replace the
       // line below it with the commented line
 
@@ -253,26 +254,18 @@ struct exact_arithmetic
    static float_pair fast_sum(const float_type& a, const float_type& b)
    {
       // Exact addition of two floating point numbers, given |a| > |b|
-      using std::fabs;
-      using std::isnormal;
+      const float_type a_plus_b = a + b;
 
-      float_pair out;
-      out.first  = a + b;
-      out.second = b - (out.first - a);
-
-      return out;
+      return float_pair(a_plus_b, b - (a_plus_b - a));
    }
 
    static float_pair sum(const float_type& a, const float_type& b)
    {
       // Exact addition of two floating point numbers
-      float_pair out;
+      const float_type a_plus_b = a + b;
+      const float_type v = a_plus_b - a;
 
-      out.first    = a + b;
-      float_type v = out.first - a;
-      out.second   = (a - (out.first - v)) + (b - v);
-
-      return out;
+      return float_pair(a_plus_b, (a - (a_plus_b - v)) + (b - v));
    }
 
    static void three_sum(float_type& a, float_type& b, float_type& c)
@@ -326,11 +319,18 @@ struct exact_arithmetic
 
       const volatile float_type pf = a * b;
 
-      return std::make_pair(
-          (const float_type&)pf,
-          (
-              ((a_split.first * b_split.first) - (const float_type&)pf) + (a_split.first * b_split.second) + (a_split.second * b_split.first)) +
-              (a_split.second * b_split.second));
+      return
+        std::make_pair
+        (
+          const_cast<const float_type&>(pf),
+            (
+                ((a_split.first  * b_split.first) - const_cast<const float_type&>(pf))
+              +  (a_split.first  * b_split.second)
+              +  (a_split.second * b_split.first)
+            )
+          +
+            (a_split.second * b_split.second)
+        );
    }
 
    static void normalize(float_pair& p, bool fast = true)
@@ -350,11 +350,13 @@ struct exact_arithmetic
       // TODO: discuss ?
       // If exponent of the second component is farther away than digits represented by this type
       // then means that these "dangling" bits should be zero.
-      int e1 = 0;
-      int e2 = 0;
+      int e1 { };
+      int e2 { };
+
       using std::frexp;
       frexp(p.first, &e1);
       frexp(p.second, &e2);
+
       // Interesting: when we set   digits = 2 * <digits of underlying type>
       // then this extra normalize, to work with DecomposedReal guard_bits
       // needs the subtraction of 2 here.
@@ -385,18 +387,15 @@ struct exact_arithmetic
       {
          tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<2>(t));
 
-         if (get<2>(s) != 0)
-            tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), get<3>(t));
-         else
-            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
+         (get<2>(s) != 0) ? tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), get<3>(t))
+                          : tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
       }
       else
       {
          tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<2>(t));
-         if (get<1>(s) != 0)
-            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
-         else
-            tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<3>(t));
+
+         (get<1>(s) != 0) ? tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t))
+                          : tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<3>(t));
       }
 
       t = s;
@@ -419,41 +418,45 @@ struct exact_arithmetic
       if (get<1>(s) != 0)
       {
          tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<2>(t));
+
          if (get<2>(s) != 0)
          {
             tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), get<3>(t));
-            if (get<3>(s) != 0)
-               get<3>(s) += e;
+
+            if(get<3>(s) != 0)
+            {
+              get<3>(s) += e;
+            }
             else
-               tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
+            {
+              tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
+            }
          }
          else
          {
             tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
-            if (get<2>(s) != 0)
-               tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
-            else
-               tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
+
+            (get<2>(s) != 0) ? tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e)
+                             : tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
          }
       }
       else
       {
          tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<2>(t));
+
          if (get<1>(s) != 0)
          {
             tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
-            if (get<2>(s) != 0)
-               tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
-            else
-               tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
+
+            (get<2>(s) != 0) ? tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e)
+                             : tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
          }
          else
          {
             tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<3>(t));
-            if (get<1>(s) != 0)
-               tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
-            else
-               tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), e);
+
+            (get<1>(s) != 0) ? tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e)
+                             : tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), e);
          }
       }
 
@@ -512,10 +515,10 @@ class cpp_double_fp_backend
    template <typename OtherFloatType,
              typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatType>::value == true) && (std::is_same<FloatingPointType, OtherFloatType>::value == false))>::type const* = nullptr>
    cpp_double_fp_backend(const cpp_double_fp_backend<OtherFloatType>& a)
-       : cpp_double_fp_backend(a.first())
+       : cpp_double_fp_backend(a.my_first())
    {
       // TBD: Maybe specialize this constructor for cases either wider or less wide.
-      *this += a.second();
+      *this += a.my_second();
    }
 
    // Constructors from integers
@@ -591,7 +594,9 @@ class cpp_double_fp_backend
       std::size_t result = 0;
 
       for (std::string::size_type i = 0U; i < str_to_hash.length(); ++i)
+      {
          boost::multiprecision::detail::hash_combine(result, str_to_hash.at(i));
+      }
 
       return result;
    }
@@ -611,11 +616,11 @@ class cpp_double_fp_backend
    }
 
    // Getters/Setters
-   constexpr const float_type& first() const { return data.first; }
-   constexpr const float_type& second() const { return data.second; }
+   constexpr const float_type& my_first () const { return data.first; }
+   constexpr const float_type& my_second() const { return data.second; }
 
-   rep_type&       rep() { return data; }
-   const rep_type& rep() const { return data; }
+         rep_type& rep ()       { return data; }
+   const rep_type& rep () const { return data; }
    const rep_type& crep() const { return data; }
 
    // Retrieve debug string.
@@ -649,9 +654,9 @@ class cpp_double_fp_backend
    {
       using other_cpp_double_float_type = cpp_double_fp_backend<float_type>;
 
-      typename other_cpp_double_float_type::rep_type s = other_cpp_double_float_type::arithmetic::sum(a.first(), b);
+      typename other_cpp_double_float_type::rep_type s = other_cpp_double_float_type::arithmetic::sum(a.my_first(), b);
 
-      s.second += a.second();
+      s.second += a.my_second();
       other_cpp_double_float_type::arithmetic::normalize(s);
 
       return other_cpp_double_float_type(s);
@@ -661,9 +666,9 @@ class cpp_double_fp_backend
    {
       using other_cpp_double_float_type = cpp_double_fp_backend<float_type>;
 
-      typename other_cpp_double_float_type::rep_type s = other_cpp_double_float_type::arithmetic::difference(a.first(), b);
+      typename other_cpp_double_float_type::rep_type s = other_cpp_double_float_type::arithmetic::difference(a.my_first(), b);
 
-      s.second += a.second();
+      s.second += a.my_second();
       other_cpp_double_float_type::arithmetic::normalize(s);
 
       return other_cpp_double_float_type(s);
@@ -673,7 +678,7 @@ class cpp_double_fp_backend
    {
       using other_cpp_double_float_type = cpp_double_fp_backend<float_type>;
 
-      typename other_cpp_double_float_type::rep_type p = other_cpp_double_float_type::arithmetic::product(a.first(), b);
+      typename other_cpp_double_float_type::rep_type p = other_cpp_double_float_type::arithmetic::product(a.my_first(), b);
 
       using boost::multiprecision::isfinite;
       using std::isfinite;
@@ -681,7 +686,7 @@ class cpp_double_fp_backend
       if ((isfinite)(p.first) == false)
          return other_cpp_double_float_type(p);
 
-      p.second += a.second() * b;
+      p.second += a.my_second() * b;
 
       other_cpp_double_float_type::arithmetic::normalize(p);
 
@@ -694,11 +699,11 @@ class cpp_double_fp_backend
 
       typename other_cpp_double_float_type::rep_type p, q, s;
 
-      p.first = a.first() / b;
+      p.first = a.my_first() / b;
 
       q = other_cpp_double_float_type::arithmetic::product(p.first, b);
-      s = other_cpp_double_float_type::arithmetic::difference(a.first(), q.first);
-      s.second += a.second();
+      s = other_cpp_double_float_type::arithmetic::difference(a.my_first(), q.first);
+      s.second += a.my_second();
       s.second -= q.second;
 
       p.second = (s.first + s.second) / b;
@@ -736,13 +741,13 @@ class cpp_double_fp_backend
       using boost::multiprecision::isfinite;
       using std::isfinite;
 
-      float_type sec = second();
-      data = arithmetic::sum(first(), other.first());
+      float_type sec = my_second();
+      data = arithmetic::sum(my_first(), other.my_first());
 
-      if ((isfinite)(first()) == false)
+      if ((isfinite)(my_first()) == false)
          return *this;
 
-      const rep_type t = arithmetic::sum(sec, other.second());
+      const rep_type t = arithmetic::sum(sec, other.my_second());
 
       data.second += t.first;
       arithmetic::normalize(data);
@@ -757,13 +762,13 @@ class cpp_double_fp_backend
       using boost::multiprecision::isfinite;
       using std::isfinite;
 
-      float_type sec = second();
-      data = arithmetic::difference(first(), other.first());
+      float_type sec = my_second();
+      data = arithmetic::difference(my_first(), other.my_first());
 
-      if ((isfinite)(first()) == false)
+      if ((isfinite)(my_first()) == false)
          return *this;
 
-      const rep_type t = arithmetic::difference(sec, other.second());
+      const rep_type t = arithmetic::difference(sec, other.my_second());
 
       data.second += t.first;
       arithmetic::normalize(data);
@@ -790,12 +795,12 @@ class cpp_double_fp_backend
       rep_type p;
 
       // First approximation
-      p.first = first() / other.first();
+      p.first = my_first() / other.my_first();
 
       using boost::multiprecision::isfinite;
       using std::isfinite;
 
-      if ((isfinite)(p.first) == false)
+      if (!((isfinite)(p.first)))
       {
          data = p;
          return *this;
@@ -803,10 +808,10 @@ class cpp_double_fp_backend
 
       cpp_double_fp_backend r = *this - (other * p.first);
 
-      p.second = r.first() / other.first();
+      p.second = r.my_first() / other.my_first();
       r -= other * p.second;
 
-      const FloatingPointType p_prime = r.first() / other.first();
+      const FloatingPointType p_prime = r.my_first() / other.my_first();
 
       arithmetic::normalize(p);
 
@@ -889,6 +894,18 @@ class cpp_double_fp_backend
 
    void swap(cpp_double_fp_backend& other)
    {
+      if(this != &other)
+      {
+         rep_type tmp = data;
+
+         data = other.data;
+
+         other.data = tmp;
+      }
+   }
+
+   void swap(cpp_double_fp_backend&& other)
+   {
       rep_type tmp = data;
 
       data = other.data;
@@ -899,10 +916,10 @@ class cpp_double_fp_backend
    int compare(const cpp_double_fp_backend& other) const
    {
       // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
-      return (first() > other.first()) ? 1 : (first() < other.first()) ? -1
-                                         : (second() > other.second()) ? 1
-                                         : (second() < other.second()) ? -1
-                                                                       : 0;
+      return (my_first() > other.my_first()) ?  1 : (my_first()  < other.my_first())
+                                             ? -1 : (my_second() > other.my_second())
+                                             ?  1 : (my_second() < other.my_second())
+                                             ? -1 : 0;
    }
 
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
@@ -919,12 +936,13 @@ class cpp_double_fp_backend
    {
       using std::frexp;
       int e2;
-      frexp(first(), &e2);
+      frexp(my_first(), &e2);
       return e2;
    }
-   int  order10() const { return (int)(float(order02()) * 0.301F); }
+
+   int  order10  () const { return (int)(float(order02()) * 0.301F); }
    bool small_arg() const { return (order10() < (-my_digits10 / 6)); }
-   bool near_one() const { return cpp_double_fp_backend(fabs(cpp_double_fp_backend(1U) - *this)).small_arg(); }
+   bool near_one () const { return cpp_double_fp_backend(fabs(cpp_double_fp_backend(1U) - *this)).small_arg(); }
 
    static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_max() noexcept
    {
@@ -936,19 +954,19 @@ class cpp_double_fp_backend
 #endif
 
       return
-      cpp_double_fp_backend
-      (
-         arithmetic::fast_sum
+         cpp_double_fp_backend
          (
-            float_type(  (std::numeric_limits<float_type>::max)()
-                       * float_type(float_type(1.0F) - float_type(1.5F) * sqrt(std::numeric_limits<float_type>::epsilon()))),
-            ldexp
+            arithmetic::fast_sum
             (
-                (std::numeric_limits<float_type>::max)(),
-               -(std::numeric_limits<float_type>::digits + 1)
+               float_type(  (std::numeric_limits<float_type>::max)()
+                          * float_type(float_type(1.0F) - float_type(1.5F) * sqrt(std::numeric_limits<float_type>::epsilon()))),
+               ldexp
+               (
+                   (std::numeric_limits<float_type>::max)(),
+                  -(std::numeric_limits<float_type>::digits + 1)
+               )
             )
-         )
-      );
+         );
    }
 
    static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_min() noexcept
@@ -1091,14 +1109,12 @@ void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_doub
 {
    using std::ldexp;
 
-   typename cpp_double_fp_backend<FloatingPointType>::rep_type z =
-       std::make_pair(
-           ldexp(a.crep().first, v),
-           ldexp(a.crep().second, v));
+   result.rep() = std::make_pair(ldexp(a.crep().first, v),
+                                 ldexp(a.crep().second, v));
 
-   cpp_double_fp_backend<FloatingPointType>::arithmetic::normalize(z);
+   using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
 
-   result.rep() = z;
+   local_backend_type::arithmetic::normalize(result.rep());
 }
 
 template <typename FloatingPointType>
@@ -1110,7 +1126,7 @@ void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, const cpp_doub
 
    const typename double_float_type::float_type fhi = floor(x.rep().first);
 
-   if (fhi != x.first())
+   if (fhi != x.my_first())
    {
       result.rep().first  = fhi;
       result.rep().second = static_cast<typename double_float_type::float_type>(0.0F);
@@ -1242,7 +1258,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       }
       else if (xx.is_one())
       {
-         static const double_float_type constant_e1(std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
+         static const double_float_type constant_e1         (std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
          static const double_float_type constant_one_over_e1(std::string("0.36787944117144232159552377016146086744581113103176783450783680169746149574489980335714727434591964375"));
 
          result = ((b_neg == false) ? constant_e1 : constant_one_over_e1);
@@ -1250,7 +1266,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       else
       {
          // Use an argument reduction algorithm for exp() in classic MPFUN-style.
-         static const double_float_type constant_ln2(std::string("0.69314718055994530941723212145817656807550013436025525412068000949339362196969471560586332699641868754"));
+         static const double_float_type constant_ln2         (std::string("0.69314718055994530941723212145817656807550013436025525412068000949339362196969471560586332699641868754"));
          static const double_float_type constant_one_over_ln2(std::string("1.4426950408889634073599246810018921374266459541529859341354494069311092191811850798855266228935063445"));
 
          double_float_type nf;
