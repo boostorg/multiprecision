@@ -174,7 +174,7 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
          // Input is an integer, sometimes we get a result which is not an integer here as a result of printing too
          // many digits, so lets round if required:
          round_string_up_at(result, expon + 1, expon);
-         result.erase(expon + 1);
+         result.erase(static_cast<std::string::size_type>(expon + 1));
       }
    }
    while ((static_cast<std::streamsize>(result.size()) > digits) && (result.size() != 0U))

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_MP_CPP_DOUBLE_FLOAT_2021_06_05_HPP
-#define BOOST_MP_CPP_DOUBLE_FLOAT_2021_06_05_HPP
+#ifndef BOOST_MP_CPP_DOUBLE_FP_BACKEND_2021_06_05_HPP
+#define BOOST_MP_CPP_DOUBLE_FP_BACKEND_2021_06_05_HPP
 
 #include <boost/config.hpp>
 
@@ -19,14 +19,12 @@
 #include <type_traits>
 #include <utility>
 
-#include <boost/assert.hpp>
 #if defined(BOOST_MATH_USE_FLOAT128)
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
-#include <boost/type_traits/common_type.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
 
 namespace boost { namespace multiprecision { namespace backends {
@@ -179,13 +177,13 @@ namespace backends {
 namespace detail {
 
 template <typename R>
-typename std::enable_if<boost::is_unsigned<R>::value == false, R>::type minus_max()
+typename std::enable_if<std::is_unsigned<R>::value == false, R>::type minus_max()
 {
-   return boost::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
+   return std::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
 }
 
 template <typename R>
-typename std::enable_if<boost::is_unsigned<R>::value == true, R>::type minus_max()
+typename std::enable_if<std::is_unsigned<R>::value == true, R>::type minus_max()
 {
    return 0;
 }
@@ -263,7 +261,7 @@ struct exact_arithmetic
    {
       // Exact addition of two floating point numbers
       const float_type a_plus_b = a + b;
-      const float_type v = a_plus_b - a;
+      const float_type v        = a_plus_b - a;
 
       return float_pair(a_plus_b, (a - (a_plus_b - v)) + (b - v));
    }
@@ -302,13 +300,10 @@ struct exact_arithmetic
    static float_pair difference(const float_type& a, const float_type& b)
    {
       // Exact subtraction of two floating point numbers
-      float_pair out;
+      const float_type a_minus_b = a - b;
+      const float_type v         = a_minus_b - a;
 
-      out.first    = a - b;
-      float_type v = out.first - a;
-      out.second   = (a - (out.first - v)) - (b + v);
-
-      return out;
+      return float_pair(a_minus_b, (a - (a_minus_b - v)) - (b + v));
    }
 
    static float_pair product(const float_type& a, const float_type& b)
@@ -354,6 +349,7 @@ struct exact_arithmetic
       int e2 { };
 
       using std::frexp;
+
       frexp(p.first, &e1);
       frexp(p.second, &e2);
 
@@ -503,7 +499,7 @@ class cpp_double_fp_backend
    // Constructors from other floating-point types.
    template <typename OtherFloatType,
              typename std::enable_if<(detail::is_floating_point_or_float128<OtherFloatType>::value == true) && (std::numeric_limits<OtherFloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
-   constexpr cpp_double_fp_backend(const OtherFloatType& f) : data(std::make_pair(f, (float_type)0)) { }
+   constexpr cpp_double_fp_backend(const OtherFloatType& f) : data(std::make_pair(f, static_cast<float_type>(0.0F))) { }
 
    template <typename OtherFloatType,
              typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatType>::value == true) && (std::numeric_limits<OtherFloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
@@ -527,14 +523,14 @@ class cpp_double_fp_backend
                                       && (std::is_unsigned<SignedIntegralType>::value == false)
                                       && (std::numeric_limits<SignedIntegralType>::digits + 1 <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const SignedIntegralType& n)
-      : data(std::make_pair(static_cast<float_type>(n), float_type(0.0F))) { }
+      : data(std::make_pair(static_cast<float_type>(n), static_cast<float_type>(0.0F))) { }
 
    template <typename UnsignedIntegralType,
              typename std::enable_if<(   (std::is_integral<UnsignedIntegralType>::value == true)
                                       && (std::is_unsigned<UnsignedIntegralType>::value == true)
                                       && (std::numeric_limits<UnsignedIntegralType>::digits <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const UnsignedIntegralType& u)
-      : data(std::make_pair(static_cast<float_type>(u), float_type(0.0F))) { }
+      : data(std::make_pair(static_cast<float_type>(u), static_cast<float_type>(0.0F))) { }
 
    // Constructors from integers which hold more information than *this can contain
    template <typename SignedIntegralType,
@@ -565,9 +561,9 @@ class cpp_double_fp_backend
            )
         ) { }
 
-   constexpr cpp_double_fp_backend(const float_type& a, const float_type& b) : data(std::make_pair(a, b)) { }
+   constexpr cpp_double_fp_backend(const float_type& a, const float_type& b) noexcept : data(std::make_pair(a, b)) { }
 
-   constexpr cpp_double_fp_backend(const std::pair<float_type, float_type>& p) : data(p) { }
+   constexpr cpp_double_fp_backend(const std::pair<float_type, float_type>& p) noexcept : data(p) { }
 
    cpp_double_fp_backend(const std::string& str)
    {
@@ -579,9 +575,9 @@ class cpp_double_fp_backend
       boost::multiprecision::detail::convert_from_string(*this, pstr);
    }
 
-   constexpr cpp_double_fp_backend(cpp_double_fp_backend&& other) : data(other.data) {}
+   constexpr cpp_double_fp_backend(cpp_double_fp_backend&& other) noexcept : data(other.data) { }
 
-   ~cpp_double_fp_backend() {}
+   ~cpp_double_fp_backend() { }
 
    std::size_t hash() const
    {
@@ -669,6 +665,7 @@ class cpp_double_fp_backend
       typename other_cpp_double_float_type::rep_type s = other_cpp_double_float_type::arithmetic::difference(a.my_first(), b);
 
       s.second += a.my_second();
+
       other_cpp_double_float_type::arithmetic::normalize(s);
 
       return other_cpp_double_float_type(s);
@@ -684,7 +681,9 @@ class cpp_double_fp_backend
       using std::isfinite;
 
       if ((isfinite)(p.first) == false)
+      {
          return other_cpp_double_float_type(p);
+      }
 
       p.second += a.my_second() * b;
 
@@ -703,6 +702,7 @@ class cpp_double_fp_backend
 
       q = other_cpp_double_float_type::arithmetic::product(p.first, b);
       s = other_cpp_double_float_type::arithmetic::difference(a.my_first(), q.first);
+
       s.second += a.my_second();
       s.second -= q.second;
 
@@ -867,18 +867,18 @@ class cpp_double_fp_backend
 
          local_float_type y(x);
 
-         std::uint32_t p_local = (std::uint32_t)p;
+         auto p_local = static_cast<std::uint32_t>(p);
 
          for (;;)
          {
-            if (std::uint_fast8_t(p_local & 1U) != 0U)
+            if (static_cast<std::uint_fast8_t>(p_local & 1U) != static_cast<std::uint_fast8_t>(UINT8_C(0)))
             {
                result *= y;
             }
 
             p_local >>= 1U;
 
-            if (p_local == 0U)
+            if (p_local == static_cast<std::uint32_t>(UINT8_C(0)))
             {
                break;
             }
@@ -896,7 +896,7 @@ class cpp_double_fp_backend
    {
       if(this != &other)
       {
-         rep_type tmp = data;
+         const rep_type tmp = data;
 
          data = other.data;
 
@@ -904,9 +904,9 @@ class cpp_double_fp_backend
       }
    }
 
-   void swap(cpp_double_fp_backend&& other)
+   void swap(cpp_double_fp_backend&& other) noexcept
    {
-      rep_type tmp = data;
+      const rep_type tmp = data;
 
       data = other.data;
 
@@ -934,9 +934,12 @@ class cpp_double_fp_backend
 
    int order02() const
    {
-      using std::frexp;
       int e2;
+
+      using std::frexp;
+
       frexp(my_first(), &e2);
+
       return e2;
    }
 
@@ -1152,7 +1155,10 @@ void eval_ceil(cpp_double_fp_backend<FloatingPointType>& result, const cpp_doubl
 template <typename FloatingPointType>
 int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
 {
-   return (int)(boost::math::fpclassify)(o.crep().first);
+   using boost::multiprecision::fpclassify;
+   using std::fpclassify;
+
+   return static_cast<int>((fpclassify)(o.crep().first));
 }
 
 template <typename FloatingPointType>
@@ -1534,7 +1540,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       }
       else if (xx.is_one())
       {
-         static const double_float_type constant_e1(std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
+         static const double_float_type constant_e1         (std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
          static const double_float_type constant_one_over_e1(std::string("0.36787944117144232159552377016146086744581113103176783450783680169746149574489980335714727434591964375"));
 
          result = ((b_neg == false) ? constant_e1 : constant_one_over_e1);
@@ -1542,7 +1548,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       else
       {
          // Use an argument reduction algorithm for exp() in classic MPFUN-style.
-         static const double_float_type constant_ln2(std::string("0.69314718055994530941723212145817656807550013436025525412068000949339362196969471560586332699641868754"));
+         static const double_float_type constant_ln2         (std::string("0.69314718055994530941723212145817656807550013436025525412068000949339362196969471560586332699641868754"));
          static const double_float_type constant_one_over_ln2(std::string("1.4426950408889634073599246810018921374266459541529859341354494069311092191811850798855266228935063445"));
 
          double_float_type nf;
@@ -1642,7 +1648,7 @@ void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       eval_exp(E, s);
 
       // Do one single step of Newton-Raphson iteration
-      result = s + (x - E) / E;
+      result = s + ((x - E) / E);
    }
 }
 
@@ -1650,8 +1656,7 @@ template <typename FloatingPointType,
           typename R>
 typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
-   // TBD: Does boost::common_type have a C++ 11 replacement?
-   using c_type = typename boost::common_type<R, FloatingPointType>::type;
+   using c_type = typename std::common_type<R, FloatingPointType>::type;
 
    using std::fabs;
 
@@ -1659,7 +1664,7 @@ typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_t
    BOOST_CONSTEXPR const c_type my_min = static_cast<c_type>((std::numeric_limits<R>::min)());
    c_type                       ct     = fabs(backend.crep().first);
 
-   (void)my_min;
+   static_cast<void>(my_min);
 
    if (ct > my_max)
       if (!std::is_unsigned<R>::value)
@@ -1668,7 +1673,7 @@ typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_t
          *result = (std::numeric_limits<R>::max)();
    else
    {
-      *result = static_cast<R>(backend.crep().first);
+      *result  = static_cast<R>(backend.crep().first);
       *result += static_cast<R>(backend.crep().second);
    }
 }
@@ -1801,4 +1806,4 @@ constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprec
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
 constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent10;
 
-#endif // BOOST_MP_CPP_DOUBLE_FLOAT_2021_06_05_HPP
+#endif // BOOST_MP_CPP_DOUBLE_FP_BACKEND_2021_06_05_HPP

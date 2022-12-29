@@ -8,14 +8,14 @@
 #if defined(BOOST_MATH_USE_FLOAT128)
 #include <boost/multiprecision/float128.hpp>
 #endif
-#include <boost/multiprecision/cpp_double_float.hpp>
+#include <boost/multiprecision/cpp_double_fp_backend.hpp>
 #endif
 
 void test52()
 {
 #ifdef TEST_CPP_DOUBLE_FLOAT
-   using double_float_of_double_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_float<double>, boost::multiprecision::et_off>;
+   using double_float_of_double_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<double>, boost::multiprecision::et_off>;
 
-   test<double_float_of_double_type>("cpp_double_float<double>", 1024*16);
+   test<double_float_of_double_type>("cpp_double_fp_backend<double>", 1024*16);
 #endif
 }

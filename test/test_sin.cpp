@@ -61,7 +61,7 @@
 #if defined(BOOST_MATH_USE_FLOAT128)
 #include <boost/multiprecision/float128.hpp>
 #endif
-#include <boost/multiprecision/cpp_double_float.hpp>
+#include <boost/multiprecision/cpp_double_fp_backend.hpp>
 #endif
 #ifdef TEST_CPP_QUAD_FLOAT
 #if defined(BOOST_MATH_USE_FLOAT128)
