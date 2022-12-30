@@ -343,6 +343,32 @@ struct exact_arithmetic
       p = (fast ? fast_sum(p.first, p.second) : sum(p.first, p.second));
    }
 
+   static void extra_normalize(float_pair& p)
+   {
+      // TODO: discuss ?
+      // If exponent of the second component is farther away than digits represented by this type
+      // then means that these "dangling" bits should be zero.
+      int e1 { };
+      int e2 { };
+
+      using std::frexp;
+
+      frexp(p.first, &e1);
+      frexp(p.second, &e2);
+
+      // Interesting: when we set   digits = 2 * <digits of underlying type>
+      // then this extra normalize, to work with DecomposedReal guard_bits
+      // needs the subtraction of 2 here.
+      if ((e1 - e2) > cpp_double_fp_backend<float_type>::my_digits - 2)
+      {
+         p.second = 0;
+      }
+      // ... maybe even better would be to zero all the bits further away than cpp_double_fp_backend<float_type>>::digits away
+      // not only when entire p.second is too far.
+      // FIXME - currently I have no idea how to implement this efficiently. But for debugging maybe even the super slow (with frexp, ldexp) implementation will help in edge cases...
+      // best would be doing & operation on a bitmask..... But can we make sure that would work on all architectures?
+   }
+
    static BOOST_MP_CXX14_CONSTEXPR void normalize(float_tuple& t)
    {
       using std::get;
