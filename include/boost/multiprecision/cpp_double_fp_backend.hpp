@@ -590,13 +590,14 @@ class cpp_double_fp_backend
    constexpr const float_type& my_first () const noexcept { return data.first; }
    constexpr const float_type& my_second() const noexcept { return data.second; }
 
-   constexpr       rep_type& rep ()       noexcept { return data; }
-   constexpr const rep_type& rep () const noexcept { return data; }
-   constexpr const rep_type& crep() const noexcept { return data; }
+   BOOST_MP_CXX14_CONSTEXPR       rep_type& rep ()       noexcept { return data; }
+   BOOST_MP_CXX14_CONSTEXPR const rep_type& rep () const noexcept { return data; }
+   BOOST_MP_CXX14_CONSTEXPR const rep_type& crep() const noexcept { return data; }
 
-   // Retrieve debug string.
    std::string raw_str() const
    {
+      // Retrieve debug string.
+
       std::stringstream ss;
       ss << std::hexfloat << std::showpos << data.first << " + " << std::hexfloat << data.second;
       return ss.str();
