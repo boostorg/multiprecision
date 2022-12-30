@@ -1101,7 +1101,7 @@ BOOST_MP_CXX14_CONSTEXPR bool eval_lt(cpp_double_fp_backend<FloatingPointType>& 
 template <typename FloatingPointType>
 BOOST_MP_CXX14_CONSTEXPR bool eval_gt(cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { return (a.compare(b) == 1); }
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR bool eval_is_zero(cpp_double_fp_backend<FloatingPointType>& x) { return ((x.crep().my_first()) == 0 && (x.crep().my_second())); }
+BOOST_MP_CXX14_CONSTEXPR bool eval_is_zero(cpp_double_fp_backend<FloatingPointType>& x) { return ((x.crep().first) == 0 && (x.crep().second == 0)); }
 
 template <typename FloatingPointType>
 void eval_fabs(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a)
