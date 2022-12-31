@@ -945,7 +945,7 @@ class cpp_double_fp_backend
       other.data = tmp;
    }
 
-   constexpr int compare(const cpp_double_fp_backend& other) const
+   BOOST_MP_CXX14_CONSTEXPR int compare(const cpp_double_fp_backend& other) const
    {
       // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
 

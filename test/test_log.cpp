@@ -16,7 +16,7 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT) && !defined(TEST_CPP_QUAD_FLOAT)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
 //#  define TEST_MPF
 #define TEST_BACKEND
@@ -25,7 +25,6 @@
 #define TEST_MPFI_50
 #define TEST_CPP_BIN_FLOAT
 #define TEST_CPP_DOUBLE_FLOAT
-#define TEST_CPP_QUAD_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -62,12 +61,6 @@
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_double_fp_backend.hpp>
-#endif
-#ifdef TEST_CPP_QUAD_FLOAT
-#if defined(BOOST_MATH_USE_FLOAT128)
-#include <boost/multiprecision/float128.hpp>
-#endif
-#include <boost/multiprecision/cpp_quad_float.hpp>
 #endif
 
 template <class T>
@@ -216,8 +209,6 @@ void test()
    std::cout << "Max error was: " << max_err << std::endl;
 #if defined(BOOST_INTEL) && defined(TEST_FLOAT128)
    BOOST_TEST(max_err < 20);
-#elif defined(TEST_CPP_QUAD_FLOAT)
-   BOOST_TEST(max_err < 40);
 #else
    BOOST_TEST(max_err < 10);
 #endif
@@ -279,13 +270,6 @@ int main()
    test<boost::multiprecision::cpp_double_long_double>();
    #if defined(BOOST_MATH_USE_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
-   #endif
-#endif
-#ifdef TEST_CPP_QUAD_FLOAT
-   test<boost::multiprecision::cpp_quad_double>();
-   test<boost::multiprecision::cpp_quad_long_double>();
-   #if defined(BOOST_MATH_USE_FLOAT128)
-   test<boost::multiprecision::cpp_quad_float128>();
    #endif
 #endif
    return boost::report_errors();
