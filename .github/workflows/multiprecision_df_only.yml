@@ -7,7 +7,7 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
-name: multiprecision_quad_double_only
+name: multiprecision_df_only
 on:
   push:
     branches:
@@ -16,7 +16,7 @@ on:
   schedule:
     - cron: '0 2 * * *' # run at 2 AM UTC
 jobs:
-  ubuntu-focal-df_qf_tests:
+  ubuntu-focal-df_tests:
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -25,8 +25,8 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [ g++, clang++ ]
-        standard: [ c++11, c++14, c++17, c++2a ]
-        suite: [ df_qf_tests ]
+        standard: [ c++14, c++17, c++2a ]
+        suite: [ df_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -78,7 +78,7 @@ jobs:
       - name: Test
         run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
-  ubuntu-focal-df_qf_quadmath_tests:
+  ubuntu-focal-df_quadmath_tests:
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -87,8 +87,8 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [ g++ ]
-        standard: [ gnu++11, gnu++14, gnu++17, gnu++2a ]
-        suite: [ df_qf_quadmath_tests ]
+        standard: [ gnu++14, gnu++17, gnu++2a ]
+        suite: [ df_quadmath_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -140,7 +140,7 @@ jobs:
       - name: Test
         run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
-  ubuntu-bionic-df_qf_tests:
+  ubuntu-bionic-df_tests:
     runs-on: ubuntu-18.04
     defaults:
       run:
@@ -149,8 +149,8 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [ g++-6, g++-7, g++-8, clang++-6.0, clang++-7, clang++-8 ]
-        standard: [ c++11, c++14, c++17 ]
-        suite: [ df_qf_tests ]
+        standard: [ c++14, c++17 ]
+        suite: [ df_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -202,7 +202,7 @@ jobs:
       - name: Test
         run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
-  windows_msvc_14_0-df_qf_tests:
+  windows_msvc_14_0-df_tests:
     runs-on: windows-2019
     defaults:
       run:
@@ -214,7 +214,7 @@ jobs:
       matrix:
         toolset: [ msvc-14.0 ]
         standard: [ 14, 17 ]
-        suite: [ df_qf_tests ]
+        suite: [ df_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -245,7 +245,7 @@ jobs:
       - name: Test
         run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/multiprecision/test
-  windows_msvc_14_2-df_qf_tests:
+  windows_msvc_14_2-df_tests:
     runs-on: windows-2019
     defaults:
       run:
@@ -257,7 +257,7 @@ jobs:
       matrix:
         toolset: [ msvc-14.2 ]
         standard: [ 14, 17, 20 ]
-        suite: [ df_qf_tests ]
+        suite: [ df_tests ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -288,14 +288,14 @@ jobs:
       - name: Test
         run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/multiprecision/test
-  macos-df_qf_tests:
+  macos-df_tests:
     runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
         toolset: [ clang ]
-        standard: [ 11, 14, 17, 2a ]
-        suite: [ df_qf_tests ]
+        standard: [ 14, 17, 2a ]
+        suite: [ df_tests ]
     steps:
       - uses: actions/checkout@v2
         with:

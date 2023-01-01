@@ -300,7 +300,6 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
-   test<boost::multiprecision::cpp_double_float>();
    test<boost::multiprecision::cpp_double_double>();
    test<boost::multiprecision::cpp_double_long_double>();
    #if defined(BOOST_MATH_USE_FLOAT128)

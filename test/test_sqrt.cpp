@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2002 - 2011, 2021.
-//  Copyright 2011 -2021 John Maddock. Distributed under the Boost
+//  Copyright 2011 -2021 John Maddock.
+//  Copyright Christopher Kormanyos 2021 - 2023.
+//  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 //
@@ -16,7 +17,7 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT) && !defined(TEST_CPP_QUAD_FLOAT)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
 #define TEST_MPFR_50
 #define TEST_MPFI_50
@@ -25,7 +26,6 @@
 #define TEST_FLOAT128
 #define TEST_CPP_BIN_FLOAT
 #define TEST_CPP_DOUBLE_FLOAT
-#define TEST_CPP_QUAD_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -62,12 +62,6 @@
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_double_fp_backend.hpp>
-#endif
-#ifdef TEST_CPP_QUAD_FLOAT
-#if defined(BOOST_MATH_USE_FLOAT128)
-#include <boost/multiprecision/float128.hpp>
-#endif
-#include <boost/multiprecision/cpp_quad_float.hpp>
 #endif
 
 template <class T>
@@ -180,16 +174,19 @@ void test()
 
    T pi = static_cast<T>("3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593344612847564823378678316527120190914564856692346034861045432664821339360726024914127372458700660631558817488152092096282925409171536436789259036001133053054882046652138414695194151160943305727036575959195309218611738193261179310511854807446237996274956735188575272489122793818301194912983367336244065664308602139494639522473719070217986094370277053921717629317675238467481846766940513200056812714526356082778577134275778960917363717872146844090122495343014654958537105079227968925892354201995611212902196086403441815981362977477130996051870721134999999837297804995105973173281609631859502445945534690830264252230825334468503526193118817101000313783875288658753320838142061717766914730359825349042875546873115956286388235378759375195778185778053217122680661300192787661119590921642019893809525720106548586327886593615338182796823030195203530185296899577362259941389124972177528347913152");
 
-   unsigned max_err = 0;
-   for (unsigned k = 0; k < data.size(); k++)
+   unsigned max_err = 0u;
+   for (unsigned k = 0u; k < data.size(); k++)
    {
       T        val = sqrt(pi * k);
       T        e   = relative_error(val, T(data[k]));
-      unsigned err = e.template convert_to<unsigned>();
+      const unsigned err = e.template convert_to<unsigned>();
       if (err > max_err)
       {
          max_err = err;
       }
+
+      if(k == 0u)
+         BOOST_TEST(val == 0);
    }
    std::cout << "Max error was: " << max_err << std::endl;
 #if defined(BOOST_INTEL) && defined(TEST_FLOAT128)
@@ -255,13 +252,6 @@ int main()
    test<boost::multiprecision::cpp_double_long_double>();
    #if defined(BOOST_MATH_USE_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
-   #endif
-#endif
-#ifdef TEST_CPP_QUAD_FLOAT
-   test<boost::multiprecision::cpp_quad_double>();
-   test<boost::multiprecision::cpp_quad_long_double>();
-   #if defined(BOOST_MATH_USE_FLOAT128)
-   test<boost::multiprecision::cpp_quad_float128>();
    #endif
 #endif
    return boost::report_errors();

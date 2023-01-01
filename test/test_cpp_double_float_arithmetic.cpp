@@ -29,13 +29,13 @@
 #include <boost/core/demangle.hpp>
 
 #if defined(__clang__)
-  #if defined __has_feature && (__has_feature(thread_sanitizer) || __has_feature(address_sanitizer))
-  #define CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH
-  #endif
+   #if defined __has_feature && (__has_feature(thread_sanitizer) || __has_feature(address_sanitizer))
+   #define CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH
+   #endif
 #elif defined(__GNUC__)
-  #if defined(__SANITIZE_THREAD__) || defined(__SANITIZE_ADDRESS__)
-  #define CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH
-  #endif
+   #if defined(__SANITIZE_THREAD__) || defined(__SANITIZE_ADDRESS__)
+   #define CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH
+   #endif
 #endif
 
 namespace local
@@ -380,38 +380,46 @@ namespace local
 
 int main()
 {
-  #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 18U);
-  #else
-  constexpr unsigned int test_cases_built_in = (unsigned int) (1ULL << 14U);
-  #endif
+   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
+   constexpr auto test_cases_built_in = static_cast<unsigned int>(1ULL << 18U);
+   #else
+   constexpr auto test_cases_built_in = static_cast<unsigned int>(1ULL << 14U);
+   #endif
 
-  #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
-  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL << 14U);
-  #else
-  constexpr unsigned int test_cases_float128 = (unsigned int) (1ULL << 10U);
-  #endif
+   #if !defined(CPP_DOUBLE_FLOAT_REDUCE_TEST_DEPTH)
+   constexpr auto test_cases_float128 = static_cast<unsigned int>(1ULL << 14U);
+   #else
+   constexpr auto test_cases_float128 = static_cast<unsigned int>(1ULL << 10U);
+   #endif
 
-  const bool result_flt___is_ok = local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
-  const bool result_dbl___is_ok = local::test_arithmetic<double>     (test_cases_built_in); std::cout << "result_dbl___is_ok: " << std::boolalpha << result_dbl___is_ok << std::endl;
-  const bool result_ldbl__is_ok = local::test_arithmetic<long double>(test_cases_built_in); std::cout << "result_ldbl__is_ok: " << std::boolalpha << result_ldbl__is_ok << std::endl;
+   const auto result_flt___is_ok = local::test_arithmetic<float>      (test_cases_built_in); std::cout << "result_flt___is_ok: " << std::boolalpha << result_flt___is_ok << std::endl;
+   const auto result_dbl___is_ok = local::test_arithmetic<double>     (test_cases_built_in); std::cout << "result_dbl___is_ok: " << std::boolalpha << result_dbl___is_ok << std::endl;
+   const auto result_ldbl__is_ok = local::test_arithmetic<long double>(test_cases_built_in); std::cout << "result_ldbl__is_ok: " << std::boolalpha << result_ldbl__is_ok << std::endl;
 
 #ifdef BOOST_MATH_USE_FLOAT128
-  const bool result_f128__is_ok = local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
-                                                                                            std::cout << "result_f128__is_ok: " << std::boolalpha << result_f128__is_ok << std::endl;
+   const auto result_f128__is_ok = local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
+                                                                                             std::cout << "result_f128__is_ok: " << std::boolalpha << result_f128__is_ok << std::endl;
 #else
-   (void) test_cases_float128;
+   static_cast<void>(test_cases_float128);
 #endif
 
-  const bool result_is_ok =
-  (
-      result_flt___is_ok
-   && result_dbl___is_ok
-   && result_ldbl__is_ok
+   const auto result_is_ok =
+   (
+         result_flt___is_ok
+      && result_dbl___is_ok
+      && result_ldbl__is_ok
 #ifdef BOOST_MATH_USE_FLOAT128
-   && result_f128__is_ok
+      && result_f128__is_ok
 #endif
-  );
+   );
 
-  return (result_is_ok ? 0 : -1);
+   {
+      const auto flg = std::cout.flags();
+
+      std::cout << "result_is_ok: " << std::boolalpha << result_is_ok << std::endl;
+
+      std::cout.flags(flg);
+   }
+
+   return (result_is_ok ? 0 : -1);
 }

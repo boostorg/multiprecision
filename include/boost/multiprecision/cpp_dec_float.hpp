@@ -3653,7 +3653,7 @@ struct precision<boost::multiprecision::number<boost::multiprecision::cpp_dec_fl
    static constexpr std::int32_t cpp_dec_float_digits10 = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
 
    using precision_type = typename Policy::precision_type                           ;
-   using digits_2 = digits2<((cpp_dec_float_digits10 + 1LL) * 1000LL) / 301LL>;
+   using digits_2 = digits2<static_cast<int>(((cpp_dec_float_digits10 + 1LL) * 1000LL) / 301LL)>;
    using type = typename std::conditional<
        ((digits_2::value <= precision_type::value) || (Policy::precision_type::value <= 0)),
        // Default case, full precision for RealType:
