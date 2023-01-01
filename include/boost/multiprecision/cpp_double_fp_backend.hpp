@@ -1265,7 +1265,31 @@ BOOST_MP_CXX14_CONSTEXPR int eval_fpclassify(const cpp_double_fp_backend<Floatin
 template <typename FloatingPointType>
 void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& o)
 {
-   using local_float_type = typename cpp_double_fp_backend<FloatingPointType>::float_type;
+   using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+   using local_float_type = typename double_float_type::float_type;
+
+   const auto fpc = eval_fpclassify(o);
+
+   const auto isneg_o = o.isneg();
+
+   if((fpc != FP_NORMAL) || isneg_o)
+   {
+      if((fpc == FP_ZERO) || (fpc == FP_SUBNORMAL))
+      {
+         result = double_float_type(0);
+         return;
+      }
+      else if(fpc == FP_NAN)
+      {
+         result = double_float_type(std::numeric_limits<local_float_type>::quiet_NaN());
+         return;
+      }
+      else if((fpc == FP_INFINITE) || isneg_o)
+      {
+         result = double_float_type(std::numeric_limits<local_float_type>::quiet_NaN());
+         return;
+      }
+   }
 
    using std::sqrt;
 
