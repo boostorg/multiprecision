@@ -731,20 +731,39 @@ class cpp_double_fp_backend
       return my_str;
    }
 
-   int order02() const
+   BOOST_MP_CXX14_CONSTEXPR int order02() const
    {
-      int e2;
+      // TBD: Is there another option to get the base-2 log
+      // that's more unequivocally closer to constexpr?
 
-      using std::frexp;
+      // TBD: Either way, integrate this (or something like it)
+      // into any potential implementation of eval_ilogb().
 
-      frexp(my_first(), &e2);
+      int e2 { };
+      cpp_double_fp_backend dummy { };
+
+      eval_frexp(dummy, &e2);
 
       return e2;
    }
 
-   int  order10  () const { return (int)(float(order02()) * 0.301F); }
-   bool small_arg() const { return (order10() < (-my_digits10 / 6)); }
-   bool near_one () const { return cpp_double_fp_backend(fabs(cpp_double_fp_backend(1U) - *this)).small_arg(); }
+   BOOST_MP_CXX14_CONSTEXPR int order10() const { return static_cast<int>(static_cast<float>(order02()) * 0.301F); }
+
+   BOOST_MP_CXX14_CONSTEXPR bool small_arg() const { return (order10() < static_cast<int>(-my_digits10 / 6)); }
+
+   BOOST_MP_CXX14_CONSTEXPR bool near_one() const
+   {
+      cpp_double_fp_backend delta_one { };
+
+      eval_subtract(delta_one, cpp_double_fp_backend(1U), *this);
+
+      if(delta_one().isneg())
+      {
+         delta_one.negate();
+      }
+
+      return delta_one.small_arg();
+   }
 
    static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_max() noexcept
    {
@@ -754,6 +773,10 @@ class cpp_double_fp_backend
       using boost::multiprecision::ldexp;
       using boost::multiprecision::sqrt;
 #endif
+
+      // TBD: Can this be simplified in any way?
+      // Is the use of the square root the best way to go?
+      // Can this be made traditional C++11 constexpr?
 
       return
          cpp_double_fp_backend
@@ -788,7 +811,7 @@ class cpp_double_fp_backend
       using boost::multiprecision::ldexp;
 #endif
 
-      // TBD: Need a better value here.
+      // TBD: Do we need a better value here.
       return []() -> cpp_double_fp_backend {
          cpp_double_fp_backend result;
 

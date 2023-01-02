@@ -255,7 +255,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 4 - std::numeric_limits<double_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 5 - std::numeric_limits<double_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
