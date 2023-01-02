@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2021 Fahad Syed.
-//  Copyright 2021 Christopher Kormanyos.
+//  Copyright 2021 - 2023 Christopher Kormanyos.
 //  Copyright 2021 Janek Kozicki.
 //  Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
-//  || copy at http://www.boost.org/LICENSE_1_0.txt)
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 // Test for binary rebuilding of a number from constituent bits.
 
@@ -410,16 +410,6 @@ int main()
 #ifdef BOOST_MATH_USE_FLOAT128
    errors += test<double_float<boost::multiprecision::float128>>();
 #endif
-
-// TODO: soon we should be able to test quad_float also :)
-/*
-   errors += test<quad_float<float>>();
-   errors += test<quad_float<double>>();
-   errors += test<quad_float<long double>>();
-#ifdef BOOST_MATH_USE_FLOAT128
-   errors += test<quad_float<boost::multiprecision::float128>>();
-#endif
-*/
 
    std::cout << "Total number of errors : " << errors << std::endl << std::endl;
 

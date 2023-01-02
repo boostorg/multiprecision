@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2021 Fahad Syed.
-//  Copyright 2021 Christopher Kormanyos.
+//  Copyright 2021 - 2023 Christopher Kormanyos.
 //  Copyright 2021 Janek Kozicki.
 //  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
@@ -139,7 +139,7 @@ ConstructionType construct_from(const ArithmeticType& f)
 template <typename ConstructionType, typename DoubleFloatType>
 ConstructionType construct_from(const boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<typename DoubleFloatType::backend_type::float_type> >& f)
 {
-   return ConstructionType(f.backend().first()) + ConstructionType(f.backend().second());
+   return ConstructionType(f.backend().my_first()) + ConstructionType(f.backend().my_second());
 }
 
 template <typename FloatingPointType, typename NumericType>

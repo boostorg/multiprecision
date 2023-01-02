@@ -37,7 +37,7 @@ namespace detail {
 template <class T>
 struct is_arithmetic_or_float128
 {
-   static constexpr bool value = ((std::is_arithmetic<T>::value == true)
+   static constexpr bool value = ((boost::multiprecision::detail::is_arithmetic<T>::value)
 #if defined(BOOST_MATH_USE_FLOAT128)
                                   || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
 #endif
@@ -47,7 +47,7 @@ struct is_arithmetic_or_float128
 template <class T>
 struct is_floating_point_or_float128
 {
-   static constexpr bool value = ((std::is_floating_point<T>::value == true)
+   static constexpr bool value = ((std::is_floating_point<T>::value)
 #if defined(BOOST_MATH_USE_FLOAT128)
                                   || (std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value == true)
 #endif
@@ -102,27 +102,29 @@ template <typename FloatingPointType>
 void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& o);
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const* = nullptr>
+          typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const* = nullptr>
 void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const* = nullptr>
+          typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const* = nullptr>
 void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const* = nullptr>
+          typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const* = nullptr>
 void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 
 template <typename FloatingPointType>
 void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 
-template <typename FloatingPointType,
-          typename R>
-typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend);
+template <typename FloatingPointType>
+void eval_convert_to(signed long long* result, const cpp_double_fp_backend<FloatingPointType>& backend);
+
+template <typename FloatingPointType>
+void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<FloatingPointType>& backend);
 
 template <typename FloatingPointType,
           typename R>
-typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend);
+typename std::enable_if<detail::is_floating_point_or_float128<R>::value>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend);
 
 template <typename FloatingPointType,
           typename char_type,
@@ -167,13 +169,13 @@ namespace backends {
 namespace detail {
 
 template <typename R>
-typename std::enable_if<std::is_unsigned<R>::value == false, R>::type minus_max()
+typename std::enable_if<!boost::multiprecision::detail::is_unsigned<R>::value, R>::type minus_max()
 {
-   return std::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
+   return boost::multiprecision::detail::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
 }
 
 template <typename R>
-typename std::enable_if<std::is_unsigned<R>::value == true, R>::type minus_max()
+typename std::enable_if<boost::multiprecision::detail::is_unsigned<R>::value, R>::type minus_max()
 {
    return 0;
 }
@@ -184,7 +186,7 @@ struct exact_arithmetic
    // The exact_arithmetic<> struct implements extended precision
    // techniques that are used in cpp_double_fp_backend and cpp_quad_float.
 
-   static_assert(detail::is_floating_point_or_float128<FloatingPointType>::value == true,
+   static_assert(detail::is_floating_point_or_float128<FloatingPointType>::value,
                  "Error: exact_arithmetic<> invoked with unknown floating-point type");
 
    using float_type  = FloatingPointType;
@@ -196,7 +198,7 @@ struct exact_arithmetic
       // Split a floating point number in two (high and low) parts approximating the
       // upper-half and lower-half bits of the float
 
-      static_assert(detail::is_floating_point_or_float128<FloatingPointType>::value == true,
+      static_assert(detail::is_floating_point_or_float128<FloatingPointType>::value,
                     "Error: exact_arithmetic<>::split invoked with unknown floating-point type");
 
       // TODO Replace bit shifts with constexpr funcs or ldexp for better compaitibility
@@ -486,18 +488,21 @@ class cpp_double_fp_backend
 
    // Constructors from other floating-point types.
    template <typename OtherFloatType,
-             typename std::enable_if<(detail::is_floating_point_or_float128<OtherFloatType>::value == true) && (std::numeric_limits<OtherFloatType>::digits <= std::numeric_limits<float_type>::digits)>::type const* = nullptr>
+             typename std::enable_if<(    detail::is_floating_point_or_float128<OtherFloatType>::value
+                                      && (std::numeric_limits<OtherFloatType>::digits <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const OtherFloatType& f) : data(std::make_pair(f, static_cast<float_type>(0.0F))) { }
 
    template <typename OtherFloatType,
-             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatType>::value == true) && (std::numeric_limits<OtherFloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+             typename std::enable_if<(    detail::is_floating_point_or_float128<OtherFloatType>::value
+                                      && (std::numeric_limits<OtherFloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const OtherFloatType& f)
        : data(std::make_pair(static_cast<float_type>(f),
                              static_cast<float_type>(f - (OtherFloatType) static_cast<float_type>(f)))) { }
 
    // Constructor from other cpp_double_fp_backend<> objects.
    template <typename OtherFloatType,
-             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatType>::value == true) && (std::is_same<FloatingPointType, OtherFloatType>::value == false))>::type const* = nullptr>
+             typename std::enable_if<(    detail::is_floating_point_or_float128<OtherFloatType>::value
+                                      && (!std::is_same<FloatingPointType, OtherFloatType>::value))>::type const* = nullptr>
    BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend(const cpp_double_fp_backend<OtherFloatType>& a)
        : cpp_double_fp_backend(a.my_first())
    {
@@ -507,45 +512,57 @@ class cpp_double_fp_backend
 
    // Constructors from integers
    template <typename SignedIntegralType,
-             typename std::enable_if<(   (std::is_integral<SignedIntegralType>::value == true)
-                                      && (std::is_unsigned<SignedIntegralType>::value == false)
-                                      && (std::numeric_limits<SignedIntegralType>::digits + 1 <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+             typename std::enable_if<(    boost::multiprecision::detail::is_integral<SignedIntegralType>::value
+                                      && !boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value
+                                      && (static_cast<int>(sizeof(SignedIntegralType) * 8u) <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const SignedIntegralType& n)
       : data(std::make_pair(static_cast<float_type>(n), static_cast<float_type>(0.0F))) { }
 
    template <typename UnsignedIntegralType,
-             typename std::enable_if<(   (std::is_integral<UnsignedIntegralType>::value == true)
-                                      && (std::is_unsigned<UnsignedIntegralType>::value == true)
-                                      && (std::numeric_limits<UnsignedIntegralType>::digits <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+             typename std::enable_if<(    boost::multiprecision::detail::is_integral<UnsignedIntegralType>::value
+                                      &&  boost::multiprecision::detail::is_unsigned<UnsignedIntegralType>::value
+                                      && (static_cast<int>(sizeof(UnsignedIntegralType) * 8u) <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const UnsignedIntegralType& u)
       : data(std::make_pair(static_cast<float_type>(u), static_cast<float_type>(0.0F))) { }
 
    // Constructors from integers which hold more information than *this can contain
-   template <typename SignedIntegralType,
-             typename std::enable_if<(   (std::is_integral<SignedIntegralType>::value == true)
-                                      && (std::is_unsigned<SignedIntegralType>::value == false)
-                                      && (std::numeric_limits<SignedIntegralType>::digits + 1 > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   constexpr cpp_double_fp_backend(SignedIntegralType n)
-      : data
-        (
-           std::make_pair
-           (
-              static_cast<float_type>(n),
-              static_cast<float_type>(n - static_cast<SignedIntegralType>(static_cast<float_type>(n)))
-           )
-        ) { }
-
    template <typename UnsignedIntegralType,
-             typename std::enable_if<(   (std::is_integral<UnsignedIntegralType>::value == true)
-                                      && (std::is_unsigned<UnsignedIntegralType>::value == true)
-                                      && (std::numeric_limits<UnsignedIntegralType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+             typename std::enable_if<(    boost::multiprecision::detail::is_integral<UnsignedIntegralType>::value
+                                      &&  boost::multiprecision::detail::is_unsigned<UnsignedIntegralType>::value
+                                      && (static_cast<int>(sizeof(UnsignedIntegralType) * 8u) > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(UnsignedIntegralType u)
       : data
         (
            std::make_pair
            (
               static_cast<float_type>(u),
-              static_cast<float_type>(typename std::make_signed<UnsignedIntegralType>::type(u - static_cast<UnsignedIntegralType>(static_cast<float_type>(u))))
+              static_cast<float_type>
+              (
+                 static_cast<UnsignedIntegralType>
+                 (
+                    u - static_cast<UnsignedIntegralType>(static_cast<float_type>(u))
+                 )
+              )
+           )
+        ) { }
+
+   template <typename SignedIntegralType,
+             typename std::enable_if<(    boost::multiprecision::detail::is_integral<SignedIntegralType>::value
+                                      && !boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value
+                                      && (static_cast<int>(sizeof(SignedIntegralType) * 8u) > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
+   constexpr cpp_double_fp_backend(SignedIntegralType n)
+      : data
+        (
+           std::make_pair
+           (
+              static_cast<float_type>(n),
+              static_cast<float_type>
+              (
+                 static_cast<SignedIntegralType>
+                 (
+                    n - static_cast<SignedIntegralType>(static_cast<float_type>(n))
+                 )
+              )
            )
         ) { }
 
@@ -643,7 +660,7 @@ class cpp_double_fp_backend
       return *this;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator=(cpp_double_fp_backend&& other)
+   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator=(cpp_double_fp_backend&& other) noexcept
    {
       data = other.data;
 
@@ -948,7 +965,13 @@ class cpp_double_fp_backend
    BOOST_MP_CXX14_CONSTEXPR int compare(const cpp_double_fp_backend& other) const
    {
       // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
+      #if 0
+      return (my_first() > other.my_first()) ?  1 : (my_first()  < other.my_first())
+                                             ? -1 : (my_second() > other.my_second())
+                                             ?  1 : (my_second() < other.my_second())
+                                             ? -1 : 0;
 
+      #else
       const auto other_is_neg = (other.my_first() < 0);
       const auto my_is_neg    = (my_first() < 0);
 
@@ -978,6 +1001,7 @@ class cpp_double_fp_backend
       }
 
       return n_result;
+      #endif
    }
 
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
@@ -1066,15 +1090,15 @@ class cpp_double_fp_backend
    rep_type data;
 
    template <typename OtherFloatingPointType,
-             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const*>
+             typename std::enable_if<(detail::is_floating_point_or_float128<OtherFloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const*>
    friend void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
 
    template <typename OtherFloatingPointType,
-             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true) && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
+             typename std::enable_if<(detail::is_floating_point_or_float128<OtherFloatingPointType>::value && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
    friend void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
 
    template <typename OtherFloatingPointType,
-             typename std::enable_if<((detail::is_floating_point_or_float128<OtherFloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const*>
+             typename std::enable_if<(detail::is_floating_point_or_float128<OtherFloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const*>
    friend void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
 };
 
@@ -1328,12 +1352,12 @@ void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_doubl
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const*>
+          typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const*>
 void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
    const auto x_is_zero = x.is_zero();
 
-   if ((eval_fpclassify(x) != static_cast<int>(FP_NORMAL)) && (x_is_zero == false))
+   if ((eval_fpclassify(x) != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
    {
       result = x;
    }
@@ -1389,7 +1413,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
          static const double_float_type constant_e1         (std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
          static const double_float_type constant_one_over_e1(std::string("0.36787944117144232159552377016146086744581113103176783450783680169746149574489980335714727434591964375"));
 
-         result = ((b_neg == false) ? constant_e1 : constant_one_over_e1);
+         result = ((!b_neg) ? constant_e1 : constant_one_over_e1);
       }
       else
       {
@@ -1447,9 +1471,11 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
             result *= result;
             result *= result;
 
-            int n;
+            signed long long lln;
 
-            eval_convert_to(&n, nf);
+            eval_convert_to(&lln, nf);
+
+            const auto n = static_cast<int>(lln);
 
             if (n > 0)
             {
@@ -1466,12 +1492,14 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
+          typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
 void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   const bool x_is_zero = x.is_zero();
+   const auto x_is_zero = x.is_zero();
 
-   if ((eval_fpclassify(x) != (int)FP_NORMAL) && (x_is_zero == false))
+   const auto fpc = eval_fpclassify(x);
+
+   if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
    {
       result = x;
    }
@@ -1527,7 +1555,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
          static const double_float_type constant_e1(std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
          static const double_float_type constant_one_over_e1(std::string("0.36787944117144232159552377016146086744581113103176783450783680169746149574489980335714727434591964375"));
 
-         result = ((b_neg == false) ? constant_e1 : constant_one_over_e1);
+         result = ((!b_neg) ? constant_e1 : constant_one_over_e1);
       }
       else
       {
@@ -1585,9 +1613,11 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
             result *= result;
             result *= result;
 
-            int n;
+            signed long long lln;
 
-            eval_convert_to(&n, nf);
+            eval_convert_to(&lln, nf);
+
+            const auto n = static_cast<int>(lln);
 
             if (n > 0)
             {
@@ -1604,12 +1634,14 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<((detail::is_floating_point_or_float128<FloatingPointType>::value == true) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const*>
+          typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const*>
 void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   const bool x_is_zero = x.is_zero();
+   const auto x_is_zero = x.is_zero();
 
-   if ((eval_fpclassify(x) != (int)FP_NORMAL) && (x_is_zero == false))
+   const auto fpc = eval_fpclassify(x);
+
+   if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
    {
       result = x;
    }
@@ -1665,7 +1697,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
          static const double_float_type constant_e1         (std::string("2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274"));
          static const double_float_type constant_one_over_e1(std::string("0.36787944117144232159552377016146086744581113103176783450783680169746149574489980335714727434591964375"));
 
-         result = ((b_neg == false) ? constant_e1 : constant_one_over_e1);
+         result = ((!b_neg) ? constant_e1 : constant_one_over_e1);
       }
       else
       {
@@ -1724,9 +1756,11 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
             result *= result;
             result *= result;
 
-            int n;
+            signed long long lln;
 
-            eval_convert_to(&n, nf);
+            eval_convert_to(&lln, nf);
+
+            const auto n = static_cast<int>(lln);
 
             if (n > 0)
             {
@@ -1747,7 +1781,11 @@ void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
 {
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
-   if (eval_fpclassify(x) != (int)FP_NORMAL)
+   const auto x_is_zero = x.is_zero();
+
+   const auto fpc = eval_fpclassify(x);
+
+   if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
    {
       result = x;
    }
@@ -1774,38 +1812,54 @@ void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
    }
 }
 
-template <typename FloatingPointType,
-          typename R>
-typename std::enable_if<std::is_integral<R>::value == true>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend)
+template <typename FloatingPointType>
+void eval_convert_to(signed long long* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
-   using c_type = typename std::common_type<R, FloatingPointType>::type;
+   using c_type = typename std::common_type<signed long long, FloatingPointType>::type;
 
    using std::fabs;
 
-   BOOST_CONSTEXPR const c_type my_max = static_cast<c_type>((std::numeric_limits<R>::max)());
-   BOOST_CONSTEXPR const c_type my_min = static_cast<c_type>((std::numeric_limits<R>::min)());
-   c_type                       ct     = fabs(backend.crep().first);
-
-   static_cast<void>(my_min);
+   constexpr c_type my_max = static_cast<c_type>((std::numeric_limits<signed long long>::max)());
+   c_type           ct     = fabs(backend.crep().first);
 
    if (ct > my_max)
-      if (!std::is_unsigned<R>::value)
-         *result = backend.crep().first >= typename cpp_double_fp_backend<FloatingPointType>::float_type(0U) ? (std::numeric_limits<R>::max)() : detail::minus_max<R>();
-      else
-         *result = (std::numeric_limits<R>::max)();
+   {
+      *result = backend.crep().first >= typename cpp_double_fp_backend<FloatingPointType>::float_type(0U) ? (std::numeric_limits<signed long long>::max)() : detail::minus_max<signed long long>();
+   }
    else
    {
-      *result  = static_cast<R>(backend.crep().first);
-      *result += static_cast<R>(backend.crep().second);
+      *result  = static_cast<signed long long>(backend.crep().first);
+      *result += static_cast<signed long long>(backend.crep().second);
+   }
+}
+
+template <typename FloatingPointType>
+void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<FloatingPointType>& backend)
+{
+   using c_type = typename std::common_type<unsigned long long, FloatingPointType>::type;
+
+   using std::fabs;
+
+   constexpr c_type my_max = static_cast<c_type>((std::numeric_limits<unsigned long long>::max)());
+   c_type           ct     = fabs(backend.crep().first);
+
+   if (ct > my_max)
+   {
+      *result = (std::numeric_limits<unsigned long long>::max)();
+   }
+   else
+   {
+      *result  = static_cast<unsigned long long>(backend.crep().first);
+      *result += static_cast<unsigned long long>(backend.crep().second);
    }
 }
 
 template <typename FloatingPointType,
           typename R>
-typename std::enable_if<std::is_integral<R>::value == false>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend)
+typename std::enable_if<detail::is_floating_point_or_float128<R>::value>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
-   *result = R(backend.crep().first);
-   *result += R(backend.crep().second);
+   *result  = static_cast<R>(backend.crep().first);
+   *result += static_cast<R>(backend.crep().second);
 }
 
 template <typename FloatingPointType>
