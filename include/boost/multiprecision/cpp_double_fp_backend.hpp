@@ -1773,7 +1773,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>&
             result *= result;
             result *= result;
 
-            signed long long lln;
+            signed long long lln { };
 
             eval_convert_to(&lln, nf);
 
