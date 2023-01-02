@@ -126,13 +126,19 @@ int(fpclassify)(const boost::multiprecision::backends::cpp_double_fp_backend<Flo
 
 }} // namespace boost::math
 
+#if (defined(__clang__) && (__clang_major__ <= 9))
+#define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE struct
+#else
+#define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE class
+#endif
+
 namespace std {
 
 // Foward declarations of various specializations of std::numeric_limits
 
 template <typename FloatingPointType,
           const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >;
+BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >;
 
 } // namespace std
 
@@ -1485,7 +1491,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>&
             result *= result;
             result *= result;
 
-            signed long long lln;
+            signed long long lln { };
 
             eval_convert_to(&lln, nf);
 
@@ -1625,7 +1631,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>&
             result *= result;
             result *= result;
 
-            signed long long lln;
+            signed long long lln { };
 
             eval_convert_to(&lln, nf);
 
@@ -1736,7 +1742,8 @@ BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>&
          double_float_type x_pow_n_div_n_fact(xh);
 
          result = double_float_type(1U) + x_pow_n_div_n_fact;
-         double_float_type dummy;
+
+         double_float_type dummy { };
 
          // Series expansion of hypergeometric_0f0(; ; x).
          // For this high(er) digit count, a scaled argument with subsequent
@@ -1746,7 +1753,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>&
             x_pow_n_div_n_fact *= xh;
             x_pow_n_div_n_fact /= typename double_float_type::float_type(n);
 
-            int n_tol;
+            int n_tol { };
 
             eval_frexp(dummy, x_pow_n_div_n_fact, &n_tol);
 
@@ -1906,7 +1913,7 @@ namespace std {
 // Specialization of numeric_limits for boost::multiprecision::number<cpp_double_fp_backend<>>
 template <typename FloatingPointType,
           const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >
+BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >
     : public std::numeric_limits<FloatingPointType>
 {
  private:
