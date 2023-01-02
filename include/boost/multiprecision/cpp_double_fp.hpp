@@ -1,16 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2021 Fahad Syed.
-//  Copyright 2021 Christopher Kormanyos.
+//  Copyright 2021 - 2023 Christopher Kormanyos.
 //  Copyright 2021 Janek Kozicki.
 //  Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+//  (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_MP_CPP_DOUBLE_FP_BACKEND_2021_06_05_HPP
-#define BOOST_MP_CPP_DOUBLE_FP_BACKEND_2021_06_05_HPP
-
-#include <boost/config.hpp>
+#ifndef BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
+#define BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 
 #include <limits>
 #include <sstream>
@@ -18,6 +16,8 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+
+#include <boost/config.hpp>
 
 #if defined(BOOST_MATH_USE_FLOAT128)
 #include <boost/multiprecision/float128.hpp>
@@ -1961,4 +1961,4 @@ constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprec
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
 constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent10;
 
-#endif // BOOST_MP_CPP_DOUBLE_FP_BACKEND_2021_06_05_HPP
+#endif // BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
