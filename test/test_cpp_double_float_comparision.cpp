@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2021 Fahad Syed.
-//  Copyright 2021 Christopher Kormanyos.
+//  Copyright 2021 - 2023 Christopher Kormanyos.
 //  Copyright 2021 Janek Kozicki.
 //  Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt

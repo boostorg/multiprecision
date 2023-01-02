@@ -141,11 +141,6 @@ enum struct scoped_enum
 template <class Real>
 typename std::enable_if<boost::multiprecision::is_number<Real>::value>::type test_enum_conversions()
 {
-   const int n1(one);
-   Real r1(n1);
-   BOOST_CHECK_EQUAL(r1, 1);
-
-   #if 0
    Real r1(one);
    BOOST_CHECK_EQUAL(r1, 1);
    Real r2(scoped_enum::four);
@@ -159,7 +154,6 @@ typename std::enable_if<boost::multiprecision::is_number<Real>::value>::type tes
 
    BOOST_CHECK_EQUAL(static_cast<unscoped_enum>(r1), two);
    BOOST_CHECK(static_cast<scoped_enum>(r2) == scoped_enum::four);
-   #endif
 }
 
 template <class Real>
