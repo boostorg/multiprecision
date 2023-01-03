@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2002 - 2011.
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright 2011 John Maddock.
+//  Copyright Christopher Kormanyos 2002 - 2011, 2021 - 2023.
+//  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 //
@@ -176,6 +177,9 @@ void test()
       {
          max_err = err;
       }
+
+      if(k == 0u)
+         BOOST_TEST(val == 0);
    }
    std::cout << "Max error was: " << max_err << std::endl;
 #if defined(BOOST_INTEL) && defined(TEST_FLOAT128)
