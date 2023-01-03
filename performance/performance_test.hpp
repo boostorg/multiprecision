@@ -72,8 +72,6 @@ extern unsigned bits_wanted; // for integer types
 template <class T, int Type>
 struct tester
 {
-// Workaround
-#define TestCases 10000
    tester()
    {
       a.assign(500, 0);
@@ -87,7 +85,7 @@ struct tester
    double test_add()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j] + c[j];
@@ -97,7 +95,7 @@ struct tester
    double test_subtract()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j] - c[j];
@@ -107,7 +105,7 @@ struct tester
    double test_add_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j] + 1;
@@ -117,7 +115,7 @@ struct tester
    double test_subtract_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j] - 1;
@@ -127,7 +125,7 @@ struct tester
    double test_multiply()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned k = 0; k < b.size(); ++k)
             a[k] = b[k] * c[k];
@@ -137,7 +135,7 @@ struct tester
    double test_multiply_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j] * 3;
@@ -147,7 +145,7 @@ struct tester
    double test_divide()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j] / c[j] + b[j] / small[j];
@@ -157,7 +155,7 @@ struct tester
    double test_divide_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j] / 3;
@@ -188,7 +186,7 @@ struct tester
    double test_mod()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] % c[i] + b[i] % small[i];
@@ -198,7 +196,7 @@ struct tester
    double test_mod_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] % 254;
@@ -208,7 +206,7 @@ struct tester
    double test_or()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] | c[i];
@@ -218,7 +216,7 @@ struct tester
    double test_or_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] | 234;
@@ -228,7 +226,7 @@ struct tester
    double test_and()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] & c[i];
@@ -238,7 +236,7 @@ struct tester
    double test_and_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] & 234;
@@ -248,7 +246,7 @@ struct tester
    double test_xor()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] ^ c[i];
@@ -258,7 +256,7 @@ struct tester
    double test_xor_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] ^ 234;
@@ -268,7 +266,7 @@ struct tester
    double test_complement()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = ~b[i];
@@ -280,7 +278,7 @@ struct tester
       int                                             max_shift = std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits : bits_wanted;
       int                                             shift     = 0;
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] << (shift++ % max_shift);
@@ -292,7 +290,7 @@ struct tester
       int                                             max_shift = 2 + std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits : bits_wanted;
       int                                             shift     = 0;
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] >> (shift++) % max_shift;
@@ -303,7 +301,7 @@ struct tester
    {
       using boost::integer::gcd;
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned i = 0; i < b.size(); ++i)
             a[i] = gcd(b[i], c[i]);
@@ -323,49 +321,49 @@ struct tester
    double test_construct()
    {
       std::allocator<T>                               alloc;
-      T*                                              pt = alloc.allocate(TestCases);
+      T*                                              pt = alloc.allocate(1000);
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for (unsigned j = 0; j < TestCases; ++j)
+         for (unsigned j = 0; j < 1000; ++j)
             new (pt + j) T();
-         for (unsigned j = 0; j < TestCases; ++j)
+         for (unsigned j = 0; j < 1000; ++j)
             std::allocator_traits<std::allocator<T> >::destroy(alloc, pt + j);
       }
       double result = boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
-      alloc.deallocate(pt, TestCases);
+      alloc.deallocate(pt, 1000);
       return result;
    }
    double test_construct_unsigned()
    {
       std::allocator<T>                               alloc;
-      T*                                              pt = alloc.allocate(TestCases);
+      T*                                              pt = alloc.allocate(1000);
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for (unsigned j = 0; j < TestCases; ++j)
+         for (unsigned j = 0; j < 1000; ++j)
             new (pt + j) T(j);
-         for (unsigned j = 0; j < TestCases; ++j)
+         for (unsigned j = 0; j < 1000; ++j)
             std::allocator_traits<std::allocator<T> >::destroy(alloc, pt + j);
       }
       double result = boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
-      alloc.deallocate(pt, TestCases);
+      alloc.deallocate(pt, 1000);
       return result;
    }
    double test_construct_unsigned_ll()
    {
       std::allocator<T>                               alloc;
-      T*                                              pt = alloc.allocate(TestCases);
+      T*                                              pt = alloc.allocate(1000);
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for (unsigned long long j = 0; j < TestCases; ++j)
+         for (unsigned long long j = 0; j < 1000; ++j)
             new (pt + j) T(j);
-         for (unsigned j = 0; j < TestCases; ++j)
+         for (unsigned j = 0; j < 1000; ++j)
             std::allocator_traits<std::allocator<T>  >::destroy(alloc, pt + j);
       }
       double result = boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
-      alloc.deallocate(pt, TestCases);
+      alloc.deallocate(pt, 1000);
       return result;
    }
 
@@ -392,7 +390,7 @@ struct tester
    {
       const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j] * vals[j];
@@ -404,7 +402,7 @@ struct tester
    {
       const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j], a[j] *= vals[j];
@@ -416,7 +414,7 @@ struct tester
    {
       const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j] + vals[j];
@@ -428,7 +426,7 @@ struct tester
    {
       const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j], a[j] += vals[j];
@@ -440,7 +438,7 @@ struct tester
    {
       const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j] - vals[j];
@@ -452,7 +450,7 @@ struct tester
    {
       const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j], a[j] -= vals[j];
@@ -464,7 +462,7 @@ struct tester
    {
       const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j] / vals[j];
@@ -476,7 +474,7 @@ struct tester
    {
       const std::vector<U>&                           vals = get_hetero_test_vector<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for (unsigned i = 0; i < TestCases; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
             a[j] = b[j], a[j] /= vals[j];
