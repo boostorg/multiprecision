@@ -826,8 +826,8 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
 
  public:
    static constexpr bool is_specialized = true;
-   static BOOST_MP_CXX14_CONSTEXPR number_type(min)() noexcept { return number_type(BOOST_MP_QUAD_MIN); }
-   static BOOST_MP_CXX14_CONSTEXPR number_type(max)() noexcept { return number_type(BOOST_MP_QUAD_MAX); }
+   static BOOST_MP_CXX14_CONSTEXPR number_type(min)() noexcept { return BOOST_MP_QUAD_MIN; }
+   static BOOST_MP_CXX14_CONSTEXPR number_type(max)() noexcept { return BOOST_MP_QUAD_MAX; }
    static BOOST_MP_CXX14_CONSTEXPR number_type          lowest() noexcept { return -(max)(); }
    static constexpr int  digits       = 113;
    static constexpr int  digits10     = 33;
@@ -850,7 +850,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    static BOOST_MP_CXX14_CONSTEXPR number_type                        infinity() { return HUGE_VAL; /* conversion from double infinity OK */ }
    static BOOST_MP_CXX14_CONSTEXPR number_type                        quiet_NaN() { return number_type(NAN); }
    static BOOST_MP_CXX14_CONSTEXPR number_type                        signaling_NaN() { return 0; }
-   static BOOST_MP_CXX14_CONSTEXPR number_type                        denorm_min() { return number_type(BOOST_MP_QUAD_DENORM_MIN); }
+   static BOOST_MP_CXX14_CONSTEXPR number_type                        denorm_min() { return BOOST_MP_QUAD_DENORM_MIN; }
    static constexpr bool               is_iec559       = true;
    static constexpr bool               is_bounded      = true;
    static constexpr bool               is_modulo       = false;
