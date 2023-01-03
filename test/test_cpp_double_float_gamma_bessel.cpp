@@ -7,7 +7,7 @@
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <boost/multiprecision/cpp_double_fp_backend.hpp>
+#include <boost/multiprecision/cpp_double_fp.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
 template<typename MpFloatType>

@@ -1,28 +1,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2021 Fahad Syed.
-//  Copyright 2021 Christopher Kormanyos.
+//  Copyright 2021 - 2023 Christopher Kormanyos.
 //  Copyright 2021 Janek Kozicki.
 //  Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+//  (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_MP_CPP_DOUBLE_FP_BACKEND_2021_06_05_HPP
-#define BOOST_MP_CPP_DOUBLE_FP_BACKEND_2021_06_05_HPP
-
-#include <boost/config.hpp>
+#ifndef BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
+#define BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 
 #include <limits>
 #include <sstream>
 #include <string>
-#include <tuple>
 #include <type_traits>
-#include <utility>
 
-#if defined(BOOST_MATH_USE_FLOAT128)
-#include <boost/multiprecision/float128.hpp>
-#endif
-#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_double_quad_fp/arithmetic.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
@@ -31,22 +24,6 @@ namespace boost { namespace multiprecision { namespace backends {
 
 template <typename FloatingPointType>
 class cpp_double_fp_backend;
-
-namespace detail {
-
-template <class T>
-struct is_floating_point_or_float128
-{
-   static constexpr bool value =
-   (
-         std::is_floating_point<T>::value
-      #if defined(BOOST_MATH_USE_FLOAT128)
-      || std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value
-      #endif
-   );
-};
-
-} // namespace detail
 
 template <typename FloatingPointType>
 BOOST_MP_CXX14_CONSTEXPR void eval_add(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
@@ -117,14 +94,17 @@ std::size_t hash_value(const cpp_double_fp_backend<FloatingPointType>& a);
 template <typename FloatingPointType>
 BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend<FloatingPointType> fabs(const cpp_double_fp_backend<FloatingPointType>& a);
 
-}}} // namespace boost::multiprecision::backends
+} } } // namespace boost::multiprecision::backends
 
+#if 0
 namespace boost { namespace math {
 
+// TBD: Is this really needed?
 template <typename FloatingPointType>
 int(fpclassify)(const boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>& o);
 
-}} // namespace boost::math
+} } // namespace boost::math
+#endif
 
 #if (defined(__clang__) && (__clang_major__ <= 9))
 #define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE struct
@@ -164,276 +144,6 @@ typename std::enable_if<boost::multiprecision::detail::is_unsigned<R>::value, R>
    return 0;
 }
 
-template <typename FloatingPointType>
-struct exact_arithmetic
-{
-   // The exact_arithmetic<> struct implements extended precision
-   // techniques that are used in cpp_double_fp_backend and cpp_quad_float.
-
-   static_assert(detail::is_floating_point_or_float128<FloatingPointType>::value,
-                 "Error: exact_arithmetic<> invoked with unknown floating-point type");
-
-   using float_type  = FloatingPointType;
-   using float_pair  = std::pair<float_type, float_type>;
-   using float_tuple = std::tuple<float_type, float_type, float_type, float_type>;
-
-   static BOOST_MP_CXX14_CONSTEXPR float_pair split(const float_type& a)
-   {
-      // Split a floating point number in two (high and low) parts approximating the
-      // upper-half and lower-half bits of the float
-
-      static_assert(detail::is_floating_point_or_float128<FloatingPointType>::value,
-                    "Error: exact_arithmetic<>::split invoked with unknown floating-point type");
-
-      // TODO Replace bit shifts with constexpr funcs or ldexp for better compaitibility
-      constexpr int MantissaBits = std::numeric_limits<float_type>::digits;
-      constexpr int SplitBits    = MantissaBits / 2 + 1;
-
-      // Check if the integer is wide enough to hold the Splitter.
-      static_assert(std::numeric_limits<uintmax_t>::digits > SplitBits,
-                    "Inadequate integer width for binary shifting needed in split(), try using ldexp instead");
-
-      // If the above line gives an compilation error, replace the
-      // line below it with the commented line
-
-      constexpr float_type Splitter       = FloatingPointType((uintmax_t(1) << SplitBits) + 1);
-      const     float_type SplitThreshold = (std::numeric_limits<float_type>::max)() / (Splitter * 2);
-
-      float_type hi { };
-      float_type lo { };
-
-      // Handle if multiplication with the splitter would cause overflow
-      if (a > SplitThreshold || a < -SplitThreshold)
-      {
-         constexpr float_type Normalizer = float_type(1ULL << (SplitBits + 1));
-
-         const float_type a_ = a / Normalizer;
-
-         const float_type temp = Splitter * a_;
-
-         hi   = temp - (temp - a_);
-         lo   = a_ - hi;
-
-         hi *= Normalizer;
-         lo *= Normalizer;
-      }
-      else
-      {
-         const float_type temp = Splitter * a;
-
-         hi   = temp - (temp - a);
-         lo   = a - hi;
-      }
-
-      return std::make_pair(hi, lo);
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR float_pair fast_sum(const float_type& a, const float_type& b)
-   {
-      // Exact addition of two floating point numbers, given |a| > |b|
-      const float_type a_plus_b = a + b;
-
-      return float_pair(a_plus_b, b - (a_plus_b - a));
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR float_pair sum(const float_type& a, const float_type& b)
-   {
-      // Exact addition of two floating point numbers
-      const float_type a_plus_b = a + b;
-      const float_type v        = a_plus_b - a;
-
-      return float_pair(a_plus_b, (a - (a_plus_b - v)) + (b - v));
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR void three_sum(float_type& a, float_type& b, float_type& c)
-   {
-      using std::get;
-      using std::tie;
-
-      std::tuple<float_type, float_type, float_type> t;
-
-      tie(get<0>(t), get<1>(t)) = sum(a, b);
-      tie(a, get<2>(t))         = sum(c, get<0>(t));
-      tie(b, c)                 = sum(get<1>(t), get<2>(t));
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR void sum(float_pair& p, float_type& e)
-   {
-      using std::tie;
-
-      float_pair t;
-      float_type t_;
-
-      t                = sum(p.first, p.second);
-      tie(p.first, t_) = sum(e, t.first);
-      tie(p.second, e) = sum(t.second, t_);
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR float_tuple four_sum(float_type a, float_type b, float_type c, float_type d)
-   {
-      float_tuple out = std::make_tuple(a, b, c, d);
-      normalize(out);
-      return out;
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR float_pair difference(const float_type& a, const float_type& b)
-   {
-      // Exact subtraction of two floating point numbers
-      const float_type a_minus_b = a - b;
-      const float_type v         = a_minus_b - a;
-
-      return float_pair(a_minus_b, (a - (a_minus_b - v)) - (b + v));
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR float_pair product(const float_type& a, const float_type& b)
-   {
-      // Exact product of two floating point numbers
-      const float_pair a_split = split(a);
-      const float_pair b_split = split(b);
-
-      const volatile float_type pf = a * b;
-
-      return
-        std::make_pair
-        (
-          const_cast<const float_type&>(pf),
-            (
-                ((a_split.first  * b_split.first) - const_cast<const float_type&>(pf))
-              +  (a_split.first  * b_split.second)
-              +  (a_split.second * b_split.first)
-            )
-          +
-            (a_split.second * b_split.second)
-        );
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR void normalize(float_pair& p, bool fast = true)
-   {
-      // Converts a pair of floats to standard form.
-
-      p = (fast ? fast_sum(p.first, p.second) : sum(p.first, p.second));
-   }
-
-   static void extra_normalize(float_pair& p)
-   {
-      // TODO: discuss ?
-      // If exponent of the second component is farther away than digits represented by this type
-      // then means that these "dangling" bits should be zero.
-      int e1 { };
-      int e2 { };
-
-      using std::frexp;
-
-      frexp(p.first, &e1);
-      frexp(p.second, &e2);
-
-      // Interesting: when we set   digits = 2 * <digits of underlying type>
-      // then this extra normalize, to work with DecomposedReal guard_bits
-      // needs the subtraction of 2 here.
-      if ((e1 - e2) > cpp_double_fp_backend<float_type>::my_digits - 2)
-      {
-         p.second = 0;
-      }
-      // ... maybe even better would be to zero all the bits further away than cpp_double_fp_backend<float_type>>::digits away
-      // not only when entire p.second is too far.
-      // FIXME - currently I have no idea how to implement this efficiently. But for debugging maybe even the super slow (with frexp, ldexp) implementation will help in edge cases...
-      // best would be doing & operation on a bitmask..... But can we make sure that would work on all architectures?
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR void normalize(float_tuple& t)
-   {
-      using std::get;
-      using std::tie;
-
-      float_tuple s(float_type(0.0F), float_type(0.0F), float_type(0.0F), float_type(0.0F));
-
-      tie(get<0>(s), get<3>(t)) = fast_sum(get<2>(t), get<3>(t));
-      tie(get<0>(s), get<2>(t)) = fast_sum(get<1>(t), get<0>(s));
-      tie(get<0>(t), get<1>(t)) = fast_sum(get<0>(t), get<0>(s));
-
-      tie(get<0>(s), get<1>(s)) = std::make_tuple(get<0>(t), get<1>(t));
-
-      if (get<1>(s) != 0)
-      {
-         tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<2>(t));
-
-         (get<2>(s) != 0) ? tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), get<3>(t))
-                          : tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
-      }
-      else
-      {
-         tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<2>(t));
-
-         (get<1>(s) != 0) ? tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t))
-                          : tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<3>(t));
-      }
-
-      t = s;
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR void normalize(float_tuple& t, float_type e)
-   {
-      using std::get;
-      using std::tie;
-
-      float_tuple s(float_type(0.0F), float_type(0.0F), float_type(0.0F), float_type(0.0F));
-
-      tie(get<0>(s), e)         = fast_sum(get<3>(t), e);
-      tie(get<0>(s), get<3>(t)) = fast_sum(get<2>(t), get<0>(s));
-      tie(get<0>(s), get<2>(t)) = fast_sum(get<1>(t), get<0>(s));
-      tie(get<0>(t), get<1>(t)) = fast_sum(get<0>(t), get<0>(s));
-
-      tie(get<0>(s), get<1>(s)) = std::make_tuple(get<0>(t), get<1>(t));
-
-      if (get<1>(s) != 0)
-      {
-         tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<2>(t));
-
-         if (get<2>(s) != 0)
-         {
-            tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), get<3>(t));
-
-            if(get<3>(s) != 0)
-            {
-              get<3>(s) += e;
-            }
-            else
-            {
-              tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
-            }
-         }
-         else
-         {
-            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
-
-            (get<2>(s) != 0) ? tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e)
-                             : tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
-         }
-      }
-      else
-      {
-         tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<2>(t));
-
-         if (get<1>(s) != 0)
-         {
-            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
-
-            (get<2>(s) != 0) ? tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e)
-                             : tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
-         }
-         else
-         {
-            tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<3>(t));
-
-            (get<1>(s) != 0) ? tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e)
-                             : tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), e);
-         }
-      }
-
-      t = s;
-   }
-};
-
 } // namespace detail
 
 // A cpp_double_fp_backend is represented by an unevaluated sum of two floating-point
@@ -468,22 +178,29 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend() { }
 
    // Copy constructor.
-   constexpr cpp_double_fp_backend(const cpp_double_fp_backend& other) : data(other.data) {}
+   constexpr cpp_double_fp_backend(const cpp_double_fp_backend& other) : data(other.data) { }
+
+   // Move constructor.
+   constexpr cpp_double_fp_backend(cpp_double_fp_backend&& other) noexcept : data(other.data) { }
 
    // Constructors from other floating-point types.
    template <typename OtherFloatType,
              typename std::enable_if<(    detail::is_floating_point_or_float128<OtherFloatType>::value
                                       && (std::numeric_limits<OtherFloatType>::digits <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
-   constexpr cpp_double_fp_backend(const OtherFloatType& f) : data(std::make_pair(f, static_cast<float_type>(0.0F))) { }
+   constexpr cpp_double_fp_backend(const OtherFloatType& f)
+      : data(f, static_cast<float_type>(0.0F)) { }
 
    template <typename OtherFloatType,
              typename std::enable_if<(    detail::is_floating_point_or_float128<OtherFloatType>::value
                                       && (std::numeric_limits<OtherFloatType>::digits > std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const OtherFloatType& f)
-       : data(std::make_pair(static_cast<float_type>(f),
-                             static_cast<float_type>(f - (OtherFloatType) static_cast<float_type>(f)))) { }
+      : data(static_cast<float_type>(f),
+             static_cast<float_type>(f - (OtherFloatType) static_cast<float_type>(f))) { }
 
-   // Constructor from other cpp_double_fp_backend<> objects.
+   // Construtor from another kind of cpp_double_fp_backend<> object.
+
+   // TBD: Need to keep widening conversion implicit,
+   // but ensure that narrowing conversion is explicit.
    template <typename OtherFloatType,
              typename std::enable_if<(    detail::is_floating_point_or_float128<OtherFloatType>::value
                                       && (!std::is_same<FloatingPointType, OtherFloatType>::value))>::type const* = nullptr>
@@ -491,7 +208,7 @@ class cpp_double_fp_backend
        : cpp_double_fp_backend(a.my_first())
    {
       // TBD: Maybe specialize this constructor for cases either wider or less wide.
-      *this += a.my_second();
+      operator+=(a.my_second());
    }
 
    // Constructors from integers
@@ -507,7 +224,7 @@ class cpp_double_fp_backend
                                       &&  boost::multiprecision::detail::is_unsigned<UnsignedIntegralType>::value
                                       && (static_cast<int>(sizeof(UnsignedIntegralType) * 8u) <= std::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const UnsignedIntegralType& u)
-      : data(std::make_pair(static_cast<float_type>(u), static_cast<float_type>(0.0F))) { }
+      : data(static_cast<float_type>(u), static_cast<float_type>(0.0F)) { }
 
    // Constructors from integers which hold more information than *this can contain
    template <typename UnsignedIntegralType,
@@ -550,7 +267,7 @@ class cpp_double_fp_backend
            )
         ) { }
 
-   constexpr cpp_double_fp_backend(const float_type& a, const float_type& b) noexcept : data(std::make_pair(a, b)) { }
+   constexpr cpp_double_fp_backend(const float_type& a, const float_type& b) noexcept : data(a, b) { }
 
    constexpr cpp_double_fp_backend(const std::pair<float_type, float_type>& p) noexcept : data(p) { }
 
@@ -564,7 +281,33 @@ class cpp_double_fp_backend
       boost::multiprecision::detail::convert_from_string(*this, pstr);
    }
 
-   constexpr cpp_double_fp_backend(cpp_double_fp_backend&& other) noexcept : data(other.data) { }
+   // Assignment operator.
+   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator=(const cpp_double_fp_backend& other)
+   {
+      if (this != &other)
+      {
+         data = other.data;
+      }
+
+      return *this;
+   }
+
+   // Move assignment operator.
+   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator=(cpp_double_fp_backend&& other) noexcept
+   {
+      data = other.data;
+
+      return *this;
+   }
+
+   // Assignment operator from another kind of cpp_double_fp_backend<> object.
+   template <typename OtherFloatType,
+             typename std::enable_if<(    detail::is_floating_point_or_float128<OtherFloatType>::value
+                                      && (!std::is_same<FloatingPointType, OtherFloatType>::value))>::type const* = nullptr>
+   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator=(const cpp_double_fp_backend<OtherFloatType>& other)
+   {
+     return operator=(cpp_double_fp_backend(other));
+   }
 
    std::size_t hash() const
    {
@@ -576,7 +319,7 @@ class cpp_double_fp_backend
 
       std::size_t result = 0;
 
-      for (std::string::size_type i = 0U; i < str_to_hash.length(); ++i)
+      for (auto i = static_cast<std::string::size_type>(UINT8_C(0)); i < str_to_hash.length(); ++i)
       {
          boost::multiprecision::detail::hash_combine(result, str_to_hash.at(i));
       }
@@ -585,13 +328,14 @@ class cpp_double_fp_backend
    }
 
    // Methods
-   constexpr bool is_neg() const { return (data.first < 0); }
-
+   constexpr bool is_neg () const { return (data.first < 0); }
    constexpr bool is_zero() const { return (compare(cpp_double_fp_backend(0U)) == 0); }
    constexpr bool is_one () const { return (compare(cpp_double_fp_backend(1U)) == 0); }
 
    BOOST_MP_CXX14_CONSTEXPR void negate()
    {
+      // TBD: Can this be simplified?
+
       const auto fpc = eval_fpclassify(*this);
 
       const auto isinf_u  = (fpc == FP_INFINITE);
@@ -631,24 +375,6 @@ class cpp_double_fp_backend
       std::stringstream ss;
       ss << std::hexfloat << std::showpos << data.first << " + " << std::hexfloat << data.second;
       return ss.str();
-   }
-
-   // Assignment operators.
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator=(const cpp_double_fp_backend& other)
-   {
-      if (this != &other)
-      {
-         data = other.data;
-      }
-
-      return *this;
-   }
-
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator=(cpp_double_fp_backend&& other) noexcept
-   {
-      data = other.data;
-
-      return *this;
    }
 
    // Unary add/sub/mul/div.
@@ -770,6 +496,13 @@ class cpp_double_fp_backend
 
    BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator/=(const cpp_double_fp_backend& v)
    {
+      // TBD: Do I like this implementation of divide or not?
+      // It looks like an estimate followed by one single Newton-Raphson iteration.
+      // Intuitively, I would have gone for Briggs'/Shoup's implementation from the
+      // original double-double work.
+      // TBD: Figure out which implementation has advantages in terms of
+      // speed/accuracy, exactness, etc.
+
       // Handle special cases like zero, inf and NaN.
       const auto fpc_u = eval_fpclassify(*this);
       const auto fpc_v = eval_fpclassify(v);
@@ -998,20 +731,39 @@ class cpp_double_fp_backend
       return my_str;
    }
 
-   int order02() const
+   BOOST_MP_CXX14_CONSTEXPR int order02() const
    {
-      int e2;
+      // TBD: Is there another option to get the base-2 log
+      // that's more unequivocally closer to constexpr?
 
-      using std::frexp;
+      // TBD: Either way, integrate this (or something like it)
+      // into any potential implementation of eval_ilogb().
 
-      frexp(my_first(), &e2);
+      int e2 { };
+      cpp_double_fp_backend dummy { };
+
+      eval_frexp(dummy, *this, &e2);
 
       return e2;
    }
 
-   int  order10  () const { return (int)(float(order02()) * 0.301F); }
-   bool small_arg() const { return (order10() < (-my_digits10 / 6)); }
-   bool near_one () const { return cpp_double_fp_backend(fabs(cpp_double_fp_backend(1U) - *this)).small_arg(); }
+   BOOST_MP_CXX14_CONSTEXPR int order10() const { return static_cast<int>(static_cast<float>(order02()) * 0.301F); }
+
+   BOOST_MP_CXX14_CONSTEXPR bool small_arg() const { return (order10() < static_cast<int>(-my_digits10 / 6)); }
+
+   BOOST_MP_CXX14_CONSTEXPR bool near_one() const
+   {
+      cpp_double_fp_backend delta_one { };
+
+      eval_subtract(delta_one, cpp_double_fp_backend(1U), *this);
+
+      if(delta_one().isneg())
+      {
+         delta_one.negate();
+      }
+
+      return delta_one.small_arg();
+   }
 
    static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_max() noexcept
    {
@@ -1021,6 +773,10 @@ class cpp_double_fp_backend
       using boost::multiprecision::ldexp;
       using boost::multiprecision::sqrt;
 #endif
+
+      // TBD: Can this be simplified in any way?
+      // Is the use of the square root the best way to go?
+      // Can this be made traditional C++11 constexpr?
 
       return
          cpp_double_fp_backend
@@ -1055,7 +811,7 @@ class cpp_double_fp_backend
       using boost::multiprecision::ldexp;
 #endif
 
-      // TBD: Need a better value here.
+      // TBD: Do we need a better value here.
       return []() -> cpp_double_fp_backend {
          cpp_double_fp_backend result;
 
@@ -1987,4 +1743,4 @@ constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprec
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
 constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent10;
 
-#endif // BOOST_MP_CPP_DOUBLE_FP_BACKEND_2021_06_05_HPP
+#endif // BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP

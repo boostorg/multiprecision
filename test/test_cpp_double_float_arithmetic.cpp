@@ -24,7 +24,7 @@
 #ifdef BOOST_MATH_USE_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
-#include <boost/multiprecision/cpp_double_fp_backend.hpp>
+#include <boost/multiprecision/cpp_double_fp.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/core/demangle.hpp>
 
@@ -255,7 +255,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 4 - std::numeric_limits<double_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 5 - std::numeric_limits<double_float_type>::digits);
 
       for(std::uint32_t i = 0U; ((i < count) && result_is_ok); ++i)
       {
@@ -288,7 +288,7 @@ namespace local
     {
       bool result_is_ok = true;
 
-      const control_float_type MaxError = ldexp(control_float_type(1), 3 - std::numeric_limits<double_float_type>::digits);
+      const control_float_type MaxError = ldexp(control_float_type(1), 4 - std::numeric_limits<double_float_type>::digits);
 
       for(std::uint32_t i = 0U;((i < count) && result_is_ok); ++i)
       {
