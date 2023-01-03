@@ -16,7 +16,7 @@
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_double_fp.hpp>
@@ -123,7 +123,7 @@ get_rand(control_float_type mn = 0, control_float_type mx = 0)
 
    auto shifted_rand = [&](int i) {
       using std::ldexp;
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
       using boost::multiprecision::ldexp;
 #endif
 
@@ -265,14 +265,14 @@ int main()
    //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<float>();
    //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<double>();
    //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<long double>();
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    //result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::float128>();
 #endif
 
    result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::cpp_double_float>();
    result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::cpp_double_double>();
    result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::cpp_double_long_double> ();
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    result_is_ok &= test_arithmetic_cpp_double_float::test_arithmetic<boost::multiprecision::cpp_double_float128> > ();
 #endif
 

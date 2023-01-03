@@ -1,5 +1,5 @@
 // Copyright John Maddock 2011.
-// Copyright Christopher Kormanyos 2023.
+// Copyright Christopher Kormanyos 2021 - 2023.
 // Use, modification and distribution are subject to the
 // Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
@@ -42,6 +42,9 @@
 #include <boost/multiprecision/float128.hpp>
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
+#if defined(BOOST_HAS_FLOAT128)
+#include <boost/multiprecision/float128.hpp>
+#endif
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
@@ -146,12 +149,15 @@ void test()
             {
                #if defined(TEST_CPP_DOUBLE_FLOAT)
                if (has_bad_bankers_rounding(mp_t()))
+               {
+                  std::cout << "Ignoring bankers-rounding error with TEST_CPP_DOUBLE_FLOAT.\n";
+               }
                #else
                if (has_bad_bankers_rounding(mp_t()) && is_bankers_rounding_error(ss.str(), expect))
-               #endif
                {
                   std::cout << "Ignoring bankers-rounding error with GMP mp_f.\n";
                }
+               #endif
                else
                {
                   std::cout << std::setprecision(20) << "Testing value " << val << std::endl;
@@ -252,7 +258,12 @@ T generate_random()
    constexpr auto exp_range =
       static_cast<int>
       (
-         static_cast<float>(std::numeric_limits<T>::max_exponent) * 0.85F
+         static_cast<float>
+         (
+              static_cast<float>(std::numeric_limits<T>::max_exponent10)
+            - static_cast<float>(static_cast<float>(std::numeric_limits<T>::max_digits10) * 1.1F)
+         )
+         / 0.301F
       );
    #else
    constexpr auto exp_range = std::numeric_limits<T>::max_exponent - 10
@@ -419,6 +430,16 @@ int main()
    test<boost::multiprecision::cpp_double_double>();
    test_to_string<boost::multiprecision::cpp_double_double>();
    test_round_trip<boost::multiprecision::cpp_double_double>();
+
+   test<boost::multiprecision::cpp_double_long_double>();
+   test_to_string<boost::multiprecision::cpp_double_long_double>();
+   test_round_trip<boost::multiprecision::cpp_double_long_double>();
+
+   #if defined(BOOST_HAS_FLOAT128)
+   test<boost::multiprecision::cpp_double_float128>();
+   test_to_string<boost::multiprecision::cpp_double_float128>();
+   test_round_trip<boost::multiprecision::cpp_double_float128>();
+   #endif
 #endif
    return boost::report_errors();
 }

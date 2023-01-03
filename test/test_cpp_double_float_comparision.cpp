@@ -12,7 +12,7 @@
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_double_fp.hpp>
@@ -102,7 +102,7 @@ template <typename FloatingPointType, typename ComparisionType>
 int test()
 {
    using double_float_t = boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>;
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    using largest_type   = boost::multiprecision::backends::cpp_double_fp_backend<boost::multiprecision::float128>;
 #else
    using largest_type   = boost::multiprecision::backends::cpp_double_fp_backend<long double>;
@@ -364,13 +364,13 @@ int test_comparison() {
    e += test_cpp_double_comparision::test<FloatingPointType, float>();
    e += test_cpp_double_comparision::test<FloatingPointType, double>();
    e += test_cpp_double_comparision::test<FloatingPointType, long double>();
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::float128>();
 #endif
    e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<float> >();
    e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<double> >();
    e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<long double> >();
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    e += test_cpp_double_comparision::test<FloatingPointType, boost::multiprecision::backends::cpp_double_fp_backend<boost::multiprecision::float128> >();
 #endif
    std::cout << std::endl;
@@ -383,7 +383,7 @@ int main()
    e += test_comparison<float>();
    e += test_comparison<double>();
    e += test_comparison<long double>();
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    e += test_comparison<boost::multiprecision::float128>();
 #endif
 

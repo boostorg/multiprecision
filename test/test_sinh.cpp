@@ -58,7 +58,7 @@
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
-#if defined(BOOST_MATH_USE_FLOAT128)
+#if defined(BOOST_HAS_FLOAT128)
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_double_fp.hpp>
@@ -266,7 +266,7 @@ int main()
    test<boost::multiprecision::cpp_double_float>();
    test<boost::multiprecision::cpp_double_double>();
    test<boost::multiprecision::cpp_double_long_double>();
-   #if defined(BOOST_MATH_USE_FLOAT128)
+   #if defined(BOOST_HAS_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
    #endif
 #endif

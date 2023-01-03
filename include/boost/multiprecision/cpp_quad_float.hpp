@@ -401,7 +401,7 @@ class cpp_quad_fp_backend
       using std::isfinite;
       using std::tie;
 
-      #if defined(BOOST_MATH_USE_FLOAT128)
+      #if defined(BOOST_HAS_FLOAT128)
       using boost::multiprecision::isfinite;
       #endif
 
@@ -503,7 +503,7 @@ class cpp_quad_fp_backend
       using std::isfinite;
       using std::tie;
 
-      #if defined(BOOST_MATH_USE_FLOAT128)
+      #if defined(BOOST_HAS_FLOAT128)
       using boost::multiprecision::isfinite;
       #endif
 
@@ -615,7 +615,7 @@ class cpp_quad_fp_backend
       using std::get;
       using std::isfinite;
 
-      #if defined(BOOST_MATH_USE_FLOAT128)
+      #if defined(BOOST_HAS_FLOAT128)
       using boost::multiprecision::isfinite;
       #endif
 
@@ -793,7 +793,7 @@ class cpp_quad_fp_backend
    {
       using std::ldexp;
       using std::sqrt;
-#if defined(BOOST_MATH_USE_FLOAT128)
+#if defined(BOOST_HAS_FLOAT128)
       using boost::multiprecision::ldexp;
       using boost::multiprecision::sqrt;
 #endif
@@ -812,7 +812,7 @@ class cpp_quad_fp_backend
    static cpp_quad_fp_backend my_value_min() noexcept
    {
       using std::ldexp;
-#if defined(BOOST_MATH_USE_FLOAT128)
+#if defined(BOOST_HAS_FLOAT128)
       using boost::multiprecision::ldexp;
 #endif
 
@@ -822,7 +822,7 @@ class cpp_quad_fp_backend
    static cpp_quad_fp_backend my_value_eps() noexcept
    {
       using std::ldexp;
-#if defined(BOOST_MATH_USE_FLOAT128)
+#if defined(BOOST_HAS_FLOAT128)
       using boost::multiprecision::ldexp;
 #endif
 
@@ -1043,7 +1043,7 @@ void eval_sqrt(cpp_quad_fp_backend<FloatingPointType>& result, const cpp_quad_fp
    using quad_float_type   = cpp_quad_fp_backend  <FloatingPointType>;
    using std::sqrt;
 
-#if defined(BOOST_MATH_USE_FLOAT128)
+#if defined(BOOST_HAS_FLOAT128)
    using boost::multiprecision::sqrt;
 #endif
 
@@ -1274,7 +1274,7 @@ std::size_t hash_value(const cpp_quad_fp_backend<FloatingPointType>& a)
 
 using cpp_quad_double      = number<backends::cpp_quad_fp_backend<double>>;
 using cpp_quad_long_double = number<backends::cpp_quad_fp_backend<long double>>;
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
 using cpp_quad_float128    = number<backends::cpp_quad_fp_backend<float128>>;
 #endif
 
