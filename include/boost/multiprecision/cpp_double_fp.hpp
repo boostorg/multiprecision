@@ -20,6 +20,12 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
 
+#if (defined(__clang__) && (__clang_major__ <= 9))
+#define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE struct
+#else
+#define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE class
+#endif
+
 namespace boost { namespace multiprecision { namespace backends {
 
 template <typename FloatingPointType>
@@ -95,22 +101,6 @@ template <typename FloatingPointType>
 BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend<FloatingPointType> fabs(const cpp_double_fp_backend<FloatingPointType>& a);
 
 } } } // namespace boost::multiprecision::backends
-
-#if 0
-namespace boost { namespace math {
-
-// TBD: Is this really needed?
-template <typename FloatingPointType>
-int(fpclassify)(const boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>& o);
-
-} } // namespace boost::math
-#endif
-
-#if (defined(__clang__) && (__clang_major__ <= 9))
-#define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE struct
-#else
-#define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE class
-#endif
 
 namespace std {
 
@@ -397,7 +387,7 @@ class cpp_double_fp_backend
       {
          if (isinf_v && (isneg() != v.isneg()))
          {
-            *this = cpp_double_fp_backend(std::numeric_limits<float_type>::quiet_NaN());
+            *this = cpp_double_fp_backend::my_value_nan();
          }
          return *this;
       }
@@ -466,13 +456,12 @@ class cpp_double_fp_backend
 
       if ((isnan_u || isnan_v) || (isinf_u && iszero_v) || (isinf_v && iszero_u))
       {
-         *this = cpp_double_fp_backend(std::numeric_limits<float_type>::quiet_NaN());
-         return *this;
+         return (*this = cpp_double_fp_backend::my_value_nan());
       }
 
       if (isinf_u || isinf_v)
       {
-         *this = cpp_double_fp_backend(std::numeric_limits<float_type>::infinity());
+         *this = cpp_double_fp_backend::my_value_inf();
          if (b_result_is_neg)
             negate();
          return *this;
@@ -496,13 +485,6 @@ class cpp_double_fp_backend
 
    BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator/=(const cpp_double_fp_backend& v)
    {
-      // TBD: Do I like this implementation of divide or not?
-      // It looks like an estimate followed by one single Newton-Raphson iteration.
-      // Intuitively, I would have gone for Briggs'/Shoup's implementation from the
-      // original double-double work.
-      // TBD: Figure out which implementation has advantages in terms of
-      // speed/accuracy, exactness, etc.
-
       // Handle special cases like zero, inf and NaN.
       const auto fpc_u = eval_fpclassify(*this);
       const auto fpc_v = eval_fpclassify(v);
@@ -512,7 +494,7 @@ class cpp_double_fp_backend
 
       if (isnan_u || isnan_v)
       {
-         *this = cpp_double_fp_backend(std::numeric_limits<float_type>::quiet_NaN());
+         return (*this = cpp_double_fp_backend::my_value_nan());
       }
 
       const auto iszero_u = (fpc_u == FP_ZERO);
@@ -526,7 +508,7 @@ class cpp_double_fp_backend
       {
          if (iszero_v)
          {
-            return *this = cpp_double_fp_backend(std::numeric_limits<float_type>::quiet_NaN());
+            return (*this = cpp_double_fp_backend::my_value_nan());
          }
          else
          {
@@ -537,7 +519,7 @@ class cpp_double_fp_backend
       // Handle more special cases like zero, inf and NaN.
       if (iszero_v)
       {
-         *this = cpp_double_fp_backend(std::numeric_limits<float_type>::infinity());
+         *this = cpp_double_fp_backend::my_value_inf();
          if (b_neg)
             negate();
          return *this;
@@ -550,11 +532,11 @@ class cpp_double_fp_backend
       {
          if (isinf_v)
          {
-            return (*this = cpp_double_fp_backend(std::numeric_limits<float_type>::quiet_NaN()));
+            return (*this = cpp_double_fp_backend::my_value_nan());
          }
          else
          {
-            return (*this = cpp_double_fp_backend(std::numeric_limits<float_type>::infinity()));
+            return (*this = cpp_double_fp_backend::my_value_inf());
          }
       }
 
@@ -565,9 +547,16 @@ class cpp_double_fp_backend
 
       if(b_neg) { negate(); }
 
+      // TBD: Do I like this implementation of divide or not?
+      // It looks like an estimate followed by one single Newton-Raphson iteration.
+      // Intuitively, I would have gone for Briggs'/Shoup's implementation from the
+      // original double-double work.
+      // TBD: Figure out which implementation has advantages in terms
+      // of speed/accuracy/exactness, etc.
+
       rep_type p;
 
-      // First approximation
+      // First approximation.
       p.first = my_first() / v.my_first();
 
       cpp_double_fp_backend r = *this - (v * static_cast<cpp_double_fp_backend>(p.first));
@@ -769,10 +758,6 @@ class cpp_double_fp_backend
    {
       using std::ldexp;
       using std::sqrt;
-#if defined(BOOST_MATH_USE_FLOAT128)
-      using boost::multiprecision::ldexp;
-      using boost::multiprecision::sqrt;
-#endif
 
       // TBD: Can this be simplified in any way?
       // Is the use of the square root the best way to go?
@@ -821,12 +806,15 @@ class cpp_double_fp_backend
       }();
    }
 
-   static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_nan() noexcept
+   static constexpr cpp_double_fp_backend my_value_nan() noexcept
    {
       return cpp_double_fp_backend(std::numeric_limits<float_type>::quiet_NaN());
    }
 
-   static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend from_parts(float_type f, float_type s) { return std::make_pair(f, s); }
+   static constexpr cpp_double_fp_backend my_value_inf() noexcept
+   {
+      return cpp_double_fp_backend(std::numeric_limits<float_type>::infinity());
+   }
 
  private:
    rep_type data;
@@ -1083,12 +1071,12 @@ BOOST_MP_CXX14_CONSTEXPR void eval_sqrt(cpp_double_fp_backend<FloatingPointType>
       }
       else if(fpc == FP_NAN)
       {
-         result = double_float_type(std::numeric_limits<local_float_type>::quiet_NaN());
+         result = double_float_type::my_value_nan();
          return;
       }
       else if((fpc == FP_INFINITE) || isneg_o)
       {
-         result = double_float_type(std::numeric_limits<local_float_type>::quiet_NaN());
+         result = double_float_type::my_value_nan();
          return;
       }
    }
@@ -1133,9 +1121,11 @@ template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const*>
 BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   const auto x_is_zero = x.is_zero();
+   const auto fpc = eval_fpclassify(x);
 
-   if ((eval_fpclassify(x) != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
+   const auto x_is_zero = (fpc == FP_ZERO);
+
+   if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
    {
       result = x;
    }
@@ -1184,7 +1174,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>&
       }
       else if (eval_gt(xx, max_exp_input))
       {
-         result = double_float_type(std::numeric_limits<local_float_type>::infinity());
+         result = double_float_type::my_value_inf();
       }
       else if (xx.is_one())
       {
@@ -1271,9 +1261,9 @@ template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
 BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   const auto x_is_zero = x.is_zero();
-
    const auto fpc = eval_fpclassify(x);
+
+   const auto x_is_zero = (fpc == FP_ZERO);
 
    if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
    {
@@ -1324,7 +1314,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>&
       }
       else if (eval_gt(xx, max_exp_input))
       {
-         result = double_float_type(std::numeric_limits<local_float_type>::infinity());
+         result = double_float_type::my_value_inf();
       }
       else if (xx.is_one())
       {
@@ -1411,9 +1401,9 @@ template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const*>
 BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   const auto x_is_zero = x.is_zero();
-
    const auto fpc = eval_fpclassify(x);
+
+   const auto x_is_zero = (fpc == FP_ZERO);
 
    if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
    {
@@ -1464,7 +1454,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>&
       }
       else if (eval_gt(xx, max_exp_input))
       {
-         result = double_float_type(std::numeric_limits<local_float_type>::infinity());
+         result = double_float_type::my_value_inf();
       }
       else if (xx.is_one())
       {
@@ -1554,9 +1544,9 @@ BOOST_MP_CXX14_CONSTEXPR void eval_log(cpp_double_fp_backend<FloatingPointType>&
 {
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
-   const auto x_is_zero = x.is_zero();
-
    const auto fpc = eval_fpclassify(x);
+
+   const auto x_is_zero = (fpc == FP_ZERO);
 
    if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
    {
@@ -1565,6 +1555,10 @@ BOOST_MP_CXX14_CONSTEXPR void eval_log(cpp_double_fp_backend<FloatingPointType>&
    else if (x.is_neg())
    {
       result = double_float_type::my_value_nan();
+   }
+   else if (x_is_zero)
+   {
+      result = double_float_type::my_value_inf();
    }
    else if (x.is_one())
    {
