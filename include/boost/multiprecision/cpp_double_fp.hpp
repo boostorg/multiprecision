@@ -742,7 +742,7 @@ class cpp_double_fp_backend
       int e2 { };
       cpp_double_fp_backend dummy { };
 
-      eval_frexp(dummy, &e2);
+      eval_frexp(dummy, *this, &e2);
 
       return e2;
    }
