@@ -456,7 +456,7 @@ class cpp_double_fp_backend
 
       if ((isnan_u || isnan_v) || (isinf_u && iszero_v) || (isinf_v && iszero_u))
       {
-         return (*this = cpp_double_fp_backend::my_value_nan());
+         return operator=( cpp_double_fp_backend::my_value_nan());
       }
 
       if (isinf_u || isinf_v)
@@ -494,7 +494,7 @@ class cpp_double_fp_backend
 
       if (isnan_u || isnan_v)
       {
-         return (*this = cpp_double_fp_backend::my_value_nan());
+         return operator=( cpp_double_fp_backend::my_value_nan());
       }
 
       const auto iszero_u = (fpc_u == FP_ZERO);
@@ -508,11 +508,11 @@ class cpp_double_fp_backend
       {
          if (iszero_v)
          {
-            return (*this = cpp_double_fp_backend::my_value_nan());
+            return operator=( cpp_double_fp_backend::my_value_nan());
          }
          else
          {
-            return (*this = cpp_double_fp_backend(0));
+            return operator=( cpp_double_fp_backend(0));
          }
       }
 
@@ -532,17 +532,17 @@ class cpp_double_fp_backend
       {
          if (isinf_v)
          {
-            return (*this = cpp_double_fp_backend::my_value_nan());
+            return operator=( cpp_double_fp_backend::my_value_nan());
          }
          else
          {
-            return (*this = cpp_double_fp_backend::my_value_inf());
+            return operator=( cpp_double_fp_backend::my_value_inf());
          }
       }
 
       if (isinf_v)
       {
-         return (*this = cpp_double_fp_backend(0));
+         return operator=( cpp_double_fp_backend(0));
       }
 
       if(b_neg) { negate(); }
@@ -1121,11 +1121,9 @@ template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const*>
 BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   const auto fpc = eval_fpclassify(x);
+   const auto x_is_zero = x.is_zero();
 
-   const auto x_is_zero = (fpc == FP_ZERO);
-
-   if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
+   if ((eval_fpclassify(x) != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
    {
       result = x;
    }
@@ -1261,9 +1259,9 @@ template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
 BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   const auto fpc = eval_fpclassify(x);
+   const auto x_is_zero = x.is_zero();
 
-   const auto x_is_zero = (fpc == FP_ZERO);
+   const auto fpc = eval_fpclassify(x);
 
    if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
    {
@@ -1401,9 +1399,9 @@ template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const*>
 BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   const auto fpc = eval_fpclassify(x);
+   const auto x_is_zero = x.is_zero();
 
-   const auto x_is_zero = (fpc == FP_ZERO);
+   const auto fpc = eval_fpclassify(x);
 
    if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
    {
