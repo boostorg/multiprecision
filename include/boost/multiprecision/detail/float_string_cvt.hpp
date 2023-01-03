@@ -160,12 +160,12 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
             // Bankers rounding:
             if ((*result.rbegin() - '0') & 1)
             {
-               round_string_up_at(result, (int) result.size() - 1, expon);
+               round_string_up_at(result, static_cast<std::ptrdiff_t>(result.size() - 1u), expon);
             }
          }
          else if (cdigit >= 5)
          {
-            round_string_up_at(result, (int) result.size() - 1, expon);
+            round_string_up_at(result, static_cast<std::ptrdiff_t>(result.size() - 1u), expon);
          }
       }
       eval_floor(t, b);
