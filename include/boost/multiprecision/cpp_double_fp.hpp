@@ -25,6 +25,22 @@
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
 
+#ifdef BOOST_MP_MATH_AVAILABLE
+//
+// Headers required for Boost.Math integration:
+//
+#include <boost/math/policies/policy.hpp>
+//
+// Some includes we need from Boost.Math, since we rely on that library to provide these functions:
+//
+#include <boost/math/special_functions/acosh.hpp>
+#include <boost/math/special_functions/asinh.hpp>
+#include <boost/math/special_functions/atanh.hpp>
+#include <boost/math/special_functions/cbrt.hpp>
+#include <boost/math/special_functions/expm1.hpp>
+#include <boost/math/special_functions/gamma.hpp>
+#endif
+
 #if (defined(__clang__) && (__clang_major__ <= 9))
 #define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE struct
 #else
@@ -1856,7 +1872,7 @@ BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE numeric_limits<boost::multiprecision::numbe
  private:
    using base_class_type = std::numeric_limits<FloatingPointType>;
 
-   using inner_self_type = boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>;
+   using inner_self_type = boost::multiprecision::cpp_double_fp_backend<FloatingPointType>;
 
    using self_type =
        boost::multiprecision::number<inner_self_type, ExpressionTemplatesOption>;
@@ -1923,6 +1939,30 @@ template <typename FloatingPointType, const boost::multiprecision::expression_te
 constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::max_exponent10;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
 constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent10;
+
+#ifdef BOOST_MP_MATH_AVAILABLE
+namespace boost { namespace math { namespace policies {
+
+template <class FloatingPointType, class Policy, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct precision<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplates>, Policy>
+{
+   using inner_self_type = boost::multiprecision::cpp_double_fp_backend<FloatingPointType>;
+   //static constexpr std::int32_t cpp_dec_float_digits10 = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
+
+   using precision_type = typename Policy::precision_type;
+   using digits_2 = digits2<inner_self_type::my_digits>;
+   using type = typename std::conditional<
+       ((digits_2::value <= precision_type::value) || (Policy::precision_type::value <= 0)),
+       // Default case, full precision for RealType:
+       digits_2,
+       // User customized precision:
+       precision_type>::type;
+};
+
+}
+
+}} // namespace boost::math::policies
+#endif
 
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 #pragma warning(pop)
