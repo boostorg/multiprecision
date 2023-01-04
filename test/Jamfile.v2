@@ -146,8 +146,18 @@ test-suite df_quadmath_tests :
    [ run test_sqrt.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_sqrt_df ]
    [ run test_exp.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_exp_df ]
    [ run test_pow_df.cpp                      quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_pow_df ]
-   [ run test_log.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_pow_df ]
-   [ run test_sin.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_log_df ]
+   [ run test_log.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_log_df ]
+   [ run test_sin.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_sin_df ]
+   [ run test_cos.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_cos_df ]
+   [ run test_tan.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_tan_df ]
+   [ run test_asin.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_asin_df ]
+   [ run test_acos.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_acos_df ]
+   [ run test_atan.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_atan_df ]
+   [ run test_sinh.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_sinh_df ]
+   [ run test_cosh.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_cosh_df ]
+   [ run test_tanh.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_tanh_df ]
+   [ run test_float_io.cpp                    quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_float_io_df ]
+   [ run test_fpclassify.cpp                  quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_fpclassify_df ]
 
 ;
 
