@@ -364,9 +364,26 @@ class cpp_double_fp_backend
    constexpr const float_type& my_first () const noexcept { return data.first; }
    constexpr const float_type& my_second() const noexcept { return data.second; }
 
-   constexpr       rep_type& rep ()       noexcept { return data; }
-   constexpr const rep_type& rep () const noexcept { return data; }
-   constexpr const rep_type& crep() const noexcept { return data; }
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   rep_type& rep () noexcept { return data; }
+
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   const rep_type& rep () const noexcept { return data; }
+
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   const rep_type& crep() const noexcept { return data; }
 
    std::string raw_str() const
    {
