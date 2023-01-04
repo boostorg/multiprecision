@@ -1946,17 +1946,24 @@ namespace boost { namespace math { namespace policies {
 template <class FloatingPointType, class Policy, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct precision<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplates>, Policy>
 {
-   using inner_self_type = boost::multiprecision::cpp_double_fp_backend<FloatingPointType>;
-   //static constexpr std::int32_t cpp_dec_float_digits10 = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_digits10;
-
+public:
    using precision_type = typename Policy::precision_type;
-   using digits_2 = digits2<inner_self_type::my_digits>;
-   using type = typename std::conditional<
-       ((digits_2::value <= precision_type::value) || (Policy::precision_type::value <= 0)),
-       // Default case, full precision for RealType:
-       digits_2,
-       // User customized precision:
-       precision_type>::type;
+
+private:
+   using my_multiprecision_backend_type = boost::multiprecision::cpp_double_fp_backend<FloatingPointType>;
+
+   static constexpr auto my_is_default_precision() -> bool
+   {
+      return ((digits_2::value <= precision_type::value) || (precision_type::value <= 0));
+   }
+
+public:
+   using digits_2 = digits2<my_multiprecision_backend_type::my_digits>;
+
+   using type =
+      typename std::conditional<my_is_default_precision(),
+                                digits_2,                  // Default case: Full precision for RealType.
+                                precision_type>::type;     // User customized precision.
 };
 
 }
