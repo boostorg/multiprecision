@@ -59,12 +59,7 @@ constexpr bool eval_lt(const cpp_double_fp_backend<FloatingPointType>& a, const 
 template <typename FloatingPointType>
 constexpr bool eval_gt(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-BOOST_MP_CXX14_CONSTEXPR
-#else
-constexpr
-#endif
-          bool eval_is_zero(const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr bool eval_is_zero(const cpp_double_fp_backend<FloatingPointType>& x);
 template <typename FloatingPointType>
 constexpr int eval_signbit(const cpp_double_fp_backend<FloatingPointType>& x);
 
@@ -270,7 +265,7 @@ class cpp_double_fp_backend
              typename std::enable_if<(    detail::is_floating_point_or_float128<OtherFloatType>::value
                                       && (!std::is_same<FloatingPointType, OtherFloatType>::value))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const cpp_double_fp_backend<OtherFloatType>& a)
-       : cpp_double_fp_backend(a.my_first())
+      : cpp_double_fp_backend(a.my_first())
    {
       // TBD: Maybe specialize this constructor for cases either wider or less wide.
       operator+=(a.my_second());
@@ -397,7 +392,7 @@ class cpp_double_fp_backend
 
       const std::string str_to_hash = str(cpp_double_fp_backend::my_digits10, std::ios::scientific);
 
-      std::size_t result = 0;
+      auto result = static_cast<std::size_t>(UINT8_C(0));
 
       for (auto i = static_cast<std::string::size_type>(UINT8_C(0)); i < str_to_hash.length(); ++i)
       {
@@ -1078,20 +1073,9 @@ template <typename FloatingPointType>
 constexpr bool eval_gt(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { return (a.compare(b) == 1); }
 template <typename FloatingPointType>
 
-#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-BOOST_MP_CXX14_CONSTEXPR
-#else
-constexpr
-#endif
-bool eval_is_zero(const cpp_double_fp_backend<FloatingPointType>& x)
+constexpr bool eval_is_zero(const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   auto my_iszero =
-      [](FloatingPointType a) -> bool
-      {
-         return ((a == static_cast<FloatingPointType>(0)) || (a == static_cast<FloatingPointType>(-0)));
-      };
-
-   return (my_iszero(x.crep().first) && my_iszero(x.crep().second));
+   return x.is_zero();
 }
 
 template <typename FloatingPointType>
