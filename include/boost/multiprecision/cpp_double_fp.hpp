@@ -32,71 +32,71 @@ template <typename FloatingPointType>
 class cpp_double_fp_backend;
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_add(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr void eval_add(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_add(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
+constexpr void eval_add(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_subtract(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr void eval_subtract(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_subtract(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
+constexpr void eval_subtract(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_multiply(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr void eval_multiply(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_multiply(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
+constexpr void eval_multiply(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_divide(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr void eval_divide(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_divide(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
+constexpr void eval_divide(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR bool eval_eq(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
+constexpr bool eval_eq(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR bool eval_lt(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
+constexpr bool eval_lt(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR bool eval_gt(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
+constexpr bool eval_gt(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR bool eval_is_zero(const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr bool eval_is_zero(const cpp_double_fp_backend<FloatingPointType>& x);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR int eval_signbit(const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr int eval_signbit(const cpp_double_fp_backend<FloatingPointType>& x);
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_fabs(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a);
+constexpr void eval_fabs(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int* v);
+constexpr void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int* v);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int v);
+constexpr void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int v);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_ceil(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr void eval_ceil(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o);
+constexpr int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o);
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& o);
+constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& o);
 
 template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const* = nullptr>
-BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 
 template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const* = nullptr>
-BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 
 template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const* = nullptr>
-BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
+constexpr void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(signed long long* result, const cpp_double_fp_backend<FloatingPointType>& backend);
+constexpr void eval_convert_to(signed long long* result, const cpp_double_fp_backend<FloatingPointType>& backend);
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<FloatingPointType>& backend);
+constexpr void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<FloatingPointType>& backend);
 
 template <typename FloatingPointType,
           typename R>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_floating_point_or_float128<R>::value>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend);
+constexpr typename std::enable_if<detail::is_floating_point_or_float128<R>::value>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend);
 
 template <typename FloatingPointType,
           typename char_type,
@@ -108,7 +108,7 @@ template <typename FloatingPointType>
 std::size_t hash_value(const cpp_double_fp_backend<FloatingPointType>& a);
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend<FloatingPointType> fabs(const cpp_double_fp_backend<FloatingPointType>& a);
+constexpr cpp_double_fp_backend<FloatingPointType> fabs(const cpp_double_fp_backend<FloatingPointType>& a);
 
 } } } // namespace boost::multiprecision::backends
 
@@ -204,7 +204,7 @@ class cpp_double_fp_backend
    template <typename OtherFloatType,
              typename std::enable_if<(    detail::is_floating_point_or_float128<OtherFloatType>::value
                                       && (!std::is_same<FloatingPointType, OtherFloatType>::value))>::type const* = nullptr>
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend(const cpp_double_fp_backend<OtherFloatType>& a)
+   constexpr cpp_double_fp_backend(const cpp_double_fp_backend<OtherFloatType>& a)
        : cpp_double_fp_backend(a.my_first())
    {
       // TBD: Maybe specialize this constructor for cases either wider or less wide.
@@ -282,7 +282,7 @@ class cpp_double_fp_backend
    }
 
    // Assignment operator.
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator=(const cpp_double_fp_backend& other)
+   constexpr cpp_double_fp_backend& operator=(const cpp_double_fp_backend& other)
    {
       if (this != &other)
       {
@@ -293,7 +293,7 @@ class cpp_double_fp_backend
    }
 
    // Move assignment operator.
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator=(cpp_double_fp_backend&& other) noexcept
+   constexpr cpp_double_fp_backend& operator=(cpp_double_fp_backend&& other) noexcept
    {
       data = other.data;
 
@@ -304,7 +304,7 @@ class cpp_double_fp_backend
    template <typename OtherFloatType,
              typename std::enable_if<(    detail::is_floating_point_or_float128<OtherFloatType>::value
                                       && (!std::is_same<FloatingPointType, OtherFloatType>::value))>::type const* = nullptr>
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator=(const cpp_double_fp_backend<OtherFloatType>& other)
+   constexpr cpp_double_fp_backend& operator=(const cpp_double_fp_backend<OtherFloatType>& other)
    {
      return operator=(cpp_double_fp_backend(other));
    }
@@ -332,7 +332,7 @@ class cpp_double_fp_backend
    constexpr bool is_zero() const { return (compare(cpp_double_fp_backend(0U)) == 0); }
    constexpr bool is_one () const { return (compare(cpp_double_fp_backend(1U)) == 0); }
 
-   BOOST_MP_CXX14_CONSTEXPR void negate()
+   constexpr void negate()
    {
       // TBD: Can this be simplified?
 
@@ -364,9 +364,9 @@ class cpp_double_fp_backend
    constexpr const float_type& my_first () const noexcept { return data.first; }
    constexpr const float_type& my_second() const noexcept { return data.second; }
 
-   BOOST_MP_CXX14_CONSTEXPR       rep_type& rep ()       noexcept { return data; }
-   BOOST_MP_CXX14_CONSTEXPR const rep_type& rep () const noexcept { return data; }
-   BOOST_MP_CXX14_CONSTEXPR const rep_type& crep() const noexcept { return data; }
+   constexpr       rep_type& rep ()       noexcept { return data; }
+   constexpr const rep_type& rep () const noexcept { return data; }
+   constexpr const rep_type& crep() const noexcept { return data; }
 
    std::string raw_str() const
    {
@@ -378,7 +378,7 @@ class cpp_double_fp_backend
    }
 
    // Unary add/sub/mul/div.
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator+=(const cpp_double_fp_backend& v)
+   constexpr cpp_double_fp_backend& operator+=(const cpp_double_fp_backend& v)
    {
       const auto fpc_u = eval_fpclassify(*this);
       const auto fpc_v = eval_fpclassify(v);
@@ -430,7 +430,7 @@ class cpp_double_fp_backend
       return *this;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator-=(const cpp_double_fp_backend& v)
+   constexpr cpp_double_fp_backend& operator-=(const cpp_double_fp_backend& v)
    {
       // Use *this - v = -(-*this + v).
       negate();
@@ -439,7 +439,7 @@ class cpp_double_fp_backend
       return *this;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator*=(const cpp_double_fp_backend& other)
+   constexpr cpp_double_fp_backend& operator*=(const cpp_double_fp_backend& other)
    {
       cpp_double_fp_backend v(other);
 
@@ -493,7 +493,7 @@ class cpp_double_fp_backend
       return *this;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator/=(const cpp_double_fp_backend& v)
+   constexpr cpp_double_fp_backend& operator/=(const cpp_double_fp_backend& v)
    {
       // Handle special cases like zero, inf and NaN.
       const auto fpc_u = eval_fpclassify(*this);
@@ -585,24 +585,24 @@ class cpp_double_fp_backend
       return *this;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend operator++(int)
+   constexpr cpp_double_fp_backend operator++(int)
    {
       cpp_double_fp_backend t(*this);
       ++*this;
       return t;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend operator--(int)
+   constexpr cpp_double_fp_backend operator--(int)
    {
       cpp_double_fp_backend t(*this);
       --*this;
       return t;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator++() { return *this += cpp_double_fp_backend<float_type>(float_type(1.0F)); }
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend& operator--() { return *this -= cpp_double_fp_backend<float_type>(float_type(1.0F)); }
+   constexpr cpp_double_fp_backend& operator++() { return *this += cpp_double_fp_backend<float_type>(float_type(1.0F)); }
+   constexpr cpp_double_fp_backend& operator--() { return *this -= cpp_double_fp_backend<float_type>(float_type(1.0F)); }
 
-   BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend operator-() const
+   constexpr cpp_double_fp_backend operator-() const
    {
       cpp_double_fp_backend v(*this);
       v.negate();
@@ -610,7 +610,7 @@ class cpp_double_fp_backend
    }
 
    // Helper functions
-   BOOST_MP_CXX14_CONSTEXPR static cpp_double_fp_backend pown(const cpp_double_fp_backend& x, int p)
+   constexpr static cpp_double_fp_backend pown(const cpp_double_fp_backend& x, int p)
    {
       using local_float_type = cpp_double_fp_backend;
 
@@ -657,7 +657,7 @@ class cpp_double_fp_backend
       return result;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR void swap(cpp_double_fp_backend& other)
+   constexpr void swap(cpp_double_fp_backend& other)
    {
       if(this != &other)
       {
@@ -669,7 +669,7 @@ class cpp_double_fp_backend
       }
    }
 
-   BOOST_MP_CXX14_CONSTEXPR void swap(cpp_double_fp_backend&& other) noexcept
+   constexpr void swap(cpp_double_fp_backend&& other) noexcept
    {
       const rep_type tmp = data;
 
@@ -678,7 +678,7 @@ class cpp_double_fp_backend
       other.data = tmp;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR int compare(const cpp_double_fp_backend& other) const
+   constexpr int compare(const cpp_double_fp_backend& other) const
    {
       // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
       #if 1
@@ -730,7 +730,7 @@ class cpp_double_fp_backend
       return my_str;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR int order02() const
+   constexpr int order02() const
    {
       // TBD: Is there another option to get the base-2 log
       // that's more unequivocally closer to constexpr?
@@ -746,11 +746,11 @@ class cpp_double_fp_backend
       return e2;
    }
 
-   BOOST_MP_CXX14_CONSTEXPR int order10() const { return static_cast<int>(static_cast<float>(order02()) * 0.301F); }
+   constexpr int order10() const { return static_cast<int>(static_cast<float>(order02()) * 0.301F); }
 
-   BOOST_MP_CXX14_CONSTEXPR bool small_arg() const { return (order10() < static_cast<int>(-my_digits10 / 6)); }
+   constexpr bool small_arg() const { return (order10() < static_cast<int>(-my_digits10 / 6)); }
 
-   BOOST_MP_CXX14_CONSTEXPR bool near_one() const
+   constexpr bool near_one() const
    {
       cpp_double_fp_backend delta_one { };
 
@@ -764,7 +764,7 @@ class cpp_double_fp_backend
       return delta_one.small_arg();
    }
 
-   static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_max() noexcept
+   static constexpr cpp_double_fp_backend my_value_max() noexcept
    {
       using std::ldexp;
       using std::sqrt;
@@ -789,14 +789,14 @@ class cpp_double_fp_backend
          );
    }
 
-   static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_min() noexcept
+   static constexpr cpp_double_fp_backend my_value_min() noexcept
    {
       using std::ldexp;
 
       return cpp_double_fp_backend(ldexp(float_type(1), my_min_exponent));
    }
 
-   static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_eps() noexcept
+   static constexpr cpp_double_fp_backend my_value_eps() noexcept
    {
       // TBD: Do we need a better value here.
       return []() -> cpp_double_fp_backend {
@@ -823,15 +823,15 @@ class cpp_double_fp_backend
 
    template <typename OtherFloatingPointType,
              typename std::enable_if<(detail::is_floating_point_or_float128<OtherFloatingPointType>::value && ((std::numeric_limits<OtherFloatingPointType>::digits10 * 2) < 16))>::type const*>
-   friend BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
+   friend constexpr void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
 
    template <typename OtherFloatingPointType,
              typename std::enable_if<(detail::is_floating_point_or_float128<OtherFloatingPointType>::value && (((std::numeric_limits<OtherFloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<OtherFloatingPointType>::digits10 * 2) <= 36)))>::type const*>
-   friend BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
+   friend constexpr void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
 
    template <typename OtherFloatingPointType,
              typename std::enable_if<(detail::is_floating_point_or_float128<OtherFloatingPointType>::value && ((std::numeric_limits<OtherFloatingPointType>::digits10 * 2) > 36))>::type const*>
-   friend BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
+   friend constexpr void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
 };
 
 namespace detail {
@@ -928,30 +928,30 @@ operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_fp_backend
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_add(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x) { result += x; }
+constexpr void eval_add(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x) { result += x; }
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_add(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { result = cpp_double_fp_backend<FloatingPointType>(a) += b; }
+constexpr void eval_add(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { result = cpp_double_fp_backend<FloatingPointType>(a) += b; }
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_subtract(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x) { result -= x; }
+constexpr void eval_subtract(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x) { result -= x; }
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_subtract(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { result = cpp_double_fp_backend<FloatingPointType>(a) -= b; }
+constexpr void eval_subtract(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { result = cpp_double_fp_backend<FloatingPointType>(a) -= b; }
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_multiply(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x) { result *= x; }
+constexpr void eval_multiply(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x) { result *= x; }
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_multiply(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { result = cpp_double_fp_backend<FloatingPointType>(a) *= b; }
+constexpr void eval_multiply(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { result = cpp_double_fp_backend<FloatingPointType>(a) *= b; }
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_divide(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x) { result /= x; }
+constexpr void eval_divide(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x) { result /= x; }
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_divide(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { result = cpp_double_fp_backend<FloatingPointType>(a) /= b; }
+constexpr void eval_divide(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { result = cpp_double_fp_backend<FloatingPointType>(a) /= b; }
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR bool eval_eq(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { return (a.compare(b) == 0); }
+constexpr bool eval_eq(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { return (a.compare(b) == 0); }
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR bool eval_lt(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { return (a.compare(b) == -1); }
+constexpr bool eval_lt(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { return (a.compare(b) == -1); }
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR bool eval_gt(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { return (a.compare(b) == 1); }
+constexpr bool eval_gt(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { return (a.compare(b) == 1); }
 template <typename FloatingPointType>
 
-BOOST_MP_CXX14_CONSTEXPR bool eval_is_zero(const cpp_double_fp_backend<FloatingPointType>& x)
+constexpr bool eval_is_zero(const cpp_double_fp_backend<FloatingPointType>& x)
 {
    auto my_iszero =
       [](FloatingPointType a) -> bool
@@ -963,13 +963,13 @@ BOOST_MP_CXX14_CONSTEXPR bool eval_is_zero(const cpp_double_fp_backend<FloatingP
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR int eval_signbit(const cpp_double_fp_backend<FloatingPointType>& x)
+constexpr int eval_signbit(const cpp_double_fp_backend<FloatingPointType>& x)
 {
    return (x.isneg() ? 1 : 0);
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_fabs(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a)
+constexpr void eval_fabs(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a)
 {
    result = a;
 
@@ -980,7 +980,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_fabs(cpp_double_fp_backend<FloatingPointType>
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int* v)
+constexpr void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int* v)
 {
    using std::frexp;
    using std::ldexp;
@@ -990,7 +990,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_frexp(cpp_double_fp_backend<FloatingPointType
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int v)
+constexpr void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int v)
 {
    using std::ldexp;
 
@@ -1007,7 +1007,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_ldexp(cpp_double_fp_backend<FloatingPointType
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
+constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
@@ -1030,7 +1030,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_floor(cpp_double_fp_backend<FloatingPointType
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_ceil(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
+constexpr void eval_ceil(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
    // Compute -floor(-x);
    eval_floor(result, -x);
@@ -1039,7 +1039,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_ceil(cpp_double_fp_backend<FloatingPointType>
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
+constexpr int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
 {
    // The eval_fpclassify implementation is modelled after Matt Borland's work in <ccmath.hpp>.
 
@@ -1069,7 +1069,7 @@ BOOST_MP_CXX14_CONSTEXPR int eval_fpclassify(const cpp_double_fp_backend<Floatin
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& o)
+constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& o)
 {
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
    using local_float_type = typename double_float_type::float_type;
@@ -1135,7 +1135,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_sqrt(cpp_double_fp_backend<FloatingPointType>
 
 template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const*>
-BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
+constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
    const auto x_is_zero = x.is_zero();
 
@@ -1273,7 +1273,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>&
 
 template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && (((std::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((std::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
-BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
+constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
    const auto x_is_zero = x.is_zero();
 
@@ -1413,7 +1413,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>&
 
 template <typename FloatingPointType,
           typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && ((std::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const*>
-BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
+constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
    const auto x_is_zero = x.is_zero();
 
@@ -1554,7 +1554,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_exp(cpp_double_fp_backend<FloatingPointType>&
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
+constexpr void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
@@ -1594,7 +1594,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_log(cpp_double_fp_backend<FloatingPointType>&
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(signed long long* result, const cpp_double_fp_backend<FloatingPointType>& backend)
+constexpr void eval_convert_to(signed long long* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
    using c_type = typename std::common_type<signed long long, FloatingPointType>::type;
 
@@ -1615,7 +1615,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(signed long long* result, const cp
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<FloatingPointType>& backend)
+constexpr void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
    using c_type = typename std::common_type<unsigned long long, FloatingPointType>::type;
 
@@ -1637,14 +1637,14 @@ BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(unsigned long long* result, const 
 
 template <typename FloatingPointType,
           typename R>
-BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<detail::is_floating_point_or_float128<R>::value>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend)
+constexpr typename std::enable_if<detail::is_floating_point_or_float128<R>::value>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
    *result  = static_cast<R>(backend.crep().first);
    *result += static_cast<R>(backend.crep().second);
 }
 
 template <typename FloatingPointType>
-BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend<FloatingPointType> fabs(const cpp_double_fp_backend<FloatingPointType>& a)
+constexpr cpp_double_fp_backend<FloatingPointType> fabs(const cpp_double_fp_backend<FloatingPointType>& a)
 {
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
@@ -1663,21 +1663,23 @@ std::size_t hash_value(const cpp_double_fp_backend<FloatingPointType>& a)
 
 } // namespace backends
 
-using cpp_double_float       = number<backends::cpp_double_fp_backend<float>>;
-using cpp_double_double      = number<backends::cpp_double_fp_backend<double>>;
-using cpp_double_long_double = number<backends::cpp_double_fp_backend<long double>>;
+using backends::cpp_double_fp_backend;
+
+using cpp_double_float       = number<cpp_double_fp_backend<float>>;
+using cpp_double_double      = number<cpp_double_fp_backend<double>>;
+using cpp_double_long_double = number<cpp_double_fp_backend<long double>>;
 #ifdef BOOST_HAS_FLOAT128
-using cpp_double_float128    = number<backends::cpp_double_fp_backend<float128>>;
+using cpp_double_float128    = number<cpp_double_fp_backend<float128>>;
 #endif
 
-}} // namespace boost::multiprecision
+} } // namespace boost::multiprecision
 
 namespace std {
 
 // Specialization of numeric_limits for boost::multiprecision::number<cpp_double_fp_backend<>>
 template <typename FloatingPointType,
           const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >
+BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >
     : public std::numeric_limits<FloatingPointType>
 {
  private:
@@ -1707,48 +1709,48 @@ BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE numeric_limits<boost::multiprecision::numbe
    static constexpr int max_exponent10                 = inner_self_type::my_max_exponent10;
    static constexpr int min_exponent10                 = inner_self_type::my_min_exponent10;
 
-   static BOOST_MP_CXX14_CONSTEXPR self_type(min)         () noexcept { return self_type(inner_self_type::my_value_min()); }
-   static BOOST_MP_CXX14_CONSTEXPR self_type(max)         () noexcept { return self_type(inner_self_type::my_value_max()); }
-   static BOOST_MP_CXX14_CONSTEXPR self_type lowest       () noexcept { return self_type(-(max)()); }
-   static BOOST_MP_CXX14_CONSTEXPR self_type epsilon      () noexcept { return self_type(inner_self_type::my_value_eps()); }
-   static BOOST_MP_CXX14_CONSTEXPR self_type round_error  () noexcept { return self_type(base_class_type::round_error()); }
-   static BOOST_MP_CXX14_CONSTEXPR self_type denorm_min   () noexcept { return self_type((min)()); }
-   static BOOST_MP_CXX14_CONSTEXPR self_type infinity     () noexcept { return self_type(base_class_type::infinity()); }
-   static BOOST_MP_CXX14_CONSTEXPR self_type quiet_NaN    () noexcept { return self_type(base_class_type::quiet_NaN()); }
-   static BOOST_MP_CXX14_CONSTEXPR self_type signaling_NaN() noexcept { return self_type(base_class_type::signaling_NaN()); }
+   static constexpr self_type(min)         () noexcept { return self_type(inner_self_type::my_value_min()); }
+   static constexpr self_type(max)         () noexcept { return self_type(inner_self_type::my_value_max()); }
+   static constexpr self_type lowest       () noexcept { return self_type(-(max)()); }
+   static constexpr self_type epsilon      () noexcept { return self_type(inner_self_type::my_value_eps()); }
+   static constexpr self_type round_error  () noexcept { return self_type(base_class_type::round_error()); }
+   static constexpr self_type denorm_min   () noexcept { return self_type((min)()); }
+   static constexpr self_type infinity     () noexcept { return self_type(base_class_type::infinity()); }
+   static constexpr self_type quiet_NaN    () noexcept { return self_type(base_class_type::quiet_NaN()); }
+   static constexpr self_type signaling_NaN() noexcept { return self_type(base_class_type::signaling_NaN()); }
 };
 
 } // namespace std
 
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_specialized;
+constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_specialized;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_signed;
+constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_signed;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_integer;
+constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_integer;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_exact;
+constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_exact;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_bounded;
+constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_bounded;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_modulo;
+constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_modulo;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr bool std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_iec559;
+constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_iec559;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr std::float_denorm_style std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::has_denorm;
+constexpr std::float_denorm_style std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::has_denorm;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::digits;
+constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::digits;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::digits10;
+constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::digits10;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::max_digits10;
+constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::max_digits10;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::max_exponent;
+constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::max_exponent;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent;
+constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::max_exponent10;
+constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::max_exponent10;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
-constexpr int std::numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent10;
+constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent10;
 
 #endif // BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP

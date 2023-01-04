@@ -152,10 +152,10 @@ void test()
 
 int main()
 {
-   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::backends::cpp_double_fp_backend<double>>, boost::multiprecision::et_on> >();
-   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::backends::cpp_double_fp_backend<long double>>, boost::multiprecision::et_on> >();
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<double>>, boost::multiprecision::et_on> >();
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<long double>>, boost::multiprecision::et_on> >();
 #ifdef BOOST_HAS_FLOAT128
-   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::backends::cpp_double_fp_backend<boost::multiprecision::float128>>, boost::multiprecision::et_on> >();
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<boost::multiprecision::float128>>, boost::multiprecision::et_on> >();
 #endif
    return boost::report_errors();
 }
