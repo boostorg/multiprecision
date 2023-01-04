@@ -87,7 +87,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [ g++ ]
-        standard: [ g++14, g++17, g++2a ]
+        standard: [ c++14, c++17, c++2a ]
         suite: [ df_quadmath_tests ]
     steps:
       - uses: actions/checkout@v2
@@ -138,7 +138,7 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} cxxstd-dialect=gnu define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
   ubuntu-bionic-df_tests:
     runs-on: ubuntu-18.04
