@@ -69,7 +69,12 @@ constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, cons
 template <typename FloatingPointType>
 constexpr void eval_ceil(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 template <typename FloatingPointType>
-constexpr int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o);
+#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+BOOST_MP_CXX14_CONSTEXPR
+#else
+constexpr
+#endif
+          int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o);
 template <typename FloatingPointType>
 constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& o);
 
@@ -304,7 +309,12 @@ class cpp_double_fp_backend
    template <typename OtherFloatType,
              typename std::enable_if<(    detail::is_floating_point_or_float128<OtherFloatType>::value
                                       && (!std::is_same<FloatingPointType, OtherFloatType>::value))>::type const* = nullptr>
-   constexpr cpp_double_fp_backend& operator=(const cpp_double_fp_backend<OtherFloatType>& other)
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   cpp_double_fp_backend& operator=(const cpp_double_fp_backend<OtherFloatType>& other)
    {
      return operator=(cpp_double_fp_backend(other));
    }
@@ -1023,7 +1033,12 @@ constexpr void eval_ceil(cpp_double_fp_backend<FloatingPointType>& result, const
 }
 
 template <typename FloatingPointType>
-constexpr int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
+#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+BOOST_MP_CXX14_CONSTEXPR
+#else
+constexpr
+#endif
+int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
 {
    // The eval_fpclassify implementation is modelled after Matt Borland's work in <ccmath.hpp>.
 
