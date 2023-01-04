@@ -87,7 +87,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [ g++ ]
-        standard: [ gnu++14, gnu++17, gnu++2a ]
+        standard: [ g++14, g++17, g++2a ]
         suite: [ df_quadmath_tests ]
     steps:
       - uses: actions/checkout@v2
