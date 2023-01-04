@@ -142,7 +142,7 @@ test-suite df_quadmath_tests :
 
    [ run test_cpp_double_float_arithmetic.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 :                               : <build>no ] ]
    [ run test_cpp_double_float_tgamma.cpp     quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 :                               : <build>no ] ]
-   [ run test_arithmetic_df.cpp               quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 :                               : <build>no ] ]
+   [ run test_arithmetic_df.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_sqrt.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_sqrt_df ]
    [ run test_exp.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_exp_df ]
    [ run test_pow_df.cpp                      quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_pow_df ]
