@@ -1836,11 +1836,11 @@ std::size_t hash_value(const cpp_double_fp_backend<FloatingPointType>& a)
 
 using backends::cpp_double_fp_backend;
 
-using cpp_double_float       = number<cpp_double_fp_backend<float>>;
-using cpp_double_double      = number<cpp_double_fp_backend<double>>;
-using cpp_double_long_double = number<cpp_double_fp_backend<long double>>;
+using cpp_double_float       = number<cpp_double_fp_backend<float>,       boost::multiprecision::et_off>;
+using cpp_double_double      = number<cpp_double_fp_backend<double>,      boost::multiprecision::et_off>;
+using cpp_double_long_double = number<cpp_double_fp_backend<long double>, boost::multiprecision::et_off>;
 #ifdef BOOST_HAS_FLOAT128
-using cpp_double_float128    = number<cpp_double_fp_backend<float128>>;
+using cpp_double_float128    = number<cpp_double_fp_backend<float128>,    boost::multiprecision::et_off>;
 #endif
 
 } } // namespace boost::multiprecision
