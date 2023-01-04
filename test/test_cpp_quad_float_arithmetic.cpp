@@ -21,7 +21,7 @@
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_quad_float.hpp>
@@ -384,7 +384,7 @@ int main()
   const bool result_dbl___is_ok = local::test_arithmetic<double>     (test_cases_built_in); std::cout << "result_dbl___is_ok: " << std::boolalpha << result_dbl___is_ok << std::endl;
   const bool result_ldbl__is_ok = local::test_arithmetic<long double>(test_cases_built_in); std::cout << "result_ldbl__is_ok: " << std::boolalpha << result_ldbl__is_ok << std::endl;
 
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
   const bool result_f128__is_ok = local::test_arithmetic<boost::multiprecision::float128>(test_cases_float128);
                                                                                             std::cout << "result_f128__is_ok: " << std::boolalpha << result_f128__is_ok << std::endl;
 #else
@@ -395,7 +395,7 @@ int main()
   (
       result_dbl___is_ok
    && result_ldbl__is_ok
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    && result_f128__is_ok
 #endif
   );

@@ -7,7 +7,7 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_quad_float.hpp>
@@ -25,13 +25,13 @@ int main()
 {
    using quad_float_of_double_type   = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<double>, boost::multiprecision::et_off>;
    using quad_float_of_ldbl_type     = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<long double>, boost::multiprecision::et_off>;
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    using quad_float_of_float128_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<boost::multiprecision::float128>, boost::multiprecision::et_off>;
 #endif
 
    test<quad_float_of_double_type>();
    test<quad_float_of_ldbl_type>();
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    test<quad_float_of_float128_type>();
 #endif
    return boost::report_errors();

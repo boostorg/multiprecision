@@ -10,7 +10,7 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include "test.hpp"
 
-#if defined(BOOST_MATH_USE_FLOAT128)
+#if defined(BOOST_HAS_FLOAT128)
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_double_fp.hpp>
@@ -40,13 +40,13 @@ int main()
 {
    using double_float_of_double_type   = boost::multiprecision::cpp_double_double;
    using double_float_of_ldbl_type     = boost::multiprecision::cpp_double_long_double;
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    using double_float_of_float128_type = boost::multiprecision::cpp_double_float128;
 #endif
 
    local::test<double_float_of_double_type>();
    local::test<double_float_of_ldbl_type>();
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    local::test<double_float_of_float128_type>();
 #endif
 

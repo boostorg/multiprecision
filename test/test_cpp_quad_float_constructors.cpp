@@ -16,7 +16,7 @@
 #include <boost/config.hpp>
 #include <boost/core/demangle.hpp>
 #include <boost/multiprecision/number.hpp>
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_quad_float.hpp>
@@ -119,7 +119,7 @@ get_rand(control_float_type mn = 0, control_float_type mx = 0)
    auto shifted_rand = [&](int i)
    {
       using std::ldexp;
-      #ifdef BOOST_MATH_USE_FLOAT128
+      #ifdef BOOST_HAS_FLOAT128
       using boost::multiprecision::ldexp;
       #endif
 
@@ -223,13 +223,13 @@ int test_constructors()
    e += test_constructor<FloatingPointType, float>();
    e += test_constructor<FloatingPointType, double>();
    e += test_constructor<FloatingPointType, long double>();
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    e += test_constructor<FloatingPointType, boost::multiprecision::float128>();
 #endif
 
    e += test_constructor<FloatingPointType, boost::multiprecision::cpp_quad_double >();
    e += test_constructor<FloatingPointType, boost::multiprecision::cpp_quad_long_double>();
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    e += test_constructor<FloatingPointType, boost::multiprecision::cpp_quad_float128>();
 #endif
 
@@ -251,7 +251,7 @@ int main()
 
    e += test_cpp_quad_float_constructors::test_constructors<double>();
    e += test_cpp_quad_float_constructors::test_constructors<long double>();
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
    e += test_cpp_quad_float_constructors::test_constructors<boost::multiprecision::float128>();
 #endif
 

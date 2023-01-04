@@ -9,7 +9,7 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_quad_float.hpp>
-#if defined(BOOST_MATH_USE_FLOAT128)
+#if defined(BOOST_HAS_FLOAT128)
 #include <boost/multiprecision/float128.hpp>
 #endif
 
@@ -90,7 +90,7 @@ int main()
       represent_cyl_bessel_j<dec_float_type>();
    }
 
-   #if defined(BOOST_MATH_USE_FLOAT128)
+   #if defined(BOOST_HAS_FLOAT128)
    {
       using quad_float_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_quad_fp_backend<boost::multiprecision::float128>, boost::multiprecision::et_off>;
       using dec_float_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<std::numeric_limits<quad_float_type>::digits10>, boost::multiprecision::et_off>;

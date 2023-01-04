@@ -14,7 +14,7 @@
 #include <utility>
 
 #include <boost/config.hpp>
-#if defined(BOOST_MATH_USE_FLOAT128)
+#if defined(BOOST_HAS_FLOAT128)
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/number.hpp>
@@ -27,7 +27,7 @@ struct is_floating_point_or_float128
    static constexpr bool value =
    (
          std::is_floating_point<T>::value
-      #if defined(BOOST_MATH_USE_FLOAT128)
+      #if defined(BOOST_HAS_FLOAT128)
       || std::is_same<typename std::decay<T>::type, boost::multiprecision::float128>::value
       #endif
    );

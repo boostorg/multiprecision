@@ -11,7 +11,7 @@
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_double_fp.hpp>
@@ -116,7 +116,7 @@ int main()
    test_basic_io_manual<boost::multiprecision::backends::cpp_double_fp_backend<double>>();
    test_basic_io_manual < boost::multiprecision::backends::cpp_double_fp_backend<float>>();
    //test_basic_io_manual < boost::multiprecision::backends::cpp_double_fp_backend<long double>>();
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
 // FIXME:
 // test_basic_io_manual<boost::multiprecision::float128>();
 #endif

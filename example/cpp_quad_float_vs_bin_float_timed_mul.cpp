@@ -16,7 +16,7 @@
 #include <vector>
 
 #include <boost/config.hpp>
-#ifdef BOOST_MATH_USE_FLOAT128
+#ifdef BOOST_HAS_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
 #include <boost/multiprecision/cpp_quad_float.hpp>
