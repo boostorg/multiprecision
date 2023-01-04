@@ -681,7 +681,7 @@ class cpp_double_fp_backend
    BOOST_MP_CXX14_CONSTEXPR int compare(const cpp_double_fp_backend& other) const
    {
       // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
-      #if 0
+      #if 1
       return (my_first() > other.my_first()) ?  1 : (my_first()  < other.my_first())
                                              ? -1 : (my_second() > other.my_second())
                                              ?  1 : (my_second() < other.my_second())
@@ -792,20 +792,12 @@ class cpp_double_fp_backend
    static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_min() noexcept
    {
       using std::ldexp;
-#if defined(BOOST_HAS_FLOAT128)
-      using boost::multiprecision::ldexp;
-#endif
 
       return cpp_double_fp_backend(ldexp(float_type(1), my_min_exponent));
    }
 
    static BOOST_MP_CXX14_CONSTEXPR cpp_double_fp_backend my_value_eps() noexcept
    {
-      using std::ldexp;
-#if defined(BOOST_HAS_FLOAT128)
-      using boost::multiprecision::ldexp;
-#endif
-
       // TBD: Do we need a better value here.
       return []() -> cpp_double_fp_backend {
          cpp_double_fp_backend result;
