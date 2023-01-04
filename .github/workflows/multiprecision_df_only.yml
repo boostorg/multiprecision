@@ -138,7 +138,7 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} cxxstd-dialect=gnu define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
   ubuntu-bionic-df_tests:
     runs-on: ubuntu-18.04

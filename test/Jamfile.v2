@@ -133,6 +133,7 @@ test-suite df_tests :
    [ run test_float_io.cpp      no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_float_io_df ]
    [ run test_fpclassify.cpp    no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_fpclassify_df ]
    [ run test_sf_import_c99.cpp no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_sf_import_c99_df ]
+   [ run test_round.cpp         no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_round_df ]
 
    [ compile concepts/sf_concept_check_basic.cpp     :     <define>TEST_CPP_DOUBLE_FLOAT <debug-symbols>off <optimization>space : sf_concept_check_basic_df ]
    [ compile concepts/sf_concept_check_bessel.cpp    :     <define>TEST_CPP_DOUBLE_FLOAT <debug-symbols>off <optimization>space : sf_concept_check_bessel_df ]
@@ -161,6 +162,7 @@ test-suite df_quadmath_tests :
    [ run test_fpclassify.cpp                  quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_fpclassify_df ]
    [ run test_complex_df.cpp                  quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_complex_df ]
    [ run test_sf_import_c99.cpp               quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_sf_import_c99_df ]
+   [ run test_round.cpp                       quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_round_df ]
 
 ;
 
