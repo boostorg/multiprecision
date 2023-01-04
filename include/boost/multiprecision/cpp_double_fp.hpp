@@ -20,7 +20,7 @@
 #include <string>
 #include <type_traits>
 
-#include <boost/multiprecision/cpp_double_quad_fp/arithmetic.hpp>
+#include <boost/multiprecision/cpp_df_qf_fp/arithmetic.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
@@ -1003,7 +1003,7 @@ namespace detail {
    template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename std::enable_if<(detail::is_floating_point_or_float128<FloatingPointType>::value && (std::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.71828182845904523536028747135266231436Q), static_cast<FloatingPointType>(1.83398825226506410712297736767396397644e-34Q)); }
    #endif
 
-}
+} // namespace detail
 
 template <typename FloatingPointType>
 constexpr int cpp_double_fp_backend<FloatingPointType>::my_digits;
@@ -1123,11 +1123,11 @@ constexpr void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, cons
 }
 
 template <typename FloatingPointType>
-  #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-  BOOST_MP_CXX14_CONSTEXPR
-  #else
-  constexpr
-  #endif
+#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+BOOST_MP_CXX14_CONSTEXPR
+#else
+constexpr
+#endif
 void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
@@ -1762,7 +1762,7 @@ void eval_convert_to(signed long long* result, const cpp_double_fp_backend<Float
    using std::fabs;
 
    constexpr c_type my_max = static_cast<c_type>((std::numeric_limits<signed long long>::max)());
-   c_type           ct     = fabs(backend.crep().first);
+   const     c_type ct     = fabs(backend.crep().first);
 
    if (ct > my_max)
    {
@@ -1788,7 +1788,7 @@ void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<Flo
    using std::fabs;
 
    constexpr c_type my_max = static_cast<c_type>((std::numeric_limits<unsigned long long>::max)());
-   c_type           ct     = fabs(backend.crep().first);
+   const     c_type ct     = fabs(backend.crep().first);
 
    if (ct > my_max)
    {
@@ -1819,7 +1819,7 @@ constexpr cpp_double_fp_backend<FloatingPointType> fabs(const cpp_double_fp_back
 {
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
-   double_float_type result;
+   double_float_type result { };
 
    eval_fabs(result, a);
 
