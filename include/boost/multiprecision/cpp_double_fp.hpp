@@ -133,13 +133,13 @@ namespace backends {
 namespace detail {
 
 template <typename R>
-typename std::enable_if<!boost::multiprecision::detail::is_unsigned<R>::value, R>::type minus_max()
+constexpr typename std::enable_if<!boost::multiprecision::detail::is_unsigned<R>::value, R>::type minus_max()
 {
    return boost::multiprecision::detail::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
 }
 
 template <typename R>
-typename std::enable_if<boost::multiprecision::detail::is_unsigned<R>::value, R>::type minus_max()
+constexpr typename std::enable_if<boost::multiprecision::detail::is_unsigned<R>::value, R>::type minus_max()
 {
    return 0;
 }
@@ -681,43 +681,10 @@ class cpp_double_fp_backend
    constexpr int compare(const cpp_double_fp_backend& other) const
    {
       // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
-      #if 1
       return (my_first() > other.my_first()) ?  1 : (my_first()  < other.my_first())
                                              ? -1 : (my_second() > other.my_second())
                                              ?  1 : (my_second() < other.my_second())
                                              ? -1 : 0;
-
-      #else
-      const auto other_is_neg = (other.my_first() < 0);
-      const auto my_is_neg    = (my_first() < 0);
-
-      auto n_result = static_cast<int>(INT8_C(0));
-
-      if(my_is_neg && (!other_is_neg))
-      {
-        n_result = static_cast<int>(INT8_C(-1));
-      }
-      else if((!my_is_neg) && other_is_neg)
-      {
-        n_result = static_cast<int>(INT8_C(1));
-      }
-      else
-      {
-        auto a = *this; if(my_is_neg)    { a.negate(); }
-        auto b = other; if(other_is_neg) { b.negate(); }
-
-        if(a.crep() > b.crep())
-        {
-          n_result = (!my_is_neg) ? 1 : -1;
-        }
-        else if(a.crep() < b.crep())
-        {
-          n_result = (!my_is_neg) ? -1 : 1;
-        }
-      }
-
-      return n_result;
-      #endif
    }
 
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
@@ -1709,15 +1676,15 @@ BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE numeric_limits<boost::multiprecision::numbe
    static constexpr int max_exponent10                 = inner_self_type::my_max_exponent10;
    static constexpr int min_exponent10                 = inner_self_type::my_min_exponent10;
 
-   static constexpr self_type(min)         () noexcept { return self_type(inner_self_type::my_value_min()); }
-   static constexpr self_type(max)         () noexcept { return self_type(inner_self_type::my_value_max()); }
-   static constexpr self_type lowest       () noexcept { return self_type(-(max)()); }
-   static constexpr self_type epsilon      () noexcept { return self_type(inner_self_type::my_value_eps()); }
-   static constexpr self_type round_error  () noexcept { return self_type(base_class_type::round_error()); }
-   static constexpr self_type denorm_min   () noexcept { return self_type((min)()); }
-   static constexpr self_type infinity     () noexcept { return self_type(base_class_type::infinity()); }
-   static constexpr self_type quiet_NaN    () noexcept { return self_type(base_class_type::quiet_NaN()); }
-   static constexpr self_type signaling_NaN() noexcept { return self_type(base_class_type::signaling_NaN()); }
+   static constexpr self_type(min)         () noexcept { return static_cast<self_type>(inner_self_type::my_value_min()); }
+   static constexpr self_type(max)         () noexcept { return static_cast<self_type>(inner_self_type::my_value_max()); }
+   static constexpr self_type lowest       () noexcept { return static_cast<self_type>(-(max)()); }
+   static constexpr self_type epsilon      () noexcept { return static_cast<self_type>(inner_self_type::my_value_eps()); }
+   static constexpr self_type round_error  () noexcept { return static_cast<self_type>(base_class_type::round_error()); }
+   static constexpr self_type denorm_min   () noexcept { return static_cast<self_type>((min)()); }
+   static constexpr self_type infinity     () noexcept { return static_cast<self_type>(base_class_type::infinity()); }
+   static constexpr self_type quiet_NaN    () noexcept { return static_cast<self_type>(base_class_type::quiet_NaN()); }
+   static constexpr self_type signaling_NaN() noexcept { return static_cast<self_type>(base_class_type::signaling_NaN()); }
 };
 
 } // namespace std
