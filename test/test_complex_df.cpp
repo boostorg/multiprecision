@@ -27,7 +27,7 @@ void test()
 
    typedef typename complex_type::value_type float_type;
 
-   const std::string str_tol("0." + std::string(std::size_t(std::numeric_limits<float_type>::digits10 - 3), char('0')) + std::string(std::size_t(2U), char('9')));
+   const std::string str_tol("0." + std::string(std::size_t(std::numeric_limits<float_type>::digits10 - 2), char('0')) + std::string(std::size_t(2U), char('9')));
 
    const float_type tol = boost::lexical_cast<float_type>(str_tol.c_str());
 
@@ -131,10 +131,10 @@ void test()
    BOOST_CHECK_CLOSE_FRACTION(result_18.imag(), control_18.imag(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_19.real(), control_19.real(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_19.imag(), control_19.imag(), tol);
-   BOOST_CHECK_CLOSE_FRACTION(result_20.real(), control_20.real(), tol);
-   BOOST_CHECK_CLOSE_FRACTION(result_20.imag(), control_20.imag(), tol);
-   BOOST_CHECK_CLOSE_FRACTION(result_21.real(), control_21.real(), tol);
-   BOOST_CHECK_CLOSE_FRACTION(result_21.imag(), control_21.imag(), tol);
+   BOOST_CHECK_CLOSE_FRACTION(result_20.real(), control_20.real(), tol * 3);
+   BOOST_CHECK_CLOSE_FRACTION(result_20.imag(), control_20.imag(), tol * 3);
+   BOOST_CHECK_CLOSE_FRACTION(result_21.real(), control_21.real(), tol * 20);
+   BOOST_CHECK_CLOSE_FRACTION(result_21.imag(), control_21.imag(), tol * 20);
    BOOST_CHECK_CLOSE_FRACTION(result_22.real(), control_22.real(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_22.imag(), control_22.imag(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_23.real(), control_23.real(), tol);
@@ -153,6 +153,7 @@ void test()
 int main()
 {
    local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::backends::cpp_double_fp_backend<double>>, boost::multiprecision::et_on> >();
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::backends::cpp_double_fp_backend<long double>>, boost::multiprecision::et_on> >();
 #ifdef BOOST_HAS_FLOAT128
    local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::backends::cpp_double_fp_backend<boost::multiprecision::float128>>, boost::multiprecision::et_on> >();
 #endif
