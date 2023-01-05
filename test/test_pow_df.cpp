@@ -9,10 +9,6 @@
 // "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 
-#if !defined(TEST_CPP_DOUBLE_FLOAT)
-#define TEST_CPP_DOUBLE_FLOAT
-#endif
-
 #ifdef _MSC_VER
 #define _SCL_SECURE_NO_WARNINGS
 #endif
@@ -22,9 +18,6 @@
 #include "test.hpp"
 
 #ifdef TEST_CPP_DOUBLE_FLOAT
-#if defined(BOOST_HAS_FLOAT128)
-#include <boost/multiprecision/float128.hpp>
-#endif
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 

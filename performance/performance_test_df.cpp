@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2011-21 John Maddock. Distributed under the Boost
+//  Copyright John Maddock 2019.
+//  Copyright Christopher Kormanyos 2021 - 2023.
+//  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
@@ -16,33 +18,18 @@
 // In order to build this program, you must compile and link this file against
 // all the libs/multiprecision/performance/performance_test_files/*.cpp files.
 // 
-// The default behaviour is to "test everything", which is probably not what you want.
-// In order to restict testing to a specific selection of backends, you will need to
-// define one or more of the following macros when building:
-// 
-// TEST_MPF
-// TEST_MPZ
-// TEST_CPP_DEC_FLOAT
-// TEST_MPFR
-// TEST_MPQ
-// TEST_TOMMATH
-// TEST_TOMMATH_BOOST_RATIONAL
-// TEST_MPZ_BOOST_RATIONAL
-// TEST_CPP_INT
-// TEST_CPP_INT_RATIONAL
-// TEST_CPP_BIN_FLOAT
-// TEST_CPP_DOUBLE_FLOAT
-//
+
+#include <boost/version.hpp>
+
+#if defined(TEST_CPP_DOUBLE_FLOAT)
+#include <boost/multiprecision/cpp_double_fp.hpp>
+#endif
+
+#if defined(TEST_CPP_BIN_FLOAT)
+#include <boost/multiprecision/cpp_bin_float.hpp>
+#endif
 
 #include "performance_test.hpp"
-
-#ifdef TEST_MPZ
-#include <gmp.h>
-#endif
-#ifdef TEST_MPFR
-#include <mpfr.h>
-#endif
-#include <boost/version.hpp>
 
 //
 // Keys in order are:
@@ -178,57 +165,30 @@ int main()
    quickbook_results();
 }
 
-///////////////////////////////////////////////////////////////
-//  Copyright John Maddock 2019.
-//  Copyright Christopher Kormanyos 2021 - 2023.
-//  Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
-
-//#include "../performance_test.hpp"
-#if defined(TEST_CPP_DOUBLE_FLOAT)
-#if defined(BOOST_HAS_FLOAT128)
-#include <boost/multiprecision/float128.hpp>
-#endif
-#include <boost/multiprecision/cpp_double_fp.hpp>
-#endif
-
 #ifdef TEST_CPP_DOUBLE_FLOAT
-using double_float_of_double_type =
-   boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<double>, boost::multiprecision::et_off>;
-#endif
+using double_float_of_double_type = boost::multiprecision::cpp_double_double;
 
-void test52()
-{
-#ifdef TEST_CPP_DOUBLE_FLOAT
-   test<double_float_of_double_type>("cpp_double_fp_backend<double>", 1024*16);
-#endif
-}
-
-///////////////////////////////////////////////////////////////
-//  Copyright 2019 John Maddock. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
-
-#if defined(TEST_CPP_BIN_FLOAT)
-#include <boost/multiprecision/cpp_bin_float.hpp>
+constexpr auto digits10_for_performance_test = std::numeric_limits<double_float_of_double_type>::digits10;
+#else
+constexpr auto digits10_for_performance_test = 31;
 #endif
 
 void test32()
 {
-   #ifdef TEST_CPP_DOUBLE_FLOAT
-   constexpr auto digits10_for_bin_float_test = std::numeric_limits<double_float_of_double_type>::digits10;
-   #else
-   constexpr auto digits10_for_bin_float_test = 31;
-   #endif
-
-   static_assert(digits10_for_bin_float_test >= 31, "Error: Too few digits for perf compare");
+#ifdef TEST_CPP_BIN_FLOAT
+   static_assert(digits10_for_performance_test >= 31, "Error: Too few digits for performance comparison");
 
    using cpp_bin_float_type =
-     boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<digits10_for_bin_float_test>,
-                                   boost::multiprecision::et_off>;
+      boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<digits10_for_performance_test>,
+                                    boost::multiprecision::et_off>;
 
-#ifdef TEST_CPP_BIN_FLOAT
-   test<boost::multiprecision::cpp_bin_float_50>("cpp_bin_float", digits10_for_bin_float_test);
+   test<cpp_bin_float_type>("cpp_bin_float", digits10_for_performance_test);
+#endif
+}
+
+void test52()
+{
+#ifdef TEST_CPP_DOUBLE_FLOAT
+   test<double_float_of_double_type>("cpp_double_fp_backend<double>", digits10_for_performance_test);
 #endif
 }

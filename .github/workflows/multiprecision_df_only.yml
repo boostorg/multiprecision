@@ -3,7 +3,7 @@
 # Copyright 2021 John Maddock
 # Copyright 2021 Fahad Syed
 # Copyright 2021 Janek Kozicki
-# Copyright 2021 Christopher Kormanyos
+# Copyright 2021 - 2023 Christopher Kormanyos
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -28,7 +28,7 @@ jobs:
         standard: [ c++14, c++17, c++2a ]
         suite: [ df_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -90,7 +90,7 @@ jobs:
         standard: [ gnu++14, gnu++17, gnu++2a ]
         suite: [ df_quadmath_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -140,19 +140,19 @@ jobs:
       - name: Test
         run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
-  ubuntu-bionic-df_tests:
-    runs-on: ubuntu-18.04
+  ubuntu-focal-df_older_compiler_tests:
+    runs-on: ubuntu-20.04
     defaults:
       run:
         shell: bash
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ g++-6, g++-7, g++-8, clang++-6.0, clang++-7, clang++-8 ]
+        compiler: [ g++-7, g++-8, g++-9, clang++-8, clang++-9 ]
         standard: [ c++14, c++17 ]
         suite: [ df_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -172,7 +172,7 @@ jobs:
         if: steps.retry1.outcome=='failure'
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: sudo apt install g++-6 g++-7 g++-8 clang-6.0 clang-7 clang-8
+        run: sudo apt install g++-7 g++-8 g++-9 clang-8 clang-9
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
@@ -216,7 +216,7 @@ jobs:
         standard: [ 14, 17 ]
         suite: [ df_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Checkout main boost
@@ -259,7 +259,7 @@ jobs:
         standard: [ 14, 17, 20 ]
         suite: [ df_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Checkout main boost
@@ -297,7 +297,7 @@ jobs:
         standard: [ 14, 17, 2a ]
         suite: [ df_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Checkout main boost
