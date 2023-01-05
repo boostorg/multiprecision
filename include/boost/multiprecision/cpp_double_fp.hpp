@@ -169,6 +169,24 @@ constexpr
 #endif
           void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<FloatingPointType>& backend);
 
+#ifdef BOOST_HAS_INT128
+template <typename FloatingPointType>
+#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+BOOST_MP_CXX14_CONSTEXPR
+#else
+constexpr
+#endif
+          void eval_convert_to(int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend);
+
+template <typename FloatingPointType>
+#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+BOOST_MP_CXX14_CONSTEXPR
+#else
+constexpr
+#endif
+          void eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend);
+#endif
+
 template <typename FloatingPointType,
           typename R>
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
@@ -209,22 +227,6 @@ struct number_category<backends::cpp_double_fp_backend<FloatingPointType> >
     : public std::integral_constant<int, number_kind_floating_point> { };
 
 namespace backends {
-
-namespace cpp_df_qf_detail {
-
-template <typename R>
-constexpr typename std::enable_if<!boost::multiprecision::detail::is_unsigned<R>::value, R>::type minus_max()
-{
-   return boost::multiprecision::detail::is_signed<R>::value ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
-}
-
-template <typename R>
-constexpr typename std::enable_if<boost::multiprecision::detail::is_unsigned<R>::value, R>::type minus_max()
-{
-   return 0;
-}
-
-} // namespace cpp_df_qf_detail
 
 // A cpp_double_fp_backend is represented by an unevaluated sum of two floating-point
 // units (say a0 and a1) which satisfy |a1| <= (1 / 2) * ulp(a0).
@@ -1761,14 +1763,19 @@ constexpr
 #endif
 void eval_convert_to(signed long long* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
+   constexpr signed long long my_max_val = (std::numeric_limits<signed long long>::max)();
+   constexpr signed long long my_min_val = (std::numeric_limits<signed long long>::min)();
+
    using c_type = typename std::common_type<signed long long, FloatingPointType>::type;
 
-   constexpr c_type my_max = static_cast<c_type>((std::numeric_limits<signed long long>::max)());
+   constexpr c_type my_max = static_cast<c_type>(my_max_val);
    const     c_type ct     = cpp_df_qf_detail::fabs_of_constituent(backend.crep().first);
 
    if (ct > my_max)
    {
-      *result = backend.crep().first >= typename cpp_double_fp_backend<FloatingPointType>::float_type(0U) ? (std::numeric_limits<signed long long>::max)() : cpp_df_qf_detail::minus_max<signed long long>();
+      *result = backend.crep().first >= typename cpp_double_fp_backend<FloatingPointType>::float_type(0U)
+         ? my_max_val
+         : my_min_val;
    }
    else
    {
@@ -1785,14 +1792,16 @@ constexpr
 #endif
 void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
+   constexpr unsigned long long my_max_val = (std::numeric_limits<unsigned long long>::max)();
+
    using c_type = typename std::common_type<unsigned long long, FloatingPointType>::type;
 
-   constexpr c_type my_max = static_cast<c_type>((std::numeric_limits<unsigned long long>::max)());
+   constexpr c_type my_max = static_cast<c_type>(my_max_val);
    const     c_type ct     = cpp_df_qf_detail::fabs_of_constituent(backend.crep().first);
 
    if (ct > my_max)
    {
-      *result = (std::numeric_limits<unsigned long long>::max)();
+      *result = my_max_val;
    }
    else
    {
@@ -1800,6 +1809,63 @@ void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<Flo
       *result += static_cast<unsigned long long>(backend.crep().second);
    }
 }
+
+#ifdef BOOST_HAS_INT128
+template <typename FloatingPointType>
+#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+BOOST_MP_CXX14_CONSTEXPR
+#else
+constexpr
+#endif
+void eval_convert_to(int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend)
+{
+   constexpr int128_type my_max_val = (((static_cast<int128_type>(1) << (sizeof(int128_type) * CHAR_BIT - 2)) - 1) << 1) + 1;
+   constexpr int128_type my_min_val = static_cast<int128_type>(-my_max_val - 1);
+
+   using c_type = typename std::common_type<int128_type, FloatingPointType>::type;
+
+   constexpr c_type my_max = static_cast<c_type>(my_max_val);
+   const     c_type ct     = cpp_df_qf_detail::fabs_of_constituent(backend.crep().first);
+
+   if (ct > my_max)
+   {
+      *result = backend.crep().first >= typename cpp_double_fp_backend<FloatingPointType>::float_type(0U)
+         ? my_max_val
+         : my_min_val;
+   }
+   else
+   {
+      *result  = static_cast<signed long long>(backend.crep().first);
+      *result += static_cast<signed long long>(backend.crep().second);
+   }
+}
+
+template <typename FloatingPointType>
+#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+BOOST_MP_CXX14_CONSTEXPR
+#else
+constexpr
+#endif
+void eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend)
+{
+   constexpr uint128_type my_max_val = static_cast<uint128_type>(~static_cast<uint128_type>(0));
+
+   using c_type = typename std::common_type<uint128_type, FloatingPointType>::type;
+
+   constexpr c_type my_max = static_cast<c_type>(my_max_val);
+   const     c_type ct     = cpp_df_qf_detail::fabs_of_constituent(backend.crep().first);
+
+   if (ct > my_max)
+   {
+      *result = my_max_val;
+   }
+   else
+   {
+      *result  = static_cast<unsigned long long>(backend.crep().first);
+      *result += static_cast<unsigned long long>(backend.crep().second);
+   }
+}
+#endif
 
 template <typename FloatingPointType,
           typename R>
