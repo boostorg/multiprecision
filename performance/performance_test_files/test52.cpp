@@ -7,9 +7,6 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_CPP_DOUBLE_FLOAT)
-#if defined(BOOST_HAS_FLOAT128)
-#include <boost/multiprecision/float128.hpp>
-#endif
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 

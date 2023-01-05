@@ -13,9 +13,6 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/multiprecision/complex_adaptor.hpp>
-#if defined(BOOST_HAS_FLOAT128)
-#include <boost/multiprecision/float128.hpp>
-#endif
 #include <boost/multiprecision/cpp_double_fp.hpp>
 
 #include "test.hpp"
@@ -152,10 +149,11 @@ void test()
 
 int main()
 {
-   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<double>>, boost::multiprecision::et_on> >();
-   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<long double>>, boost::multiprecision::et_on> >();
-#ifdef BOOST_HAS_FLOAT128
-   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<boost::multiprecision::float128>>, boost::multiprecision::et_on> >();
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<double>>, boost::multiprecision::et_off> >();
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<long double>>, boost::multiprecision::et_off> >();
+#if defined(BOOST_HAS_FLOAT128)
+   using boost::multiprecision::float128_type;
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<float128_type>>, boost::multiprecision::et_off> >();
 #endif
    return boost::report_errors();
 }
