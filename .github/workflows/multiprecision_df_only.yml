@@ -3,7 +3,7 @@
 # Copyright 2021 John Maddock
 # Copyright 2021 Fahad Syed
 # Copyright 2021 Janek Kozicki
-# Copyright 2021 Christopher Kormanyos
+# Copyright 2021 - 2023 Christopher Kormanyos
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -28,7 +28,7 @@ jobs:
         standard: [ c++14, c++17, c++2a ]
         suite: [ df_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -90,7 +90,7 @@ jobs:
         standard: [ gnu++14, gnu++17, gnu++2a ]
         suite: [ df_quadmath_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -152,7 +152,7 @@ jobs:
         standard: [ c++14, c++17 ]
         suite: [ df_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -216,7 +216,7 @@ jobs:
         standard: [ 14, 17 ]
         suite: [ df_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Checkout main boost
@@ -259,7 +259,7 @@ jobs:
         standard: [ 14, 17, 20 ]
         suite: [ df_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Checkout main boost
@@ -297,7 +297,7 @@ jobs:
         standard: [ 14, 17, 2a ]
         suite: [ df_tests ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Checkout main boost
