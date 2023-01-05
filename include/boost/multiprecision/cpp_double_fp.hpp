@@ -16,7 +16,6 @@
 #endif
 
 #include <limits>
-#include <sstream>
 #include <string>
 #include <type_traits>
 
@@ -486,15 +485,6 @@ class cpp_double_fp_backend
    #endif
    const rep_type& crep() const noexcept { return data; }
 
-   std::string raw_str() const
-   {
-      // Retrieve debug string.
-
-      std::stringstream ss;
-      ss << std::hexfloat << std::showpos << data.first << " + " << std::hexfloat << data.second;
-      return ss.str();
-   }
-
    // Unary add/sub/mul/div.
    #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
    BOOST_MP_CXX14_CONSTEXPR
@@ -909,7 +899,12 @@ class cpp_double_fp_backend
       return cpp_double_fp_backend(cpp_df_qf_detail::ldexp_of_constituent(float_type(1), my_min_exponent));
    }
 
-   static constexpr cpp_double_fp_backend my_value_eps() noexcept
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   static BOOST_MP_CXX14_CONSTEXPR
+   #else
+   static constexpr
+   #endif
+   cpp_double_fp_backend my_value_eps() noexcept
    {
       // TBD: Do we need a better value here.
 
@@ -1942,7 +1937,7 @@ constexpr int                     std::numeric_limits<boost::multiprecision::num
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
 constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::min_exponent10;
 
-#ifdef BOOST_MP_MATH_AVAILABLE
+#if defined(BOOST_MP_MATH_AVAILABLE)
 namespace boost { namespace math { namespace policies {
 
 template <class FloatingPointType, class Policy, boost::multiprecision::expression_template_option ExpressionTemplates>
@@ -1963,9 +1958,7 @@ public:
          precision_type>::type;     // User customized precision.
 };
 
-}
-
-}} // namespace boost::math::policies
+} } } // namespace boost::math::policies
 #endif
 
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
