@@ -113,7 +113,6 @@ lib no_eh_support : no_eh_test_support.cpp ;
 test-suite df_tests :
 
    [ run test_arithmetic_df.cpp                  no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
-   [ run test_arithmetic_df.cpp                  no_eh_support : : : release : test_arithmetic_df2 ]
    [ run test_cpp_double_float_tgamma.cpp        no_eh_support : : : release : test_cpp_double_float_tgamma ]
    [ run test_cpp_double_fp_conv.cpp             no_eh_support : : : release : test_cpp_double_fp_conv ]
 
