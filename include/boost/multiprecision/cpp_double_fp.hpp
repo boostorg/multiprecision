@@ -1848,12 +1848,21 @@ constexpr
 #endif
 void eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
-   constexpr uint128_type my_max_val = static_cast<uint128_type>(~static_cast<uint128_type>(0));
+   uint128_type my_max_val { };
+
+   BOOST_IF_CONSTEXPR(std::is_same<FloatingPointType, float>::value && (std::numeric_limits<float>::digits == 24))
+   {
+      my_max_val = static_cast<uint128_type>(FLT_MAX);
+   }
+   else
+   {
+      my_max_val = static_cast<uint128_type>(~static_cast<uint128_type>(0));
+   }
 
    using c_type = typename std::common_type<uint128_type, FloatingPointType>::type;
 
-   constexpr c_type my_max = static_cast<c_type>(my_max_val);
-   const     c_type ct     = cpp_df_qf_detail::fabs_of_constituent(backend.crep().first);
+   const c_type my_max = static_cast<c_type>(my_max_val);
+   const c_type ct     = cpp_df_qf_detail::fabs_of_constituent(backend.crep().first);
 
    if (ct > my_max)
    {
