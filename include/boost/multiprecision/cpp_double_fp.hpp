@@ -526,18 +526,11 @@ class cpp_double_fp_backend
       }
 
       const auto iszero_u = (fpc_u == FP_ZERO);
+      const auto isnan_v  = (fpc_v == FP_NAN);
 
-      if (iszero_u)
+      if (iszero_u || (isnan_v || isinf_v))
       {
          return operator=(v);
-      }
-
-      const auto isnan_v = (fpc_v == FP_NAN);
-
-      if (isnan_v || isinf_v)
-      {
-         *this = v;
-         return *this;
       }
 
       float_type sec = my_second();
@@ -612,7 +605,7 @@ class cpp_double_fp_backend
 
       if (iszero_u || iszero_v)
       {
-         return *this = cpp_double_fp_backend(0);
+         return operator=(cpp_double_fp_backend(0));
       }
 
       rep_type tmp = arithmetic::product(data.first, v.data.first);
@@ -779,7 +772,7 @@ class cpp_double_fp_backend
 
          for (;;)
          {
-            if (static_cast<std::uint_fast8_t>(p_local & 1U) != static_cast<std::uint_fast8_t>(UINT8_C(0)))
+            if (static_cast<std::uint_fast8_t>(p_local & static_cast<std::uint32_t>(UINT8_C(1))) != static_cast<std::uint_fast8_t>(UINT8_C(0)))
             {
                result *= y;
             }
@@ -919,13 +912,15 @@ class cpp_double_fp_backend
    static constexpr cpp_double_fp_backend my_value_eps() noexcept
    {
       // TBD: Do we need a better value here.
-      return []() -> cpp_double_fp_backend {
-         cpp_double_fp_backend result;
 
-         eval_ldexp(result, cpp_double_fp_backend(1), 4 - my_digits);
+      // Or should we tune the value of epsilon() depending
+      // on the width of the underlying floating-point constituent.
 
-         return result;
-      }();
+      cpp_double_fp_backend result { };
+
+      eval_ldexp(result, cpp_double_fp_backend(1), 4 - my_digits);
+
+      return result;
    }
 
    static constexpr cpp_double_fp_backend my_value_nan() noexcept
@@ -1218,14 +1213,15 @@ constexpr
 #endif
 int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
 {
-   // The eval_fpclassify implementation is modelled
-   // after Matt Borland's work in <ccmath.hpp>.
+   // The eval_fpclassify implementation is slightly modelled
+   // after Matt Borland's constexpr-focussed work in <ccmath.hpp>.
 
-      return  BOOST_MP_ISNAN(o.crep().first) ? FP_NAN       :
-              BOOST_MP_ISINF(o.crep().first) ? FP_INFINITE  :
-              eval_is_zero(o)                ? FP_ZERO      :
-             (cpp_df_qf_detail::fabs_of_constituent(o.crep().first) > 0) && (cpp_df_qf_detail::fabs_of_constituent(o.crep().first) < (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::min)())
-                                             ? FP_SUBNORMAL : FP_NORMAL;
+   return  BOOST_MP_ISNAN(o.crep().first) ? FP_NAN       :
+           BOOST_MP_ISINF(o.crep().first) ? FP_INFINITE  :
+           eval_is_zero(o)                ? FP_ZERO      :
+          (   (cpp_df_qf_detail::fabs_of_constituent(o.crep().first) > 0)
+           && (cpp_df_qf_detail::fabs_of_constituent(o.crep().first) < (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::min)()))
+                                          ? FP_SUBNORMAL : FP_NORMAL;
 }
 
 template <typename FloatingPointType>

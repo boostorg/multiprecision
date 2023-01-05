@@ -97,7 +97,7 @@ struct numeric_limits_partial_of_constituent<float>
 
   static constexpr float (min)   () noexcept { return (std::numeric_limits<float>::min)(); }
   static constexpr float (max)   () noexcept { return (std::numeric_limits<float>::max)(); }
-  static constexpr float  epsilon() noexcept { return  std::numeric_limits<float>::epsilon(); }
+  static constexpr float  epsilon()          { return  std::numeric_limits<float>::epsilon(); }
 };
 
 template <>
@@ -113,7 +113,7 @@ struct numeric_limits_partial_of_constituent<double>
 
   static constexpr double (min)   () noexcept { return (std::numeric_limits<double>::min)(); }
   static constexpr double (max)   () noexcept { return (std::numeric_limits<double>::max)(); }
-  static constexpr double  epsilon() noexcept { return  std::numeric_limits<double>::epsilon(); }
+  static constexpr double  epsilon()          { return  std::numeric_limits<double>::epsilon(); }
 };
 
 template <>
@@ -129,7 +129,7 @@ struct numeric_limits_partial_of_constituent<long double>
 
   static constexpr long double (min)   () noexcept { return (std::numeric_limits<long double>::min)(); }
   static constexpr long double (max)   () noexcept { return (std::numeric_limits<long double>::max)(); }
-  static constexpr long double  epsilon() noexcept { return  std::numeric_limits<long double>::epsilon(); }
+  static constexpr long double  epsilon()          { return  std::numeric_limits<long double>::epsilon(); }
 };
 
 #if defined(BOOST_HAS_FLOAT128)
@@ -144,7 +144,7 @@ struct numeric_limits_partial_of_constituent<float128_type>
   static constexpr int  max_exponent   = 16384;
   static constexpr int  max_exponent10 = static_cast<int>(static_cast<long>(max_exponent) * 301L / 1000L);
 
-  static constexpr float128_type(min)() noexcept
+  static constexpr float128_type (min)() noexcept
   {
     return   static_cast<float128_type>(1)
            * static_cast<float128_type>(DBL_MIN)
@@ -165,7 +165,7 @@ struct numeric_limits_partial_of_constituent<float128_type>
            * static_cast<float128_type>(DBL_MIN) / 1073741824;
   }
 
-  static constexpr float128_type(max)() noexcept
+  static constexpr float128_type (max)() noexcept
   {
     // This has one bit set only.
     constexpr double dbl_mult = 8.9884656743115795386e+307;
@@ -189,7 +189,7 @@ struct numeric_limits_partial_of_constituent<float128_type>
            *  static_cast<float128_type>(dbl_mult) * 65536;
   }
 
-  static constexpr float128_type  epsilon()
+  static constexpr float128_type epsilon()
   {
     // This double value has only one bit set and so is exact.
     return 1.92592994438723585305597794258492732e-34;
