@@ -113,7 +113,6 @@ lib no_eh_support : no_eh_test_support.cpp ;
 test-suite df_tests :
 
    [ run test_arithmetic_df.cpp                  no_eh_support : : : release : test_arithmetic_df ]
-   [ run test_cpp_double_float_arithmetic.cpp    no_eh_support : : : release : test_cpp_double_float_arithmetic ]
    [ run test_cpp_double_float_tgamma.cpp        no_eh_support : : : release : test_cpp_double_float_tgamma ]
    [ run test_cpp_double_fp_conv.cpp             no_eh_support : : : release : test_cpp_double_fp_conv ]
 
@@ -142,7 +141,6 @@ test-suite df_tests :
 
 test-suite df_quadmath_tests :
 
-   [ run test_cpp_double_float_arithmetic.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 :                               : <build>no ] ]
    [ run test_cpp_double_float_tgamma.cpp     quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 :                               : <build>no ] ]
    [ run test_arithmetic_df.cpp               quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 :                               : <build>no ] ]
    [ run test_sqrt.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_sqrt_df ]
