@@ -13,8 +13,8 @@
 void test52()
 {
 #ifdef TEST_CPP_DOUBLE_FLOAT
-   using double_float_of_double_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_double_fp_backend<double>, boost::multiprecision::et_off>;
+   using boost::multiprecision::cpp_double_double;
 
-   test<double_float_of_double_type>("cpp_double_fp_backend<double>", 1024*16);
+   test<cpp_double_double>("cpp_double_fp_backend<double>", std::numeric_limits<cpp_double_double>::digits10);
 #endif
 }

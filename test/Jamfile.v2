@@ -261,7 +261,7 @@ alias precision_tests : test_preserve_source_precision_gmp test_preserve_source_
 rule get_function_tests
 {
    local result ;
-   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
+   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_pow_df.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
    {
          result += [ run $(source) gmp no_eh_support
               : # command line
@@ -296,6 +296,12 @@ rule get_function_tests
               : # requirements
                <define>TEST_CPP_BIN_FLOAT
               : $(source:B)_cpp_bin_float ] ;
+         result += [ run $(source) no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+               <define>TEST_CPP_DOUBLE_FLOAT
+              : $(source:B)_cpp_double_fp ] ;
          result += [ run $(source) quadmath no_eh_support
               : # command line
               : # input files
@@ -385,6 +391,13 @@ test-suite functions_and_limits :
               <define>TEST_CPP_BIN_FLOAT <define>PRINT_MAX_DIGITS10
               : test_numeric_limits_cpp_bin_float ]
 
+      [ run test_numeric_limits.cpp no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+              <define>TEST_CPP_DOUBLE_FLOAT <define>PRINT_MAX_DIGITS10
+              : test_numeric_limits_cpp_double_float ]
+
       [ run test_numeric_limits.cpp $(TOMMATH) no_eh_support
               : # command line
               : # input files
@@ -431,6 +444,8 @@ test-suite functions_and_limits :
 
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_BIN_FLOAT_2 : test_sf_import_c99_cpp_bin_float_2 ]
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_BIN_FLOAT_2 : test_sf_import_c99_cpp_bin_float_3 ]
+
+      [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DOUBLE_FLOAT : test_sf_import_c99_cpp_double_float ]
 
       [ run test_sf_import_c99.cpp mpfi mpfr gmp : : : <define>TEST_MPFI_DEBUG_ADAPTOR [ check-target-builds ../config//has_mpfi : : <build>no ] : test_sf_import_c99_mpfi_debug_adptr  ]
       [ run test_sf_import_c99.cpp mpfr gmp : : : <define>TEST_MPFR_DEBUG_ADAPTOR [ check-target-builds ../config//has_mpfr : : <build>no ] : test_sf_import_c99_mpfr_debug_adptr  ]

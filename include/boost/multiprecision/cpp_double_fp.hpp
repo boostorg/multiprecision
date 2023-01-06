@@ -1947,6 +1947,9 @@ BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE numeric_limits<boost::multiprecision::numbe
    static constexpr bool                    has_quiet_NaN                 = true;
    static constexpr bool                    has_signaling_NaN             = false;
    static constexpr bool                    has_denorm_loss               = true;
+   static constexpr bool                    traps                         = false;
+   static constexpr bool                    tinyness_before               = false;
+   static constexpr float_round_style       round_style                   = round_to_nearest;
 
    static constexpr int radix                          = 2;
    static constexpr int digits                         = inner_self_type::my_digits;
@@ -1987,6 +1990,8 @@ template <typename FloatingPointType, const boost::multiprecision::expression_te
 constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::is_iec559;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
 constexpr std::float_denorm_style std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::has_denorm;
+
+
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
 constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::has_infinity;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
@@ -1995,6 +2000,12 @@ template <typename FloatingPointType, const boost::multiprecision::expression_te
 constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::has_signaling_NaN;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
 constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::has_denorm_loss;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::traps;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr bool                    std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::tinyness_before;
+template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
+constexpr std::float_round_style  std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::round_style;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>
 constexpr int                     std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_double_fp_backend<FloatingPointType>, ExpressionTemplatesOption> >::radix;
 template <typename FloatingPointType, const boost::multiprecision::expression_template_option ExpressionTemplatesOption>

@@ -17,6 +17,45 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
+#define TEST_MPF_50
+//#  define TEST_MPF
+#define TEST_BACKEND
+#define TEST_CPP_DEC_FLOAT
+#define TEST_MPFR_50
+#define TEST_MPFI_50
+#define TEST_CPP_BIN_FLOAT
+
+#ifdef _MSC_VER
+#pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
+#endif
+#ifdef __GNUC__
+#pragma warning "CAUTION!!: No backend type specified so testing everything.... this will take some time!!"
+#endif
+
+#endif
+
+#if defined(TEST_MPF_50)
+#include <boost/multiprecision/gmp.hpp>
+#endif
+#if defined(TEST_MPFR_50)
+#include <boost/multiprecision/mpfr.hpp>
+#endif
+#if defined(TEST_MPFI_50)
+#include <boost/multiprecision/mpfi.hpp>
+#endif
+#ifdef TEST_BACKEND
+#include <boost/multiprecision/concepts/mp_number_archetypes.hpp>
+#endif
+#ifdef TEST_CPP_DEC_FLOAT
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#endif
+#ifdef TEST_FLOAT128
+#include <boost/multiprecision/float128.hpp>
+#endif
+#ifdef TEST_CPP_BIN_FLOAT
+#include <boost/multiprecision/cpp_bin_float.hpp>
+#endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
@@ -760,16 +799,69 @@ void test_bug_case()
 
 int main()
 {
-   test<boost::multiprecision::cpp_double_double>();
-   test<boost::multiprecision::cpp_double_long_double>();
-   #if defined(BOOST_HAS_FLOAT128)
-   test<boost::multiprecision::cpp_double_float128>();
-   #endif
+#ifdef TEST_BACKEND
+   test<boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype> >();
+#endif
+#ifdef TEST_MPF_50
+   test<boost::multiprecision::mpf_float_50>();
+   test<boost::multiprecision::mpf_float_100>();
+#endif
+#ifdef TEST_MPFR_50
+   test<boost::multiprecision::mpfr_float_50>();
+   test<boost::multiprecision::mpfr_float_100>();
+#endif
+#ifdef TEST_MPFI_50
+   test<boost::multiprecision::mpfi_float_50>();
+   test<boost::multiprecision::mpfi_float_100>();
+#endif
+#ifdef TEST_CPP_DEC_FLOAT
+   test<boost::multiprecision::cpp_dec_float_50>();
+   test<boost::multiprecision::cpp_dec_float_100>();
+#ifndef SLOW_COMPLER
+   // Some "peculiar" digit counts which stress our code:
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<63> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61, long long> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59, long long, std::allocator<char> > > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58, long long, std::allocator<char> > > >();
+   // Check low multiprecision digit counts.
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<9> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> > >();
+#endif
+#endif
+#ifdef TEST_FLOAT128
+   test<boost::multiprecision::float128>();
+#endif
+#ifdef TEST_CPP_BIN_FLOAT
+   test<boost::multiprecision::cpp_bin_float_50>();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
+#endif
+#ifdef TEST_CPP_DOUBLE_FLOAT
+   {
+      using boost::multiprecision::cpp_double_double;
+      using boost::multiprecision::cpp_double_long_double;
+      #if defined(BOOST_HAS_FLOAT128)
+      using boost::multiprecision::cpp_double_float128;
+      #endif
 
-   test_bug_case<boost::multiprecision::cpp_double_double>();
-   #if defined(BOOST_HAS_FLOAT128)
-   test_bug_case<boost::multiprecision::cpp_double_float128>();
-   #endif
+      test<cpp_double_double>();
+      test<cpp_double_long_double>();
+      #if defined(BOOST_HAS_FLOAT128)
+      test<cpp_double_float128>();
+      #endif
 
+      test_bug_case<cpp_double_double>();
+      // TBD: This is buggy: Why?
+      // Hmmm... The bug case is buggy for 10-byte long double.
+      // Is this supposed to be telling me something?
+      //test<cpp_double_long_double>();
+      #if defined(BOOST_HAS_FLOAT128)
+      test_bug_case<cpp_double_float128>();
+      #endif
+   }
+#endif
    return boost::report_errors();
 }
