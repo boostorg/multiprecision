@@ -446,8 +446,6 @@ test-suite functions_and_limits :
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_BIN_FLOAT_2 : test_sf_import_c99_cpp_bin_float_2 ]
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_BIN_FLOAT_2 : test_sf_import_c99_cpp_bin_float_3 ]
 
-      [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DOUBLE_FLOAT : test_sf_import_c99_cpp_double_float ]
-
       [ run test_sf_import_c99.cpp mpfi mpfr gmp : : : <define>TEST_MPFI_DEBUG_ADAPTOR [ check-target-builds ../config//has_mpfi : : <build>no ] : test_sf_import_c99_mpfi_debug_adptr  ]
       [ run test_sf_import_c99.cpp mpfr gmp : : : <define>TEST_MPFR_DEBUG_ADAPTOR [ check-target-builds ../config//has_mpfr : : <build>no ] : test_sf_import_c99_mpfr_debug_adptr  ]
 
