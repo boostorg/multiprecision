@@ -18,6 +18,10 @@
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
 
+#ifdef BOOST_HAS_FLOAT128
+#include <quadmath.h>
+#endif
+
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail {
 
 template <class FloatingPointType>

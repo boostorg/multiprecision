@@ -41,10 +41,6 @@
 #include <boost/math/special_functions/gamma.hpp>
 #endif
 
-#ifdef BOOST_HAS_FLOAT128
-#include <quadmath.h>
-#endif
-
 #if (defined(__clang__) && (__clang_major__ <= 9))
 #define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE struct
 #else
