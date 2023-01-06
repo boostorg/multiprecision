@@ -116,6 +116,7 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_backend_concept.cpp no_eh_support ]
    [ compile test_arithmetic_skeleton.cpp ]
 
+   [ run test_arithmetic_df.cpp              no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_cpp_dec_float_1.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_cpp_dec_float_2.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_cpp_dec_float_3.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]

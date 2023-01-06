@@ -1,40 +1,35 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2011-21 John Maddock. Distributed under the Boost
+//  Copyright John Maddock 2019.
+//  Copyright Christopher Kormanyos 2021 - 2023.
+//  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+
+#if !defined(TEST_CPP_DOUBLE_FLOAT)
+#define TEST_CPP_DOUBLE_FLOAT
+#endif
+
+#if !defined(TEST_CPP_BIN_FLOAT)
+#define TEST_CPP_BIN_FLOAT
+#endif
 
 //
 // This is the main entry point for our operator performance test suite.
 // In order to build this program, you must compile and link this file against
 // all the libs/multiprecision/performance/performance_test_files/*.cpp files.
 // 
-// The default behaviour is to "test everything", which is probably not what you want.
-// In order to restict testing to a specific selection of backends, you will need to
-// define one or more of the following macros when building:
-// 
-// TEST_MPF
-// TEST_MPZ
-// TEST_CPP_DEC_FLOAT
-// TEST_MPFR
-// TEST_MPQ
-// TEST_TOMMATH
-// TEST_TOMMATH_BOOST_RATIONAL
-// TEST_MPZ_BOOST_RATIONAL
-// TEST_CPP_INT
-// TEST_CPP_INT_RATIONAL
-// TEST_CPP_BIN_FLOAT
-// TEST_CPP_DOUBLE_FLOAT
-//
+
+#include <boost/version.hpp>
+
+#if defined(TEST_CPP_DOUBLE_FLOAT)
+#include <boost/multiprecision/cpp_double_fp.hpp>
+#endif
+
+#if defined(TEST_CPP_BIN_FLOAT)
+#include <boost/multiprecision/cpp_bin_float.hpp>
+#endif
 
 #include "performance_test.hpp"
-
-#ifdef TEST_MPZ
-#include <gmp.h>
-#endif
-#ifdef TEST_MPFR
-#include <mpfr.h>
-#endif
-#include <boost/version.hpp>
 
 //
 // Keys in order are:
@@ -164,59 +159,36 @@ int main()
 {
    quickbook_platform_details();
 
-   test01();
-   test02();
-   test03();
-   test04();
-   test05();
-   test06();
-   test07();
-   test08();
-   test09();
-   test10();
-   test11();
-   test12();
-   test13();
-   test14();
-   test15();
-   test16();
-   test17();
-   test18();
-   test19();
-   test20();
-   test21();
-   test22();
-   test23();
-   test24();
-   test25();
-   test26();
-   test27();
-   test28();
-   test29();
-   test30();
-   test31();
    test32();
-   test33();
-   test34();
-   test35();
-   test36();
-   test37();
-   test38();
-   test39();
-   test40();
-   test41();
-   test42();
-   test43();
-   test44();
-   test45();
-   test46();
-   test47();
-   test48();
-   test49();
-   test50();
-   test51();
    test52();
 
    quickbook_results();
-   return 0;
+}
+
+#ifdef TEST_CPP_DOUBLE_FLOAT
+using double_float_of_double_type = boost::multiprecision::cpp_double_double;
+
+constexpr auto digits10_for_performance_test = std::numeric_limits<double_float_of_double_type>::digits10;
+#else
+constexpr auto digits10_for_performance_test = 31;
+#endif
+
+void test32()
+{
+#ifdef TEST_CPP_BIN_FLOAT
+   static_assert(digits10_for_performance_test >= 31, "Error: Too few digits for performance comparison");
+
+   using cpp_bin_float_type =
+      boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<digits10_for_performance_test>,
+                                    boost::multiprecision::et_off>;
+
+   test<cpp_bin_float_type>("cpp_bin_float", digits10_for_performance_test);
+#endif
+}
+
+void test52()
+{
+#ifdef TEST_CPP_DOUBLE_FLOAT
+   test<double_float_of_double_type>("cpp_double_fp_backend<double>", digits10_for_performance_test);
+#endif
 }

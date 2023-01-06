@@ -12,7 +12,7 @@
 #if !defined(TEST_MPF) && !defined(TEST_MPZ) && \
     !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPQ) && !defined(TEST_TOMMATH) && \
     !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL) && !defined(TEST_CPP_INT) && \
-    !defined(TEST_CPP_INT_RATIONAL) && !defined(TEST_CPP_BIN_FLOAT)
+    !defined(TEST_CPP_INT_RATIONAL) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF
 #define TEST_MPZ
 #define TEST_MPQ
@@ -23,6 +23,7 @@
 #define TEST_CPP_INT
 #define TEST_CPP_INT_RATIONAL
 #define TEST_CPP_BIN_FLOAT
+#define TEST_CPP_DOUBLE_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -767,4 +768,5 @@ void test48();
 void test49();
 void test50();
 void test51();
+void test52();
 
