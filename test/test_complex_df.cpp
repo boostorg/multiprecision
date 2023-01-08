@@ -1,4 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
+// Copyright John Maddock 2016.
 //  Copyright Christopher Kormanyos 2016, 2021 - 2023.
 //  Distributed under the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt
@@ -128,10 +129,10 @@ void test()
    BOOST_CHECK_CLOSE_FRACTION(result_18.imag(), control_18.imag(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_19.real(), control_19.real(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_19.imag(), control_19.imag(), tol);
-   BOOST_CHECK_CLOSE_FRACTION(result_20.real(), control_20.real(), tol * 3);
-   BOOST_CHECK_CLOSE_FRACTION(result_20.imag(), control_20.imag(), tol * 3);
-   BOOST_CHECK_CLOSE_FRACTION(result_21.real(), control_21.real(), tol * 20);
-   BOOST_CHECK_CLOSE_FRACTION(result_21.imag(), control_21.imag(), tol * 20);
+   BOOST_CHECK_CLOSE_FRACTION(result_20.real(), control_20.real(), tol);
+   BOOST_CHECK_CLOSE_FRACTION(result_20.imag(), control_20.imag(), tol);
+   BOOST_CHECK_CLOSE_FRACTION(result_21.real(), control_21.real(), tol * 5);
+   BOOST_CHECK_CLOSE_FRACTION(result_21.imag(), control_21.imag(), tol * 5);
    BOOST_CHECK_CLOSE_FRACTION(result_22.real(), control_22.real(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_22.imag(), control_22.imag(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_23.real(), control_23.real(), tol);

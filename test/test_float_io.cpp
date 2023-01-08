@@ -263,7 +263,7 @@ T generate_random()
          / 0.301F
       );
    #else
-   constexpr auto exp_range = std::numeric_limits<T>::max_exponent - 10
+   constexpr auto exp_range = std::numeric_limits<T>::max_exponent - 10;
    #endif
 
    static boost::random::uniform_int_distribution<e_type> ui(0, exp_range);

@@ -71,7 +71,8 @@ test-suite performance :
             performance_test_files/test14.cpp  performance_test_files/test31.cpp  performance_test_files/test48.cpp
             performance_test_files/test15.cpp  performance_test_files/test32.cpp  performance_test_files/test49.cpp
             performance_test_files/test16.cpp  performance_test_files/test33.cpp  performance_test_files/test50.cpp
-            performance_test_files/test17.cpp  performance_test_files/test34.cpp  performance_test_files/test51.cpp            
+            performance_test_files/test17.cpp  performance_test_files/test34.cpp  performance_test_files/test51.cpp
+            performance_test_files/test52.cpp
             /boost/system//boost_system
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <define>TEST_MPQ <source>gmp : ]
