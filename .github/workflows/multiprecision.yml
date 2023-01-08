@@ -398,8 +398,8 @@ jobs:
       fail-fast: false
       matrix:
         toolset: [ gcc ]
-        standard: [ 11, 14, 17 ]
-        suite: [ github_ci_block_1, github_ci_block_2 ]
+        standard: [ 14, 17 ]
+        suite: [ arithmetic_tests, functions_and_limits, conversions, github_ci_block_2 ]
     steps:
       - uses: actions/checkout@v3
         with:
