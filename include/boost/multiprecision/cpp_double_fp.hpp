@@ -452,7 +452,7 @@ class cpp_double_fp_backend
          data.first  = -data.first;
          data.second = -data.second;
 
-         arithmetic::normalize(data);
+         arithmetic::normalize(data, data.first, data.second);
       }
    }
 
@@ -522,14 +522,16 @@ class cpp_double_fp_backend
       }
 
       float_type sec = my_second();
-      data = arithmetic::sum(my_first(), v.my_first());
+      arithmetic::sum(data, my_first(), v.my_first());
 
-      const rep_type t = arithmetic::sum(sec, v.my_second());
+      rep_type t { };
+
+      arithmetic::sum(t, sec, v.my_second());
 
       data.second += t.first;
-      arithmetic::normalize(data);
+      arithmetic::normalize(data, data.first, data.second);
       data.second += t.second;
-      arithmetic::normalize(data);
+      arithmetic::normalize(data, data.first, data.second);
 
       return *this;
    }
@@ -695,9 +697,7 @@ class cpp_double_fp_backend
 
       const FloatingPointType p_prime = r.my_first() / v.my_first();
 
-      arithmetic::normalize(p);
-
-      data = p;
+      arithmetic::normalize(data, p.first, p.second);
 
       operator+=(p_prime);
 
@@ -1152,16 +1152,12 @@ constexpr void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, cons
 template <typename FloatingPointType>
 constexpr void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int v)
 {
-   result.rep() =
-      std::make_pair
-      (
-         cpp_df_qf_detail::ccmath::ldexp(a.crep().first,  v),
-         cpp_df_qf_detail::ccmath::ldexp(a.crep().second, v)
-      );
+   result.rep().first  = cpp_df_qf_detail::ccmath::ldexp(a.crep().first,  v);
+   result.rep().second = cpp_df_qf_detail::ccmath::ldexp(a.crep().second, v);
 
    using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
 
-   local_backend_type::arithmetic::normalize(result.rep());
+   local_backend_type::arithmetic::normalize(result.rep(), result.rep().first, result.rep().second);
 }
 
 template <typename FloatingPointType>
@@ -1186,7 +1182,7 @@ void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, const cpp_doub
       result.rep().first  = fhi;
       result.rep().second = cpp_df_qf_detail::floor_of_constituent(x.rep().second);
 
-      double_float_type::arithmetic::normalize(result.rep());
+      double_float_type::arithmetic::normalize(result.rep(), result.rep().first, result.rep().second);
    }
 }
 
@@ -1215,12 +1211,12 @@ int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
    // The eval_fpclassify implementation is slightly modelled
    // after Matt Borland's constexpr-focussed work in <ccmath.hpp>.
 
-   return  BOOST_MP_ISNAN(o.crep().first) ? FP_NAN       :
-           BOOST_MP_ISINF(o.crep().first) ? FP_INFINITE  :
-           eval_is_zero(o)                ? FP_ZERO      :
+   return  cpp_df_qf_detail::ccmath::isnan(o.crep().first) ? FP_NAN       :
+           cpp_df_qf_detail::ccmath::isinf(o.crep().first) ? FP_INFINITE  :
+           eval_is_zero(o)                                 ? FP_ZERO      :
           (   (cpp_df_qf_detail::ccmath::fabs(o.crep().first) > 0)
            && (cpp_df_qf_detail::ccmath::fabs(o.crep().first) < (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::min)()))
-                                          ? FP_SUBNORMAL : FP_NORMAL;
+                                                           ? FP_SUBNORMAL : FP_NORMAL;
 }
 
 template <typename FloatingPointType>

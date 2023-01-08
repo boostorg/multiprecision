@@ -66,7 +66,13 @@ struct exact_arithmetic
    using float_pair  = std::pair<float_type, float_type>;
    using float_tuple = std::tuple<float_type, float_type, float_type, float_type>;
 
-   static BOOST_MP_CXX14_CONSTEXPR float_pair split(const float_type& a)
+   static
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   float_pair split(const float_type& a)
    {
       // Split a floating point number in two (high and low) parts approximating the
       // upper-half and lower-half bits of the float
@@ -117,36 +123,48 @@ struct exact_arithmetic
       return std::make_pair(hi, lo);
    }
 
-   static BOOST_MP_CXX14_CONSTEXPR float_pair fast_sum(const float_type& a, const float_type& b)
+   static
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   float_pair fast_sum(float_type a, float_type b)
    {
       // Exact addition of two floating point numbers, given |a| > |b|
       const float_type a_plus_b = a + b;
 
-      return float_pair(a_plus_b, b - (a_plus_b - a));
+      const float_pair result(a_plus_b, b - (a_plus_b - a));
+
+      return result;
    }
 
-   static BOOST_MP_CXX14_CONSTEXPR float_pair sum(const float_type& a, const float_type& b)
+   static
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   void sum(float_pair& result, float_type a, float_type b)
    {
       // Exact addition of two floating point numbers
       const float_type a_plus_b = a + b;
       const float_type v        = a_plus_b - a;
 
-      return float_pair(a_plus_b, (a - (a_plus_b - v)) + (b - v));
+      const float_pair tmp(a_plus_b, (a - (a_plus_b - v)) + (b - v));
+
+      result.first  = tmp.first;
+      result.second = tmp.second;
    }
 
-   static BOOST_MP_CXX14_CONSTEXPR void three_sum(float_type& a, float_type& b, float_type& c)
-   {
-      using std::get;
-      using std::tie;
-
-      std::tuple<float_type, float_type, float_type> t;
-
-      tie(get<0>(t), get<1>(t)) = sum(a, b);
-      tie(a, get<2>(t))         = sum(c, get<0>(t));
-      tie(b, c)                 = sum(get<1>(t), get<2>(t));
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR void sum(float_pair& p, float_type& e)
+   #if 0
+   static
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   void sum(float_pair& p, float_type& e)
    {
       using std::tie;
 
@@ -157,15 +175,15 @@ struct exact_arithmetic
       tie(p.first, t_) = sum(e, t.first);
       tie(p.second, e) = sum(t.second, t_);
    }
+   #endif
 
-   static BOOST_MP_CXX14_CONSTEXPR float_tuple four_sum(float_type a, float_type b, float_type c, float_type d)
-   {
-      float_tuple out = std::make_tuple(a, b, c, d);
-      normalize(out);
-      return out;
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR float_pair difference(const float_type& a, const float_type& b)
+   static
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   float_pair difference(const float_type& a, const float_type& b)
    {
       // Exact subtraction of two floating point numbers
       const float_type a_minus_b = a - b;
@@ -174,7 +192,13 @@ struct exact_arithmetic
       return float_pair(a_minus_b, (a - (a_minus_b - v)) - (b + v));
    }
 
-   static BOOST_MP_CXX14_CONSTEXPR float_pair product(const float_type& a, const float_type& b)
+   static
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   float_pair product(const float_type& a, const float_type& b)
    {
       // Exact product of two floating point numbers
       const float_pair a_split = split(a);
@@ -196,104 +220,19 @@ struct exact_arithmetic
         );
    }
 
-   static BOOST_MP_CXX14_CONSTEXPR void normalize(float_pair& p, bool fast = true)
+   static
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   void normalize(float_pair& result, float_type a, float_type b)
    {
       // Converts a pair of floats to standard form.
+      const float_pair tmp = fast_sum(a, b);
 
-      p = (fast ? fast_sum(p.first, p.second) : sum(p.first, p.second));
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR void normalize(float_tuple& t)
-   {
-      using std::get;
-      using std::tie;
-
-      float_tuple s(float_type(0.0F), float_type(0.0F), float_type(0.0F), float_type(0.0F));
-
-      tie(get<0>(s), get<3>(t)) = fast_sum(get<2>(t), get<3>(t));
-      tie(get<0>(s), get<2>(t)) = fast_sum(get<1>(t), get<0>(s));
-      tie(get<0>(t), get<1>(t)) = fast_sum(get<0>(t), get<0>(s));
-
-      tie(get<0>(s), get<1>(s)) = std::make_tuple(get<0>(t), get<1>(t));
-
-      if (get<1>(s) != 0)
-      {
-         tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<2>(t));
-
-         (get<2>(s) != 0) ? tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), get<3>(t))
-                          : tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
-      }
-      else
-      {
-         tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<2>(t));
-
-         (get<1>(s) != 0) ? tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t))
-                          : tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<3>(t));
-      }
-
-      t = s;
-   }
-
-   static BOOST_MP_CXX14_CONSTEXPR void normalize(float_tuple& t, float_type e)
-   {
-      using std::get;
-      using std::tie;
-
-      float_tuple s(float_type(0.0F), float_type(0.0F), float_type(0.0F), float_type(0.0F));
-
-      tie(get<0>(s), e)         = fast_sum(get<3>(t), e);
-      tie(get<0>(s), get<3>(t)) = fast_sum(get<2>(t), get<0>(s));
-      tie(get<0>(s), get<2>(t)) = fast_sum(get<1>(t), get<0>(s));
-      tie(get<0>(t), get<1>(t)) = fast_sum(get<0>(t), get<0>(s));
-
-      tie(get<0>(s), get<1>(s)) = std::make_tuple(get<0>(t), get<1>(t));
-
-      if (get<1>(s) != 0)
-      {
-         tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<2>(t));
-
-         if (get<2>(s) != 0)
-         {
-            tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), get<3>(t));
-
-            if(get<3>(s) != 0)
-            {
-              get<3>(s) += e;
-            }
-            else
-            {
-              tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e);
-            }
-         }
-         else
-         {
-            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
-
-            (get<2>(s) != 0) ? tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e)
-                             : tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
-         }
-      }
-      else
-      {
-         tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<2>(t));
-
-         if (get<1>(s) != 0)
-         {
-            tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), get<3>(t));
-
-            (get<2>(s) != 0) ? tie(get<2>(s), get<3>(s)) = fast_sum(get<2>(s), e)
-                             : tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e);
-         }
-         else
-         {
-            tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), get<3>(t));
-
-            (get<1>(s) != 0) ? tie(get<1>(s), get<2>(s)) = fast_sum(get<1>(s), e)
-                             : tie(get<0>(s), get<1>(s)) = fast_sum(get<0>(s), e);
-         }
-      }
-
-      t = s;
+      result.first  = tmp.first;
+      result.second = tmp.second;
    }
 };
 

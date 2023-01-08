@@ -21,7 +21,12 @@ namespace detail
 {
 
 template <typename Real>
-inline constexpr Real frexp_zero_impl(Real arg, int* exp)
+#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+BOOST_MP_CXX14_CONSTEXPR
+#else
+constexpr
+#endif
+Real frexp_zero_impl(Real arg, int* exp)
 {
    if (exp != nullptr)
    {
@@ -32,10 +37,17 @@ inline constexpr Real frexp_zero_impl(Real arg, int* exp)
 }
 
 template <typename Real>
-inline constexpr Real frexp_impl(Real arg, int* expptr)
+#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+BOOST_MP_CXX14_CONSTEXPR
+#else
+constexpr
+#endif
+Real frexp_impl(Real arg, int* expptr)
 {
    Real f = arg;
-   int e2 = 0;
+
+   auto e2 = static_cast<int>(0);
+
    constexpr Real two_pow_n_big = Real(UINT32_C(65536));
 
    while (f >= two_pow_n_big)
@@ -67,10 +79,17 @@ inline constexpr Real frexp_impl(Real arg, int* expptr)
 }
 
 template <typename Real>
-inline constexpr Real frexp_impl_lt_half(Real arg, int* expptr)
+#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+BOOST_MP_CXX14_CONSTEXPR
+#else
+constexpr
+#endif
+Real frexp_impl_lt_half(Real arg, int* expptr)
 {
    Real f = arg;
-   int e2 = 0;
+
+   auto e2 = static_cast<int>(0);
+
    constexpr Real two_pow_n_big = Real(UINT32_C(65536));
 
    while (f < Real(0.00000762939453125L))
@@ -104,7 +123,12 @@ inline constexpr Real frexp_impl_lt_half(Real arg, int* expptr)
 } // namespace detail
 
 template <typename Real>
-inline constexpr Real frexp(Real arg, int* expptr)
+#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+BOOST_MP_CXX14_CONSTEXPR
+#else
+constexpr
+#endif
+Real frexp(Real arg, int* expptr)
 {
    if (   (arg == Real(0))
        || (arg == Real(-0))
