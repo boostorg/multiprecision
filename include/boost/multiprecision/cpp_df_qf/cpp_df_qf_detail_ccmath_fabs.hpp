@@ -16,18 +16,9 @@ namespace boost { namespace multiprecision { namespace backends { namespace cpp_
 template <class FloatingPointType>
 constexpr FloatingPointType fabs(FloatingPointType x)
 {
-   if (cpp_df_qf_detail::ccmath::isnan(x))
-   {
-      return cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::quiet_NaN();
-   }
-   else if (x == static_cast<FloatingPointType>(-0))
-   {
-      return static_cast<FloatingPointType>(0);
-   }
-   else
-   {
-      return ((x >= 0) ? x : -x);
-   }
+   return (cpp_df_qf_detail::ccmath::isnan(x))      ? cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::quiet_NaN() :
+          (x == static_cast<FloatingPointType>(-0)) ? static_cast<FloatingPointType>(0) :
+          (x >= 0)                                  ? x : -x;
 };
 
 } } } } } // namespace boost::multiprecision::backends::cpp_df_qf_detail::ccmath

@@ -1259,9 +1259,9 @@ void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_doubl
 
    const local_float_type c = cpp_df_qf_detail::ccmath::sqrt(o.crep().first);
 
-   constexpr int              MantissaBits = cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits;
-   constexpr int              SplitBits    = MantissaBits / 2 + 1;
-   constexpr local_float_type Splitter     = static_cast<local_float_type>((1ULL << SplitBits) + 1);
+   constexpr auto MantissaBits = cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits;
+   constexpr auto SplitBits    = static_cast<int>((MantissaBits / 2) + 1);
+   constexpr auto Splitter     = static_cast<local_float_type>((1ULL << SplitBits) + 1);
 
    local_float_type p  = Splitter * c;
    local_float_type hx = (c - p);
@@ -1314,7 +1314,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       // Get a local copy of the argument and force it to be positive.
       const auto b_neg = x.is_neg();
 
-      double_float_type xx;
+      double_float_type xx { };
 
       eval_fabs(xx, x);
 
@@ -1323,7 +1323,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       {
          []() -> local_float_type
          {
-            local_float_type mx;
+            local_float_type mx { };
             eval_convert_to(&mx, double_float_type::my_value_max());
 
             const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
@@ -1336,7 +1336,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       {
          []() -> local_float_type
          {
-            local_float_type mn;
+            local_float_type mn { };
             eval_convert_to(&mn, double_float_type::my_value_min());
 
             const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
@@ -1368,14 +1368,14 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       {
          // Use an argument reduction algorithm for exp() in classic MPFUN-style.
 
-         double_float_type nf;
+         double_float_type nf { };
 
          eval_floor(nf, xx / cpp_df_qf_detail::constant_df_ln_two<local_float_type>());
 
          // Prepare the scaled variables.
          const auto b_scale = (xx.order02() > -1);
 
-         double_float_type r;
+         double_float_type r { };
 
          if (b_scale)
          {
@@ -1461,9 +1461,9 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       using local_float_type  = typename double_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
-      const bool b_neg = x.is_neg();
+      const auto b_neg = x.is_neg();
 
-      double_float_type xx;
+      double_float_type xx { };
 
       eval_fabs(xx, x);
 
@@ -1472,7 +1472,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       {
          []() -> local_float_type
          {
-            local_float_type mx;
+            local_float_type mx { };
             eval_convert_to(&mx, double_float_type::my_value_max());
 
             const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
@@ -1485,7 +1485,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       {
          []() -> local_float_type
          {
-            local_float_type mn;
+            local_float_type mn { };
             eval_convert_to(&mn, double_float_type::my_value_min());
 
             const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
@@ -1517,14 +1517,14 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       {
          // Use an argument reduction algorithm for exp() in classic MPFUN-style.
 
-         double_float_type nf;
+         double_float_type nf { };
 
          eval_floor(nf, xx / cpp_df_qf_detail::constant_df_ln_two<local_float_type>());
 
          // Prepare the scaled variables.
-         const bool b_scale = (xx.order02() > -4);
+         const auto b_scale = (xx.order02() > -4);
 
-         double_float_type r;
+         double_float_type r { };
 
          if (b_scale)
          {
@@ -1610,9 +1610,9 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       using local_float_type  = typename double_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
-      const bool b_neg = x.is_neg();
+      const auto b_neg = x.is_neg();
 
-      double_float_type xx;
+      double_float_type xx { };
 
       eval_fabs(xx, x);
 
@@ -1621,7 +1621,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       {
          []() -> local_float_type
          {
-            local_float_type mx;
+            local_float_type mx { };
             eval_convert_to(&mx, double_float_type::my_value_max());
 
             const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
@@ -1634,7 +1634,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       {
          []() -> local_float_type
          {
-            local_float_type mn;
+            local_float_type mn { };
             eval_convert_to(&mn, double_float_type::my_value_min());
 
             const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
@@ -1666,14 +1666,14 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       {
          // Use an argument reduction algorithm for exp() in classic MPFUN-style.
 
-         double_float_type nf;
+         double_float_type nf { };
 
          eval_floor(nf, xx / cpp_df_qf_detail::constant_df_ln_two<local_float_type>());
 
          // Prepare the scaled variables.
-         const bool b_scale = (xx.order02() > -4);
+         const auto b_scale = (xx.order02() > -4);
 
-         double_float_type xh;
+         double_float_type xh { };
 
          if (b_scale)
          {
@@ -1766,24 +1766,35 @@ void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
    }
    else if(eval_lt(x, double_float_type(1)))
    {
-     double_float_type x_inv;
-     eval_divide(x_inv, double_float_type(1), x);
-     eval_log(result, x_inv);
-     result.negate();
+      // TBD: Optimize check with 1.
+      // TBD: optimize inversion and negation.
+
+      double_float_type x_inv;
+      eval_divide(x_inv, double_float_type(1), x);
+      eval_log(result, x_inv);
+      result.negate();
    }
    else if(eval_gt(x, double_float_type(1)))
    {
-      double_float_type x2;
-      int n2;
+      // TBD: Optimize check with 1.
+
+      // TBD: Optimize to only use eval_frexp if (and only if) the exponent
+      // is actually large/small in the sense of above/below a defined cutoff.
+
+      double_float_type x2 { };
+
+      int n2 { };
+
       eval_frexp(x2, x, &n2);
 
       // Get initial estimate using the (wrapped) standard math function log.
       const double_float_type s(cpp_df_qf_detail::log_of_constituent(x2.crep().first));
-      double_float_type E;
+
+      double_float_type E { };
 
       eval_exp(E, s);
 
-      // Do one single step of Newton-Raphson iteration
+      // Do one single step of Newton-Raphson iteration.
       result = s + ((x2 - E) / E);
 
       double_float_type xn2(n2);
@@ -2045,6 +2056,8 @@ constexpr
 typename std::enable_if<cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value>::type eval_convert_to(OtherFloatingPointType* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
    const auto fpc = eval_fpclassify(backend);
+
+   // TBD: Implement min/max chek for the destination floating-point type result.
 
    if(fpc != FP_NORMAL)
    {
