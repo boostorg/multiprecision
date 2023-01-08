@@ -17,6 +17,7 @@
 
 #include <boost/config.hpp>
 #include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath.hpp>
 
 #ifdef BOOST_HAS_FLOAT128
 #include <quadmath.h>
@@ -24,187 +25,32 @@
 
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail {
 
+template <class T> T                      floor_of_constituent                        (T                      x) { return T(); }
+template <>        float                  floor_of_constituent<float>                 (float                  x) { return ::floorf(x); }
+template <>        double                 floor_of_constituent<double>                (double                 x) { return ::floor (x); }
+template <>        long double            floor_of_constituent<long double>           (long double            x) { return ::floorl(x); }
+#if defined(BOOST_HAS_FLOAT128)
+template <>        ::boost::float128_type floor_of_constituent<::boost::float128_type>(::boost::float128_type x) { return ::floorq(x); }
+#endif
+
+template <class T> T                      log_of_constituent                        (T                      x) { return T(); }
+template <>        float                  log_of_constituent<float>                 (float                  x) { return ::logf(x); }
+template <>        double                 log_of_constituent<double>                (double                 x) { return ::log (x); }
+template <>        long double            log_of_constituent<long double>           (long double            x) { return ::logl(x); }
+#if defined(BOOST_HAS_FLOAT128)
+template <>        ::boost::float128_type log_of_constituent<::boost::float128_type>(::boost::float128_type x) { return ::logq(x); }
+#endif
+
 template <class FloatingPointType>
-constexpr FloatingPointType fabs_of_constituent(FloatingPointType x)
-{
-   return (x == static_cast<FloatingPointType>(-0))
-      ? static_cast<FloatingPointType>(0)
-      : ((x >= 0) ? x : -x);
-};
-
-template <class T> T             frexp_of_constituent               (T             x, int*)        { return T(); }
-template <>        float         frexp_of_constituent<float>        (float         x, int* expptr) { return ::frexpf(x, expptr); }
-template <>        double        frexp_of_constituent<double>       (double        x, int* expptr) { return ::frexp (x, expptr); }
-template <>        long double   frexp_of_constituent<long double>  (long double   x, int* expptr) { return ::frexpl(x, expptr); }
-#if defined(BOOST_HAS_FLOAT128)
-template <>        float128_type frexp_of_constituent<float128_type>(float128_type x, int* expptr) { return ::frexpq(x, expptr); }
-#endif
-
-template <class T> T             ldexp_of_constituent               (T             x, int)        { return T(); }
-template <>        float         ldexp_of_constituent<float>        (float         x, int expval) { return ::ldexpf(x, expval); }
-template <>        double        ldexp_of_constituent<double>       (double        x, int expval) { return ::ldexp (x, expval); }
-template <>        long double   ldexp_of_constituent<long double>  (long double   x, int expval) { return ::ldexpl(x, expval); }
-#if defined(BOOST_HAS_FLOAT128)
-template <>        float128_type ldexp_of_constituent<float128_type>(float128_type x, int expval) { return ::ldexpq(x, expval); }
-#endif
-
-template <class T> T             sqrt_of_constituent               (T             x) { return T(); }
-template <>        float         sqrt_of_constituent<float>        (float         x) { return ::sqrtf(x); }
-template <>        double        sqrt_of_constituent<double>       (double        x) { return ::sqrt (x); }
-template <>        long double   sqrt_of_constituent<long double>  (long double   x) { return ::sqrtl(x); }
-#if defined(BOOST_HAS_FLOAT128)
-template <>        float128_type sqrt_of_constituent<float128_type>(float128_type x) { return ::sqrtq(x); }
-#endif
-
-template <class T> T             floor_of_constituent               (T             x) { return T(); }
-template <>        float         floor_of_constituent<float>        (float         x) { return ::floorf(x); }
-template <>        double        floor_of_constituent<double>       (double        x) { return ::floor (x); }
-template <>        long double   floor_of_constituent<long double>  (long double   x) { return ::floorl(x); }
-#if defined(BOOST_HAS_FLOAT128)
-template <>        float128_type floor_of_constituent<float128_type>(float128_type x) { return ::floorq(x); }
-#endif
-
-template <class T> T             log_of_constituent               (T             x) { return T(); }
-template <>        float         log_of_constituent<float>        (float         x) { return ::logf(x); }
-template <>        double        log_of_constituent<double>       (double        x) { return ::log (x); }
-template <>        long double   log_of_constituent<long double>  (long double   x) { return ::logl(x); }
-#if defined(BOOST_HAS_FLOAT128)
-template <>        float128_type log_of_constituent<float128_type>(float128_type x) { return ::logq(x); }
-#endif
-
-template <class T>
-struct numeric_limits_partial_of_constituent
-{
-  static constexpr bool is_specialized = false;
-  static constexpr int  digits         = 0;
-  static constexpr int  digits10       = 0;
-  static constexpr int  min_exponent   = 0;
-  static constexpr int  min_exponent10 = 0;
-  static constexpr int  max_exponent   = 0;
-  static constexpr int  max_exponent10 = 0;
-
-  static constexpr T (min)   () noexcept { return T(); }
-  static constexpr T (max)   () noexcept { return T(); }
-  static constexpr T  epsilon()          { return T(); }
-};
-
-template <>
-struct numeric_limits_partial_of_constituent<float>
-{
-  static constexpr bool is_specialized = true;
-  static constexpr int  digits         = std::numeric_limits<float>::digits;
-  static constexpr int  digits10       = std::numeric_limits<float>::digits10;
-  static constexpr int  min_exponent   = std::numeric_limits<float>::min_exponent;
-  static constexpr int  min_exponent10 = std::numeric_limits<float>::min_exponent10;
-  static constexpr int  max_exponent   = std::numeric_limits<float>::max_exponent;
-  static constexpr int  max_exponent10 = std::numeric_limits<float>::max_exponent10;
-
-  static constexpr float (min)   () noexcept { return (std::numeric_limits<float>::min)(); }
-  static constexpr float (max)   () noexcept { return (std::numeric_limits<float>::max)(); }
-  static constexpr float  epsilon()          { return  std::numeric_limits<float>::epsilon(); }
-};
-
-template <>
-struct numeric_limits_partial_of_constituent<double>
-{
-  static constexpr bool is_specialized = true;
-  static constexpr int  digits         = std::numeric_limits<double>::digits;
-  static constexpr int  digits10       = std::numeric_limits<double>::digits10;
-  static constexpr int  min_exponent   = std::numeric_limits<double>::min_exponent;
-  static constexpr int  min_exponent10 = std::numeric_limits<double>::min_exponent10;
-  static constexpr int  max_exponent   = std::numeric_limits<double>::max_exponent;
-  static constexpr int  max_exponent10 = std::numeric_limits<double>::max_exponent10;
-
-  static constexpr double (min)   () noexcept { return (std::numeric_limits<double>::min)(); }
-  static constexpr double (max)   () noexcept { return (std::numeric_limits<double>::max)(); }
-  static constexpr double  epsilon()          { return  std::numeric_limits<double>::epsilon(); }
-};
-
-template <>
-struct numeric_limits_partial_of_constituent<long double>
-{
-  static constexpr bool is_specialized = true;
-  static constexpr int  digits         = std::numeric_limits<long double>::digits;
-  static constexpr int  digits10       = std::numeric_limits<long double>::digits10;
-  static constexpr int  min_exponent   = std::numeric_limits<long double>::min_exponent;
-  static constexpr int  min_exponent10 = std::numeric_limits<long double>::min_exponent10;
-  static constexpr int  max_exponent   = std::numeric_limits<long double>::max_exponent;
-  static constexpr int  max_exponent10 = std::numeric_limits<long double>::max_exponent10;
-
-  static constexpr long double (min)   () noexcept { return (std::numeric_limits<long double>::min)(); }
-  static constexpr long double (max)   () noexcept { return (std::numeric_limits<long double>::max)(); }
-  static constexpr long double  epsilon()          { return  std::numeric_limits<long double>::epsilon(); }
-};
-
-#if defined(BOOST_HAS_FLOAT128)
-template <>
-struct numeric_limits_partial_of_constituent<float128_type>
-{
-  static constexpr bool is_specialized = true;
-  static constexpr int  digits         = 113;
-  static constexpr int  digits10       = 33;
-  static constexpr int  min_exponent   = -16381;
-  static constexpr int  min_exponent10 = static_cast<int>(static_cast<long>(min_exponent) * 301L / 1000L);
-  static constexpr int  max_exponent   = 16384;
-  static constexpr int  max_exponent10 = static_cast<int>(static_cast<long>(max_exponent) * 301L / 1000L);
-
-  static constexpr float128_type (min)() noexcept
-  {
-    return   static_cast<float128_type>(1)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN)
-           * static_cast<float128_type>(DBL_MIN) / 1073741824;
-  }
-
-  static constexpr float128_type (max)() noexcept
-  {
-    // This has one bit set only.
-    constexpr double dbl_mult = 8.9884656743115795386e+307;
-
-    return   (static_cast<float128_type>(1) - 9.62964972193617926527988971292463659e-35) // This now has all bits sets to 1
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult)
-           *  static_cast<float128_type>(dbl_mult) * 65536;
-  }
-
-  static constexpr float128_type epsilon()
-  {
-    // This double value has only one bit set and so is exact.
-    return 1.92592994438723585305597794258492732e-34;
-  }
-};
-#endif
-
-template <class T>
 struct is_floating_point_or_float128
 {
-   static constexpr auto value = numeric_limits_partial_of_constituent<T>::is_specialized;
+   static constexpr auto value =    std::is_same<FloatingPointType, float>::value
+                                 || std::is_same<FloatingPointType, double>::value
+                                 || std::is_same<FloatingPointType, long double>::value
+#if defined(BOOST_HAS_FLOAT128)
+                                 || std::is_same<FloatingPointType, ::boost::float128_type>::value
+#endif
+                                 ;
 };
 
 template <typename FloatingPointType>
@@ -229,7 +75,7 @@ struct exact_arithmetic
                     "Error: exact_arithmetic<>::split invoked with unknown floating-point type");
 
       // TODO Replace bit shifts with constexpr funcs or ldexp for better compaitibility
-      constexpr int MantissaBits = numeric_limits_partial_of_constituent<float_type>::digits;
+      constexpr int MantissaBits = cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits;
       constexpr int SplitBits    = MantissaBits / 2 + 1;
 
       // Check if the integer is wide enough to hold the Splitter.
@@ -240,7 +86,7 @@ struct exact_arithmetic
       // line below it with the commented line
 
       constexpr float_type Splitter       = FloatingPointType((static_cast<std::uintmax_t>(UINT8_C(1)) << SplitBits) + 1);
-      const     float_type SplitThreshold = (numeric_limits_partial_of_constituent<float_type>::max)() / (Splitter * 2);
+      const     float_type SplitThreshold = (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)() / (Splitter * 2);
 
       float_type hi { };
       float_type lo { };

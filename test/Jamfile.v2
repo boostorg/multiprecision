@@ -392,11 +392,12 @@ test-suite functions_and_limits :
               <define>TEST_CPP_BIN_FLOAT <define>PRINT_MAX_DIGITS10
               : test_numeric_limits_cpp_bin_float ]
 
-      [ run test_numeric_limits.cpp no_eh_support
+      [ run test_numeric_limits.cpp quadmath no_eh_support
               : # command line
               : # input files
               : # requirements
               <define>TEST_CPP_DOUBLE_FLOAT <define>PRINT_MAX_DIGITS10
+               [ check-target-builds ../config//has_float128 : : <build>no ]
               : test_numeric_limits_cpp_double_float ]
 
       [ run test_numeric_limits.cpp $(TOMMATH) no_eh_support

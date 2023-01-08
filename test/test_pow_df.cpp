@@ -782,17 +782,21 @@ void test()
 template <class T>
 void test_bug_case()
 {
-   T bug_case = -1.05L * log((std::numeric_limits<T>::max)()) / log(T(1.01L));
+   T bug_case = -T(T(105) / 100) * log((std::numeric_limits<T>::max)()) / log(T(T(101) / 100));
 
    for (unsigned i = 0; i < 100; ++i, bug_case *= 1.05L)
    {
+      const T p101 = pow(T(T(101) / 100), bug_case);
+
+      BOOST_CHECK(isfinite(p101));
+
       if (std::numeric_limits<T>::has_infinity)
       {
-         BOOST_CHECK_EQUAL(pow(T(1.01L), bug_case), 0);
+         BOOST_CHECK_EQUAL(p101, 0);
       }
       else
       {
-         BOOST_CHECK_LE(pow(T(1.01L), bug_case), (std::numeric_limits<T>::min)());
+         BOOST_CHECK_LE(p101, (std::numeric_limits<T>::min)());
       }
    }
 }
@@ -854,10 +858,7 @@ int main()
       #endif
 
       test_bug_case<cpp_double_double>();
-      // TBD: This is buggy: Why?
-      // Hmmm... The bug case is buggy for 10-byte long double.
-      // Is this supposed to be telling me something?
-      //test<cpp_double_long_double>();
+      test_bug_case<cpp_double_long_double>();
       #if defined(BOOST_HAS_FLOAT128)
       test_bug_case<cpp_double_float128>();
       #endif

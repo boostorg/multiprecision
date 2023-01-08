@@ -115,7 +115,7 @@ constexpr
           void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& o);
 
 template <typename FloatingPointType,
-          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && ((cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits10 * 2) < 16))>::type const* = nullptr>
+          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const* = nullptr>
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 BOOST_MP_CXX14_CONSTEXPR
 #else
@@ -124,7 +124,7 @@ constexpr
           void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 
 template <typename FloatingPointType,
-          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (((cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits10 * 2) >= 16) && ((cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits10 * 2) <= 36)))>::type const* = nullptr>
+          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const* = nullptr>
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 BOOST_MP_CXX14_CONSTEXPR
 #else
@@ -133,7 +133,7 @@ constexpr
           void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 
 template <typename FloatingPointType,
-          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && ((cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits10 * 2) > 36))>::type const* = nullptr>
+          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const* = nullptr>
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 BOOST_MP_CXX14_CONSTEXPR
 #else
@@ -184,13 +184,13 @@ constexpr
 #endif
 
 template <typename FloatingPointType,
-          typename R>
+          typename OtherFloatingPointType>
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 BOOST_MP_CXX14_CONSTEXPR
 #else
 constexpr
 #endif
-typename std::enable_if<cpp_df_qf_detail::is_floating_point_or_float128<R>::value>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend);
+typename std::enable_if<cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value>::type eval_convert_to(OtherFloatingPointType* result, const cpp_double_fp_backend<FloatingPointType>& backend);
 
 template <typename FloatingPointType,
           typename char_type,
@@ -241,11 +241,11 @@ class cpp_double_fp_backend
    using float_types    = std::tuple<float, double, long double>;
    using exponent_type  = int;
 
-   static constexpr int my_digits         = 2 * cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::digits;
+   static constexpr int my_digits         = 2 * cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits;
    static constexpr int my_digits10       = boost::multiprecision::detail::calc_digits10<my_digits>::value;
    static constexpr int my_max_digits10   = boost::multiprecision::detail::calc_max_digits10<my_digits>::value;
-   static constexpr int my_max_exponent   = cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::max_exponent;
-   static constexpr int my_min_exponent   = cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::min_exponent + cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::digits;
+   static constexpr int my_max_exponent   = cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max_exponent;
+   static constexpr int my_min_exponent   = cpp_df_qf_detail::ccmath::numeric_limits<float_type>::min_exponent + cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits;
    static constexpr int my_max_exponent10 = static_cast<int>(static_cast<float>(my_max_exponent) * 0.301F);
    static constexpr int my_min_exponent10 = static_cast<int>(static_cast<float>(my_min_exponent) * 0.301F);
 
@@ -264,13 +264,13 @@ class cpp_double_fp_backend
    // Constructors from other floating-point types.
    template <typename OtherFloatType,
              typename std::enable_if<(    cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatType>::value
-                                      && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<OtherFloatType>::digits <= cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::digits))>::type const* = nullptr>
+                                      && (cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatType>::digits <= cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const OtherFloatType& f)
       : data(f, static_cast<float_type>(0.0F)) { }
 
    template <typename OtherFloatType,
              typename std::enable_if<(    cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatType>::value
-                                      && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<OtherFloatType>::digits > cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::digits))>::type const* = nullptr>
+                                      && (cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatType>::digits > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const OtherFloatType& f)
       : data(static_cast<float_type>(f),
              static_cast<float_type>(f - (OtherFloatType) static_cast<float_type>(f))) { }
@@ -293,14 +293,14 @@ class cpp_double_fp_backend
    template <typename SignedIntegralType,
              typename std::enable_if<(    boost::multiprecision::detail::is_integral<SignedIntegralType>::value
                                       && !boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value
-                                      && (static_cast<int>(sizeof(SignedIntegralType) * 8u) <= cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::digits))>::type const* = nullptr>
+                                      && (static_cast<int>(sizeof(SignedIntegralType) * 8u) <= cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const SignedIntegralType& n)
       : data(std::make_pair(static_cast<float_type>(n), static_cast<float_type>(0.0F))) { }
 
    template <typename UnsignedIntegralType,
              typename std::enable_if<(    boost::multiprecision::detail::is_integral<UnsignedIntegralType>::value
                                       &&  boost::multiprecision::detail::is_unsigned<UnsignedIntegralType>::value
-                                      && (static_cast<int>(sizeof(UnsignedIntegralType) * 8u) <= cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::digits))>::type const* = nullptr>
+                                      && (static_cast<int>(sizeof(UnsignedIntegralType) * 8u) <= cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const UnsignedIntegralType& u)
       : data(static_cast<float_type>(u), static_cast<float_type>(0.0F)) { }
 
@@ -308,7 +308,7 @@ class cpp_double_fp_backend
    template <typename UnsignedIntegralType,
              typename std::enable_if<(    boost::multiprecision::detail::is_integral<UnsignedIntegralType>::value
                                       &&  boost::multiprecision::detail::is_unsigned<UnsignedIntegralType>::value
-                                      && (static_cast<int>(sizeof(UnsignedIntegralType) * 8u) > cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::digits))>::type const* = nullptr>
+                                      && (static_cast<int>(sizeof(UnsignedIntegralType) * 8u) > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(UnsignedIntegralType u)
       : data
         (
@@ -328,7 +328,7 @@ class cpp_double_fp_backend
    template <typename SignedIntegralType,
              typename std::enable_if<(    boost::multiprecision::detail::is_integral<SignedIntegralType>::value
                                       && !boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value
-                                      && (static_cast<int>(sizeof(SignedIntegralType) * 8u) > cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::digits))>::type const* = nullptr>
+                                      && (static_cast<int>(sizeof(SignedIntegralType) * 8u) > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(SignedIntegralType n)
       : data
         (
@@ -881,12 +881,18 @@ class cpp_double_fp_backend
          (
             arithmetic::fast_sum
             (
-               float_type(  (cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::max)()
-                          * float_type(float_type(1.0F) - float_type(1.5F) * cpp_df_qf_detail::sqrt_of_constituent(cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::epsilon()))),
-               cpp_df_qf_detail::ldexp_of_constituent
+               static_cast<float_type>
                (
-                   (cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::max)(),
-                  -(cpp_df_qf_detail::numeric_limits_partial_of_constituent<float_type>::digits + 1)
+                    (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)()
+                  * (
+                         static_cast<float_type>(1.0F)
+                       - static_cast<float_type>(1.5F) * cpp_df_qf_detail::ccmath::sqrt(cpp_df_qf_detail::ccmath::numeric_limits<float_type>::epsilon())
+                    )
+               ),
+               cpp_df_qf_detail::ccmath::ldexp
+               (
+                   (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)(),
+                  -(cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits + 1)
                )
             )
          );
@@ -894,7 +900,7 @@ class cpp_double_fp_backend
 
    static constexpr cpp_double_fp_backend my_value_min() noexcept
    {
-      return cpp_double_fp_backend(cpp_df_qf_detail::ldexp_of_constituent(float_type(1), my_min_exponent));
+      return cpp_double_fp_backend(cpp_df_qf_detail::ccmath::ldexp(float_type(1), my_min_exponent));
    }
 
    #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
@@ -930,7 +936,7 @@ class cpp_double_fp_backend
    rep_type data;
 
    template <typename OtherFloatingPointType,
-             typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value && ((cpp_df_qf_detail::numeric_limits_partial_of_constituent<OtherFloatingPointType>::digits10 * 2) < 16))>::type const*>
+             typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits10 * 2) < 16))>::type const*>
    friend
    #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
    BOOST_MP_CXX14_CONSTEXPR
@@ -940,7 +946,7 @@ class cpp_double_fp_backend
    void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
 
    template <typename OtherFloatingPointType,
-             typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value && (((cpp_df_qf_detail::numeric_limits_partial_of_constituent<OtherFloatingPointType>::digits10 * 2) >= 16) && ((cpp_df_qf_detail::numeric_limits_partial_of_constituent<OtherFloatingPointType>::digits10 * 2) <= 36)))>::type const*>
+             typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value && (((cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits10 * 2) >= 16) && ((cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits10 * 2) <= 36)))>::type const*>
    friend
    #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
    BOOST_MP_CXX14_CONSTEXPR
@@ -950,7 +956,7 @@ class cpp_double_fp_backend
    void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
 
    template <typename OtherFloatingPointType,
-             typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value && ((cpp_df_qf_detail::numeric_limits_partial_of_constituent<OtherFloatingPointType>::digits10 * 2) > 36))>::type const*>
+             typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits10 * 2) > 36))>::type const*>
    friend
    #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
    BOOST_MP_CXX14_CONSTEXPR
@@ -970,13 +976,13 @@ namespace cpp_df_qf_detail {
    // 3.14159265358979323851281,                -5.01655761266833202345176e-20
    // 3.14159265358979323846264338327950279748, 8.67181013012378102479704402604335225411e-35
 
-   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.14159250259L),                            static_cast<FloatingPointType>(1.50995788317e-07L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.141592653589793116L),                     static_cast<FloatingPointType>(1.2246467991473529607e-16L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.14159265358979323851281L),                static_cast<FloatingPointType>(-5.01655761266833202345176e-20L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.14159250259L),                            static_cast<FloatingPointType>(1.50995788317e-07L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.141592653589793116L),                     static_cast<FloatingPointType>(1.2246467991473529607e-16L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.14159265358979323851281L),                static_cast<FloatingPointType>(-5.01655761266833202345176e-20L)); }
    #if defined(BOOST_HAS_FLOAT128)
 
    #if defined(__STRICT_ANSI__)
-   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type
+   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type
    {
      return   cpp_double_fp_backend<FloatingPointType>(3.141592653589793116)
             + cpp_double_fp_backend<FloatingPointType>(1.2246467991473532072e-16)
@@ -986,7 +992,7 @@ namespace cpp_df_qf_detail {
             ;
    }
    #else
-   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.14159265358979323846264338327950279748Q), static_cast<FloatingPointType>(8.67181013012378102479704402604335225411e-35Q)); }
+   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.14159265358979323846264338327950279748Q), static_cast<FloatingPointType>(8.67181013012378102479704402604335225411e-35Q)); }
    #endif
    #endif
 
@@ -998,12 +1004,12 @@ namespace cpp_df_qf_detail {
    // 0.69314718055994530942869,                 -1.14583527267987328094768e-20
    // 0.693147180559945309417232121458176575084, -7.00813947454958516341266200877162272784e-36
 
-   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.69314712286L),                             static_cast<FloatingPointType>(5.76999887869e-08L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.6931471805599451752L),                     static_cast<FloatingPointType>(1.3421277060097865271e-16L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.69314718055994530942869L),                 static_cast<FloatingPointType>(-1.14583527267987328094768e-20L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.69314712286L),                             static_cast<FloatingPointType>(5.76999887869e-08L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.6931471805599451752L),                     static_cast<FloatingPointType>(1.3421277060097865271e-16L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.69314718055994530942869L),                 static_cast<FloatingPointType>(-1.14583527267987328094768e-20L)); }
    #if defined(BOOST_HAS_FLOAT128)
    #if defined(__STRICT_ANSI__)
-   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type
+   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type
    {
       return   cpp_double_fp_backend<FloatingPointType>(0.69314718055994528623)
              + cpp_double_fp_backend<FloatingPointType>(2.3190468138462995584e-17)
@@ -1013,7 +1019,7 @@ namespace cpp_df_qf_detail {
              ;
    }
    #else
-   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.693147180559945309417232121458176575084Q), static_cast<FloatingPointType>(-7.00813947454958516341266200877162272784e-36Q)); }
+   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.693147180559945309417232121458176575084Q), static_cast<FloatingPointType>(-7.00813947454958516341266200877162272784e-36Q)); }
    #endif
    #endif
 
@@ -1025,12 +1031,12 @@ namespace cpp_df_qf_detail {
    // 2.71828182845904523521133,                1.4895979785582304563159e-19
    // 2.71828182845904523536028747135266231436, 1.83398825226506410712297736767396397644e-34
 
-   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.71828174591L),                            static_cast<FloatingPointType>(8.25483965627e-08L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.7182818284590450908L),                    static_cast<FloatingPointType>(1.4456468917292501578e-16L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.71828182845904523521133L),                static_cast<FloatingPointType>(1.4895979785582304563159e-19L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.71828174591L),                            static_cast<FloatingPointType>(8.25483965627e-08L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.7182818284590450908L),                    static_cast<FloatingPointType>(1.4456468917292501578e-16L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.71828182845904523521133L),                static_cast<FloatingPointType>(1.4895979785582304563159e-19L)); }
    #if defined(BOOST_HAS_FLOAT128)
    #if defined(__STRICT_ANSI__)
-   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type
+   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type
    {
       return   cpp_double_fp_backend<FloatingPointType>(2.7182818284590450908)
              + cpp_double_fp_backend<FloatingPointType>(1.4456468917292501578e-16)
@@ -1040,7 +1046,7 @@ namespace cpp_df_qf_detail {
              ;
    }
    #else
-   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.71828182845904523536028747135266231436Q), static_cast<FloatingPointType>(1.83398825226506410712297736767396397644e-34Q)); }
+   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.71828182845904523536028747135266231436Q), static_cast<FloatingPointType>(1.83398825226506410712297736767396397644e-34Q)); }
    #endif
    #endif
 
@@ -1139,8 +1145,8 @@ constexpr void eval_fabs(cpp_double_fp_backend<FloatingPointType>& result, const
 template <typename FloatingPointType>
 constexpr void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int* v)
 {
-   result.rep().first  = cpp_df_qf_detail::frexp_of_constituent(a.rep().first, v);
-   result.rep().second = cpp_df_qf_detail::ldexp_of_constituent(a.rep().second, -*v);
+   result.rep().first  = cpp_df_qf_detail::ccmath::frexp(a.rep().first, v);
+   result.rep().second = cpp_df_qf_detail::ccmath::ldexp(a.rep().second, -*v);
 }
 
 template <typename FloatingPointType>
@@ -1149,8 +1155,8 @@ constexpr void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, cons
    result.rep() =
       std::make_pair
       (
-         cpp_df_qf_detail::ldexp_of_constituent(a.crep().first,  v),
-         cpp_df_qf_detail::ldexp_of_constituent(a.crep().second, v)
+         cpp_df_qf_detail::ccmath::ldexp(a.crep().first,  v),
+         cpp_df_qf_detail::ccmath::ldexp(a.crep().second, v)
       );
 
    using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
@@ -1212,8 +1218,8 @@ int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
    return  BOOST_MP_ISNAN(o.crep().first) ? FP_NAN       :
            BOOST_MP_ISINF(o.crep().first) ? FP_INFINITE  :
            eval_is_zero(o)                ? FP_ZERO      :
-          (   (cpp_df_qf_detail::fabs_of_constituent(o.crep().first) > 0)
-           && (cpp_df_qf_detail::fabs_of_constituent(o.crep().first) < (cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::min)()))
+          (   (cpp_df_qf_detail::ccmath::fabs(o.crep().first) > 0)
+           && (cpp_df_qf_detail::ccmath::fabs(o.crep().first) < (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::min)()))
                                           ? FP_SUBNORMAL : FP_NORMAL;
 }
 
@@ -1251,9 +1257,9 @@ void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_doubl
       }
    }
 
-   const local_float_type c = cpp_df_qf_detail::sqrt_of_constituent(o.crep().first);
+   const local_float_type c = cpp_df_qf_detail::ccmath::sqrt(o.crep().first);
 
-   constexpr int              MantissaBits = cpp_df_qf_detail::numeric_limits_partial_of_constituent<local_float_type>::digits;
+   constexpr int              MantissaBits = cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits;
    constexpr int              SplitBits    = MantissaBits / 2 + 1;
    constexpr local_float_type Splitter     = static_cast<local_float_type>((1ULL << SplitBits) + 1);
 
@@ -1286,7 +1292,7 @@ void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_doubl
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && ((cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits10 * 2) < 16))>::type const*>
+          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const*>
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 BOOST_MP_CXX14_CONSTEXPR
 #else
@@ -1313,23 +1319,31 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       eval_fabs(xx, x);
 
       // Check the range of the input.
-      const double_float_type max_exp_input =
-      []() -> double_float_type
+      const double_float_type max_exp_input
       {
-         const double_float_type lg_x0 = cpp_df_qf_detail::log_of_constituent(double_float_type::my_value_max().crep().first);
-         const double_float_type dx    =   double_float_type(double_float_type::my_value_max().crep().second)
-                                         / double_float_type(double_float_type::my_value_max().crep().first);
+         []() -> local_float_type
+         {
+            local_float_type mx;
+            eval_convert_to(&mx, double_float_type::my_value_max());
 
-         return lg_x0 + dx;
-      }();
+            const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
 
-      const double_float_type min_exp_input =
-      []() -> double_float_type
+            return log_of_mx;
+         }()
+      };
+
+      const double_float_type min_exp_input
       {
-         const double_float_type lg_x0 = cpp_df_qf_detail::log_of_constituent(double_float_type::my_value_min().crep().first);
+         []() -> local_float_type
+         {
+            local_float_type mn;
+            eval_convert_to(&mn, double_float_type::my_value_min());
 
-         return lg_x0;
-      }();
+            const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
+
+            return log_of_mn;
+         }()
+      };
 
       if (x_is_zero)
       {
@@ -1425,7 +1439,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (((cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits10 * 2) >= 16) && ((cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
+          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 BOOST_MP_CXX14_CONSTEXPR
 #else
@@ -1454,23 +1468,31 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       eval_fabs(xx, x);
 
       // Check the range of the input.
-      const double_float_type max_exp_input =
-      []() -> double_float_type
+      const double_float_type max_exp_input
       {
-         const double_float_type lg_x0 = cpp_df_qf_detail::log_of_constituent(double_float_type::my_value_max().crep().first);
-         const double_float_type dx    =   double_float_type(double_float_type::my_value_max().crep().second)
-                                         / double_float_type(double_float_type::my_value_max().crep().first);
+         []() -> local_float_type
+         {
+            local_float_type mx;
+            eval_convert_to(&mx, double_float_type::my_value_max());
 
-         return lg_x0 + dx;
-      }();
+            const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
 
-      const double_float_type min_exp_input =
-      []() -> double_float_type
+            return log_of_mx;
+         }()
+      };
+
+      const double_float_type min_exp_input
       {
-         const double_float_type lg_x0 = cpp_df_qf_detail::log_of_constituent(double_float_type::my_value_min().crep().first);
+         []() -> local_float_type
+         {
+            local_float_type mn;
+            eval_convert_to(&mn, double_float_type::my_value_min());
 
-         return lg_x0;
-      }();
+            const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
+
+            return log_of_mn;
+         }()
+      };
 
       if (x_is_zero)
       {
@@ -1566,7 +1588,7 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
 }
 
 template <typename FloatingPointType,
-          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && ((cpp_df_qf_detail::numeric_limits_partial_of_constituent<FloatingPointType>::digits10 * 2) > 36))>::type const*>
+          typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const*>
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 BOOST_MP_CXX14_CONSTEXPR
 #else
@@ -1595,23 +1617,31 @@ void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
       eval_fabs(xx, x);
 
       // Check the range of the input.
-      const double_float_type max_exp_input =
-      []() -> double_float_type
+      const double_float_type max_exp_input
       {
-         const double_float_type lg_x0 = cpp_df_qf_detail::log_of_constituent(double_float_type::my_value_max().crep().first);
-         const double_float_type dx    =   double_float_type(double_float_type::my_value_max().crep().second)
-                                         / double_float_type(double_float_type::my_value_max().crep().first);
+         []() -> local_float_type
+         {
+            local_float_type mx;
+            eval_convert_to(&mx, double_float_type::my_value_max());
 
-         return lg_x0 + dx;
-      }();
+            const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
 
-      const double_float_type min_exp_input =
-      []() -> double_float_type
+            return log_of_mx;
+         }()
+      };
+
+      const double_float_type min_exp_input
       {
-         const double_float_type lg_x0 = cpp_df_qf_detail::log_of_constituent(double_float_type::my_value_min().crep().first);
+         []() -> local_float_type
+         {
+            local_float_type mn;
+            eval_convert_to(&mn, double_float_type::my_value_min());
 
-         return lg_x0;
-      }();
+            const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
+
+            return log_of_mn;
+         }()
+      };
 
       if (x_is_zero)
       {
@@ -1734,20 +1764,37 @@ void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double
    {
       result = double_float_type::my_value_inf();
    }
-   else if (x.is_one())
+   else if(eval_lt(x, double_float_type(1)))
    {
-      result = double_float_type(0U);
+     double_float_type x_inv;
+     eval_divide(x_inv, double_float_type(1), x);
+     eval_log(result, x_inv);
+     result.negate();
    }
-   else
+   else if(eval_gt(x, double_float_type(1)))
    {
+      double_float_type x2;
+      int n2;
+      eval_frexp(x2, x, &n2);
+
       // Get initial estimate using the (wrapped) standard math function log.
-      const double_float_type s(cpp_df_qf_detail::log_of_constituent(x.crep().first));
-      double_float_type       E;
+      const double_float_type s(cpp_df_qf_detail::log_of_constituent(x2.crep().first));
+      double_float_type E;
 
       eval_exp(E, s);
 
       // Do one single step of Newton-Raphson iteration
-      result = s + ((x - E) / E);
+      result = s + ((x2 - E) / E);
+
+      double_float_type xn2(n2);
+
+      eval_multiply(xn2, cpp_df_qf_detail::constant_df_ln_two<typename double_float_type::float_type>());
+
+      eval_add(result, xn2);
+   }
+   else
+   {
+      result = 0;
    }
 }
 
@@ -1759,13 +1806,22 @@ constexpr
 #endif
 void eval_convert_to(signed long long* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
+   const auto fpc = eval_fpclassify(backend);
+
+   if(fpc != FP_NORMAL)
+   {
+      *result = static_cast<signed long long>(backend.crep().first);
+
+      return;
+   }
+
    constexpr signed long long my_max_val = (std::numeric_limits<signed long long>::max)();
    constexpr signed long long my_min_val = (std::numeric_limits<signed long long>::min)();
 
    using c_type = typename std::common_type<signed long long, FloatingPointType>::type;
 
    constexpr c_type my_max = static_cast<c_type>(my_max_val);
-   const     c_type ct     = cpp_df_qf_detail::fabs_of_constituent(backend.crep().first);
+   const     c_type ct     = cpp_df_qf_detail::ccmath::fabs(backend.crep().first);
 
    if (ct > my_max)
    {
@@ -1775,8 +1831,28 @@ void eval_convert_to(signed long long* result, const cpp_double_fp_backend<Float
    }
    else
    {
-      *result  = static_cast<signed long long>(backend.crep().first);
-      *result += static_cast<signed long long>(backend.crep().second);
+      BOOST_IF_CONSTEXPR(std::numeric_limits<signed long long>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      {
+         *result  = static_cast<signed long long>(backend.crep().first);
+         *result += static_cast<signed long long>(backend.crep().second);
+      }
+      else
+      {
+         cpp_double_fp_backend<FloatingPointType> source = backend;
+
+         *result = 0;
+
+         for(auto digit_count  = 0;
+                  digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
+                  digit_count += std::numeric_limits<signed long long>::digits)
+         {
+            const auto next = static_cast<signed long long>(source.crep().first);
+
+            *result += next;
+
+            eval_subtract(source, cpp_double_fp_backend<FloatingPointType>(next));
+         }
+      }
    }
 }
 
@@ -1788,12 +1864,21 @@ constexpr
 #endif
 void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
+   const auto fpc = eval_fpclassify(backend);
+
+   if(fpc != FP_NORMAL)
+   {
+      *result = static_cast<unsigned long long>(backend.crep().first);
+
+      return;
+   }
+
    constexpr unsigned long long my_max_val = (std::numeric_limits<unsigned long long>::max)();
 
    using c_type = typename std::common_type<unsigned long long, FloatingPointType>::type;
 
    constexpr c_type my_max = static_cast<c_type>(my_max_val);
-   const     c_type ct     = cpp_df_qf_detail::fabs_of_constituent(backend.crep().first);
+   const     c_type ct     = cpp_df_qf_detail::ccmath::fabs(backend.crep().first);
 
    if (ct > my_max)
    {
@@ -1801,8 +1886,28 @@ void eval_convert_to(unsigned long long* result, const cpp_double_fp_backend<Flo
    }
    else
    {
-      *result  = static_cast<unsigned long long>(backend.crep().first);
-      *result += static_cast<unsigned long long>(backend.crep().second);
+      BOOST_IF_CONSTEXPR(std::numeric_limits<unsigned long long>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      {
+         *result  = static_cast<unsigned long long>(backend.crep().first);
+         *result += static_cast<unsigned long long>(backend.crep().second);
+      }
+      else
+      {
+         cpp_double_fp_backend<FloatingPointType> source = backend;
+
+         *result = 0;
+
+         for(auto digit_count  = 0;
+                  digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
+                  digit_count += std::numeric_limits<unsigned long long>::digits)
+         {
+            const auto next = static_cast<unsigned long long>(source.crep().first);
+
+            *result += next;
+
+            eval_subtract(source, cpp_double_fp_backend<FloatingPointType>(next));
+         }
+      }
    }
 }
 
@@ -1815,13 +1920,22 @@ constexpr
 #endif
 void eval_convert_to(int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
+   const auto fpc = eval_fpclassify(backend);
+
+   if(fpc != FP_NORMAL)
+   {
+      *result = static_cast<int128_type>(backend.crep().first);
+
+      return;
+   }
+
    constexpr int128_type my_max_val = (((static_cast<int128_type>(1) << (sizeof(int128_type) * CHAR_BIT - 2)) - 1) << 1) + 1;
    constexpr int128_type my_min_val = static_cast<int128_type>(-my_max_val - 1);
 
    using c_type = typename std::common_type<int128_type, FloatingPointType>::type;
 
    constexpr c_type my_max = static_cast<c_type>(my_max_val);
-   const     c_type ct     = cpp_df_qf_detail::fabs_of_constituent(backend.crep().first);
+   const     c_type ct     = cpp_df_qf_detail::ccmath::fabs(backend.crep().first);
 
    if (ct > my_max)
    {
@@ -1831,8 +1945,28 @@ void eval_convert_to(int128_type* result, const cpp_double_fp_backend<FloatingPo
    }
    else
    {
-      *result  = static_cast<signed long long>(backend.crep().first);
-      *result += static_cast<signed long long>(backend.crep().second);
+      BOOST_IF_CONSTEXPR(std::numeric_limits<int128_type>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      {
+         *result  = static_cast<int128_type>(backend.crep().first);
+         *result += static_cast<int128_type>(backend.crep().second);
+      }
+      else
+      {
+         cpp_double_fp_backend<FloatingPointType> source = backend;
+
+         *result = 0;
+
+         for(auto digit_count  = 0;
+                  digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
+                  digit_count += std::numeric_limits<int128_type>::digits)
+         {
+            const auto next = static_cast<int128_type>(source.crep().first);
+
+            *result += next;
+
+            eval_subtract(source, cpp_double_fp_backend<FloatingPointType>(next));
+         }
+      }
    }
 }
 
@@ -1844,6 +1978,15 @@ constexpr
 #endif
 void eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
+   const auto fpc = eval_fpclassify(backend);
+
+   if(fpc != FP_NORMAL)
+   {
+      *result = static_cast<uint128_type>(backend.crep().first);
+
+      return;
+   }
+
    uint128_type my_max_val { };
 
    BOOST_IF_CONSTEXPR(std::is_same<FloatingPointType, float>::value && (std::numeric_limits<float>::digits == 24))
@@ -1858,7 +2001,7 @@ void eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingP
    using c_type = typename std::common_type<uint128_type, FloatingPointType>::type;
 
    const c_type my_max = static_cast<c_type>(my_max_val);
-   const c_type ct     = cpp_df_qf_detail::fabs_of_constituent(backend.crep().first);
+   const c_type ct     = cpp_df_qf_detail::ccmath::fabs(backend.crep().first);
 
    if (ct > my_max)
    {
@@ -1866,35 +2009,74 @@ void eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingP
    }
    else
    {
-      *result  = static_cast<unsigned long long>(backend.crep().first);
-      *result += static_cast<unsigned long long>(backend.crep().second);
+      BOOST_IF_CONSTEXPR(std::numeric_limits<int128_type>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      {
+         *result  = static_cast<int128_type>(backend.crep().first);
+         *result += static_cast<int128_type>(backend.crep().second);
+      }
+      else
+      {
+         cpp_double_fp_backend<FloatingPointType> source = backend;
+
+         *result = 0;
+
+         for(auto digit_count  = 0;
+                  digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
+                  digit_count += std::numeric_limits<int128_type>::digits)
+         {
+            const auto next = static_cast<uint128_type>(source.crep().first);
+
+            *result += next;
+
+            eval_subtract(source, cpp_double_fp_backend<FloatingPointType>(next));
+         }
+      }
    }
 }
 #endif
 
 template <typename FloatingPointType,
-          typename R>
+          typename OtherFloatingPointType>
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 BOOST_MP_CXX14_CONSTEXPR
 #else
 constexpr
 #endif
-typename std::enable_if<cpp_df_qf_detail::is_floating_point_or_float128<R>::value>::type eval_convert_to(R* result, const cpp_double_fp_backend<FloatingPointType>& backend)
+typename std::enable_if<cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value>::type eval_convert_to(OtherFloatingPointType* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
-   *result  = static_cast<R>(backend.crep().first);
-   *result += static_cast<R>(backend.crep().second);
-}
+   const auto fpc = eval_fpclassify(backend);
 
-template <typename FloatingPointType>
-constexpr cpp_double_fp_backend<FloatingPointType> fabs(const cpp_double_fp_backend<FloatingPointType>& a)
-{
-   using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+   if(fpc != FP_NORMAL)
+   {
+      *result = static_cast<OtherFloatingPointType>(backend.crep().first);
 
-   double_float_type result { };
+      return;
+   }
+   else
+   {
+      BOOST_IF_CONSTEXPR(std::numeric_limits<OtherFloatingPointType>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      {
+         *result  = static_cast<OtherFloatingPointType>(backend.crep().first);
+         *result += static_cast<OtherFloatingPointType>(backend.crep().second);
+      }
+      else
+      {
+         cpp_double_fp_backend<FloatingPointType> source = backend;
 
-   eval_fabs(result, a);
+         *result = 0;
 
-   return result;
+         for(auto digit_count  = 0;
+                  digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
+                  digit_count += std::numeric_limits<OtherFloatingPointType>::digits)
+         {
+            const auto next = static_cast<OtherFloatingPointType>(source.crep().first);
+
+            *result += next;
+
+            eval_subtract(source, cpp_double_fp_backend<FloatingPointType>(next));
+         }
+      }
+   }
 }
 
 template <typename FloatingPointType>
@@ -1907,11 +2089,11 @@ std::size_t hash_value(const cpp_double_fp_backend<FloatingPointType>& a)
 
 using backends::cpp_double_fp_backend;
 
-using cpp_double_float       = number<cpp_double_fp_backend<float>,         boost::multiprecision::et_off>;
-using cpp_double_double      = number<cpp_double_fp_backend<double>,        boost::multiprecision::et_off>;
-using cpp_double_long_double = number<cpp_double_fp_backend<long double>,   boost::multiprecision::et_off>;
+using cpp_double_float       = number<cpp_double_fp_backend<float>,                  boost::multiprecision::et_off>;
+using cpp_double_double      = number<cpp_double_fp_backend<double>,                 boost::multiprecision::et_off>;
+using cpp_double_long_double = number<cpp_double_fp_backend<long double>,            boost::multiprecision::et_off>;
 #ifdef BOOST_HAS_FLOAT128
-using cpp_double_float128    = number<cpp_double_fp_backend<float128_type>, boost::multiprecision::et_off>;
+using cpp_double_float128    = number<cpp_double_fp_backend<::boost::float128_type>, boost::multiprecision::et_off>;
 #endif
 
 } } // namespace boost::multiprecision
