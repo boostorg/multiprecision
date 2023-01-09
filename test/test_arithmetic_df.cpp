@@ -16,8 +16,16 @@
 int main()
 {
    using boost::multiprecision::cpp_double_double;
+   using boost::multiprecision::cpp_double_long_double;
+#ifdef BOOST_HAS_FLOAT128
+   using boost::multiprecision::cpp_double_float128;
+#endif
 
    test<cpp_double_double>();
+   test<cpp_double_long_double>();
+#ifdef BOOST_HAS_FLOAT128
+   test<cpp_double_float128>();
+#endif
 
    return boost::report_errors();
 }
