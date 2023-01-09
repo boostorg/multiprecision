@@ -1952,7 +1952,7 @@ void eval_convert_to(int128_type* result, const cpp_double_fp_backend<FloatingPo
    }
    else
    {
-      BOOST_IF_CONSTEXPR(std::numeric_limits<int128_type>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      BOOST_IF_CONSTEXPR(static_cast<int>(static_cast<int>(sizeof(int128_type)) * CHAR_BIT) >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
       {
          *result  = static_cast<int128_type>(backend.crep().first);
          *result += static_cast<int128_type>(backend.crep().second);
@@ -1963,9 +1963,9 @@ void eval_convert_to(int128_type* result, const cpp_double_fp_backend<FloatingPo
 
          *result = 0;
 
-         for(auto digit_count  = 0;
+         for(auto digit_count  = static_cast<int>(0);
                   digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
-                  digit_count += std::numeric_limits<int128_type>::digits)
+                  digit_count += static_cast<int>(static_cast<int>(sizeof(int128_type)) * CHAR_BIT))
          {
             const auto next = static_cast<int128_type>(source.crep().first);
 
@@ -2016,7 +2016,7 @@ void eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingP
    }
    else
    {
-      BOOST_IF_CONSTEXPR(std::numeric_limits<int128_type>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      BOOST_IF_CONSTEXPR(static_cast<int>(static_cast<int>(sizeof(uint128_type)) * CHAR_BIT) >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
       {
          *result  = static_cast<int128_type>(backend.crep().first);
          *result += static_cast<int128_type>(backend.crep().second);
@@ -2027,9 +2027,9 @@ void eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingP
 
          *result = 0;
 
-         for(auto digit_count  = 0;
+         for(auto digit_count  = static_cast<int>(0);
                   digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
-                  digit_count += std::numeric_limits<int128_type>::digits)
+                  digit_count += static_cast<int>(static_cast<int>(sizeof(uint128_type)) * CHAR_BIT))
          {
             const auto next = static_cast<uint128_type>(source.crep().first);
 
@@ -2063,7 +2063,7 @@ typename std::enable_if<cpp_df_qf_detail::is_floating_point_or_float128<OtherFlo
    }
    else
    {
-      BOOST_IF_CONSTEXPR(std::numeric_limits<OtherFloatingPointType>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      BOOST_IF_CONSTEXPR(cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
       {
          *result  = static_cast<OtherFloatingPointType>(backend.crep().first);
          *result += static_cast<OtherFloatingPointType>(backend.crep().second);
@@ -2074,9 +2074,9 @@ typename std::enable_if<cpp_df_qf_detail::is_floating_point_or_float128<OtherFlo
 
          *result = 0;
 
-         for(auto digit_count  = 0;
+         for(auto digit_count  = static_cast<int>(0);
                   digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
-                  digit_count += std::numeric_limits<OtherFloatingPointType>::digits)
+                  digit_count += cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits)
          {
             const auto next = static_cast<OtherFloatingPointType>(source.crep().first);
 

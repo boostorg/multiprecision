@@ -3201,11 +3201,9 @@ void test()
    test_mixed<Real, double>(tag);
    test_mixed<Real, long double>(tag);
 
-#if 0
 #if defined(BOOST_HAS_FLOAT128)
    BOOST_IF_CONSTEXPR(std::is_constructible<Real, __float128>::value)
       test_mixed<Real, __float128>(tag);
-#endif
 #endif
 
    typedef typename related_type<Real>::type                                                                      related_type;
