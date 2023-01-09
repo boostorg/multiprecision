@@ -86,6 +86,7 @@ project : requirements
       cxx11_hdr_functional cxx11_variadic_templates cxx11_user_defined_literals cxx11_decltype cxx11_static_assert cxx11_defaulted_functions
       cxx11_noexcept cxx11_ref_qualifiers cxx11_user_defined_literals cxx11_hdr_type_traits
       ]
+   [ requires cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction cxx14_variable_templates cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction ]
    ;
 
 local enable-specfun = [ MATCH (--enable-specfun) : [ modules.peek : ARGV ] ] ;
@@ -110,65 +111,12 @@ else
 
 lib no_eh_support : no_eh_test_support.cpp ;
 
-test-suite df_tests :
-
-   [ run test_arithmetic_df.cpp                  no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
-   [ run test_cpp_double_float_tgamma.cpp        no_eh_support : : : release : test_cpp_double_float_tgamma ]
-   [ run test_cpp_double_fp_conv.cpp             no_eh_support : : : release : test_cpp_double_fp_conv ]
-
-   [ run test_sqrt.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_sqrt_df ]
-   [ run test_exp.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_exp_df ]
-   [ run test_pow_df.cpp        no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_pow_df ]
-   [ run test_log.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_log_df ]
-   [ run test_sin.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_sin_df ]
-   [ run test_cos.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_cos_df ]
-   [ run test_tan.cpp           no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_tan_df ]
-   [ run test_asin.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_asin_df ]
-   [ run test_acos.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_acos_df ]
-   [ run test_atan.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_atan_df ]
-   [ run test_sinh.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_sinh_df ]
-   [ run test_cosh.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_cosh_df ]
-   [ run test_tanh.cpp          no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_tanh_df ]
-   [ run test_float_io.cpp      no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_float_io_df ]
-   [ run test_fpclassify.cpp    no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_fpclassify_df ]
-   [ run test_sf_import_c99.cpp no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_sf_import_c99_df ]
-   [ run test_round.cpp         no_eh_support : : : release <define>TEST_CPP_DOUBLE_FLOAT : test_round_df ]
-
-   [ compile concepts/sf_concept_check_basic.cpp     :     <define>TEST_CPP_DOUBLE_FLOAT <debug-symbols>off <optimization>space : sf_concept_check_basic_df ]
-   [ compile concepts/sf_concept_check_bessel.cpp    :     <define>TEST_CPP_DOUBLE_FLOAT <debug-symbols>off <optimization>space : sf_concept_check_bessel_df ]
-
-;
-
-test-suite df_quadmath_tests :
-
-   [ run test_cpp_double_float_tgamma.cpp     quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 :                               : <build>no ] ]
-   [ run test_arithmetic_df.cpp               quadmath no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : : <build>no ] ]
-   [ run test_sqrt.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_sqrt_df ]
-   [ run test_exp.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_exp_df ]
-   [ run test_pow_df.cpp                      quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_pow_df ]
-   [ run test_log.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_log_df ]
-   [ run test_sin.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_sin_df ]
-   [ run test_cos.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_cos_df ]
-   [ run test_tan.cpp                         quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_tan_df ]
-   [ run test_asin.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_asin_df ]
-   [ run test_acos.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_acos_df ]
-   [ run test_atan.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_atan_df ]
-   [ run test_sinh.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_sinh_df ]
-   [ run test_cosh.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_cosh_df ]
-   [ run test_tanh.cpp                        quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_tanh_df ]
-   [ run test_float_io.cpp                    quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_float_io_df ]
-   [ run test_fpclassify.cpp                  quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_fpclassify_df ]
-   [ run test_complex_df.cpp                  quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_complex_df ]
-   [ run test_sf_import_c99.cpp               quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_sf_import_c99_df ]
-   [ run test_round.cpp                       quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : <define>TEST_CPP_DOUBLE_FLOAT : <build>no ] : test_round_df ]
-
-;
-
 test-suite arithmetic_tests :
 
    [ run test_arithmetic_backend_concept.cpp no_eh_support ]
    [ compile test_arithmetic_skeleton.cpp ]
 
+   [ run test_arithmetic_df.cpp              no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_cpp_dec_float_1.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_cpp_dec_float_2.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_cpp_dec_float_3.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
@@ -313,7 +261,7 @@ alias precision_tests : test_preserve_source_precision_gmp test_preserve_source_
 rule get_function_tests
 {
    local result ;
-   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
+   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_pow_df.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
    {
          result += [ run $(source) gmp no_eh_support
               : # command line
@@ -348,6 +296,13 @@ rule get_function_tests
               : # requirements
                <define>TEST_CPP_BIN_FLOAT
               : $(source:B)_cpp_bin_float ] ;
+         result += [ run $(source) quadmath no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+               [ check-target-builds ../config//has_float128 : : <build>no ]
+               <define>TEST_CPP_DOUBLE_FLOAT
+              : $(source:B)_cpp_double_fp ] ;
          result += [ run $(source) quadmath no_eh_support
               : # command line
               : # input files
@@ -436,6 +391,14 @@ test-suite functions_and_limits :
               : # requirements
               <define>TEST_CPP_BIN_FLOAT <define>PRINT_MAX_DIGITS10
               : test_numeric_limits_cpp_bin_float ]
+
+      [ run test_numeric_limits.cpp quadmath no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+              <define>TEST_CPP_DOUBLE_FLOAT <define>PRINT_MAX_DIGITS10
+               [ check-target-builds ../config//has_float128 : : <build>no ]
+              : test_numeric_limits_cpp_double_float ]
 
       [ run test_numeric_limits.cpp $(TOMMATH) no_eh_support
               : # command line

@@ -1,22 +1,83 @@
 # Copyright 2020 Evan Miller
 # Copyright 2020 Matt Borland
 # Copyright 2021 John Maddock
-# Copyright 2021 Fahad Syed
-# Copyright 2021 Janek Kozicki
-# Copyright 2021 - 2023 Christopher Kormanyos
+# Copyright 2021 Christopher Kormanyos
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
-name: multiprecision_df_only
+name: multiprecision
 on:
   push:
     branches:
-      - '**'
+      - master
+      - develop
   pull_request:
-  schedule:
-    - cron: '0 2 * * *' # run at 2 AM UTC
+  release:
+    types: [published, created, edited]
 jobs:
-  ubuntu-focal-df_tests:
+  ubuntu-jammy:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [ g++-12, clang++-14 ]
+        standard: [ c++14, c++17, c++20, c++2b ]
+        suite: [ github_ci_block_1, github_ci_block_2 ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Set TOOLSET
+        run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
+      - name: Add repository
+        continue-on-error: true
+        id: addrepo
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo
+        continue-on-error: true
+        id: retry1
+        if: steps.addrepo.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo 2
+        continue-on-error: true
+        id: retry2
+        if: steps.retry1.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Install packages
+        run: sudo apt install g++-12 clang-14 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev libmpfi-dev libmpc-dev
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: cp -r $GITHUB_WORKSPACE/* libs/multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: ./bootstrap.sh
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: ./b2 headers
+        working-directory: ../boost-root
+      - name: Generate user config
+        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: ./config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES include=/usr/include/eigen3
+        working-directory: ../boost-root/libs/multiprecision/test
+  ubuntu-focal:
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -24,9 +85,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ g++, clang++ ]
+        compiler: [ g++-10, g++-11, clang++-10, clang++-11 ]
         standard: [ c++14, c++17, c++2a ]
-        suite: [ df_tests ]
+        suite: [ github_ci_block_1, github_ci_block_2 ]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -48,7 +109,7 @@ jobs:
         if: steps.retry1.outcome=='failure'
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: echo no packages to install at the moment
+        run: sudo apt install g++-9 g++-10 g++-11 clang-10 clang-11 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev libmpfi-dev libmpc-dev
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
@@ -76,9 +137,9 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES include=/usr/include/eigen3
         working-directory: ../boost-root/libs/multiprecision/test
-  ubuntu-focal-df_quadmath_tests:
+  ubuntu-focal-slow-tests:
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -86,9 +147,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ g++ ]
-        standard: [ gnu++14, gnu++17, gnu++2a ]
-        suite: [ df_quadmath_tests ]
+        compiler: [ g++-10 ]
+        standard: [ c++17, c++2a ]
+        suite: [ specfun_mpfr, specfun_gmp, specfun_cpp_dec_float, specfun_cpp_bin_float, specfun_float128 ]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -110,7 +171,7 @@ jobs:
         if: steps.retry1.outcome=='failure'
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: echo no packages to install at the moment
+        run: sudo apt install g++-9 g++-10 clang-10 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev libmpfi-dev libmpc-dev
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
@@ -138,9 +199,9 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES include=/usr/include/eigen3
         working-directory: ../boost-root/libs/multiprecision/test
-  ubuntu-focal-df_older_compiler_tests:
+  ubuntu-focal-standalone-tests:
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -148,9 +209,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ g++-7, g++-8, g++-9, clang++-8, clang++-9 ]
-        standard: [ c++14, c++17 ]
-        suite: [ df_tests ]
+        compiler: [ g++-11 ]
+        standard: [ c++14, c++17, c++20 ]
+        suite: [ standalone ]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -172,7 +233,7 @@ jobs:
         if: steps.retry1.outcome=='failure'
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: sudo apt install g++-7 g++-8 g++-9 clang-8 clang-9
+        run: sudo apt install g++-11 libgmp-dev libmpfr-dev libtommath-dev
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
@@ -202,7 +263,174 @@ jobs:
       - name: Test
         run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
-  windows_msvc_14_0-df_tests:
+  ubuntu-focal-ASAN:
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [ g++-10 ]
+        standard: [ c++17 ]
+        suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Set TOOLSET
+        run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
+      - name: Add repository
+        continue-on-error: true
+        id: addrepo
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo
+        continue-on-error: true
+        id: retry1
+        if: steps.addrepo.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo 2
+        continue-on-error: true
+        id: retry2
+        if: steps.retry1.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Install packages
+        run: sudo apt install g++-10 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: cp -r $GITHUB_WORKSPACE/* libs/multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: ./bootstrap.sh
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: ./b2 headers
+        working-directory: ../boost-root
+      - name: Generate user config
+        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: ./config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ../../../b2 define=BOOST_CI_ASAN_BUILD define=BOOST_CI_SANITIZER_BUILD cxxflags=-fsanitize=address linkflags=-fsanitize=address toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        working-directory: ../boost-root/libs/multiprecision/test
+  ubuntu-focal-UBSAN:
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [ g++-10 ]
+        standard: [ c++17 ]
+        suite: [ arithmetic_tests, functions_and_limits, misc ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Set TOOLSET
+        run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
+      - name: Add repository
+        continue-on-error: true
+        id: addrepo
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo
+        continue-on-error: true
+        id: retry1
+        if: steps.addrepo.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo 2
+        continue-on-error: true
+        id: retry2
+        if: steps.retry1.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Install packages
+        run: sudo apt install g++-10 libgmp-dev libeigen3-dev
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: cp -r $GITHUB_WORKSPACE/* libs/multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: ./bootstrap.sh
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: ./b2 headers
+        working-directory: ../boost-root
+      - name: Generate user config
+        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: ./config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ../../../b2 define=BOOST_CI_UBSAN_BUILD define=BOOST_CI_SANITIZER_BUILD cxxflags=-fsanitize=undefined linkflags=-fsanitize=undefined toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
+        working-directory: ../boost-root/libs/multiprecision/test
+  windows_gcc:
+    runs-on: windows-2019
+    defaults:
+      run:
+        shell: cmd
+    env:
+      ARGS: toolset=${{ matrix.toolset }} address-model=64 cxxstd=${{ matrix.standard }}
+    strategy:
+      fail-fast: false
+      matrix:
+        toolset: [ gcc ]
+        standard: [ 14, 17 ]
+        suite: [ github_ci_block_1, github_ci_block_2 ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: xcopy /s /e /q %GITHUB_WORKSPACE% libs\multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: bootstrap
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: b2 headers
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ..\..\..\b2 config_info_travis_install %ARGS%
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
+        working-directory: ../boost-root/libs/multiprecision/test
+  windows_msvc_14_0:
     runs-on: windows-2019
     defaults:
       run:
@@ -214,7 +442,7 @@ jobs:
       matrix:
         toolset: [ msvc-14.0 ]
         standard: [ 14, 17 ]
-        suite: [ df_tests ]
+        suite: [ github_ci_block_1, github_ci_block_2 ]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -245,7 +473,7 @@ jobs:
       - name: Test
         run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/multiprecision/test
-  windows_msvc_14_2-df_tests:
+  windows_msvc_14_2:
     runs-on: windows-2019
     defaults:
       run:
@@ -257,7 +485,7 @@ jobs:
       matrix:
         toolset: [ msvc-14.2 ]
         standard: [ 14, 17, 20 ]
-        suite: [ df_tests ]
+        suite: [ github_ci_block_1, github_ci_block_2 ]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -288,14 +516,14 @@ jobs:
       - name: Test
         run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/multiprecision/test
-  macos-df_tests:
+  macos:
     runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
         toolset: [ clang ]
         standard: [ 14, 17, 2a ]
-        suite: [ df_tests ]
+        suite: [ github_ci_block_1, github_ci_block_2 ]
     steps:
       - uses: actions/checkout@v3
         with:
