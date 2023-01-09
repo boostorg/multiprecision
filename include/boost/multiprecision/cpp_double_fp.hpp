@@ -295,7 +295,7 @@ class cpp_double_fp_backend
                                       && !boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value
                                       && (static_cast<int>(sizeof(SignedIntegralType) * 8u) <= cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const SignedIntegralType& n)
-      : data(std::make_pair(static_cast<float_type>(n), static_cast<float_type>(0.0F))) { }
+      : data(static_cast<float_type>(n), static_cast<float_type>(0.0F)) { }
 
    template <typename UnsignedIntegralType,
              typename std::enable_if<(    boost::multiprecision::detail::is_integral<UnsignedIntegralType>::value
@@ -312,15 +312,12 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend(UnsignedIntegralType u)
       : data
         (
-           std::make_pair
+           static_cast<float_type>(u),
+           static_cast<float_type>
            (
-              static_cast<float_type>(u),
-              static_cast<float_type>
+              static_cast<UnsignedIntegralType>
               (
-                 static_cast<UnsignedIntegralType>
-                 (
-                    u - static_cast<UnsignedIntegralType>(static_cast<float_type>(u))
-                 )
+                 u - static_cast<UnsignedIntegralType>(static_cast<float_type>(u))
               )
            )
         ) { }
@@ -332,15 +329,12 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend(SignedIntegralType n)
       : data
         (
-           std::make_pair
+           static_cast<float_type>(n),
+           static_cast<float_type>
            (
-              static_cast<float_type>(n),
-              static_cast<float_type>
+              static_cast<SignedIntegralType>
               (
-                 static_cast<SignedIntegralType>
-                 (
-                    n - static_cast<SignedIntegralType>(static_cast<float_type>(n))
-                 )
+                 n - static_cast<SignedIntegralType>(static_cast<float_type>(n))
               )
            )
         ) { }
