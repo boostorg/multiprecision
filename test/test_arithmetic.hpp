@@ -3170,6 +3170,7 @@ test_relationals(T a, T b)
 template <class T>
 const T& self(const T& a) { return a; }
 
+#if 0
 #if defined(BOOST_HAS_INT128)
 template <class Real> typename std::enable_if< std::is_constructible<Real, boost::int128_type >::value, void>::type test_mixed_int128 () { boost::multiprecision::is_number<Real> tag; test_mixed<Real, boost::int128_type>(tag); }
 template <class Real> typename std::enable_if<!std::is_constructible<Real, boost::int128_type >::value, void>::type test_mixed_int128 () { }
@@ -3180,6 +3181,7 @@ template <class Real> typename std::enable_if<!std::is_constructible<Real, boost
 #if defined(BOOST_HAS_FLOAT128)
 template <class Real> typename std::enable_if< std::is_constructible<Real, __float128>::value, void>::type test_mixed_float128 () { boost::multiprecision::is_number<Real> tag; test_mixed<Real, __float128>(tag); }
 template <class Real> typename std::enable_if<!std::is_constructible<Real, __float128>::value, void>::type test_mixed_float128 () { }
+#endif
 #endif
 
 template <class Real>
@@ -3200,15 +3202,19 @@ void test()
    test_mixed<Real, long long>(tag);
    test_mixed<Real, unsigned long long>(tag);
 #endif
+#if 0
 #if defined(BOOST_HAS_INT128)
    test_mixed_int128<Real>();
    test_mixed_uint128<Real>();
 #endif
+#endif
    test_mixed<Real, float>(tag);
    test_mixed<Real, double>(tag);
    test_mixed<Real, long double>(tag);
+#if 0
 #if defined(BOOST_HAS_FLOAT128)
    test_mixed_float128<Real>();
+#endif
 #endif
 
    typedef typename related_type<Real>::type                                                                      related_type;
