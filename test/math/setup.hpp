@@ -145,7 +145,7 @@ typedef boost::multiprecision::float128 test_type_1;
 #ifdef TEST_CPP_DOUBLE_FLOAT
 #include <boost/multiprecision/cpp_double_fp.hpp>
 
-#define CPP_DOUBLE_FLOAT_TESTS test(cpp_double_double(), "cpp_double_double");
+#define CPP_DOUBLE_FLOAT_TESTS test(cpp_double_double(), "cpp_double_fp");
 
 typedef boost::multiprecision::cpp_double_double test_type_1;
 
