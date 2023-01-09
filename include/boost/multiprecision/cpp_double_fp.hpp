@@ -295,7 +295,7 @@ class cpp_double_fp_backend
                                       && !boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value
                                       && (static_cast<int>(sizeof(SignedIntegralType) * 8u) <= cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const SignedIntegralType& n)
-      : data(std::make_pair(static_cast<float_type>(n), static_cast<float_type>(0.0F))) { }
+      : data(static_cast<float_type>(n), static_cast<float_type>(0.0F)) { }
 
    template <typename UnsignedIntegralType,
              typename std::enable_if<(    boost::multiprecision::detail::is_integral<UnsignedIntegralType>::value
@@ -312,15 +312,12 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend(UnsignedIntegralType u)
       : data
         (
-           std::make_pair
+           static_cast<float_type>(u),
+           static_cast<float_type>
            (
-              static_cast<float_type>(u),
-              static_cast<float_type>
+              static_cast<UnsignedIntegralType>
               (
-                 static_cast<UnsignedIntegralType>
-                 (
-                    u - static_cast<UnsignedIntegralType>(static_cast<float_type>(u))
-                 )
+                 u - static_cast<UnsignedIntegralType>(static_cast<float_type>(u))
               )
            )
         ) { }
@@ -332,15 +329,12 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend(SignedIntegralType n)
       : data
         (
-           std::make_pair
+           static_cast<float_type>(n),
+           static_cast<float_type>
            (
-              static_cast<float_type>(n),
-              static_cast<float_type>
+              static_cast<SignedIntegralType>
               (
-                 static_cast<SignedIntegralType>
-                 (
-                    n - static_cast<SignedIntegralType>(static_cast<float_type>(n))
-                 )
+                 n - static_cast<SignedIntegralType>(static_cast<float_type>(n))
               )
            )
         ) { }
@@ -1952,7 +1946,7 @@ void eval_convert_to(int128_type* result, const cpp_double_fp_backend<FloatingPo
    }
    else
    {
-      BOOST_IF_CONSTEXPR(std::numeric_limits<int128_type>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      BOOST_IF_CONSTEXPR(static_cast<int>(static_cast<int>(sizeof(int128_type)) * CHAR_BIT) >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
       {
          *result  = static_cast<int128_type>(backend.crep().first);
          *result += static_cast<int128_type>(backend.crep().second);
@@ -1963,9 +1957,9 @@ void eval_convert_to(int128_type* result, const cpp_double_fp_backend<FloatingPo
 
          *result = 0;
 
-         for(auto digit_count  = 0;
+         for(auto digit_count  = static_cast<int>(0);
                   digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
-                  digit_count += std::numeric_limits<int128_type>::digits)
+                  digit_count += static_cast<int>(static_cast<int>(sizeof(int128_type)) * CHAR_BIT))
          {
             const auto next = static_cast<int128_type>(source.crep().first);
 
@@ -2016,7 +2010,7 @@ void eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingP
    }
    else
    {
-      BOOST_IF_CONSTEXPR(std::numeric_limits<int128_type>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      BOOST_IF_CONSTEXPR(static_cast<int>(static_cast<int>(sizeof(uint128_type)) * CHAR_BIT) >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
       {
          *result  = static_cast<int128_type>(backend.crep().first);
          *result += static_cast<int128_type>(backend.crep().second);
@@ -2027,9 +2021,9 @@ void eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingP
 
          *result = 0;
 
-         for(auto digit_count  = 0;
+         for(auto digit_count  = static_cast<int>(0);
                   digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
-                  digit_count += std::numeric_limits<int128_type>::digits)
+                  digit_count += static_cast<int>(static_cast<int>(sizeof(uint128_type)) * CHAR_BIT))
          {
             const auto next = static_cast<uint128_type>(source.crep().first);
 
@@ -2063,7 +2057,7 @@ typename std::enable_if<cpp_df_qf_detail::is_floating_point_or_float128<OtherFlo
    }
    else
    {
-      BOOST_IF_CONSTEXPR(std::numeric_limits<OtherFloatingPointType>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      BOOST_IF_CONSTEXPR(cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
       {
          *result  = static_cast<OtherFloatingPointType>(backend.crep().first);
          *result += static_cast<OtherFloatingPointType>(backend.crep().second);
@@ -2074,9 +2068,9 @@ typename std::enable_if<cpp_df_qf_detail::is_floating_point_or_float128<OtherFlo
 
          *result = 0;
 
-         for(auto digit_count  = 0;
+         for(auto digit_count  = static_cast<int>(0);
                   digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
-                  digit_count += std::numeric_limits<OtherFloatingPointType>::digits)
+                  digit_count += cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits)
          {
             const auto next = static_cast<OtherFloatingPointType>(source.crep().first);
 
