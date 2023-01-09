@@ -3188,27 +3188,19 @@ void test()
    test_mixed<Real, long long>(tag);
    test_mixed<Real, unsigned long long>(tag);
 #endif
-
-#if defined(BOOST_HAS_INT128)
-   BOOST_IF_CONSTEXPR(std::is_constructible<Real, boost::int128_type >::value)
+#if defined(BOOST_HAS_INT128) && !defined(BOOST_NO_CXX17_IF_CONSTEXPR)
+   if constexpr (std::is_constructible<Real, boost::int128_type>::value)
    {
-      boost::multiprecision::is_number<Real> tag; test_mixed<Real, boost::int128_type>(tag);
-   }
-   BOOST_IF_CONSTEXPR(std::is_constructible<Real, boost::uint128_type >::value)
-   {
-      boost::multiprecision::is_number<Real> tag; test_mixed<Real, boost::uint128_type>(tag);
+      test_mixed<Real, boost::int128_type>(tag);
+      test_mixed<Real, boost::uint128_type>(tag);
    }
 #endif
-
    test_mixed<Real, float>(tag);
    test_mixed<Real, double>(tag);
    test_mixed<Real, long double>(tag);
-
-#if defined(BOOST_HAS_FLOAT128)
-   BOOST_IF_CONSTEXPR(std::is_constructible<Real, __float128>::value)
-   {
-      boost::multiprecision::is_number<Real> tag; test_mixed<Real, __float128>(tag);
-   }
+#if defined(BOOST_HAS_FLOAT128) && !defined(BOOST_NO_CXX17_IF_CONSTEXPR)
+   if constexpr (std::is_constructible<Real, __float128>::value)
+      test_mixed<Real, __float128>(tag);
 #endif
 
    typedef typename related_type<Real>::type                                                                      related_type;
