@@ -398,7 +398,7 @@ test-suite functions_and_limits :
               : # requirements
               <define>TEST_CPP_DOUBLE_FLOAT <define>PRINT_MAX_DIGITS10
                [ check-target-builds ../config//has_float128 : : <build>no ]
-              : test_numeric_limits_cpp_double_float ]
+              : test_numeric_limits_cpp_double_fp ]
 
       [ run test_numeric_limits.cpp $(TOMMATH) no_eh_support
               : # command line
@@ -1509,6 +1509,30 @@ rule get_specfun_tests_float128
    return $(result) ;
 }
 
+rule get_specfun_tests_cpp_double_fp
+{
+   local result ;
+   for local source in [ glob math/*.cpp ]
+   {
+      result += [ run $(source) quadmath 
+            /boost/test//boost_unit_test_framework/<link>static 
+            math/instances//test_instances_cpp_double_fp/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_float128 : : <build>no ]
+            <optimization>speed
+            <define>TEST_CPP_DOUBLE_FLOAT
+            <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
+            <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
+            release
+           : $(source:B)_cpp_double_fp ] ;
+   }
+   return $(result) ;
+}
+
 rule get_specfun_tests_intel_quad
 {
    local result ;
@@ -1544,10 +1568,12 @@ test-suite specfun_cpp_bin_float : [ get_specfun_tests_cpp_bin_float ] ;
 explicit specfun_cpp_bin_float ;
 test-suite specfun_float128 : [ get_specfun_tests_float128 ] ;
 explicit specfun_float128 ;
+test-suite specfun_cpp_double_fp : [ get_specfun_tests_cpp_double_fp ] ;
+explicit specfun_cpp_double_fp ;
 test-suite specfun_intel_quad : [ get_specfun_tests_intel_quad ] ;
 explicit specfun_intel_quad ;
 
-test-suite specfun : specfun_mpfr specfun_gmp specfun_cpp_dec_float specfun_cpp_bin_float specfun_float128 specfun_intel_quad ;
+test-suite specfun : specfun_mpfr specfun_gmp specfun_cpp_dec_float specfun_cpp_bin_float specfun_float128 specfun_cpp_double_fp specfun_intel_quad ;
 explicit specfun ;
 
 rule get_compile_fail_tests
