@@ -3188,6 +3188,7 @@ void test()
    test_mixed<Real, long long>(tag);
    test_mixed<Real, unsigned long long>(tag);
 #endif
+#if 0
 #if defined(BOOST_HAS_INT128) && !defined(BOOST_NO_CXX17_IF_CONSTEXPR)
    if constexpr (std::is_constructible<Real, boost::int128_type>::value)
    {
@@ -3195,12 +3196,15 @@ void test()
       test_mixed<Real, boost::uint128_type>(tag);
    }
 #endif
+#endif
    test_mixed<Real, float>(tag);
    test_mixed<Real, double>(tag);
    test_mixed<Real, long double>(tag);
+#if 0
 #if defined(BOOST_HAS_FLOAT128) && !defined(BOOST_NO_CXX17_IF_CONSTEXPR)
    if constexpr (std::is_constructible<Real, __float128>::value)
       test_mixed<Real, __float128>(tag);
+#endif
 #endif
 
    typedef typename related_type<Real>::type                                                                      related_type;

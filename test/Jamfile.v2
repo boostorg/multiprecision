@@ -113,7 +113,7 @@ lib no_eh_support : no_eh_test_support.cpp ;
 
 test-suite arithmetic_tests :
 
-   [ run test_arithmetic_df.cpp ]
+   [ run test_arithmetic_df.cpp                 no_eh_support  : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_df128.cpp              no_eh_support  : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 
 ;
