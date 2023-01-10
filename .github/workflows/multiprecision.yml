@@ -149,7 +149,7 @@ jobs:
       matrix:
         compiler: [ g++-10 ]
         standard: [ c++17, c++2a ]
-        suite: [ specfun_mpfr, specfun_gmp, specfun_cpp_dec_float, specfun_cpp_bin_float, specfun_float128 ]
+        suite: [ specfun_mpfr, specfun_gmp, specfun_cpp_dec_float, specfun_cpp_bin_float, specfun_float128, specfun_cpp_double_double ]
     steps:
       - uses: actions/checkout@v3
         with:
