@@ -33,6 +33,13 @@ void expected_results()
        ".*", 10000000L, 2000000L);     // test function
 #endif
    add_expected_result(
+       ".*",                           // compiler
+       ".*",                           // stdlib
+       ".*",                           // platform
+       "cpp_double_double",            // test type(s)
+       ".*",                           // test data group
+       ".*", 12000L, 3000L);           // test function
+   add_expected_result(
        ".*",             // compiler
        ".*",             // stdlib
        ".*",             // platform

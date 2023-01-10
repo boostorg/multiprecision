@@ -1509,24 +1509,26 @@ rule get_specfun_tests_float128
    return $(result) ;
 }
 
-
-rule get_specfun_tests_cpp_double_fp
+rule get_specfun_tests_cpp_double_double
 {
    local result ;
    for local source in [ glob math/*.cpp ]
    {
-      result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static 
-               math/instances//test_instances_cpp_double_fp/<link>static
+      result += [ run $(source) quadmath 
+            /boost/test//boost_unit_test_framework/<link>static 
+            math/instances//test_instances_cpp_double_double/<link>static
            : # command line
            : # input files
            : # requirements
+            [ check-target-builds ../config//has_float128 : : <build>no ]
+            <optimization>speed
             <define>TEST_CPP_DOUBLE_FLOAT
             <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <toolset>msvc:<cxxflags>-bigobj
             <include>../../math/include_private
             release
-            [ check-target-builds ../config//has_float128 : <source>quadmath ]
-           : $(source:B)_cpp_double_fp ] ;
+           : $(source:B)_cpp_double_double ] ;
    }
    return $(result) ;
 }
@@ -1566,12 +1568,12 @@ test-suite specfun_cpp_bin_float : [ get_specfun_tests_cpp_bin_float ] ;
 explicit specfun_cpp_bin_float ;
 test-suite specfun_float128 : [ get_specfun_tests_float128 ] ;
 explicit specfun_float128 ;
-test-suite specfun_cpp_double_fp : [ get_specfun_tests_cpp_double_fp ] ;
-explicit specfun_cpp_double_fp ;
+test-suite specfun_cpp_double_double : [ get_specfun_tests_cpp_double_double ] ;
+explicit specfun_cpp_double_double ;
 test-suite specfun_intel_quad : [ get_specfun_tests_intel_quad ] ;
 explicit specfun_intel_quad ;
 
-test-suite specfun : specfun_mpfr specfun_gmp specfun_cpp_dec_float specfun_cpp_bin_float specfun_float128 specfun_cpp_double_fp specfun_intel_quad ;
+test-suite specfun : specfun_mpfr specfun_gmp specfun_cpp_dec_float specfun_cpp_bin_float specfun_float128 specfun_cpp_double_double specfun_intel_quad ;
 explicit specfun ;
 
 rule get_compile_fail_tests
