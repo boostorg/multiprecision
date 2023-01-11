@@ -25,20 +25,18 @@
 
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail {
 
-template <class T> T                      floor_of_constituent                        (T                      x) { return T(); }
-template <>        float                  floor_of_constituent<float>                 (float                  x) { return ::floorf(x); }
-template <>        double                 floor_of_constituent<double>                (double                 x) { return ::floor (x); }
-template <>        long double            floor_of_constituent<long double>           (long double            x) { return ::floorl(x); }
+inline float                  floor_of_constituent(float                  x) { return ::floorf(x); }
+inline double                 floor_of_constituent(double                 x) { return ::floor (x); }
+inline long double            floor_of_constituent(long double            x) { return ::floorl(x); }
 #if defined(BOOST_HAS_FLOAT128)
-template <>        ::boost::float128_type floor_of_constituent<::boost::float128_type>(::boost::float128_type x) { return ::floorq(x); }
+inline ::boost::float128_type floor_of_constituent(::boost::float128_type x) { return ::floorq(x); }
 #endif
 
-template <class T> T                      log_of_constituent                        (T                      x) { return T(); }
-template <>        float                  log_of_constituent<float>                 (float                  x) { return ::logf(x); }
-template <>        double                 log_of_constituent<double>                (double                 x) { return ::log (x); }
-template <>        long double            log_of_constituent<long double>           (long double            x) { return ::logl(x); }
+inline float                  log_of_constituent(float                  x) { return ::logf(x); }
+inline double                 log_of_constituent(double                 x) { return ::log (x); }
+inline long double            log_of_constituent(long double            x) { return ::logl(x); }
 #if defined(BOOST_HAS_FLOAT128)
-template <>        ::boost::float128_type log_of_constituent<::boost::float128_type>(::boost::float128_type x) { return ::logq(x); }
+inline ::boost::float128_type log_of_constituent(::boost::float128_type x) { return ::logq(x); }
 #endif
 
 template <class FloatingPointType>

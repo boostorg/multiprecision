@@ -40,6 +40,13 @@ void expected_results()
        "(?i).*medium.*",            // test data group
        ".*", 400, 100);             // test function
    add_expected_result(
+       "[^|]*",                     // compiler
+       "[^|]*",                     // stdlib
+       "[^|]*",                     // platform
+       "cpp_double_double",         // test type(s)
+       ".*",                        // test data group
+       ".*", 800, 400);             // test function
+   add_expected_result(
        "[^|]*",         // compiler
        "[^|]*",         // stdlib
        "[^|]*",         // platform
