@@ -1220,10 +1220,6 @@ inline void eval_abs(rational_adaptor<Backend>& result, const rational_adaptor<B
 } // namespace backends
 
 //
-// Import the backend into this namespace:
-//
-using boost::multiprecision::backends::rational_adaptor;
-//
 // Define a category for this number type, one of:
 // 
 //    number_kind_integer
@@ -1234,10 +1230,6 @@ using boost::multiprecision::backends::rational_adaptor;
 //
 template<class Backend>
 struct number_category<rational_adaptor<Backend> > : public std::integral_constant<int, number_kind_rational>
-{};
-
-template <class IntBackend>
-struct expression_template_default<backends::rational_adaptor<IntBackend> > : public expression_template_default<IntBackend>
 {};
 
 template <class Backend, expression_template_option ExpressionTemplates>

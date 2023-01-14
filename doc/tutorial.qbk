@@ -22,6 +22,7 @@ In order to use this library you need to make two choices:
 [include tutorial_complex.qbk]
 [include tutorial_rational.qbk]
 [include tutorial_misc_backends.qbk]
+[include tutorial_fwd.qbk]
 [include tutorial_conversions.qbk]
 [include tutorial_random.qbk]
 [include tutorial_primality.qbk]

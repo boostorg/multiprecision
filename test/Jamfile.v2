@@ -1227,13 +1227,17 @@ test-suite misc :
          [ check-target-builds ../config//has_mpc : <define>TEST_MPC <source>gmp <source>mpfr <source>mpc : ] ]
       [ run issue_13301.cpp ]
       [ run issue_13148.cpp ]
+      [ run logged_adaptor_output_test.cpp : : : 
+         [ check-target-builds ../config//has_mpfi : <source>gmp <source>mpfr <source>mpfi : <build>no ]
+         ]
+      [ run logged_adaptor_cpp_output_test.cpp : : : [ requires cxx17_if_constexpr ] ]
       [ run test_hash.cpp : : : 
          [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
          [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>gmp <source>mpfr : ]
          [ check-target-builds ../config//has_mpfi : <define>TEST_MPFI <source>gmp <source>mpfr <source>mpfi : ]
          [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>tommath : ]
-          ]
+         ]
       [ run test_optional_compat.cpp ]
       #
       # Eigen interoperability:
