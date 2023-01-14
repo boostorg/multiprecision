@@ -32,9 +32,9 @@ int main()
       static_assert(std::is_constructible<int_backend, boost::int128_type>::value);
 #endif
 
-      //static_assert(b == -108);
+      static_assert(b == -108);
       static_assert(d == 554);
-      //static_assert(llv == -108);
+      static_assert(llv == -108);
 
       BOOST_CHECK_EQUAL(b, non_constexpr_invoke(test_constexpr_add_subtract<int_backend>, a));
       BOOST_CHECK_EQUAL(d, non_constexpr_invoke(test_constexpr_add_subtract<unsigned_backend>, c));
