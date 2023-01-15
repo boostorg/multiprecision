@@ -441,7 +441,7 @@ inline void eval_sqrt(complex_adaptor<Backend>& result, const complex_adaptor<Ba
    eval_ldexp(t, __my_sqrt_part, -1);
    eval_sqrt(__my_sqrt_part, t);
 
-   if (__my_real_part_is_neg == false)
+   if (!__my_real_part_is_neg)
    {
       eval_ldexp(t, __my_sqrt_part, 1);
       eval_divide(result.imag_data(), val.imag_data(), t);

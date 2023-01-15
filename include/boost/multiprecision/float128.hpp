@@ -693,7 +693,7 @@ inline boost::multiprecision::number<float128_backend, ExpressionTemplates> tgam
 
       const boost::multiprecision::number<float128_backend, ExpressionTemplates> result_of_tgammaq = fabsq(tgammaq(arg.backend().value()));
 
-      return ((result_is_neg == false) ? result_of_tgammaq : -result_of_tgammaq);
+      return (result_is_neg ? -result_of_tgammaq : result_of_tgammaq);
    }
    else
    {
