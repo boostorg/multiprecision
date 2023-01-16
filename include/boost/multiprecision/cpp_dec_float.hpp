@@ -64,12 +64,6 @@
 
 namespace boost {
 namespace multiprecision {
-namespace backends {
-
-template <unsigned Digits10, class ExponentType = std::int32_t, class Allocator = void>
-class cpp_dec_float;
-
-} // namespace backends
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 struct number_category<backends::cpp_dec_float<Digits10, ExponentType, Allocator> > : public std::integral_constant<int, number_kind_floating_point>
@@ -3524,11 +3518,6 @@ inline std::size_t hash_value(const cpp_dec_float<Digits10, ExponentType, Alloca
 }
 
 } // namespace backends
-
-using boost::multiprecision::backends::cpp_dec_float;
-
-using cpp_dec_float_50 = number<cpp_dec_float<50> > ;
-using cpp_dec_float_100 = number<cpp_dec_float<100> >;
 
 namespace detail {
 
