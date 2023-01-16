@@ -31,6 +31,8 @@
 
 #include "performance_test.hpp"
 
+// g++ -O3 -Wall -march=native -std=gnu++14 -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/performance/performance_test_files -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/performance -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/include -I/mnt/c/MyGitRepos/BoostGSoC21_multiprecision/test -I/mnt/c/boost/boost_1_81_0 test.cpp -lquadmath -o test.exe
+
 //
 // Keys in order are:
 // Category
