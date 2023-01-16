@@ -5,14 +5,17 @@
 
 //[logged_adaptor
 
-#include <boost/multiprecision/mpfi.hpp>
-#include <boost/multiprecision/logged_adaptor.hpp>
 #include <iostream>
 #include <iomanip>
+#include <boost/multiprecision/fwd.hpp>
 //
-// Begin by overloading log_postfix_event so we can capture each arithmetic event as it happens:
+// Begin by overloading log_postfix_event so we can capture each arithmetic event as it happens,
+// unfortunately this must occur BEFORE we include the full header, so just include the forward
+// declarations and define our overloads for now.  Note that in some cases we may need to just
+// declare the overloads here, and define them once the types become concrete:
 //
-namespace boost{ namespace multiprecision{
+namespace boost {
+namespace multiprecision {
 
 template <unsigned D>
 inline void log_postfix_event(const mpfi_float_backend<D>& val, const char* event_description)
@@ -29,13 +32,18 @@ inline void log_postfix_event(const mpfi_float_backend<D>&, const T&, const char
    // This version is never called in this example.
 }
 
-}}
-
+}
+} // namespace boost::multiprecision
+//
+// Now we can include the actual multiprecision headers and make the types concrete:
+//
+#include <boost/multiprecision/mpfi.hpp>
+#include <boost/multiprecision/logged_adaptor.hpp>
 
 int main()
 {
    using namespace boost::multiprecision;
-   typedef number<logged_adaptor<mpfi_float_backend<17> > > logged_type;
+   using logged_type = logged_adaptor_t<mpfi_float_50>;
    //
    // Test case deliberately introduces cancellation error, relative size of interval
    // gradually gets larger after each operation:
@@ -58,62 +66,61 @@ int main()
 /*
 //[logged_adaptor_output
 
-Diameter was nan after operation: Default construct
+Diameter was -0 after operation: Default construct
 Diameter was 0 after operation: Assignment from arithmetic type
-Diameter was 4.33681e-18 after operation: /=
-Diameter was nan after operation: Default construct
-Diameter was 7.70988e-18 after operation: *
-Diameter was 9.63735e-18 after operation: /=
-Diameter was 1.30104e-16 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 1.30104e-16 after operation: *
-Diameter was 1.38537e-16 after operation: /=
-Diameter was 2.54788e-15 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 2.54788e-15 after operation: *
-Diameter was 2.54863e-15 after operation: /=
-Diameter was 4.84164e-14 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 4.84164e-14 after operation: *
-Diameter was 4.84221e-14 after operation: /=
-Diameter was 9.19962e-13 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 9.19962e-13 after operation: *
-Diameter was 9.19966e-13 after operation: /=
-Diameter was 1.74793e-11 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 1.74793e-11 after operation: *
-Diameter was 1.74793e-11 after operation: /=
-Diameter was 3.32107e-10 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 3.32107e-10 after operation: *
-Diameter was 3.32107e-10 after operation: /=
-Diameter was 6.31003e-09 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 6.31003e-09 after operation: *
-Diameter was 6.31003e-09 after operation: /=
-Diameter was 1.19891e-07 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 1.19891e-07 after operation: *
-Diameter was 1.19891e-07 after operation: /=
-Diameter was 2.27792e-06 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 2.27792e-06 after operation: *
-Diameter was 2.27792e-06 after operation: /=
-Diameter was 4.32805e-05 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 4.32805e-05 after operation: *
-Diameter was 4.32805e-05 after operation: /=
-Diameter was 0.00082233 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 0.00082233 after operation: *
-Diameter was 0.00082233 after operation: /=
-Diameter was 0.0156243 after operation: -=
-Diameter was nan after operation: Default construct
-Diameter was 0.0156243 after operation: *
-Diameter was 0.0156243 after operation: /=
-Diameter was 0.296861 after operation: -=
-Final value was: {8.51569e-15,1.14843e-14}
-
+Diameter was 3.34096e-51 after operation: /=
+Diameter was -0 after operation: Default construct
+Diameter was 5.93948e-51 after operation: *
+Diameter was 7.42435e-51 after operation: /=
+Diameter was 1.00229e-49 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 1.00229e-49 after operation: *
+Diameter was 1.02085e-49 after operation: /=
+Diameter was 1.92105e-48 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 1.92105e-48 after operation: *
+Diameter was 1.92279e-48 after operation: /=
+Diameter was 3.65156e-47 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 3.65156e-47 after operation: *
+Diameter was 3.65163e-47 after operation: /=
+Diameter was 6.93803e-46 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 6.93803e-46 after operation: *
+Diameter was 6.93803e-46 after operation: /=
+Diameter was 1.31823e-44 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 1.31823e-44 after operation: *
+Diameter was 1.31823e-44 after operation: /=
+Diameter was 2.50463e-43 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 2.50463e-43 after operation: *
+Diameter was 2.50463e-43 after operation: /=
+Diameter was 4.7588e-42 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 4.7588e-42 after operation: *
+Diameter was 4.7588e-42 after operation: /=
+Diameter was 9.04171e-41 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 9.04171e-41 after operation: *
+Diameter was 9.04171e-41 after operation: /=
+Diameter was 1.71793e-39 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 1.71793e-39 after operation: *
+Diameter was 1.71793e-39 after operation: /=
+Diameter was 3.26406e-38 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 3.26406e-38 after operation: *
+Diameter was 3.26406e-38 after operation: /=
+Diameter was 6.20171e-37 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 6.20171e-37 after operation: *
+Diameter was 6.20171e-37 after operation: /=
+Diameter was 1.17832e-35 after operation: -=
+Diameter was -0 after operation: Default construct
+Diameter was 1.17832e-35 after operation: *
+Diameter was 1.17832e-35 after operation: /=
+Diameter was 2.23882e-34 after operation: -=
+Final value was: {1e-14,1e-14}
 //]
 */
