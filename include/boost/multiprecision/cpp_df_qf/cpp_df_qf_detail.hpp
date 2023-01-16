@@ -39,6 +39,13 @@ inline long double            log_of_constituent(long double            x) { ret
 inline ::boost::float128_type log_of_constituent(::boost::float128_type x) { return ::logq(x); }
 #endif
 
+inline float                  split(const float)                  { return static_cast<float>      (1U + static_cast<unsigned long long>(static_cast<unsigned long long>(1U) << static_cast<unsigned>((cpp_df_qf_detail::ccmath::numeric_limits<float                 >::digits + 1) / 2))); }
+inline double                 split(const double)                 { return static_cast<double>     (1U + static_cast<unsigned long long>(static_cast<unsigned long long>(1U) << static_cast<unsigned>((cpp_df_qf_detail::ccmath::numeric_limits<double                >::digits + 1) / 2))); }
+inline long double            split(const long double)            { return static_cast<long double>(1U + static_cast<unsigned long long>(static_cast<unsigned long long>(1U) << static_cast<unsigned>((cpp_df_qf_detail::ccmath::numeric_limits<long double           >::digits + 1) / 2))); }
+#if defined(BOOST_HAS_FLOAT128)
+inline ::boost::float128_type split(const ::boost::float128_type) { return static_cast<::boost::float128_type>(1) + static_cast<::boost::float128_type>(static_cast<::boost::uint128_type>(1U) << static_cast<unsigned>((cpp_df_qf_detail::ccmath::numeric_limits<::boost::float128_type>::digits + 1) / 2)); }
+#endif
+
 template <class FloatingPointType>
 struct is_floating_point_or_float128
 {
