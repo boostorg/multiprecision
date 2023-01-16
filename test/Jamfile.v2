@@ -1003,6 +1003,9 @@ test-suite cpp_int_tests :
 
 test-suite misc :
 
+      [ compile remove_me_1.cpp ]
+      [ compile remove_me_2.cpp ]
+
       [ compile test_constexpr.cpp : 
          [ check-target-builds ../config//has_float128 : <define>HAVE_FLOAT128 : ] 
          [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type <define>HAVE_FLOAT128 : ] 
