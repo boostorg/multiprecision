@@ -35,7 +35,7 @@ echo '==================================> BEFORE_SCRIPT'
 echo '==================================> SCRIPT'
 
 echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
-(cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis)
+(cd libs/config/test && ../../../b2 print_config_info print_math_info toolset=$TOOLSET)
 (cd libs/multiprecision/test && ../../../b2 -j3 toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
 
 echo '==================================> AFTER_SUCCESS'
