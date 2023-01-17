@@ -171,7 +171,7 @@ jobs:
         if: steps.retry1.outcome=='failure'
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: sudo apt install g++-9 g++-10 clang-10 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev libmpfi-dev libmpc-dev
+        run: sudo apt install g++-10 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev libmpfi-dev libmpc-dev
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
@@ -398,7 +398,7 @@ jobs:
       fail-fast: false
       matrix:
         toolset: [ gcc ]
-        standard: [ 11, 14, 17 ]
+        standard: [ 14, 17 ]
         suite: [ github_ci_block_1, github_ci_block_2 ]
     steps:
       - uses: actions/checkout@v3
