@@ -546,7 +546,7 @@ jobs:
         run: ./b2 headers
         working-directory: ../boost-root
       - name: Config Info
-        run: ../../../b2 print_config_info print_math_info toolset=$TOOLSET
+        run: ../../../b2 print_config_info print_math_info toolset=${{ matrix.toolset }} cxxstd=${{ matrix.standard }}
         working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ../../../b2 -j2 toolset=${{ matrix.toolset }} cxxstd=${{ matrix.standard }} ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
