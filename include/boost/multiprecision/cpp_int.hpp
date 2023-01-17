@@ -2298,6 +2298,25 @@ template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, c
 struct number_category<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> > : public std::integral_constant<int, number_kind_integer>
 {};
 
+#ifdef BOOST_HAS_INT128
+
+namespace detail {
+
+template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+struct is_convertible_arithmetic<int128_type, backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
+{
+   static constexpr bool value = true;
+};
+template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+struct is_convertible_arithmetic<uint128_type, backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
+{
+   static constexpr bool value = true;
+};
+
+}
+
+#endif
+
 #if defined(__GNUC__) && !defined(__clang__)
 // see https://github.com/boostorg/multiprecision/issues/413
 // and https://github.com/boostorg/multiprecision/issues/431

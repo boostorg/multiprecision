@@ -50,7 +50,10 @@ BOOST_CXX14_CONSTEXPR T test_constexpr_add_subtract(T a)
    a += do_test_constexpr_add_subtract(a, a);
    a += do_test_constexpr_add_subtract(a, static_cast<unsigned char>(2));
    a += do_test_constexpr_add_subtract(a, static_cast<signed char>(2));
-   a += do_test_constexpr_add_subtract(a, static_cast<char>(2));
+   if constexpr(std::numeric_limits<char>::is_signed)
+      a += do_test_constexpr_add_subtract(a, static_cast<char>(2));
+   else
+      a += do_test_constexpr_add_subtract(a, static_cast<signed char>(2));  // we need a consistent result.
    a += do_test_constexpr_add_subtract(a, static_cast<short>(2));
    a += do_test_constexpr_add_subtract(a, static_cast<unsigned short>(2));
    a += do_test_constexpr_add_subtract(a, static_cast<int>(2));
