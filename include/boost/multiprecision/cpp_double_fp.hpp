@@ -18,13 +18,11 @@
 #include <limits>
 #include <string>
 #include <type_traits>
-
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 #include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
-
 #ifdef BOOST_MP_MATH_AVAILABLE
 //
 // Headers required for Boost.Math integration:
@@ -40,7 +38,6 @@
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #endif
-
 #if (defined(__clang__) && (__clang_major__ <= 9))
 #define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE struct
 #else
@@ -552,13 +549,64 @@ class cpp_double_fp_backend
    #endif
    cpp_double_fp_backend& operator-=(const cpp_double_fp_backend& v)
    {
-      // Use *this - v = -(-*this + v).
+      const auto fpc_u = eval_fpclassify(*this);
+      const auto fpc_v = eval_fpclassify(v);
 
-      // TBD: Perform NaN, inf, zero and equality checks and
-      // implement full length subtract from Briggs/Shoup.
-      negate();
-      *this += v;
-      negate();
+      const auto isnan_u = (fpc_u == FP_NAN);
+
+      if (isnan_u)
+      {
+         return *this;
+      }
+
+      const auto isinf_u = (fpc_u == FP_INFINITE);
+      const auto isinf_v = (fpc_v == FP_INFINITE);
+
+      if (isinf_u)
+      {
+         if (isinf_v && (isneg() == v.isneg()))
+         {
+            *this = cpp_double_fp_backend::my_value_nan();
+         }
+         return *this;
+      }
+
+      const auto iszero_u = (fpc_u == FP_ZERO);
+      const auto isnan_v  = (fpc_v == FP_NAN);
+
+      if (iszero_u || (isnan_v || isinf_v))
+      {
+         return operator=(-v);
+      }
+
+      // Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
+
+      const float_type S = data.first + - v.data.first;
+      const float_type T = data.second + - v.data.second;
+      const float_type e = S - data.first;
+      volatile float_type f = T - data.second;
+
+      float_type t1 = S - e;
+      t1 = data.first - t1;
+      float_type s  = - v.data.first - e;
+      s  = s + t1;
+
+      t1 = T - f;
+      t1 = data.second - t1;
+      float_type t  = - v.data.second - f;
+      t  = t + t1;
+
+      s = s + T;
+      float_type H = S + s;
+      float_type h = S - H;
+      h = h + s;
+
+      // Simplification compared to Victor Shoup.
+      h  = h + t;
+      data.first = H + h;
+      f  = H - data.first;
+      data.second = f + h;
+
       return *this;
    }
 
