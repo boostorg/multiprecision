@@ -246,6 +246,9 @@ class cpp_double_fp_backend
    static constexpr int my_max_exponent10 = static_cast<int>(static_cast<float>(my_max_exponent) * 0.301F);
    static constexpr int my_min_exponent10 = static_cast<int>(static_cast<float>(my_min_exponent) * 0.301F);
 
+   // TBD: Did we justify this static assertion during the GSoC?
+   // Does anyone remember what the meaning of the number 77 is?
+
    static_assert(((my_max_exponent - my_digits) >= 77),
                  "Error: floating-point constituent does not have wide enough exponent range");
 
