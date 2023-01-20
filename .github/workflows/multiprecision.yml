@@ -68,15 +68,15 @@ jobs:
       - name: Generate user config
         run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
-      - name: Config info install
-        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
-        working-directory: ../boost-root/libs/config/test
-      - name: Config info
-        run: ./config_info_travis
+      - name: Config Info
+        run: ../../../b2 print_config_info print_math_info toolset=$TOOLSET
         working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES include=/usr/include/eigen3
         working-directory: ../boost-root/libs/multiprecision/test
+      - name: b2 config
+        run: cat bin.v2/config.log
+        working-directory: ../boost-root/
   ubuntu-focal:
     runs-on: ubuntu-20.04
     defaults:
@@ -130,15 +130,15 @@ jobs:
       - name: Generate user config
         run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
-      - name: Config info install
-        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
-        working-directory: ../boost-root/libs/config/test
-      - name: Config info
-        run: ./config_info_travis
+      - name: Config Info
+        run: ../../../b2 print_config_info print_math_info toolset=$TOOLSET
         working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES include=/usr/include/eigen3
         working-directory: ../boost-root/libs/multiprecision/test
+      - name: b2 config
+        run: cat bin.v2/config.log
+        working-directory: ../boost-root/
   ubuntu-focal-slow-tests:
     runs-on: ubuntu-20.04
     defaults:
@@ -192,15 +192,15 @@ jobs:
       - name: Generate user config
         run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
-      - name: Config info install
-        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
-        working-directory: ../boost-root/libs/config/test
-      - name: Config info
-        run: ./config_info_travis
+      - name: Config Info
+        run: ../../../b2 print_config_info print_math_info toolset=$TOOLSET
         working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES include=/usr/include/eigen3
         working-directory: ../boost-root/libs/multiprecision/test
+      - name: b2 config
+        run: cat bin.v2/config.log
+        working-directory: ../boost-root/
   ubuntu-focal-standalone-tests:
     runs-on: ubuntu-20.04
     defaults:
@@ -254,15 +254,15 @@ jobs:
       - name: Generate user config
         run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
-      - name: Config info install
-        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
-        working-directory: ../boost-root/libs/config/test
-      - name: Config info
-        run: ./config_info_travis
+      - name: Config Info
+        run: ../../../b2 print_config_info print_math_info toolset=$TOOLSET
         working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
+      - name: b2 config
+        run: cat bin.v2/config.log
+        working-directory: ../boost-root/
   ubuntu-focal-ASAN:
     runs-on: ubuntu-20.04
     defaults:
@@ -316,15 +316,15 @@ jobs:
       - name: Generate user config
         run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
-      - name: Config info install
-        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
-        working-directory: ../boost-root/libs/config/test
-      - name: Config info
-        run: ./config_info_travis
+      - name: Config Info
+        run: ../../../b2 print_config_info print_math_info toolset=$TOOLSET
         working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ../../../b2 define=BOOST_CI_ASAN_BUILD define=BOOST_CI_SANITIZER_BUILD cxxflags=-fsanitize=address linkflags=-fsanitize=address toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
+      - name: b2 config
+        run: cat bin.v2/config.log
+        working-directory: ../boost-root/
   ubuntu-focal-UBSAN:
     runs-on: ubuntu-20.04
     defaults:
@@ -378,15 +378,15 @@ jobs:
       - name: Generate user config
         run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
-      - name: Config info install
-        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
-        working-directory: ../boost-root/libs/config/test
-      - name: Config info
-        run: ./config_info_travis
+      - name: Config Info
+        run: ../../../b2 print_config_info print_math_info toolset=$TOOLSET
         working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ../../../b2 define=BOOST_CI_UBSAN_BUILD define=BOOST_CI_SANITIZER_BUILD cxxflags=-fsanitize=undefined linkflags=-fsanitize=undefined toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
+      - name: b2 config
+        run: cat bin.v2/config.log
+        working-directory: ../boost-root/
   windows_gcc:
     runs-on: windows-2019
     defaults:
@@ -421,15 +421,15 @@ jobs:
       - name: Generate headers
         run: b2 headers
         working-directory: ../boost-root
-      - name: Config info install
-        run: ..\..\..\b2 config_info_travis_install %ARGS%
-        working-directory: ../boost-root/libs/config/test
-      - name: Config info
-        run: config_info_travis
+      - name: Config Info
+        run: ..\..\..\b2 print_config_info print_math_info %ARGS%
         working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/multiprecision/test
+      - name: b2 config
+        run: cat bin.v2/config.log
+        working-directory: ../boost-root/
   windows_msvc_14_0:
     runs-on: windows-2019
     defaults:
@@ -464,15 +464,15 @@ jobs:
       - name: Generate headers
         run: b2 headers
         working-directory: ../boost-root
-      - name: Config info install
-        run: ..\..\..\b2 config_info_travis_install %ARGS%
-        working-directory: ../boost-root/libs/config/test
-      - name: Config info
-        run: config_info_travis
+      - name: Config Info
+        run: ..\..\..\b2 print_config_info print_math_info %ARGS%
         working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/multiprecision/test
+      - name: b2 config
+        run: cat bin.v2/config.log
+        working-directory: ../boost-root/
   windows_msvc_14_2:
     runs-on: windows-2019
     defaults:
@@ -507,15 +507,15 @@ jobs:
       - name: Generate headers
         run: b2 headers
         working-directory: ../boost-root
-      - name: Config info install
-        run: ..\..\..\b2 config_info_travis_install %ARGS%
-        working-directory: ../boost-root/libs/config/test
-      - name: Config info
-        run: config_info_travis
+      - name: Config Info
+        run: ..\..\..\b2 print_config_info print_math_info %ARGS%
         working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/multiprecision/test
+      - name: b2 config
+        run: cat bin.v2/config.log
+        working-directory: ../boost-root/
   macos:
     runs-on: macos-latest
     strategy:
@@ -545,12 +545,12 @@ jobs:
       - name: Generate headers
         run: ./b2 headers
         working-directory: ../boost-root
-      - name: Config info install
-        run: ../../../b2 config_info_travis_install toolset=${{ matrix.toolset }} cxxstd=${{ matrix.standard }}
-        working-directory: ../boost-root/libs/config/test
-      - name: Config info
-        run: ./config_info_travis
+      - name: Config Info
+        run: ../../../b2 print_config_info print_math_info toolset=${{ matrix.toolset }} cxxstd=${{ matrix.standard }}
         working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ../../../b2 -j2 toolset=${{ matrix.toolset }} cxxstd=${{ matrix.standard }} ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES
         working-directory: ../boost-root/libs/multiprecision/test
+      - name: b2 config
+        run: cat bin.v2/config.log
+        working-directory: ../boost-root/
