@@ -576,9 +576,6 @@ public:
 
 } // namespace detail
 
-struct gmp_int;
-struct gmp_rational;
-
 template <unsigned digits10>
 struct gmp_float : public detail::gmp_float_imp<digits10>
 {
@@ -3268,10 +3265,6 @@ inline gmp_int& gmp_int::operator=(const gmp_rational& o)
 
 } //namespace backends
 
-using boost::multiprecision::backends::gmp_float;
-using boost::multiprecision::backends::gmp_int;
-using boost::multiprecision::backends::gmp_rational;
-
 template <expression_template_option ExpressionTemplates>
 struct component_type<number<gmp_rational, ExpressionTemplates> >
 {
@@ -3364,14 +3357,6 @@ template <>
 struct is_variable_precision<backends::gmp_float<0> > : public std::integral_constant<bool, true>
 {};
 } // namespace detail
-
-using mpf_float_50 = number<gmp_float<50> >;
-using mpf_float_100 = number<gmp_float<100> >;
-using mpf_float_500 = number<gmp_float<500> >;
-using mpf_float_1000 = number<gmp_float<1000> >;
-using mpf_float = number<gmp_float<0> >;
-using mpz_int = number<gmp_int>;
-using mpq_rational = number<gmp_rational>;
 
 } // namespace multiprecision
 
