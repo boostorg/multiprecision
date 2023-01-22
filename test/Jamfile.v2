@@ -296,11 +296,10 @@ rule get_function_tests
               : # requirements
                <define>TEST_CPP_BIN_FLOAT
               : $(source:B)_cpp_bin_float ] ;
-         result += [ run $(source) quadmath no_eh_support
+         result += [ run $(source) no_eh_support
               : # command line
               : # input files
               : # requirements
-               [ check-target-builds ../config//has_float128 : : <build>no ]
                <define>TEST_CPP_DOUBLE_FLOAT
               : $(source:B)_cpp_double_fp ] ;
          result += [ run $(source) quadmath no_eh_support

@@ -620,11 +620,17 @@ class cpp_double_fp_backend
    #endif
    cpp_double_fp_backend& operator*=(const cpp_double_fp_backend& other)
    {
-      cpp_double_fp_backend v(other);
+            cpp_double_fp_backend v(other);
+
+      // Evaluate the sign of the result.
+      const auto isneg_u =   isneg();
+      const auto isneg_v = v.isneg();
+
+      const bool b_result_is_neg = (isneg_u != isneg_v);
 
       // Artificially set the sign of the result to be positive.
-      //if(isneg_u) {   negate(); }
-      //if(isneg_v) { v.negate(); }
+      if(isneg_u) {   negate(); }
+      if(isneg_v) { v.negate(); }
 
       const auto fpc_u = eval_fpclassify(*this);
       const auto fpc_v = eval_fpclassify(v);
@@ -644,14 +650,7 @@ class cpp_double_fp_backend
 
       if (isinf_u || isinf_v)
       {
-         // Evaluate the sign of the result.
-         const auto isneg_u =   isneg();
-         const auto isneg_v = v.isneg();
-
-         const bool b_result_is_neg = (isneg_u != isneg_v);
-
          *this = cpp_double_fp_backend::my_value_inf();
-
          if (b_result_is_neg)
             negate();
          return *this;
@@ -662,36 +661,13 @@ class cpp_double_fp_backend
          return operator=(cpp_double_fp_backend(0));
       }
 
-      // Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
-      volatile float_type C  = cpp_df_qf_detail::split(float_type()) * data.first;
-      float_type hu = C - data.first;
-      float_type c  = cpp_df_qf_detail::split(float_type()) * v.data.first;
-      hu = C - hu;
-      float_type tu = data.first - hu;
-      float_type hv = c - v.data.first;
-      C  = data.first * v.data.first;
-      hv = c - hv;
-      const float_type tv = v.data.first - hv;
+      rep_type tmp = arithmetic::product(data.first, v.data.first);
 
-      float_type t1 = hu * hv;
-      t1 = t1 - C;
-      float_type t2 = hu * tv;
-      t1 = t1 + t2;
-      t2 = tu * hv;
-      t1 = t1 + t2;
-      t2 = tu * tv;
-      c  = t1 + t2;
-      t1 = data.first * v.data.second;
-      t2 = data.second * v.data.first;
-      t1 = t1 + t2;
-      c  = c + t1;
+      tmp.second += (data.first * v.data.second + data.second * v.data.first);
 
-      // Simplification compared to Victor Shoup.
-      data.first = C + c;
-      tu = C - data.first;
-      data.second = tu + c;
+      data = tmp;
 
-      //if(b_result_is_neg) { negate(); }
+      if(b_result_is_neg) { negate(); }
 
       return *this;
    }
