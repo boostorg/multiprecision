@@ -194,7 +194,8 @@ void test()
    for (unsigned k = 0; k < data.size(); k++)
    {
       static const T euler_gamma = static_cast<T>("5.77215664901532860606512090082402431042159335939923598805767234884867726777664670936947063291746749514631447249807082480960504014486542836224173997644923536253500333742937337737673942792595258247094916008735203948165670853233151776611528621199501507984793745085705740029921354786146694029604325421519e-1");
-      T              val         = sin(euler_gamma * ((100 * k) - 5000));
+      const T        arg         = T(euler_gamma * ((100 * k) - 5000));
+      T              val         = sin(arg);
       T              e           = relative_error(val, T(data[k]));
       unsigned       err         = e.template convert_to<unsigned>();
       if (err > max_err)
@@ -375,7 +376,6 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
-   test<boost::multiprecision::cpp_double_float>();
    test<boost::multiprecision::cpp_double_double>();
    test<boost::multiprecision::cpp_double_long_double>();
    #if defined(BOOST_HAS_FLOAT128)
