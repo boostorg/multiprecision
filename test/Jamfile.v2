@@ -1518,7 +1518,7 @@ rule get_specfun_tests_cpp_double_double
    for local source in [ glob math/*.cpp ]
    {
       result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static 
-               math/instances//test_instances_cpp_dec_float/<link>static
+               math/instances//test_instances_cpp_double_double/<link>static
            : # command line
            : # input files
            : # requirements
