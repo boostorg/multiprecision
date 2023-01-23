@@ -17,30 +17,7 @@
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
-template<typename MpFloatType>
-void represent_cyl_bessel_j()
-{
-   // N[BesselJ[2, 345/100], 101]
-   // 0.46452112540537213897844513503677773921598161558478057526782559731407738667745222063644605126028883049
-
-   std::cout << std::endl << "represent_cyl_bessel_j" << std::endl;
-
-   using float_type = MpFloatType;
-
-   const float_type b    = boost::math::cyl_bessel_j(2, float_type(345) / 100);
-   const float_type ctrl("0.46452112540537213897844513503677773921598161558478057526782559731407738667745222063644605126028883049");
-
-   const float_type delta = fabs(1 - (b / ctrl));
-
-   const std::streamsize original_streamsize = std::cout.precision();
-   std::cout << std::setprecision(std::numeric_limits<float_type>::digits10) << b    << std::endl;
-   std::cout << std::setprecision(std::numeric_limits<float_type>::digits10) << ctrl << std::endl;
-   std::cout << std::scientific << std::setprecision(4) << delta << std::endl;
-   std::cout.precision(original_streamsize);
-   std::cout.unsetf(std::ios::scientific);
-}
-
-template<typename MpFloatType>
+template<typename FloatType>
 void represent_tgamma_half()
 {
    // N[Sqrt[Pi], 101]
@@ -48,19 +25,45 @@ void represent_tgamma_half()
 
    std::cout << std::endl << "represent_tgamma_half" << std::endl;
 
-   using float_type = MpFloatType;
+   using float_type = FloatType;
 
    const float_type g    = boost::math::tgamma(float_type(0.5F));
    const float_type ctrl = sqrt(boost::math::constants::pi<float_type>());
 
    const float_type delta = fabs(1 - (g / ctrl));
 
-   const std::streamsize original_streamsize = std::cout.precision();
+   const auto flg = std::cout.flags();
+
    std::cout << std::setprecision(std::numeric_limits<float_type>::digits10) << g    << std::endl;
    std::cout << std::setprecision(std::numeric_limits<float_type>::digits10) << ctrl << std::endl;
    std::cout << std::scientific << std::setprecision(4) << delta << std::endl;
-   std::cout.precision(original_streamsize);
-   std::cout.unsetf(std::ios::scientific);
+
+   std::cout.flags(flg);
+}
+
+template<typename FloatType>
+void represent_cyl_bessel_j()
+{
+   // N[BesselJ[2, 345/100], 101]
+   // 0.46452112540537213897844513503677773921598161558478057526782559731407738667745222063644605126028883049
+
+   std::cout << std::endl << "represent_cyl_bessel_j" << std::endl;
+
+   using float_type = FloatType;
+
+   const float_type b    = boost::math::cyl_bessel_j(2, float_type(345) / 100);
+   const float_type ctrl("0.46452112540537213897844513503677773921598161558478057526782559731407738667745222063644605126028883049");
+
+   const float_type delta = fabs(1 - (b / ctrl));
+
+
+   const auto flg = std::cout.flags();
+
+   std::cout << std::setprecision(std::numeric_limits<float_type>::digits10) << b    << std::endl;
+   std::cout << std::setprecision(std::numeric_limits<float_type>::digits10) << ctrl << std::endl;
+   std::cout << std::scientific << std::setprecision(4) << delta << std::endl;
+
+   std::cout.flags(flg);
 }
 
 int main()
