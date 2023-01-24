@@ -1116,22 +1116,22 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
             data.first  = static_cast<float_type>(0.0F);
             data.second = static_cast<float_type>(0.0F);
 
-            using local_builtin_float_type = typename local_double_fp_type::float_type;
+            using local_builtin_float_type = double;
 
             constexpr auto dig_lim =
                static_cast<unsigned>
                (
                   static_cast<int>
                   (
-                         (local_double_fp_type::my_digits / std::numeric_limits<local_builtin_float_type>::digits)
-                     + (((local_double_fp_type::my_digits % std::numeric_limits<local_builtin_float_type>::digits) != 0) ? 1 : 0)
+                         (local_double_fp_type::my_digits / cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits)
+                     + (((local_double_fp_type::my_digits % cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits) != 0) ? 1 : 0)
                   )
-                  * std::numeric_limits<local_builtin_float_type>::digits
+                  * cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits
                );
 
             for(auto i = static_cast<unsigned>(UINT8_C(0));
                      i < dig_lim;
-                     i = static_cast<unsigned>(i + static_cast<unsigned>(std::numeric_limits<local_builtin_float_type>::digits)))
+                     i = static_cast<unsigned>(i + static_cast<unsigned>(cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits)))
             {
                local_cpp_dec_float_type f_dec_abs { };
 
