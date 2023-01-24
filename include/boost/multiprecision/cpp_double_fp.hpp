@@ -275,7 +275,7 @@ class cpp_double_fp_backend
                                       && (cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatType>::digits > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const OtherFloatType& f)
       : data(static_cast<float_type>(f),
-             static_cast<float_type>(f - (OtherFloatType) static_cast<float_type>(f))) { }
+             static_cast<float_type>(f - static_cast<OtherFloatType>(static_cast<float_type>(f)))) { }
 
    // Construtor from another kind of cpp_double_fp_backend<> object.
 
@@ -391,6 +391,28 @@ class cpp_double_fp_backend
    cpp_double_fp_backend& operator=(const cpp_double_fp_backend<OtherFloatType>& other)
    {
      return operator=(cpp_double_fp_backend(other));
+   }
+
+   template <typename OtherFloatType>
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   typename std::enable_if<cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatType>::value, cpp_double_fp_backend&>::type operator=(const OtherFloatType f)
+   {
+     return operator=(cpp_double_fp_backend(f));
+   }
+
+   template <typename IntegralType>
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   typename std::enable_if<boost::multiprecision::detail::is_integral<IntegralType>::value, cpp_double_fp_backend&>::type operator=(const IntegralType n)
+   {
+     return operator=(cpp_double_fp_backend(n));
    }
 
    cpp_double_fp_backend& operator=(const char* v)
