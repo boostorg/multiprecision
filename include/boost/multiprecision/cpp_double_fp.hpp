@@ -18,6 +18,8 @@
 #include <limits>
 #include <string>
 #include <type_traits>
+
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 #include <boost/multiprecision/detail/fpclassify.hpp>
@@ -343,14 +345,9 @@ class cpp_double_fp_backend
 
    constexpr cpp_double_fp_backend(const std::pair<float_type, float_type>& p) noexcept : data(p) { }
 
-   cpp_double_fp_backend(const std::string& str)
+   cpp_double_fp_backend(const char* s)
    {
-      boost::multiprecision::detail::convert_from_string(*this, str.c_str());
-   }
-
-   cpp_double_fp_backend(const char* pstr)
-   {
-      boost::multiprecision::detail::convert_from_string(*this, pstr);
+      *this = s;
    }
 
    // Assignment operator.
@@ -394,6 +391,13 @@ class cpp_double_fp_backend
    cpp_double_fp_backend& operator=(const cpp_double_fp_backend<OtherFloatType>& other)
    {
      return operator=(cpp_double_fp_backend(other));
+   }
+
+   cpp_double_fp_backend& operator=(const char* v)
+   {
+      rd_string(v);
+
+      return *this;
    }
 
    std::size_t hash() const
@@ -741,36 +745,58 @@ class cpp_double_fp_backend
 
       // Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
       volatile float_type C  = data.first / v.data.first;
-      float_type c  = cpp_df_qf_detail::split(float_type()) * C;
-      volatile float_type hc = c - C;
-      float_type u  = cpp_df_qf_detail::split(float_type()) * v.data.first;
-      hc = c - hc;
-      const float_type tc = C - hc;
-      float_type hv = u - v.data.first;
-      const volatile float_type U  = C * v.data.first;
-      hv = u - hv;
-      float_type tv = v.data.first - hv;
 
-      u  = hc * hv;
-      u  = u - U;
-      float_type t1 = hc * tv;
-      u  = u + t1;
-      t1 = tc * hv;
-      u  = u + t1;
-      t1 = tc * tv;
-      u  = u + t1;
+      // Check if the first order of division gives us zero or infinite.
+      // TBD: Do we need more refined checks either here or later in this subroutine?
 
-      c  = data.first - U;
-      c  = c - u;
-      c  = c + data.second;
-      t1 = C * v.data.second;
-      c  = c - t1;
-      c  = c / v.data.first;
+      const auto cabs = cpp_df_qf_detail::ccmath::fabs(C);
 
-      // Simplification compared to Victor Shoup.
-      data.first = C + c;
-      tv = C - data.first;
-      data.second = tv + c;
+      const auto is_definitely_zero = (cabs < my_value_min().my_first());
+      const auto is_definitely_inf  = (cabs > my_value_max().my_first() || cpp_df_qf_detail::ccmath::isinf(C));
+
+      if (is_definitely_zero)
+      {
+         data.first  = 0;
+         data.second = 0;
+      }
+      else if (is_definitely_inf)
+      {
+         data.first  = C;
+         data.second = 0;
+      }
+      else
+      {
+         float_type c  = cpp_df_qf_detail::split(float_type()) * C;
+         volatile float_type hc = c - C;
+         float_type u  = cpp_df_qf_detail::split(float_type()) * v.data.first;
+         hc = c - hc;
+         const float_type tc = C - hc;
+         float_type hv = u - v.data.first;
+         const volatile float_type U  = C * v.data.first;
+         hv = u - hv;
+         float_type tv = v.data.first - hv;
+
+         u  = hc * hv;
+         u  = u - U;
+         float_type t1 = hc * tv;
+         u  = u + t1;
+         t1 = tc * hv;
+         u  = u + t1;
+         t1 = tc * tv;
+         u  = u + t1;
+
+         c  = data.first - U;
+         c  = c - u;
+         c  = c + data.second;
+         t1 = C * v.data.second;
+         c  = c - t1;
+         c  = c / v.data.first;
+
+         // Simplification compared to Victor Shoup.
+         data.first = C + c;
+         tv = C - data.first;
+         data.second = tv + c;
+      }
 
       return *this;
    }
@@ -1006,6 +1032,8 @@ class cpp_double_fp_backend
  private:
    rep_type data;
 
+   bool rd_string(const char* pstr);
+
    template <typename OtherFloatingPointType,
              typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits10 * 2) < 16))>::type const*>
    friend
@@ -1036,6 +1064,98 @@ class cpp_double_fp_backend
    #endif
    void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
 };
+
+template <typename FloatingPointType>
+bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
+{
+   // TBD: Do we need-to / want-to throw-catch on invalid string input?
+
+   constexpr auto local_cpp_dec_float_digits10 = static_cast<int>(INT16_C(201));
+
+   using local_cpp_dec_float_type     = boost::multiprecision::cpp_dec_float<static_cast<unsigned>(local_cpp_dec_float_digits10), std::int32_t, std::allocator<void>>;
+   using local_double_fp_type         = cpp_double_fp_backend<FloatingPointType>;
+   using local_cpp_dec_float_exp_type = typename local_cpp_dec_float_type::exponent_type;
+
+   local_cpp_dec_float_type f_dec = pstr;
+
+   const auto fpc = eval_fpclassify(f_dec);
+
+   const auto is_definitely_nan = (fpc == FP_NAN);
+
+   if (is_definitely_nan)
+   {
+      static_cast<void>(operator=(local_double_fp_type::my_value_nan()));
+   }
+   else
+   {
+      const auto e10 = eval_ilogb(f_dec);
+
+      const auto is_definitely_zero =
+      (
+            (fpc == FP_ZERO)
+         || (e10 < static_cast<local_cpp_dec_float_exp_type>(local_double_fp_type::my_min_exponent10))
+      );
+
+      if (is_definitely_zero)
+      {
+         data.first  = 0;
+         data.second = 0;
+      }
+      else
+      {
+         const auto is_definitely_inf = (e10 > static_cast<local_cpp_dec_float_exp_type>(local_double_fp_type::my_max_exponent10));
+
+         if (is_definitely_inf)
+         {
+            static_cast<void>(operator=(local_double_fp_type::my_value_inf()));
+         }
+         else
+         {
+            boost::multiprecision::detail::convert_from_string(*this, pstr);
+
+            data.first  = static_cast<float_type>(0.0F);
+            data.second = static_cast<float_type>(0.0F);
+
+            using local_builtin_float_type = typename local_double_fp_type::float_type;
+
+            constexpr auto dig_lim =
+               static_cast<unsigned>
+               (
+                  static_cast<int>
+                  (
+                         (local_double_fp_type::my_digits / std::numeric_limits<local_builtin_float_type>::digits)
+                     + (((local_double_fp_type::my_digits % std::numeric_limits<local_builtin_float_type>::digits) != 0) ? 1 : 0)
+                  )
+                  * std::numeric_limits<local_builtin_float_type>::digits
+               );
+
+            for(auto i = static_cast<unsigned>(UINT8_C(0));
+                     i < dig_lim;
+                     i = static_cast<unsigned>(i + static_cast<unsigned>(std::numeric_limits<local_builtin_float_type>::digits)))
+            {
+               local_cpp_dec_float_type f_dec_abs { };
+
+               eval_fabs(f_dec_abs, f_dec);
+
+               if (f_dec_abs.compare((local_cpp_dec_float_type::min)()) <= 0)
+               {
+                  break;
+               }
+
+               auto f = local_builtin_float_type { };
+
+               eval_convert_to(&f, f_dec);
+
+               f_dec -= f;
+
+               eval_add(*this, local_double_fp_type(f));
+            }
+         }
+      }
+   }
+
+   return true;
+}
 
 namespace cpp_df_qf_detail {
 
@@ -1161,9 +1281,12 @@ template <typename FloatingPointType, typename char_type, typename traits_type>
 std::basic_istream<char_type, traits_type>&
 operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_fp_backend<FloatingPointType>& f)
 {
-   std::string str;
-   is >> str;
-   boost::multiprecision::detail::convert_from_string(f, str.c_str());
+   std::string input_str;
+
+   is >> input_str;
+
+   f = input_str.c_str();
+
    return is;
 }
 

@@ -2105,7 +2105,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          #else
          exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
          #endif
-         
+
          str = str.substr(static_cast<std::size_t>(0u), pos);
       }
 
