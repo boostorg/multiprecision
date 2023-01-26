@@ -1092,10 +1092,18 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 {
    // TBD: Do we need-to / want-to throw-catch on invalid string input?
 
-   constexpr auto local_cpp_dec_float_digits10 = static_cast<int>(INT16_C(201));
+   using local_double_fp_type = cpp_double_fp_backend<FloatingPointType>;
+
+   constexpr auto local_cpp_dec_float_digits10 =
+      static_cast<int>
+      (
+         static_cast<float>
+         (
+            static_cast<float>(local_double_fp_type::my_digits) * 0.9F
+         )
+      );
 
    using local_cpp_dec_float_type     = boost::multiprecision::cpp_dec_float<static_cast<unsigned>(local_cpp_dec_float_digits10), std::int32_t, std::allocator<void>>;
-   using local_double_fp_type         = cpp_double_fp_backend<FloatingPointType>;
    using local_cpp_dec_float_exp_type = typename local_cpp_dec_float_type::exponent_type;
 
    local_cpp_dec_float_type f_dec = pstr;

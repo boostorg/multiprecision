@@ -69,6 +69,15 @@ void expected_results()
        500,                          // Max Peek error
        100);                         // Max mean error
    add_expected_result(
+       ".*",                         // compiler
+       ".*",                         // stdlib
+       ".*",                         // platform
+       ".*cpp_double_double.*",      // test type(s)
+       ".*",                         // test data group
+       ".*",                         // test function
+       30,                           // Max Peek error
+       5);                           // Max mean error
+   add_expected_result(
        ".*", // compiler
        ".*", // stdlib
        ".*", // platform
