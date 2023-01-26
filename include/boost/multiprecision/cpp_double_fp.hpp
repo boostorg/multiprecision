@@ -10,6 +10,8 @@
 #ifndef BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 #define BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 
+#define BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
+
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 #pragma warning(push)
 #pragma warning (disable : 4814)
@@ -18,11 +20,14 @@
 #include <limits>
 #include <string>
 #include <type_traits>
+
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 #include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
+
 #ifdef BOOST_MP_MATH_AVAILABLE
 //
 // Headers required for Boost.Math integration:
@@ -38,6 +43,7 @@
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #endif
+
 #if (defined(__clang__) && (__clang_major__ <= 9))
 #define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE struct
 #else
@@ -273,7 +279,7 @@ class cpp_double_fp_backend
                                       && (cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatType>::digits > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const OtherFloatType& f)
       : data(static_cast<float_type>(f),
-             static_cast<float_type>(f - (OtherFloatType) static_cast<float_type>(f))) { }
+             static_cast<float_type>(f - static_cast<OtherFloatType>(static_cast<float_type>(f)))) { }
 
    // Construtor from another kind of cpp_double_fp_backend<> object.
 
@@ -343,14 +349,9 @@ class cpp_double_fp_backend
 
    constexpr cpp_double_fp_backend(const std::pair<float_type, float_type>& p) noexcept : data(p) { }
 
-   cpp_double_fp_backend(const std::string& str)
+   cpp_double_fp_backend(const char* s)
    {
-      boost::multiprecision::detail::convert_from_string(*this, str.c_str());
-   }
-
-   cpp_double_fp_backend(const char* pstr)
-   {
-      boost::multiprecision::detail::convert_from_string(*this, pstr);
+      *this = s;
    }
 
    // Assignment operator.
@@ -394,6 +395,35 @@ class cpp_double_fp_backend
    cpp_double_fp_backend& operator=(const cpp_double_fp_backend<OtherFloatType>& other)
    {
      return operator=(cpp_double_fp_backend(other));
+   }
+
+   template <typename OtherFloatType>
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   typename std::enable_if<cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatType>::value, cpp_double_fp_backend&>::type operator=(const OtherFloatType f)
+   {
+     return operator=(cpp_double_fp_backend(f));
+   }
+
+   template <typename IntegralType>
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
+   typename std::enable_if<boost::multiprecision::detail::is_integral<IntegralType>::value, cpp_double_fp_backend&>::type operator=(const IntegralType n)
+   {
+     return operator=(cpp_double_fp_backend(n));
+   }
+
+   cpp_double_fp_backend& operator=(const char* v)
+   {
+      rd_string(v);
+
+      return *this;
    }
 
    std::size_t hash() const
@@ -515,7 +545,7 @@ class cpp_double_fp_backend
          return operator=(v);
       }
 
-#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
       float_type sec = my_second();
       arithmetic::sum(data, my_first(), v.my_first());
 
@@ -566,7 +596,7 @@ class cpp_double_fp_backend
    #endif
    cpp_double_fp_backend& operator-=(const cpp_double_fp_backend& v)
    {
-#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
       negate();
       *this += v;
       negate();
@@ -642,7 +672,7 @@ class cpp_double_fp_backend
    {
       cpp_double_fp_backend v(other);
 
-#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
       // Evaluate the sign of the result.
       const auto isneg_u =   isneg();
       const auto isneg_v = v.isneg();
@@ -671,7 +701,7 @@ class cpp_double_fp_backend
 
       if (isinf_u || isinf_v)
       {
-#ifndef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+#ifndef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
          // Evaluate the sign of the result.
          const auto isneg_u =   isneg();
          const auto isneg_v = v.isneg();
@@ -691,7 +721,7 @@ class cpp_double_fp_backend
          return operator=(cpp_double_fp_backend(0));
       }
 
-#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
       rep_type tmp = arithmetic::product(data.first, v.data.first);
 
       tmp.second += (data.first * v.data.second + data.second * v.data.first);
@@ -754,7 +784,7 @@ class cpp_double_fp_backend
 
       const auto iszero_u = (fpc_u == FP_ZERO);
       const auto iszero_v = (fpc_v == FP_ZERO);
-#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
       const bool b_neg = isneg();
 
       if (b_neg) { negate(); }
@@ -804,7 +834,7 @@ class cpp_double_fp_backend
          return operator=(cpp_double_fp_backend(0));
       }
 
-#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
       if(b_neg) { negate(); }
       rep_type p;
 
@@ -1089,6 +1119,8 @@ class cpp_double_fp_backend
  private:
    rep_type data;
 
+   bool rd_string(const char* pstr);
+
    template <typename OtherFloatingPointType,
              typename std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits10 * 2) < 16))>::type const*>
    friend
@@ -1119,6 +1151,106 @@ class cpp_double_fp_backend
    #endif
    void eval_exp(cpp_double_fp_backend<OtherFloatingPointType>& result, const cpp_double_fp_backend<OtherFloatingPointType>& x);
 };
+
+template <typename FloatingPointType>
+bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
+{
+   // TBD: Do we need-to / want-to throw-catch on invalid string input?
+
+   using local_double_fp_type = cpp_double_fp_backend<FloatingPointType>;
+
+   constexpr auto local_cpp_dec_float_digits10 =
+      static_cast<int>
+      (
+         static_cast<float>
+         (
+            static_cast<float>(local_double_fp_type::my_digits) * 0.9F
+         )
+      );
+
+   using local_cpp_dec_float_type     = boost::multiprecision::cpp_dec_float<static_cast<unsigned>(local_cpp_dec_float_digits10), std::int32_t, std::allocator<void>>;
+   using local_cpp_dec_float_exp_type = typename local_cpp_dec_float_type::exponent_type;
+
+   local_cpp_dec_float_type f_dec = pstr;
+
+   const auto fpc = eval_fpclassify(f_dec);
+
+   const auto is_definitely_nan = (fpc == FP_NAN);
+
+   if (is_definitely_nan)
+   {
+      static_cast<void>(operator=(local_double_fp_type::my_value_nan()));
+   }
+   else
+   {
+      const auto e10 = eval_ilogb(f_dec);
+
+      const auto is_definitely_zero =
+      (
+            (fpc == FP_ZERO)
+         || (e10 < static_cast<local_cpp_dec_float_exp_type>(local_double_fp_type::my_min_exponent10))
+      );
+
+      if (is_definitely_zero)
+      {
+         data.first  = 0;
+         data.second = 0;
+      }
+      else
+      {
+         const auto is_definitely_inf = (e10 > static_cast<local_cpp_dec_float_exp_type>(local_double_fp_type::my_max_exponent10));
+
+         if (is_definitely_inf)
+         {
+            static_cast<void>(operator=(local_double_fp_type::my_value_inf()));
+         }
+         else
+         {
+            boost::multiprecision::detail::convert_from_string(*this, pstr);
+
+            data.first  = static_cast<float_type>(0.0F);
+            data.second = static_cast<float_type>(0.0F);
+
+            using local_builtin_float_type = double;
+
+            constexpr auto dig_lim =
+               static_cast<unsigned>
+               (
+                  static_cast<int>
+                  (
+                         (local_double_fp_type::my_digits / cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits)
+                     + (((local_double_fp_type::my_digits % cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits) != 0) ? 1 : 0)
+                  )
+                  * cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits
+               );
+
+            for(auto i = static_cast<unsigned>(UINT8_C(0));
+                     i < dig_lim;
+                     i = static_cast<unsigned>(i + static_cast<unsigned>(cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits)))
+            {
+               local_cpp_dec_float_type f_dec_abs { };
+
+               eval_fabs(f_dec_abs, f_dec);
+
+               if (f_dec_abs.compare((local_cpp_dec_float_type::min)()) <= 0)
+               {
+                  break;
+               }
+
+               auto f = local_builtin_float_type { };
+
+               eval_convert_to(&f, f_dec);
+
+               f_dec -= f;
+
+               eval_add(*this, local_double_fp_type(f));
+            }
+         }
+      }
+   }
+
+   return true;
+}
 
 namespace cpp_df_qf_detail {
 
@@ -1244,9 +1376,12 @@ template <typename FloatingPointType, typename char_type, typename traits_type>
 std::basic_istream<char_type, traits_type>&
 operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_fp_backend<FloatingPointType>& f)
 {
-   std::string str;
-   is >> str;
-   boost::multiprecision::detail::convert_from_string(f, str.c_str());
+   std::string input_str;
+
+   is >> input_str;
+
+   f = input_str.c_str();
+
    return is;
 }
 

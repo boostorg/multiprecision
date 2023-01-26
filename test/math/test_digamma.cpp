@@ -24,6 +24,13 @@ void expected_results()
        ".*Negative.*",               // test data group
        ".*", 20000, 2000);           // test function
    add_expected_result(
+       ".*",                     // compiler
+       ".*",                     // stdlib
+       ".*",                     // platform
+       ".*cpp_double_double.*",  // test type(s)
+       ".*Negative.*",           // test data group
+       ".*", 650, 50);           // test function
+   add_expected_result(
        ".*",           // compiler
        ".*",           // stdlib
        ".*",           // platform
