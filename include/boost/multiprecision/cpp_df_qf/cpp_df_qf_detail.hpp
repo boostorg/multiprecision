@@ -93,6 +93,24 @@ struct exact_arithmetic
    #else
    constexpr
    #endif
+   void sum(float_pair& result, float_type a, float_type b)
+   {
+      // Exact addition of two floating point numbers
+      const float_type a_plus_b = a + b;
+      const float_type v        = a_plus_b - a;
+
+      const float_pair tmp(a_plus_b, (a - (a_plus_b - v)) + (b - v));
+
+      result.first  = tmp.first;
+      result.second = tmp.second;
+   }
+
+   static
+   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
+   BOOST_MP_CXX14_CONSTEXPR
+   #else
+   constexpr
+   #endif
    void normalize(float_pair& result, float_type a, float_type b)
    {
       // Converts a pair of floats to standard form.

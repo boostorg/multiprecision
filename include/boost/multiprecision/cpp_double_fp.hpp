@@ -515,6 +515,19 @@ class cpp_double_fp_backend
          return operator=(v);
       }
 
+#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+      float_type sec = my_second();
+      arithmetic::sum(data, my_first(), v.my_first());
+
+      rep_type t { };
+
+      arithmetic::sum(t, sec, v.my_second());
+
+      data.second += t.first;
+      arithmetic::normalize(data, data.first, data.second);
+      data.second += t.second;
+      arithmetic::normalize(data, data.first, data.second);
+#else
       // Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
       const float_type S = data.first + v.data.first;
       const float_type T = data.second + v.data.second;
@@ -542,6 +555,7 @@ class cpp_double_fp_backend
       f  = H - data.first;
       data.second = f + h;
 
+#endif
       return *this;
    }
 
@@ -552,6 +566,11 @@ class cpp_double_fp_backend
    #endif
    cpp_double_fp_backend& operator-=(const cpp_double_fp_backend& v)
    {
+#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+      negate();
+      *this += v;
+      negate();
+#else
       const auto fpc_u = eval_fpclassify(*this);
       const auto fpc_v = eval_fpclassify(v);
 
@@ -609,6 +628,7 @@ class cpp_double_fp_backend
       data.first = H + h;
       f  = H - data.first;
       data.second = f + h;
+#endif
 
       return *this;
    }
@@ -620,8 +640,9 @@ class cpp_double_fp_backend
    #endif
    cpp_double_fp_backend& operator*=(const cpp_double_fp_backend& other)
    {
-            cpp_double_fp_backend v(other);
+      cpp_double_fp_backend v(other);
 
+#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
       // Evaluate the sign of the result.
       const auto isneg_u =   isneg();
       const auto isneg_v = v.isneg();
@@ -631,7 +652,7 @@ class cpp_double_fp_backend
       // Artificially set the sign of the result to be positive.
       if(isneg_u) {   negate(); }
       if(isneg_v) { v.negate(); }
-
+#endif
       const auto fpc_u = eval_fpclassify(*this);
       const auto fpc_v = eval_fpclassify(v);
 
@@ -650,7 +671,16 @@ class cpp_double_fp_backend
 
       if (isinf_u || isinf_v)
       {
+#ifndef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+         // Evaluate the sign of the result.
+         const auto isneg_u =   isneg();
+         const auto isneg_v = v.isneg();
+
+         const bool b_result_is_neg = (isneg_u != isneg_v);
+#endif
+
          *this = cpp_double_fp_backend::my_value_inf();
+
          if (b_result_is_neg)
             negate();
          return *this;
@@ -661,6 +691,7 @@ class cpp_double_fp_backend
          return operator=(cpp_double_fp_backend(0));
       }
 
+#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
       rep_type tmp = arithmetic::product(data.first, v.data.first);
 
       tmp.second += (data.first * v.data.second + data.second * v.data.first);
@@ -668,6 +699,36 @@ class cpp_double_fp_backend
       data = tmp;
 
       if(b_result_is_neg) { negate(); }
+#else
+// Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
+      volatile float_type C  = cpp_df_qf_detail::split(float_type()) * data.first;
+      float_type hu = C - data.first;
+      float_type c  = cpp_df_qf_detail::split(float_type()) * v.data.first;
+      hu = C - hu;
+      float_type tu = data.first - hu;
+      float_type hv = c - v.data.first;
+      C  = data.first * v.data.first;
+      hv = c - hv;
+      const float_type tv = v.data.first - hv;
+
+      float_type t1 = hu * hv;
+      t1 = t1 - C;
+      float_type t2 = hu * tv;
+      t1 = t1 + t2;
+      t2 = tu * hv;
+      t1 = t1 + t2;
+      t2 = tu * tv;
+      c  = t1 + t2;
+      t1 = data.first * v.data.second;
+      t2 = data.second * v.data.first;
+      t1 = t1 + t2;
+      c  = c + t1;
+
+      // Simplification compared to Victor Shoup.
+      data.first = C + c;
+      tu = C - data.first;
+      data.second = tu + c;
+#endif
 
       return *this;
    }
@@ -693,7 +754,11 @@ class cpp_double_fp_backend
 
       const auto iszero_u = (fpc_u == FP_ZERO);
       const auto iszero_v = (fpc_v == FP_ZERO);
+#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+      const bool b_neg = isneg();
 
+      if (b_neg) { negate(); }
+#endif
       if (iszero_u)
       {
          if (iszero_v)
@@ -739,6 +804,24 @@ class cpp_double_fp_backend
          return operator=(cpp_double_fp_backend(0));
       }
 
+#ifdef BOOST_CPP_DOUBLE_FP_USE_QD_ALGOS
+      if(b_neg) { negate(); }
+      rep_type p;
+
+      // First approximation.
+      p.first = my_first() / v.my_first();
+
+      cpp_double_fp_backend r = *this - (v * static_cast<cpp_double_fp_backend>(p.first));
+
+      p.second = r.my_first() / v.my_first();
+      r -= v * static_cast<cpp_double_fp_backend>(p.second);
+
+      const FloatingPointType p_prime = r.my_first() / v.my_first();
+
+      arithmetic::normalize(data, p.first, p.second);
+
+      operator+=(p_prime);
+#else
       // Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
       volatile float_type C  = data.first / v.data.first;
       float_type c  = cpp_df_qf_detail::split(float_type()) * C;
@@ -771,7 +854,7 @@ class cpp_double_fp_backend
       data.first = C + c;
       tv = C - data.first;
       data.second = tv + c;
-
+#endif
       return *this;
    }
 
