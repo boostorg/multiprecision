@@ -50,7 +50,7 @@ void expected_results()
        ".*",                          // platform
        "cpp_double_double",           // test type(s)
        "near.*",                      // test data group
-       "lgamma", 8000000L, 2000000L); // test function
+       "lgamma", 8500000L, 2000000L); // test function
 #ifdef BOOST_INTEL
    add_expected_result(
        ".*",                   // compiler

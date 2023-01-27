@@ -10,6 +10,8 @@
 #ifndef BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 #define BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 
+#define BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
+
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 #pragma warning(push)
 #pragma warning (disable : 4814)
@@ -25,6 +27,7 @@
 #include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
+
 #ifdef BOOST_MP_MATH_AVAILABLE
 //
 // Headers required for Boost.Math integration:
@@ -40,6 +43,7 @@
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #endif
+
 #if (defined(__clang__) && (__clang_major__ <= 9))
 #define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE struct
 #else
@@ -541,6 +545,19 @@ class cpp_double_fp_backend
          return operator=(v);
       }
 
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
+      float_type sec = my_second();
+      arithmetic::sum(data, my_first(), v.my_first());
+
+      rep_type t { };
+
+      arithmetic::sum(t, sec, v.my_second());
+
+      data.second += t.first;
+      arithmetic::normalize(data, data.first, data.second);
+      data.second += t.second;
+      arithmetic::normalize(data, data.first, data.second);
+#else
       // Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
       const float_type S = data.first + v.data.first;
       const float_type T = data.second + v.data.second;
@@ -568,6 +585,7 @@ class cpp_double_fp_backend
       f  = H - data.first;
       data.second = f + h;
 
+#endif
       return *this;
    }
 
@@ -578,6 +596,11 @@ class cpp_double_fp_backend
    #endif
    cpp_double_fp_backend& operator-=(const cpp_double_fp_backend& v)
    {
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
+      negate();
+      *this += v;
+      negate();
+#else
       const auto fpc_u = eval_fpclassify(*this);
       const auto fpc_v = eval_fpclassify(v);
 
@@ -635,6 +658,7 @@ class cpp_double_fp_backend
       data.first = H + h;
       f  = H - data.first;
       data.second = f + h;
+#endif
 
       return *this;
    }
@@ -646,8 +670,9 @@ class cpp_double_fp_backend
    #endif
    cpp_double_fp_backend& operator*=(const cpp_double_fp_backend& other)
    {
-            cpp_double_fp_backend v(other);
+      cpp_double_fp_backend v(other);
 
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
       // Evaluate the sign of the result.
       const auto isneg_u =   isneg();
       const auto isneg_v = v.isneg();
@@ -657,7 +682,7 @@ class cpp_double_fp_backend
       // Artificially set the sign of the result to be positive.
       if(isneg_u) {   negate(); }
       if(isneg_v) { v.negate(); }
-
+#endif
       const auto fpc_u = eval_fpclassify(*this);
       const auto fpc_v = eval_fpclassify(v);
 
@@ -676,7 +701,16 @@ class cpp_double_fp_backend
 
       if (isinf_u || isinf_v)
       {
+#ifndef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
+         // Evaluate the sign of the result.
+         const auto isneg_u =   isneg();
+         const auto isneg_v = v.isneg();
+
+         const bool b_result_is_neg = (isneg_u != isneg_v);
+#endif
+
          *this = cpp_double_fp_backend::my_value_inf();
+
          if (b_result_is_neg)
             negate();
          return *this;
@@ -687,6 +721,7 @@ class cpp_double_fp_backend
          return operator=(cpp_double_fp_backend(0));
       }
 
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
       rep_type tmp = arithmetic::product(data.first, v.data.first);
 
       tmp.second += (data.first * v.data.second + data.second * v.data.first);
@@ -694,6 +729,36 @@ class cpp_double_fp_backend
       data = tmp;
 
       if(b_result_is_neg) { negate(); }
+#else
+// Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
+      volatile float_type C  = cpp_df_qf_detail::split(float_type()) * data.first;
+      float_type hu = C - data.first;
+      float_type c  = cpp_df_qf_detail::split(float_type()) * v.data.first;
+      hu = C - hu;
+      float_type tu = data.first - hu;
+      float_type hv = c - v.data.first;
+      C  = data.first * v.data.first;
+      hv = c - hv;
+      const float_type tv = v.data.first - hv;
+
+      float_type t1 = hu * hv;
+      t1 = t1 - C;
+      float_type t2 = hu * tv;
+      t1 = t1 + t2;
+      t2 = tu * hv;
+      t1 = t1 + t2;
+      t2 = tu * tv;
+      c  = t1 + t2;
+      t1 = data.first * v.data.second;
+      t2 = data.second * v.data.first;
+      t1 = t1 + t2;
+      c  = c + t1;
+
+      // Simplification compared to Victor Shoup.
+      data.first = C + c;
+      tu = C - data.first;
+      data.second = tu + c;
+#endif
 
       return *this;
    }
@@ -719,7 +784,11 @@ class cpp_double_fp_backend
 
       const auto iszero_u = (fpc_u == FP_ZERO);
       const auto iszero_v = (fpc_v == FP_ZERO);
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
+      const bool b_neg = isneg();
 
+      if (b_neg) { negate(); }
+#endif
       if (iszero_u)
       {
          if (iszero_v)
@@ -765,61 +834,57 @@ class cpp_double_fp_backend
          return operator=(cpp_double_fp_backend(0));
       }
 
+#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGOS
+      if(b_neg) { negate(); }
+      rep_type p;
+
+      // First approximation.
+      p.first = my_first() / v.my_first();
+
+      cpp_double_fp_backend r = *this - (v * static_cast<cpp_double_fp_backend>(p.first));
+
+      p.second = r.my_first() / v.my_first();
+      r -= v * static_cast<cpp_double_fp_backend>(p.second);
+
+      const FloatingPointType p_prime = r.my_first() / v.my_first();
+
+      arithmetic::normalize(data, p.first, p.second);
+
+      operator+=(p_prime);
+#else
       // Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
       volatile float_type C  = data.first / v.data.first;
+      float_type c  = cpp_df_qf_detail::split(float_type()) * C;
+      volatile float_type hc = c - C;
+      float_type u  = cpp_df_qf_detail::split(float_type()) * v.data.first;
+      hc = c - hc;
+      const float_type tc = C - hc;
+      float_type hv = u - v.data.first;
+      const volatile float_type U  = C * v.data.first;
+      hv = u - hv;
+      float_type tv = v.data.first - hv;
 
-      // Check if the first order of division gives us zero or infinite.
-      // TBD: Do we need more refined checks either here or later in this subroutine?
+      u  = hc * hv;
+      u  = u - U;
+      float_type t1 = hc * tv;
+      u  = u + t1;
+      t1 = tc * hv;
+      u  = u + t1;
+      t1 = tc * tv;
+      u  = u + t1;
 
-      const auto cabs = cpp_df_qf_detail::ccmath::fabs(C);
+      c  = data.first - U;
+      c  = c - u;
+      c  = c + data.second;
+      t1 = C * v.data.second;
+      c  = c - t1;
+      c  = c / v.data.first;
 
-      const auto is_definitely_zero = (cabs < my_value_min().my_first());
-      const auto is_definitely_inf  = (cabs > my_value_max().my_first() || cpp_df_qf_detail::ccmath::isinf(C));
-
-      if (is_definitely_zero)
-      {
-         data.first  = 0;
-         data.second = 0;
-      }
-      else if (is_definitely_inf)
-      {
-         data.first  = C;
-         data.second = 0;
-      }
-      else
-      {
-         float_type c  = cpp_df_qf_detail::split(float_type()) * C;
-         volatile float_type hc = c - C;
-         float_type u  = cpp_df_qf_detail::split(float_type()) * v.data.first;
-         hc = c - hc;
-         const float_type tc = C - hc;
-         float_type hv = u - v.data.first;
-         const volatile float_type U  = C * v.data.first;
-         hv = u - hv;
-         float_type tv = v.data.first - hv;
-
-         u  = hc * hv;
-         u  = u - U;
-         float_type t1 = hc * tv;
-         u  = u + t1;
-         t1 = tc * hv;
-         u  = u + t1;
-         t1 = tc * tv;
-         u  = u + t1;
-
-         c  = data.first - U;
-         c  = c - u;
-         c  = c + data.second;
-         t1 = C * v.data.second;
-         c  = c - t1;
-         c  = c / v.data.first;
-
-         // Simplification compared to Victor Shoup.
-         data.first = C + c;
-         tv = C - data.first;
-         data.second = tv + c;
-      }
-
+      // Simplification compared to Victor Shoup.
+      data.first = C + c;
+      tv = C - data.first;
+      data.second = tv + c;
+#endif
       return *this;
    }
 
