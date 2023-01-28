@@ -249,8 +249,16 @@ class cpp_double_fp_backend
    static constexpr int my_max_digits10   = boost::multiprecision::detail::calc_max_digits10<my_digits>::value;
    static constexpr int my_max_exponent   = cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max_exponent;
    static constexpr int my_min_exponent   = cpp_df_qf_detail::ccmath::numeric_limits<float_type>::min_exponent + cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits;
-   static constexpr int my_max_exponent10 = boost::multiprecision::detail::calc_digits10<my_max_exponent>::value;
-   static constexpr int my_min_exponent10 = boost::multiprecision::detail::calc_digits10<my_min_exponent>::value;
+   static constexpr int my_max_exponent10 = boost::multiprecision::detail::calc_digits10<static_cast<unsigned>(my_max_exponent)>::value;
+
+   static constexpr int my_min_exponent10 =
+      static_cast<int>
+      (
+         -static_cast<int>
+          (
+             boost::multiprecision::detail::calc_digits10<static_cast<unsigned>(-my_min_exponent)>::value
+          )
+      );
 
    // TBD: Did we justify this static assertion during the GSoC?
    // Does anyone remember what the meaning of the number 77 is?
