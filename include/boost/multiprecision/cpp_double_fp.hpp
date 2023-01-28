@@ -249,8 +249,8 @@ class cpp_double_fp_backend
    static constexpr int my_max_digits10   = boost::multiprecision::detail::calc_max_digits10<my_digits>::value;
    static constexpr int my_max_exponent   = cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max_exponent;
    static constexpr int my_min_exponent   = cpp_df_qf_detail::ccmath::numeric_limits<float_type>::min_exponent + cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits;
-   static constexpr int my_max_exponent10 = static_cast<int>(static_cast<float>(my_max_exponent) * 0.301F);
-   static constexpr int my_min_exponent10 = static_cast<int>(static_cast<float>(my_min_exponent) * 0.301F);
+   static constexpr int my_max_exponent10 = boost::multiprecision::detail::calc_digits10<my_max_exponent>::value;
+   static constexpr int my_min_exponent10 = boost::multiprecision::detail::calc_digits10<my_min_exponent>::value;
 
    // TBD: Did we justify this static assertion during the GSoC?
    // Does anyone remember what the meaning of the number 77 is?
@@ -1084,7 +1084,15 @@ class cpp_double_fp_backend
 
    static constexpr cpp_double_fp_backend my_value_min() noexcept
    {
-      return cpp_double_fp_backend(cpp_df_qf_detail::ccmath::ldexp(float_type(1), my_min_exponent));
+      return
+         cpp_double_fp_backend
+         (
+            cpp_df_qf_detail::ccmath::ldexp
+            (
+               (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::min)(),
+                cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits
+            )
+         );
    }
 
    #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
@@ -1183,12 +1191,16 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
    }
    else
    {
-      const auto e10 = eval_ilogb(f_dec);
+      local_cpp_dec_float_type dummy_frexp { };
+      auto e2_from_f_dec = int { };
+      eval_frexp(dummy_frexp, f_dec, &e2_from_f_dec);
 
       const auto is_definitely_zero =
       (
+         // TBD: A detailed, clear comparison (or something close to a comparison)
+         // is still needed for input values having (e2_from_f_dec == my_min_exponent).
             (fpc == FP_ZERO)
-         || (e10 < static_cast<local_cpp_dec_float_exp_type>(local_double_fp_type::my_min_exponent10))
+         || (e2_from_f_dec < static_cast<local_cpp_dec_float_exp_type>(local_double_fp_type::my_min_exponent))
       );
 
       if (is_definitely_zero)
@@ -1198,7 +1210,9 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
       }
       else
       {
-         const auto is_definitely_inf = (e10 > static_cast<local_cpp_dec_float_exp_type>(local_double_fp_type::my_max_exponent10));
+         // TBD: A detailed, clear comparison (or something close to a comparison)
+         // is still needed for input values having (e2_from_f_dec == my_max_exponent).
+         const auto is_definitely_inf = (e2_from_f_dec > static_cast<local_cpp_dec_float_exp_type>(local_double_fp_type::my_max_exponent));
 
          if (is_definitely_inf)
          {
