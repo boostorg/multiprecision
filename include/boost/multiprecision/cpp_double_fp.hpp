@@ -244,12 +244,23 @@ class cpp_double_fp_backend
    using float_types    = std::tuple<float, double, long double>;
    using exponent_type  = int;
 
-   static constexpr int my_digits         = 2 * cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits;
-   static constexpr int my_digits10       = boost::multiprecision::detail::calc_digits10<my_digits>::value;
-   static constexpr int my_max_digits10   = boost::multiprecision::detail::calc_max_digits10<my_digits>::value;
+   static constexpr int my_digits         = static_cast<int>(cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits * static_cast<int>(INT8_C(2)));
+   static constexpr int my_digits10       = static_cast<int>(boost::multiprecision::detail::calc_digits10    <static_cast<unsigned>(my_digits)>::value);
+   static constexpr int my_max_digits10   = static_cast<int>(boost::multiprecision::detail::calc_max_digits10<static_cast<unsigned>(my_digits)>::value);
    static constexpr int my_max_exponent   = cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max_exponent;
-   static constexpr int my_min_exponent   = cpp_df_qf_detail::ccmath::numeric_limits<float_type>::min_exponent + cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits;
-   static constexpr int my_max_exponent10 = boost::multiprecision::detail::calc_digits10<static_cast<unsigned>(my_max_exponent)>::value;
+
+   static constexpr int my_min_exponent =
+      static_cast<int>
+      (
+           cpp_df_qf_detail::ccmath::numeric_limits<float_type>::min_exponent
+         + cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits
+      );
+
+   static constexpr int my_max_exponent10 =
+      static_cast<int>
+      (
+         boost::multiprecision::detail::calc_digits10<static_cast<unsigned>(my_max_exponent)>::value
+      );
 
    static constexpr int my_min_exponent10 =
       static_cast<int>
@@ -439,8 +450,9 @@ class cpp_double_fp_backend
       // Here we first convert to scientific string, then
       // hash the charactgers in the scientific string.
       // TBD: Is there a faster or more simple hash method?
+      // TBD: Is there any constexpr support for rudimentary hashing?
 
-      const std::string str_to_hash = str(cpp_double_fp_backend::my_digits10, std::ios::scientific);
+      const auto str_to_hash = str(cpp_double_fp_backend::my_digits10, std::ios::scientific);
 
       auto result = static_cast<std::size_t>(UINT8_C(0));
 
@@ -1228,8 +1240,6 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
          }
          else
          {
-            boost::multiprecision::detail::convert_from_string(*this, pstr);
-
             data.first  = static_cast<float_type>(0.0F);
             data.second = static_cast<float_type>(0.0F);
 
@@ -1245,6 +1255,21 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
                   )
                   * cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits
                );
+
+
+            using local_double_fp_constituent_type = typename local_double_fp_type::float_type;
+
+            constexpr auto pow2_scaling_for_small_input = cpp_df_qf_detail::ccmath::numeric_limits<local_double_fp_constituent_type>::digits;
+
+            const auto has_pow2_scaling_for_small_input =
+            (
+               e2_from_f_dec < static_cast<int>(local_double_fp_type::my_min_exponent + pow2_scaling_for_small_input)
+            );
+
+            if (has_pow2_scaling_for_small_input)
+            {
+               f_dec *= local_cpp_dec_float_type::pow2(static_cast<long long>(pow2_scaling_for_small_input));
+            }
 
             for(auto i = static_cast<unsigned>(UINT8_C(0));
                      i < dig_lim;
@@ -1266,6 +1291,11 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
                f_dec -= f;
 
                eval_add(*this, local_double_fp_type(f));
+            }
+
+            if (has_pow2_scaling_for_small_input)
+            {
+               eval_ldexp(*this, local_double_fp_type(*this), static_cast<int>(-pow2_scaling_for_small_input));
             }
          }
       }
