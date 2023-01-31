@@ -694,14 +694,12 @@ class cpp_double_fp_backend
    #endif
    cpp_double_fp_backend& operator*=(const cpp_double_fp_backend& v)
    {
-#ifdef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGO_MUL
       // Evaluate the sign of the result.
       const auto isneg_u =   isneg();
       const auto isneg_v = v.isneg();
 
       const bool b_result_is_neg = (isneg_u != isneg_v);
 
-#endif
       const auto fpc_u = eval_fpclassify(*this);
       const auto fpc_v = eval_fpclassify(v);
 
@@ -720,14 +718,6 @@ class cpp_double_fp_backend
 
       if (isinf_u || isinf_v)
       {
-#ifndef BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGO_MUL
-         // Evaluate the sign of the result.
-         const auto isneg_u =   isneg();
-         const auto isneg_v = v.isneg();
-
-         const bool b_result_is_neg = (isneg_u != isneg_v);
-#endif
-
          *this = cpp_double_fp_backend::my_value_inf();
 
          if (b_result_is_neg)
@@ -756,6 +746,16 @@ class cpp_double_fp_backend
       float_type tu = data.first - hu;
       float_type hv = c - v.data.first;
       C  = data.first * v.data.first;
+
+      if (cpp_df_qf_detail::ccmath::isinf(C))
+      {
+         *this = cpp_double_fp_backend::my_value_inf();
+
+         if (b_result_is_neg)
+            negate();
+         return *this;
+      }
+
       hv = c - hv;
       const float_type tv = v.data.first - hv;
 
