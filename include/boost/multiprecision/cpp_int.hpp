@@ -1854,7 +1854,10 @@ public:
                      {
                         // If this is the most-significant-limb, we may need to allocate an extra one for the overflow:
                         if (limb + 1 == newsize)
+                        {
                            result.resize(static_cast<unsigned>(newsize + 1), static_cast<unsigned>(newsize + 1));
+                           result.limbs()[limb + 1] = 0;
+                        }
                         if (result.size() > limb + 1)
                         {
                            result.limbs()[limb + 1] |= val;
