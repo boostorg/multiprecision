@@ -121,7 +121,7 @@ namespace boost {
          template <>
          struct mpfr_float_backend<0, allocate_stack>;
 
-         template <class Backend>
+         template <class Backend, expression_template_option ExpressionTemplates = expression_template_default<Backend>::value>
          struct rational_adaptor;
 
          struct tommath_int;

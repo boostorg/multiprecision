@@ -15,7 +15,7 @@ namespace boost {
 namespace multiprecision {
 namespace backends {
 
-template <class Backend>
+template <class Backend, expression_template_option ExpressionTemplates>
 struct rational_adaptor
 {
    //
@@ -63,7 +63,7 @@ struct rational_adaptor
       using default_ops::eval_divide;
       using default_ops::eval_get_sign;
 
-      int s = eval_get_sign(m_denom);
+      int s = eval_get_sign(m_denom.backend());
 
       if(s == 0)
       {
@@ -71,18 +71,18 @@ struct rational_adaptor
       }
       else if (s < 0)
       {
-         m_num.negate();
-         m_denom.negate();
+         m_num.backend().negate();
+         m_denom.backend().negate();
       }
 
       Backend g, t;
-      eval_gcd(g, m_num, m_denom);
+      eval_gcd(g, m_num.backend(), m_denom.backend());
       if (!eval_eq(g, one()))
       {
-         eval_divide(t, m_num, g);
-         m_num.swap(t);
-         eval_divide(t, m_denom, g);
-         m_denom = std::move(t);
+         eval_divide(t, m_num.backend(), g);
+         m_num.backend().swap(t);
+         eval_divide(t, m_denom.backend(), g);
+         m_denom.backend() = std::move(t);
       }
    }
 
@@ -139,8 +139,8 @@ struct rational_adaptor
    template <class Arithmetic>
    inline typename std::enable_if<!std::is_floating_point<Arithmetic>::value, rational_adaptor&>::type operator=(const Arithmetic& i)
    {
-      m_num = i;
-      m_denom = one();
+      m_num.backend() = i;
+      m_denom.backend() = one();
       return *this;
    }
    rational_adaptor& operator=(const char* s)
@@ -230,8 +230,8 @@ struct rational_adaptor
 
    void swap(rational_adaptor& o)
    {
-      m_num.swap(o.m_num);
-      m_denom.swap(o.m_denom);
+      m_num.backend().swap(o.m_num.backend());
+      m_denom.backend().swap(o.m_denom.backend());
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
    {
@@ -249,7 +249,7 @@ struct rational_adaptor
    }
    void negate()
    {
-      m_num.negate();
+      m_num.backend().negate();
    }
    int compare(const rational_adaptor& o) const
    {
@@ -300,10 +300,15 @@ struct rational_adaptor
       return compare(t);
    }
 
-   Backend& num() { return m_num; }
-   const Backend& num()const { return m_num; }
-   Backend& denom() { return m_denom; }
-   const Backend& denom()const { return m_denom; }
+   Backend& num() { return m_num.backend(); }
+   const Backend& num()const { return m_num.backend(); }
+   Backend& denom() { return m_denom.backend(); }
+   const Backend& denom()const { return m_denom.backend(); }
+
+   number<Backend, ExpressionTemplates>& nnum() { return m_num; }
+   const number<Backend, ExpressionTemplates>& nnum()const { return m_num; }
+   number<Backend, ExpressionTemplates>& ndenom() { return m_denom; }
+   const number<Backend, ExpressionTemplates>& ndenom()const { return m_denom; }
 
    #ifndef BOOST_MP_STANDALONE
    template <class Archive>
@@ -334,7 +339,7 @@ struct rational_adaptor
    #endif // BOOST_MP_STANDALONE
    
  private:
-   Backend m_num, m_denom;
+   number<Backend, ExpressionTemplates> m_num, m_denom;
 };
 
 //
@@ -356,28 +361,28 @@ is_minus_one(const T& val)
 //
 // Required non-members:
 //
-template <class Backend> 
-inline void eval_add(rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+template <class Backend, expression_template_option ExpressionTemplates>
+inline void eval_add(rational_adaptor<Backend, ExpressionTemplates>& a, const rational_adaptor<Backend, ExpressionTemplates>& b)
 {
    eval_add_subtract_imp(a, a, b, true);
 }
-template <class Backend> 
-inline void eval_subtract(rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+template <class Backend, expression_template_option ExpressionTemplates> 
+inline void eval_subtract(rational_adaptor<Backend, ExpressionTemplates>& a, const rational_adaptor<Backend, ExpressionTemplates>& b)
 {
    eval_add_subtract_imp(a, a, b, false);
 }
 
-template <class Backend> 
-inline void eval_multiply(rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+template <class Backend, expression_template_option ExpressionTemplates> 
+inline void eval_multiply(rational_adaptor<Backend, ExpressionTemplates>& a, const rational_adaptor<Backend, ExpressionTemplates>& b)
 {
    eval_multiply_imp(a, a, b.num(), b.denom());
 }
 
-template <class Backend> 
-void eval_divide(rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+template <class Backend, expression_template_option ExpressionTemplates> 
+void eval_divide(rational_adaptor<Backend, ExpressionTemplates>& a, const rational_adaptor<Backend, ExpressionTemplates>& b)
 {
    using default_ops::eval_divide;
-   rational_adaptor<Backend> t;
+   rational_adaptor<Backend, ExpressionTemplates> t;
    eval_divide(t, a, b);
    a = std::move(t);
 }
@@ -403,8 +408,8 @@ inline typename std::enable_if<(number_category<R>::value != number_kind_integer
    *result /= d;
 }
 
-template <class R, class Backend>
-inline typename std::enable_if<number_category<R>::value == number_kind_integer>::type eval_convert_to(R* result, const rational_adaptor<Backend>& backend)
+template <class R, class Backend, expression_template_option ExpressionTemplates>
+inline typename std::enable_if<number_category<R>::value == number_kind_integer>::type eval_convert_to(R* result, const rational_adaptor<Backend, ExpressionTemplates>& backend)
 {
    using default_ops::eval_divide;
    using default_ops::eval_convert_to;
@@ -416,8 +421,8 @@ inline typename std::enable_if<number_category<R>::value == number_kind_integer>
 //
 // Hashing support, not strictly required, but it is used in our tests:
 //
-template <class Backend>
-inline std::size_t hash_value(const rational_adaptor<Backend>& arg)
+template <class Backend, expression_template_option ExpressionTemplates>
+inline std::size_t hash_value(const rational_adaptor<Backend, ExpressionTemplates>& arg)
 {
    std::size_t result = hash_value(arg.num());
    std::size_t result2 = hash_value(arg.denom());
@@ -427,8 +432,8 @@ inline std::size_t hash_value(const rational_adaptor<Backend>& arg)
 //
 // assign_components:
 //
-template <class Backend>
-void assign_components(rational_adaptor<Backend>& result, Backend const& a, Backend const& b)
+template <class Backend, expression_template_option ExpressionTemplates>
+void assign_components(rational_adaptor<Backend, ExpressionTemplates>& result, Backend const& a, Backend const& b)
 {
    using default_ops::eval_gcd;
    using default_ops::eval_divide;
@@ -442,7 +447,7 @@ void assign_components(rational_adaptor<Backend>& result, Backend const& a, Back
    }
    Backend g;
    eval_gcd(g, a, b);
-   if (eval_eq(g, rational_adaptor<Backend>::one()))
+   if (eval_eq(g, rational_adaptor<Backend, ExpressionTemplates>::one()))
    {
       result.num() = a;
       result.denom() = b;
@@ -461,8 +466,8 @@ void assign_components(rational_adaptor<Backend>& result, Backend const& a, Back
 //
 // Again for arithmetic types, overload for whatever arithmetic types are directly supported:
 //
-template <class Backend, class Arithmetic1, class Arithmetic2>
-inline void assign_components(rational_adaptor<Backend>& result, const Arithmetic1& a, typename std::enable_if<std::is_arithmetic<Arithmetic1>::value && std::is_arithmetic<Arithmetic2>::value, const Arithmetic2&>::type b)
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic1, class Arithmetic2>
+inline void assign_components(rational_adaptor<Backend, ExpressionTemplates>& result, const Arithmetic1& a, typename std::enable_if<std::is_arithmetic<Arithmetic1>::value && std::is_arithmetic<Arithmetic2>::value, const Arithmetic2&>::type b)
 {
    using default_ops::eval_gcd;
    using default_ops::eval_divide;
@@ -476,7 +481,7 @@ inline void assign_components(rational_adaptor<Backend>& result, const Arithmeti
    Backend g;
    result.num()   = a;
    eval_gcd(g, result.num(), b);
-   if (eval_eq(g, rational_adaptor<Backend>::one()))
+   if (eval_eq(g, rational_adaptor<Backend, ExpressionTemplates>::one()))
    {
       result.denom() = b;
    }
@@ -491,8 +496,8 @@ inline void assign_components(rational_adaptor<Backend>& result, const Arithmeti
       result.denom().negate();
    }
 }
-template <class Backend, class Arithmetic1, class Arithmetic2>
-inline void assign_components(rational_adaptor<Backend>& result, const Arithmetic1& a, typename std::enable_if<!std::is_arithmetic<Arithmetic1>::value || !std::is_arithmetic<Arithmetic2>::value, const Arithmetic2&>::type b)
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic1, class Arithmetic2>
+inline void assign_components(rational_adaptor<Backend, ExpressionTemplates>& result, const Arithmetic1& a, typename std::enable_if<!std::is_arithmetic<Arithmetic1>::value || !std::is_arithmetic<Arithmetic2>::value, const Arithmetic2&>::type b)
 {
    using default_ops::eval_gcd;
    using default_ops::eval_divide;
@@ -508,7 +513,7 @@ inline void assign_components(rational_adaptor<Backend>& result, const Arithmeti
    }
 
    eval_gcd(g, result.num(), result.denom());
-   if (!eval_eq(g, rational_adaptor<Backend>::one()))
+   if (!eval_eq(g, rational_adaptor<Backend, ExpressionTemplates>::one()))
    {
       eval_divide(result.num(), g);
       eval_divide(result.denom(), g);
@@ -522,48 +527,48 @@ inline void assign_components(rational_adaptor<Backend>& result, const Arithmeti
 //
 // Optional comparison operators:
 //
-template <class Backend>
-inline bool eval_is_zero(const rational_adaptor<Backend>& arg)
+template <class Backend, expression_template_option ExpressionTemplates>
+inline bool eval_is_zero(const rational_adaptor<Backend, ExpressionTemplates>& arg)
 {
    using default_ops::eval_is_zero;
    return eval_is_zero(arg.num());
 }
 
-template <class Backend>
-inline int eval_get_sign(const rational_adaptor<Backend>& arg)
+template <class Backend, expression_template_option ExpressionTemplates>
+inline int eval_get_sign(const rational_adaptor<Backend, ExpressionTemplates>& arg)
 {
    using default_ops::eval_get_sign;
    return eval_get_sign(arg.num());
 }
 
-template <class Backend>
-inline bool eval_eq(const rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+template <class Backend, expression_template_option ExpressionTemplates>
+inline bool eval_eq(const rational_adaptor<Backend, ExpressionTemplates>& a, const rational_adaptor<Backend, ExpressionTemplates>& b)
 {
    using default_ops::eval_eq;
    return eval_eq(a.num(), b.num()) && eval_eq(a.denom(), b.denom());
 }
 
-template <class Backend, class Arithmetic>
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value, bool>::type 
-   eval_eq(const rational_adaptor<Backend>& a, Arithmetic b)
+   eval_eq(const rational_adaptor<Backend, ExpressionTemplates>& a, Arithmetic b)
 {
    using default_ops::eval_eq;
-   return eval_eq(a.denom(), rational_adaptor<Backend>::one()) && eval_eq(a.num(), b);
+   return eval_eq(a.denom(), rational_adaptor<Backend, ExpressionTemplates>::one()) && eval_eq(a.num(), b);
 }
 
-template <class Backend, class Arithmetic>
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value&& std::is_integral<Arithmetic>::value, bool>::type 
-   eval_eq(Arithmetic b, const rational_adaptor<Backend>& a)
+   eval_eq(Arithmetic b, const rational_adaptor<Backend, ExpressionTemplates>& a)
 {
    using default_ops::eval_eq;
-   return eval_eq(a.denom(), rational_adaptor<Backend>::one()) && eval_eq(a.num(), b);
+   return eval_eq(a.denom(), rational_adaptor<Backend, ExpressionTemplates>::one()) && eval_eq(a.num(), b);
 }
 
 //
 // Arithmetic operations, starting with addition:
 //
-template <class Backend, class Arithmetic> 
-void eval_add_subtract_imp(rational_adaptor<Backend>& result, const Arithmetic& arg, bool isaddition)
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
+void eval_add_subtract_imp(rational_adaptor<Backend, ExpressionTemplates>& result, const Arithmetic& arg, bool isaddition)
 {
    using default_ops::eval_multiply;
    using default_ops::eval_divide;
@@ -582,7 +587,7 @@ void eval_add_subtract_imp(rational_adaptor<Backend>& result, const Arithmetic& 
    //
    /*
    eval_gcd(t, result.num(), result.denom());
-   if (!eval_eq(t, rational_adaptor<Backend>::one()) != 0)
+   if (!eval_eq(t, rational_adaptor<Backend, ExpressionTemplates>::one()) != 0)
    {
       Backend t2;
       eval_divide(t2, result.num(), t);
@@ -593,22 +598,22 @@ void eval_add_subtract_imp(rational_adaptor<Backend>& result, const Arithmetic& 
    */
 }
 
-template <class Backend, class Arithmetic> 
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
-   eval_add(rational_adaptor<Backend>& result, const Arithmetic& arg)
+   eval_add(rational_adaptor<Backend, ExpressionTemplates>& result, const Arithmetic& arg)
 {
    eval_add_subtract_imp(result, arg, true);
 }
 
-template <class Backend, class Arithmetic> 
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
-   eval_subtract(rational_adaptor<Backend>& result, const Arithmetic& arg)
+   eval_subtract(rational_adaptor<Backend, ExpressionTemplates>& result, const Arithmetic& arg)
 {
    eval_add_subtract_imp(result, arg, false);
 }
 
-template <class Backend>
-void eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b, bool isaddition)
+template <class Backend, expression_template_option ExpressionTemplates>
+void eval_add_subtract_imp(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, const rational_adaptor<Backend, ExpressionTemplates>& b, bool isaddition)
 {
    using default_ops::eval_eq;
    using default_ops::eval_multiply;
@@ -637,7 +642,7 @@ void eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_ada
    //
    // Do we have gcd > 1:
    //
-   if (!eval_eq(gcd, rational_adaptor<Backend>::one()))
+   if (!eval_eq(gcd, rational_adaptor<Backend, ExpressionTemplates>::one()))
    {
       //
       // Scale the denominators by gcd, and put the results in t1 and t2:
@@ -660,7 +665,7 @@ void eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_ada
       // Get the gcd of gcd and our numerator (t3):
       //
       eval_gcd(t4, t3, gcd);
-      if (eval_eq(t4, rational_adaptor<Backend>::one()))
+      if (eval_eq(t4, rational_adaptor<Backend, ExpressionTemplates>::one()))
       {
          result.num() = t3;
          eval_multiply(result.denom(), t1, a.denom());
@@ -696,19 +701,19 @@ void eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_ada
 }
 
 
-template <class Backend>
-inline void eval_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+template <class Backend, expression_template_option ExpressionTemplates>
+inline void eval_add(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, const rational_adaptor<Backend, ExpressionTemplates>& b)
 {
    eval_add_subtract_imp(result, a, b, true);
 }
-template <class Backend>
-inline void eval_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+template <class Backend, expression_template_option ExpressionTemplates>
+inline void eval_subtract(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, const rational_adaptor<Backend, ExpressionTemplates>& b)
 {
    eval_add_subtract_imp(result, a, b, false);
 }
 
-template <class Backend, class Arithmetic>
-void eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Arithmetic& b, bool isaddition)
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
+void eval_add_subtract_imp(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, const Arithmetic& b, bool isaddition)
 {
    using default_ops::eval_add;
    using default_ops::eval_subtract;
@@ -739,15 +744,15 @@ void eval_add_subtract_imp(rational_adaptor<Backend>& result, const rational_ada
    // and gcd(a + bm, b) = gcd(a, b) = 1
    //
 }
-template <class Backend, class Arithmetic>
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
-   eval_add(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Arithmetic& b)
+   eval_add(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, const Arithmetic& b)
 {
    eval_add_subtract_imp(result, a, b, true);
 }
-template <class Backend, class Arithmetic>
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
-   eval_subtract(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Arithmetic& b)
+   eval_subtract(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, const Arithmetic& b)
 {
    eval_add_subtract_imp(result, a, b, false);
 }
@@ -755,8 +760,8 @@ inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value &
 //
 // Multiplication:
 //
-template <class Backend> 
-void eval_multiply_imp(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Backend& b_num, const Backend& b_denom)
+template <class Backend, expression_template_option ExpressionTemplates> 
+void eval_multiply_imp(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, const Backend& b_num, const Backend& b_denom)
 {
    using default_ops::eval_multiply;
    using default_ops::eval_divide;
@@ -770,8 +775,8 @@ void eval_multiply_imp(rational_adaptor<Backend>& result, const rational_adaptor
    //
    // Unit gcd's are the most likely case:
    //
-   bool b_left = eval_eq(gcd_left, rational_adaptor<Backend>::one());
-   bool b_right = eval_eq(gcd_right, rational_adaptor<Backend>::one());
+   bool b_left = eval_eq(gcd_left, rational_adaptor<Backend, ExpressionTemplates>::one());
+   bool b_right = eval_eq(gcd_right, rational_adaptor<Backend, ExpressionTemplates>::one());
 
    if (b_left && b_right)
    {
@@ -811,8 +816,8 @@ void eval_multiply_imp(rational_adaptor<Backend>& result, const rational_adaptor
    }
 }
 
-template <class Backend> 
-void eval_multiply(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+template <class Backend, expression_template_option ExpressionTemplates> 
+void eval_multiply(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, const rational_adaptor<Backend, ExpressionTemplates>& b)
 {
    using default_ops::eval_multiply;
 
@@ -826,7 +831,7 @@ void eval_multiply(rational_adaptor<Backend>& result, const rational_adaptor<Bac
    eval_multiply_imp(result, a, b.num(), b.denom());
 }
 
-template <class Backend, class Arithmetic> 
+template <class Backend, class Arithmetic>
 void eval_multiply_imp(Backend& result_num, Backend& result_denom, Arithmetic arg)
 {
    if (arg == 0)
@@ -907,21 +912,21 @@ void eval_multiply_imp(Backend& result_num, Backend& result_denom, Backend arg)
    }
 }
 
-template <class Backend, class Arithmetic> 
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
-   eval_multiply(rational_adaptor<Backend>& result, const Arithmetic& arg)
+   eval_multiply(rational_adaptor<Backend, ExpressionTemplates>& result, const Arithmetic& arg)
 {
    eval_multiply_imp(result.num(), result.denom(), arg);
 }
 
-template <class Backend, class Arithmetic> 
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type
-   eval_multiply_imp(rational_adaptor<Backend>& result, const Backend& a_num, const Backend& a_denom, Arithmetic b)
+   eval_multiply_imp(rational_adaptor<Backend, ExpressionTemplates>& result, const Backend& a_num, const Backend& a_denom, Arithmetic b)
 {
    if (b == 0)
    {
-      result.num() = rational_adaptor<Backend>::zero();
-      result.denom() = rational_adaptor<Backend>::one();
+      result.num() = rational_adaptor<Backend, ExpressionTemplates>::zero();
+      result.denom() = rational_adaptor<Backend, ExpressionTemplates>::one();
       return;
    }
    else if (b == 1)
@@ -955,17 +960,17 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::
    else
       result.denom() = a_denom;
 }
-template <class Backend> 
-inline void eval_multiply_imp(rational_adaptor<Backend>& result, const Backend& a_num, const Backend& a_denom, const Backend& b)
+template <class Backend, expression_template_option ExpressionTemplates> 
+inline void eval_multiply_imp(rational_adaptor<Backend, ExpressionTemplates>& result, const Backend& a_num, const Backend& a_denom, const Backend& b)
 {
    result.num() = a_num;
    result.denom() = a_denom;
    eval_multiply_imp(result.num(), result.denom(), b);
 }
 
-template <class Backend, class Arithmetic> 
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
-   eval_multiply(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const Arithmetic& b)
+   eval_multiply(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, const Arithmetic& b)
 {
    if (&result == &a)
       return eval_multiply(result, b);
@@ -973,9 +978,9 @@ inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value &
    eval_multiply_imp(result, a.num(), a.denom(), b);
 }
 
-template <class Backend, class Arithmetic> 
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
-   eval_multiply(rational_adaptor<Backend>& result, const Arithmetic& b, const rational_adaptor<Backend>& a)
+   eval_multiply(rational_adaptor<Backend, ExpressionTemplates>& result, const Arithmetic& b, const rational_adaptor<Backend, ExpressionTemplates>& a)
 {
    return eval_multiply(result, a, b);
 }
@@ -983,8 +988,8 @@ inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value &
 //
 // Division:
 //
-template <class Backend>
-inline void eval_divide(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, const rational_adaptor<Backend>& b)
+template <class Backend, expression_template_option ExpressionTemplates>
+inline void eval_divide(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, const rational_adaptor<Backend, ExpressionTemplates>& b)
 {
    using default_ops::eval_multiply;
    using default_ops::eval_get_sign;
@@ -997,20 +1002,20 @@ inline void eval_divide(rational_adaptor<Backend>& result, const rational_adapto
    if (&a == &b)
    {
       // Huh? Really?
-      result.num() = result.denom() = rational_adaptor<Backend>::one();
+      result.num() = result.denom() = rational_adaptor<Backend, ExpressionTemplates>::one();
       return;
    }
    if (&result == &b)
    {
-      rational_adaptor<Backend> t(b);
+      rational_adaptor<Backend, ExpressionTemplates> t(b);
       return eval_divide(result, a, t);
    }
    eval_multiply_imp(result, a, b.denom(), b.num());
 }
 
-template <class Backend, class Arithmetic> 
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && (std::is_integral<Arithmetic>::value || std::is_same<Arithmetic, Backend>::value)>::type
-   eval_divide(rational_adaptor<Backend>& result, const Arithmetic& b, const rational_adaptor<Backend>& a)
+   eval_divide(rational_adaptor<Backend, ExpressionTemplates>& result, const Arithmetic& b, const rational_adaptor<Backend, ExpressionTemplates>& a)
 {
    using default_ops::eval_get_sign;
 
@@ -1034,9 +1039,9 @@ inline typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value &
    }
 }
 
-template <class Backend, class Arithmetic>
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type
-eval_divide(rational_adaptor<Backend>& result, Arithmetic arg)
+eval_divide(rational_adaptor<Backend, ExpressionTemplates>& result, Arithmetic arg)
 {
    if (arg == 0)
    {
@@ -1079,8 +1084,8 @@ eval_divide(rational_adaptor<Backend>& result, Arithmetic arg)
       result.num() = std::move(t);
    }
 }
-template <class Backend>
-void eval_divide(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, Backend arg)
+template <class Backend, expression_template_option ExpressionTemplates>
+void eval_divide(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, Backend arg)
 {
    using default_ops::eval_multiply;
    using default_ops::eval_gcd;
@@ -1095,7 +1100,7 @@ void eval_divide(rational_adaptor<Backend>& result, const rational_adaptor<Backe
       BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
       return;
    }
-   else if (eval_eq(a, rational_adaptor<Backend>::one()) || (eval_get_sign(a) == 0))
+   else if (eval_eq(a, rational_adaptor<Backend, ExpressionTemplates>::one()) || (eval_get_sign(a) == 0))
    {
       if (&result != &a)
          result = a;
@@ -1104,7 +1109,7 @@ void eval_divide(rational_adaptor<Backend>& result, const rational_adaptor<Backe
 
    Backend gcd, u_arg, t;
    eval_gcd(gcd, a.num(), arg);
-   bool has_unit_gcd = eval_eq(gcd, rational_adaptor<Backend>::one());
+   bool has_unit_gcd = eval_eq(gcd, rational_adaptor<Backend, ExpressionTemplates>::one());
    if (!has_unit_gcd)
    {
       eval_divide(u_arg, arg, gcd);
@@ -1131,15 +1136,15 @@ void eval_divide(rational_adaptor<Backend>& result, const rational_adaptor<Backe
       result.num().negate();
    }
 }
-template <class Backend>
-void eval_divide(rational_adaptor<Backend>& result, Backend arg)
+template <class Backend, expression_template_option ExpressionTemplates>
+void eval_divide(rational_adaptor<Backend, ExpressionTemplates>& result, Backend arg)
 {
    eval_divide(result, result, arg);
 }
 
-template <class Backend, class Arithmetic>
+template <class Backend, expression_template_option ExpressionTemplates, class Arithmetic>
 typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::is_integral<Arithmetic>::value>::type
-   eval_divide(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& a, Arithmetic arg)
+   eval_divide(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& a, Arithmetic arg)
 {
    if (&result == &a)
       return eval_divide(result, arg);
@@ -1193,14 +1198,14 @@ typename std::enable_if<std::is_convertible<Arithmetic, Backend>::value && std::
 //
 // Increment and decrement:
 //
-template <class Backend> 
-inline void eval_increment(rational_adaptor<Backend>& arg)
+template <class Backend, expression_template_option ExpressionTemplates> 
+inline void eval_increment(rational_adaptor<Backend, ExpressionTemplates>& arg)
 {
    using default_ops::eval_add;
    eval_add(arg.num(), arg.denom());
 }
-template <class Backend> 
-inline void eval_decrement(rational_adaptor<Backend>& arg)
+template <class Backend, expression_template_option ExpressionTemplates> 
+inline void eval_decrement(rational_adaptor<Backend, ExpressionTemplates>& arg)
 {
    using default_ops::eval_subtract;
    eval_subtract(arg.num(), arg.denom());
@@ -1209,8 +1214,8 @@ inline void eval_decrement(rational_adaptor<Backend>& arg)
 //
 // abs:
 //
-template <class Backend> 
-inline void eval_abs(rational_adaptor<Backend>& result, const rational_adaptor<Backend>& arg)
+template <class Backend, expression_template_option ExpressionTemplates> 
+inline void eval_abs(rational_adaptor<Backend, ExpressionTemplates>& result, const rational_adaptor<Backend, ExpressionTemplates>& arg)
 {
    using default_ops::eval_abs;
    eval_abs(result.num(), arg.num());
@@ -1228,29 +1233,29 @@ inline void eval_abs(rational_adaptor<Backend>& result, const rational_adaptor<B
 //    number_kind_fixed_point
 //    number_kind_complex
 //
-template<class Backend>
-struct number_category<rational_adaptor<Backend> > : public std::integral_constant<int, number_kind_rational>
+template <class Backend, expression_template_option ExpressionTemplates>
+struct number_category<rational_adaptor<Backend, ExpressionTemplates> > : public std::integral_constant<int, number_kind_rational>
 {};
 
 template <class Backend, expression_template_option ExpressionTemplates>
-struct component_type<number<rational_adaptor<Backend>, ExpressionTemplates> >
+struct component_type<number<rational_adaptor<Backend, ExpressionTemplates>, ExpressionTemplates> >
 {
    typedef number<Backend, ExpressionTemplates> type;
 };
 
 template <class IntBackend, expression_template_option ET>
-inline number<IntBackend, ET> numerator(const number<rational_adaptor<IntBackend>, ET>& val)
+inline const number<IntBackend, ET>& numerator(const number<rational_adaptor<IntBackend>, ET>& val)
 {
-   return val.backend().num();
+   return val.backend().nnum();
 }
 template <class IntBackend, expression_template_option ET>
-inline number<IntBackend, ET> denominator(const number<rational_adaptor<IntBackend>, ET>& val)
+inline const number<IntBackend, ET>& denominator(const number<rational_adaptor<IntBackend>, ET>& val)
 {
-   return val.backend().denom();
+   return val.backend().ndenom();
 }
 
-template <class Backend>
-struct is_unsigned_number<rational_adaptor<Backend> > : public is_unsigned_number<Backend>
+template <class Backend, expression_template_option ExpressionTemplates>
+struct is_unsigned_number<rational_adaptor<Backend, ExpressionTemplates> > : public is_unsigned_number<Backend>
 {};
 
 

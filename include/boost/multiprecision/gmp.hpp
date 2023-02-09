@@ -3270,20 +3270,35 @@ struct component_type<number<gmp_rational, ExpressionTemplates> >
 {
    using type = number<gmp_int, ExpressionTemplates>;
 };
-
+//
+// The following code breaks C++'s strict aliasing rules, but works
+// because we are casting between (references to) two layout-compatible types.
+// We do this for performance reasons to avoid making an unnecessary copy
+// (which involves two expensive memory allocations).
+// If this causes issues down the road, then we will revert to the old
+// return-by-value approach.
+//
 template <expression_template_option ET>
-inline number<gmp_int, ET> numerator(const number<gmp_rational, ET>& val)
+inline const number<gmp_int, ET>& numerator(const number<gmp_rational, ET>& val)
 {
+#if 0
    number<gmp_int, ET> result;
    mpz_set(result.backend().data(), (mpq_numref(val.backend().data())));
    return result;
+#endif
+   static_assert(sizeof(number<gmp_int, ET>) == sizeof(*mpq_numref(val.backend().data())), "Size sanity check failed");
+   return reinterpret_cast<const number<gmp_int, ET>&>(*mpq_numref(val.backend().data()));
 }
 template <expression_template_option ET>
-inline number<gmp_int, ET> denominator(const number<gmp_rational, ET>& val)
+inline const number<gmp_int, ET>& denominator(const number<gmp_rational, ET>& val)
 {
+#if 0
    number<gmp_int, ET> result;
    mpz_set(result.backend().data(), (mpq_denref(val.backend().data())));
    return result;
+#endif
+   static_assert(sizeof(number<gmp_int, ET>) == sizeof(*mpq_numref(val.backend().data())), "Size sanity check failed");
+   return reinterpret_cast<const number<gmp_int, ET>&>(*mpq_denref(val.backend().data()));
 }
 
 namespace detail {
