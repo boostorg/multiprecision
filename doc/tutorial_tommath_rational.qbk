@@ -28,8 +28,8 @@ greatly reducing the number of temporaries created in complex expressions.
 
 There are also non-member functions:
 
-   tom_int numerator(const tom_rational&);
-   tom_int denominator(const tom_rational&);
+   tom_int const& numerator(const tom_rational&);
+   tom_int const& denominator(const tom_rational&);
 
 which return the numerator and denominator of the number.
 
