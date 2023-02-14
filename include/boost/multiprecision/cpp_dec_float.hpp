@@ -2088,6 +2088,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 #endif
 
       std::string str(s);
+      static const std::string valid_characters{"0123456789"};
 
       // TBD: Using several regular expressions may significantly reduce
       // the code complexity (and perhaps the run-time) of rd_string().
@@ -2100,11 +2101,13 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       if (((pos = str.find('e')) != std::string::npos) || ((pos = str.find('E')) != std::string::npos))
       {
          // Remove the exponent part from the string.
-         #ifndef BOOST_MP_STANDALONE
+#ifndef BOOST_MP_STANDALONE
          exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(str.c_str() + (pos + 1u)));
-         #else
+#else
+         if (str.find_first_not_of(valid_characters, pos + 1) != std::string::npos)
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
          exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
-         #endif
+#endif
          
          str = str.substr(static_cast<std::size_t>(0u), pos);
       }
@@ -2173,6 +2176,12 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
       if (pos != std::string::npos)
       {
+         // Check we have only digits either side of the point:
+         if (str.find_first_not_of(valid_characters) != pos)
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
+         if (str.find_first_not_of(valid_characters, pos + 1) != std::string::npos)
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
+
          // Remove all trailing insignificant zeros.
          const std::string::const_reverse_iterator rit_non_zero = std::find_if(str.rbegin(), str.rend(), char_is_nonzero_predicate);
 
@@ -2217,6 +2226,10 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       }
       else
       {
+         // We should have only digits:
+         if (str.find_first_not_of(valid_characters) != std::string::npos)
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
+
          // Input string has no decimal point: Append decimal point.
          str.append(".");
       }
