@@ -8,6 +8,8 @@
 #ifndef BOOST_MP_DETAIL_STRING_HELPERS_HPP
 #define BOOST_MP_DETAIL_STRING_HELPERS_HPP
 
+#include <algorithm>
+
 namespace boost { namespace multiprecision { namespace detail {
 
    struct is_in_string
