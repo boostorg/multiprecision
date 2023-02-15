@@ -18,6 +18,7 @@
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
 #include <boost/multiprecision/detail/fpclassify.hpp>
+#include <boost/multiprecision/detail/string_helpers.hpp>
 #include <algorithm>
 #include <cctype>
 #include <cfloat>
@@ -353,6 +354,31 @@ struct gmp_float_imp
       }
       if (s && (*s == '+'))
          ++s;  // Leading "+" sign not supported by mpf_set_str:
+      //
+      // Validate the string as mpf_set_str does a poor job of this:
+      //
+      static const char* digits = "0123456789";
+      const char* p = s;
+      if (*s == '-')
+         ++s;
+      s += boost::multiprecision::detail::find_first_not_of(s, s + std::strlen(s), digits);
+      if (*s == '.')
+      {
+         ++s;
+         s += boost::multiprecision::detail::find_first_not_of(s, s + std::strlen(s), digits);
+      }
+      if ((*s == 'e') || (*s == 'E'))
+      {
+         ++s;
+         if ((*s == '+') || (*s == '-'))
+            ++s;
+         s += boost::multiprecision::detail::find_first_not_of(s, s + std::strlen(s), digits);
+      }
+      if(*s)
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid floating point number.")));
+
+      s = p;
+
       if (0 != mpf_set_str(m_data, s, 10))
          BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid floating point number.")));
       return *this;
