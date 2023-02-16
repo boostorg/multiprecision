@@ -362,7 +362,9 @@ struct gmp_float_imp
       if (*s == '-')
          ++s;
       s += boost::multiprecision::detail::find_first_not_of(s, s + std::strlen(s), digits);
-      if (*s == '.')
+      std::lconv const* l = std::localeconv();
+      std::size_t len = strlen(l->decimal_point);
+      if (std::find(l->decimal_point, l->decimal_point + len, *s) != l->decimal_point + len)
       {
          ++s;
          s += boost::multiprecision::detail::find_first_not_of(s, s + std::strlen(s), digits);
