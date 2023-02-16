@@ -23,6 +23,7 @@
 #include <cctype>
 #include <cfloat>
 #include <climits>
+#include <clocale>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
