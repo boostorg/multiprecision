@@ -1363,6 +1363,15 @@ void test_float_funcs(const std::integral_constant<bool, true>&)
    BOOST_CHECK_EQUAL(Real(arg(a)), 0);
    BOOST_CHECK_EQUAL(Real(arg(a - 20)), 0);
    #endif
+
+   //
+   // String construction errors:
+   //
+   BOOST_CHECK_THROW(Real("12x34.345"), std::runtime_error);
+   BOOST_CHECK_THROW(Real("1234x345"), std::runtime_error);
+   BOOST_CHECK_THROW(Real("1234.3x45"), std::runtime_error);
+   BOOST_CHECK_THROW(Real("1234.345e34b"), std::runtime_error);
+   BOOST_CHECK_THROW(Real("1234.345e3c4"), std::runtime_error);
 }
 
 template <class T, class U>
