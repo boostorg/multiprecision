@@ -9,6 +9,7 @@
 #define BOOST_MP_DETAIL_STRING_HELPERS_HPP
 
 #include <algorithm>
+#include <cstring>
 
 namespace boost { namespace multiprecision { namespace detail {
 
