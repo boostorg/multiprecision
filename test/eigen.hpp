@@ -585,6 +585,7 @@ void test_float_type_3()
 template <class Num>
 void complex_eg_1()
 {
+#if EIGEN_VERSION_AT_LEAST(3, 4, 90)
    using namespace std;
    Matrix<Num, 3, 2> m = Matrix<Num, 3, 2>::Random(3, 2);
    cout << "Here is the matrix m:" << endl
@@ -601,6 +602,7 @@ void complex_eg_1()
         << rhs << endl;
    cout << "A least-squares solution of m*x = rhs is:" << endl
         << svd.solve(rhs) << endl;
+#endif
 }
 
 template <class Num>
