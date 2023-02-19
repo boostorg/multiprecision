@@ -909,6 +909,33 @@ template <>
 struct number_category<tommath_int> : public std::integral_constant<int, number_kind_integer>
 {};
 
+#ifndef BOOST_NO_CXX20_HDR_FORMAT
+template <expression_template_option ExpressionTemplates>
+std::string print_binary_string(const number<tommath_int, ExpressionTemplates>& value)
+{
+   if (value < 0)
+      throw std::format_error("Binary string not supported negative values in sign-magnitude format.");
+
+   int s;
+   boost::multiprecision::backends::detail::check_tommath_result(mp_radix_size(const_cast<::mp_int*>(&value.backend().data()), 2, &s));
+   std::unique_ptr<char[]> a(new char[s + 1]);
+#ifndef mp_to_binary
+   boost::multiprecision::backends::detail::check_tommath_result(mp_toradix_n(const_cast<::mp_int*>(&value.backend().data()), a.get(), 2, s + 1));
+#else
+   std::size_t written;
+   boost::multiprecision::backends::detail::check_tommath_result(mp_to_radix(const_cast<::mp_int*>(&value.backend().data()), a.get(), s + 1, &written, 2));
+#endif
+   std::string result = a.get();
+
+   // remove leading zeros:
+   std::string::size_type pos = result.find('1');
+   if (pos != std::string::npos)
+      result.erase(0, pos);
+
+   return result;
+}
+#endif
+
 }
 } // namespace boost::multiprecision
 
