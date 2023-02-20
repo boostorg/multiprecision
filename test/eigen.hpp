@@ -583,6 +583,29 @@ void test_float_type_3()
 }
 
 template <class Num>
+void complex_eg_1()
+{
+#if EIGEN_VERSION_AT_LEAST(3, 4, 90)
+   using namespace std;
+   Matrix<Num, 3, 2> m = Matrix<Num, 3, 2>::Random(3, 2);
+   cout << "Here is the matrix m:" << endl
+        << m << endl;
+   JacobiSVD<Matrix<Num, 3, 2>, ComputeThinU | ComputeThinV> svd(m);
+   cout << "Its singular values are:" << endl
+        << svd.singularValues() << endl;
+   cout << "Its left singular vectors are the columns of the thin U matrix:" << endl
+        << svd.matrixU() << endl;
+   cout << "Its right singular vectors are the columns of the thin V matrix:" << endl
+        << svd.matrixV() << endl;
+   Vector<Num, 3> rhs(1, 0, 0);
+   cout << "Now consider this rhs vector:" << endl
+        << rhs << endl;
+   cout << "A least-squares solution of m*x = rhs is:" << endl
+        << svd.solve(rhs) << endl;
+#endif
+}
+
+template <class Num>
 void test_complex_type()
 {
    std::cout << "Epsilon    = " << Eigen::NumTraits<Num>::epsilon() << std::endl;
@@ -615,4 +638,6 @@ void test_complex_type()
    example22<Num>();
    // example23<Num>();  //requires comparisons.
    example24<Num>();
+
+   complex_eg_1<Num>();
 }
