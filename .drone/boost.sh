@@ -15,16 +15,16 @@ echo '==================================> BEFORE_INSTALL'
 echo '==================================> INSTALL'
 
 cd ..
-git clone -b $TRAVIS_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+for i in 1 2 3 4 5; do git clone -b $TRAVIS_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root && break || sleep 15; done
 cd boost-root
-git submodule update --init tools/build
-git submodule update --init libs/config
-git submodule update --init libs/polygon
-git submodule update --init tools/boost_install
-git submodule update --init libs/headers
-git submodule update --init tools/boostdep
+for i in 1 2 3 4 5; do git submodule update --init tools/build && break || sleep 15; done
+for i in 1 2 3 4 5; do git submodule update --init libs/config && break || sleep 15; done
+for i in 1 2 3 4 5; do git submodule update --init libs/polygon && break || sleep 15; done
+for i in 1 2 3 4 5; do git submodule update --init tools/boost_install && break || sleep 15; done
+for i in 1 2 3 4 5; do git submodule update --init libs/headers && break || sleep 15; done
+for i in 1 2 3 4 5; do git submodule update --init tools/boostdep && break || sleep 15; done
 cp -r $TRAVIS_BUILD_DIR/* libs/multiprecision
-python tools/boostdep/depinst/depinst.py multiprecision
+for i in 1 2 3 4 5; do python tools/boostdep/depinst/depinst.py multiprecision && break || sleep 15; done
 ./bootstrap.sh
 ./b2 headers
 
@@ -35,7 +35,7 @@ echo '==================================> BEFORE_SCRIPT'
 echo '==================================> SCRIPT'
 
 echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
-(cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis)
+(cd libs/config/test && ../../../b2 print_config_info print_math_info toolset=$TOOLSET)
 (cd libs/multiprecision/test && ../../../b2 -j3 toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
 
 echo '==================================> AFTER_SUCCESS'

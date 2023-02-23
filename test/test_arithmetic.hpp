@@ -1363,6 +1363,15 @@ void test_float_funcs(const std::integral_constant<bool, true>&)
    BOOST_CHECK_EQUAL(Real(arg(a)), 0);
    BOOST_CHECK_EQUAL(Real(arg(a - 20)), 0);
    #endif
+
+   //
+   // String construction errors:
+   //
+   BOOST_CHECK_THROW(Real("12x34.345"), std::runtime_error);
+   BOOST_CHECK_THROW(Real("1234x345"), std::runtime_error);
+   BOOST_CHECK_THROW(Real("1234.3x45"), std::runtime_error);
+   BOOST_CHECK_THROW(Real("1234.345e34b"), std::runtime_error);
+   BOOST_CHECK_THROW(Real("1234.345e3c4"), std::runtime_error);
 }
 
 template <class T, class U>
@@ -1483,14 +1492,60 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
    BOOST_CHECK_EQUAL(r, boost::math::pow<2>(3.25));
    r = pow(v, 3);
    BOOST_CHECK_EQUAL(r, boost::math::pow<3>(3.25));
-   r = pow(v, 4);
-   BOOST_CHECK_EQUAL(r, boost::math::pow<4>(3.25));
-   r = pow(v, 5);
-   BOOST_CHECK_EQUAL(r, boost::math::pow<5>(3.25));
-   r = pow(v, 6);
-   BOOST_CHECK_EQUAL(r, boost::math::pow<6>(3.25));
-   r = pow(v, 25);
-   BOOST_CHECK_EQUAL(r, boost::math::pow<25>(Real(3.25)));
+
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Real>::digits10 > 11)
+   {
+      // (13/4)^4
+      // 28561 / 256
+      // 111.56640625
+      r = pow(v, 4);
+      BOOST_CHECK_EQUAL(r, boost::math::pow<4>(Real(3.25)));
+   }
+
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Real>::digits10 > 13)
+   {
+      // (13/4)^5
+      // 371293 / 1024
+      // 362.5908203125
+      r = pow(v, 5);
+      BOOST_CHECK_EQUAL(r, boost::math::pow<5>(Real(3.25)));
+   }
+
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Real>::digits10 > 16)
+   {
+      // (13/4)^6
+      // 4826809 / 4096
+      // 1178.420166015625
+      r = pow(v, 6);
+      BOOST_CHECK_EQUAL(r, boost::math::pow<6>(Real(3.25)));
+   }
+
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Real>::digits10 > 26)
+   {
+      // (13/4)^10
+      // 137858491849 / 1048576
+      // 131472.10297489166259765625
+      r = pow(v, 10);
+      BOOST_CHECK_EQUAL(r, boost::math::pow<10>(Real(3.25)));
+   }
+
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Real>::digits10 > 38)
+   {
+      // (13/4)^15
+      // 51185893014090757 / 1073741824
+      // 47670577.665875439532101154327392578125
+      r = pow(v, 15);
+      BOOST_CHECK_EQUAL(r, boost::math::pow<15>(Real(3.25)));
+   }
+
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Real>::digits10 > 63)
+   {
+      // (13/4)^25
+      // 7056410014866816666030739693 / 1125899906842624
+      // 6267351095760.54642313524184960016327750054188072681427001953125
+      r = pow(v, 25);
+      BOOST_CHECK_EQUAL(r, boost::math::pow<25>(Real(3.25)));
+   }
    #endif
 
 #ifndef BOOST_NO_EXCEPTIONS
