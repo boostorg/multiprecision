@@ -2104,7 +2104,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 #ifndef BOOST_MP_STANDALONE
          exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(str.c_str() + (pos + 1u)));
 #else
-         if (str.find_first_not_of(valid_characters, pos + 1) != std::string::npos)
+         if (str.find_first_not_of(valid_characters, ((str[pos + 1] == '+') || (str[pos + 1] == '-')) ? pos + 2 : pos + 1) != std::string::npos)
             BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
          exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
 #endif
