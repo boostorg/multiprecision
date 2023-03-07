@@ -7,6 +7,9 @@
 // This tests that cpp_dec_float_50 meets our
 // conceptual requirements when used with Boost.Math.
 //
+
+#ifdef BOOST_MP_SF_CONCEPT_TESTS
+
 #ifdef _MSC_VER
 #define _SCL_SECURE_NO_WARNINGS
 #pragma warning(disable : 4800)
@@ -113,3 +116,12 @@ int main()
 {
    foo();
 }
+
+#else
+
+int main()
+{
+   return 0;
+}
+
+#endif
