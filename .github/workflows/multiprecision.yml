@@ -77,7 +77,7 @@ jobs:
         run: ../../../b2 print_config_info print_math_info toolset=$TOOLSET
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES include=/usr/include/eigen3
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES define=BOOST_MP_SF_CONCEPT_TESTS include=/usr/include/eigen3
         working-directory: ../boost-root/libs/multiprecision/test
       - name: b2 config
         run: cat bin.v2/config.log
@@ -516,7 +516,7 @@ jobs:
         run: ..\..\..\b2 print_config_info print_math_info %ARGS%
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
+        run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }} define=BOOST_MP_SF_CONCEPT_TESTS
         working-directory: ../boost-root/libs/multiprecision/test
       - name: b2 config
         run: cat bin.v2/config.log
