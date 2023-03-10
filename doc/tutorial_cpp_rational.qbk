@@ -30,8 +30,8 @@ There is also a two argument constructor that accepts a numerator and denominato
 
 There are also non-member functions:
 
-   cpp_int numerator(const cpp_rational&);
-   cpp_int denominator(const cpp_rational&);
+   cpp_int const& numerator(const cpp_rational&);
+   cpp_int const& denominator(const cpp_rational&);
 
 which return the numerator and denominator of the number.
 

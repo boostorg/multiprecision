@@ -12,7 +12,7 @@
 
    namespace boost{ namespace multiprecision{
 
-   template <class IntBackend>
+   template <class IntBackend, expression_template_option ExpressionTemplates = expression_template_default<Backend>::value>
    class rational_adpater;
 
    }}

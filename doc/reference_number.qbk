@@ -262,8 +262,8 @@
    bool miller_rabin_test(const ``['number-or-expression-template-type]``& n, unsigned trials);
 
    // Rational number support:
-   typename component_type<``['number-or-expression-template-type]``>::type numerator  (const ``['number-or-expression-template-type]``&);
-   typename component_type<``['number-or-expression-template-type]``>::type denominator(const ``['number-or-expression-template-type]``&);
+   typename component_type<``['number-or-expression-template-type]``>::type const& numerator  (const ``['number-or-expression-template-type]``&);
+   typename component_type<``['number-or-expression-template-type]``>::type const& denominator(const ``['number-or-expression-template-type]``&);
 
    }} // namespaces
 
@@ -817,10 +817,14 @@ to ensure accuracy.
 
 [h4 Rational Number Functions]
 
-   typename component_type<``['number-or-expression-template-type]``>::type numerator  (const ``['number-or-expression-template-type]``&);
-   typename component_type<``['number-or-expression-template-type]``>::type denominator(const ``['number-or-expression-template-type]``&);
+   typename component_type<``['number-or-expression-template-type]``>::type const& numerator  (const ``['number-or-expression-template-type]``&);
+   typename component_type<``['number-or-expression-template-type]``>::type const& denominator(const ``['number-or-expression-template-type]``&);
 
 These functions return the numerator and denominator of a rational number respectively.
+
+The returned value is by reference wherever possible.  However, there are a few types, most notably where the number uses 
+`logged_adaptor` or `debug_adaptor` where this is not possible and the result is a temporary returned by value.  As a result
+code should *never* rely on a reference being returned.
 
 [h4 Boost.Math Interoperability Support]
 

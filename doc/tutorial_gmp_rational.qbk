@@ -33,8 +33,8 @@ There is also a two-argument constructor that accepts a numerator and denominato
 
 There are also non-member functions:
 
-   mpz_int numerator(const mpq_rational&);
-   mpz_int denominator(const mpq_rational&);
+   mpz_int const& numerator(const mpq_rational&);
+   mpz_int const& denominator(const mpq_rational&);
 
 which return the numerator and denominator of the number.
 
