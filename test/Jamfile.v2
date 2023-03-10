@@ -1230,6 +1230,7 @@ test-suite misc :
       [ run git_issue_506.cpp ]
       [ run git_issue_509.cpp : : : [ requires cpp_lib_bit_cast ] ]
       [ run git_issue_526.cpp ]
+      [ run git_issue_540.cpp ]
       [ compile git_issue_98.cpp : 
          [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
