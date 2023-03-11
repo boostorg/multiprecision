@@ -600,10 +600,20 @@ struct expression<tag, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value, int>::type = 0
+             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value && std::is_copy_constructible<T>::value && std::is_destructible<T>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+   template <class T
+#ifndef __SUNPRO_CC
+             ,
+             typename std::enable_if<!is_number<T>::value && std::is_convertible<result_type, T const&>::value && std::is_copy_constructible<T>::value && std::is_destructible<T>::value, int>::type = 0
+#endif
+             >
+   BOOST_MP_CXX14_CONSTEXPR operator T() const
    {
       return static_cast<T>(static_cast<result_type>(*this));
    }
@@ -751,10 +761,20 @@ struct expression<terminal, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value, int>::type = 0
+             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value && std::is_copy_constructible<T>::value && std::is_destructible<T>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+   template <class T
+#ifndef __SUNPRO_CC
+      ,
+      typename std::enable_if<!is_number<T>::value&& std::is_convertible<result_type, T const&>::value && std::is_copy_constructible<T>::value && std::is_destructible<T>::value, int>::type = 0
+#endif
+   >
+   BOOST_MP_CXX14_CONSTEXPR operator T() const
    {
       return static_cast<T>(static_cast<result_type>(*this));
    }
@@ -907,10 +927,20 @@ struct expression<tag, Arg1, Arg2, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value, int>::type = 0
+             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value && std::is_copy_constructible<T>::value && std::is_destructible<T>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+   template <class T
+#ifndef __SUNPRO_CC
+      ,
+      typename std::enable_if<!is_number<T>::value&& std::is_convertible<result_type, T const&>::value&& std::is_copy_constructible<T>::value&& std::is_destructible<T>::value, int>::type = 0
+#endif
+   >
+   BOOST_MP_CXX14_CONSTEXPR operator T() const
    {
       return static_cast<T>(static_cast<result_type>(*this));
    }
@@ -1073,10 +1103,20 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value, int>::type = 0
+             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value && std::is_copy_constructible<T>::value && std::is_destructible<T>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+   template <class T
+#ifndef __SUNPRO_CC
+      ,
+      typename std::enable_if<!is_number<T>::value&& std::is_convertible<result_type, T const&>::value && std::is_copy_constructible<T>::value && std::is_destructible<T>::value, int>::type = 0
+#endif
+   >
+   BOOST_MP_CXX14_CONSTEXPR operator T() const
    {
       return static_cast<T>(static_cast<result_type>(*this));
    }
@@ -1247,10 +1287,20 @@ struct expression
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value, int>::type = 0
+             typename std::enable_if<!is_number<T>::value && !std::is_convertible<result_type, T const&>::value && std::is_constructible<T, result_type>::value && std::is_copy_constructible<T>::value && std::is_destructible<T>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+   template <class T
+#ifndef __SUNPRO_CC
+      ,
+      typename std::enable_if<!is_number<T>::value&& std::is_convertible<result_type, T const&>::value && std::is_copy_constructible<T>::value && std::is_destructible<T>::value, int>::type = 0
+#endif
+   >
+   BOOST_MP_CXX14_CONSTEXPR operator T() const
    {
       return static_cast<T>(static_cast<result_type>(*this));
    }
