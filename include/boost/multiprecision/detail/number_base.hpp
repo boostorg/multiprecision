@@ -102,6 +102,18 @@
 #  define BOOST_CXX14_CONSTEXPR_IF_DETECTION constexpr
 #endif
 
+#if BOOST_CXX_VERSION < 201703L
+#  define BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS
+#endif
+
+#if defined(__MINGW32__) && (defined(__GNUC__) && (__GNUC__ < 9)) && !defined(__clang__) && !defined(BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS)
+//
+// For some reason gcc-8 on Mingw (but not Linux for example) has a problem with overload resolution:
+//
+#  define BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS
+#endif
+
+
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 6326)
@@ -607,7 +619,7 @@ struct expression<tag, Arg1, void, void, void>
    {
       return static_cast<T>(static_cast<result_type>(*this));
    }
-#if BOOST_CXX_VERSION >= 201703L
+#ifndef BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS
    template <class T
 #ifndef __SUNPRO_CC
              ,
@@ -770,7 +782,7 @@ struct expression<terminal, Arg1, void, void, void>
    {
       return static_cast<T>(static_cast<result_type>(*this));
    }
-#if BOOST_CXX_VERSION >= 201703L
+#ifndef BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS
    template <class T
 #ifndef __SUNPRO_CC
       ,
@@ -938,7 +950,7 @@ struct expression<tag, Arg1, Arg2, void, void>
    {
       return static_cast<T>(static_cast<result_type>(*this));
    }
-#if BOOST_CXX_VERSION >= 201703L
+#ifndef BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS
    template <class T
 #ifndef __SUNPRO_CC
       ,
@@ -1116,7 +1128,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    {
       return static_cast<T>(static_cast<result_type>(*this));
    }
-#if BOOST_CXX_VERSION >= 201703L
+#ifndef BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS
    template <class T
 #ifndef __SUNPRO_CC
       ,
@@ -1302,7 +1314,7 @@ struct expression
    {
       return static_cast<T>(static_cast<result_type>(*this));
    }
-#if BOOST_CXX_VERSION >= 201703L
+#ifndef BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS
    template <class T
 #ifndef __SUNPRO_CC
       ,

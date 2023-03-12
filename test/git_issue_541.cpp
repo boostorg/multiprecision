@@ -22,7 +22,7 @@ void f(F) {}
 
 int main()
 {
-#if BOOST_CXX_VERSION >= 201703L
+#ifndef BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS
    //
    // An expression template should be implicitly convertible to
    // anything that the number type is, we only have a fix for this
