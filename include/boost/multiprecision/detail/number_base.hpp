@@ -113,6 +113,13 @@
 #  define BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS
 #endif
 
+// Clang 14 with C++17 on linux gives the following error. C++20 is fine and so is Apple's clang on ARM
+// /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/type_traits:1003:14: error: base class has incomplete type
+//  : public __is_constructible_impl<_Tp, const _Tp&>
+//    ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#if defined(__clang__) && __clang_major__ == 14 && BOOST_CXX_VERSION == 201703L && defined(__linux__) && !defined(BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS)
+#  define BOOST_MP_NO_ET_IMPLICIT_CONVERSIONS
+#endif
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
