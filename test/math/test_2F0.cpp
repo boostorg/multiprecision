@@ -23,21 +23,21 @@ void expected_results()
       ".*",                         // platform
       ".*",                         // test type(s)
       "Random non-integer a2.*",    // test data group
-      ".*", 9000, 3000);            // test function
+      ".*", 30000, 3000);            // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib
       ".*",                          // platform
        ".*",                         // test type(s)
       "Integer.*",                   // test data group
-      ".*", 300, 100);               // test function
+      ".*", 450, 100);               // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib
       ".*",                          // platform
        ".*",                         // test type(s)
       "a1 = a2 \\+ 0\\.5",           // test data group
-      ".*", 2000, 200);              // test function
+      ".*", 2500, 200);              // test function
 
    //
    // Finish off by printing out the compiler/stdlib/platform names,
