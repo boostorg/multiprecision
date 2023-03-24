@@ -107,14 +107,6 @@ namespace boost { namespace multiprecision {
 
 #endif
 
-#ifndef BOOST_CXX_VERSION
-#ifdef _MSVC_LANG
-#  define BOOST_CXX_VERSION _MSVC_LANG
-#else
-#  define BOOST_CXX_VERSION __cplusplus
-#endif
-#endif
-
 #endif // BOOST_MP_STANDALONE
 
 // Workarounds for numeric limits on old compilers
