@@ -149,7 +149,10 @@ template <class T>
 void test()
 {
    T::thread_default_precision(100);
-   T::thread_default_variable_precision_options(boost::multiprecision::variable_precision_options::preserve_target_precision);
+   T::default_variable_precision_options(boost::multiprecision::variable_precision_options::preserve_target_precision);
+
+   BOOST_CHECK_EQUAL((int)T::default_variable_precision_options(), (int)boost::multiprecision::variable_precision_options::preserve_target_precision);
+   BOOST_CHECK_EQUAL((int)T::thread_default_variable_precision_options(), (int)boost::multiprecision::variable_precision_options::preserve_target_precision);
 
    T hp1("0.1"), hp2("0.3"), hp3("0.11"), hp4("0.1231");
 
