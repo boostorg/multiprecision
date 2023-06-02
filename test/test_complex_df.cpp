@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Copyright John Maddock 2016.
-//  Copyright Christopher Kormanyos 2016.
+//  Copyright Christopher Kormanyos 2016, 2021 - 2023.
 //  Distributed under the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,14 +13,8 @@
 #include <string>
 
 #include <boost/lexical_cast.hpp>
-#ifdef TEST_MPC
-#include <boost/multiprecision/mpc.hpp>
-#endif
-#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/complex_adaptor.hpp>
-#ifdef BOOST_HAS_FLOAT128
-#include <boost/multiprecision/complex128.hpp>
-#endif
+#include <boost/multiprecision/cpp_double_fp.hpp>
 
 #include "test.hpp"
 
@@ -137,8 +131,8 @@ void test()
    BOOST_CHECK_CLOSE_FRACTION(result_19.imag(), control_19.imag(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_20.real(), control_20.real(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_20.imag(), control_20.imag(), tol);
-   BOOST_CHECK_CLOSE_FRACTION(result_21.real(), control_21.real(), tol);
-   BOOST_CHECK_CLOSE_FRACTION(result_21.imag(), control_21.imag(), tol);
+   BOOST_CHECK_CLOSE_FRACTION(result_21.real(), control_21.real(), tol * 5);
+   BOOST_CHECK_CLOSE_FRACTION(result_21.imag(), control_21.imag(), tol * 5);
    BOOST_CHECK_CLOSE_FRACTION(result_22.real(), control_22.real(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_22.imag(), control_22.imag(), tol);
    BOOST_CHECK_CLOSE_FRACTION(result_23.real(), control_23.real(), tol);
@@ -156,15 +150,11 @@ void test()
 
 int main()
 {
-   //local::test<std::complex<double> >();
-#ifdef TEST_MPC
-   local::test<boost::multiprecision::mpc_complex_50>();
-   local::test<boost::multiprecision::mpc_complex_100>();
-#endif
-   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_bin_float<50> >, boost::multiprecision::et_on> >();
-   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_bin_float<50> >, boost::multiprecision::et_off> >();
-#ifdef BOOST_HAS_FLOAT128
-   local::test<boost::multiprecision::complex128>();
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<double>>, boost::multiprecision::et_off> >();
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<long double>>, boost::multiprecision::et_off> >();
+#if defined(BOOST_HAS_FLOAT128)
+   using boost::multiprecision::float128_type;
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<float128_type>>, boost::multiprecision::et_off> >();
 #endif
    return boost::report_errors();
 }

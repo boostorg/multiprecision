@@ -18,7 +18,7 @@
 #include <boost/detail/lightweight_test.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
 //#  define TEST_MPF
 #define TEST_BACKEND
@@ -26,6 +26,7 @@
 #define TEST_MPFI_50
 #define TEST_FLOAT128
 #define TEST_CPP_BIN_FLOAT
+#define TEST_CPP_DOUBLE_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -56,6 +57,9 @@
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
 #include <boost/multiprecision/cpp_bin_float.hpp>
+#endif
+#ifdef TEST_CPP_DOUBLE_FLOAT
+#include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
 template <class T>
@@ -394,6 +398,14 @@ int main()
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
+#endif
+#ifdef TEST_CPP_DOUBLE_FLOAT
+   test<boost::multiprecision::cpp_double_float>();
+   test<boost::multiprecision::cpp_double_double>();
+   test<boost::multiprecision::cpp_double_long_double>();
+   #if defined(BOOST_HAS_FLOAT128)
+   test<boost::multiprecision::cpp_double_float128>();
+   #endif
 #endif
    return boost::report_errors();
 }

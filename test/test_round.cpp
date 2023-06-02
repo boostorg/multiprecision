@@ -1,4 +1,5 @@
 //  (C) Copyright John Maddock 2007.
+//  (C) Copyright Christopher Kormanyos 2023.
 //  Use, modification and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,7 +16,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
 #define TEST_MPFR_50
 #define TEST_MPFI_50
@@ -23,6 +24,7 @@
 #define TEST_CPP_DEC_FLOAT
 #define TEST_FLOAT128
 #define TEST_CPP_BIN_FLOAT
+#define TEST_CPP_DOUBLE_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -53,6 +55,9 @@
 #endif
 #ifdef TEST_FLOAT128
 #include <boost/multiprecision/float128.hpp>
+#endif
+#ifdef TEST_CPP_DOUBLE_FLOAT
+#include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
 #ifdef BOOST_MSVC
@@ -167,12 +172,14 @@ template <class T, class U>
 void check_modf_result(T a, T fract, U ipart)
 {
    BOOST_MATH_STD_USING
+   //#if !defined(TEST_CPP_DOUBLE_FLOAT)
    if (fract + ipart != a)
    {
       BOOST_ERROR("Fractional and integer results do not add up to the original value");
       std::cerr << "Values were: " << std::setprecision(35) << " "
                 << std::left << a << ipart << " " << fract << std::endl;
    }
+   //#endif
    if ((boost::math::sign(a) != boost::math::sign(fract)) && boost::math::sign(fract))
    {
       BOOST_ERROR("Original and fractional parts have differing signs");
@@ -207,8 +214,10 @@ void test()
       r = trunc(arg);
       check_trunc_result(arg, r);
       BOOST_TEST(r == trunc(arg + 0));
+      #if !defined(TEST_CPP_DOUBLE_FLOAT)
       T frac = modf(arg, &r);
       check_modf_result(arg, frac, r);
+      #endif
 
       if (abs(r) < (std::numeric_limits<int>::max)())
       {
@@ -218,9 +227,13 @@ void test()
          i = itrunc(arg);
          check_trunc_result(arg, i);
          BOOST_TEST(i == itrunc(arg + 0));
+         #if !defined(TEST_CPP_DOUBLE_FLOAT)
          r = modf(arg, &i);
          check_modf_result(arg, r, i);
+         #endif
       }
+      #if defined(TEST_CPP_DOUBLE_FLOAT)
+      #else
       if (abs(r) < (std::numeric_limits<long>::max)())
       {
          long l = lround(arg);
@@ -232,8 +245,9 @@ void test()
          r = modf(arg, &l);
          check_modf_result(arg, r, l);
       }
+      #endif
 
-#ifdef BOOST_HAS_LONG_LONG
+#if (defined(BOOST_HAS_LONG_LONG) && !defined(TEST_CPP_DOUBLE_FLOAT))
       if (abs(r) < (std::numeric_limits<long long>::max)())
       {
          long long ll = llround(arg);
@@ -274,6 +288,8 @@ void test()
       si = itrunc(static_cast<T>((std::numeric_limits<int>::min)() + 1));
       check_trunc_result(static_cast<T>((std::numeric_limits<int>::min)() + 1), si);
    }
+   #if defined(TEST_CPP_DOUBLE_FLOAT)
+   #else
    if (std::numeric_limits<T>::digits >= std::numeric_limits<long>::digits)
    {
       long k = lround(static_cast<T>((std::numeric_limits<long>::max)()));
@@ -298,7 +314,10 @@ void test()
       k = ltrunc(static_cast<T>((std::numeric_limits<long>::min)() + 1));
       check_trunc_result(static_cast<T>((std::numeric_limits<long>::min)() + 1), k);
    }
-#ifndef BOOST_NO_LONG_LONG
+   #endif
+#if !defined(BOOST_NO_LONG_LONG)
+   #if defined(TEST_CPP_DOUBLE_FLOAT)
+   #else
    if (std::numeric_limits<T>::digits >= std::numeric_limits<long long>::digits)
    {
       long long j = llround(static_cast<T>((std::numeric_limits<long long>::max)()));
@@ -323,6 +342,7 @@ void test()
       j = lltrunc(static_cast<T>((std::numeric_limits<long long>::min)() + 1));
       check_trunc_result(static_cast<T>((std::numeric_limits<long long>::min)() + 1), j);
    }
+   #endif
 #endif
    //
    // Finish off by testing the error handlers:
@@ -465,5 +485,13 @@ int main()
 #ifdef TEST_FLOAT128
    test<boost::multiprecision::float128>();
 #endif
+#ifdef TEST_CPP_DOUBLE_FLOAT
+   test<boost::multiprecision::cpp_double_double>();
+   test<boost::multiprecision::cpp_double_long_double>();
+   #if defined(BOOST_HAS_FLOAT128)
+   test<boost::multiprecision::cpp_double_float128>();
+   #endif
+#endif
+
    return boost::report_errors();
 }

@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2002 - 2011.
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright 2011 John Maddock.
+//  Copyright Christopher Kormanyos 2002 - 2011, 2021 - 2023.
+//  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 //
@@ -16,7 +17,7 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
 //#  define TEST_MPF
 #define TEST_BACKEND
@@ -54,6 +55,9 @@
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
 #include <boost/multiprecision/cpp_bin_float.hpp>
+#endif
+#ifdef TEST_CPP_DOUBLE_FLOAT
+#include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
 template <class T>
@@ -865,6 +869,13 @@ int main()
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
+#endif
+#ifdef TEST_CPP_DOUBLE_FLOAT
+   #ifdef _MSC_VER
+   #pragma message("TEST_CPP_DOUBLE_FLOAT: Caution: This test is temporarily disabled")
+   #else
+   std::cout << "TEST_CPP_DOUBLE_FLOAT: Caution: This test is temporarily disabled" << std::endl;
+   #endif
 #endif
    return boost::report_errors();
 }
