@@ -61,6 +61,8 @@ void test_special_cases()
 
    BOOST_CHECK((boost::math::isnormal)(max_val));
    BOOST_CHECK((boost::math::isnormal)(-max_val));
+   BOOST_CHECK((boost::math::isnormal)(min_val));
+   BOOST_CHECK((boost::math::isnormal)(-min_val));
    BOOST_CHECK((boost::math::isnormal)(denorm_min_val));
    BOOST_CHECK((boost::math::isnormal)(-denorm_min_val));
    BOOST_CHECK((boost::math::isinf)(inf_val));
@@ -93,25 +95,41 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(max_val * -2, -inf_val);
    BOOST_CHECK_EQUAL(max_val / half, inf_val);
    BOOST_CHECK_EQUAL(max_val / -half, -inf_val);
+   BOOST_CHECK_EQUAL(max_val / min_val, inf_val);
+   BOOST_CHECK_EQUAL(max_val / -min_val, -inf_val);
    BOOST_CHECK_EQUAL(max_val / denorm_min_val, inf_val);
    BOOST_CHECK_EQUAL(max_val / -denorm_min_val, -inf_val);
    // Underflow:
+   BOOST_CHECK_EQUAL(min_val * 2 - one_point_5 * min_val, 0);
+   BOOST_CHECK_EQUAL(-min_val * 2 + one_point_5 * min_val, 0);
+   BOOST_CHECK_EQUAL(min_val / 2, 0);
+   BOOST_CHECK_EQUAL(min_val / max_val, 0);
+   BOOST_CHECK_EQUAL(min_val * half, 0);
+   BOOST_CHECK_EQUAL(min_val - min_val, 0);
+   BOOST_CHECK_EQUAL(-min_val + min_val, 0);
+
    BOOST_CHECK_EQUAL(denorm_min_val * 2 - one_point_5 * denorm_min_val, 0);
    BOOST_CHECK_EQUAL(-denorm_min_val * 2 + one_point_5 * denorm_min_val, 0);
    BOOST_CHECK_EQUAL(denorm_min_val / 2, 0);
    BOOST_CHECK_EQUAL(denorm_min_val / max_val, 0);
    BOOST_CHECK_EQUAL(denorm_min_val * half, 0);
    BOOST_CHECK_EQUAL(denorm_min_val - denorm_min_val, 0);
-   BOOST_CHECK_EQUAL(max_val - max_val, 0);
    BOOST_CHECK_EQUAL(-denorm_min_val + denorm_min_val, 0);
-   BOOST_CHECK_EQUAL(-max_val + max_val, 0);
    // Things which should not over/underflow:
+   BOOST_CHECK_EQUAL((min_val * 2) / 2, min_val);
+   BOOST_CHECK_GE((min_val * 2.0000001) / 1.9999999999999999, min_val);
+   BOOST_CHECK_EQUAL(min_val * 2 - min_val, min_val);
+
    BOOST_CHECK_EQUAL((denorm_min_val * 2) / 2, denorm_min_val);
-   BOOST_CHECK_EQUAL((max_val / 2) * 2, max_val);
    BOOST_CHECK_GE((denorm_min_val * 2.0000001) / 1.9999999999999999, denorm_min_val);
-   BOOST_CHECK_LE((max_val / 2.0000001) * 1.9999999999999999, max_val);
    BOOST_CHECK_EQUAL(denorm_min_val * 2 - denorm_min_val, denorm_min_val);
+
+   BOOST_CHECK_EQUAL(-max_val + max_val, 0);
+   BOOST_CHECK_EQUAL(max_val - max_val, 0);
+   BOOST_CHECK_EQUAL((max_val / 2) * 2, max_val);
+   BOOST_CHECK_LE((max_val / 2.0000001) * 1.9999999999999999, max_val);
    BOOST_CHECK_EQUAL(max_val / 2 + max_val / 2, max_val);
+
    // Things involving zero:
    BOOST_CHECK_EQUAL(max_val + 0, max_val);
    BOOST_CHECK_EQUAL(max_val - 0, max_val);
@@ -214,6 +232,14 @@ void test_special_cases()
    // Corner cases:
    BOOST_CHECK_EQUAL((max_val * half) / half, max_val);
    BOOST_CHECK_EQUAL((max_val / 2) * 2, max_val);
+
+   BOOST_CHECK_EQUAL((min_val / half) * half, min_val);
+   BOOST_CHECK_EQUAL((min_val * 2) / 2, min_val);
+   BOOST_CHECK_EQUAL(max_val + min_val, max_val);
+   BOOST_CHECK_EQUAL(min_val + max_val, max_val);
+   BOOST_CHECK_EQUAL(max_val - min_val, max_val);
+   BOOST_CHECK_EQUAL(min_val - max_val, -max_val);
+
    BOOST_CHECK_EQUAL((denorm_min_val / half) * half, denorm_min_val);
    BOOST_CHECK_EQUAL((denorm_min_val * 2) / 2, denorm_min_val);
    BOOST_CHECK_EQUAL(max_val + denorm_min_val, max_val);
@@ -221,6 +247,20 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(max_val - denorm_min_val, max_val);
    BOOST_CHECK_EQUAL(denorm_min_val - max_val, -max_val);
    // Signed zeros:
+   BOOST_CHECK(boost::math::signbit(min_val * -min_val));
+   BOOST_CHECK(boost::math::signbit(min_val * min_val) == 0);
+   BOOST_CHECK(boost::math::signbit(-min_val * -min_val) == 0);
+   BOOST_CHECK(boost::math::signbit(-min_val * min_val));
+   BOOST_CHECK(boost::math::signbit(min_val / max_val) == 0);
+   BOOST_CHECK(boost::math::signbit(min_val / -max_val));
+   BOOST_CHECK(boost::math::signbit(-min_val / -max_val) == 0);
+   BOOST_CHECK(boost::math::signbit(-min_val / max_val));
+   BOOST_CHECK(boost::math::signbit(min_val / 2) == 0);
+   BOOST_CHECK(boost::math::signbit(min_val / -2));
+   BOOST_CHECK(boost::math::signbit(-min_val / -2) == 0);
+   BOOST_CHECK(boost::math::signbit(-min_val / 2));
+   test_type neg_zero = min_val * -min_val;
+
    BOOST_CHECK(boost::math::signbit(denorm_min_val * -denorm_min_val));
    BOOST_CHECK(boost::math::signbit(denorm_min_val * denorm_min_val) == 0);
    BOOST_CHECK(boost::math::signbit(-denorm_min_val * -denorm_min_val) == 0);
@@ -233,7 +273,11 @@ void test_special_cases()
    BOOST_CHECK(boost::math::signbit(denorm_min_val / -2));
    BOOST_CHECK(boost::math::signbit(-denorm_min_val / -2) == 0);
    BOOST_CHECK(boost::math::signbit(-denorm_min_val / 2));
-   test_type neg_zero = denorm_min_val * -denorm_min_val;
+
+   test_type neg_denorm_zero = denorm_min_val * -denorm_min_val;
+
+   BOOST_CHECK_EQUAL(neg_zero, neg_denorm_zero);
+
    test_type zero     = 0;
    // Arithmetic involving signed zero:
    BOOST_CHECK_EQUAL(-neg_zero, 0);

@@ -126,6 +126,7 @@ void test_specific(const std::integral_constant<int, boost::multiprecision::numb
          BOOST_TEST(std::numeric_limits<Number>::denorm_min() > 0);
          BOOST_TEST(!(std::numeric_limits<Number>::denorm_min() > (std::numeric_limits<Number>::min)()));
          BOOST_TEST(!(std::numeric_limits<Number>::denorm_min() < (std::numeric_limits<Number>::min)()));
+         BOOST_TEST(std::numeric_limits<Number>::denorm_min() == (std::numeric_limits<Number>::min)());
          BOOST_TEST(FP_NORMAL == (boost::math::fpclassify)(std::numeric_limits<Number>::denorm_min()));
          BOOST_TEST(FP_NORMAL == (boost::math::fpclassify)(-std::numeric_limits<Number>::denorm_min()));
          BOOST_TEST(FP_ZERO != (boost::math::fpclassify)(std::numeric_limits<Number>::denorm_min()));
