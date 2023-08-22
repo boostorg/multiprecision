@@ -446,7 +446,7 @@ jobs:
       fail-fast: false
       matrix:
         toolset: [ msvc-14.0 ]
-        standard: [ 14, 17 ]
+        standard: [ 14, latest ]
         suite: [ github_ci_block_1, github_ci_block_2 ]
     steps:
       - uses: actions/checkout@v3
