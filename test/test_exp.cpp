@@ -14,7 +14,7 @@
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include "test.hpp"
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT)
@@ -61,7 +61,7 @@ template <class T>
 void test()
 {
    std::cout << "Testing type " << typeid(T).name() << std::endl;
-   static const boost::array<const char*, 51u> data =
+   static const std::array<const char*, 51u> data =
        {{
            "1.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
            "9.47747587596218770242116751705184563668845029215054154915126374673142219159548534317576897266130328412495991561490384353e76",
@@ -145,7 +145,7 @@ void test()
    BOOST_TEST(max_err < 5000);
 #endif
 
-   static const boost::array<boost::array<T, 2>, 12> exact_data =
+   static const std::array<std::array<T, 2>, 12> exact_data =
        {{
            {{std::ldexp(1.0, -50), static_cast<T>("1.00000000000000088817841970012562676935794497867573073630970950828771105957980924149923657574337470594698012676100224953")}},
            {{std::ldexp(1.0, -20), static_cast<T>("1.00000095367477115374544678824955687428365188553281789775169686343569285229334215539516690752571791280462887427635269562")}},

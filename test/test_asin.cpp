@@ -13,7 +13,7 @@
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include "test.hpp"
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT)
@@ -64,7 +64,7 @@ void test()
    // Test with some exact binary values as input - this tests our code
    // rather than the test data:
    //
-   static const boost::array<boost::array<T, 2>, 6> exact_data =
+   static const std::array<std::array<T, 2>, 6> exact_data =
        {{
            {{0.5, static_cast<T>("0.523598775598298873077107230546583814032861566562517636829157432051302734381034833104672470890352844663691347752213717775")}},
            {{0.25, static_cast<T>("0.252680255142078653485657436993710972252193733096838193633923778740575060481021222411748742228014601605092602909414066566")}},

@@ -10,7 +10,7 @@
 
 #include <thread>
 #include <boost/detail/lightweight_test.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/math/special_functions/relative_difference.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/quadrature/tanh_sinh.hpp>
