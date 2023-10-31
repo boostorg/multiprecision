@@ -3183,6 +3183,8 @@ const T& self(const T& a) { return a; }
 template <class Real>
 void test()
 {
+   using std::swap;
+
 #if !defined(NO_MIXED_OPS) && !defined(SLOW_COMPILER)
    boost::multiprecision::is_number<Real> tag;
    test_mixed<Real, unsigned char>(tag);
