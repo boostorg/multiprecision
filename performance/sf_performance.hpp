@@ -50,7 +50,7 @@
 #include <boost/math/distributions/non_central_t.hpp>
 #include <libs/math/test/table_type.hpp>
 #include <boost/chrono.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/thread.hpp>
 #include <boost/atomic.hpp>
 

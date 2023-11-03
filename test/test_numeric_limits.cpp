@@ -83,9 +83,9 @@ void test_specific(const std::integral_constant<int, boost::multiprecision::numb
    BOOST_CHECK((boost::math::isnormal)(sqrt(minv)));
    BOOST_CHECK((boost::math::isnormal)(sqrt(maxv)));
 
-   if (std::numeric_limits<Number>::is_specialized)
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::is_specialized)
    {
-      if (std::numeric_limits<Number>::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::has_quiet_NaN)
       {
          BOOST_TEST((boost::math::isnan)(std::numeric_limits<Number>::quiet_NaN()));
          BOOST_TEST(FP_NAN == (boost::math::fpclassify)(std::numeric_limits<Number>::quiet_NaN()));
@@ -93,7 +93,7 @@ void test_specific(const std::integral_constant<int, boost::multiprecision::numb
          BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::quiet_NaN()));
          BOOST_TEST(!(boost::math::isinf)(std::numeric_limits<Number>::quiet_NaN()));
       }
-      if (std::numeric_limits<Number>::has_signaling_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::has_signaling_NaN)
       {
          BOOST_TEST((boost::math::isnan)(std::numeric_limits<Number>::signaling_NaN()));
          BOOST_TEST(FP_NAN == (boost::math::fpclassify)(std::numeric_limits<Number>::signaling_NaN()));
@@ -101,7 +101,7 @@ void test_specific(const std::integral_constant<int, boost::multiprecision::numb
          BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::signaling_NaN()));
          BOOST_TEST(!(boost::math::isinf)(std::numeric_limits<Number>::signaling_NaN()));
       }
-      if (std::numeric_limits<Number>::has_infinity)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::has_infinity)
       {
          BOOST_TEST((boost::math::isinf)(std::numeric_limits<Number>::infinity()));
          BOOST_TEST(FP_INFINITE == (boost::math::fpclassify)(std::numeric_limits<Number>::infinity()));
@@ -109,7 +109,7 @@ void test_specific(const std::integral_constant<int, boost::multiprecision::numb
          BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::infinity()));
          BOOST_TEST(!(boost::math::isnan)(std::numeric_limits<Number>::infinity()));
       }
-      if (std::numeric_limits<Number>::has_denorm == std::denorm_present)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::has_denorm == std::denorm_present)
       {
          BOOST_TEST(FP_SUBNORMAL == (boost::math::fpclassify)(std::numeric_limits<Number>::denorm_min()));
          BOOST_TEST(FP_SUBNORMAL == (boost::math::fpclassify)((std::numeric_limits<Number>::min)() / 2));
@@ -120,6 +120,16 @@ void test_specific(const std::integral_constant<int, boost::multiprecision::numb
          BOOST_TEST(0 == std::numeric_limits<Number>::denorm_min() / 2);
          BOOST_TEST(0 != (std::numeric_limits<Number>::min)() / 2);
          BOOST_TEST(0 != std::numeric_limits<Number>::denorm_min());
+      }
+      BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::has_denorm == std::denorm_absent)
+      {
+         BOOST_TEST(std::numeric_limits<Number>::denorm_min() > 0);
+         BOOST_TEST(!(std::numeric_limits<Number>::denorm_min() > (std::numeric_limits<Number>::min)()));
+         BOOST_TEST(!(std::numeric_limits<Number>::denorm_min() < (std::numeric_limits<Number>::min)()));
+         BOOST_TEST(std::numeric_limits<Number>::denorm_min() == (std::numeric_limits<Number>::min)());
+         BOOST_TEST(FP_NORMAL == (boost::math::fpclassify)(std::numeric_limits<Number>::denorm_min()));
+         BOOST_TEST(FP_NORMAL == (boost::math::fpclassify)(-std::numeric_limits<Number>::denorm_min()));
+         BOOST_TEST(FP_ZERO != (boost::math::fpclassify)(std::numeric_limits<Number>::denorm_min()));
       }
    }
    Number n = 0;
@@ -135,11 +145,11 @@ void test_specific(const std::integral_constant<int, boost::multiprecision::numb
    BOOST_TEST(!(boost::math::isinf)(n));
    BOOST_TEST(!(boost::math::isnan)(n));
 
-   if (std::numeric_limits<Number>::round_style == std::round_to_nearest)
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::round_style == std::round_to_nearest)
    {
       BOOST_CHECK_EQUAL(std::numeric_limits<Number>::round_error(), 0.5);
    }
-   else if (std::numeric_limits<Number>::round_style != std::round_indeterminate)
+   else BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::round_style != std::round_indeterminate)
    {
       // Round error is 1.0:
       BOOST_CHECK_EQUAL(std::numeric_limits<Number>::round_error(), 1);
@@ -154,9 +164,9 @@ void test_specific(const std::integral_constant<int, boost::multiprecision::numb
 template <class Number>
 void test_specific(const std::integral_constant<int, boost::multiprecision::number_kind_integer>&)
 {
-   if (std::numeric_limits<Number>::is_modulo)
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::is_modulo)
    {
-      if (!std::numeric_limits<Number>::is_signed)
+      BOOST_IF_CONSTEXPR(!std::numeric_limits<Number>::is_signed)
       {
          BOOST_TEST(1 + (std::numeric_limits<Number>::max)() == 0);
          BOOST_TEST(--Number(0) == (std::numeric_limits<Number>::max)());
@@ -186,13 +196,13 @@ void test()
    std::cout << "numeric_limits values for type " << typeid(Number).name() << std::endl;
 
    PRINT(is_specialized);
-   if (std::numeric_limits<Number>::is_integer)
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::is_integer)
    {
       std::cout << std::hex << std::showbase;
    }
    std::cout << "max()"
              << " = " << (std::numeric_limits<Number>::max)() << std::endl;
-   if (std::numeric_limits<Number>::is_integer)
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::is_integer)
    {
       std::cout << std::dec;
    }

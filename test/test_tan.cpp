@@ -13,7 +13,7 @@
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include "test.hpp"
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT)
@@ -80,7 +80,7 @@ template <class T>
 void test()
 {
    std::cout << "Testing type: " << typeid(T).name() << std::endl;
-   static const boost::array<boost::array<const char*, 2>, 500> data =
+   static const std::array<std::array<const char*, 2>, 500> data =
        {{
            {{"0", "0"}},
            {{"0.03125", "0.03126017650125595642059651621507489147877835880393069701338513042228140662868270178810496567920444849"}},

@@ -13,7 +13,7 @@
 #include <boost/math/tools/stats.hpp>
 #include <boost/math/tools/test.hpp>
 #include <boost/math/constants/constants.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include "libs/math/test/functor.hpp"
 
 #include "libs/math/test/handle_test_result.hpp"
