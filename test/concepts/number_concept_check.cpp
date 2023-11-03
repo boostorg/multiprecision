@@ -16,6 +16,7 @@
 #pragma warning(disable : 4503) // decorated name length exceeded, name was truncated
 #endif
 
+#include <boost/concept/assert.hpp>
 #include <boost/container_hash/hash.hpp>
 #include <libs/math/test/compile_test/poison.hpp>
 
