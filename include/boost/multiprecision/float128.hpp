@@ -15,6 +15,12 @@
 #error libquadmath only works on on i386, x86_64, IA-64, and hppa HP-UX, as well as on PowerPC GNU/Linux targets that enable the vector scalar (VSX) instruction set.
 #endif
 
+#if defined(_MSVC_LANG) && _MSVC_LANG > 202002L
+#  ifndef _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
+#    define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
+#  endif
+#endif
+
 #include <memory>
 #include <climits>
 #include <cfloat>

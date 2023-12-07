@@ -16,6 +16,12 @@
 #ifndef BOOST_MP_CPP_DEC_FLOAT_HPP
 #define BOOST_MP_CPP_DEC_FLOAT_HPP
 
+#if defined(_MSVC_LANG) && _MSVC_LANG > 202002L
+#  ifndef _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
+#    define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
+#  endif
+#endif
+
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>

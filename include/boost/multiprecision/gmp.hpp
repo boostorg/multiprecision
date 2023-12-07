@@ -7,6 +7,12 @@
 #ifndef BOOST_MP_GMP_HPP
 #define BOOST_MP_GMP_HPP
 
+#if defined(_MSVC_LANG) && _MSVC_LANG > 202002L
+#  ifndef _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
+#    define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
+#  endif
+#endif
+
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp>
