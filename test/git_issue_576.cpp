@@ -97,9 +97,9 @@ void test()
 #ifdef BOOST_HAS_FLOAT128
       if (std::numeric_limits<Float>::max_exponent < std::numeric_limits<__float128>::digits)
       {
-         test<Float>(static_cast<__float128>(i));
+         test<Float>(static_cast<__float128>(i), big);
          for (int exp = -1; exp >= std::numeric_limits<Float>::min_exponent; --exp)
-            test<Float>(std::ldexp(static_cast<__float128>(i), exp), big);
+            test<Float>(ldexpq(static_cast<__float128>(i), exp), big);
       }
 #endif
 
