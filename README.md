@@ -28,7 +28,7 @@ The full documentation is available on [boost.org](http://www.boost.org/doc/libs
 ## Standalone ##
 
 Defining BOOST_MP_STANDALONE allows Boost.Multiprecision to be used with the only dependency being [Boost.Config](https://github.com/boostorg/config). Our [package on this page](https://github.com/boostorg/multiprecision/releases)
-already includes a copy of Boost.Config so no other donwloads are required. Some functionality is reduced in this mode. A static_assert message will alert you if a particular feature has been disabled by standalone mode.
+already includes a copy of Boost.Config so no other downloads are required. Some functionality is reduced in this mode. A static_assert message will alert you if a particular feature has been disabled by standalone mode.
 [Boost.Math](https://github.com/boostorg/math) standalone mode is compatiable, and recommended if special functions are required for the floating point types.
 
 ## Support, bugs and feature requests ##
