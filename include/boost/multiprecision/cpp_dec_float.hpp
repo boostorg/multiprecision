@@ -635,8 +635,8 @@ class cpp_dec_float
       }
       else
       {
-         std::copy(result.cbegin() + 1,
-                   result.cbegin() + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+         std::copy(result.cbegin() + static_cast<std::ptrdiff_t>(1),
+                   result.cbegin() + static_cast<std::ptrdiff_t>(1 + (std::min)(prec_elems_for_multiply, cpp_dec_float_elem_number)),
                    data.begin());
       }
    }
@@ -673,8 +673,8 @@ class cpp_dec_float
          }
          else
          {
-            std::copy(result.cbegin() + 1,
-                      result.cbegin() + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+            std::copy(result.cbegin() + static_cast<std::ptrdiff_t>(1),
+                      result.cbegin() + static_cast<std::ptrdiff_t>(1 + (std::min)(prec_elems_for_multiply, cpp_dec_float_elem_number)),
                       data.begin());
          }
       }
@@ -719,8 +719,8 @@ class cpp_dec_float
          }
          else
          {
-            std::copy(result + 1,
-                      result + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+            std::copy(result + static_cast<std::ptrdiff_t>(1),
+                      result + static_cast<std::ptrdiff_t>(1 + (std::min)(prec_elems_for_multiply, cpp_dec_float_elem_number)),
                       data.begin());
          }
       }
