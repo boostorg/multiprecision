@@ -26,7 +26,18 @@ inline T trunc BOOST_PREVENT_MACRO_SUBSTITUTION (const T arg)
     using std::floor;
     using std::ceil;
 
-    return (arg > 0) ? floor(arg) : ceil(arg);
+    T t { };
+
+    if (arg > T(0))
+    {
+        t = floor(arg);
+    }
+    else
+    {
+        t = ceil(arg);
+    }
+
+    return t;
 }
 
 } // namespace impl
