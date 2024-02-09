@@ -7,7 +7,7 @@ Boost Multiprecision Library
 |------------------|----------|-------------|
 | Drone            | [![Build Status](https://drone.cpp.al/api/badges/boostorg/multiprecision/status.svg?ref=refs/heads/master)](https://drone.cpp.al/boostorg/multiprecision)          | [![Build Status](https://drone.cpp.al/api/badges/boostorg/multiprecision/status.svg)](https://drone.cpp.al/boostorg/multiprecision) |
 | Github Actions   | [![Build Status](https://github.com/boostorg/multiprecision/workflows/multiprecision/badge.svg?branch=master)](https://github.com/boostorg/multiprecision/actions) | [![Build Status](https://github.com/boostorg/multiprecision/workflows/multiprecision/badge.svg?branch=develop)](https://github.com/boostorg/multiprecision/actions) |
-| Code Coverage    |          | [![codecov](https://codecov.io/gh/boostorg/multiprecision/graph/badge.svg?token=SDDBym7Pc9)](https://codecov.io/gh/boostorg/multiprecision) |
+| Codecov          | [![codecov](https://codecov.io/gh/boostorg/multiprecision/branch/master/graph/badge.svg)](https://codecov.io/gh/boostorg/multiprecision/branch/master)             | [![codecov](https://codecov.io/gh/boostorg/multiprecision/branch/develop/graph/badge.svg)]
 
  The Multiprecision Library provides integer, rational, floating-point, complex and interval number types in C++ that have more range and 
  precision than C++'s ordinary built-in types. The big number types in Multiprecision can be used with a wide selection of basic 
