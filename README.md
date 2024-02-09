@@ -37,7 +37,7 @@ The full documentation is available on [boost.org](http://www.boost.org/doc/libs
 In the following example, we use Multiprecision's Boost-licensed binary
 floating-point backend type `cpp_bin_float` to compute ${\sim}100$ decimal digits of
 
-$$sqrt{\pi} = \Gamma \left( \frac{1}{2} \right) {\approx}1.772453850905516027298{\ldots}\text{,}$$
+$$\sqrt{\pi} = \Gamma \left( \frac{1}{2} \right)~{\approx}~1.772453850905516027298{\ldots}\text{,}$$
 
 where we also observe that Multiprecision can seemlesly interoperate with
 [Boost.Math](https://github.com/boostorg/math).
