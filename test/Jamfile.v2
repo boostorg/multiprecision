@@ -1235,6 +1235,11 @@ test-suite misc :
       [ run git_issue_573.cpp : : : <toolset>msvc:<cxxflags>-sdl ]
       [ run git_issue_576.cpp : : : [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ] ]
       [ run git_issue_595.cpp : : : [ check-target-builds ../config//has_mpfr : <source>gmp <source>mpfr : <build>no ] ]
+      [ run git_issue_604.cpp : : : [ check-target-builds ../config//has_mpfr : <source>gmp <source>mpfr <define>TEST_MPFR_50 ]
+                                    [ check-target-builds ../config//has_gmp : <source>gmp <define>TEST_MPF_50 ]
+                                    [ check-target-builds ../config//has_float128 : <source>quadmath <define>TEST_FLOAT128 ]
+                                    <define>TEST_CPP_DEC_FLOAT 
+                                    <define>TEST_CPP_BIN_FLOAT ]
       [ compile git_issue_98.cpp : 
          [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
