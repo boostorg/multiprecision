@@ -2486,13 +2486,19 @@ void raise_rounding_error(T1, T2, T3, T4, T5)
 template <typename T1, typename T2, typename T3, typename T4, typename T5>
 void raise_overflow_error(T1, T2, T3, T4, T5)
 {
-   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Overflow error"));
+   BOOST_MP_THROW_EXCEPTION(std::overflow_error("Overflow error"));
 }
 
 template <typename T1, typename T2, typename T3, typename T4, typename T5>
 void raise_evaluation_error(T1, T2, T3, T4, T5)
 {
    BOOST_MP_THROW_EXCEPTION(std::runtime_error("Evaluation error"));
+}
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5>
+void raise_domain_error(T1, T2, T3, T4, T5)
+{
+   BOOST_MP_THROW_EXCEPTION(std::domain_error("Domain error"));
 }
 
 template <typename T, typename... Args>

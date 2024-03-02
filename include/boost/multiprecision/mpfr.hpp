@@ -2802,6 +2802,8 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D
    boost::multiprecision::detail::scoped_default_precision<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> > precision_guard(arg);
 
    boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
+   if (mpfr_nan_p(arg.backend().data()))
+      return policies::raise_domain_error("cbrt<%1%>(%1%)", "Input is a NaN", result, Policy());
    mpfr_cbrt(result.backend().data(), arg.backend().data(), GMP_RNDN);
    if (mpfr_inf_p(result.backend().data()))
       return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("cbrt<%1%>(%1%)", nullptr, Policy());
@@ -2821,6 +2823,8 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D
    boost::multiprecision::detail::scoped_default_precision<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> > precision_guard(arg);
 
    boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
+   if (mpfr_nan_p(arg.backend().data()))
+      return policies::raise_domain_error("erf<%1%>(%1%)", "Input is a NaN", result, pol);
    mpfr_erf(result.backend().data(), arg.backend().data(), GMP_RNDN);
    if (mpfr_inf_p(result.backend().data()))
       return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("erf<%1%>(%1%)", nullptr, pol);
@@ -2840,6 +2844,8 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D
    boost::multiprecision::detail::scoped_default_precision<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> > precision_guard(arg);
 
    boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
+   if (mpfr_nan_p(arg.backend().data()))
+      return policies::raise_domain_error("erf<%1%>(%1%)", "Input is a NaN", result, pol);
    mpfr_erfc(result.backend().data(), arg.backend().data(), GMP_RNDN);
    if (mpfr_inf_p(result.backend().data()))
       return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("erfc<%1%>(%1%)", nullptr, pol);
@@ -2859,6 +2865,8 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D
    boost::multiprecision::detail::scoped_default_precision<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> > precision_guard(arg);
 
    boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
+   if (mpfr_nan_p(arg.backend().data()))
+      return policies::raise_domain_error("erf<%1%>(%1%)", "Input is a NaN", result, pol);
    mpfr_expm1(result.backend().data(), arg.backend().data(), GMP_RNDN);
    if (mpfr_inf_p(result.backend().data()))
       return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("expm1<%1%>(%1%)", nullptr, pol);
@@ -2867,7 +2875,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D
    return result;
 }
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
-inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> exm1 BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg)
+inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg)
 {
    return expm1(arg, policies::policy<>());
 }
