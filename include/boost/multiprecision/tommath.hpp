@@ -440,8 +440,14 @@ struct tommath_int
       if ((base != 10) && m_data.sign)
          BOOST_MP_THROW_EXCEPTION(std::runtime_error("Formatted output in bases 8 or 16 is only available for positive numbers"));
 
+      // Check against known removed macro that was removed around the same time as type was changed
+      #ifdef mp_tobinary
       int s;
+      #else
+      size_t s;
+      #endif
       detail::check_tommath_result(mp_radix_size(const_cast< ::mp_int*>(&m_data), base, &s));
+
       std::unique_ptr<char[]> a(new char[s + 1]);
 #ifndef mp_to_binary
       detail::check_tommath_result(mp_toradix_n(const_cast< ::mp_int*>(&m_data), a.get(), base, s + 1));
