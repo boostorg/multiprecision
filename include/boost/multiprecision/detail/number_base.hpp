@@ -153,7 +153,8 @@ struct is_number_expression<detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > : 
 template <class T, class Num>
 struct is_compatible_arithmetic_type
     : public std::integral_constant<bool, 
-          std::is_convertible<T, Num>::value && !std::is_same<T, Num>::value && !is_number_expression<T>::value>
+          std::is_convertible<T, Num>::value && !std::is_same<T, Num>::value && !is_number_expression<T>::value
+          && (std::is_constructible<typename Num::backend_type, T>::value || std::is_assignable<typename Num::backend_type, T>::value)>
 {};
 
 namespace detail {
