@@ -154,7 +154,7 @@ template <class T, class Num>
 struct is_compatible_arithmetic_type
     : public std::integral_constant<bool, 
           std::is_convertible<T, Num>::value && !std::is_same<T, Num>::value && !is_number_expression<T>::value
-          && (std::is_constructible<typename Num::backend_type, T>::value || std::is_assignable<typename Num::backend_type, T>::value)>
+          && (std::is_constructible<typename Num::backend_type, T>::value || std::is_assignable<typename Num::backend_type, T>::value || is_number<T>::value || is_number_expression<T>::value)>
 {};
 
 namespace detail {
