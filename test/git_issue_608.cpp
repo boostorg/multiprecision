@@ -10,6 +10,6 @@ using big_float_type = boost::multiprecision::cpp_bin_float_100;
 
 int main()
 {
-   static_assert(boost::multiprecision::is_compatible_arithmetic_type<std::reference_wrapper<big_float_type>, big_float_type>::value == 0);
+   static_assert(boost::multiprecision::is_compatible_arithmetic_type<std::reference_wrapper<big_float_type>, big_float_type>::value == 0, "This should not be a compatible type");
 }
 
