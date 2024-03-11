@@ -1,0 +1,30 @@
+# Copyright René Ferdinand Rivera Morell 2023
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+
+import project ;
+
+project /boost/multiprecision
+    : common-requirements
+        <source>/boost/assert//boost_assert
+        <source>/boost/config//boost_config
+        <source>/boost/core//boost_core
+        <source>/boost/integer//boost_integer
+        <source>/boost/lexical_cast//boost_lexical_cast
+        <source>/boost/math//boost_math
+        <source>/boost/predef//boost_predef
+        <source>/boost/random//boost_random
+        <source>/boost/throw_exception//boost_throw_exception
+        <include>include
+    ;
+
+explicit
+    [ alias boost_multiprecision ]
+    [ alias all : boost_multiprecision test ]
+    ;
+
+call-if : boost-library multiprecision
+    ;
+
+use-project /boost/multiprecision/config : config ;

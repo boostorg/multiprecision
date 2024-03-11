@@ -5,7 +5,7 @@
 
 import modules ;
 import path ;
-import ../../config/checks/config : requires ;
+import config : requires ;
 
 local ntl-path = [ modules.peek : NTL_PATH ] ;
 local gmp_path = [ modules.peek : GMP_PATH ] ;
@@ -21,7 +21,6 @@ project : requirements
    <include>$(gmp_path)/gmpfrxx 
    <include>$(mpfr_path)
    <include>$(tommath_path)
-   <include>../../.. 
    <search>$(gmp_path) 
    <search>$(mpfr_path) 
    <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
@@ -34,13 +33,16 @@ project : requirements
    <define>BOOST_ALL_NO_LIB
    <debug-symbols>off
    <define>NDEBUG=1
+   <library>/boost/chrono//boost_chrono
+   <source>/boost/math//testing
+   : default-build release
    ;
 
 
-lib gmp ;
-lib mpfr ;
-lib quadmath ;
-lib f2c ;
+searched-lib gmp ;
+searched-lib mpfr ;
+searched-lib quadmath ;
+searched-lib f2c ;
 
 if $(tommath_path)
 {
@@ -48,7 +50,7 @@ if $(tommath_path)
 }
 else
 {
-   lib tommath ;
+   searched-lib tommath ;
    TOMMATH = tommath ;
 }
 
@@ -73,7 +75,7 @@ test-suite performance :
             performance_test_files/test16.cpp  performance_test_files/test33.cpp  performance_test_files/test50.cpp
             performance_test_files/test17.cpp  performance_test_files/test34.cpp  performance_test_files/test51.cpp            
             /boost/system//boost_system
-          : release
+          :
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <define>TEST_MPQ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
           [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) : ]
@@ -92,7 +94,7 @@ test-suite performance :
             miller_rabin_performance_files/test05.cpp  miller_rabin_performance_files/test11.cpp
             miller_rabin_performance_files/test06.cpp  miller_rabin_performance_files/test12.cpp
             /boost/system//boost_system /boost/chrono//boost_chrono 
-          : release
+          :
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
           [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) : ]
@@ -136,7 +138,7 @@ test-suite performance :
                      sf_performance_files/sf_performance_nct_04.cpp     sf_performance_files/sf_performance_poly_17.cpp
                      sf_performance_files/sf_performance_nct_05.cpp     sf_performance_files/sf_performance_poly_18.cpp
                      /boost/system//boost_system /boost/chrono//boost_chrono /boost/thread//boost_thread
-          : release
+          :
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
           [ check-target-builds ../config//has_float128 : <source>quadmath : ]
@@ -150,106 +152,106 @@ test-suite performance :
 [ exe delaunay_test : delaunay_test.cpp /boost/system//boost_system /boost/chrono//boost_chrono ]
 
 #[ exe voronoi_performance : voronoi_performance.cpp /boost/system//boost_system /boost/chrono//boost_chrono
-#   : release
+#   :
 #          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
 #          [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) : ]
 #   ]
 
 [ obj obj_linpack_benchmark_mpfr : linpack-benchmark.cpp
-          : release
+          :
           [ check-target-builds ../config//has_mpfr : : <build>no ]
           <define>TEST_MPFR_50
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ obj obj_linpack_benchmark_mpf : linpack-benchmark.cpp 
-          : release
+          :
           [ check-target-builds ../config//has_gmp : : <build>no ]
           <define>TEST_MPF_50
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ obj obj_linpack_benchmark_cpp_float : linpack-benchmark.cpp
-          : release
+          :
           <define>TEST_CPP_DEC_FLOAT
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ obj obj_linpack_benchmark_double : linpack-benchmark.cpp
-          : release
+          :
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ obj obj_linpack_benchmark_native_float128 : linpack-benchmark.cpp
-          : release
+          :
           <define>NATIVE_FLOAT128
           [ check-target-builds ../config//has_float128 : : <build>no ]
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ obj obj_linpack_benchmark_float128 : linpack-benchmark.cpp
-          : release
+          :
           <define>TEST_FLOAT128
           [ check-target-builds ../config//has_float128 : : <build>no ]
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ obj obj_linpack_benchmark_cpp_quad_float : linpack-benchmark.cpp
-          : release
+          :
           <define>TEST_CPP_BIN_FLOAT_QUAD
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ obj obj_linpack_benchmark_cpp_oct_float : linpack-benchmark.cpp
-          : release
+          :
           <define>TEST_CPP_BIN_FLOAT_OCT
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ exe linpack_benchmark_mpfr : obj_linpack_benchmark_mpfr mpfr f2c gmp
-          : release
+          :
           [ check-target-builds ../config//has_mpfr : : <build>no ]
           <define>TEST_MPFR_50
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ exe linpack_benchmark_mpf : obj_linpack_benchmark_mpf gmp  f2c
-          : release
+          :
           [ check-target-builds ../config//has_gmp : : <build>no ]
           <define>TEST_MPF_50
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ exe linpack_benchmark_cpp_float : obj_linpack_benchmark_cpp_float  f2c
-          : release
+          :
           <define>TEST_CPP_DEC_FLOAT
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ exe linpack_benchmark_double : obj_linpack_benchmark_double  f2c
-          : release
+          :
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ exe linpack_benchmark_native_float128 : obj_linpack_benchmark_native_float128  f2c quadmath
-          : release
+          :
           [ check-target-builds ../config//has_float128 : : <build>no ]
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ exe linpack_benchmark_float128 : obj_linpack_benchmark_float128  f2c quadmath
-          : release
+          :
           [ check-target-builds ../config//has_float128 : : <build>no ]
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ exe linpack_benchmark_cpp_quad_float : obj_linpack_benchmark_cpp_quad_float  f2c
-          : release
+          :
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 
 [ exe linpack_benchmark_cpp_oct_float : obj_linpack_benchmark_cpp_oct_float  f2c
-          : release
+          :
           [ check-target-builds ../config//has_f2c : : <build>no ]
           ]
 

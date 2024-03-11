@@ -14,9 +14,9 @@
 #include <boost/math/tools/test.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <array>
-#include "libs/math/test/functor.hpp"
+#include "functor.hpp"
 
-#include "libs/math/test/handle_test_result.hpp"
+#include "handle_test_result.hpp"
 #include "../table_type.hpp"
 
 #ifndef SC_

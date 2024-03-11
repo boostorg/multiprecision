@@ -20,7 +20,6 @@ project : requirements
    <include>$(mpfi_path)
    <include>$(mpfi_path)/src
    <include>$(tommath_path)
-   <include>../../..
    # We set these to make it easier to set up and test GMP and MPFR under Win32:
    #<toolset>msvc:<runtime-link>static
    #<toolset>msvc:<link>static
@@ -36,10 +35,10 @@ project : requirements
    <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
    ;
 
-lib gmp : : <search>$(gmp_path) ;
-lib mpfr : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug ;
-lib mpfi : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug <search>$(mpfi_path) <search>$(mpfi_path)/src ;
-lib quadmath ;
+searched-lib gmp : : <search>$(gmp_path) ;
+searched-lib mpfr : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug ;
+searched-lib mpfi : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug <search>$(mpfi_path) <search>$(mpfi_path)/src ;
+searched-lib quadmath ;
 
 rule generate_objs ( suffix : variant_count : build_opts * )
 {
