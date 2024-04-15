@@ -493,6 +493,9 @@ struct tester
       a = -4294967296;
       a = (a / b) * c;
       BOOST_CHECK_EQUAL(a, 1);
+      a = test_type("000144");
+      b = test_type("144");
+      BOOST_CHECK_EQUAL(a, b);
       a = -23;
       b = 23;
       a = (a / b) * c;
