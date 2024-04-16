@@ -515,6 +515,11 @@ struct tester
       a                      = a - ull;
       BOOST_CHECK_EQUAL(a, test_type("0x12345600012434ffffffff0000000000000000"));
 #endif
+      // https://github.com/boostorg/multiprecision/issues/612
+      a = test_type("000144");
+      b = test_type("144");
+      boost::multiprecision::cpp_int("000144");
+      BOOST_CHECK_EQUAL(a, b);
       //
       // Now check that things which should be zero really are
       // https://svn.boost.org/trac/boost/ticket/8145:
