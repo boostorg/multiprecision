@@ -1706,10 +1706,19 @@ public:
             s += 2;
             n -= 2;
          }
-         else
+         else if ((n > 1) && (s[1] != '0'))
          {
             radix = 8;
             n -= 1;
+         }
+         else
+         {
+            // We need to strip out any leading zeros
+            while (n && *s == '0')
+            {
+               --n;
+               ++s;
+            }
          }
       }
       if (n)
@@ -1759,10 +1768,19 @@ public:
             s += 2;
             n -= 2;
          }
-         else
+         else if ((n > 1) && (s[1] != '0'))
          {
             radix = 8;
             n -= 1;
+         }
+         else
+         {
+            // We need to strip out any leading zeros
+            while (n && *s == '0')
+            {
+               --n;
+               ++s;
+            }
          }
       }
       //
