@@ -11,6 +11,7 @@
 import testing ;
 import modules ;
 import path ;
+import-search /boost/config/checks ;
 import config : requires ;
 
 local ntl-path = [ modules.peek : NTL_PATH ] ;
@@ -28,7 +29,7 @@ project
      <include>$(mpfi_path)
      <include>$(mpfi_path)/src
      <include>$(tommath_path)
-     
+
       <toolset>gcc:<cxxflags>-Wno-missing-braces
       <toolset>darwin:<cxxflags>-Wno-missing-braces
       <toolset>acc:<cxxflags>+W2068,2461,2236,4070
@@ -49,7 +50,7 @@ project
       <toolset>msvc:<cxxflags>/wd4701
       <toolset>msvc:<cxxflags>/wd4305
       <toolset>clang:<link>static
-      [ requires  
+      [ requires
          cxx11_rvalue_references cxx11_template_aliases cxx11_hdr_array cxx11_allocator cxx11_constexpr cxx11_explicit_conversion_operators cxx11_ref_qualifiers
          cxx11_hdr_functional cxx11_variadic_templates cxx11_user_defined_literals cxx11_decltype cxx11_static_assert cxx11_defaulted_functions
          cxx11_noexcept cxx11_ref_qualifiers cxx11_user_defined_literals cxx11_hdr_type_traits
@@ -102,7 +103,7 @@ test-suite examples :
       [ run mpfr_snips.cpp mpfr gmp no_eh_eg_support : : : [ check-target-builds ../config//has_mpfr : : <build>no ] ]
       [ run tommath_snips.cpp $(TOMMATH) no_eh_eg_support : : : [ check-target-builds ../config//has_tommath : : <build>no ] ]
       [ compile constexpr_float_arithmetic_examples.cpp : [ requires cxx14_constexpr cxx17_if_constexpr ] ]
-      
+
       [ run big_seventh.cpp no_eh_eg_support ]
 
       [ run exercise_threading_log_agm.cpp : : : <define>BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE=101 release [ requires cxx11_hdr_atomic cxx11_hdr_thread ] : exercise_threading_log_agm_cpp_dec_float ]
