@@ -7,13 +7,14 @@
 #define BOOST_MP_COMPLEX_HPP
 
 #include <boost/multiprecision/detail/assert.hpp>
+#include <boost/multiprecision/traits/is_backend.hpp>
 #include <complex>
 #include <cmath>
 
 namespace boost {
 namespace multiprecision {
 
-template <typename T>
+template <typename T, std::enable_if_t<detail::is_backend<T>::value, bool> = true>
 class complex
 {
 private:
@@ -88,7 +89,7 @@ constexpr complex<T> operator/(const complex<T>& lhs, const complex<T>& rhs) noe
     return {real_part, imag_part};
 }
 
-template <typename T>
+template <typename T, std::enable_if_t<detail::is_backend<T>::value, bool> = true>
 inline complex<T> polar(const T& rho, const T& theta) noexcept
 {
     using std::sin;

@@ -17,6 +17,18 @@ void test_construction()
     using std::complex;
     using std::polar;
     using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar v {};
+    BOOST_TEST_EQ(v.real(), T{0});
+    BOOST_TEST_EQ(v.imag(), T{0});
+
+    complex_scalar v1 {T{1}};
+    BOOST_TEST_EQ(v1.real(), T{1});
+    BOOST_TEST_EQ(v1.imag(), T{0});
+
+    complex_scalar v2 {T{2}, T{2}};
+    BOOST_TEST_EQ(v2.real(), T{2});
+    BOOST_TEST_EQ(v2.imag(), T{2});
 }
 
 int main()
