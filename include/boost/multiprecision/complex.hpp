@@ -30,6 +30,9 @@ public:
     constexpr T real() noexcept { return real_; }
     constexpr T imag() noexcept { return imag_; }
 
+    constexpr complex<T> operator+() { return *this; }
+    constexpr complex<T> operator-() { return {-real_, -imag_}; }
+
     friend constexpr complex<T> operator+(const complex<T>& lhs, const complex<T>& rhs) noexcept;
     friend constexpr complex<T> operator-(const complex<T>& lhs, const complex<T>& rhs) noexcept;
     friend constexpr complex<T> operator*(const complex<T>& lhs, const complex<T>& rhs) noexcept;
