@@ -203,6 +203,12 @@ inline BOOST_MP_CXX14_CONSTEXPR boost::multiprecision::number<T, ET> arg(const c
     return atan2(z.imag(), z.real());
 }
 
+template <typename T, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR boost::multiprecision::number<T, ET> norm(const complex<boost::multiprecision::number<T, ET>>& z) noexcept
+{
+    return z.real() * z.real() + z.imag() * z.imag();
+}
+
 } // Namespace multiprecision
 } // Namespace boost
 

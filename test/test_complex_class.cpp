@@ -16,6 +16,13 @@
 using namespace boost::multiprecision;
 
 template <typename T>
+bool test_equal(T lhs, T rhs, int tol = 10) noexcept
+{
+    using std::fabs;
+    return fabs(lhs - rhs) < static_cast<T>(tol) * std::numeric_limits<T>::epsilon();
+}
+
+template <typename T>
 void test_construction()
 {
     using std::complex;
@@ -145,14 +152,7 @@ void test_abs()
 
     complex_scalar lhs {T{1}, T{1}};
 
-    BOOST_TEST_EQ(abs(lhs), sqrt(T{2}));
-}
-
-template <typename T>
-bool test_equal(T lhs, T rhs, int tol = 10) noexcept
-{
-    using std::fabs;
-    return fabs(lhs - rhs) < static_cast<T>(tol) * std::numeric_limits<T>::epsilon();
+    BOOST_TEST(test_equal(abs(lhs), sqrt(T{2})));
 }
 
 template <typename T>
@@ -169,6 +169,19 @@ void test_arg()
     BOOST_TEST(test_equal(arg(complex_scalar{T{0}, T{0}}), T{0}));
     BOOST_TEST(test_equal(arg(complex_scalar{T{0}, T{1}}), half_pi<T>()));
     BOOST_TEST(test_equal(arg(complex_scalar{T{-1}, T{0}}), pi<T>()));
+}
+
+template <typename T>
+void test_norm()
+{
+    using std::complex;
+    using std::polar;
+    using std::norm;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{3}, T{4}};
+
+    BOOST_TEST(test_equal(norm(lhs), T{25}));
 }
 
 int main()
@@ -217,6 +230,11 @@ int main()
     test_arg<double>();
     test_arg<cpp_bin_float_50>();
     test_arg<cpp_dec_float_50>();
+
+    test_norm<float>();
+    test_norm<double>();
+    test_norm<cpp_bin_float_50>();
+    test_norm<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
