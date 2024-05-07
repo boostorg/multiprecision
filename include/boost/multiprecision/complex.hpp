@@ -31,6 +31,7 @@ public:
     {
         real_ = rhs.real_;
         imag_ = rhs.imag_;
+        return *this;
     }
 
     T real() const noexcept { return real_; }
@@ -84,6 +85,26 @@ public:
     {
         *this = *this / rhs;
         return *this;
+    }
+
+    bool operator==(const complex& rhs) noexcept
+    {
+        return real_ == rhs.real_ && imag_ == rhs.imag_;
+    }
+
+    bool operator!=(const complex& rhs) noexcept
+    {
+        return !(*this == rhs);
+    }
+
+    bool operator==(const T& rhs) noexcept
+    {
+        return real_ == rhs && imag_ == T{0};
+    }
+
+    bool operator!=(const T& rhs) noexcept
+    {
+        return !(*this == rhs);
     }
 };
 

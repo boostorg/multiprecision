@@ -96,6 +96,29 @@ void test_multiplication()
     BOOST_TEST_EQ(res_1.imag(), T{0});
 }
 
+template <typename T>
+void test_equality()
+{
+    using std::complex;
+    using std::polar;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{2}, T{-1}};
+    complex_scalar rhs {T{2}, T{1}};
+
+    BOOST_TEST(lhs != rhs);
+    BOOST_TEST(!(lhs == rhs));
+
+    T scalar_rhs {T{2}};
+
+    BOOST_TEST(lhs != scalar_rhs);
+    BOOST_TEST(!(lhs == scalar_rhs));
+
+    lhs = complex_scalar{T{2}, T{0}};
+    BOOST_TEST(lhs == scalar_rhs);
+    BOOST_TEST(!(lhs != scalar_rhs));
+}
+
 int main()
 {
     test_construction<float>();
@@ -122,6 +145,11 @@ int main()
     test_multiplication<double>();
     test_multiplication<cpp_bin_float_50>();
     test_multiplication<cpp_dec_float_50>();
+
+    test_equality<float>();
+    test_equality<double>();
+    test_equality<cpp_bin_float_50>();
+    test_equality<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
