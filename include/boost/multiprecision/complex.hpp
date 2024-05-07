@@ -89,35 +89,34 @@ public:
         return *this;
     }
 
-    BOOST_MP_CXX14_CONSTEXPR bool operator==(const complex& rhs) noexcept
+    BOOST_MP_CXX14_CONSTEXPR bool operator==(const complex& rhs) const noexcept
     {
         return real_ == rhs.real_ && imag_ == rhs.imag_;
     }
 
-    BOOST_MP_CXX14_CONSTEXPR bool operator!=(const complex& rhs) noexcept
+    BOOST_MP_CXX14_CONSTEXPR bool operator!=(const complex& rhs) const noexcept
     {
         return !(*this == rhs);
     }
 
-    BOOST_MP_CXX14_CONSTEXPR bool operator==(const T& rhs) noexcept
+    BOOST_MP_CXX14_CONSTEXPR bool operator==(const T& rhs) const noexcept
     {
         return real_ == rhs && imag_ == T{0};
     }
 
-    BOOST_MP_CXX14_CONSTEXPR bool operator!=(const T& rhs) noexcept
+    BOOST_MP_CXX14_CONSTEXPR bool operator!=(const T& rhs) const noexcept
     {
         return !(*this == rhs);
     }
 
-    // Writes in the form (real, imag)
     template <typename CharT, typename Traits>
-    std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os)
+    friend std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os, const complex& z)
     {
         std::basic_ostringstream<CharT, Traits> s;
         s.flags(os.flags());
         s.imbue(os.getloc());
         s.precision(os.precision());
-        s << '(' << real_ << ',' << imag_ << ')';
+        s << '(' << z.real_ << ',' << z.imag_ << ')';
 
         return os << s.str();
     }
@@ -127,7 +126,7 @@ public:
     // 2) (real)
     // 3) (real, imag)
     template <typename CharT, typename Traits>
-    std::basic_istream<CharT, Traits>& operator>>(std::basic_ostream<CharT, Traits>& is)
+    friend std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is, complex& z)
     {
         CharT ch {};
         T real = T{0};
@@ -163,8 +162,8 @@ public:
 
         if (!is.fail())
         {
-            real_ = real;
-            imag_ = imag;
+            z.real_ = real;
+            z.imag_ = imag;
         }
 
         return is;
@@ -213,6 +212,17 @@ template <typename T, expression_template_option ET>
 inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> conj(const complex<boost::multiprecision::number<T, ET>>& z) noexcept
 {
     return {z.real(), -z.imag()};
+}
+
+template <typename T, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> proj(const complex<boost::multiprecision::number<T, ET>>& z) noexcept
+{
+    if (isinf(z.real()) || isinf(z.imag()))
+    {
+        return {std::numeric_limits<boost::multiprecision::number<T, ET>>::infinity(), copysign(boost::multiprecision::number<T, ET>{0}, z.imag())};
+    }
+
+    return z;
 }
 
 } // Namespace multiprecision

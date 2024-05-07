@@ -195,7 +195,27 @@ void test_conj()
     complex_scalar lhs {T{1}, T{1}};
     complex_scalar rhs {T{1}, T{-1}};
 
-    BOOST_TEST(conj(lhs) == rhs);
+    BOOST_TEST_EQ(conj(lhs), rhs);
+}
+
+template <typename T>
+void test_proj()
+{
+    using std::complex;
+    using std::polar;
+    using std::proj;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{1}, T{1}};
+    BOOST_TEST_EQ(lhs, proj(lhs));
+
+    lhs = complex_scalar{T{std::numeric_limits<T>::infinity()}, T{1}};
+    complex_scalar rhs = complex_scalar{T{std::numeric_limits<T>::infinity()}, T{0}};
+    BOOST_TEST_EQ(proj(lhs), rhs);
+
+    lhs = complex_scalar{T{std::numeric_limits<T>::infinity()}, T{-1}};
+    rhs = complex_scalar{T{std::numeric_limits<T>::infinity()}, T{-0}};
+    BOOST_TEST_EQ(proj(lhs), rhs);
 }
 
 int main()
@@ -254,6 +274,11 @@ int main()
     test_conj<double>();
     test_conj<cpp_bin_float_50>();
     test_conj<cpp_dec_float_50>();
+
+    test_proj<float>();
+    test_proj<double>();
+    test_proj<cpp_bin_float_50>();
+    test_proj<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
