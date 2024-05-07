@@ -152,7 +152,7 @@ void test_abs()
 
     complex_scalar lhs {T{1}, T{1}};
 
-    BOOST_TEST(test_equal(abs(lhs), sqrt(T{2})));
+    BOOST_TEST(test_equal(static_cast<T>(abs(lhs)), static_cast<T>(sqrt(T{2}))));
 }
 
 template <typename T>
