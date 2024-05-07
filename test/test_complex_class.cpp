@@ -184,6 +184,20 @@ void test_norm()
     BOOST_TEST(test_equal(norm(lhs), T{25}));
 }
 
+template <typename T>
+void test_conj()
+{
+    using std::complex;
+    using std::polar;
+    using std::conj;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{1}, T{1}};
+    complex_scalar rhs {T{1}, T{-1}};
+
+    BOOST_TEST(conj(lhs) == rhs);
+}
+
 int main()
 {
     test_construction<float>();
@@ -235,6 +249,11 @@ int main()
     test_norm<double>();
     test_norm<cpp_bin_float_50>();
     test_norm<cpp_dec_float_50>();
+
+    test_conj<float>();
+    test_conj<double>();
+    test_conj<cpp_bin_float_50>();
+    test_conj<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
