@@ -10,6 +10,7 @@
 #include <boost/multiprecision/traits/is_backend.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/fwd.hpp>
+#include <ostream>
 #include <complex>
 #include <cmath>
 
@@ -105,6 +106,19 @@ public:
     bool operator!=(const T& rhs) noexcept
     {
         return !(*this == rhs);
+    }
+
+    // Writes in the form (real, imag)
+    template <typename CharT, typename Traits>
+    std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os)
+    {
+        std::basic_ostringstream<CharT, Traits> s;
+        s.flags(os.flags());
+        s.imbue(os.getloc());
+        s.precision(os.precision());
+        s << '(' << real_ << ',' << imag_ << ')';
+
+        return os << s.str();
     }
 };
 
