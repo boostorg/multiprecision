@@ -101,27 +101,27 @@ int main()
     test_construction<float>();
     test_construction<double>();
     test_construction<cpp_bin_float_50>();
-    //test_construction<cpp_dec_float_50>();
+    test_construction<cpp_dec_float_50>();
 
     test_unary_operators<float>();
     test_unary_operators<double>();
     test_unary_operators<cpp_bin_float_50>();
-    //test_unary_operators<cpp_dec_float_50>();
+    test_unary_operators<cpp_dec_float_50>();
 
     test_addition<float>();
     test_addition<double>();
     test_addition<cpp_bin_float_50>();
-    //test_addition<cpp_dec_float_50>();
+    test_addition<cpp_dec_float_50>();
 
     test_subtraction<float>();
     test_subtraction<double>();
     test_subtraction<cpp_bin_float_50>();
-    //test_subtraction<cpp_dec_float_50>();
+    test_subtraction<cpp_dec_float_50>();
 
     test_multiplication<float>();
     test_multiplication<double>();
     test_multiplication<cpp_bin_float_50>();
-    //test_multiplication<cpp_dec_float_50>();
+    test_multiplication<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
