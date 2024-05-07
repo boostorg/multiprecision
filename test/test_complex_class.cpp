@@ -6,7 +6,9 @@
 #include <boost/multiprecision/complex.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/math/constants/constants.hpp>
 #include <boost/core/lightweight_test.hpp>
+#include <limits>
 #include <complex>
 #include <iostream>
 #include <cmath>
@@ -139,12 +141,34 @@ void test_abs()
     using std::complex;
     using std::polar;
     using std::abs;
-    using std::sqrt;
     using complex_scalar = decltype(polar(T(), T()));
 
     complex_scalar lhs {T{1}, T{1}};
 
     BOOST_TEST_EQ(abs(lhs), sqrt(T{2}));
+}
+
+template <typename T>
+bool test_equal(T lhs, T rhs, int tol = 10) noexcept
+{
+    using std::fabs;
+    return fabs(lhs - rhs) < static_cast<T>(tol) * std::numeric_limits<T>::epsilon();
+}
+
+template <typename T>
+void test_arg()
+{
+    using std::complex;
+    using std::polar;
+    using std::arg;
+    using boost::math::constants::pi;
+    using boost::math::constants::half_pi;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    BOOST_TEST(test_equal(arg(complex_scalar{T{1}, T{0}}), T{0}));
+    BOOST_TEST(test_equal(arg(complex_scalar{T{0}, T{0}}), T{0}));
+    BOOST_TEST(test_equal(arg(complex_scalar{T{0}, T{1}}), half_pi<T>()));
+    BOOST_TEST(test_equal(arg(complex_scalar{T{-1}, T{0}}), pi<T>()));
 }
 
 int main()
@@ -188,6 +212,11 @@ int main()
     test_abs<double>();
     test_abs<cpp_bin_float_50>();
     test_abs<cpp_dec_float_50>();
+
+    test_arg<float>();
+    test_arg<double>();
+    test_arg<cpp_bin_float_50>();
+    test_arg<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
