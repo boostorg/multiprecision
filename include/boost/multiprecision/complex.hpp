@@ -179,6 +179,18 @@ inline complex<boost::multiprecision::number<T, ET>> polar(const boost::multipre
     return {rho * cos(theta), rho * sin(theta)};
 }
 
+template <typename T, expression_template_option ET>
+inline boost::multiprecision::number<T, ET> real(const complex<boost::multiprecision::number<T, ET>>& c) noexcept
+{
+    return c.real();
+}
+
+template <typename T, expression_template_option ET>
+inline boost::multiprecision::number<T, ET> imag(const complex<boost::multiprecision::number<T, ET>>& c) noexcept
+{
+    return c.imag();
+}
+
 } // Namespace multiprecision
 } // Namespace boost
 

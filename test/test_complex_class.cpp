@@ -119,6 +119,21 @@ void test_equality()
     BOOST_TEST(!(lhs != scalar_rhs));
 }
 
+template <typename T>
+void test_non_member_real_imag()
+{
+    using std::complex;
+    using std::polar;
+    using std::real;
+    using std::complex;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{2}, T{-1}};
+
+    BOOST_TEST_EQ(real(lhs), lhs.real());
+    BOOST_TEST_EQ(imag(lhs), lhs.imag());
+}
+
 int main()
 {
     test_construction<float>();
@@ -150,6 +165,11 @@ int main()
     test_equality<double>();
     test_equality<cpp_bin_float_50>();
     test_equality<cpp_dec_float_50>();
+
+    test_non_member_real_imag<float>();
+    test_non_member_real_imag<double>();
+    test_non_member_real_imag<cpp_bin_float_50>();
+    test_non_member_real_imag<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
