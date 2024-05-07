@@ -180,15 +180,21 @@ inline complex<boost::multiprecision::number<T, ET>> polar(const boost::multipre
 }
 
 template <typename T, expression_template_option ET>
-inline boost::multiprecision::number<T, ET> real(const complex<boost::multiprecision::number<T, ET>>& c) noexcept
+inline boost::multiprecision::number<T, ET> real(const complex<boost::multiprecision::number<T, ET>>& z) noexcept
 {
-    return c.real();
+    return z.real();
 }
 
 template <typename T, expression_template_option ET>
-inline boost::multiprecision::number<T, ET> imag(const complex<boost::multiprecision::number<T, ET>>& c) noexcept
+inline boost::multiprecision::number<T, ET> imag(const complex<boost::multiprecision::number<T, ET>>& z) noexcept
 {
-    return c.imag();
+    return z.imag();
+}
+
+template <typename T, expression_template_option ET>
+inline boost::multiprecision::number<T, ET> abs(const complex<boost::multiprecision::number<T, ET>>& z) noexcept
+{
+    return hypot(z.real(), z.imag());
 }
 
 } // Namespace multiprecision

@@ -125,13 +125,26 @@ void test_non_member_real_imag()
     using std::complex;
     using std::polar;
     using std::real;
-    using std::complex;
     using complex_scalar = decltype(polar(T(), T()));
 
     complex_scalar lhs {T{2}, T{-1}};
 
     BOOST_TEST_EQ(real(lhs), lhs.real());
     BOOST_TEST_EQ(imag(lhs), lhs.imag());
+}
+
+template <typename T>
+void test_abs()
+{
+    using std::complex;
+    using std::polar;
+    using std::abs;
+    using std::sqrt;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{1}, T{1}};
+
+    BOOST_TEST_EQ(abs(lhs), sqrt(T{2}));
 }
 
 int main()
@@ -170,6 +183,11 @@ int main()
     test_non_member_real_imag<double>();
     test_non_member_real_imag<cpp_bin_float_50>();
     test_non_member_real_imag<cpp_dec_float_50>();
+
+    test_abs<float>();
+    test_abs<double>();
+    test_abs<cpp_bin_float_50>();
+    test_abs<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
