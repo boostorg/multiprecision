@@ -176,7 +176,7 @@ inline complex<boost::multiprecision::number<T, ET>> polar(const boost::multipre
                                                            const boost::multiprecision::number<T, ET>& theta) noexcept
 {
     BOOST_MP_ASSERT_MSG(rho >= T{0}, "Rho must be positive");
-    return {rho * cos(theta), rho * sin(theta)};
+    return polar(rho, theta);
 }
 
 template <typename T, expression_template_option ET>
