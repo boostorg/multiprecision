@@ -11,6 +11,7 @@
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/fwd.hpp>
 #include <ostream>
+#include <istream>
 #include <complex>
 #include <cmath>
 
@@ -119,6 +120,54 @@ public:
         s << '(' << real_ << ',' << imag_ << ')';
 
         return os << s.str();
+    }
+
+    // Supported formats:
+    // 1) real
+    // 2) (real)
+    // 3) (real, imag)
+    template <typename CharT, typename Traits>
+    std::basic_istream<CharT, Traits>& operator>>(std::basic_ostream<CharT, Traits>& is)
+    {
+        CharT ch {};
+        T real = T{0};
+        T imag = T{0};
+
+        is >> std::ws;
+        is.get(ch);
+
+        if (ch == '(')
+        {
+            // Expecting a format like 2 or 3
+            is >> std::ws >> real;
+            is.get(ch);
+            if (ch == ',')
+            {
+                // A comma indicates it's 3
+                is >> std::ws >> imag;
+                is.get(ch); // Should be ')'
+            }
+            else if (ch != ')')
+            {
+                // Syntax error: unexpected character
+                is.setstate(std::ios_base::failbit);
+                return is;
+            }
+        }
+        else
+        {
+            // No parentheses, just a real number from format 1
+            is.putback(ch);
+            is >> real;
+        }
+
+        if (!is.fail())
+        {
+            real_ = real;
+            imag_ = imag;
+        }
+
+        return is;
     }
 };
 
