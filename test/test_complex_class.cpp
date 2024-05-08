@@ -401,6 +401,31 @@ void test_pow()
     }
 }
 
+template <typename T>
+void test_sqrt()
+{
+    using std::complex;
+    using std::polar;
+    using std::sqrt;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{4}, T{0}};
+    lhs = sqrt(lhs);
+    complex_scalar rhs {T{2}, T{0}};
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+
+    // Check other side of the cut
+    BOOST_IF_CONSTEXPR (!std::is_same<T, cpp_dec_float_50>::value)
+    {
+        lhs = {T {4}, -T {0}};
+        lhs = sqrt(lhs);
+        rhs = {T {2}, -T {0}};
+        BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+        BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+    }
+}
+
 int main()
 {
     test_construction<float>();
@@ -507,6 +532,11 @@ int main()
     test_pow<double>();
     test_pow<cpp_bin_float_50>();
     test_pow<cpp_dec_float_50>();
+
+    test_sqrt<float>();
+    test_sqrt<double>();
+    test_sqrt<cpp_bin_float_50>();
+    test_sqrt<cpp_dec_float_50>();
 
     return boost::report_errors();
 }

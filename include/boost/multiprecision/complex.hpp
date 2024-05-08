@@ -336,6 +336,12 @@ inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> po
     return exp(new_y * log(x));
 }
 
+template <typename T, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> sqrt(const complex<boost::multiprecision::number<T, ET>>& z) noexcept
+{
+    return polar(sqrt(abs(z)), arg(z) / 2);
+}
+
 } // Namespace multiprecision
 } // Namespace boost
 
