@@ -468,6 +468,27 @@ void test_cosh()
     BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
 }
 
+template <typename T>
+void test_tanh()
+{
+    using std::complex;
+    using std::polar;
+    using std::sinh;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{1}, T{0}};
+    lhs = tanh(lhs);
+    complex_scalar rhs {tanh(T{1}), T{0}};
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+
+    lhs = {T{0}, T{1}};
+    lhs = tanh(lhs);
+    rhs = {T{0}, tan(T{1})};
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+}
+
 int main()
 {
     test_construction<float>();
@@ -589,6 +610,11 @@ int main()
     test_cosh<double>();
     test_cosh<cpp_bin_float_50>();
     test_cosh<cpp_dec_float_50>();
+
+    test_tanh<float>();
+    test_tanh<double>();
+    test_tanh<cpp_bin_float_50>();
+    test_tanh<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
