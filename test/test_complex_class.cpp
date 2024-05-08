@@ -19,7 +19,18 @@ template <typename T>
 bool test_equal(T lhs, T rhs, int tol = 10) noexcept
 {
     using std::fabs;
-    return fabs(lhs - rhs) < static_cast<T>(tol) * std::numeric_limits<T>::epsilon();
+    const bool res = fabs(lhs - rhs) < static_cast<T>(tol) * std::numeric_limits<T>::epsilon();
+
+    if (!res)
+    {
+        // LCOV_EXCL_START
+        std::cerr << "LHS: " << lhs
+                  << "\nRHS: " << rhs
+                  << "\nDist: " << fabs(lhs - rhs) / std::numeric_limits<T>::epsilon() << std::endl;
+        // LCOV_EXCL_STOP
+    }
+
+    return res;
 }
 
 template <typename T>
@@ -359,6 +370,37 @@ void test_log10()
     BOOST_TEST(test_equal(lhs.real(), rhs.real()));
 }
 
+template <typename T>
+void test_pow()
+{
+    using std::complex;
+    using std::polar;
+    using std::pow;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{1}, T{2}};
+    lhs = pow(lhs, T{2});
+    complex_scalar rhs {T{-3}, T{4}};
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.imag(), rhs.imag(), 100));
+
+    lhs = {T{-1}, T{0}};
+    lhs = pow(lhs, T{1}/2);
+    rhs = {T{0}, T{1}};
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+
+    // Check other side of the cut
+    BOOST_IF_CONSTEXPR (!std::is_same<T, cpp_dec_float_50>::value)
+    {
+        lhs = {T {-1}, -T {0}};
+        lhs = pow(lhs, T {1} / 2);
+        rhs = {T {0}, T {-1}};
+        BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+        BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+    }
+}
+
 int main()
 {
     test_construction<float>();
@@ -460,6 +502,11 @@ int main()
     test_log10<double>();
     test_log10<cpp_bin_float_50>();
     test_log10<cpp_dec_float_50>();
+
+    test_pow<float>();
+    test_pow<double>();
+    test_pow<cpp_bin_float_50>();
+    test_pow<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
