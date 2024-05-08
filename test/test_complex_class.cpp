@@ -426,6 +426,27 @@ void test_sqrt()
     }
 }
 
+template <typename T>
+void test_sinh()
+{
+    using std::complex;
+    using std::polar;
+    using std::sinh;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{1}, T{0}};
+    lhs = sinh(lhs);
+    complex_scalar rhs {sinh(T{1}), T{0}};
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+
+    lhs = {T{0}, T{1}};
+    lhs = sinh(lhs);
+    rhs = {T{0}, sin(T{1})};
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+}
+
 int main()
 {
     test_construction<float>();
@@ -537,6 +558,11 @@ int main()
     test_sqrt<double>();
     test_sqrt<cpp_bin_float_50>();
     test_sqrt<cpp_dec_float_50>();
+
+    test_sinh<float>();
+    test_sinh<double>();
+    test_sinh<cpp_bin_float_50>();
+    test_sinh<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
