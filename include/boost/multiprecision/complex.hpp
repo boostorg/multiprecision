@@ -348,6 +348,12 @@ inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> si
     return {sinh(z.real()) * cos(z.imag()), cosh(z.real()) * sin(z.imag())};
 }
 
+template <typename T, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> cosh(const complex<boost::multiprecision::number<T, ET>>& z) noexcept
+{
+    return {cosh(z.real()) * cos(z.imag()), sinh(z.real()) * sin(z.imag())};
+}
+
 } // Namespace multiprecision
 } // Namespace boost
 
