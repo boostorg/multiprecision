@@ -218,6 +218,22 @@ void test_proj()
     BOOST_TEST_EQ(proj(lhs), rhs);
 }
 
+template <typename T>
+void test_exp()
+{
+    using std::complex;
+    using std::polar;
+    using std::exp;
+    using boost::math::constants::pi;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{0}, pi<T>()};
+    lhs = exp(lhs);
+    complex_scalar rhs {T{-1}, T{0}};
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+}
+
 int main()
 {
     test_construction<float>();
@@ -279,6 +295,11 @@ int main()
     test_proj<double>();
     test_proj<cpp_bin_float_50>();
     test_proj<cpp_dec_float_50>();
+
+    test_exp<float>();
+    test_exp<double>();
+    test_exp<cpp_bin_float_50>();
+    test_exp<cpp_dec_float_50>();
 
     return boost::report_errors();
 }

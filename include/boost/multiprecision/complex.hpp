@@ -174,8 +174,8 @@ template <typename T, expression_template_option ET>
 inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> polar(const boost::multiprecision::number<T, ET>& rho,
                                                                                     const boost::multiprecision::number<T, ET>& theta) noexcept
 {
-    BOOST_MP_ASSERT_MSG(rho >= T{0}, "Rho must be positive");
-    return polar(rho, theta);
+    BOOST_MP_ASSERT_MSG(rho >= 0, "Rho must be positive");
+    return {rho * cos(theta), rho * sin(theta)};
 }
 
 template <typename T, expression_template_option ET>
@@ -223,6 +223,12 @@ inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> pr
     }
 
     return z;
+}
+
+template <typename T, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> exp(const complex<boost::multiprecision::number<T, ET>>& z) noexcept
+{
+    return polar(exp(z.real()), z.imag());
 }
 
 } // Namespace multiprecision
