@@ -234,6 +234,39 @@ void test_exp()
     BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
 }
 
+template <typename T>
+void test_log()
+{
+    using std::complex;
+    using std::polar;
+    using std::log;
+    using boost::math::constants::half_pi;
+    using boost::math::constants::pi;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{0}, T{1}};
+    lhs = log(lhs);
+    complex_scalar rhs {T{0}, half_pi<T>()};
+
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+
+    lhs = {T{-1}, T{0}};
+    lhs = log(lhs);
+    rhs = {T{0}, pi<T>()};
+
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+
+    // Other side of the cut line
+    lhs = {T{-1}, T{-0}};
+    lhs = log(lhs);
+    rhs = {T{0}, -pi<T>()};
+
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+}
+
 int main()
 {
     test_construction<float>();
@@ -300,6 +333,11 @@ int main()
     test_exp<double>();
     test_exp<cpp_bin_float_50>();
     test_exp<cpp_dec_float_50>();
+
+    test_log<float>();
+    test_log<double>();
+    test_log<cpp_bin_float_50>();
+    test_log<cpp_dec_float_50>();
 
     return boost::report_errors();
 }

@@ -231,6 +231,12 @@ inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> ex
     return polar(exp(z.real()), z.imag());
 }
 
+template <typename T, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> log(const complex<boost::multiprecision::number<T, ET>>& z) noexcept
+{
+    return {log(abs(z)), arg(z)};
+}
+
 } // Namespace multiprecision
 } // Namespace boost
 
