@@ -391,6 +391,8 @@ void test_pow()
     BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
 
     // Check other side of the cut
+    // MSVC 14.0 gets this wrong with float and double
+    #if !defined(_MSC_VER) || (_MSC_VER > 1900)
     BOOST_IF_CONSTEXPR (!std::is_same<T, cpp_dec_float_50>::value)
     {
         lhs = {T {-1}, -T {0}};
@@ -399,6 +401,7 @@ void test_pow()
         BOOST_TEST(test_equal(lhs.real(), rhs.real()));
         BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
     }
+    #endif
 }
 
 template <typename T>
