@@ -284,6 +284,12 @@ inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> lo
     return {log(abs(z)), arg(z)};
 }
 
+template <typename T, expression_template_option ET>
+inline BOOST_MP_CXX14_CONSTEXPR complex<boost::multiprecision::number<T, ET>> log10(const complex<boost::multiprecision::number<T, ET>>& z) noexcept
+{
+    return log(z) / log(boost::multiprecision::number<T, ET>{10});
+}
+
 } // Namespace multiprecision
 } // Namespace boost
 

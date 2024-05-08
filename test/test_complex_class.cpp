@@ -345,6 +345,20 @@ void test_scalar_division()
     BOOST_TEST_EQ(res_1.imag(), T{1});
 }
 
+template <typename T>
+void test_log10()
+{
+    using std::complex;
+    using std::polar;
+    using std::log10;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs {T{-100}, T{0}};
+    lhs = log10(lhs);
+    complex_scalar rhs {T{2}, static_cast<T>(1.36438)};
+    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+}
+
 int main()
 {
     test_construction<float>();
@@ -441,6 +455,11 @@ int main()
     test_scalar_division<double>();
     test_scalar_division<cpp_bin_float_50>();
     test_scalar_division<cpp_dec_float_50>();
+
+    test_log10<float>();
+    test_log10<double>();
+    test_log10<cpp_bin_float_50>();
+    test_log10<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
