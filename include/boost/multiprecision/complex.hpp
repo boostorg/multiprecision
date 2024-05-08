@@ -42,49 +42,72 @@ public:
     BOOST_MP_CXX14_CONSTEXPR complex operator+() const { return *this; }
     BOOST_MP_CXX14_CONSTEXPR complex operator-() const { return {-real_, -imag_}; }
 
-    BOOST_MP_CXX14_CONSTEXPR complex operator+(const complex& rhs) noexcept
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator+(const complex& lhs, const complex& rhs) noexcept
     {
-        return {real_ + rhs.real_, imag_ + rhs.imag_};
+        return {lhs.real_ + rhs.real_, lhs.imag_ + rhs.imag_};
     }
 
-    BOOST_MP_CXX14_CONSTEXPR complex operator+(const T& rhs) noexcept
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator+(const complex& lhs, const T& rhs) noexcept
     {
-        return {real_ + rhs, imag_};
+        return {lhs.real_ + rhs, lhs.imag_};
     }
 
-    BOOST_MP_CXX14_CONSTEXPR complex operator-(const complex& rhs) noexcept
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator+(const T& lhs, const complex& rhs) noexcept
     {
-        return {real_ - rhs.real_, imag_ - rhs.imag_};
+        return {lhs + rhs.real_, rhs.imag_};
     }
 
-    BOOST_MP_CXX14_CONSTEXPR complex operator-(const T& rhs) noexcept
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator-(const complex& lhs, const complex& rhs) noexcept
     {
-        return {real_ - rhs, imag_};
+        return {lhs.real_ - rhs.real_, lhs.imag_ - rhs.imag_};
     }
 
-    BOOST_MP_CXX14_CONSTEXPR complex operator*(const complex& rhs) noexcept
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator-(const complex& lhs, const T& rhs) noexcept
     {
-        return {real_ * rhs.real_ - imag_ * rhs.imag_, imag_ * rhs.real_ + real_ * rhs.imag_};
+        return {lhs.real_ - rhs, lhs.imag_};
     }
 
-    BOOST_MP_CXX14_CONSTEXPR complex operator*(const T& rhs) noexcept
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator-(const T& lhs, const complex& rhs) noexcept
     {
-        return {real_ * rhs, imag_ * rhs};
+        return {lhs - rhs.real_, -rhs.imag_};
     }
 
-    BOOST_MP_CXX14_CONSTEXPR complex operator/(const complex& rhs) noexcept
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator*(const complex& lhs, const complex& rhs) noexcept
+    {
+        return {lhs.real_ * rhs.real_ - lhs.imag_ * rhs.imag_, lhs.imag_ * rhs.real_ + lhs.real_ * rhs.imag_};
+    }
+
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator*(const complex& lhs, const T& rhs) noexcept
+    {
+        return {lhs.real_ * rhs, lhs.imag_ * rhs};
+    }
+
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator*(const T& lhs, const complex& rhs) noexcept
+    {
+        return {lhs * rhs.real_, lhs * rhs.imag_};
+    }
+
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator/(const complex& lhs, const complex& rhs) noexcept
     {
         const T divisor = rhs.real_ * rhs.real_ + rhs.imag_ * rhs.imag_;
-        const T real_part = (real_ * rhs.real_ + imag_ * rhs.imag_) / divisor;
-        const T imag_part = (imag_ * rhs.real_ - real_ * rhs.imag_) / divisor;
+        const T real_part = (lhs.real_ * rhs.real_ + lhs.imag_ * rhs.imag_) / divisor;
+        const T imag_part = (lhs.imag_ * rhs.real_ - lhs.real_ * rhs.imag_) / divisor;
         return {real_part, imag_part};
     }
 
-    BOOST_MP_CXX14_CONSTEXPR complex operator/(const T& rhs) noexcept
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator/(const complex& lhs, const T& rhs) noexcept
     {
         const T divisor = rhs * rhs;
-        const T real_part = (real_ * rhs) / divisor;
-        const T imag_part = (imag_ * rhs) / divisor;
+        const T real_part = (lhs.real_ * rhs) / divisor;
+        const T imag_part = (lhs.imag_ * rhs) / divisor;
+        return {real_part, imag_part};
+    }
+
+    friend BOOST_MP_CXX14_CONSTEXPR complex operator/(const T& lhs, const complex& rhs) noexcept
+    {
+        const T divisor = rhs.real_ * rhs.real_ + rhs.imag_ * rhs.imag_;
+        const T real_part = (lhs * rhs.real_) / divisor;
+        const T imag_part = -(lhs.real_ * rhs.imag_) / divisor;
         return {real_part, imag_part};
     }
 
