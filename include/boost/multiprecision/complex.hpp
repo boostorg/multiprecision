@@ -47,14 +47,29 @@ public:
         return {real_ + rhs.real_, imag_ + rhs.imag_};
     }
 
+    BOOST_MP_CXX14_CONSTEXPR complex operator+(const T& rhs) noexcept
+    {
+        return {real_ + rhs, imag_};
+    }
+
     BOOST_MP_CXX14_CONSTEXPR complex operator-(const complex& rhs) noexcept
     {
         return {real_ - rhs.real_, imag_ - rhs.imag_};
     }
 
+    BOOST_MP_CXX14_CONSTEXPR complex operator-(const T& rhs) noexcept
+    {
+        return {real_ - rhs, imag_};
+    }
+
     BOOST_MP_CXX14_CONSTEXPR complex operator*(const complex& rhs) noexcept
     {
         return {real_ * rhs.real_ - imag_ * rhs.imag_, imag_ * rhs.real_ + real_ * rhs.imag_};
+    }
+
+    BOOST_MP_CXX14_CONSTEXPR complex operator*(const T& rhs) noexcept
+    {
+        return {real_ * rhs, imag_ * rhs};
     }
 
     BOOST_MP_CXX14_CONSTEXPR complex operator/(const complex& rhs) noexcept
@@ -65,7 +80,21 @@ public:
         return {real_part, imag_part};
     }
 
+    BOOST_MP_CXX14_CONSTEXPR complex operator/(const T& rhs) noexcept
+    {
+        const T divisor = rhs * rhs;
+        const T real_part = (real_ * rhs) / divisor;
+        const T imag_part = (imag_ * rhs) / divisor;
+        return {real_part, imag_part};
+    }
+
     BOOST_MP_CXX14_CONSTEXPR complex& operator+=(const complex& rhs) noexcept
+    {
+        *this = *this + rhs;
+        return *this;
+    }
+
+    BOOST_MP_CXX14_CONSTEXPR complex& operator+=(const T& rhs) noexcept
     {
         *this = *this + rhs;
         return *this;
@@ -77,13 +106,31 @@ public:
         return *this;
     }
 
+    BOOST_MP_CXX14_CONSTEXPR complex& operator-=(const T& rhs) noexcept
+    {
+        *this = *this - rhs;
+        return *this;
+    }
+
     BOOST_MP_CXX14_CONSTEXPR complex& operator*=(const complex& rhs) noexcept
     {
         *this = *this * rhs;
         return *this;
     }
 
+    BOOST_MP_CXX14_CONSTEXPR complex& operator*=(const T& rhs) noexcept
+    {
+        *this = *this * rhs;
+        return *this;
+    }
+
     BOOST_MP_CXX14_CONSTEXPR complex& operator/=(const complex& rhs) noexcept
+    {
+        *this = *this / rhs;
+        return *this;
+    }
+
+    BOOST_MP_CXX14_CONSTEXPR complex& operator/=(const T& rhs) noexcept
     {
         *this = *this / rhs;
         return *this;

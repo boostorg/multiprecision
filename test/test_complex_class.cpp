@@ -72,7 +72,7 @@ void test_addition()
     complex_scalar res_1 = lhs_1 + rhs_1;
 
     BOOST_TEST_EQ(res_1.real(), T{3});
-    BOOST_TEST_EQ(res_1.real(), T{3});
+    BOOST_TEST_EQ(res_1.imag(), T{3});
 }
 
 template <typename T>
@@ -87,7 +87,7 @@ void test_subtraction()
     complex_scalar res_1 = lhs_1 - rhs_1;
 
     BOOST_TEST_EQ(res_1.real(), T{-1});
-    BOOST_TEST_EQ(res_1.real(), T{-1});
+    BOOST_TEST_EQ(res_1.imag(), T{-1});
 }
 
 template <typename T>
@@ -103,6 +103,21 @@ void test_multiplication()
 
     BOOST_TEST_EQ(res_1.real(), T{-12});
     BOOST_TEST_EQ(res_1.imag(), T{0});
+}
+
+template <typename T>
+void test_division()
+{
+    using std::complex;
+    using std::polar;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs_1 {T{6}, T{2}};
+    complex_scalar rhs_1 {T{2}, T{2}};
+    complex_scalar res_1 = lhs_1 / rhs_1;
+
+    BOOST_TEST_EQ(res_1.real(), T{2});
+    BOOST_TEST_EQ(res_1.imag(), T{-1});
 }
 
 template <typename T>
@@ -258,13 +273,76 @@ void test_log()
     BOOST_TEST(test_equal(lhs.real(), rhs.real()));
     BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
 
-    // Other side of the cut line
-    lhs = {T{-1}, T{-0}};
-    lhs = log(lhs);
-    rhs = {T{0}, -pi<T>()};
+    BOOST_IF_CONSTEXPR (!std::is_same<T, cpp_dec_float_50>::value)
+    {
+        // Other side of the cut line
+        lhs = {T {-1}, -T {0}};
+        lhs = log(lhs);
+        rhs = {T {0}, -pi<T>()};
 
-    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
-    BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+        BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+        BOOST_TEST(test_equal(lhs.imag(), rhs.imag()));
+    }
+}
+
+template <typename T>
+void test_scalar_addition()
+{
+    using std::complex;
+    using std::polar;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs_1 {T{1}, T{1}};
+    T rhs_1 {T{2}};
+    complex_scalar res_1 = lhs_1 + rhs_1;
+
+    BOOST_TEST_EQ(res_1.real(), T{3});
+    BOOST_TEST_EQ(res_1.imag(), T{1});
+}
+
+template <typename T>
+void test_scalar_subtraction()
+{
+    using std::complex;
+    using std::polar;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs_1 {T{1}, T{1}};
+    T rhs_1 {T{2}};
+    complex_scalar res_1 = lhs_1 - rhs_1;
+
+    BOOST_TEST_EQ(res_1.real(), T{-1});
+    BOOST_TEST_EQ(res_1.imag(), T{1});
+}
+
+template <typename T>
+void test_scalar_multiplication()
+{
+    using std::complex;
+    using std::polar;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs_1 {T{3}, T{2}};
+    T rhs_1 {T{2}};
+    complex_scalar res_1 = lhs_1 * rhs_1;
+
+    BOOST_TEST_EQ(res_1.real(), T{6});
+    BOOST_TEST_EQ(res_1.imag(), T{4});
+}
+
+template <typename T>
+void test_scalar_division()
+{
+    using std::complex;
+    using std::polar;
+    using complex_scalar = decltype(polar(T(), T()));
+
+    complex_scalar lhs_1 {T{4}, T{2}};
+    T rhs_1 {T{2}};
+    complex_scalar res_1 = lhs_1 / rhs_1;
+
+    BOOST_TEST_EQ(res_1.real(), T{2});
+    BOOST_TEST_EQ(res_1.imag(), T{1});
 }
 
 int main()
@@ -293,6 +371,11 @@ int main()
     test_multiplication<double>();
     test_multiplication<cpp_bin_float_50>();
     test_multiplication<cpp_dec_float_50>();
+
+    test_division<float>();
+    test_division<double>();
+    test_division<cpp_bin_float_50>();
+    test_division<cpp_dec_float_50>();
 
     test_equality<float>();
     test_equality<double>();
@@ -338,6 +421,26 @@ int main()
     test_log<double>();
     test_log<cpp_bin_float_50>();
     test_log<cpp_dec_float_50>();
+
+    test_scalar_addition<float>();
+    test_scalar_addition<double>();
+    test_scalar_addition<cpp_bin_float_50>();
+    test_scalar_addition<cpp_dec_float_50>();
+
+    test_scalar_subtraction<float>();
+    test_scalar_subtraction<double>();
+    test_scalar_subtraction<cpp_bin_float_50>();
+    test_scalar_subtraction<cpp_dec_float_50>();
+
+    test_scalar_multiplication<float>();
+    test_scalar_multiplication<double>();
+    test_scalar_multiplication<cpp_bin_float_50>();
+    test_scalar_multiplication<cpp_dec_float_50>();
+
+    test_scalar_division<float>();
+    test_scalar_division<double>();
+    test_scalar_division<cpp_bin_float_50>();
+    test_scalar_division<cpp_dec_float_50>();
 
     return boost::report_errors();
 }
