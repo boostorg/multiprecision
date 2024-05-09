@@ -628,6 +628,123 @@ inline std::complex<boost::multiprecision::number<T, ET>> proj(const std::comple
     return {proj(z.data())};
 }
 
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> exp(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {exp(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> log(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {log(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> log10(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {log10(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline  std::complex<boost::multiprecision::number<T, ET>> pow(const std::complex<boost::multiprecision::number<T, ET>>& x,
+                                                               const std::complex<boost::multiprecision::number<T, ET>>& y)
+{
+    return {pow(x.data(), y.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> pow(const boost::multiprecision::number<T, ET>& x,
+                                                              const std::complex<boost::multiprecision::number<T, ET>>& y)
+{
+    return {pow(x, y.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> pow(const std::complex<boost::multiprecision::number<T, ET>>& x,
+                                                              const boost::multiprecision::number<T, ET>& y)
+{
+    return {pow(x.data(), y)};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> sqrt(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {sqrt(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> sin(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {sin(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> cos(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {cos(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> tan(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {tan(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> asin(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {asin(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> acos(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {acos(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> atan(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {atan(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> sinh(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {sinh(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> cosh(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {cosh(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> tanh(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {tanh(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> asinh(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {asinh(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> acosh(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {acosh(z.data())};
+}
+
+template <typename T, expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> atanh(const std::complex<boost::multiprecision::number<T, ET>>& z)
+{
+    return {atanh(z.data())};
+}
+
 } // namespace MP
 } // namespace boost
 

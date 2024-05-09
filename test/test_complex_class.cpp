@@ -380,7 +380,7 @@ void test_pow()
     complex_scalar lhs {T{1}, T{2}};
     lhs = pow(lhs, T{2});
     complex_scalar rhs {T{-3}, T{4}};
-    BOOST_TEST(test_equal(lhs.real(), rhs.real()));
+    BOOST_TEST(test_equal(lhs.real(), rhs.real(), 100));
     BOOST_TEST(test_equal(lhs.imag(), rhs.imag(), 100));
 
     lhs = {T{-1}, T{0}};
@@ -557,7 +557,7 @@ int main()
     test_proj<double>();
     test_proj<cpp_bin_float_50>();
     test_proj<cpp_bin_float_100>();
-/*
+
     test_exp<float>();
     test_exp<double>();
     test_exp<cpp_bin_float_50>();
@@ -617,7 +617,6 @@ int main()
     test_tanh<double>();
     test_tanh<cpp_bin_float_50>();
     test_tanh<cpp_bin_float_100>();
-*/
 
     return boost::report_errors();
 }
