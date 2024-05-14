@@ -36,7 +36,6 @@ template <typename T>
 void test_construction()
 {
     using std::complex;
-    using std::polar;
     using complex_scalar = std::complex<T>;
     std::cerr << typeid(complex_scalar).name() << std::endl;
 
@@ -51,13 +50,20 @@ void test_construction()
     complex_scalar v2 {T{2}, T{2}};
     BOOST_TEST_EQ(v2.real(), T{2});
     BOOST_TEST_EQ(v2.imag(), T{2});
+
+    if constexpr(boost::multiprecision::is_number<T>::value)
+    {
+       complex_scalar v3 = std::polar(T(1), T(2));
+       complex_scalar v4 = boost::multiprecision::polar(T(1), T(2));
+       BOOST_TEST_EQ(v3.real(), v4.real());
+       BOOST_TEST_EQ(v3.imag(), v4.imag());
+    }
 }
 
 template <typename T>
 void test_unary_operators()
 {
     using std::complex;
-    using std::polar;
     using complex_scalar = std::complex<T>;
 
     const complex_scalar val {T{2}, T{-2}};
@@ -74,7 +80,6 @@ template <typename T>
 void test_addition()
 {
     using std::complex;
-    using std::polar;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs_1 {T{1}, T{1}};
@@ -89,7 +94,6 @@ template <typename T>
 void test_subtraction()
 {
     using std::complex;
-    using std::polar;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs_1 {T{1}, T{1}};
@@ -104,7 +108,6 @@ template <typename T>
 void test_multiplication()
 {
     using std::complex;
-    using std::polar;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs_1 {T{-3}, T{3}};
@@ -119,7 +122,6 @@ template <typename T>
 void test_division()
 {
     using std::complex;
-    using std::polar;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs_1 {T{6}, T{2}};
@@ -134,7 +136,6 @@ template <typename T>
 void test_equality()
 {
     using std::complex;
-    using std::polar;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs {T{2}, T{-1}};
@@ -157,7 +158,6 @@ template <typename T>
 void test_non_member_real_imag()
 {
     using std::complex;
-    using std::polar;
     using std::real;
     using complex_scalar = std::complex<T>;
 
@@ -171,7 +171,6 @@ template <typename T>
 void test_abs()
 {
     using std::complex;
-    using std::polar;
     using std::abs;
     using complex_scalar = std::complex<T>;
 
@@ -184,7 +183,6 @@ template <typename T>
 void test_arg()
 {
     using std::complex;
-    using std::polar;
     using std::arg;
     using boost::math::constants::pi;
     using boost::math::constants::half_pi;
@@ -200,7 +198,6 @@ template <typename T>
 void test_norm()
 {
     using std::complex;
-    using std::polar;
     using std::norm;
     using complex_scalar = std::complex<T>;
 
@@ -213,7 +210,6 @@ template <typename T>
 void test_conj()
 {
     using std::complex;
-    using std::polar;
     using std::conj;
     using complex_scalar = std::complex<T>;
 
@@ -227,7 +223,6 @@ template <typename T>
 void test_proj()
 {
     using std::complex;
-    using std::polar;
     using std::proj;
     using complex_scalar = std::complex<T>;
 
@@ -247,7 +242,6 @@ template <typename T>
 void test_exp()
 {
     using std::complex;
-    using std::polar;
     using std::exp;
     using boost::math::constants::pi;
     using complex_scalar = std::complex<T>;
@@ -263,7 +257,6 @@ template <typename T>
 void test_log()
 {
     using std::complex;
-    using std::polar;
     using std::log;
     using boost::math::constants::half_pi;
     using boost::math::constants::pi;
@@ -299,7 +292,6 @@ template <typename T>
 void test_scalar_addition()
 {
     using std::complex;
-    using std::polar;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs_1 {T{1}, T{1}};
@@ -314,7 +306,6 @@ template <typename T>
 void test_scalar_subtraction()
 {
     using std::complex;
-    using std::polar;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs_1 {T{1}, T{1}};
@@ -329,7 +320,6 @@ template <typename T>
 void test_scalar_multiplication()
 {
     using std::complex;
-    using std::polar;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs_1 {T{3}, T{2}};
@@ -344,7 +334,6 @@ template <typename T>
 void test_scalar_division()
 {
     using std::complex;
-    using std::polar;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs_1 {T{4}, T{2}};
@@ -359,7 +348,6 @@ template <typename T>
 void test_log10()
 {
     using std::complex;
-    using std::polar;
     using std::log10;
     using complex_scalar = std::complex<T>;
 
@@ -373,7 +361,6 @@ template <typename T>
 void test_pow()
 {
     using std::complex;
-    using std::polar;
     using std::pow;
     using complex_scalar = std::complex<T>;
 
@@ -407,7 +394,6 @@ template <typename T>
 void test_sqrt()
 {
     using std::complex;
-    using std::polar;
     using std::sqrt;
     using complex_scalar = std::complex<T>;
 
@@ -432,8 +418,8 @@ template <typename T>
 void test_sinh()
 {
     using std::complex;
-    using std::polar;
     using std::sinh;
+    using std::sin;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs {T{1}, T{0}};
@@ -453,8 +439,8 @@ template <typename T>
 void test_cosh()
 {
     using std::complex;
-    using std::polar;
-    using std::sinh;
+    using std::cosh;
+    using std::cos;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs {T{1}, T{0}};
@@ -474,8 +460,8 @@ template <typename T>
 void test_tanh()
 {
     using std::complex;
-    using std::polar;
-    using std::sinh;
+    using std::tanh;
+    using std::tan;
     using complex_scalar = std::complex<T>;
 
     complex_scalar lhs {T{1}, T{0}};

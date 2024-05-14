@@ -373,7 +373,7 @@ class complex<boost::multiprecision::number<T, ET>>
 private:
     using float_type = boost::multiprecision::number<T, ET>;
     using self_type = complex<boost::multiprecision::number<T, ET>>;
-    using complex_type = decltype(polar(std::declval<boost::multiprecision::number<T, ET>>(), std::declval<boost::multiprecision::number<T, ET>>()));
+    using complex_type = decltype(boost::multiprecision::polar(std::declval<boost::multiprecision::number<T, ET>>(), std::declval<boost::multiprecision::number<T, ET>>()));
 
     complex_type m_data_;
 
@@ -580,6 +580,12 @@ public:
         return is;
     }
 };
+
+template <typename T, boost::multiprecision::expression_template_option ET>
+inline std::complex<boost::multiprecision::number<T, ET>> polar(const boost::multiprecision::number<T, ET>& a, const boost::multiprecision::number<T, ET>& b)
+{
+   return { boost::multiprecision::polar(a, b) };
+}
 
 } // namespace std
 
