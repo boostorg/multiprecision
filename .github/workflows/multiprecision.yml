@@ -435,49 +435,6 @@ jobs:
       - name: b2 config
         run: cat bin.v2/config.log
         working-directory: ../boost-root/
-  windows_msvc_14_0:
-    runs-on: windows-2019
-    defaults:
-      run:
-        shell: cmd
-    env:
-      ARGS: toolset=${{ matrix.toolset }} address-model=64 cxxstd=${{ matrix.standard }}
-    strategy:
-      fail-fast: false
-      matrix:
-        toolset: [ msvc-14.0 ]
-        standard: [ 14, latest ]
-        suite: [ github_ci_block_1, github_ci_block_2 ]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: '0'
-      - name: Checkout main boost
-        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
-      - name: Update tools/boostdep
-        run: git submodule update --init tools/boostdep
-        working-directory: ../boost-root
-      - name: Copy files
-        run: xcopy /s /e /q %GITHUB_WORKSPACE% libs\multiprecision
-        working-directory: ../boost-root
-      - name: Install deps
-        run: python tools/boostdep/depinst/depinst.py multiprecision
-        working-directory: ../boost-root
-      - name: Bootstrap
-        run: bootstrap
-        working-directory: ../boost-root
-      - name: Generate headers
-        run: b2 headers
-        working-directory: ../boost-root
-      - name: Config Info
-        run: ..\..\..\b2 print_config_info print_math_info %ARGS%
-        working-directory: ../boost-root/libs/config/test
-      - name: Test
-        run: ..\..\..\b2 -j2 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
-        working-directory: ../boost-root/libs/multiprecision/test
-      - name: b2 config
-        run: cat bin.v2/config.log
-        working-directory: ../boost-root/
   windows_msvc_14_2:
     runs-on: windows-2019
     defaults:
