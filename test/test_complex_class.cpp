@@ -51,7 +51,7 @@ void test_construction()
     BOOST_TEST_EQ(v2.real(), T{2});
     BOOST_TEST_EQ(v2.imag(), T{2});
 
-    if constexpr(boost::multiprecision::is_number<T>::value)
+    BOOST_IF_CONSTEXPR (boost::multiprecision::is_number<T>::value)
     {
        complex_scalar v3 = std::polar(T(1), T(2));
        complex_scalar v4 = boost::multiprecision::polar(T(1), T(2));
