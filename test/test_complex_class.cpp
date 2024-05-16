@@ -32,7 +32,27 @@ bool test_equal(T lhs, T rhs, int tol = 10) noexcept
     return res;
 }
 
-template <typename T>
+template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+void test_construction()
+{
+    using std::complex;
+    using complex_scalar = std::complex<T>;
+    std::cerr << typeid(complex_scalar).name() << std::endl;
+
+    complex_scalar v {};
+    BOOST_TEST_EQ(v.real(), T{0});
+    BOOST_TEST_EQ(v.imag(), T{0});
+
+    complex_scalar v1 {T{1}};
+    BOOST_TEST_EQ(v1.real(), T{1});
+    BOOST_TEST_EQ(v1.imag(), T{0});
+
+    complex_scalar v2 {T{2}, T{2}};
+    BOOST_TEST_EQ(v2.real(), T{2});
+    BOOST_TEST_EQ(v2.imag(), T{2});
+}
+
+template <typename T, std::enable_if_t<!std::is_floating_point<T>::value, bool> = true>
 void test_construction()
 {
     using std::complex;
@@ -51,13 +71,10 @@ void test_construction()
     BOOST_TEST_EQ(v2.real(), T{2});
     BOOST_TEST_EQ(v2.imag(), T{2});
 
-    BOOST_IF_CONSTEXPR (boost::multiprecision::is_number<T>::value)
-    {
-       complex_scalar v3 = std::polar(T(1), T(2));
-       complex_scalar v4 = boost::multiprecision::polar(T(1), T(2));
-       BOOST_TEST_EQ(v3.real(), v4.real());
-       BOOST_TEST_EQ(v3.imag(), v4.imag());
-    }
+   complex_scalar v3 = std::polar(T(1), T(2));
+   complex_scalar v4 = boost::multiprecision::polar(T(1), T(2));
+   BOOST_TEST_EQ(v3.real(), v4.real());
+   BOOST_TEST_EQ(v3.imag(), v4.imag());
 }
 
 template <typename T>
