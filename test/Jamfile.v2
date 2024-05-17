@@ -1266,6 +1266,7 @@ test-suite misc :
       # Eigen interoperability:
       #
       [ run test_eigen_interop_cpp_int.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
+      [ run boost_math_issue_1131.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
       [ run test_eigen_interop_cpp_dec_float.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
       [ run test_eigen_interop_cpp_dec_float_2.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
       [ run test_eigen_interop_cpp_dec_float_3.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
