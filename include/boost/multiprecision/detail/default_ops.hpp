@@ -4026,7 +4026,7 @@ template <class Backend, multiprecision::expression_template_option ExpressionTe
 inline multiprecision::number<Backend, ExpressionTemplates> sinhc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x, const Policy& pol)
 {
    boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x, pol);
-   return boost::math::sinhc_pi(x, pol);
+   return detail::sinhc_pi_imp(x, pol);
 }
 
 using boost::multiprecision::gcd;
