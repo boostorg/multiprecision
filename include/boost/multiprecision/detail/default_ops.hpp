@@ -3981,24 +3981,17 @@ ilogb(const detail::expression<tag, A1, A2, A3, A4>& val)
 
 namespace math {
 
-using boost::multiprecision::gcd;
-using boost::multiprecision::lcm;
-
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
-} // namespace math
-
-namespace integer {
 
 //
 // Overload of Boost.Math functions that find the wrong overload when used with number:
 //
 namespace detail {
+
 template <class T>
 T sinc_pi_imp(T);
 template <class T, class Policy>
 T sinhc_pi_imp(T, const Policy&);
+
 } // namespace detail
 
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
@@ -4028,6 +4021,16 @@ inline multiprecision::number<Backend, ExpressionTemplates> sinhc_pi(const multi
    boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x, pol);
    return detail::sinhc_pi_imp(x, pol);
 }
+
+using boost::multiprecision::gcd;
+using boost::multiprecision::lcm;
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
+} // namespace math
+
+namespace integer {
 
 using boost::multiprecision::gcd;
 using boost::multiprecision::lcm;
