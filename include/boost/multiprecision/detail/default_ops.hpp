@@ -3991,6 +3991,44 @@ using boost::multiprecision::lcm;
 
 namespace integer {
 
+//
+// Overload of Boost.Math functions that find the wrong overload when used with number:
+//
+namespace detail {
+template <class T>
+T sinc_pi_imp(T);
+template <class T, class Policy>
+T sinhc_pi_imp(T, const Policy&);
+} // namespace detail
+
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline multiprecision::number<Backend, ExpressionTemplates> sinc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x)
+{
+   boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x);
+   return detail::sinc_pi_imp(x);
+}
+
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates, class Policy>
+inline multiprecision::number<Backend, ExpressionTemplates> sinc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x, const Policy&)
+{
+   boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x);
+   return detail::sinc_pi_imp(x);
+}
+
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline multiprecision::number<Backend, ExpressionTemplates> sinhc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x)
+{
+   boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x);
+   return detail::sinhc_pi_imp(x, boost::math::policies::policy<>());
+}
+
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates, class Policy>
+inline multiprecision::number<Backend, ExpressionTemplates> sinhc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x, const Policy& pol)
+{
+   boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x, pol);
+   return boost::math::sinhc_pi(x, pol);
+}
+
 using boost::multiprecision::gcd;
 using boost::multiprecision::lcm;
 
