@@ -668,7 +668,7 @@ eval_modulus(
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
     V o)
 {
-   using local_limb_type = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type;
+   using local_limb_type = typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type;
 
    BOOST_IF_CONSTEXPR(std::numeric_limits<V>::digits > MaxBits1)
    {
