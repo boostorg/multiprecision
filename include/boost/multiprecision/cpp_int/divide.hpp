@@ -672,8 +672,10 @@ eval_modulus(
 
    BOOST_IF_CONSTEXPR(std::numeric_limits<V>::digits > MaxBits1)
    {
-      if (o > (static_cast<V>(1u) << std::numeric_limits<local_limb_type>::digits))
+      if (o >= (static_cast<V>(1u) << MaxBits1))
       {
+         // Modulus is larger than any value that the result can hold,
+         // so the result is just "a":
          result = a;
          return;
       }
