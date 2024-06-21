@@ -695,7 +695,7 @@ eval_modulus(
     V o)
 {
    using unsigned_type = typename std::make_unsigned<V>::type;
-   eval_modulus(result, a, static_cast<unsigned_type>(std::abs(o)));
+   eval_modulus(result, a, static_cast<unsigned_type>(o < 0 ? -o : o));
 }
 
 }}} // namespace boost::multiprecision::backends
