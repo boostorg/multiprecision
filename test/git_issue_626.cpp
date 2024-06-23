@@ -35,13 +35,13 @@ template <unsigned int N>
 void test_overflow() {
    using uint_t = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N, N, boost::multiprecision::unsigned_magnitude, boost::multiprecision::cpp_int_check_type::checked, void>>;
 
-   uint_t value = std::numeric_limits<uint_t>::max();
+   uint_t value = (std::numeric_limits<uint_t>::max)();
    BOOST_CHECK_THROW(value += 1, std::overflow_error);
    //
    // We don't care what the value is, but it must be sane and normalized
    // to be within the range of the type under test:
    //
-   BOOST_CHECK(value <= std::numeric_limits<uint_t>::max());
+   BOOST_CHECK(value <= (std::numeric_limits<uint_t>::max)());
 }
 
 template <unsigned int N>
