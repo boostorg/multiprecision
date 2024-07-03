@@ -8,7 +8,7 @@ Boost Multiprecision Library
 | Codecov          | [![codecov](https://codecov.io/gh/boostorg/multiprecision/branch/master/graph/badge.svg)](https://codecov.io/gh/boostorg/multiprecision/branch/master)             | [![codecov](https://codecov.io/gh/boostorg/multiprecision/branch/develop/graph/badge.svg)](https://codecov.io/gh/boostorg/multiprecision/branch/develop) |
 
 
-The `Boost.Multiprecision` is a C++ library that provides integer, rational, floating-point, complex and interval number types
+`Boost.Multiprecision` is a C++ library that provides integer, rational, floating-point, complex and interval number types
 having more range and precision than the language's ordinary built-in types.
 
 Language adherence:
