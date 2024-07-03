@@ -17,7 +17,7 @@ Language adherence:
 
 The big number types in `Boost.Multiprecision` can be used with a wide selection of basic
 mathematical operations, elementary transcendental functions as well as the functions in Boost.Math. The Multiprecision types can
-also interoperate with the built-in types in C++ using clearly defined conversion rules. This allows Boost.Multiprecision to be
+also interoperate with the built-in types in C++ using clearly defined conversion rules. This allows `Boost.Multiprecision` to be
 used for all kinds of mathematical calculations involving integer, rational and floating-point types requiring extended range and precision.
 
 Multiprecision consists of a generic interface to the mathematics of large numbers as well as a selection of big number back ends, with
@@ -114,7 +114,7 @@ Clone the whole boost project, which includes the individual Boost projects as s
 The Boost Multiprecision Library is located in `libs/multiprecision/`.
 
 ### Running tests ###
-First, build the B2 engine by running `bootstrap.sh` in the root of the boost directory. This will generate B2 configuration in `project-config.jam`.
+First, build the `b2` engine by running `bootstrap.sh` in the root of the boost directory. This will generate `b2` configuration in `project-config.jam`.
 
 ```sh
   ./bootstrap.sh
