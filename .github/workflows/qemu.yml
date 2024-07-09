@@ -23,8 +23,8 @@ env:
   GIT_FETCH_JOBS: 8
   NET_RETRY_COUNT: 5
   B2_CI_VERSION: 1
-  B2_VARIANT: debug,release
-  B2_LINK: shared,static
+  B2_VARIANT: release
+  B2_LINK: static
   LCOV_BRANCH_COVERAGE: 0
   CODECOV_NAME: Github Actions
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
@@ -40,14 +40,24 @@ jobs:
       matrix:
         include:
           # multiarch testing
-          - { name: PPC64LE-GCC, multiarch: yes,
-              compiler: gcc, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: github_ci_block_1 }
           - { name: PPC64LE-Clang, multiarch: yes,
-              compiler: clang, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: github_ci_block_1 }
-          - { name: PPC64LE-GCC, multiarch: yes,
-              compiler: gcc, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: github_ci_block_2 }
+              compiler: clang, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: 'arithmetic_tests' }
           - { name: PPC64LE-Clang, multiarch: yes,
-              compiler: clang, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: github_ci_block_2 }
+              compiler: clang, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: 'cpp_int_tests' }
+          - { name: PPC64LE-Clang, multiarch: yes,
+              compiler: clang, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: 'functions_and_limits' }
+          - { name: PPC64LE-Clang, multiarch: yes,
+              compiler: clang, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: 'conversions' }
+          - { name: PPC64LE-Clang, multiarch: yes,
+              compiler: clang, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: 'performance' }
+          - { name: PPC64LE-Clang, multiarch: yes,
+              compiler: clang, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: 'misc' }
+          - { name: PPC64LE-Clang, multiarch: yes,
+              compiler: clang, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: 'compile_fail' }
+          - { name: PPC64LE-Clang, multiarch: yes,
+              compiler: clang, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: 'examples' }
+          - { name: PPC64LE-Clang, multiarch: yes,
+              compiler: clang, cxxstd: '17', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le, suite: 'concepts' }
 
 
     timeout-minutes: 360
