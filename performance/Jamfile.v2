@@ -35,7 +35,7 @@ project : requirements
    <debug-symbols>off
    <define>NDEBUG=1
    <library>/boost/chrono//boost_chrono
-   <source>/boost/math//testing
+   <library>/boost/math//testing
    : default-build release
    ;
 
