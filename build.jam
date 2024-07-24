@@ -5,22 +5,24 @@
 
 require-b2 5.2 ;
 
+constant boost_dependencies :
+    /boost/assert//boost_assert
+    /boost/config//boost_config
+    /boost/core//boost_core
+    /boost/integer//boost_integer
+    /boost/lexical_cast//boost_lexical_cast
+    /boost/math//boost_math
+    /boost/predef//boost_predef
+    /boost/random//boost_random
+    /boost/throw_exception//boost_throw_exception ;
+
 project /boost/multiprecision
     : common-requirements
-        <library>/boost/assert//boost_assert
-        <library>/boost/config//boost_config
-        <library>/boost/core//boost_core
-        <library>/boost/integer//boost_integer
-        <library>/boost/lexical_cast//boost_lexical_cast
-        <library>/boost/math//boost_math
-        <library>/boost/predef//boost_predef
-        <library>/boost/random//boost_random
-        <library>/boost/throw_exception//boost_throw_exception
         <include>include
     ;
 
 explicit
-    [ alias boost_multiprecision ]
+    [ alias boost_multiprecision : : : : <library>$(boost_dependencies) ]
     [ alias all : boost_multiprecision test ]
     ;
 
@@ -28,3 +30,4 @@ call-if : boost-library multiprecision
     ;
 
 use-project /boost/multiprecision/config : config ;
+
