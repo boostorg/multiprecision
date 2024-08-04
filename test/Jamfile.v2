@@ -44,6 +44,7 @@ local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 path-constant here : . ;
 
 project : requirements
+   <library>/boost/multiprecision//boost_multiprecision
    <include>.
    <include>$(gmp_path)
    <include>$(gmp_path)/mpfr
