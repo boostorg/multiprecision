@@ -70,8 +70,8 @@ and have full `std::numeric_limits` support:
    std::cout << "std::numeric_limits<>::is_iec559 = " << std::numeric_limits<float128>::is_iec559 << std::endl;
    std::cout << "std::numeric_limits<>::traps = " << std::numeric_limits<float128>::traps << std::endl;
    std::cout << "std::numeric_limits<>::tinyness_before = " << std::numeric_limits<float128>::tinyness_before << std::endl;
-   std::cout << "std::numeric_limits<>::max() = " << std::numeric_limits<float128>::max() << std::endl;
-   std::cout << "std::numeric_limits<>::min() = " << std::numeric_limits<float128>::min() << std::endl;
+   std::cout << "std::numeric_limits<>::max() = " << (std::numeric_limits<float128>::max)() << std::endl;
+   std::cout << "std::numeric_limits<>::min() = " << (std::numeric_limits<float128>::min)() << std::endl;
    std::cout << "std::numeric_limits<>::lowest() = " << std::numeric_limits<float128>::lowest() << std::endl;
    std::cout << "std::numeric_limits<>::min_exponent = " << std::numeric_limits<float128>::min_exponent << std::endl;
    std::cout << "std::numeric_limits<>::max_exponent = " << std::numeric_limits<float128>::max_exponent << std::endl;
