@@ -3,9 +3,11 @@
 # (See accompanying file LICENSE_1_0.txt or copy at 
 # http://www.boost.org/LICENSE_1_0.txt.
 
+import-search /boost/config/checks ;
+
 import modules ;
 import path ;
-import ../../config/checks/config : requires ;
+import config : requires ;
 
 local gmp_path = [ modules.peek : GMP_PATH ] ;
 local mpfr_path = [ modules.peek : MPFR_PATH ] ;
@@ -20,7 +22,6 @@ project : requirements
    <include>$(mpfi_path)
    <include>$(mpfi_path)/src
    <include>$(tommath_path)
-   <include>../../.. 
    <search>$(gmp_path) 
    <search>$(mpfr_path) 
    <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
@@ -37,13 +38,13 @@ project : requirements
    <toolset>gcc:<cxxflags>-Wextra
    ;
 
-lib gmp ;
-lib mpfr ;
-lib mpfi ;
-lib mpc ;
-lib quadmath ;
-lib tommath ;
-lib f2c ;
+searched-lib gmp : : <link>shared ;
+searched-lib mpfr : : <link>shared ;
+searched-lib mpfi : : <link>shared ;
+searched-lib mpc : : <link>shared ;
+searched-lib quadmath : : <link>shared ;
+searched-lib tommath : : <link>shared ;
+searched-lib f2c : : <link>shared ;
 
 actions mp_simple_run_action
 {
