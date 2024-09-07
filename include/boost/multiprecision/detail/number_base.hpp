@@ -1534,6 +1534,11 @@ struct number_category<number<Backend, ExpressionTemplates> > : public number_ca
 template <class tag, class A1, class A2, class A3, class A4>
 struct number_category<detail::expression<tag, A1, A2, A3, A4> > : public number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>
 {};
+#if defined(__SIZEOF_FLOAT128__)
+template <>
+struct number_category<__float128> : public std::integral_constant<int, number_kind_floating_point> {};
+#endif
+
 //
 // Specializations for types which do not always have numberic_limits specializations:
 //
