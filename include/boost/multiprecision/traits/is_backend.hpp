@@ -14,29 +14,59 @@ namespace boost { namespace multiprecision { namespace detail {
 template <class T>
 struct has_signed_types
 {
-   template <class U>
-   static double check(U*, typename U::signed_types* = nullptr);
-   static char   check(...);
-   static T* get();
-   static constexpr bool value = sizeof(check(get())) == sizeof(double);
+private:
+    template <class U>
+    static auto test(int) -> decltype(
+    typename U::signed_types(),
+            std::true_type()
+    );
+
+    template <class>
+    static auto test(...) -> std::false_type;
+
+public:
+    static constexpr bool value = std::is_same<
+            decltype(test<T>(0)),
+            std::true_type
+    >::value;
 };
 template <class T>
 struct has_unsigned_types
 {
-   template <class U>
-   static double check(U*, typename U::unsigned_types* = nullptr);
-   static char   check(...);
-   static T* get();
-   static constexpr bool value = sizeof(check(get())) == sizeof(double);
+private:
+    template <class U>
+    static auto test(int) -> decltype(
+    typename U::unsigned_types(),
+            std::true_type()
+    );
+
+    template <class>
+    static auto test(...) -> std::false_type;
+
+public:
+    static constexpr bool value = std::is_same<
+            decltype(test<T>(0)),
+            std::true_type
+    >::value;
 };
 template <class T>
 struct has_float_types
 {
-   template <class U>
-   static double check(U*, typename U::float_types* = nullptr);
-   static char   check(...);
-   static T* get();
-   static constexpr bool value = sizeof(check(get())) == sizeof(double);
+private:
+    template <class U>
+    static auto test(int) -> decltype(
+    typename U::float_types(),
+            std::true_type()
+    );
+
+    template <class>
+    static auto test(...) -> std::false_type;
+
+public:
+    static constexpr bool value = std::is_same<
+            decltype(test<T>(0)),
+            std::true_type
+    >::value;
 };
 
 template <class T>
