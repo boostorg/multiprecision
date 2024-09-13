@@ -5,7 +5,7 @@
 
 #include <boost/config.hpp>
 
-extern "C" __float128 sqrtq(__float128);
+#include <quadmath.h>
 
 int main()
 {
