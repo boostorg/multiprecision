@@ -206,7 +206,7 @@ test-suite arithmetic_tests :
 
    [ run test_arithmetic_mpfi_50.cpp mpfi mpfr gmp no_eh_support : : : [ check-target-builds ../config//has_mpfi : : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 
-   [ run test_arithmetic_float_128.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ]
+   [ run test_arithmetic_float_128.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_basic_float128 : : <build>no ] ]
    [ run test_arithmetic_float_128.cpp no_eh_support : : : [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] : test_arithmetic_intel_quad ]
 
    [ run test_arithmetic_mpc.cpp mpc mpfr gmp : : : [ check-target-builds ../config//has_mpc : : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]

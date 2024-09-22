@@ -9,6 +9,7 @@
 // Contains Quickbook markup in comments.
 
 //[float128_eg
+#include <boost/type_index.hpp>
 #include <boost/multiprecision/float128.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include <iostream>
@@ -53,7 +54,7 @@ and have full `std::numeric_limits` support:
    std::cout << "GCC " << __VERSION__ << std::endl << std::endl;
    std::cout << "Type name: boost::multiprecision::float128" << std::endl;
    std::cout << "Full name: " << boost::typeindex::type_id<float128>().pretty_name() << std::endl << std::endl;
-
+#if defined(__cpp_lib_type_trait_variable_templates) && (__cpp_lib_type_trait_variable_templates >= 201510L)
    std::cout << "std::is_fundamental<> = " << std::is_fundamental_v<float128> << std::endl;
    std::cout << "boost::multiprecision::detail::is_signed<> = " << boost::multiprecision::detail::is_signed_v<float128> << std::endl;
    std::cout << "boost::multiprecision::detail::is_unsigned<> = " << boost::multiprecision::detail::is_unsigned_v<float128> << std::endl;
@@ -64,6 +65,7 @@ and have full `std::numeric_limits` support:
    std::cout << "std::is_trivially_copyable<> = " << std::is_trivially_copyable_v<float128> << std::endl;
    std::cout << "std::is_standard_layout<> = " << std::is_standard_layout_v<float128> << std::endl;
    std::cout << "std::is_pod<> = " << std::is_pod_v<float128> << std::endl;
+#endif
    std::cout << "std::numeric_limits<>::is_exact = " << std::numeric_limits<float128>::is_exact << std::endl;
    std::cout << "std::numeric_limits<>::is_bounded = " << std::numeric_limits<float128>::is_bounded << std::endl;
    std::cout << "std::numeric_limits<>::is_modulo = " << std::numeric_limits<float128>::is_modulo << std::endl;
