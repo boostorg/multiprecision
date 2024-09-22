@@ -8,7 +8,7 @@
 #define TEST_UDT
 
 #include <boost/math/special_functions/math_fwd.hpp>
-#include "libs/math/test/test_gamma.hpp"
+#include "test_gamma.hpp"
 
 void expected_results()
 {
