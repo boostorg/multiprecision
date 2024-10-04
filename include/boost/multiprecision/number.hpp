@@ -16,6 +16,9 @@
 #include <boost/multiprecision/traits/is_convertible_arithmetic.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
+#ifndef BOOST_NO_CXX20_HDR_FORMAT
+#include <boost/multiprecision/detail/format.hpp>
+#endif
 #include <istream> // stream operators
 #include <cstdio>  // EOF
 #include <cctype>  // isspace
