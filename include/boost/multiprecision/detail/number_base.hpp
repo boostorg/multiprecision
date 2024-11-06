@@ -206,7 +206,7 @@ struct bits_of
                                               : sizeof(T) * CHAR_BIT - (boost::multiprecision::detail::is_signed<T>::value ? 1 : 0);
 };
 
-#if defined(_GLIBCXX_USE_FLOAT128) && defined(BOOST_GCC) && !defined(__STRICT_ANSI__)
+#if defined(_GLIBCXX_USE_FLOAT128) && defined(BOOST_GCC) && !defined(__STRICT_ANSI__) && !defined(__PGI)
 #define BOOST_MP_BITS_OF_FLOAT128_DEFINED
 template <>
 struct bits_of<float128_type>
