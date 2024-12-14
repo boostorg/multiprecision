@@ -150,10 +150,17 @@ template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 struct is_number_expression<detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > : public std::integral_constant<bool, true>
 {};
 
+namespace detail {
+template <class Val, class Backend>
+struct canonical;
+}
+
 template <class T, class Num>
 struct is_compatible_arithmetic_type
     : public std::integral_constant<bool, 
-          std::is_convertible<T, Num>::value && !std::is_same<T, Num>::value && !is_number_expression<T>::value>
+          std::is_convertible<T, Num>::value && !std::is_same<T, Num>::value && !is_number_expression<T>::value
+          && (std::is_constructible<typename Num::backend_type, typename detail::canonical<T, typename Num::backend_type>::type>::value 
+             || std::is_assignable<typename Num::backend_type, typename detail::canonical<T, typename Num::backend_type>::type>::value || is_number<T>::value || is_number_expression<T>::value)>
 {};
 
 namespace detail {
@@ -199,7 +206,7 @@ struct bits_of
                                               : sizeof(T) * CHAR_BIT - (boost::multiprecision::detail::is_signed<T>::value ? 1 : 0);
 };
 
-#if defined(_GLIBCXX_USE_FLOAT128) && defined(BOOST_GCC) && !defined(__STRICT_ANSI__)
+#if defined(_GLIBCXX_USE_FLOAT128) && defined(BOOST_GCC) && !defined(__STRICT_ANSI__) && !defined(__PGI)
 #define BOOST_MP_BITS_OF_FLOAT128_DEFINED
 template <>
 struct bits_of<float128_type>
@@ -1527,6 +1534,11 @@ struct number_category<number<Backend, ExpressionTemplates> > : public number_ca
 template <class tag, class A1, class A2, class A3, class A4>
 struct number_category<detail::expression<tag, A1, A2, A3, A4> > : public number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>
 {};
+#if defined(__SIZEOF_FLOAT128__) || defined(BOOST_HAS_FLOAT128)
+template <>
+struct number_category<__float128> : public std::integral_constant<int, number_kind_floating_point> {};
+#endif
+
 //
 // Specializations for types which do not always have numberic_limits specializations:
 //
@@ -1536,11 +1548,6 @@ struct number_category<boost::multiprecision::int128_type> : public std::integra
 {};
 template <>
 struct number_category<boost::multiprecision::uint128_type> : public std::integral_constant<int, number_kind_integer>
-{};
-#endif
-#ifdef BOOST_HAS_FLOAT128
-template <>
-struct number_category<boost::multiprecision::float128_type> : public std::integral_constant<int, number_kind_floating_point>
 {};
 #endif
 

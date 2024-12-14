@@ -9,7 +9,7 @@
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include "test.hpp"
 
 #include <boost/multiprecision/cpp_bin_float.hpp>

@@ -1099,6 +1099,7 @@ void eval_divide(rational_adaptor<Backend>& result, const rational_adaptor<Backe
    {
       if (&result != &a)
          result = a;
+      result.denom() = arg;
       return;
    }
 
@@ -1132,7 +1133,7 @@ void eval_divide(rational_adaptor<Backend>& result, const rational_adaptor<Backe
    }
 }
 template <class Backend>
-void eval_divide(rational_adaptor<Backend>& result, Backend arg)
+void eval_divide(rational_adaptor<Backend>& result, const Backend& arg)
 {
    eval_divide(result, result, arg);
 }

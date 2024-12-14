@@ -128,6 +128,7 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_cpp_bin_float_3.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_cpp_bin_float_4.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_cpp_bin_float_5.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
+   [ run test_arithmetic_cpp_bin_float_6.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] [ requires cxx17_if_constexpr ] ]
 
    [ run test_arithmetic_mpf_50.cpp gmp no_eh_support : : : [ check-target-builds ../config//has_gmp : : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_mpf.cpp gmp no_eh_support : : : [ check-target-builds ../config//has_gmp : : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
@@ -204,7 +205,7 @@ test-suite arithmetic_tests :
 
    [ run test_arithmetic_mpfi_50.cpp mpfi mpfr gmp no_eh_support : : : [ check-target-builds ../config//has_mpfi : : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 
-   [ run test_arithmetic_float_128.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ]
+   [ run test_arithmetic_float_128.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_basic_float128 : : <build>no ] ]
    [ run test_arithmetic_float_128.cpp no_eh_support : : : [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] : test_arithmetic_intel_quad ]
 
    [ run test_arithmetic_mpc.cpp mpc mpfr gmp : : : [ check-target-builds ../config//has_mpc : : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
@@ -734,6 +735,14 @@ test-suite conversions :
                release # Otherwise [ runtime is slow
               : test_float_io_cpp_dec_float ]
 
+      [ run test_float_io.cpp no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+              <define>TEST_CPP_DEC_FLOAT <define>BOOST_MP_STANDALONE
+               release # Otherwise [ runtime is slow
+              : test_float_io_cpp_dec_float_standalone ]
+
       [ run test_float_io.cpp gmp no_eh_support
               : # command line
               : # input files
@@ -1235,6 +1244,21 @@ test-suite misc :
       [ run git_issue_313.cpp ]
       [ run git_issue_488.cpp ]
       [ run git_issue_506.cpp ]
+      [ run git_issue_509.cpp : : : [ requires cpp_lib_bit_cast ] ]
+      [ run git_issue_526.cpp ]
+      [ run git_issue_540.cpp ]
+      [ run git_issue_573.cpp : : : <toolset>msvc:<cxxflags>-sdl ]
+      [ run git_issue_576.cpp : : : [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ] ]
+      [ run git_issue_595.cpp : : : [ check-target-builds ../config//has_mpfr : <source>gmp <source>mpfr : <build>no ] ]
+      [ run git_issue_604.cpp : : : [ check-target-builds ../config//has_mpfr : <source>gmp <source>mpfr <define>TEST_MPFR_50 ]
+                                    [ check-target-builds ../config//has_gmp : <source>gmp <define>TEST_MPF_50 ]
+                                    [ check-target-builds ../config//has_float128 : <source>quadmath <define>TEST_FLOAT128 ]
+                                    <define>TEST_CPP_DEC_FLOAT 
+                                    <define>TEST_CPP_BIN_FLOAT ]
+      [ compile git_issue_608.cpp ]
+      [ run git_issue_624.cpp ]
+      [ run git_issue_626.cpp ]
+      [ run git_issue_636.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath : <build>no ] ]
       [ compile git_issue_98.cpp : 
          [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
@@ -1273,6 +1297,7 @@ test-suite misc :
       [ run test_eigen_interop_gmp.cpp gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_gmp : : <build>no ] ]
       [ run test_eigen_interop_gmp_2.cpp gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_gmp : : <build>no ] ]
       [ run test_eigen_interop_mpc.cpp mpc mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpc : : <build>no ] ]
+      [ run test_eigen_interop_cpp_complex.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
       [ compile git_issue_393.cpp : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
 ;
 
