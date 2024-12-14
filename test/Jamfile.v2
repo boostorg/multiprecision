@@ -262,7 +262,7 @@ alias precision_tests : test_preserve_source_precision_gmp test_preserve_source_
 rule get_function_tests
 {
    local result ;
-   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_pow_df.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
+   for local source in test_log.cpp test_pow.cpp test_pow_df.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
    {
          result += [ run $(source) gmp no_eh_support
               : # command line
@@ -297,6 +297,12 @@ rule get_function_tests
               : # requirements
                <define>TEST_CPP_BIN_FLOAT
               : $(source:B)_cpp_bin_float ] ;
+         result += [ run $(source) no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+               <define>TEST_CPP_DOUBLE_FLOAT
+              : $(source:B)_cpp_double_fp ] ;
          result += [ run $(source) quadmath no_eh_support
               : # command line
               : # input files
