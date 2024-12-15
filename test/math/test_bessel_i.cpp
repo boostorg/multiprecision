@@ -33,6 +33,13 @@ void expected_results()
        ".*", // test function
        500,  // Max Peek error
        200); // Max mean error
+   add_expected_result(
+       ".*",                    // compiler
+       ".*",                    // stdlib
+       ".*",                    // platform
+       ".*cpp_double_double.*", // test type(s)
+       ".*",                    // test data group
+       ".*", 500000, 200000);   // test function
 
    //
    // Finish off by printing out the compiler/stdlib/platform names,
