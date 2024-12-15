@@ -30,7 +30,7 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/chrono.hpp>
 #include "test.hpp"
-#include <boost/array.hpp>
+#include <array>
 #include <iostream>
 #include <iomanip>
 

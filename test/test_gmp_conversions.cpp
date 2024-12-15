@@ -13,7 +13,7 @@
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include "test.hpp"
 
 #include <boost/multiprecision/gmp.hpp>

@@ -176,12 +176,9 @@ struct float128_backend
 
  public:
    constexpr   float128_backend() noexcept : m_value(0) {}
-   constexpr   float128_backend(const float128_backend& o) noexcept : m_value(o.m_value) {}
-   BOOST_MP_CXX14_CONSTEXPR float128_backend& operator=(const float128_backend& o) noexcept
-   {
-      m_value = o.m_value;
-      return *this;
-   }
+   constexpr   float128_backend(const float128_backend& o) noexcept = default;
+   BOOST_MP_CXX14_CONSTEXPR float128_backend& operator=(const float128_backend& o) noexcept = default;
+
    template <class T>
    constexpr float128_backend(const T& i, const typename std::enable_if<std::is_convertible<T, float128_type>::value>::type* = nullptr) noexcept(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
        : m_value(i) {}
@@ -835,8 +832,15 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    static constexpr bool has_infinity                  = true;
    static constexpr bool has_quiet_NaN                 = true;
    static constexpr bool has_signaling_NaN             = false;
-   static constexpr float_denorm_style has_denorm      = denorm_present;
-   static constexpr bool               has_denorm_loss = true;
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+   static constexpr float_denorm_style                                has_denorm      = denorm_present;
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+   static constexpr bool                                              has_denorm_loss = true;
    static BOOST_MP_CXX14_CONSTEXPR number_type                        infinity() { return HUGE_VAL; /* conversion from double infinity OK */ }
    static BOOST_MP_CXX14_CONSTEXPR number_type                        quiet_NaN() { return number_type(NAN); }
    static BOOST_MP_CXX14_CONSTEXPR number_type                        signaling_NaN() { return 0; }
@@ -898,8 +902,15 @@ constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecisio
 
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates> >::round_style;
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr float_denorm_style numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates> >::has_denorm;
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 } // namespace std
 

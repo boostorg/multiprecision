@@ -7,13 +7,13 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
+#include <boost/rational.hpp>
 #include <boost/multiprecision/gmp.hpp>
 
 #define NO_MIXED_OPS
 #define BOOST_MP_NOT_TESTING_NUMBER
 
 #include "test_arithmetic.hpp"
-#include <boost/rational.hpp>
 
 template <class T>
 struct is_boost_rational<boost::rational<T> > : public std::integral_constant<bool, true>

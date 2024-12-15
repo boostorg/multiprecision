@@ -1295,6 +1295,30 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_fmod(T& result, const T& a, const T& b
       eval_floor(n, result);
    eval_multiply(n, b);
    eval_subtract(result, a, n);
+   if (eval_get_sign(result) != 0)
+   {
+      //
+      // Sanity check, that due to rounding errors in division, 
+      // we haven't accidently calculated the wrong value:
+      // See https://github.com/boostorg/multiprecision/issues/604 for an example.
+      //
+      if (eval_get_sign(result) == eval_get_sign(b))
+      {
+         if (result.compare(b) >= 0)
+         {
+            eval_subtract(result, b);
+         }
+      }
+      else
+      {
+         n = b;
+         n.negate();
+         if (result.compare(n) >= 0)
+         {
+            eval_subtract(result, n);
+         }
+      }
+   }
 }
 template <class T, class A>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_fmod(T& result, const T& x, const A& a)
@@ -2462,13 +2486,19 @@ void raise_rounding_error(T1, T2, T3, T4, T5)
 template <typename T1, typename T2, typename T3, typename T4, typename T5>
 void raise_overflow_error(T1, T2, T3, T4, T5)
 {
-   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Overflow error"));
+   BOOST_MP_THROW_EXCEPTION(std::overflow_error("Overflow error"));
 }
 
 template <typename T1, typename T2, typename T3, typename T4, typename T5>
 void raise_evaluation_error(T1, T2, T3, T4, T5)
 {
    BOOST_MP_THROW_EXCEPTION(std::runtime_error("Evaluation error"));
+}
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5>
+void raise_domain_error(T1, T2, T3, T4, T5)
+{
+   BOOST_MP_THROW_EXCEPTION(std::domain_error("Domain error"));
 }
 
 template <typename T, typename... Args>
@@ -3733,6 +3763,17 @@ struct conj_funct
       using default_ops::eval_conj;
       eval_conj(result, arg);
    }
+   //
+   // To allow for mixed complex/scalar arithmetic where conj is called on the scalar type (as in Eigen)
+   // we provide an overload that will promote the arg to the distination type:
+   //
+   template <class Other>
+   BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_constructible<Other, Backend>::value>::type operator()(Other& result, const Backend& arg) const
+   {
+      using default_ops::eval_conj;
+      Other t(arg);
+      eval_conj(result, t);
+   }
 };
 template <class Backend>
 struct proj_funct
@@ -3939,41 +3980,46 @@ ilogb(const detail::expression<tag, A1, A2, A3, A4>& val)
 } //namespace multiprecision
 
 namespace math {
+
+
 //
 // Overload of Boost.Math functions that find the wrong overload when used with number:
 //
 namespace detail {
+
 template <class T>
 T sinc_pi_imp(T);
-template <class T>
-T sinhc_pi_imp(T);
+template <class T, class Policy>
+T sinhc_pi_imp(T, const Policy&);
+
 } // namespace detail
+
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline multiprecision::number<Backend, ExpressionTemplates> sinc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x)
 {
    boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x);
-   return std::move(detail::sinc_pi_imp(x));
+   return detail::sinc_pi_imp(x);
 }
 
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates, class Policy>
 inline multiprecision::number<Backend, ExpressionTemplates> sinc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x, const Policy&)
 {
    boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x);
-   return std::move(detail::sinc_pi_imp(x));
+   return detail::sinc_pi_imp(x);
 }
 
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline multiprecision::number<Backend, ExpressionTemplates> sinhc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x)
 {
    boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x);
-   return std::move(detail::sinhc_pi_imp(x));
+   return detail::sinhc_pi_imp(x, boost::math::policies::policy<>());
 }
 
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates, class Policy>
-inline multiprecision::number<Backend, ExpressionTemplates> sinhc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x, const Policy&)
+inline multiprecision::number<Backend, ExpressionTemplates> sinhc_pi(const multiprecision::number<Backend, ExpressionTemplates>& x, const Policy& pol)
 {
-   boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x);
-   return std::move(boost::math::sinhc_pi(x));
+   boost::multiprecision::detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(x, pol);
+   return detail::sinhc_pi_imp(x, pol);
 }
 
 using boost::multiprecision::gcd;

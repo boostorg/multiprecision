@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock.
-//  Copyright Christopher Kormanyos 2002 - 2011, 2021 - 2023.
+//  Copyright Christopher Kormanyos 2002 - 2011, 2021 - 2024.
 //  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
@@ -15,7 +15,7 @@
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include "test.hpp"
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
@@ -68,7 +68,7 @@ void test()
    std::cout << "Testing type " << typeid(T).name() << std::endl;
    unsigned max_err = 0;
 #if !defined(TEST_CPP_DOUBLE_FLOAT) // exponent range in tabulated data is too large for these types.
-   static const boost::array<const char*, 51u> data =
+   static const std::array<const char*, 51u> data =
        {{
            "1.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
            "9.47747587596218770242116751705184563668845029215054154915126374673142219159548534317576897266130328412495991561490384353e76",
@@ -206,13 +206,7 @@ void test()
             BOOST_CHECK_LE(exp(bug_case), (std::numeric_limits<T>::min)());
          }
       }
-      // Adapt the fractional parts in the following test cases
-      // for TEST_CPP_DOUBLE_FLOAT
-      #if defined(TEST_CPP_DOUBLE_FLOAT)
-      bug_case = log((std::numeric_limits<T>::max)()) / -1.3;
-      #else
       bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
-      #endif
       for (unsigned i = 0; i < 20; ++i, bug_case /= 1.05)
       {
          BOOST_CHECK_GE(exp(bug_case), (std::numeric_limits<T>::min)());

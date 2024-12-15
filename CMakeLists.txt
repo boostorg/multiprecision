@@ -38,9 +38,14 @@ else()
 
 endif()
 
-if(BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
+# Only enable tests when we're the root project
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
-  add_subdirectory(test)
+  #Testing with CMake not currently used
+  #Uncomment following two lines onec  
+  #include(CTest)
+  #add_subdirectory(test)
+  include(GNUInstallDirs)
+  install(DIRECTORY "include/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
 endif()
-
