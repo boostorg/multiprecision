@@ -10,10 +10,10 @@
 #ifndef BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 #define BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 
-//#define BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGO_ADD
-//#define BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGO_SUB
-//#define BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGO_MUL
-//#define BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGO_DIV
+#define BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGO_ADD
+#define BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGO_SUB
+#define BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGO_MUL
+#define BOOST_MP_CPP_DOUBLE_FP_USE_QD_ALGO_DIV
 
 #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
 #pragma warning(push)
@@ -281,7 +281,7 @@ class cpp_double_fp_backend
                  "Error: floating-point constituent does not have wide enough exponent range");
 
    // Default constructor.
-   constexpr cpp_double_fp_backend() { }
+   constexpr cpp_double_fp_backend() noexcept = default;
 
    // Copy constructor.
    constexpr cpp_double_fp_backend(const cpp_double_fp_backend& other) : data(other.data) { }
