@@ -87,13 +87,7 @@ struct exact_arithmetic
       return result;
    }
 
-   static
-   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-   BOOST_MP_CXX14_CONSTEXPR
-   #else
-   constexpr
-   #endif
-   void sum(float_pair& result, float_type a, float_type b)
+   static constexpr void sum(float_pair& result, float_type a, float_type b)
    {
       // Exact addition of two floating point numbers
       const float_type a_plus_b = a + b;
@@ -105,13 +99,7 @@ struct exact_arithmetic
       result.second = tmp.second;
    }
 
-   static
-   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-   BOOST_MP_CXX14_CONSTEXPR
-   #else
-   constexpr
-   #endif
-   void normalize(float_pair& result, float_type a, float_type b)
+   static constexpr void normalize(float_pair& result, float_type a, float_type b)
    {
       // Converts a pair of floats to standard form.
       const float_pair tmp = fast_sum(a, b);
@@ -120,13 +108,7 @@ struct exact_arithmetic
       result.second = tmp.second;
    }
 
-   static
-   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-   BOOST_MP_CXX14_CONSTEXPR
-   #else
-   constexpr
-   #endif
-   float_pair split(const float_type& a)
+   static constexpr float_pair split(const float_type& a)
    {
       // Split a floating point number in two (high and low) parts approximating the
       // upper-half and lower-half bits of the float
@@ -177,13 +159,7 @@ struct exact_arithmetic
       return std::make_pair(hi, lo);
    }
 
-   static
-   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-   BOOST_MP_CXX14_CONSTEXPR
-   #else
-   constexpr
-   #endif
-   float_pair product(const float_type& a, const float_type& b)
+   static constexpr float_pair product(const float_type& a, const float_type& b)
    {
       // Exact product of two floating point numbers
       const float_pair a_split = split(a);
