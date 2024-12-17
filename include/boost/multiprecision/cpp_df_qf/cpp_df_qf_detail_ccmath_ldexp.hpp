@@ -18,12 +18,7 @@ namespace boost { namespace multiprecision { namespace backends { namespace cpp_
 namespace detail {
 
 template <typename Real>
-#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-BOOST_MP_CXX14_CONSTEXPR
-#else
-constexpr
-#endif
-Real ldexp_impl(Real arg, int exp) noexcept
+constexpr Real ldexp_impl(Real arg, int exp) noexcept
 {
     while(exp > 0)
     {

@@ -21,12 +21,7 @@ namespace detail
 {
 
 template <typename Real>
-#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-BOOST_MP_CXX14_CONSTEXPR
-#else
-constexpr
-#endif
-Real frexp_zero_impl(Real arg, int* exp)
+constexpr Real frexp_zero_impl(Real arg, int* exp)
 {
    if (exp != nullptr)
    {
@@ -37,12 +32,7 @@ Real frexp_zero_impl(Real arg, int* exp)
 }
 
 template <typename Real>
-#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-BOOST_MP_CXX14_CONSTEXPR
-#else
-constexpr
-#endif
-Real frexp_impl(Real arg, int* expptr)
+constexpr Real frexp_impl(Real arg, int* expptr)
 {
    Real f = arg;
 
@@ -79,12 +69,7 @@ Real frexp_impl(Real arg, int* expptr)
 }
 
 template <typename Real>
-#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-BOOST_MP_CXX14_CONSTEXPR
-#else
-constexpr
-#endif
-Real frexp_impl_lt_half(Real arg, int* expptr)
+constexpr Real frexp_impl_lt_half(Real arg, int* expptr)
 {
    Real f = arg;
 
@@ -123,12 +108,7 @@ Real frexp_impl_lt_half(Real arg, int* expptr)
 } // namespace detail
 
 template <typename Real>
-#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-BOOST_MP_CXX14_CONSTEXPR
-#else
-constexpr
-#endif
-Real frexp(Real arg, int* expptr)
+constexpr Real frexp(Real arg, int* expptr)
 {
    if (   (arg == Real(0))
        || (arg == Real(-0))
