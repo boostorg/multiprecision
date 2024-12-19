@@ -10,10 +10,6 @@
 #ifndef BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 #define BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 
-#if !defined(BOOST_NO_LIMITS_COMPILE_TIME_CONSTANTS)
-#define BOOST_NO_LIMITS_COMPILE_TIME_CONSTANTS
-#endif
-
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
@@ -823,19 +819,17 @@ class cpp_double_fp_backend
 
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
    {
-      // TBD: Just use cpp_dec_float to write string (as is similarly done to read string).
-
       if (number_of_digits == 0)
          number_of_digits = cpp_double_fp_backend::my_digits10;
 
+      // Use cpp_dec_float to write string (as is similarly done to read string).
+
       cpp_dec_float_read_write_type f_dec { 0 };
 
+      f_dec  = data.first;
       f_dec += data.second;
-      f_dec += data.first;
 
-      const std::string my_str { f_dec.str(number_of_digits, format_flags) };
-
-      return my_str;
+      return f_dec.str(number_of_digits, format_flags);
    }
 
    constexpr int order02() const
