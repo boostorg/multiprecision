@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock.
-//  Copyright Christopher Kormanyos 2002 - 2011, 2021 - 2023.
+//  Copyright Christopher Kormanyos 2021 - 2024.
 //  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
@@ -14,8 +14,9 @@
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
-#include <array>
 #include "test.hpp"
+
+#include <array>
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
@@ -25,6 +26,7 @@
 #define TEST_MPFR_50
 #define TEST_MPFI_50
 #define TEST_CPP_BIN_FLOAT
+#define TEST_CPP_DOUBLE_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -871,11 +873,23 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
-   #ifdef _MSC_VER
-   #pragma message("TEST_CPP_DOUBLE_FLOAT: Caution: This test is temporarily disabled")
-   #else
-   std::cout << "TEST_CPP_DOUBLE_FLOAT: Caution: This test is temporarily disabled" << std::endl;
-   #endif
+   {
+      using boost::multiprecision::cpp_double_double;
+      using boost::multiprecision::cpp_double_long_double;
+      #if defined(BOOST_HAS_FLOAT128)
+      using boost::multiprecision::cpp_double_float128;
+      #endif
+
+      test<cpp_double_double>();
+      test<cpp_double_long_double>();
+      #if defined(BOOST_HAS_FLOAT128)
+      test<cpp_double_float128>();
+      #endif
+
+      #if defined(BOOST_HAS_FLOAT128)
+      test_bug_case<cpp_double_float128>();
+      #endif
+   }
 #endif
    return boost::report_errors();
 }

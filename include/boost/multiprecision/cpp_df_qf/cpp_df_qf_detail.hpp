@@ -71,13 +71,7 @@ struct exact_arithmetic
    using float_pair  = std::pair<float_type, float_type>;
    using float_tuple = std::tuple<float_type, float_type, float_type, float_type>;
 
-   static
-   #if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-   BOOST_MP_CXX14_CONSTEXPR
-   #else
-   constexpr
-   #endif
-   float_pair fast_sum(float_type a, float_type b)
+   static constexpr auto fast_sum(float_type a, float_type b) -> float_pair
    {
       // Exact addition of two floating point numbers, given |a| > |b|
       const float_type a_plus_b = a + b;
@@ -99,7 +93,7 @@ struct exact_arithmetic
       result.second = tmp.second;
    }
 
-   static constexpr void normalize(float_pair& result, float_type a, float_type b)
+   static constexpr auto normalize(float_pair& result, float_type a, float_type b) -> void
    {
       // Converts a pair of floats to standard form.
       const float_pair tmp = fast_sum(a, b);
@@ -108,7 +102,7 @@ struct exact_arithmetic
       result.second = tmp.second;
    }
 
-   static constexpr float_pair split(const float_type& a)
+   static constexpr auto split(const float_type& a) -> float_pair
    {
       // Split a floating point number in two (high and low) parts approximating the
       // upper-half and lower-half bits of the float
@@ -156,29 +150,7 @@ struct exact_arithmetic
          lo   = a - hi;
       }
 
-      return std::make_pair(hi, lo);
-   }
-
-   static constexpr float_pair product(const float_type& a, const float_type& b)
-   {
-      // Exact product of two floating point numbers
-      const float_pair a_split = split(a);
-      const float_pair b_split = split(b);
-
-      const volatile float_type pf = a * b;
-
-      return
-        std::make_pair
-        (
-          const_cast<const float_type&>(pf),
-            (
-                ((a_split.first  * b_split.first) - const_cast<const float_type&>(pf))
-              +  (a_split.first  * b_split.second)
-              +  (a_split.second * b_split.first)
-            )
-          +
-            (a_split.second * b_split.second)
-        );
+      return { hi, lo };
    }
 };
 

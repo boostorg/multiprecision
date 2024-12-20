@@ -539,12 +539,12 @@ class cpp_double_fp_backend
       const auto fpc_v = eval_fpclassify(v);
 
       // Handle special cases like zero, inf and NaN.
-      const bool isinf_u  { fpc_u == FP_INFINITE };
-      const bool isinf_v  { fpc_v == FP_INFINITE };
-      const bool isnan_u  { fpc_u == FP_NAN };
-      const bool isnan_v  { fpc_v == FP_NAN };
-      const bool iszero_u { fpc_u == FP_ZERO };
-      const bool iszero_v { fpc_v == FP_ZERO };
+      const bool isinf_u  { (fpc_u == FP_INFINITE) };
+      const bool isinf_v  { (fpc_v == FP_INFINITE) };
+      const bool isnan_u  { (fpc_u == FP_NAN) };
+      const bool isnan_v  { (fpc_v == FP_NAN) };
+      const bool iszero_u { (fpc_u == FP_ZERO) };
+      const bool iszero_v { (fpc_v == FP_ZERO) };
 
       if ((isnan_u || isnan_v) || (isinf_u && iszero_v) || (isinf_v && iszero_u))
       {
@@ -696,9 +696,9 @@ class cpp_double_fp_backend
 
       float_type u { cpp_df_qf_detail::split(float_type()) * v.data.first };
 
-      if (cpp_df_qf_detail::ccmath::isinf(u))
+      if (cpp_df_qf_detail::ccmath::isinf(u) || cpp_df_qf_detail::ccmath::isinf(c))
       {
-         // Evidently we have a very large denominator. Let's take a last chance
+         // Evidently we have some very large operands. Let's take a last chance
          // for finite division. Use the ratio of square roots and subsequently
          // square the ratio, handling the sign of the result separately.
 
