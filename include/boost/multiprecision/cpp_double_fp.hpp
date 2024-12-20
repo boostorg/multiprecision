@@ -432,12 +432,20 @@ class cpp_double_fp_backend
          return *this;
       }
 
-      const auto iszero_u = (fpc_u == FP_ZERO);
+      const auto iszero_u = ((fpc_u == FP_ZERO) || (fpc_u == FP_SUBNORMAL));
       const auto isnan_v  = (fpc_v == FP_NAN);
 
       if (iszero_u || (isnan_v || isinf_v))
       {
-         return operator=(v);
+         if (iszero_u)
+         {
+            data.first  = float_type { 0.0F };
+            data.second = float_type { 0.0F };
+         }
+
+         const auto iszero_v = ((fpc_v == FP_ZERO) || (fpc_v == FP_SUBNORMAL));
+
+         return ((!iszero_v) ? operator=(v) : *this);
       }
 
       if (this == &v)
@@ -482,12 +490,20 @@ class cpp_double_fp_backend
          return *this;
       }
 
-      const auto iszero_u = (fpc_u == FP_ZERO);
+      const auto iszero_u = ((fpc_u == FP_ZERO) || (fpc_u == FP_SUBNORMAL));
       const auto isnan_v  = (fpc_v == FP_NAN);
 
       if (iszero_u || (isnan_v || isinf_v))
       {
-         return operator=(-v);
+         if (iszero_u)
+         {
+            data.first  = float_type { 0.0F };
+            data.second = float_type { 0.0F };
+         }
+
+         const auto iszero_v = ((fpc_v == FP_ZERO) || (fpc_v == FP_SUBNORMAL));
+
+         return ((!iszero_v) ? operator=(-v) : *this);
       }
 
       if (this == &v)
