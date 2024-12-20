@@ -59,6 +59,9 @@
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
+#if defined(BOOST_MATH_USE_FLOAT128)
+#include <boost/multiprecision/float128.hpp>
+#endif
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
@@ -206,8 +209,16 @@ void test()
             BOOST_CHECK_LE(exp(bug_case), (std::numeric_limits<T>::min)());
          }
       }
+
       bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
-      for (unsigned i = 0; i < 20; ++i, bug_case /= 1.05)
+      unsigned i { 0U };
+
+      #if defined(TEST_CPP_DOUBLE_FLOAT)
+      BOOST_IF_CONSTEXPR(std::is_same<T, boost::multiprecision::cpp_double_float>::value) { for ( ; i < 7; ++i, bug_case /= 1.05) { ; } }
+      BOOST_IF_CONSTEXPR(std::is_same<T, boost::multiprecision::cpp_double_double>::value) { for ( ; i < 3; ++i, bug_case /= 1.05) { ; } }
+      BOOST_IF_CONSTEXPR(std::is_same<T, boost::multiprecision::cpp_double_long_double>::value) { for ( ; i < 3; ++i, bug_case /= 1.05) { ; } }
+      #endif
+      for ( ; i < 20U; ++i, bug_case /= static_cast<T>(1.05L))
       {
          BOOST_CHECK_GE(exp(bug_case), (std::numeric_limits<T>::min)());
       }

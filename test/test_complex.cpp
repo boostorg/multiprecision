@@ -1,16 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright John Maddock 2016.
-//  Copyright Christopher Kormanyos 2016.
+//  Copyright John Maddock 2016.
+//  Copyright Christopher Kormanyos 2016 - 2024.
 //  Distributed under the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-
-#include <cmath>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <string>
 
 #include <boost/lexical_cast.hpp>
 #ifdef TEST_MPC
@@ -21,8 +15,17 @@
 #ifdef BOOST_HAS_FLOAT128
 #include <boost/multiprecision/complex128.hpp>
 #endif
+#ifdef TEST_CPP_DOUBLE_FLOAT
+#include <boost/multiprecision/cpp_double_fp.hpp>
+#endif
 
 #include "test.hpp"
+
+#include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+#include <string>
 
 namespace local {
 template <typename complex_type>
@@ -166,5 +169,22 @@ int main()
 #ifdef BOOST_HAS_FLOAT128
    local::test<boost::multiprecision::complex128>();
 #endif
+
+#if defined(TEST_CPP_DOUBLE_FLOAT)
+   {
+      using boost::multiprecision::cpp_double_double;
+      using boost::multiprecision::cpp_double_long_double;
+      #if defined(BOOST_HAS_FLOAT128)
+      using boost::multiprecision::cpp_double_float128;
+      #endif
+
+      local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<cpp_double_double>, boost::multiprecision::et_off>>();
+      local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<cpp_double_long_double>, boost::multiprecision::et_off>>();
+#if defined(BOOST_HAS_FLOAT128)
+      local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<cpp_double_float128>, boost::multiprecision::et_off>>();
+#endif
+   }
+#endif
+
    return boost::report_errors();
 }

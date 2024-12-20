@@ -10,15 +10,6 @@
 #ifndef BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 #define BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 
-#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-#pragma warning(push)
-#pragma warning (disable : 4814)
-#endif
-
-#include <limits>
-#include <string>
-#include <type_traits>
-
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
@@ -41,6 +32,10 @@
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #endif
+
+#include <limits>
+#include <string>
+#include <type_traits>
 
 #if (defined(__clang__) && (__clang_major__ <= 9))
 #define BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE struct
@@ -206,7 +201,7 @@ class cpp_double_fp_backend
                  "Error: floating-point constituent does not have wide enough exponent range");
 
    // Default constructor.
-   constexpr cpp_double_fp_backend() { }
+   constexpr cpp_double_fp_backend() noexcept { }
 
    // Copy constructor.
    constexpr cpp_double_fp_backend(const cpp_double_fp_backend& other) : data(other.data) { }
@@ -244,8 +239,8 @@ class cpp_double_fp_backend
 
    // Constructors from integers
    template <typename SignedIntegralType,
-             typename ::std::enable_if<(    boost::multiprecision::detail::is_integral<SignedIntegralType>::value
-                                        && !boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value
+             typename ::std::enable_if<(     boost::multiprecision::detail::is_integral<SignedIntegralType>::value
+                                        && (!boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value)
                                         && (static_cast<int>(sizeof(SignedIntegralType) * 8u) <= cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const SignedIntegralType& n)
       : data(static_cast<float_type>(n), static_cast<float_type>(0.0F)) { }
@@ -276,8 +271,8 @@ class cpp_double_fp_backend
         ) { }
 
    template <typename SignedIntegralType,
-             typename ::std::enable_if<(    boost::multiprecision::detail::is_integral<SignedIntegralType>::value
-                                        && !boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value
+             typename ::std::enable_if<(     boost::multiprecision::detail::is_integral<SignedIntegralType>::value
+                                        && (!boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value)
                                         && (static_cast<int>(sizeof(SignedIntegralType) * 8u) > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(SignedIntegralType n)
       : data
@@ -355,7 +350,7 @@ class cpp_double_fp_backend
       // TBD: Is there a faster or more simple hash method?
       // TBD: Is there any constexpr support for rudimentary hashing?
 
-      const auto str_to_hash = str(cpp_double_fp_backend::my_digits10, std::ios::scientific);
+      const std::string str_to_hash { str(cpp_double_fp_backend::my_digits10, std::ios::scientific) };
 
       auto result = static_cast<std::size_t>(UINT8_C(0));
 
@@ -382,16 +377,16 @@ class cpp_double_fp_backend
       const auto isnan_u  = (fpc == FP_NAN);
       const auto iszero_u = (fpc == FP_ZERO);
 
-      if(iszero_u || isnan_u)
+      if (iszero_u || isnan_u)
       {
       }
-      else if(isinf_u)
+      else if (isinf_u)
       {
-         data.first  = -data.first;
+         data.first = -data.first;
       }
       else
       {
-         data.first  = -data.first;
+         data.first = -data.first;
 
          if (data.second != 0) { data.second = -data.second; }
 
@@ -405,13 +400,14 @@ class cpp_double_fp_backend
    constexpr const float_type& my_first () const noexcept { return data.first; }
    constexpr const float_type& my_second() const noexcept { return data.second; }
 
-   constexpr rep_type& rep () noexcept { return data; }
+   constexpr rep_type& rep() noexcept { return data; }
 
-   constexpr const rep_type& rep () const noexcept { return data; }
+   constexpr const rep_type& rep() const noexcept { return data; }
 
    constexpr const rep_type& crep() const noexcept { return data; }
 
-   // Unary add/sub/mul/div.
+   // Unary add/sub/mul/div follow in the upcoming paragraphs.
+
    constexpr cpp_double_fp_backend& operator+=(const cpp_double_fp_backend& v)
    {
       const auto fpc_u = eval_fpclassify(*this);
@@ -436,15 +432,23 @@ class cpp_double_fp_backend
          return *this;
       }
 
-      const auto iszero_u = (fpc_u == FP_ZERO);
+      const auto iszero_u = ((fpc_u == FP_ZERO) || (fpc_u == FP_SUBNORMAL));
       const auto isnan_v  = (fpc_v == FP_NAN);
 
       if (iszero_u || (isnan_v || isinf_v))
       {
-         return operator=(v);
+         if (iszero_u)
+         {
+            data.first  = float_type { 0.0F };
+            data.second = float_type { 0.0F };
+         }
+
+         const auto iszero_v = ((fpc_v == FP_ZERO) || (fpc_v == FP_SUBNORMAL));
+
+         return ((!iszero_v) ? operator=(v) : *this);
       }
 
-      if(this == &v)
+      if (this == &v)
       {
          return operator+=(cpp_double_fp_backend(v));
       }
@@ -486,15 +490,23 @@ class cpp_double_fp_backend
          return *this;
       }
 
-      const auto iszero_u = (fpc_u == FP_ZERO);
+      const auto iszero_u = ((fpc_u == FP_ZERO) || (fpc_u == FP_SUBNORMAL));
       const auto isnan_v  = (fpc_v == FP_NAN);
 
       if (iszero_u || (isnan_v || isinf_v))
       {
-         return operator=(-v);
+         if (iszero_u)
+         {
+            data.first  = float_type { 0.0F };
+            data.second = float_type { 0.0F };
+         }
+
+         const auto iszero_v = ((fpc_v == FP_ZERO) || (fpc_v == FP_SUBNORMAL));
+
+         return ((!iszero_v) ? operator=(-v) : *this);
       }
 
-      if(this == &v)
+      if (this == &v)
       {
          data.first  = float_type { 0.0F };
          data.second = float_type { 0.0F };
@@ -502,33 +514,15 @@ class cpp_double_fp_backend
          return *this;
       }
 
-      // Algorithm from Victor Shoup, package WinNTL-5_3_2, slightly modified.
+      const float_type xlo { data.second };
 
-      const float_type S = data.first + - v.data.first;
-      const float_type T = data.second + - v.data.second;
-      const float_type e = S - data.first;
-      volatile float_type f = T - data.second;
+      data = two_diff(data.first, v.data.first);
 
-      float_type t1 = S - e;
-      t1 = data.first - t1;
-      float_type s  = - v.data.first - e;
-      s  = s + t1;
+      const rep_type thi_tlo { two_diff(xlo, v.data.second) };
 
-      t1 = T - f;
-      t1 = data.second - t1;
-      float_type t  = - v.data.second - f;
-      t  = t + t1;
+      data = two_hilo_sum(data.first, data.second + thi_tlo.first);
 
-      s = s + T;
-      float_type H = S + s;
-      float_type h = S - H;
-      h = h + s;
-
-      // Simplification compared to Victor Shoup.
-      h  = h + t;
-      data.first = H + h;
-      f  = H - data.first;
-      data.second = f + h;
+      data = two_hilo_sum(data.first, thi_tlo.second + data.second);
 
       return *this;
    }
@@ -545,12 +539,12 @@ class cpp_double_fp_backend
       const auto fpc_v = eval_fpclassify(v);
 
       // Handle special cases like zero, inf and NaN.
-      const bool isinf_u  = (fpc_u == FP_INFINITE);
-      const bool isinf_v  = (fpc_v == FP_INFINITE);
-      const bool isnan_u  = (fpc_u == FP_NAN);
-      const bool isnan_v  = (fpc_v == FP_NAN);
-      const bool iszero_u = (fpc_u == FP_ZERO);
-      const bool iszero_v = (fpc_v == FP_ZERO);
+      const bool isinf_u  { (fpc_u == FP_INFINITE) };
+      const bool isinf_v  { (fpc_v == FP_INFINITE) };
+      const bool isnan_u  { (fpc_u == FP_NAN) };
+      const bool isnan_v  { (fpc_v == FP_NAN) };
+      const bool iszero_u { (fpc_u == FP_ZERO) };
+      const bool iszero_v { (fpc_v == FP_ZERO) };
 
       if ((isnan_u || isnan_v) || (isinf_u && iszero_v) || (isinf_v && iszero_u))
       {
@@ -571,7 +565,7 @@ class cpp_double_fp_backend
          return operator=(cpp_double_fp_backend(0));
       }
 
-      if(this == &v)
+      if (this == &v)
       {
          return operator*=(cpp_double_fp_backend(v));
       }
@@ -638,7 +632,7 @@ class cpp_double_fp_backend
       const auto iszero_u = (fpc_u == FP_ZERO);
       const auto iszero_v = (fpc_v == FP_ZERO);
 
-      if(this == &v)
+      if (this == &v)
       {
          data.first  = float_type { 1.0F };
          data.second = float_type { 0.0F };
@@ -701,6 +695,39 @@ class cpp_double_fp_backend
       float_type c { cpp_df_qf_detail::split(float_type()) * C };
 
       float_type u { cpp_df_qf_detail::split(float_type()) * v.data.first };
+
+      if (cpp_df_qf_detail::ccmath::isinf(u) || cpp_df_qf_detail::ccmath::isinf(c))
+      {
+         // Evidently we have some very large operands. Let's take a last chance
+         // for finite division. Use the ratio of square roots and subsequently
+         // square the ratio, handling the sign of the result separately.
+
+         const bool u_neg {   isneg() };
+         const bool v_neg { v.isneg() };
+         const bool b_neg { u_neg != v_neg };
+
+         cpp_double_fp_backend uu { *this };
+         cpp_double_fp_backend vv { v };
+
+         cpp_double_fp_backend sqrt_u { };
+         cpp_double_fp_backend sqrt_v { };
+
+         if(u_neg) { uu.negate(); }
+         if(v_neg) { vv.negate(); }
+
+         eval_sqrt(sqrt_u, uu);
+         eval_sqrt(sqrt_v, vv);
+
+         cpp_double_fp_backend sqrt_ratio { sqrt_u / sqrt_v };
+
+         *this = sqrt_ratio;
+
+         eval_multiply(*this, sqrt_ratio);
+
+         if (b_neg)
+            negate();
+         return *this;
+      }
 
       const float_type hc { c - float_type { c - C } };
 
@@ -776,6 +803,8 @@ class cpp_double_fp_backend
          result = local_float_type(x * x);
       else if (p == 3)
          result = local_float_type((x * x) * x);
+      else if (p == 4)
+         { const local_float_type x2 { x * x }; result = x2 * x2; }
       else
       {
          result = local_float_type(1U);
@@ -809,7 +838,7 @@ class cpp_double_fp_backend
 
    constexpr void swap(cpp_double_fp_backend& other)
    {
-      if(this != &other)
+      if (this != &other)
       {
          const rep_type tmp = data;
 
@@ -842,9 +871,14 @@ class cpp_double_fp_backend
       if (number_of_digits == 0)
          number_of_digits = cpp_double_fp_backend::my_digits10;
 
-      const std::string my_str = boost::multiprecision::detail::convert_to_string(*this, number_of_digits, format_flags);
+      // Use cpp_dec_float to write string (as is similarly done to read string).
 
-      return my_str;
+      cpp_dec_float_read_write_type f_dec { 0 };
+
+      f_dec  = data.first;
+      f_dec += data.second;
+
+      return f_dec.str(number_of_digits, format_flags);
    }
 
    constexpr int order02() const
@@ -873,7 +907,7 @@ class cpp_double_fp_backend
 
       eval_subtract(delta_one, cpp_double_fp_backend(1U), *this);
 
-      if(delta_one().isneg())
+      if (delta_one().isneg())
       {
          delta_one.negate();
       }
@@ -885,7 +919,7 @@ class cpp_double_fp_backend
    {
       // TBD: Can this be simplified in any way?
       // Is the use of the square root the best way to go?
-      // Can this be made traditional C++11 constexpr?
+      // Can this be made more friendly to C++14 constexpr?
 
       return
          cpp_double_fp_backend
@@ -949,6 +983,18 @@ class cpp_double_fp_backend
  private:
    rep_type data;
 
+   static constexpr auto cpp_dec_float_read_write_digits10 =
+      static_cast<int>
+      (
+         static_cast<float>
+         (
+            static_cast<float>(my_digits) * 0.9F
+         )
+      );
+
+   using cpp_dec_float_read_write_type     = boost::multiprecision::cpp_dec_float<static_cast<unsigned>(cpp_dec_float_read_write_digits10), std::int32_t, std::allocator<void>>;
+   using cpp_dec_float_read_write_exp_type = typename cpp_dec_float_read_write_type::exponent_type;
+
    bool rd_string(const char* pstr);
 
    static constexpr rep_type two_sum(const float_type a, const float_type b)
@@ -958,6 +1004,15 @@ class cpp_double_fp_backend
      const float_type b1 { hi - a1 };
 
      return { hi, float_type { (a - a1) + (b - b1) } };
+   }
+
+   static constexpr rep_type two_diff(const float_type a, const float_type b)
+   {
+     const float_type hi { a - b };
+     const float_type a1 { hi + b };
+     const float_type b1 { hi - a1 };
+
+     return { hi, float_type { (a - a1) - (b + b1) } };
    }
 
    static constexpr rep_type two_hilo_sum(const float_type a, const float_type b)
@@ -987,19 +1042,7 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 
    using local_double_fp_type = cpp_double_fp_backend<FloatingPointType>;
 
-   constexpr auto local_cpp_dec_float_digits10 =
-      static_cast<int>
-      (
-         static_cast<float>
-         (
-            static_cast<float>(local_double_fp_type::my_digits) * 0.9F
-         )
-      );
-
-   using local_cpp_dec_float_type     = boost::multiprecision::cpp_dec_float<static_cast<unsigned>(local_cpp_dec_float_digits10), std::int32_t, std::allocator<void>>;
-   using local_cpp_dec_float_exp_type = typename local_cpp_dec_float_type::exponent_type;
-
-   local_cpp_dec_float_type f_dec = pstr;
+   cpp_dec_float_read_write_type f_dec = pstr;
 
    const auto fpc = eval_fpclassify(f_dec);
 
@@ -1011,7 +1054,7 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
    }
    else
    {
-      local_cpp_dec_float_type dummy_frexp { };
+      cpp_dec_float_read_write_type dummy_frexp { };
       auto e2_from_f_dec = int { };
       eval_frexp(dummy_frexp, f_dec, &e2_from_f_dec);
 
@@ -1020,19 +1063,19 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
          // TBD: A detailed, clear comparison (or something close to a comparison)
          // is still needed for input values having (e2_from_f_dec == my_min_exponent).
             (fpc == FP_ZERO)
-         || (e2_from_f_dec < static_cast<local_cpp_dec_float_exp_type>(local_double_fp_type::my_min_exponent))
+         || (e2_from_f_dec < static_cast<cpp_dec_float_read_write_exp_type>(local_double_fp_type::my_min_exponent))
       );
 
       if (is_definitely_zero)
       {
-         data.first  = 0;
-         data.second = 0;
+         data.first  = float_type { 0.0F };
+         data.second = float_type { 0.0F };
       }
       else
       {
          // TBD: A detailed, clear comparison (or something close to a comparison)
          // is still needed for input values having (e2_from_f_dec == my_max_exponent).
-         const auto is_definitely_inf = (e2_from_f_dec > static_cast<local_cpp_dec_float_exp_type>(local_double_fp_type::my_max_exponent));
+         const auto is_definitely_inf = (e2_from_f_dec > static_cast<cpp_dec_float_read_write_exp_type>(local_double_fp_type::my_max_exponent));
 
          if (is_definitely_inf)
          {
@@ -1040,8 +1083,8 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
          }
          else
          {
-            data.first  = static_cast<float_type>(0.0F);
-            data.second = static_cast<float_type>(0.0F);
+            data.first  = float_type { 0.0F };
+            data.second = float_type { 0.0F };
 
             using local_builtin_float_type = double;
 
@@ -1068,18 +1111,18 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 
             if (has_pow2_scaling_for_small_input)
             {
-               f_dec *= local_cpp_dec_float_type::pow2(static_cast<long long>(pow2_scaling_for_small_input));
+               f_dec *= cpp_dec_float_read_write_type::pow2(static_cast<long long>(pow2_scaling_for_small_input));
             }
 
             for(auto i = static_cast<unsigned>(UINT8_C(0));
                      i < dig_lim;
                      i = static_cast<unsigned>(i + static_cast<unsigned>(cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits)))
             {
-               local_cpp_dec_float_type f_dec_abs { };
+               cpp_dec_float_read_write_type f_dec_abs { };
 
                eval_fabs(f_dec_abs, f_dec);
 
-               if (f_dec_abs.compare((local_cpp_dec_float_type::min)()) <= 0)
+               if (f_dec_abs.compare((cpp_dec_float_read_write_type::min)()) <= 0)
                {
                   break;
                }
@@ -1216,8 +1259,8 @@ constexpr cpp_double_fp_backend<FloatingPointType> operator/(const cpp_double_fp
 
 // Input/Output Streaming
 template <typename FloatingPointType, typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_fp_backend<FloatingPointType>& f)
+::std::basic_ostream<char_type, traits_type>&
+operator<<(::std::basic_ostream<char_type, traits_type>& os, const cpp_double_fp_backend<FloatingPointType>& f)
 {
    const auto str_result = f.str(os.precision(), os.flags());
 
@@ -1225,8 +1268,8 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const cpp_double_fp_b
 }
 
 template <typename FloatingPointType, typename char_type, typename traits_type>
-std::basic_istream<char_type, traits_type>&
-operator>>(std::basic_istream<char_type, traits_type>& is, cpp_double_fp_backend<FloatingPointType>& f)
+::std::basic_istream<char_type, traits_type>&
+operator>>(::std::basic_istream<char_type, traits_type>& is, cpp_double_fp_backend<FloatingPointType>& f)
 {
    std::string input_str;
 
@@ -1355,19 +1398,19 @@ constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
 
    const auto isneg_o = o.isneg();
 
-   if((fpc != FP_NORMAL) || isneg_o)
+   if ((fpc != FP_NORMAL) || isneg_o)
    {
-      if((fpc == FP_ZERO) || (fpc == FP_SUBNORMAL))
+      if ((fpc == FP_ZERO) || (fpc == FP_SUBNORMAL))
       {
          result = double_float_type(0);
          return;
       }
-      else if(fpc == FP_NAN)
+      else if (fpc == FP_NAN)
       {
          result = double_float_type::my_value_nan();
          return;
       }
-      else if((fpc == FP_INFINITE) || isneg_o)
+      else if ((fpc == FP_INFINITE) || isneg_o)
       {
          result = double_float_type::my_value_nan();
          return;
@@ -1414,7 +1457,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
 {
    const auto x_is_zero = x.is_zero();
 
-   if ((eval_fpclassify(x) != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
+   if ((eval_fpclassify(x) != FP_NORMAL) && (!x_is_zero))
    {
       result = x;
    }
@@ -1534,7 +1577,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
 
             eval_convert_to(&lln, nf);
 
-            const auto n = static_cast<int>(lln);
+            const int n { static_cast<int>(lln) };
 
             if (n > 0)
             {
@@ -1558,7 +1601,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
 
    const auto fpc = eval_fpclassify(x);
 
-   if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
+   if ((fpc != FP_NORMAL) && (!x_is_zero))
    {
       result = x;
    }
@@ -1678,7 +1721,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
 
             eval_convert_to(&lln, nf);
 
-            const auto n = static_cast<int>(lln);
+            const int n { static_cast<int>(lln) };
 
             if (n > 0)
             {
@@ -1702,7 +1745,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
 
    const auto fpc = eval_fpclassify(x);
 
-   if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
+   if ((fpc != FP_NORMAL) && (!x_is_zero))
    {
       result = x;
    }
@@ -1824,7 +1867,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
 
             eval_convert_to(&lln, nf);
 
-            const auto n = static_cast<int>(lln);
+            const int n { static_cast<int>(lln) };
 
             if (n > 0)
             {
@@ -1849,7 +1892,7 @@ constexpr void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const 
 
    const auto x_is_zero = (fpc == FP_ZERO);
 
-   if ((fpc != static_cast<int>(FP_NORMAL)) && (!x_is_zero))
+   if ((fpc != FP_NORMAL) && (!x_is_zero))
    {
       result = x;
    }
@@ -1861,17 +1904,17 @@ constexpr void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const 
    {
       result = double_float_type::my_value_inf();
    }
-   else if(eval_lt(x, double_float_type(1)))
+   else if (eval_lt(x, double_float_type(1)))
    {
       // TBD: Optimize check with 1.
-      // TBD: optimize inversion and negation.
+      // TBD: Optimize inversion and negation.
 
       double_float_type x_inv;
       eval_divide(x_inv, double_float_type(1), x);
       eval_log(result, x_inv);
       result.negate();
    }
-   else if(eval_gt(x, double_float_type(1)))
+   else if (eval_gt(x, double_float_type(1)))
    {
       // TBD: Optimize check with 1.
 
@@ -1894,7 +1937,7 @@ constexpr void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const 
       // Do one single step of Newton-Raphson iteration.
       result = s + ((x2 - E) / E);
 
-      double_float_type xn2(n2);
+      double_float_type xn2 { n2 };
 
       eval_multiply(xn2, cpp_df_qf_detail::constant_df_ln_two<typename double_float_type::float_type>());
 
@@ -1911,7 +1954,7 @@ constexpr void eval_convert_to(signed long long* result, const cpp_double_fp_bac
 {
    const auto fpc = eval_fpclassify(backend);
 
-   if(fpc != FP_NORMAL)
+   if (fpc != FP_NORMAL)
    {
       *result = static_cast<signed long long>(backend.crep().first);
 
@@ -1964,7 +2007,7 @@ constexpr void eval_convert_to(unsigned long long* result, const cpp_double_fp_b
 {
    const auto fpc = eval_fpclassify(backend);
 
-   if(fpc != FP_NORMAL)
+   if (fpc != FP_NORMAL)
    {
       *result = static_cast<unsigned long long>(backend.crep().first);
 
@@ -2015,7 +2058,7 @@ constexpr void eval_convert_to(int128_type* result, const cpp_double_fp_backend<
 {
    const auto fpc = eval_fpclassify(backend);
 
-   if(fpc != FP_NORMAL)
+   if (fpc != FP_NORMAL)
    {
       *result = static_cast<int128_type>(backend.crep().first);
 
@@ -2068,7 +2111,7 @@ constexpr void eval_convert_to(uint128_type* result, const cpp_double_fp_backend
 {
    const auto fpc = eval_fpclassify(backend);
 
-   if(fpc != FP_NORMAL)
+   if (fpc != FP_NORMAL)
    {
       *result = static_cast<uint128_type>(backend.crep().first);
 
@@ -2131,7 +2174,7 @@ constexpr typename ::std::enable_if<cpp_df_qf_detail::is_floating_point_or_float
 
    // TBD: Implement min/max chek for the destination floating-point type result.
 
-   if(fpc != FP_NORMAL)
+   if (fpc != FP_NORMAL)
    {
       *result = static_cast<OtherFloatingPointType>(backend.crep().first);
 
@@ -2194,8 +2237,7 @@ BOOST_MP_DF_QF_NUM_LIMITS_CLASS_TYPE numeric_limits<boost::multiprecision::numbe
    using local_float_type = FloatingPointType;
    using inner_self_type  = boost::multiprecision::cpp_double_fp_backend<local_float_type>;
 
-   using self_type =
-       boost::multiprecision::number<inner_self_type, ExpressionTemplatesOption>;
+   using self_type = boost::multiprecision::number<inner_self_type, ExpressionTemplatesOption>;
 
  public:
    static constexpr bool                    is_specialized                = true;
@@ -2308,10 +2350,6 @@ public:
 };
 
 } } } // namespace boost::math::policies
-#endif
-
-#if (defined(_MSC_VER) && (_MSC_VER <= 1900))
-#pragma warning(pop)
 #endif
 
 #endif // BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
