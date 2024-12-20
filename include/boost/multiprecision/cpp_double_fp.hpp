@@ -680,6 +680,39 @@ class cpp_double_fp_backend
 
       float_type u { cpp_df_qf_detail::split(float_type()) * v.data.first };
 
+      if (cpp_df_qf_detail::ccmath::isinf(u))
+      {
+         // Evidently we have a very large denominator. Let's take a last chance
+         // for finite division. Use the ratio of square roots and subsequently
+         // square the ratio, handling the sign of the result separately.
+
+         const bool u_neg {   isneg() };
+         const bool v_neg { v.isneg() };
+         const bool b_neg { u_neg != v_neg };
+
+         cpp_double_fp_backend uu { *this };
+         cpp_double_fp_backend vv { v };
+
+         cpp_double_fp_backend sqrt_u { };
+         cpp_double_fp_backend sqrt_v { };
+
+         if(u_neg) { uu.negate(); }
+         if(v_neg) { vv.negate(); }
+
+         eval_sqrt(sqrt_u, uu);
+         eval_sqrt(sqrt_v, vv);
+
+         cpp_double_fp_backend sqrt_ratio { sqrt_u / sqrt_v };
+
+         *this = sqrt_ratio;
+
+         eval_multiply(*this, sqrt_ratio);
+
+         if (b_neg)
+            negate();
+         return *this;
+      }
+
       const float_type hc { c - float_type { c - C } };
 
       const float_type hv { u - float_type { u - v.data.first } };
