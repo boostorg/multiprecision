@@ -1079,7 +1079,11 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 
          if (is_definitely_inf)
          {
+            const bool b_neg { f_dec.isneg() };
+
             static_cast<void>(operator=(local_double_fp_type::my_value_inf()));
+
+            if (b_neg) { negate(); }
          }
          else
          {
@@ -1394,9 +1398,9 @@ constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
    using local_float_type = typename double_float_type::float_type;
 
-   const auto fpc = eval_fpclassify(o);
+   const int fpc { eval_fpclassify(o) };
 
-   const auto isneg_o = o.isneg();
+   const bool isneg_o { o.isneg() };
 
    if ((fpc != FP_NORMAL) || isneg_o)
    {
@@ -1405,14 +1409,14 @@ constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
          result = double_float_type(0);
          return;
       }
-      else if (fpc == FP_NAN)
+      else if ((fpc == FP_NAN) || isneg_o)
       {
          result = double_float_type::my_value_nan();
          return;
       }
-      else if ((fpc == FP_INFINITE) || isneg_o)
+      else if (fpc == FP_INFINITE)
       {
-         result = double_float_type::my_value_nan();
+         result = double_float_type::my_value_inf();
          return;
       }
    }

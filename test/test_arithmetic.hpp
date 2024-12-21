@@ -1213,6 +1213,11 @@ void test_float_funcs(const std::integral_constant<bool, true>&)
    a        = 4;
    a        = sqrt(a);
    BOOST_CHECK_CLOSE_FRACTION(a, 2, tol);
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::has_infinity)
+   {
+      a = std::numeric_limits<Real>::infinity();
+      BOOST_CHECK((boost::math::isinf)(a));
+   }
    a = 3;
    a = exp(a);
    BOOST_CHECK_CLOSE_FRACTION(a, Real(exp(Real(3))), tol);
