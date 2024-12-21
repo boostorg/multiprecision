@@ -676,7 +676,9 @@ class cpp_double_fp_backend
          }
          else
          {
-            return operator=(cpp_double_fp_backend::my_value_inf());
+            const bool b_neg { isneg() };
+
+            return operator=((!b_neg) ? cpp_double_fp_backend::my_value_inf() : -cpp_double_fp_backend::my_value_inf());
          }
       }
 
@@ -1459,16 +1461,30 @@ template <typename FloatingPointType,
           typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const*>
 constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   const auto x_is_zero = x.is_zero();
+   const int fpc { eval_fpclassify(x) };
 
-   if ((eval_fpclassify(x) != FP_NORMAL) && (!x_is_zero))
+   const bool x_is_zero { fpc == FP_ZERO };
+
+   using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+
+   if (fpc == FP_ZERO)
    {
-      result = x;
+      result = double_float_type(1);
+   }
+   else if (fpc != FP_NORMAL)
+   {
+      if (fpc == FP_INFINITE)
+      {
+         result = (x.isneg() ? double_float_type(0) : double_float_type::my_value_inf());
+      }
+      else if (fpc == FP_NAN)
+      {
+         result = x;
+      }
    }
    else
    {
-      using double_float_type = cpp_double_fp_backend<FloatingPointType>;
-      using local_float_type  = typename double_float_type::float_type;
+      using local_float_type = typename double_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
       const auto b_neg = x.is_neg();
@@ -1601,17 +1617,29 @@ template <typename FloatingPointType,
           typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && (((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) >= 16) && ((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) <= 36)))>::type const*>
 constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   const auto x_is_zero = x.is_zero();
+   const int fpc { eval_fpclassify(x) };
 
-   const auto fpc = eval_fpclassify(x);
+   const bool x_is_zero { fpc == FP_ZERO };
 
-   if ((fpc != FP_NORMAL) && (!x_is_zero))
+   using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+
+   if (fpc == FP_ZERO)
    {
-      result = x;
+      result = double_float_type(1);
+   }
+   else if (fpc != FP_NORMAL)
+   {
+      if (fpc == FP_INFINITE)
+      {
+         result = (x.isneg() ? double_float_type(0) : double_float_type::my_value_inf());
+      }
+      else if (fpc == FP_NAN)
+      {
+         result = x;
+      }
    }
    else
    {
-      using double_float_type = cpp_double_fp_backend<FloatingPointType>;
       using local_float_type  = typename double_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
@@ -1745,18 +1773,30 @@ template <typename FloatingPointType,
           typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<FloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) > 36))>::type const*>
 constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   const auto x_is_zero = x.is_zero();
+   const int fpc { eval_fpclassify(x) };
 
-   const auto fpc = eval_fpclassify(x);
+   const bool x_is_zero { fpc == FP_ZERO };
 
-   if ((fpc != FP_NORMAL) && (!x_is_zero))
+   using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+
+   if (fpc == FP_ZERO)
    {
-      result = x;
+      result = double_float_type(1);
+   }
+   else if (fpc != FP_NORMAL)
+   {
+      if (fpc == FP_INFINITE)
+      {
+         result = (x.isneg() ? double_float_type(0) : double_float_type::my_value_inf());
+      }
+      else if (fpc == FP_NAN)
+      {
+         result = x;
+      }
    }
    else
    {
-      using double_float_type = cpp_double_fp_backend<FloatingPointType>;
-      using local_float_type  = typename double_float_type::float_type;
+      using local_float_type = typename double_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
       const auto b_neg = x.is_neg();
