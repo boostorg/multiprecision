@@ -394,7 +394,10 @@ class cpp_double_fp_backend
       }
    }
 
-   constexpr bool isneg() const noexcept { return (data.first < 0); }
+   constexpr bool isneg() const noexcept
+   {
+     return (data.first < 0);
+   }
 
    // Getters/Setters
    constexpr const float_type& my_first () const noexcept { return data.first; }
