@@ -361,9 +361,31 @@ class cpp_double_fp_backend
    }
 
    // Methods
-   constexpr bool is_neg () const { return (data.first < 0); }
-   constexpr bool is_zero() const { return (compare(cpp_double_fp_backend(0U)) == 0); }
-   constexpr bool is_one () const { return (compare(cpp_double_fp_backend(1U)) == 0); }
+   constexpr bool is_neg () const noexcept { return (data.first < 0); }
+
+   constexpr bool is_zero() const noexcept
+   {
+      #if 1
+      using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
+      using local_float_type = typename local_backend_type::float_type;
+
+      return
+      (
+            ((data.first  == local_float_type { 0 }) || (-data.first  == local_float_type { 0 }))
+         && ((data.second == local_float_type { 0 }) || (-data.second == local_float_type { 0 }))
+      );
+      #else
+      return (compare(cpp_double_fp_backend(0U)) == 0);
+      #endif
+   }
+
+   constexpr bool is_one() const noexcept
+   {
+      using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
+      using local_float_type = typename local_backend_type::float_type;
+
+      return ((data.first  == local_float_type { 1 }) && (data.second  == local_float_type { 0 }));
+   }
 
    constexpr void negate()
    {
@@ -433,7 +455,7 @@ class cpp_double_fp_backend
          return *this;
       }
 
-      const auto iszero_u = (fpc_u == FP_ZERO);
+      const auto iszero_u = ((fpc_u == FP_ZERO) || (fpc_u == FP_SUBNORMAL));
       const auto isnan_v  = (fpc_v == FP_NAN);
 
       if (iszero_u || (isnan_v || isinf_v))
@@ -444,7 +466,7 @@ class cpp_double_fp_backend
             data.second = float_type { 0.0F };
          }
 
-         const auto iszero_v = (fpc_v == FP_ZERO);
+         const auto iszero_v = ((fpc_v == FP_ZERO) || (fpc_v == FP_SUBNORMAL));
 
          return ((!iszero_v) ? operator=(v) : *this);
       }
@@ -491,7 +513,7 @@ class cpp_double_fp_backend
          return *this;
       }
 
-      const auto iszero_u = (fpc_u == FP_ZERO);
+      const auto iszero_u = ((fpc_u == FP_ZERO) || (fpc_u == FP_SUBNORMAL));
       const auto isnan_v  = (fpc_v == FP_NAN);
 
       if (iszero_u || (isnan_v || isinf_v))
@@ -502,7 +524,7 @@ class cpp_double_fp_backend
             data.second = float_type { 0.0F };
          }
 
-         const auto iszero_v = (fpc_v == FP_ZERO);
+         const auto iszero_v = ((fpc_v == FP_ZERO) || (fpc_v == FP_SUBNORMAL));
 
          return ((!iszero_v) ? operator=(-v) : *this);
       }
@@ -1431,7 +1453,7 @@ constexpr void eval_ceil(cpp_double_fp_backend<FloatingPointType>& result, const
 template <typename FloatingPointType>
 constexpr int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
 {
-   #if 1
+   #if 0
    const int fpc_a { cpp_df_qf_detail::ccmath::fpclassify(o.crep().first) };
    const int fpc_b { cpp_df_qf_detail::ccmath::fpclassify(o.crep().second) };
 
@@ -1452,12 +1474,16 @@ constexpr int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
    }
 
    #else
-   return  cpp_df_qf_detail::ccmath::isnan(o.crep().first) ? FP_NAN       :
-           cpp_df_qf_detail::ccmath::isinf(o.crep().first) ? FP_INFINITE  :
-           eval_is_zero(o)                                 ? FP_ZERO      :
-          (   (cpp_df_qf_detail::ccmath::fabs(o.crep().first) > 0)
-           && (cpp_df_qf_detail::ccmath::fabs(o.crep().first) < (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::min)()))
-                                                           ? FP_SUBNORMAL : FP_NORMAL;
+   using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
+   using local_float_type = typename local_backend_type::float_type;
+
+   const local_float_type fabs_x { cpp_df_qf_detail::ccmath::fabs(o.crep().first) };
+
+   return    cpp_df_qf_detail::ccmath::isnan(o.crep().first) ? FP_NAN
+           : cpp_df_qf_detail::ccmath::isinf(o.crep().first) ? FP_INFINITE
+           : eval_is_zero(o)                                 ? FP_ZERO
+           : ((fabs_x > 0) && (fabs_x < (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::min)())) ? FP_SUBNORMAL
+           :                                                   FP_NORMAL;
    #endif
 }
 
