@@ -11,7 +11,7 @@
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail { namespace ccmath {
 
 template <class FloatingPointType>
-constexpr bool isnan(FloatingPointType x)
+constexpr auto isnan(FloatingPointType x) -> bool
 {
    return (x != x);
 }
