@@ -95,11 +95,13 @@ struct exact_arithmetic
 
    static constexpr auto normalize(float_pair& result, float_type a, float_type b) -> void
    {
-      // Converts a pair of floats to standard form.
-      const float_pair tmp = fast_sum(a, b);
+      float_type u { a + b };
+      float_type v { a - u };
 
-      result.first  = tmp.first;
-      result.second = tmp.second;
+      v = v + b;
+
+      result.first  = u;
+      result.second = v;
    }
 
    static constexpr auto split(const float_type& a) -> float_pair

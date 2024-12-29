@@ -12,8 +12,6 @@
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail.hpp>
-#include <boost/multiprecision/detail/float_string_cvt.hpp>
-#include <boost/multiprecision/detail/fpclassify.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
 
@@ -363,9 +361,31 @@ class cpp_double_fp_backend
    }
 
    // Methods
-   constexpr bool is_neg () const { return (data.first < 0); }
-   constexpr bool is_zero() const { return (compare(cpp_double_fp_backend(0U)) == 0); }
-   constexpr bool is_one () const { return (compare(cpp_double_fp_backend(1U)) == 0); }
+   constexpr bool is_neg () const noexcept { return (data.first < 0); }
+
+   constexpr bool is_zero() const noexcept
+   {
+      #if 1
+      using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
+      using local_float_type = typename local_backend_type::float_type;
+
+      return
+      (
+            ((data.first  == local_float_type { 0 }) || (-data.first  == local_float_type { 0 }))
+         && ((data.second == local_float_type { 0 }) || (-data.second == local_float_type { 0 }))
+      );
+      #else
+      return (compare(cpp_double_fp_backend(0U)) == 0);
+      #endif
+   }
+
+   constexpr bool is_one() const noexcept
+   {
+      using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
+      using local_float_type = typename local_backend_type::float_type;
+
+      return ((data.first  == local_float_type { 1 }) && (data.second  == local_float_type { 0 }));
+   }
 
    constexpr void negate()
    {
@@ -580,7 +600,23 @@ class cpp_double_fp_backend
 
       float_type C { cpp_df_qf_detail::split(float_type()) * data.first };
 
-      const float_type hu { C - float_type { C - data.first } };
+      float_type hu { C - float_type { C - data.first } };
+
+      if (cpp_df_qf_detail::ccmath::isinf(C))
+      {
+        // In this case, data.first is evidently so large that multipllication
+        // with the split has overflowed to infinity. Take a last-chance try
+        // for multiplication by scaling with the split and subsequently
+        // taking the difference term.
+
+        // TBD: Is this numericaly correct? Or is it simply the "best" we can
+        // do in this edge-case? Or is there an alternate multiplication scheme
+        // that is not susceptible to this particular sort of overflow?
+
+        C = data.first - (data.first / cpp_df_qf_detail::split(float_type()));
+
+        hu = (data.first - C) * cpp_df_qf_detail::split(float_type());
+      }
 
       C = data.first * v.data.first;
 
@@ -629,7 +665,7 @@ class cpp_double_fp_backend
 
       if (isnan_u || isnan_v)
       {
-         return operator=( cpp_double_fp_backend::my_value_nan());
+         return operator=(cpp_double_fp_backend::my_value_nan());
       }
 
       const auto iszero_u = (fpc_u == FP_ZERO);
@@ -703,7 +739,7 @@ class cpp_double_fp_backend
 
       if (cpp_df_qf_detail::ccmath::isinf(u) || cpp_df_qf_detail::ccmath::isinf(c))
       {
-         // Evidently we have some very large operands. Let's take a last chance
+         // Evidently we have some very large operands. Take a last-chance try
          // for finite division. Use the ratio of square roots and subsequently
          // square the ratio, handling the sign of the result separately.
 
@@ -922,9 +958,19 @@ class cpp_double_fp_backend
 
    static constexpr cpp_double_fp_backend my_value_max() noexcept
    {
+      // TBD: Is this value even correct, if there is such a
+      // thing as correct for this unusual data type?
+
+      // TBD: This might involve a recurring run-time calculation.
+      // Can this work be more clearly off-loaded to known
+      // compile-time constexpr?
+
       // TBD: Can this be simplified in any way?
       // Is the use of the square root the best way to go?
       // Can this be made more friendly to C++14 constexpr?
+
+      // TBD: Or should we use the static-initializer trick (as used in cpp_dec_float)
+      // to initialize this and possible other similar values?
 
       return
          cpp_double_fp_backend
@@ -950,6 +996,16 @@ class cpp_double_fp_backend
 
    static constexpr cpp_double_fp_backend my_value_min() noexcept
    {
+      // TBD: Is this value even correct, if there is such a
+      // thing as correct for this unusual data type?
+
+      // TBD: This might involve a recurring run-time calculation.
+      // Can this work be more clearly off-loaded to known
+      // compile-time constexpr?
+
+      // TBD: Or should we use the static-initializer trick (as used in cpp_dec_float)
+      // to initialize this and possible other similar values?
+
       return
          cpp_double_fp_backend
          (
@@ -968,21 +1024,28 @@ class cpp_double_fp_backend
       // Or should we tune the value of epsilon() depending
       // on the width of the underlying floating-point constituent.
 
+      // TBD: This might involve a recurring run-time calculation.
+      // Can this work be more clearly off-loaded to known
+      // compile-time constexpr?
+
+      // TBD: Or should we use the static-initializer trick (as used in cpp_dec_float)
+      // to initialize this and possible other similar values?
+
       cpp_double_fp_backend result { };
 
-      eval_ldexp(result, cpp_double_fp_backend(1), 4 - my_digits);
+      eval_ldexp(result, cpp_double_fp_backend(1), 3 - my_digits);
 
       return result;
    }
 
    static constexpr cpp_double_fp_backend my_value_nan() noexcept
    {
-      return cpp_double_fp_backend(static_cast<float_type>(NAN));
+      return cpp_double_fp_backend(static_cast<float_type>(NAN), float_type { 0.0F });
    }
 
    static constexpr cpp_double_fp_backend my_value_inf() noexcept
    {
-      return cpp_double_fp_backend(static_cast<float_type>(HUGE_VAL)); // conversion from double infinity OK
+      return cpp_double_fp_backend(static_cast<float_type>(HUGE_VAL), float_type { 0.0F }); // conversion from double infinity OK
    }
 
  private:
@@ -1060,7 +1123,8 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
    else
    {
       cpp_dec_float_read_write_type dummy_frexp { };
-      auto e2_from_f_dec = int { };
+
+      int e2_from_f_dec { };
       eval_frexp(dummy_frexp, f_dec, &e2_from_f_dec);
 
       const auto is_definitely_zero =
@@ -1111,7 +1175,7 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 
             using local_double_fp_constituent_type = typename local_double_fp_type::float_type;
 
-            constexpr auto pow2_scaling_for_small_input = cpp_df_qf_detail::ccmath::numeric_limits<local_double_fp_constituent_type>::digits;
+            constexpr int pow2_scaling_for_small_input { cpp_df_qf_detail::ccmath::numeric_limits<local_double_fp_constituent_type>::digits };
 
             const auto has_pow2_scaling_for_small_input =
             (
@@ -1147,7 +1211,7 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 
             if (has_pow2_scaling_for_small_input)
             {
-               eval_ldexp(*this, local_double_fp_type(*this), static_cast<int>(-pow2_scaling_for_small_input));
+               eval_ldexp(*this, local_double_fp_type { *this }, -pow2_scaling_for_small_input);
             }
          }
       }
@@ -1338,27 +1402,39 @@ constexpr void eval_fabs(cpp_double_fp_backend<FloatingPointType>& result, const
 template <typename FloatingPointType>
 constexpr void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int* v)
 {
+   #if 0
    result.rep().first  = cpp_df_qf_detail::ccmath::frexp(a.rep().first, v);
    result.rep().second = cpp_df_qf_detail::ccmath::ldexp(a.rep().second, -*v);
+   #else
+   using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
+   using local_float_type = typename local_backend_type::float_type;
+
+   const local_float_type fhi { cpp_df_qf_detail::ccmath::frexp(a.rep().first, v) };
+   const local_float_type flo { cpp_df_qf_detail::ccmath::ldexp(a.rep().second, -*v) };
+
+   local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
+   #endif
 }
 
 template <typename FloatingPointType>
 constexpr void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int v)
 {
-   result.rep().first  = cpp_df_qf_detail::ccmath::ldexp(a.crep().first,  v);
-   result.rep().second = cpp_df_qf_detail::ccmath::ldexp(a.crep().second, v);
-
    using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
+   using local_float_type = typename local_backend_type::float_type;
 
-   local_backend_type::arithmetic::normalize(result.rep(), result.rep().first, result.rep().second);
+   const local_float_type fhi { cpp_df_qf_detail::ccmath::ldexp(a.crep().first,  v) };
+   const local_float_type flo { cpp_df_qf_detail::ccmath::ldexp(a.crep().second, v) };
+
+   local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
 }
 
 template <typename FloatingPointType>
 constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
+   #if 0
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
-   const typename double_float_type::float_type fhi = cpp_df_qf_detail::floor_of_constituent(x.rep().first);
+   const typename double_float_type::float_type fhi = cpp_df_qf_detail::floor_of_constituent(x.my_first());
 
    if (fhi != x.my_first())
    {
@@ -1367,11 +1443,46 @@ constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, cons
    }
    else
    {
-      result.rep().first  = fhi;
-      result.rep().second = cpp_df_qf_detail::floor_of_constituent(x.rep().second);
+      const bool is_fractional_lo { cpp_df_qf_detail::ccmath::fabs(x.my_second()) < 1 };
+      const bool is_negative_lo { x.my_second() < 0 };
 
-      double_float_type::arithmetic::normalize(result.rep(), result.rep().first, result.rep().second);
+      if (is_fractional_lo)
+      {
+         if (is_negative_lo)
+         {
+            result.rep().first  = fhi - typename double_float_type::float_type { 1 };
+            result.rep().second = typename double_float_type::float_type { 0 };
+         }
+         else
+         {
+            result.rep().first  = fhi;
+            result.rep().second = typename double_float_type::float_type { 0 };
+         }
+      }
+      else
+      {
+         result.rep().second = cpp_df_qf_detail::floor_of_constituent(x.my_second());
+         result.rep().second = fhi;
+      }
    }
+   #else
+   using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
+   using local_float_type = typename local_backend_type::float_type;
+
+   const local_float_type fhi { cpp_df_qf_detail::floor_of_constituent(x.my_first()) };
+
+   if (fhi != x.my_first())
+   {
+      result.rep().first  = fhi;
+      result.rep().second = local_float_type { 0 };
+   }
+   else
+   {
+      const local_float_type flo = { cpp_df_qf_detail::floor_of_constituent(x.my_second()) };
+
+      local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
+   }
+   #endif
 }
 
 template <typename FloatingPointType>
@@ -1386,15 +1497,38 @@ constexpr void eval_ceil(cpp_double_fp_backend<FloatingPointType>& result, const
 template <typename FloatingPointType>
 constexpr int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
 {
-   // The eval_fpclassify implementation is slightly modelled
-   // after Matt Borland's constexpr-focussed work in <ccmath.hpp>.
+   #if 0
+   const int fpc_a { cpp_df_qf_detail::ccmath::fpclassify(o.crep().first) };
+   const int fpc_b { cpp_df_qf_detail::ccmath::fpclassify(o.crep().second) };
 
-   return  cpp_df_qf_detail::ccmath::isnan(o.crep().first) ? FP_NAN       :
-           cpp_df_qf_detail::ccmath::isinf(o.crep().first) ? FP_INFINITE  :
-           eval_is_zero(o)                                 ? FP_ZERO      :
-          (   (cpp_df_qf_detail::ccmath::fabs(o.crep().first) > 0)
-           && (cpp_df_qf_detail::ccmath::fabs(o.crep().first) < (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::min)()))
-                                                           ? FP_SUBNORMAL : FP_NORMAL;
+   if ((fpc_a == FP_ZERO) && ((fpc_b == FP_ZERO) || (fpc_b == FP_SUBNORMAL)))
+   {
+      return FP_ZERO;
+   }
+   else
+   {
+      if ((fpc_a == FP_NORMAL) && (fpc_b == FP_SUBNORMAL))
+      {
+         return FP_SUBNORMAL;
+      }
+      else
+      {
+         return fpc_a;
+      }
+   }
+
+   #else
+   using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
+   using local_float_type = typename local_backend_type::float_type;
+
+   const local_float_type fabs_x { cpp_df_qf_detail::ccmath::fabs(o.crep().first) };
+
+   return    cpp_df_qf_detail::ccmath::isnan(o.crep().first) ? FP_NAN
+           : cpp_df_qf_detail::ccmath::isinf(o.crep().first) ? FP_INFINITE
+           : eval_is_zero(o)                                 ? FP_ZERO
+           : ((fabs_x > 0) && (fabs_x < (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::min)())) ? FP_SUBNORMAL
+           :                                                   FP_NORMAL;
+   #endif
 }
 
 template <typename FloatingPointType>
@@ -1409,7 +1543,7 @@ constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
 
    if ((fpc != FP_NORMAL) || isneg_o)
    {
-      if ((fpc == FP_ZERO) || (fpc == FP_SUBNORMAL))
+      if (fpc == FP_ZERO)
       {
          result = double_float_type(0);
          return;

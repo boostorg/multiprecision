@@ -10,6 +10,7 @@
 
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_fabs.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_fma.hpp>
+#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_fpclassify.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_frexp.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_isinf.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_isnan.hpp>
