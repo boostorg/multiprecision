@@ -600,7 +600,27 @@ class cpp_double_fp_backend
 
       float_type C { cpp_df_qf_detail::split(float_type()) * data.first };
 
-      const float_type hu { C - float_type { C - data.first } };
+      float_type hu { };
+
+      if (cpp_df_qf_detail::ccmath::isinf(C))
+      {
+        // In this case, data.first is evidently so large that multipllication
+        // with the split has overflowed to infinity. Take a last-chance try
+        // for multiplication by scaling with the split and subsequently
+        // taking the difference term.
+
+        // TBD: Is this numericaly correct? Or is it simply the "best" we can
+        // do in this edge-case? Or is there an alternate multiplication scheme
+        // that is not susceptible to this particular sort of overflow?
+
+        C = data.first - (data.first / cpp_df_qf_detail::split(float_type()));
+
+        hu = (data.first - C) * cpp_df_qf_detail::split(float_type());
+      }
+      else
+      {
+         hu = float_type { C - float_type { C - data.first } };
+      }
 
       C = data.first * v.data.first;
 
@@ -723,7 +743,7 @@ class cpp_double_fp_backend
 
       if (cpp_df_qf_detail::ccmath::isinf(u) || cpp_df_qf_detail::ccmath::isinf(c))
       {
-         // Evidently we have some very large operands. Let's take a last chance
+         // Evidently we have some very large operands. Take a last-chance try
          // for finite division. Use the ratio of square roots and subsequently
          // square the ratio, handling the sign of the result separately.
 
@@ -942,9 +962,19 @@ class cpp_double_fp_backend
 
    static constexpr cpp_double_fp_backend my_value_max() noexcept
    {
+      // TBD: Is this value even correct, if there is such a
+      // thing as correct for this unusual data type?
+
+      // TBD: This might involve a recurring run-time calculation.
+      // Can this work be more clearly off-loaded to known
+      // compile-time constexpr?
+
       // TBD: Can this be simplified in any way?
       // Is the use of the square root the best way to go?
       // Can this be made more friendly to C++14 constexpr?
+
+      // TBD: Or should we use the static-initializer trick (as used in cpp_dec_float)
+      // to initialize this and possible other similar values?
 
       return
          cpp_double_fp_backend
@@ -970,6 +1000,16 @@ class cpp_double_fp_backend
 
    static constexpr cpp_double_fp_backend my_value_min() noexcept
    {
+      // TBD: Is this value even correct, if there is such a
+      // thing as correct for this unusual data type?
+
+      // TBD: This might involve a recurring run-time calculation.
+      // Can this work be more clearly off-loaded to known
+      // compile-time constexpr?
+
+      // TBD: Or should we use the static-initializer trick (as used in cpp_dec_float)
+      // to initialize this and possible other similar values?
+
       return
          cpp_double_fp_backend
          (
@@ -988,21 +1028,28 @@ class cpp_double_fp_backend
       // Or should we tune the value of epsilon() depending
       // on the width of the underlying floating-point constituent.
 
+      // TBD: This might involve a recurring run-time calculation.
+      // Can this work be more clearly off-loaded to known
+      // compile-time constexpr?
+
+      // TBD: Or should we use the static-initializer trick (as used in cpp_dec_float)
+      // to initialize this and possible other similar values?
+
       cpp_double_fp_backend result { };
 
-      eval_ldexp(result, cpp_double_fp_backend(1), 4 - my_digits);
+      eval_ldexp(result, cpp_double_fp_backend(1), 3 - my_digits);
 
       return result;
    }
 
    static constexpr cpp_double_fp_backend my_value_nan() noexcept
    {
-      return cpp_double_fp_backend(static_cast<float_type>(NAN));
+      return cpp_double_fp_backend(static_cast<float_type>(NAN), float_type { 0.0F });
    }
 
    static constexpr cpp_double_fp_backend my_value_inf() noexcept
    {
-      return cpp_double_fp_backend(static_cast<float_type>(HUGE_VAL)); // conversion from double infinity OK
+      return cpp_double_fp_backend(static_cast<float_type>(HUGE_VAL), float_type { 0.0F }); // conversion from double infinity OK
    }
 
  private:
@@ -1080,7 +1127,8 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
    else
    {
       cpp_dec_float_read_write_type dummy_frexp { };
-      auto e2_from_f_dec = int { };
+
+      int e2_from_f_dec { };
       eval_frexp(dummy_frexp, f_dec, &e2_from_f_dec);
 
       const auto is_definitely_zero =
@@ -1131,7 +1179,7 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 
             using local_double_fp_constituent_type = typename local_double_fp_type::float_type;
 
-            constexpr auto pow2_scaling_for_small_input = cpp_df_qf_detail::ccmath::numeric_limits<local_double_fp_constituent_type>::digits;
+            constexpr int pow2_scaling_for_small_input { cpp_df_qf_detail::ccmath::numeric_limits<local_double_fp_constituent_type>::digits };
 
             const auto has_pow2_scaling_for_small_input =
             (
@@ -1167,7 +1215,7 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 
             if (has_pow2_scaling_for_small_input)
             {
-               eval_ldexp(*this, local_double_fp_type(*this), static_cast<int>(-pow2_scaling_for_small_input));
+               eval_ldexp(*this, local_double_fp_type { *this }, -pow2_scaling_for_small_input);
             }
          }
       }
