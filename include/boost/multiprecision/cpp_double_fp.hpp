@@ -600,7 +600,7 @@ class cpp_double_fp_backend
 
       float_type C { cpp_df_qf_detail::split(float_type()) * data.first };
 
-      float_type hu { };
+      float_type hu { C - float_type { C - data.first } };
 
       if (cpp_df_qf_detail::ccmath::isinf(C))
       {
@@ -616,10 +616,6 @@ class cpp_double_fp_backend
         C = data.first - (data.first / cpp_df_qf_detail::split(float_type()));
 
         hu = (data.first - C) * cpp_df_qf_detail::split(float_type());
-      }
-      else
-      {
-         hu = float_type { C - float_type { C - data.first } };
       }
 
       C = data.first * v.data.first;
