@@ -1402,10 +1402,6 @@ constexpr void eval_fabs(cpp_double_fp_backend<FloatingPointType>& result, const
 template <typename FloatingPointType>
 constexpr void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& a, int* v)
 {
-   #if 0
-   result.rep().first  = cpp_df_qf_detail::ccmath::frexp(a.rep().first, v);
-   result.rep().second = cpp_df_qf_detail::ccmath::ldexp(a.rep().second, -*v);
-   #else
    using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
    using local_float_type = typename local_backend_type::float_type;
 
@@ -1413,7 +1409,6 @@ constexpr void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, cons
    const local_float_type flo { cpp_df_qf_detail::ccmath::ldexp(a.rep().second, -*v) };
 
    local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
-   #endif
 }
 
 template <typename FloatingPointType>
@@ -1431,41 +1426,6 @@ constexpr void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, cons
 template <typename FloatingPointType>
 constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x)
 {
-   #if 0
-   using double_float_type = cpp_double_fp_backend<FloatingPointType>;
-
-   const typename double_float_type::float_type fhi = cpp_df_qf_detail::floor_of_constituent(x.my_first());
-
-   if (fhi != x.my_first())
-   {
-      result.rep().first  = fhi;
-      result.rep().second = static_cast<typename double_float_type::float_type>(0.0F);
-   }
-   else
-   {
-      const bool is_fractional_lo { cpp_df_qf_detail::ccmath::fabs(x.my_second()) < 1 };
-      const bool is_negative_lo { x.my_second() < 0 };
-
-      if (is_fractional_lo)
-      {
-         if (is_negative_lo)
-         {
-            result.rep().first  = fhi - typename double_float_type::float_type { 1 };
-            result.rep().second = typename double_float_type::float_type { 0 };
-         }
-         else
-         {
-            result.rep().first  = fhi;
-            result.rep().second = typename double_float_type::float_type { 0 };
-         }
-      }
-      else
-      {
-         result.rep().second = cpp_df_qf_detail::floor_of_constituent(x.my_second());
-         result.rep().second = fhi;
-      }
-   }
-   #else
    using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
    using local_float_type = typename local_backend_type::float_type;
 
@@ -1482,7 +1442,6 @@ constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, cons
 
       local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
    }
-   #endif
 }
 
 template <typename FloatingPointType>
@@ -1497,27 +1456,6 @@ constexpr void eval_ceil(cpp_double_fp_backend<FloatingPointType>& result, const
 template <typename FloatingPointType>
 constexpr int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
 {
-   #if 0
-   const int fpc_a { cpp_df_qf_detail::ccmath::fpclassify(o.crep().first) };
-   const int fpc_b { cpp_df_qf_detail::ccmath::fpclassify(o.crep().second) };
-
-   if ((fpc_a == FP_ZERO) && ((fpc_b == FP_ZERO) || (fpc_b == FP_SUBNORMAL)))
-   {
-      return FP_ZERO;
-   }
-   else
-   {
-      if ((fpc_a == FP_NORMAL) && (fpc_b == FP_SUBNORMAL))
-      {
-         return FP_SUBNORMAL;
-      }
-      else
-      {
-         return fpc_a;
-      }
-   }
-
-   #else
    using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
    using local_float_type = typename local_backend_type::float_type;
 
@@ -1528,7 +1466,6 @@ constexpr int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
            : eval_is_zero(o)                                 ? FP_ZERO
            : ((fabs_x > 0) && (fabs_x < (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::min)())) ? FP_SUBNORMAL
            :                                                   FP_NORMAL;
-   #endif
 }
 
 template <typename FloatingPointType>
@@ -1560,13 +1497,15 @@ constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
       }
    }
 
+   // TBD: Optimize this in a similar was as has been done for mul/div.
+
+   // TBD: Taking the square root of a large number (like the (max)() value)
+   // will overflow when multiplying by the split. Can this be handled
+   // more graciously?
+
    const local_float_type c = cpp_df_qf_detail::ccmath::sqrt(o.crep().first);
 
-   constexpr auto MantissaBits = cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits;
-   constexpr auto SplitBits    = static_cast<int>((MantissaBits / 2) + 1);
-   constexpr auto Splitter     = static_cast<local_float_type>((1ULL << SplitBits) + 1);
-
-   local_float_type p  = Splitter * c;
+   local_float_type p  = cpp_df_qf_detail::split(local_float_type()) * c;
    local_float_type hx = (c - p);
                     hx = hx + p;
    local_float_type tx = c  - hx;
