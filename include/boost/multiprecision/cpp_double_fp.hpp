@@ -606,9 +606,7 @@ class cpp_double_fp_backend
 
       if (cpp_df_qf_detail::ccmath::isinf(C))
       {
-         // In this case, data.first is evidently so large that multipllication
-         // with the split has overflowed to infinity. Take a last-chance try
-         // for multiplication by scaling down (and then back up) with the split.
+         // Handle overflow by scaling down (and then back up) with the split.
 
          C = data.first - cpp_df_qf_detail::ccmath::ldexp(data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl);
 
@@ -623,6 +621,8 @@ class cpp_double_fp_backend
 
       if (cpp_df_qf_detail::ccmath::isinf(C))
       {
+         // Handle overflow.
+
          const bool b_neg { (isneg() != v.isneg()) };
 
          *this = cpp_double_fp_backend::my_value_inf();
@@ -641,9 +641,7 @@ class cpp_double_fp_backend
 
       if (cpp_df_qf_detail::ccmath::isinf(c))
       {
-         // In this case, v.data.first is evidently so large that multipllication
-         // with the split has overflowed to infinity. Take a last-chance try
-         // for multiplication by scaling down (and then back up) with the split.
+         // Handle overflow by scaling down (and then back up) with the split.
 
          c = v.data.first - cpp_df_qf_detail::ccmath::ldexp(v.data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl);
 
@@ -756,48 +754,42 @@ class cpp_double_fp_backend
 
       float_type c { cpp_df_qf_detail::split_maker<float_type>::value * C };
 
-      const float_type hc { c - float_type { c - C } };
+      float_type hc;
+
+      if (cpp_df_qf_detail::ccmath::isinf(c))
+      {
+         // Handle overflow by scaling down (and then back up) with the split.
+
+         hc =
+            cpp_df_qf_detail::ccmath::ldexp
+            (
+               C - float_type { C - cpp_df_qf_detail::ccmath::ldexp(C, -cpp_df_qf_detail::split_maker<float_type>::n_shl) },
+               cpp_df_qf_detail::split_maker<float_type>::n_shl
+            );
+      }
+      else
+      {
+         hc = c - float_type { c - C };
+      }
 
       float_type u { cpp_df_qf_detail::split_maker<float_type>::value * v.data.first };
 
-      const float_type hv { u - float_type { u - v.data.first } };
+      float_type hv;
 
-      if (cpp_df_qf_detail::ccmath::isinf(u) || cpp_df_qf_detail::ccmath::isinf(c))
+      if (cpp_df_qf_detail::ccmath::isinf(u))
       {
-         // Evidently we have some very large operands. Take a last-chance try
-         // for finite division. Use the ratio of square roots and subsequently
-         // square the ratio, handling the sign of the result separately.
+         // Handle overflow by scaling down (and then back up) with the split.
 
-         // TBD: Is there a more sensible catch (and handling) for this case?
-
-         const bool u_neg {   isneg() };
-         const bool v_neg { v.isneg() };
-         const bool b_neg { u_neg != v_neg };
-
-         cpp_double_fp_backend uu { *this };
-         cpp_double_fp_backend vv { v };
-
-         cpp_double_fp_backend sqrt_u { };
-         cpp_double_fp_backend sqrt_v { };
-
-         if(u_neg) { uu.negate(); }
-         if(v_neg) { vv.negate(); }
-
-         eval_sqrt(sqrt_u, uu);
-         eval_sqrt(sqrt_v, vv);
-
-         cpp_double_fp_backend sqrt_ratio { sqrt_u / sqrt_v };
-
-         *this = sqrt_ratio;
-
-         eval_multiply(*this, sqrt_ratio);
-
-         if (b_neg)
-         {
-            negate();
-         }
-
-         return *this;
+         hv =
+            cpp_df_qf_detail::ccmath::ldexp
+            (
+               v.data.first - float_type { v.data.first - cpp_df_qf_detail::ccmath::ldexp(v.data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl) },
+               cpp_df_qf_detail::split_maker<float_type>::n_shl
+            );
+      }
+      else
+      {
+         hv = u - float_type { u - v.data.first };
       }
 
       {
@@ -818,7 +810,7 @@ class cpp_double_fp_backend
          u = cpp_df_qf_detail::ccmath::unsafe::fma(tc, tv, u);
       }
 
-      c  = float_type { c - u } + data.second;
+      c = float_type { c - u } + data.second;
 
       c = (c - float_type { C * v.data.second }) / v.data.first;
 
