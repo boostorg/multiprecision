@@ -410,7 +410,7 @@ class cpp_double_fp_backend
 
          if (data.second != 0) { data.second = -data.second; }
 
-         arithmetic::normalize(data, data.first, data.second);
+         data = arithmetic::normalize(data.first, data.second);
       }
    }
 
@@ -676,19 +676,19 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend& operator/=(const cpp_double_fp_backend& v)
    {
       // Handle special cases like zero, inf and NaN.
-      const auto fpc_u = eval_fpclassify(*this);
-      const auto fpc_v = eval_fpclassify(v);
+      const int fpc_u { eval_fpclassify(*this) };
+      const int fpc_v { eval_fpclassify(v) };
 
-      const auto isnan_u = (fpc_u == FP_NAN);
-      const auto isnan_v = (fpc_v == FP_NAN);
+      const bool isnan_u { (fpc_u == FP_NAN) };
+      const bool isnan_v { (fpc_v == FP_NAN) };
 
       if (isnan_u || isnan_v)
       {
          return operator=(cpp_double_fp_backend::my_value_nan());
       }
 
-      const auto iszero_u = (fpc_u == FP_ZERO);
-      const auto iszero_v = (fpc_v == FP_ZERO);
+      const bool iszero_u { (fpc_u == FP_ZERO) };
+      const bool iszero_v { (fpc_v == FP_ZERO) };
 
       if (this == &v)
       {
@@ -718,13 +718,15 @@ class cpp_double_fp_backend
          *this = cpp_double_fp_backend::my_value_inf();
 
          if (b_neg)
+         {
             negate();
+         }
 
          return *this;
       }
 
-      const auto isinf_v = (fpc_v == FP_INFINITE);
-      const auto isinf_u = (fpc_u == FP_INFINITE);
+      const bool isinf_v { (fpc_v == FP_INFINITE) };
+      const bool isinf_u { (fpc_u == FP_INFINITE) };
 
       if (isinf_u)
       {
@@ -792,12 +794,9 @@ class cpp_double_fp_backend
          hv = u - float_type { u - v.data.first };
       }
 
-      {
-         const float_type U { C * v.data.first };
+      const float_type U { C * v.data.first };
 
-         u = cpp_df_qf_detail::ccmath::unsafe::fma(hc, hv, -U);
-         c = data.first - U;
-      }
+      u = cpp_df_qf_detail::ccmath::unsafe::fma(hc, hv, -U);
 
       const float_type tv { v.data.first - hv };
 
@@ -810,7 +809,7 @@ class cpp_double_fp_backend
          u = cpp_df_qf_detail::ccmath::unsafe::fma(tc, tv, u);
       }
 
-      c = float_type { c - u } + data.second;
+      c = float_type { (data.first - U) - u } + data.second;
 
       c = (c - float_type { C * v.data.second }) / v.data.first;
 
@@ -1405,10 +1404,17 @@ constexpr void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, cons
    using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
    using local_float_type = typename local_backend_type::float_type;
 
-   const local_float_type fhi { cpp_df_qf_detail::ccmath::frexp(a.rep().first, v) };
-   const local_float_type flo { cpp_df_qf_detail::ccmath::ldexp(a.rep().second, -*v) };
+   int expptr;
 
-   local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
+   const local_float_type fhi { cpp_df_qf_detail::ccmath::frexp(a.rep().first, &expptr) };
+   const local_float_type flo { cpp_df_qf_detail::ccmath::ldexp(a.rep().second, -expptr) };
+
+   if (v != nullptr)
+   {
+      *v = expptr;
+   }
+
+   result.rep() = local_backend_type::arithmetic::normalize(fhi, flo);
 }
 
 template <typename FloatingPointType>
@@ -1420,7 +1426,7 @@ constexpr void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, cons
    const local_float_type fhi { cpp_df_qf_detail::ccmath::ldexp(a.crep().first,  v) };
    const local_float_type flo { cpp_df_qf_detail::ccmath::ldexp(a.crep().second, v) };
 
-   local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
+   result.rep() = local_backend_type::arithmetic::normalize(fhi, flo);
 }
 
 template <typename FloatingPointType>
@@ -1440,7 +1446,7 @@ constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, cons
    {
       const local_float_type flo = { cpp_df_qf_detail::ccmath::floor(x.my_second()) };
 
-      local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
+      result.rep() = local_backend_type::arithmetic::normalize(fhi, flo);
    }
 }
 

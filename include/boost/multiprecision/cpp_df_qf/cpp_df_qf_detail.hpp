@@ -18,61 +18,6 @@
 
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail {
 
-// Define a templated function with an EnableType
-template <typename FloatType, typename EnableType = void>
-struct split_maker { };
-
-template <typename FloatType>
-struct split_maker<FloatType,
-                   typename ::std::enable_if<::std::is_floating_point<FloatType>::value>::type>
-{
-private:
-   using float_type = FloatType;
-
-public:
-   static constexpr int
-      n_shl
-      {
-         static_cast<int>((ccmath::numeric_limits<float_type>::digits + 1) / 2)
-      };
-
-   static constexpr float_type
-      value
-      {
-         static_cast<float_type>
-         (
-            1ULL + static_cast<unsigned long long>(1ULL << static_cast<unsigned>(n_shl))
-         )
-      };
-};
-
-#if defined(BOOST_HAS_FLOAT128)
-template <typename FloatType>
-struct split_maker<FloatType,
-                   typename ::std::enable_if<::std::is_same<FloatType, ::boost::float128_type>::value>::type>
-{
-private:
-   using float_type = FloatType;
-
-public:
-   static constexpr int
-      n_shl
-      {
-         static_cast<int>((ccmath::numeric_limits<float_type>::digits + 1) / 2)
-      };
-
-   static constexpr float_type
-      value
-      {
-         static_cast<float_type>
-         (
-              ::boost::uint128_type { 1 }
-            + ::boost::uint128_type { ::boost::uint128_type { 1 } << static_cast<unsigned>(n_shl) }
-         )
-      };
-};
-#endif
-
 template <class FloatingPointType>
 struct is_floating_point_or_float128
 {
@@ -83,6 +28,36 @@ struct is_floating_point_or_float128
                                  || std::is_same<FloatingPointType, ::boost::float128_type>::value
 #endif
                                  ;
+};
+
+template <typename FloatType>
+struct split_maker
+{
+private:
+   using float_type = FloatType;
+
+public:
+   static constexpr int
+      n_shl
+      {
+         static_cast<int>((ccmath::numeric_limits<float_type>::digits + 1) / 2)
+      };
+
+      static_assert(n_shl < std::numeric_limits<std::uint64_t>::digits,
+                    "Error: Left-shift amount for split does not fin in std::uint64_t");
+
+   static constexpr float_type
+      value
+      {
+         static_cast<float_type>
+         (
+            std::uint64_t
+            {
+                 UINT64_C(1)
+               + std::uint64_t { UINT64_C(1) << static_cast<unsigned>(n_shl) }
+            }
+         )
+      };
 };
 
 template <typename FloatingPointType>
@@ -101,18 +76,16 @@ struct exact_arithmetic
    {
      const float_type hi { a + b };
      const float_type a1 { hi - b };
-     const float_type b1 { hi - a1 };
 
-     return { hi, float_type { (a - a1) + (b - b1) } };
+     return { hi, float_type { (a - a1) + (b - float_type { hi - a1 }) } };
    }
 
    static constexpr auto two_diff(const float_type a, const float_type b) -> float_pair
    {
      const float_type hi { a - b };
      const float_type a1 { hi + b };
-     const float_type b1 { hi - a1 };
 
-     return { hi, float_type { (a - a1) - (b + b1) } };
+     return { hi, float_type { (a - a1) - (b + float_type { hi - a1 }) } };
    }
 
    static constexpr auto two_hilo_sum(const float_type a, const float_type b) -> float_pair
@@ -122,66 +95,15 @@ struct exact_arithmetic
       return { hi, float_type { b - (hi - a) } };
    }
 
-   static constexpr auto normalize(float_pair& result, float_type a, float_type b) -> void
+   static constexpr auto normalize(float_type a, float_type b) -> float_pair
    {
-      float_type u { a + b };
-      float_type v { a - u };
+      const float_type u { a + b };
 
-      v = v + b;
-
-      result.first  = u;
-      result.second = v;
-   }
-
-   static constexpr auto split(const float_type& a) -> float_pair
-   {
-      // Split a floating point number in two (high and low) parts approximating the
-      // upper-half and lower-half bits of the float
-
-      static_assert(is_floating_point_or_float128<FloatingPointType>::value,
-                    "Error: exact_arithmetic<>::split invoked with unknown floating-point type");
-
-      // TODO Replace bit shifts with constexpr funcs or ldexp for better compaitibility
-      constexpr int MantissaBits = cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits;
-      constexpr int SplitBits    = MantissaBits / 2 + 1;
-
-      // Check if the integer is wide enough to hold the Splitter.
-      static_assert(std::numeric_limits<std::uintmax_t>::digits > SplitBits,
-                    "Inadequate integer width for binary shifting needed in split(), try using ldexp instead");
-
-      // If the above line gives an compilation error, replace the
-      // line below it with the commented line
-
-      constexpr float_type Splitter       = FloatingPointType((static_cast<std::uintmax_t>(UINT8_C(1)) << SplitBits) + 1);
-      const     float_type SplitThreshold = (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)() / (Splitter * 2);
-
-      float_type hi { };
-      float_type lo { };
-
-      // Handle if multiplication with the splitter would cause overflow
-      if (a > SplitThreshold || a < -SplitThreshold)
+      return
       {
-         constexpr float_type Normalizer = float_type(1ULL << (SplitBits + 1));
-
-         const float_type a_ = a / Normalizer;
-
-         const float_type temp = Splitter * a_;
-
-         hi   = temp - (temp - a_);
-         lo   = a_ - hi;
-
-         hi *= Normalizer;
-         lo *= Normalizer;
-      }
-      else
-      {
-         const float_type temp = Splitter * a;
-
-         hi   = temp - (temp - a);
-         lo   = a - hi;
-      }
-
-      return { hi, lo };
+         u,
+         float_type { a - u } + b
+      };
    }
 };
 
