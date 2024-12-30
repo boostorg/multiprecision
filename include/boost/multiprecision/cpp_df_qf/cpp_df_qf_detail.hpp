@@ -14,18 +14,63 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath.hpp>
 
-#include <cmath>
-#include <limits>
-#include <tuple>
 #include <utility>
 
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail {
 
-inline constexpr float        split          (float)                  { return static_cast<float>      (1U + static_cast<unsigned long long>(static_cast<unsigned long long>(1U) << static_cast<unsigned>((cpp_df_qf_detail::ccmath::numeric_limits<float                 >::digits + 1) / 2))); }
-inline constexpr double       split          (double)                 { return static_cast<double>     (1U + static_cast<unsigned long long>(static_cast<unsigned long long>(1U) << static_cast<unsigned>((cpp_df_qf_detail::ccmath::numeric_limits<double                >::digits + 1) / 2))); }
-inline constexpr long double  split          (long double)            { return static_cast<long double>(1U + static_cast<unsigned long long>(static_cast<unsigned long long>(1U) << static_cast<unsigned>((cpp_df_qf_detail::ccmath::numeric_limits<long double           >::digits + 1) / 2))); }
+// Define a templated function with an EnableType
+template <typename FloatType, typename EnableType = void>
+struct split_maker { };
+
+template <typename FloatType>
+struct split_maker<FloatType,
+                   typename ::std::enable_if<::std::is_floating_point<FloatType>::value>::type>
+{
+private:
+   using float_type = FloatType;
+
+public:
+   static constexpr int
+      n_shl
+      {
+         static_cast<int>((ccmath::numeric_limits<float_type>::digits + 1) / 2)
+      };
+
+   static constexpr float_type
+      value
+      {
+         static_cast<float_type>
+         (
+            1ULL + static_cast<unsigned long long>(1ULL << static_cast<unsigned>(n_shl))
+         )
+      };
+};
+
 #if defined(BOOST_HAS_FLOAT128)
-inline constexpr ::boost::float128_type split(::boost::float128_type) { return static_cast<::boost::float128_type>(1) + static_cast<::boost::float128_type>(static_cast<::boost::uint128_type>(1U) << static_cast<unsigned>((cpp_df_qf_detail::ccmath::numeric_limits<::boost::float128_type>::digits + 1) / 2)); }
+template <typename FloatType>
+struct split_maker<FloatType,
+                   typename ::std::enable_if<::std::is_same<FloatType, ::boost::float128_type>::value>::type>
+{
+private:
+   using float_type = FloatType;
+
+public:
+   static constexpr int
+      n_shl
+      {
+         static_cast<int>((ccmath::numeric_limits<float_type>::digits + 1) / 2)
+      };
+
+   static constexpr float_type
+      value
+      {
+         static_cast<float_type>
+         (
+              ::boost::uint128_type { 1 }
+            + ::boost::uint128_type { ::boost::uint128_type { 1 } << static_cast<unsigned>(n_shl) }
+         )
+      };
+};
 #endif
 
 template <class FloatingPointType>

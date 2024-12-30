@@ -452,6 +452,7 @@ class cpp_double_fp_backend
          {
             *this = cpp_double_fp_backend::my_value_nan();
          }
+
          return *this;
       }
 
@@ -553,13 +554,9 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend& operator*=(const cpp_double_fp_backend& v)
    {
       // Evaluate the sign of the result.
-      const auto isneg_u =   isneg();
-      const auto isneg_v = v.isneg();
 
-      const bool b_result_is_neg = (isneg_u != isneg_v);
-
-      const auto fpc_u = eval_fpclassify(*this);
-      const auto fpc_v = eval_fpclassify(v);
+      const int fpc_u { eval_fpclassify(*this) };
+      const int fpc_v { eval_fpclassify(v) };
 
       // Handle special cases like zero, inf and NaN.
       const bool isinf_u  { (fpc_u == FP_INFINITE) };
@@ -576,10 +573,15 @@ class cpp_double_fp_backend
 
       if (isinf_u || isinf_v)
       {
+         const bool b_neg { (isneg() != v.isneg()) };
+
          *this = cpp_double_fp_backend::my_value_inf();
 
-         if (b_result_is_neg)
+         if (b_neg)
+         {
             negate();
+         }
+
          return *this;
       }
 
@@ -598,40 +600,59 @@ class cpp_double_fp_backend
       // K. Briggs work. The algorithm has been significantly simplified
       // while still atempting to retain proper rounding corrections.
 
-      float_type C { cpp_df_qf_detail::split(float_type()) * data.first };
+      float_type C { cpp_df_qf_detail::split_maker<float_type>::value * data.first };
 
-      float_type hu { C - float_type { C - data.first } };
+      float_type hu;
 
       if (cpp_df_qf_detail::ccmath::isinf(C))
       {
-        // In this case, data.first is evidently so large that multipllication
-        // with the split has overflowed to infinity. Take a last-chance try
-        // for multiplication by scaling with the split and subsequently
-        // taking the difference term.
+         // In this case, data.first is evidently so large that multipllication
+         // with the split has overflowed to infinity. Take a last-chance try
+         // for multiplication by scaling down (and then back up) with the split.
 
-        // TBD: Is this numericaly correct? Or is it simply the "best" we can
-        // do in this edge-case? Or is there an alternate multiplication scheme
-        // that is not susceptible to this particular sort of overflow?
+         C = data.first - cpp_df_qf_detail::ccmath::ldexp(data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl);
 
-        C = data.first - (data.first / cpp_df_qf_detail::split(float_type()));
-
-        hu = (data.first - C) * cpp_df_qf_detail::split(float_type());
+         hu = cpp_df_qf_detail::ccmath::ldexp(data.first - C, cpp_df_qf_detail::split_maker<float_type>::n_shl);
+      }
+      else
+      {
+         hu = C - float_type { C - data.first };
       }
 
       C = data.first * v.data.first;
 
       if (cpp_df_qf_detail::ccmath::isinf(C))
       {
+         const bool b_neg { (isneg() != v.isneg()) };
+
          *this = cpp_double_fp_backend::my_value_inf();
 
-         if (b_result_is_neg)
+         if (b_neg)
+         {
             negate();
+         }
+
          return *this;
       }
 
-      float_type c { cpp_df_qf_detail::split(float_type()) * v.data.first };
+      float_type c { cpp_df_qf_detail::split_maker<float_type>::value * v.data.first };
 
-      const float_type hv { c - float_type { c - v.data.first } };
+      float_type hv;
+
+      if (cpp_df_qf_detail::ccmath::isinf(c))
+      {
+         // In this case, v.data.first is evidently so large that multipllication
+         // with the split has overflowed to infinity. Take a last-chance try
+         // for multiplication by scaling down (and then back up) with the split.
+
+         c = v.data.first - cpp_df_qf_detail::ccmath::ldexp(v.data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl);
+
+         hv = cpp_df_qf_detail::ccmath::ldexp(v.data.first - c, cpp_df_qf_detail::split_maker<float_type>::n_shl);
+      }
+      else
+      {
+         hv = c - float_type { c - v.data.first };
+      }
 
       const float_type tv { v.data.first - hv };
 
@@ -733,15 +754,21 @@ class cpp_double_fp_backend
 
       const float_type C { data.first / v.data.first };
 
-      float_type c { cpp_df_qf_detail::split(float_type()) * C };
+      float_type c { cpp_df_qf_detail::split_maker<float_type>::value * C };
 
-      float_type u { cpp_df_qf_detail::split(float_type()) * v.data.first };
+      const float_type hc { c - float_type { c - C } };
+
+      float_type u { cpp_df_qf_detail::split_maker<float_type>::value * v.data.first };
+
+      const float_type hv { u - float_type { u - v.data.first } };
 
       if (cpp_df_qf_detail::ccmath::isinf(u) || cpp_df_qf_detail::ccmath::isinf(c))
       {
          // Evidently we have some very large operands. Take a last-chance try
          // for finite division. Use the ratio of square roots and subsequently
          // square the ratio, handling the sign of the result separately.
+
+         // TBD: Is there a more sensible catch (and handling) for this case?
 
          const bool u_neg {   isneg() };
          const bool v_neg { v.isneg() };
@@ -766,13 +793,12 @@ class cpp_double_fp_backend
          eval_multiply(*this, sqrt_ratio);
 
          if (b_neg)
+         {
             negate();
+         }
+
          return *this;
       }
-
-      const float_type hc { c - float_type { c - C } };
-
-      const float_type hv { u - float_type { u - v.data.first } };
 
       {
          const float_type U { C * v.data.first };
@@ -806,14 +832,18 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend operator++(int)
    {
       cpp_double_fp_backend t(*this);
-      ++*this;
+
+      ++(*this);
+
       return t;
    }
 
    constexpr cpp_double_fp_backend operator--(int)
    {
       cpp_double_fp_backend t(*this);
-      --*this;
+
+      --(*this);
+
       return t;
    }
 
@@ -910,7 +940,9 @@ class cpp_double_fp_backend
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
    {
       if (number_of_digits == 0)
+      {
          number_of_digits = cpp_double_fp_backend::my_digits10;
+      }
 
       // Use cpp_dec_float to write string (as is similarly done to read string).
 
@@ -1031,9 +1063,9 @@ class cpp_double_fp_backend
       // TBD: Or should we use the static-initializer trick (as used in cpp_dec_float)
       // to initialize this and possible other similar values?
 
-      cpp_double_fp_backend result { };
+      cpp_double_fp_backend result;
 
-      eval_ldexp(result, cpp_double_fp_backend(1), 3 - my_digits);
+      eval_ldexp(result, cpp_double_fp_backend { 1 }, 3 - my_digits);
 
       return result;
    }
@@ -1097,9 +1129,10 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
    }
    else
    {
-      cpp_dec_float_read_write_type dummy_frexp { };
+      cpp_dec_float_read_write_type dummy_frexp;
 
-      int e2_from_f_dec { };
+      int e2_from_f_dec;
+
       eval_frexp(dummy_frexp, f_dec, &e2_from_f_dec);
 
       const auto is_definitely_zero =
@@ -1480,7 +1513,7 @@ constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
 
    const local_float_type c = cpp_df_qf_detail::ccmath::sqrt(o.crep().first);
 
-   local_float_type p  = cpp_df_qf_detail::split(local_float_type()) * c;
+   local_float_type p  = cpp_df_qf_detail::split_maker<local_float_type>::value * c;
    local_float_type hx = (c - p);
                     hx = hx + p;
    local_float_type tx = c  - hx;
