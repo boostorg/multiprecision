@@ -478,13 +478,13 @@ class cpp_double_fp_backend
 
       const float_type xlo { data.second };
 
-      data = two_sum(data.first, v.data.first);
+      data = arithmetic::two_sum(data.first, v.data.first);
 
-      const rep_type thi_tlo { two_sum(xlo, v.data.second) };
+      const rep_type thi_tlo { arithmetic::two_sum(xlo, v.data.second) };
 
-      data = two_hilo_sum(data.first, data.second + thi_tlo.first);
+      data = arithmetic::two_hilo_sum(data.first, data.second + thi_tlo.first);
 
-      data = two_hilo_sum(data.first, thi_tlo.second + data.second);
+      data = arithmetic::two_hilo_sum(data.first, thi_tlo.second + data.second);
 
       return *this;
    }
@@ -539,13 +539,13 @@ class cpp_double_fp_backend
 
       const float_type xlo { data.second };
 
-      data = two_diff(data.first, v.data.first);
+      data = arithmetic::two_diff(data.first, v.data.first);
 
-      const rep_type thi_tlo { two_diff(xlo, v.data.second) };
+      const rep_type thi_tlo { arithmetic::two_diff(xlo, v.data.second) };
 
-      data = two_hilo_sum(data.first, data.second + thi_tlo.first);
+      data = arithmetic::two_hilo_sum(data.first, data.second + thi_tlo.first);
 
-      data = two_hilo_sum(data.first, thi_tlo.second + data.second);
+      data = arithmetic::two_hilo_sum(data.first, thi_tlo.second + data.second);
 
       return *this;
    }
@@ -975,7 +975,7 @@ class cpp_double_fp_backend
       return
          cpp_double_fp_backend
          (
-            arithmetic::fast_sum
+            arithmetic::two_hilo_sum
             (
                static_cast<float_type>
                (
@@ -1064,31 +1064,6 @@ class cpp_double_fp_backend
    using cpp_dec_float_read_write_exp_type = typename cpp_dec_float_read_write_type::exponent_type;
 
    bool rd_string(const char* pstr);
-
-   static constexpr rep_type two_sum(const float_type a, const float_type b)
-   {
-     const float_type hi { a + b };
-     const float_type a1 { hi - b };
-     const float_type b1 { hi - a1 };
-
-     return { hi, float_type { (a - a1) + (b - b1) } };
-   }
-
-   static constexpr rep_type two_diff(const float_type a, const float_type b)
-   {
-     const float_type hi { a - b };
-     const float_type a1 { hi + b };
-     const float_type b1 { hi - a1 };
-
-     return { hi, float_type { (a - a1) - (b + b1) } };
-   }
-
-   static constexpr rep_type two_hilo_sum(const float_type a, const float_type b)
-   {
-      const float_type hi { a + b };
-
-      return { hi, float_type { b - (hi - a) } };
-   }
 
    template <typename OtherFloatingPointType,
              typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits10 * 2) < 16))>::type const*>
