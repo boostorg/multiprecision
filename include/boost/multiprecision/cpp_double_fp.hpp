@@ -635,15 +635,15 @@ class cpp_double_fp_backend
 
       const float_type tv { v.data.first - hv };
 
-      float_type t1 { cpp_df_qf_detail::ccmath::fma(hu, hv, -C) };
+      float_type t1 { cpp_df_qf_detail::ccmath::unsafe::fma(hu, hv, -C) };
 
-      t1 = cpp_df_qf_detail::ccmath::fma(hu, tv, t1);
+      t1 = cpp_df_qf_detail::ccmath::unsafe::fma(hu, tv, t1);
 
       const float_type tu { data.first - hu };
 
-      t1 = cpp_df_qf_detail::ccmath::fma(tu, hv, t1);
+      t1 = cpp_df_qf_detail::ccmath::unsafe::fma(tu, hv, t1);
 
-      c =    cpp_df_qf_detail::ccmath::fma(tu, tv, t1)
+      c =    cpp_df_qf_detail::ccmath::unsafe::fma(tu, tv, t1)
           + (data.first * v.data.second)
           + (data.second * v.data.first);
 
@@ -777,19 +777,19 @@ class cpp_double_fp_backend
       {
          const float_type U { C * v.data.first };
 
-         u = cpp_df_qf_detail::ccmath::fma(hc, hv, -U);
+         u = cpp_df_qf_detail::ccmath::unsafe::fma(hc, hv, -U);
          c = data.first - U;
       }
 
       const float_type tv { v.data.first - hv };
 
-      u = cpp_df_qf_detail::ccmath::fma(hc, tv, u);
+      u = cpp_df_qf_detail::ccmath::unsafe::fma(hc, tv, u);
 
       {
          const float_type tc { C - hc };
 
-         u = cpp_df_qf_detail::ccmath::fma(tc, hv, u);
-         u = cpp_df_qf_detail::ccmath::fma(tc, tv, u);
+         u = cpp_df_qf_detail::ccmath::unsafe::fma(tc, hv, u);
+         u = cpp_df_qf_detail::ccmath::unsafe::fma(tc, tv, u);
       }
 
       c  = float_type { c - u } + data.second;
@@ -1404,7 +1404,7 @@ constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, cons
    using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
    using local_float_type = typename local_backend_type::float_type;
 
-   const local_float_type fhi { cpp_df_qf_detail::floor_of_constituent(x.my_first()) };
+   const local_float_type fhi { cpp_df_qf_detail::ccmath::floor(x.my_first()) };
 
    if (fhi != x.my_first())
    {
@@ -1413,7 +1413,7 @@ constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, cons
    }
    else
    {
-      const local_float_type flo = { cpp_df_qf_detail::floor_of_constituent(x.my_second()) };
+      const local_float_type flo = { cpp_df_qf_detail::ccmath::floor(x.my_second()) };
 
       local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
    }
@@ -1552,7 +1552,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mx { };
             eval_convert_to(&mx, double_float_type::my_value_max());
 
-            const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
+            const local_float_type log_of_mx = cpp_df_qf_detail::ccmath::log(mx);
 
             return log_of_mx;
          }()
@@ -1565,7 +1565,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mn { };
             eval_convert_to(&mn, double_float_type::my_value_min());
 
-            const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
+            const local_float_type log_of_mn = cpp_df_qf_detail::ccmath::log(mn);
 
             return log_of_mn;
          }()
@@ -1708,7 +1708,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mx { };
             eval_convert_to(&mx, double_float_type::my_value_max());
 
-            const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
+            const local_float_type log_of_mx = cpp_df_qf_detail::ccmath::log(mx);
 
             return log_of_mx;
          }()
@@ -1721,7 +1721,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mn { };
             eval_convert_to(&mn, double_float_type::my_value_min());
 
-            const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
+            const local_float_type log_of_mn = cpp_df_qf_detail::ccmath::log(mn);
 
             return log_of_mn;
          }()
@@ -1864,7 +1864,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mx { };
             eval_convert_to(&mx, double_float_type::my_value_max());
 
-            const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
+            const local_float_type log_of_mx = cpp_df_qf_detail::ccmath::log(mx);
 
             return log_of_mx;
          }()
@@ -1877,7 +1877,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mn { };
             eval_convert_to(&mn, double_float_type::my_value_min());
 
-            const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
+            const local_float_type log_of_mn = cpp_df_qf_detail::ccmath::log(mn);
 
             return log_of_mn;
          }()
@@ -2023,7 +2023,7 @@ constexpr void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const 
       eval_frexp(x2, x, &n2);
 
       // Get initial estimate using the (wrapped) standard math function log.
-      const double_float_type s(cpp_df_qf_detail::log_of_constituent(x2.crep().first));
+      const double_float_type s(cpp_df_qf_detail::ccmath::log(x2.crep().first));
 
       double_float_type E { };
 

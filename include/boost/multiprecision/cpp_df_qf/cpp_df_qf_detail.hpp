@@ -10,34 +10,16 @@
 #ifndef BOOST_MP_CPP_DF_QF_DETAIL_2023_01_02_HPP
 #define BOOST_MP_CPP_DF_QF_DETAIL_2023_01_02_HPP
 
+#include <boost/config.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath.hpp>
+
 #include <cmath>
 #include <limits>
 #include <tuple>
 #include <utility>
 
-#include <boost/config.hpp>
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath.hpp>
-
-#ifdef BOOST_HAS_FLOAT128
-#include <quadmath.h>
-#endif
-
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail {
-
-inline float                  floor_of_constituent(float                  x) { return ::floorf(x); }
-inline double                 floor_of_constituent(double                 x) { return ::floor (x); }
-inline long double            floor_of_constituent(long double            x) { return ::floorl(x); }
-#if defined(BOOST_HAS_FLOAT128)
-inline ::boost::float128_type floor_of_constituent(::boost::float128_type x) { return ::floorq(x); }
-#endif
-
-inline float                  log_of_constituent(float                  x) { return ::logf(x); }
-inline double                 log_of_constituent(double                 x) { return ::log (x); }
-inline long double            log_of_constituent(long double            x) { return ::logl(x); }
-#if defined(BOOST_HAS_FLOAT128)
-inline ::boost::float128_type log_of_constituent(::boost::float128_type x) { return ::logq(x); }
-#endif
 
 inline constexpr float        split          (float)                  { return static_cast<float>      (1U + static_cast<unsigned long long>(static_cast<unsigned long long>(1U) << static_cast<unsigned>((cpp_df_qf_detail::ccmath::numeric_limits<float                 >::digits + 1) / 2))); }
 inline constexpr double       split          (double)                 { return static_cast<double>     (1U + static_cast<unsigned long long>(static_cast<unsigned long long>(1U) << static_cast<unsigned>((cpp_df_qf_detail::ccmath::numeric_limits<double                >::digits + 1) / 2))); }

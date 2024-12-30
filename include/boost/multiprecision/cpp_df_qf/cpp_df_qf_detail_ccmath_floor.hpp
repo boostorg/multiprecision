@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2023 - 2024.
+//  Copyright Christopher Kormanyos 2024.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_SQRT_2023_01_07_HPP
-#define BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_SQRT_2023_01_07_HPP
+#ifndef BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_FLOOR_2024_12_30_HPP
+#define BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_FLOOR_2024_12_30_HPP
 
 #include <cmath>
 #include <type_traits>
@@ -17,29 +17,29 @@ namespace detail {
 
 #if defined(BOOST_HAS_FLOAT128)
 template <class T>
-auto sqrt_impl(T x) -> typename ::std::enable_if<::std::is_same<T, ::boost::float128_type>::value, T>::type
+auto floor_impl(T x) -> typename ::std::enable_if<::std::is_same<T, ::boost::float128_type>::value, T>::type
 {
-   return ::sqrtq(x);
+   return ::floorq(x);
 }
 #endif
 
 template <class T>
-auto sqrt_impl(T x) -> typename ::std::enable_if<::std::is_floating_point<T>::value, T>::type
+auto floor_impl(T x) -> typename ::std::enable_if<::std::is_floating_point<T>::value, T>::type
 {
-   // Default to the regular std::sqrt function.
-   using std::sqrt;
+   // Default to the regular std::floor function.
+   using std::floor;
 
-   return sqrt(x);
+   return floor(x);
 }
 
 } // namespace detail
 
 template <typename Real>
-auto sqrt(Real x) -> Real
+auto floor(Real x) -> Real
 {
-   return cpp_df_qf_detail::ccmath::detail::sqrt_impl<Real>(x);
+   return cpp_df_qf_detail::ccmath::detail::floor_impl<Real>(x);
 }
 
 } } } } } // namespace boost::multiprecision::backends::cpp_df_qf_detail::ccmath
 
-#endif // BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_SQRT_2023_01_07_HPP
+#endif // BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_FLOOR_2024_12_30_HPP
