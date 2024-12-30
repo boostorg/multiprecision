@@ -69,28 +69,30 @@ struct exact_arithmetic
 
    using float_type  = FloatingPointType;
    using float_pair  = std::pair<float_type, float_type>;
-   using float_tuple = std::tuple<float_type, float_type, float_type, float_type>;
 
-   static constexpr auto fast_sum(float_type a, float_type b) -> float_pair
+   static constexpr auto two_sum(const float_type a, const float_type b) -> float_pair
    {
-      // Exact addition of two floating point numbers, given |a| > |b|
-      const float_type a_plus_b = a + b;
+     const float_type hi { a + b };
+     const float_type a1 { hi - b };
+     const float_type b1 { hi - a1 };
 
-      const float_pair result(a_plus_b, b - (a_plus_b - a));
-
-      return result;
+     return { hi, float_type { (a - a1) + (b - b1) } };
    }
 
-   static constexpr void sum(float_pair& result, float_type a, float_type b)
+   static constexpr auto two_diff(const float_type a, const float_type b) -> float_pair
    {
-      // Exact addition of two floating point numbers
-      const float_type a_plus_b = a + b;
-      const float_type v        = a_plus_b - a;
+     const float_type hi { a - b };
+     const float_type a1 { hi + b };
+     const float_type b1 { hi - a1 };
 
-      const float_pair tmp(a_plus_b, (a - (a_plus_b - v)) + (b - v));
+     return { hi, float_type { (a - a1) - (b + b1) } };
+   }
 
-      result.first  = tmp.first;
-      result.second = tmp.second;
+   static constexpr auto two_hilo_sum(const float_type a, const float_type b) -> float_pair
+   {
+      const float_type hi { a + b };
+
+      return { hi, float_type { b - (hi - a) } };
    }
 
    static constexpr auto normalize(float_pair& result, float_type a, float_type b) -> void
