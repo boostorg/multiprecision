@@ -17,39 +17,31 @@ namespace unsafe {
 
 namespace detail {
 
-#if defined(BOOST_HAS_FLOAT128)
 template <class T>
-auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_same<T, ::boost::float128_type>::value, T>::type
+inline auto fma_impl(T x, T y, T z) noexcept -> T
 {
-   return ::fmaq(x);
+   // Default to the written-out operations.
+
+   return (x * y) + z;
 }
-#endif
 
 #if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
-template <class T>
-auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_same<T, float>::value, T>::type
+template <>
+inline auto fma_impl<float>(float x, float y, float z) noexcept -> float
 {
   return __builtin_fmaf(x, y, z);
 }
 
-template <class T>
-auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_same<T, double>::value, T>::type
+template <>
+inline auto fma_impl<double>(double x, double y, double z) noexcept -> double
 {
   return __builtin_fma(x, y, z);
 }
 
-template <class T>
-auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_same<T, long double>::value, T>::type
+template <>
+inline auto fma_impl<long double>(long double x, long double y, long double z) noexcept -> long double
 {
   return __builtin_fmal(x, y, z);
-}
-#else
-template <class T>
-auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_floating_point<T>::value, T>::type
-{
-  // Default to the written-out operations.
-
-   return (x * y) + z;
 }
 #endif
 

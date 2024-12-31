@@ -225,6 +225,7 @@ class cpp_double_fp_backend
 
    // TBD: Need to keep widening conversion implicit,
    // but ensure that narrowing conversion is explicit.
+
    template <typename OtherFloatType,
              typename ::std::enable_if<(    cpp_df_qf_detail::is_floating_point_or_float128<OtherFloatType>::value
                                         && (!std::is_same<FloatingPointType, OtherFloatType>::value))>::type const* = nullptr>
@@ -345,6 +346,7 @@ class cpp_double_fp_backend
    {
       // Here we first convert to scientific string, then
       // hash the charactgers in the scientific string.
+
       // TBD: Is there a faster or more simple hash method?
       // TBD: Is there any constexpr support for rudimentary hashing?
 
@@ -365,7 +367,6 @@ class cpp_double_fp_backend
 
    constexpr bool is_zero() const noexcept
    {
-      #if 1
       using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
       using local_float_type = typename local_backend_type::float_type;
 
@@ -374,9 +375,6 @@ class cpp_double_fp_backend
             ((data.first  == local_float_type { 0 }) || (-data.first  == local_float_type { 0 }))
          && ((data.second == local_float_type { 0 }) || (-data.second == local_float_type { 0 }))
       );
-      #else
-      return (compare(cpp_double_fp_backend(0U)) == 0);
-      #endif
    }
 
    constexpr bool is_one() const noexcept
@@ -389,17 +387,10 @@ class cpp_double_fp_backend
 
    constexpr void negate()
    {
-      // TBD: Can this be simplified?
+      const bool isinf_u { (cpp_df_qf_detail::ccmath::isinf)(data.first) };
+      const bool isnan_u { (cpp_df_qf_detail::ccmath::isnan)(data.first) };
 
-      const auto fpc = eval_fpclassify(*this);
-
-      const auto isinf_u  = (fpc == FP_INFINITE);
-      const auto isnan_u  = (fpc == FP_NAN);
-      const auto iszero_u = (fpc == FP_ZERO);
-
-      if (iszero_u || isnan_u)
-      {
-      }
+      if      (isnan_u) { }
       else if (isinf_u)
       {
          data.first = -data.first;
@@ -416,7 +407,9 @@ class cpp_double_fp_backend
 
    constexpr bool isneg() const noexcept
    {
-     return (data.first < 0);
+     const bool isnan_u { (cpp_df_qf_detail::ccmath::isnan)(data.first) };
+
+     return ((!isnan_u) && (data.first < 0));
    }
 
    // Getters/Setters
@@ -1503,40 +1496,33 @@ constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
       }
    }
 
-   // TBD: Optimize this in a similar was as has been done for mul/div.
+   // TBD: Do we need any overflow/underflow guards when multiplying
+   // by the split or when multiplying (hx * tx) and/or (hx * hx)?
 
-   // TBD: Taking the square root of a large number (like the (max)() value)
-   // will overflow when multiplying by the split. Can this be handled
-   // more graciously?
+   const local_float_type c { cpp_df_qf_detail::ccmath::sqrt(o.crep().first) };
 
-   const local_float_type c = cpp_df_qf_detail::ccmath::sqrt(o.crep().first);
+   local_float_type p { cpp_df_qf_detail::split_maker<local_float_type>::value * c };
 
-   local_float_type p  = cpp_df_qf_detail::split_maker<local_float_type>::value * c;
-   local_float_type hx = (c - p);
-                    hx = hx + p;
-   local_float_type tx = c  - hx;
-                    p  = hx * hx;
+   const local_float_type hx { (c - p) + p };
+   const local_float_type tx { c  - hx };
+
    local_float_type q  = hx * tx;
-                    q  = q  + q;
+   q = q + q;
 
-   local_float_type u  = p  + q;
-   local_float_type uu = p  - u;
-                    uu = uu + q;
-   local_float_type t1 = tx * tx;
-                    uu = uu + t1;
+   p = hx * hx;
 
-   local_float_type cc = o.crep().first - u;
-   cc = cc - uu;
-   cc = cc + o.crep().second;
-   t1 = c + c;
-   cc = cc / t1;
+   const local_float_type u { p + q };
 
-   hx = c + cc;
-   tx = c - hx;
-   tx = tx + cc;
+   const local_float_type uu { cpp_df_qf_detail::ccmath::unsafe::fma(tx, tx, local_float_type { p - u } + q) };
 
-   result.rep().first  = hx;
-   result.rep().second = tx;
+   const local_float_type
+      cc
+      {
+        local_float_type { local_float_type { o.crep().first - u } - uu + o.crep().second } / local_float_type { c + c }
+      };
+
+   result.rep().first  = c + cc;
+   result.rep().second = local_float_type { c - result.rep().first } + cc;
 }
 
 template <typename FloatingPointType,
@@ -1569,11 +1555,9 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
       using local_float_type = typename double_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
-      const auto b_neg = x.is_neg();
+      const bool b_neg { x.is_neg() };
 
-      double_float_type xx { };
-
-      eval_fabs(xx, x);
+      const double_float_type xx { (!b_neg) ? x : -x };
 
       // Check the range of the input.
       const double_float_type max_exp_input
@@ -1725,11 +1709,9 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
       using local_float_type  = typename double_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
-      const auto b_neg = x.is_neg();
+      const bool b_neg { x.is_neg() };
 
-      double_float_type xx { };
-
-      eval_fabs(xx, x);
+      const double_float_type xx { (!b_neg) ? x : -x };
 
       // Check the range of the input.
       const double_float_type max_exp_input
@@ -1881,11 +1863,9 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
       using local_float_type = typename double_float_type::float_type;
 
       // Get a local copy of the argument and force it to be positive.
-      const auto b_neg = x.is_neg();
+      const bool b_neg { x.is_neg() };
 
-      double_float_type xx { };
-
-      eval_fabs(xx, x);
+      const double_float_type xx { (!b_neg) ? x : -x };
 
       // Check the range of the input.
       const double_float_type max_exp_input
@@ -2014,19 +1994,17 @@ constexpr void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const 
 {
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
-   const auto fpc = eval_fpclassify(x);
+   const int fpc { eval_fpclassify(x) };
 
-   const auto x_is_zero = (fpc == FP_ZERO);
-
-   if ((fpc != FP_NORMAL) && (!x_is_zero))
+   if (fpc == FP_ZERO)
    {
-      result = x;
+      result = -double_float_type::my_value_inf();
    }
-   else if (x.is_neg())
+   else if (x.is_neg() || (fpc == FP_NAN))
    {
       result = double_float_type::my_value_nan();
    }
-   else if (x_is_zero)
+   else if (fpc == FP_INFINITE)
    {
       result = double_float_type::my_value_inf();
    }

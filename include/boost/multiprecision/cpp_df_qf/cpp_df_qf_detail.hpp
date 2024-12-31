@@ -11,7 +11,18 @@
 #define BOOST_MP_CPP_DF_QF_DETAIL_2023_01_02_HPP
 
 #include <boost/config.hpp>
+
+#ifdef BOOST_HAS_FLOAT128
+#  if __has_include(<quadmath.h>)
+#    include <quadmath.h>
+#      ifndef BOOST_MP_HAS_FLOAT128_SUPPORT
+#        define BOOST_MP_HAS_FLOAT128_SUPPORT
+#      endif
+#  endif
+#endif
+
 #include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath.hpp>
 
 #include <utility>

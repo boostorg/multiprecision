@@ -16,18 +16,10 @@ namespace boost { namespace multiprecision { namespace backends { namespace cpp_
 namespace detail
 {
 
-#if defined(BOOST_HAS_FLOAT128)
 template <class T>
-auto frexp_impl(T arg, int* expptr) -> typename ::std::enable_if<::std::is_same<T, ::boost::float128_type>::value, T>::type
+auto frexp_impl(T arg, int* expptr) -> T
 {
-   return ::frexpq(arg, expptr);
-}
-#endif
-
-template <class T>
-auto frexp_impl(T arg, int* expptr) -> typename ::std::enable_if<::std::is_floating_point<T>::value, T>::type
-{
-   // Default to the regular std::frexp function.
+   // Default to the regular frexp function.
    using std::frexp;
 
    return frexp(arg, expptr);

@@ -15,18 +15,10 @@ namespace boost { namespace multiprecision { namespace backends { namespace cpp_
 
 namespace detail {
 
-#if defined(BOOST_HAS_FLOAT128)
 template <class T>
-auto floor_impl(T x) -> typename ::std::enable_if<::std::is_same<T, ::boost::float128_type>::value, T>::type
+auto floor_impl(T x) -> T
 {
-   return ::floorq(x);
-}
-#endif
-
-template <class T>
-auto floor_impl(T x) -> typename ::std::enable_if<::std::is_floating_point<T>::value, T>::type
-{
-   // Default to the regular std::floor function.
+   // Default to the regular floor function.
    using std::floor;
 
    return floor(x);

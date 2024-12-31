@@ -10,10 +10,6 @@
 
 #include <boost/config.hpp>
 
-#ifdef BOOST_HAS_FLOAT128
-#include <quadmath.h>
-#endif
-
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_fabs.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_floor.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_fma.hpp>
