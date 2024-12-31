@@ -18,7 +18,7 @@
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail { namespace ccmath {
 
 template <typename T>
-constexpr auto fpclassify(T x) -> typename std::enable_if<!std::is_integral<T>::value, int>::type
+constexpr auto fpclassify(T x) -> int
 {
    if ((::boost::multiprecision::backends::cpp_df_qf_detail::ccmath::isnan)(x))
    {

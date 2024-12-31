@@ -21,7 +21,7 @@ namespace detail {
 template <class T>
 auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_same<T, ::boost::float128_type>::value, T>::type
 {
-   return ::fmaq(x);
+   return ::fmaq(x, y, z);
 }
 #endif
 
@@ -45,11 +45,12 @@ auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_sam
 }
 #else
 template <class T>
-auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_floating_point<T>::value, T>::type
+auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_same<T, float>::value || ::std::is_same<T, double>::value || ::std::is_same<T, long double>::value, T>::type
 {
-  // Default to the written-out operations.
+   // Default to the written-out operations.
+   using std::fma;
 
-   return (x * y) + z;
+   return fma(x, y, z);
 }
 #endif
 
