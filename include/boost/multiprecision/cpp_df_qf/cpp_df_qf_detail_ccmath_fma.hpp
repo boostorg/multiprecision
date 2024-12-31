@@ -18,12 +18,11 @@ namespace unsafe {
 namespace detail {
 
 template <class T>
-auto fma_impl(T x, T y, T z) noexcept -> T
+constexpr auto fma_impl(T x, T y, T z) noexcept -> T
 {
-   // Default to the regular fma function.
-   using std::fma;
+   // Default to the written-out operations.
 
-   return fma(x, y, z);
+   return (x * y) + z;
 }
 
 #if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
@@ -49,7 +48,7 @@ auto fma_impl<long double>(long double x, long double y, long double z) noexcept
 } // namespace detail
 
 template <typename Real>
-auto fma(Real x, Real y, Real z) noexcept -> Real
+constexpr auto fma(Real x, Real y, Real z) noexcept -> Real
 {
    return detail::fma_impl(x, y, z);
 }

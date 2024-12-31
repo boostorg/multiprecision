@@ -265,7 +265,7 @@ int main()
 #ifdef TEST_CPP_DOUBLE_FLOAT
    test<boost::multiprecision::cpp_double_float>();
    test<boost::multiprecision::cpp_double_double>();
-   //test<boost::multiprecision::cpp_double_long_double>();
+   test<boost::multiprecision::cpp_double_long_double>();
    #if defined(BOOST_HAS_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
    #endif

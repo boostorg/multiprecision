@@ -210,14 +210,16 @@ void test()
          }
       }
 
-      bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
-      unsigned i { 0U };
 
       #if defined(TEST_CPP_DOUBLE_FLOAT)
-      BOOST_IF_CONSTEXPR(std::is_same<T, boost::multiprecision::cpp_double_float>::value) { for ( ; i < 7; ++i, bug_case /= 1.05) { ; } }
-      BOOST_IF_CONSTEXPR(std::is_same<T, boost::multiprecision::cpp_double_double>::value) { for ( ; i < 3; ++i, bug_case /= 1.05) { ; } }
-      BOOST_IF_CONSTEXPR(std::is_same<T, boost::multiprecision::cpp_double_long_double>::value) { for ( ; i < 3; ++i, bug_case /= 1.05) { ; } }
+      // Handle uneven/asymmetric exponents on min/max of cpp_double_fp_backend
+      bug_case = log(1 / (std::numeric_limits<T>::min)()) / -1.0005;
+      #else
+      bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
       #endif
+
+      unsigned i { 0U };
+
       for ( ; i < 20U; ++i, bug_case /= static_cast<T>(1.05L))
       {
          BOOST_CHECK_GE(exp(bug_case), (std::numeric_limits<T>::min)());
