@@ -13,7 +13,6 @@
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_isnan.hpp>
 
 #include <cmath>
-#include <type_traits>
 
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail { namespace ccmath {
 
@@ -36,7 +35,7 @@ constexpr auto fpclassify(T x) -> int
       {
          return FP_ZERO;
       }
-      else if ((fabs_x > 0) && (fabs_x < (boost::multiprecision::backends::cpp_df_qf_detail::ccmath::numeric_limits<T>::min)()))
+      else if ((fabs_x > 0) && (fabs_x < (::boost::multiprecision::backends::cpp_df_qf_detail::ccmath::numeric_limits<T>::min)()))
       {
          return FP_SUBNORMAL;
       }

@@ -67,6 +67,7 @@ _Quad __ldexpq(_Quad, int);
 _Quad __frexpq(_Quad, int*);
 _Quad __fabsq(_Quad);
 _Quad __floorq(_Quad);
+_Quad __fmaq(_Quad, _Quad, _Quad);
 _Quad __ceilq(_Quad);
 _Quad __sqrtq(_Quad);
 _Quad __truncq(_Quad);
@@ -90,6 +91,7 @@ _Quad __atan2q(_Quad, _Quad);
 #define frexpq __frexpq
 #define fabsq __fabsq
 #define floorq __floorq
+#define fmaq __fmaq
 #define ceilq __ceilq
 #define sqrtq __sqrtq
 #define truncq __truncq

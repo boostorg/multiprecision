@@ -18,7 +18,7 @@ namespace detail {
 template <class T>
 auto log_impl(T x) -> T
 {
-   // Default to the regular std::log function.
+   // Default to the regular log function.
    using std::log;
 
    return log(x);

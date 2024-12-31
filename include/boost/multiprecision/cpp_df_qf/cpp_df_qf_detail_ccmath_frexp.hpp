@@ -19,7 +19,7 @@ namespace detail
 template <class T>
 auto frexp_impl(T arg, int* expptr) -> T
 {
-   // Default to the regular std::frexp function.
+   // Default to the regular frexp function.
    using std::frexp;
 
    return frexp(arg, expptr);

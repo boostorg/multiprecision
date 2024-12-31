@@ -18,7 +18,7 @@ namespace detail {
 template <class T>
 auto floor_impl(T x) -> T
 {
-   // Default to the regular std::floor function.
+   // Default to the regular floor function.
    using std::floor;
 
    return floor(x);

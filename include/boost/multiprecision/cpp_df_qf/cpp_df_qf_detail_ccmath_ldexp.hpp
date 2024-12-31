@@ -18,7 +18,7 @@ namespace detail {
 template <class T>
 auto ldexp_impl(T arg, int expval) -> T
 {
-   // Default to the regular std::ldexp function.
+   // Default to the regular ldexp function.
    using std::ldexp;
 
    return ldexp(arg, expval);

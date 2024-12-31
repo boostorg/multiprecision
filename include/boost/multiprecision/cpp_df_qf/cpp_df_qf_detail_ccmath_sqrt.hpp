@@ -18,7 +18,7 @@ namespace detail {
 template <class T>
 auto sqrt_impl(T x) -> T
 {
-   // Default to the regular std::sqrt function.
+   // Default to the regular sqrt function.
    using std::sqrt;
 
    return sqrt(x);
