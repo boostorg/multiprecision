@@ -18,7 +18,7 @@ namespace unsafe {
 namespace detail {
 
 template <class T>
-constexpr auto fma_impl(T x, T y, T z) noexcept -> T
+inline auto fma_impl(T x, T y, T z) noexcept -> T
 {
    // Default to the written-out operations.
 
@@ -27,19 +27,19 @@ constexpr auto fma_impl(T x, T y, T z) noexcept -> T
 
 #if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
 template <>
-auto fma_impl<float>(float x, float y, float z) noexcept -> float
+inline auto fma_impl<float>(float x, float y, float z) noexcept -> float
 {
   return __builtin_fmaf(x, y, z);
 }
 
 template <>
-auto fma_impl<double>(double x, double y, double z) noexcept -> double
+inline auto fma_impl<double>(double x, double y, double z) noexcept -> double
 {
   return __builtin_fma(x, y, z);
 }
 
 template <>
-auto fma_impl<long double>(long double x, long double y, long double z) noexcept -> long double
+inline auto fma_impl<long double>(long double x, long double y, long double z) noexcept -> long double
 {
   return __builtin_fmal(x, y, z);
 }
@@ -48,7 +48,7 @@ auto fma_impl<long double>(long double x, long double y, long double z) noexcept
 } // namespace detail
 
 template <typename Real>
-constexpr auto fma(Real x, Real y, Real z) noexcept -> Real
+auto fma(Real x, Real y, Real z) noexcept -> Real
 {
    return detail::fma_impl(x, y, z);
 }
