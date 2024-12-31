@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2023.
+//  Copyright Christopher Kormanyos 2023 - 2024.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -8,41 +8,36 @@
 #ifndef BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_LDEXP_2023_01_07_HPP
 #define BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_LDEXP_2023_01_07_HPP
 
-#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_fabs.hpp>
-#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_isinf.hpp>
-#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_isnan.hpp>
-#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_limits.hpp>
+#include <cmath>
+#include <type_traits>
 
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail { namespace ccmath {
 
 namespace detail {
 
-template <typename Real>
-constexpr Real ldexp_impl(Real arg, int exp) noexcept
+#if defined(BOOST_HAS_FLOAT128)
+template <class T>
+auto ldexp_impl(T arg, int expval) -> typename ::std::enable_if<::std::is_same<T, ::boost::float128_type>::value, T>::type
 {
-    while(exp > 0)
-    {
-        arg *= 2;
-        --exp;
-    }
-    while(exp < 0)
-    {
-        arg /= 2;
-        ++exp;
-    }
+   return ::ldexpq(arg, expval);
+}
+#endif
 
-    return arg;
+template <class T>
+auto ldexp_impl(T arg, int expval) -> typename ::std::enable_if<::std::is_floating_point<T>::value, T>::type
+{
+   // Default to the regular std::ldexp function.
+   using std::ldexp;
+
+   return ldexp(arg, expval);
 }
 
 } // Namespace detail
 
 template <typename Real>
-inline constexpr Real ldexp(Real arg, int exp) noexcept
+auto ldexp(Real arg, int expval) -> Real
 {
-   return cpp_df_qf_detail::ccmath::fabs(arg) == Real(0) ? arg :
-          cpp_df_qf_detail::ccmath::isinf(arg) ? arg :
-          cpp_df_qf_detail::ccmath::isnan(arg) ? arg :
-          cpp_df_qf_detail::ccmath::detail::ldexp_impl(arg, exp);
+   return detail::ldexp_impl(arg, expval);
 }
 
 } } } } } // namespace boost::multiprecision::backends::cpp_df_qf_detail::ccmath

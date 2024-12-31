@@ -410,7 +410,7 @@ class cpp_double_fp_backend
 
          if (data.second != 0) { data.second = -data.second; }
 
-         arithmetic::normalize(data, data.first, data.second);
+         data = arithmetic::normalize(data.first, data.second);
       }
    }
 
@@ -452,6 +452,7 @@ class cpp_double_fp_backend
          {
             *this = cpp_double_fp_backend::my_value_nan();
          }
+
          return *this;
       }
 
@@ -553,13 +554,9 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend& operator*=(const cpp_double_fp_backend& v)
    {
       // Evaluate the sign of the result.
-      const auto isneg_u =   isneg();
-      const auto isneg_v = v.isneg();
 
-      const bool b_result_is_neg = (isneg_u != isneg_v);
-
-      const auto fpc_u = eval_fpclassify(*this);
-      const auto fpc_v = eval_fpclassify(v);
+      const int fpc_u { eval_fpclassify(*this) };
+      const int fpc_v { eval_fpclassify(v) };
 
       // Handle special cases like zero, inf and NaN.
       const bool isinf_u  { (fpc_u == FP_INFINITE) };
@@ -576,10 +573,15 @@ class cpp_double_fp_backend
 
       if (isinf_u || isinf_v)
       {
+         const bool b_neg { (isneg() != v.isneg()) };
+
          *this = cpp_double_fp_backend::my_value_inf();
 
-         if (b_result_is_neg)
+         if (b_neg)
+         {
             negate();
+         }
+
          return *this;
       }
 
@@ -598,52 +600,69 @@ class cpp_double_fp_backend
       // K. Briggs work. The algorithm has been significantly simplified
       // while still atempting to retain proper rounding corrections.
 
-      float_type C { cpp_df_qf_detail::split(float_type()) * data.first };
+      float_type C { cpp_df_qf_detail::split_maker<float_type>::value * data.first };
 
-      float_type hu { C - float_type { C - data.first } };
+      float_type hu;
 
       if (cpp_df_qf_detail::ccmath::isinf(C))
       {
-        // In this case, data.first is evidently so large that multipllication
-        // with the split has overflowed to infinity. Take a last-chance try
-        // for multiplication by scaling with the split and subsequently
-        // taking the difference term.
+         // Handle overflow by scaling down (and then back up) with the split.
 
-        // TBD: Is this numericaly correct? Or is it simply the "best" we can
-        // do in this edge-case? Or is there an alternate multiplication scheme
-        // that is not susceptible to this particular sort of overflow?
+         C = data.first - cpp_df_qf_detail::ccmath::ldexp(data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl);
 
-        C = data.first - (data.first / cpp_df_qf_detail::split(float_type()));
-
-        hu = (data.first - C) * cpp_df_qf_detail::split(float_type());
+         hu = cpp_df_qf_detail::ccmath::ldexp(data.first - C, cpp_df_qf_detail::split_maker<float_type>::n_shl);
+      }
+      else
+      {
+         hu = C - float_type { C - data.first };
       }
 
       C = data.first * v.data.first;
 
       if (cpp_df_qf_detail::ccmath::isinf(C))
       {
+         // Handle overflow.
+
+         const bool b_neg { (isneg() != v.isneg()) };
+
          *this = cpp_double_fp_backend::my_value_inf();
 
-         if (b_result_is_neg)
+         if (b_neg)
+         {
             negate();
+         }
+
          return *this;
       }
 
-      float_type c { cpp_df_qf_detail::split(float_type()) * v.data.first };
+      float_type c { cpp_df_qf_detail::split_maker<float_type>::value * v.data.first };
 
-      const float_type hv { c - float_type { c - v.data.first } };
+      float_type hv;
+
+      if (cpp_df_qf_detail::ccmath::isinf(c))
+      {
+         // Handle overflow by scaling down (and then back up) with the split.
+
+         c = v.data.first - cpp_df_qf_detail::ccmath::ldexp(v.data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl);
+
+         hv = cpp_df_qf_detail::ccmath::ldexp(v.data.first - c, cpp_df_qf_detail::split_maker<float_type>::n_shl);
+      }
+      else
+      {
+         hv = c - float_type { c - v.data.first };
+      }
 
       const float_type tv { v.data.first - hv };
 
-      float_type t1 { cpp_df_qf_detail::ccmath::fma(hu, hv, -C) };
+      float_type t1 { cpp_df_qf_detail::ccmath::unsafe::fma(hu, hv, -C) };
 
-      t1 = cpp_df_qf_detail::ccmath::fma(hu, tv, t1);
+      t1 = cpp_df_qf_detail::ccmath::unsafe::fma(hu, tv, t1);
 
       const float_type tu { data.first - hu };
 
-      t1 = cpp_df_qf_detail::ccmath::fma(tu, hv, t1);
+      t1 = cpp_df_qf_detail::ccmath::unsafe::fma(tu, hv, t1);
 
-      c =    cpp_df_qf_detail::ccmath::fma(tu, tv, t1)
+      c =    cpp_df_qf_detail::ccmath::unsafe::fma(tu, tv, t1)
           + (data.first * v.data.second)
           + (data.second * v.data.first);
 
@@ -657,19 +676,19 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend& operator/=(const cpp_double_fp_backend& v)
    {
       // Handle special cases like zero, inf and NaN.
-      const auto fpc_u = eval_fpclassify(*this);
-      const auto fpc_v = eval_fpclassify(v);
+      const int fpc_u { eval_fpclassify(*this) };
+      const int fpc_v { eval_fpclassify(v) };
 
-      const auto isnan_u = (fpc_u == FP_NAN);
-      const auto isnan_v = (fpc_v == FP_NAN);
+      const bool isnan_u { (fpc_u == FP_NAN) };
+      const bool isnan_v { (fpc_v == FP_NAN) };
 
       if (isnan_u || isnan_v)
       {
          return operator=(cpp_double_fp_backend::my_value_nan());
       }
 
-      const auto iszero_u = (fpc_u == FP_ZERO);
-      const auto iszero_v = (fpc_v == FP_ZERO);
+      const bool iszero_u { (fpc_u == FP_ZERO) };
+      const bool iszero_v { (fpc_v == FP_ZERO) };
 
       if (this == &v)
       {
@@ -699,13 +718,15 @@ class cpp_double_fp_backend
          *this = cpp_double_fp_backend::my_value_inf();
 
          if (b_neg)
+         {
             negate();
+         }
 
          return *this;
       }
 
-      const auto isinf_v = (fpc_v == FP_INFINITE);
-      const auto isinf_u = (fpc_u == FP_INFINITE);
+      const bool isinf_v { (fpc_v == FP_INFINITE) };
+      const bool isinf_u { (fpc_u == FP_INFINITE) };
 
       if (isinf_u)
       {
@@ -733,66 +754,62 @@ class cpp_double_fp_backend
 
       const float_type C { data.first / v.data.first };
 
-      float_type c { cpp_df_qf_detail::split(float_type()) * C };
+      float_type c { cpp_df_qf_detail::split_maker<float_type>::value * C };
 
-      float_type u { cpp_df_qf_detail::split(float_type()) * v.data.first };
+      float_type hc;
 
-      if (cpp_df_qf_detail::ccmath::isinf(u) || cpp_df_qf_detail::ccmath::isinf(c))
+      if (cpp_df_qf_detail::ccmath::isinf(c))
       {
-         // Evidently we have some very large operands. Take a last-chance try
-         // for finite division. Use the ratio of square roots and subsequently
-         // square the ratio, handling the sign of the result separately.
+         // Handle overflow by scaling down (and then back up) with the split.
 
-         const bool u_neg {   isneg() };
-         const bool v_neg { v.isneg() };
-         const bool b_neg { u_neg != v_neg };
-
-         cpp_double_fp_backend uu { *this };
-         cpp_double_fp_backend vv { v };
-
-         cpp_double_fp_backend sqrt_u { };
-         cpp_double_fp_backend sqrt_v { };
-
-         if(u_neg) { uu.negate(); }
-         if(v_neg) { vv.negate(); }
-
-         eval_sqrt(sqrt_u, uu);
-         eval_sqrt(sqrt_v, vv);
-
-         cpp_double_fp_backend sqrt_ratio { sqrt_u / sqrt_v };
-
-         *this = sqrt_ratio;
-
-         eval_multiply(*this, sqrt_ratio);
-
-         if (b_neg)
-            negate();
-         return *this;
+         hc =
+            cpp_df_qf_detail::ccmath::ldexp
+            (
+               C - float_type { C - cpp_df_qf_detail::ccmath::ldexp(C, -cpp_df_qf_detail::split_maker<float_type>::n_shl) },
+               cpp_df_qf_detail::split_maker<float_type>::n_shl
+            );
+      }
+      else
+      {
+         hc = c - float_type { c - C };
       }
 
-      const float_type hc { c - float_type { c - C } };
+      float_type u { cpp_df_qf_detail::split_maker<float_type>::value * v.data.first };
 
-      const float_type hv { u - float_type { u - v.data.first } };
+      float_type hv;
 
+      if (cpp_df_qf_detail::ccmath::isinf(u))
       {
-         const float_type U { C * v.data.first };
+         // Handle overflow by scaling down (and then back up) with the split.
 
-         u = cpp_df_qf_detail::ccmath::fma(hc, hv, -U);
-         c = data.first - U;
+         hv =
+            cpp_df_qf_detail::ccmath::ldexp
+            (
+               v.data.first - float_type { v.data.first - cpp_df_qf_detail::ccmath::ldexp(v.data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl) },
+               cpp_df_qf_detail::split_maker<float_type>::n_shl
+            );
       }
+      else
+      {
+         hv = u - float_type { u - v.data.first };
+      }
+
+      const float_type U { C * v.data.first };
+
+      u = cpp_df_qf_detail::ccmath::unsafe::fma(hc, hv, -U);
 
       const float_type tv { v.data.first - hv };
 
-      u = cpp_df_qf_detail::ccmath::fma(hc, tv, u);
+      u = cpp_df_qf_detail::ccmath::unsafe::fma(hc, tv, u);
 
       {
          const float_type tc { C - hc };
 
-         u = cpp_df_qf_detail::ccmath::fma(tc, hv, u);
-         u = cpp_df_qf_detail::ccmath::fma(tc, tv, u);
+         u = cpp_df_qf_detail::ccmath::unsafe::fma(tc, hv, u);
+         u = cpp_df_qf_detail::ccmath::unsafe::fma(tc, tv, u);
       }
 
-      c  = float_type { c - u } + data.second;
+      c = float_type { (data.first - U) - u } + data.second;
 
       c = (c - float_type { C * v.data.second }) / v.data.first;
 
@@ -806,14 +823,18 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend operator++(int)
    {
       cpp_double_fp_backend t(*this);
-      ++*this;
+
+      ++(*this);
+
       return t;
    }
 
    constexpr cpp_double_fp_backend operator--(int)
    {
       cpp_double_fp_backend t(*this);
-      --*this;
+
+      --(*this);
+
       return t;
    }
 
@@ -910,7 +931,9 @@ class cpp_double_fp_backend
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
    {
       if (number_of_digits == 0)
+      {
          number_of_digits = cpp_double_fp_backend::my_digits10;
+      }
 
       // Use cpp_dec_float to write string (as is similarly done to read string).
 
@@ -1031,9 +1054,9 @@ class cpp_double_fp_backend
       // TBD: Or should we use the static-initializer trick (as used in cpp_dec_float)
       // to initialize this and possible other similar values?
 
-      cpp_double_fp_backend result { };
+      cpp_double_fp_backend result;
 
-      eval_ldexp(result, cpp_double_fp_backend(1), 3 - my_digits);
+      eval_ldexp(result, cpp_double_fp_backend { 1 }, 3 - my_digits);
 
       return result;
    }
@@ -1097,9 +1120,10 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
    }
    else
    {
-      cpp_dec_float_read_write_type dummy_frexp { };
+      cpp_dec_float_read_write_type dummy_frexp;
 
-      int e2_from_f_dec { };
+      int e2_from_f_dec;
+
       eval_frexp(dummy_frexp, f_dec, &e2_from_f_dec);
 
       const auto is_definitely_zero =
@@ -1380,10 +1404,17 @@ constexpr void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, cons
    using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
    using local_float_type = typename local_backend_type::float_type;
 
-   const local_float_type fhi { cpp_df_qf_detail::ccmath::frexp(a.rep().first, v) };
-   const local_float_type flo { cpp_df_qf_detail::ccmath::ldexp(a.rep().second, -*v) };
+   int expptr;
 
-   local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
+   const local_float_type fhi { cpp_df_qf_detail::ccmath::frexp(a.rep().first, &expptr) };
+   const local_float_type flo { cpp_df_qf_detail::ccmath::ldexp(a.rep().second, -expptr) };
+
+   if (v != nullptr)
+   {
+      *v = expptr;
+   }
+
+   result.rep() = local_backend_type::arithmetic::normalize(fhi, flo);
 }
 
 template <typename FloatingPointType>
@@ -1395,7 +1426,7 @@ constexpr void eval_ldexp(cpp_double_fp_backend<FloatingPointType>& result, cons
    const local_float_type fhi { cpp_df_qf_detail::ccmath::ldexp(a.crep().first,  v) };
    const local_float_type flo { cpp_df_qf_detail::ccmath::ldexp(a.crep().second, v) };
 
-   local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
+   result.rep() = local_backend_type::arithmetic::normalize(fhi, flo);
 }
 
 template <typename FloatingPointType>
@@ -1404,7 +1435,7 @@ constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, cons
    using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
    using local_float_type = typename local_backend_type::float_type;
 
-   const local_float_type fhi { cpp_df_qf_detail::floor_of_constituent(x.my_first()) };
+   const local_float_type fhi { cpp_df_qf_detail::ccmath::floor(x.my_first()) };
 
    if (fhi != x.my_first())
    {
@@ -1413,9 +1444,9 @@ constexpr void eval_floor(cpp_double_fp_backend<FloatingPointType>& result, cons
    }
    else
    {
-      const local_float_type flo = { cpp_df_qf_detail::floor_of_constituent(x.my_second()) };
+      const local_float_type flo = { cpp_df_qf_detail::ccmath::floor(x.my_second()) };
 
-      local_backend_type::arithmetic::normalize(result.rep(), fhi, flo);
+      result.rep() = local_backend_type::arithmetic::normalize(fhi, flo);
    }
 }
 
@@ -1480,7 +1511,7 @@ constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
 
    const local_float_type c = cpp_df_qf_detail::ccmath::sqrt(o.crep().first);
 
-   local_float_type p  = cpp_df_qf_detail::split(local_float_type()) * c;
+   local_float_type p  = cpp_df_qf_detail::split_maker<local_float_type>::value * c;
    local_float_type hx = (c - p);
                     hx = hx + p;
    local_float_type tx = c  - hx;
@@ -1552,7 +1583,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mx { };
             eval_convert_to(&mx, double_float_type::my_value_max());
 
-            const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
+            const local_float_type log_of_mx = cpp_df_qf_detail::ccmath::log(mx);
 
             return log_of_mx;
          }()
@@ -1565,7 +1596,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mn { };
             eval_convert_to(&mn, double_float_type::my_value_min());
 
-            const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
+            const local_float_type log_of_mn = cpp_df_qf_detail::ccmath::log(mn);
 
             return log_of_mn;
          }()
@@ -1708,7 +1739,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mx { };
             eval_convert_to(&mx, double_float_type::my_value_max());
 
-            const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
+            const local_float_type log_of_mx = cpp_df_qf_detail::ccmath::log(mx);
 
             return log_of_mx;
          }()
@@ -1721,7 +1752,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mn { };
             eval_convert_to(&mn, double_float_type::my_value_min());
 
-            const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
+            const local_float_type log_of_mn = cpp_df_qf_detail::ccmath::log(mn);
 
             return log_of_mn;
          }()
@@ -1864,7 +1895,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mx { };
             eval_convert_to(&mx, double_float_type::my_value_max());
 
-            const local_float_type log_of_mx = cpp_df_qf_detail::log_of_constituent(mx);
+            const local_float_type log_of_mx = cpp_df_qf_detail::ccmath::log(mx);
 
             return log_of_mx;
          }()
@@ -1877,7 +1908,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
             local_float_type mn { };
             eval_convert_to(&mn, double_float_type::my_value_min());
 
-            const local_float_type log_of_mn = cpp_df_qf_detail::log_of_constituent(mn);
+            const local_float_type log_of_mn = cpp_df_qf_detail::ccmath::log(mn);
 
             return log_of_mn;
          }()
@@ -2023,7 +2054,7 @@ constexpr void eval_log(cpp_double_fp_backend<FloatingPointType>& result, const 
       eval_frexp(x2, x, &n2);
 
       // Get initial estimate using the (wrapped) standard math function log.
-      const double_float_type s(cpp_df_qf_detail::log_of_constituent(x2.crep().first));
+      const double_float_type s(cpp_df_qf_detail::ccmath::log(x2.crep().first));
 
       double_float_type E { };
 

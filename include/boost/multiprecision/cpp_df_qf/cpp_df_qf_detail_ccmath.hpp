@@ -8,7 +8,14 @@
 #ifndef BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_2023_01_07_HPP
 #define BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_2023_01_07_HPP
 
+#include <boost/config.hpp>
+
+#ifdef BOOST_HAS_FLOAT128
+#include <quadmath.h>
+#endif
+
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_fabs.hpp>
+#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_floor.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_fma.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_fpclassify.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_frexp.hpp>
@@ -16,6 +23,7 @@
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_isnan.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_ldexp.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_limits.hpp>
+#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_log.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_sqrt.hpp>
 
 #endif // BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_2023_01_07_HPP

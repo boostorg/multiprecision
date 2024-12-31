@@ -11,8 +11,7 @@
 #include <cfloat>
 #include <cmath>
 #include <limits>
-
-#include <boost/config.hpp>
+#include <type_traits>
 
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail { namespace ccmath {
 

@@ -8,64 +8,60 @@
 #ifndef BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_FMA_2024_12_17_HPP
 #define BOOST_MP_CPP_DF_QF_DETAIL_CCMATH_FMA_2024_12_17_HPP
 
-#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_isnan.hpp>
-#include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath_isinf.hpp>
+#include <cmath>
+#include <type_traits>
 
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail { namespace ccmath {
 
+namespace unsafe {
+
 namespace detail {
 
+#if defined(BOOST_HAS_FLOAT128)
 template <class T>
-constexpr T fma_imp(T x, T y, T z) noexcept
+auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_same<T, ::boost::float128_type>::value, T>::type
 {
-   #if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
+   return ::fmaq(x);
+}
+#endif
 
-   BOOST_IF_CONSTEXPR(::std::is_same<T, float>::value)
-   {
-      return __builtin_fmaf(x, y, z);
-   }
-   else BOOST_IF_CONSTEXPR(::std::is_same<T, double>::value)
-   {
-      return __builtin_fma(x, y, z);
-   }
-   else BOOST_IF_CONSTEXPR(::std::is_same<T, long double>::value)
-   {
-      return __builtin_fmal(x, y, z);
-   }
-   #endif
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
+template <class T>
+auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_same<T, float>::value, T>::type
+{
+  return __builtin_fmaf(x, y, z);
+}
 
-   // If we can't use compiler intrinsics hope that -fma flag optimizes this call to fma instruction
+template <class T>
+auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_same<T, double>::value, T>::type
+{
+  return __builtin_fma(x, y, z);
+}
+
+template <class T>
+auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_same<T, long double>::value, T>::type
+{
+  return __builtin_fmal(x, y, z);
+}
+#else
+template <class T>
+auto fma_impl(T x, T y, T z) noexcept -> typename ::std::enable_if<::std::is_floating_point<T>::value, T>::type
+{
+  // Default to the written-out operations.
+
    return (x * y) + z;
-};
+}
+#endif
 
 } // namespace detail
 
 template <typename Real>
-constexpr Real fma(Real x, Real y, Real z) noexcept
+auto fma(Real x, Real y, Real z) noexcept -> Real
 {
-   if (x == 0 && cpp_df_qf_detail::ccmath::isinf(y))
-   {
-      return std::numeric_limits<Real>::quiet_NaN();
-   }
-   else if (y == 0 && cpp_df_qf_detail::ccmath::isinf(x))
-   {
-      return std::numeric_limits<Real>::quiet_NaN();
-   }
-   else if (cpp_df_qf_detail::ccmath::isnan(x))
-   {
-      return std::numeric_limits<Real>::quiet_NaN();
-   }
-   else if (cpp_df_qf_detail::ccmath::isnan(y))
-   {
-      return std::numeric_limits<Real>::quiet_NaN();
-   }
-   else if (cpp_df_qf_detail::ccmath::isnan(z))
-   {
-      return std::numeric_limits<Real>::quiet_NaN();
-   }
-
-   return detail::fma_imp(x, y, z);
+   return detail::fma_impl(x, y, z);
 }
+
+} // namespace unsafe
 
 } } } } } // namespace boost::multiprecision::backends::cpp_df_qf_detail::ccmath
 
