@@ -12,14 +12,19 @@
 
 #include <boost/config.hpp>
 
-#ifdef BOOST_HAS_FLOAT128
-#  if __has_include(<quadmath.h>)
-#    include <quadmath.h>
-#      ifndef BOOST_MP_HAS_FLOAT128_SUPPORT
-#        define BOOST_MP_HAS_FLOAT128_SUPPORT
-#      endif
-#  endif
+#if defined(BOOST_HAS_FLOAT128)
+#if defined(__has_include)
+#if __has_include(<quadmath.h>)
+
+#include <quadmath.h>
+
+#if !defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
+#define BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128
 #endif
+
+#endif // __has_include(<quadmath.h>)
+#endif // defined(__has_include)
+#endif // defined(BOOST_HAS_FLOAT128)
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/float128_functions.hpp>

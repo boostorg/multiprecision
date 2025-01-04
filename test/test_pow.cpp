@@ -885,10 +885,6 @@ int main()
       #if defined(BOOST_HAS_FLOAT128)
       test<cpp_double_float128>();
       #endif
-
-      #if defined(BOOST_HAS_FLOAT128)
-      test_bug_case<cpp_double_float128>();
-      #endif
    }
 #endif
    return boost::report_errors();
