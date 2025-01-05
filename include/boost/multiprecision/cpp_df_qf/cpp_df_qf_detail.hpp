@@ -12,14 +12,19 @@
 
 #include <boost/config.hpp>
 
-#ifdef BOOST_HAS_FLOAT128
-#  if __has_include(<quadmath.h>)
-#    include <quadmath.h>
-#      ifndef BOOST_MP_HAS_FLOAT128_SUPPORT
-#        define BOOST_MP_HAS_FLOAT128_SUPPORT
-#      endif
-#  endif
+#if defined(BOOST_HAS_FLOAT128)
+#if defined(__has_include)
+#if __has_include(<quadmath.h>)
+
+#include <quadmath.h>
+
+#if !defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
+#define BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128
 #endif
+
+#endif // __has_include(<quadmath.h>)
+#endif // defined(__has_include)
+#endif // defined(BOOST_HAS_FLOAT128)
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/float128_functions.hpp>
@@ -30,13 +35,13 @@
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail {
 
 template <class FloatingPointType>
-struct is_floating_point_or_float128
+struct is_floating_point
 {
-   static constexpr auto value =    std::is_same<FloatingPointType, float>::value
-                                 || std::is_same<FloatingPointType, double>::value
-                                 || std::is_same<FloatingPointType, long double>::value
-#if defined(BOOST_HAS_FLOAT128)
-                                 || std::is_same<FloatingPointType, ::boost::float128_type>::value
+   static constexpr auto value =    ::std::is_same<FloatingPointType, float>::value
+                                 || ::std::is_same<FloatingPointType, double>::value
+                                 || ::std::is_same<FloatingPointType, long double>::value
+#if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
+                                 || ::std::is_same<FloatingPointType, ::boost::float128_type>::value
 #endif
                                  ;
 };
@@ -77,8 +82,7 @@ struct exact_arithmetic
    // The exact_arithmetic<> struct implements extended precision
    // techniques that are used in cpp_double_fp_backend and cpp_quad_float.
 
-   static_assert(is_floating_point_or_float128<FloatingPointType>::value,
-                 "Error: exact_arithmetic<> invoked with unknown floating-point type");
+   static_assert(is_floating_point<FloatingPointType>::value, "Error: exact_arithmetic<> invoked with unknown floating-point type");
 
    using float_type  = FloatingPointType;
    using float_pair  = std::pair<float_type, float_type>;

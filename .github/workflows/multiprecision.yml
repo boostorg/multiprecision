@@ -143,6 +143,65 @@ jobs:
       - name: b2 config
         run: cat bin.v2/config.log
         working-directory: ../boost-root/
+  ubuntu-jammy-gnu-df:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [ g++ ]
+        suite: [ functions_df_gnu ]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+      - name: Set TOOLSET
+        run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
+      - name: Add repository
+        continue-on-error: true
+        id: addrepo
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo
+        continue-on-error: true
+        id: retry1
+        if: steps.addrepo.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Retry Add Repo 2
+        continue-on-error: true
+        id: retry2
+        if: steps.retry1.outcome=='failure'
+        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: cp -r $GITHUB_WORKSPACE/* libs/multiprecision
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py multiprecision
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: ./bootstrap.sh
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: ./b2 headers
+        working-directory: ../boost-root
+      - name: Generate user config
+        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=gnu++14 ;" > ~/user-config.jam'
+        working-directory: ../boost-root
+      - name: Config Info
+        run: ../../../b2 print_config_info print_math_info toolset=$TOOLSET
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ../../../b2 -j2 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES define=BOOST_MP_SF_CONCEPT_TESTS 
+        working-directory: ../boost-root/libs/multiprecision/test
+      - name: b2 config
+        run: cat bin.v2/config.log
+        working-directory: ../boost-root/
   ubuntu-focal:
     runs-on: ubuntu-20.04
     defaults:

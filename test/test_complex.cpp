@@ -1,3 +1,14 @@
+///////////////////////////////////////////////////////////////
+//  Copyright 2011 John Maddock.
+//  Copyright Christopher Kormanyos 2002 - 2011, 2021 - 2024.
+//  Distributed under the Boost
+//  Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+//
+// This work is based on an earlier work:
+// "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
+// in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
+
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright John Maddock 2016.
 //  Copyright Christopher Kormanyos 2016 - 2024.
@@ -159,7 +170,8 @@ void test()
 
 int main()
 {
-   //local::test<std::complex<double> >();
+
+#if !defined(TEST_CPP_DOUBLE_FLOAT)
 #ifdef TEST_MPC
    local::test<boost::multiprecision::mpc_complex_50>();
    local::test<boost::multiprecision::mpc_complex_100>();
@@ -169,19 +181,14 @@ int main()
 #ifdef BOOST_HAS_FLOAT128
    local::test<boost::multiprecision::complex128>();
 #endif
+#endif
 
 #if defined(TEST_CPP_DOUBLE_FLOAT)
    {
-      using boost::multiprecision::cpp_double_double;
-      using boost::multiprecision::cpp_double_long_double;
-      #if defined(BOOST_HAS_FLOAT128)
-      using boost::multiprecision::cpp_double_float128;
-      #endif
-
-      local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<cpp_double_double>, boost::multiprecision::et_off>>();
-      local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<cpp_double_long_double>, boost::multiprecision::et_off>>();
+      local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<double>>, boost::multiprecision::et_off>>();
+      local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<long double>>, boost::multiprecision::et_off>>();
 #if defined(BOOST_HAS_FLOAT128)
-      local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<cpp_double_float128>, boost::multiprecision::et_off>>();
+      local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<::boost::float128_type>>, boost::multiprecision::et_off>>();
 #endif
    }
 #endif
