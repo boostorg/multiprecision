@@ -331,9 +331,8 @@ rule get_function_tests_df_gnu
               : # command line
               : # input files
               : # requirements
-               [ check-target-builds ../config//has_float128 : : <build>no ]
                <define>TEST_CPP_DOUBLE_FLOAT
-              : $(source:B)_cpp_double_fp ] ;
+              : $(source:B)_cpp_double_fp_df_gnu ] ;
    }
    return $(result) ;
 }
