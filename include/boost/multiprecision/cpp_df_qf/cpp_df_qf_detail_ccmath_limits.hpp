@@ -27,7 +27,7 @@ struct numeric_limits<FloatingPointType,
                       typename std::enable_if<(   std::is_same<FloatingPointType, float>::value
                                                || std::is_same<FloatingPointType, double>::value
                                                || std::is_same<FloatingPointType, long double>::value
-#if defined(BOOST_HAS_FLOAT128)
+#if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
                                                || std::is_same<FloatingPointType, ::boost::float128_type>::value
 #endif
                                                )>::type>
