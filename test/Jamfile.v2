@@ -214,6 +214,7 @@ test-suite arithmetic_tests :
    [ run test_mpf_precisions.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] ]
    [ run test_threaded_precision.cpp mpfr gmp : : : [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPF_50 : test_threaded_precision_mpf ]
    [ run test_complex.cpp : : : [ check-target-builds ../config//has_mpc : <define>TEST_MPC <source>mpc <source>mpfr <source>gmp ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
+   [ run test_complex.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] <define>TEST_CPP_DOUBLE_FLOAT : test_complex_df ]
    [ run test_arithmetic_complex_adaptor.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_complex_adaptor_2.cpp : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_complex128.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
@@ -320,6 +321,27 @@ rule get_function_tests
    }
    return $(result) ;
 }
+
+rule get_function_tests_df_gnu
+{
+   local result ;
+   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
+   {
+         result += [ run $(source) quadmath
+              : # command line
+              : # input files
+              : # requirements
+               [ check-target-builds ../config//has_float128 : : <build>no ]
+               <define>TEST_CPP_DOUBLE_FLOAT
+              : $(source:B)_cpp_double_fp ] ;
+   }
+   return $(result) ;
+}
+
+test-suite functions_df_gnu :
+
+      [ get_function_tests_df_gnu ]
+;
 
 test-suite functions_and_limits :
 

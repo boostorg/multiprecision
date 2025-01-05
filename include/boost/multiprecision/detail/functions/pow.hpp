@@ -109,7 +109,6 @@ void hyp0F0(T& H0F0, const T& x)
 
    BOOST_MP_ASSERT(&H0F0 != &x);
    long tol = boost::multiprecision::detail::digits2<number<T, et_on> >::value();
-   T    t;
 
    T x_pow_n_div_n_fact(x);
 
@@ -169,7 +168,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
       lim.negate();
 
    si_type n;
-   T       term, part;
+   T       term;
 
    const si_type series_limit =
        boost::multiprecision::detail::digits2<number<T, et_on> >::value() < 100

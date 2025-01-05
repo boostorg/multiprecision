@@ -1344,7 +1344,7 @@ constexpr void eval_frexp(cpp_double_fp_backend<FloatingPointType>& result, cons
    using local_backend_type = cpp_double_fp_backend<FloatingPointType>;
    using local_float_type = typename local_backend_type::float_type;
 
-   int expptr;
+   int expptr { };
 
    const local_float_type fhi { cpp_df_qf_detail::ccmath::frexp(a.rep().first, &expptr) };
    const local_float_type flo { cpp_df_qf_detail::ccmath::ldexp(a.rep().second, -expptr) };
