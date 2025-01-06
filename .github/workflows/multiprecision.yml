@@ -151,7 +151,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ g++ ]
+        standard: [ gnu++14, gnu++20 ]
         suite: [ functions_df_gnu ]
     steps:
       - uses: actions/checkout@v4
@@ -191,7 +191,7 @@ jobs:
         run: ./b2 headers
         working-directory: ../boost-root
       - name: Generate user config
-        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=gnu++14 ;" > ~/user-config.jam'
+        run: 'echo "using $TOOLSET : : g++ : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
       - name: Config Info
         run: ../../../b2 print_config_info print_math_info toolset=$TOOLSET
