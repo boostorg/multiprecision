@@ -16,7 +16,7 @@ namespace boost { namespace multiprecision { namespace backends { namespace cpp_
 namespace detail {
 
 template <class T>
-auto sqrt_impl(T x) -> T
+constexpr auto sqrt_impl(T x) -> T
 {
    // Default to the regular sqrt function.
    using std::sqrt;
@@ -27,7 +27,7 @@ auto sqrt_impl(T x) -> T
 } // namespace detail
 
 template <typename Real>
-auto sqrt(Real x) -> Real
+constexpr auto sqrt(Real x) -> Real
 {
    return cpp_df_qf_detail::ccmath::detail::sqrt_impl<Real>(x);
 }

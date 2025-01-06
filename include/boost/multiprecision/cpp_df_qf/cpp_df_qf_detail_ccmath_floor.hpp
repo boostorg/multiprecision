@@ -16,7 +16,7 @@ namespace boost { namespace multiprecision { namespace backends { namespace cpp_
 namespace detail {
 
 template <class T>
-auto floor_impl(T x) -> T
+constexpr auto floor_impl(T x) -> T
 {
    // Default to the regular floor function.
    using std::floor;
@@ -27,7 +27,7 @@ auto floor_impl(T x) -> T
 } // namespace detail
 
 template <typename Real>
-auto floor(Real x) -> Real
+constexpr auto floor(Real x) -> Real
 {
    return cpp_df_qf_detail::ccmath::detail::floor_impl<Real>(x);
 }
