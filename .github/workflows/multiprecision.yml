@@ -151,14 +151,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ g++ ]
+        standard: [ gnu++14, gnu++20 ]
         suite: [ functions_df_gnu ]
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
-        run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
+        run: echo g++ | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
       - name: Add repository
         continue-on-error: true
         id: addrepo
@@ -191,7 +191,7 @@ jobs:
         run: ./b2 headers
         working-directory: ../boost-root
       - name: Generate user config
-        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=gnu++14 ;" > ~/user-config.jam'
+        run: 'echo "using $TOOLSET : : g++ : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
       - name: Config Info
         run: ../../../b2 print_config_info print_math_info toolset=$TOOLSET
@@ -234,7 +234,7 @@ jobs:
         if: steps.retry1.outcome=='failure'
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: sudo apt install g++-10 g++-11 clang-10 clang-11 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev libmpfi-dev libmpc-dev
+        run: sudo apt install g++-9 g++-10 g++-11 clang-10 clang-11 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev libmpfi-dev libmpc-dev
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
