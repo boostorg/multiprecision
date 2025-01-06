@@ -576,7 +576,7 @@ class cpp_double_fp_backend
 
       float_type C { cpp_df_qf_detail::split_maker<float_type>::value * data.first };
 
-      float_type hu;
+      float_type hu { };
 
       if (cpp_df_qf_detail::ccmath::isinf(C))
       {
@@ -610,7 +610,7 @@ class cpp_double_fp_backend
 
       float_type c { cpp_df_qf_detail::split_maker<float_type>::value * v.data.first };
 
-      float_type hv;
+      float_type hv { };
 
       if (cpp_df_qf_detail::ccmath::isinf(c))
       {
@@ -732,7 +732,7 @@ class cpp_double_fp_backend
 
       float_type c { cpp_df_qf_detail::split_maker<float_type>::value * C };
 
-      float_type hc;
+      float_type hc { };
 
       if (cpp_df_qf_detail::ccmath::isinf(c))
       {
@@ -752,7 +752,7 @@ class cpp_double_fp_backend
 
       float_type u { cpp_df_qf_detail::split_maker<float_type>::value * v.data.first };
 
-      float_type hv;
+      float_type hv { };
 
       if (cpp_df_qf_detail::ccmath::isinf(u))
       {
@@ -832,7 +832,7 @@ class cpp_double_fp_backend
    {
       using local_float_type = cpp_double_fp_backend;
 
-      local_float_type result;
+      local_float_type result { };
 
       if (p < 0)
          result = pown(local_float_type(1U) / x, -p);
