@@ -37,7 +37,7 @@ The exponent ranges of the types are slightly limited (on the negative side) com
 Consider again the type `cpp_double_double`, composed of two double-precision IEEE double-precision
 floating-point numebers. On common systems, this type has a maximum decimal exponent of 308
 (as does a single double-precision floating point number). The negative minimum exponent, however,
-is about -291, which is less range than the -3ß7 from standalone double. The reason for
+is about -291, which is less range than the -307 from standalone double. The reason for
 the limitation is because the composite lower-limb has lower value than its upper limb and would
 underflow or become subnormal if the upper limb had its usual minimum value.
 
