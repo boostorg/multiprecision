@@ -883,7 +883,6 @@ int main()
       test<cpp_double_double>();
       test<cpp_double_long_double>();
       #if defined(BOOST_HAS_FLOAT128)
-      #warning compiliation is here which is good as expected
       test<cpp_double_float128>();
       #endif
    }

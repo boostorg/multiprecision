@@ -405,43 +405,45 @@ class cpp_double_fp_backend
 
    constexpr cpp_double_fp_backend& operator+=(const cpp_double_fp_backend& v)
    {
-      const auto fpc_u = eval_fpclassify(*this);
-      const auto fpc_v = eval_fpclassify(v);
+      const int fpc_u { eval_fpclassify(*this) };
+      const int fpc_v { eval_fpclassify(v) };
 
-      const auto isnan_u = (fpc_u == FP_NAN);
-
-      if (isnan_u)
+      if ((fpc_u != FP_NORMAL) || (fpc_v != FP_NORMAL))
       {
-         return *this;
-      }
+         // Handle special cases like zero, inf and NaN.
 
-      const auto isinf_u = (fpc_u == FP_INFINITE);
-      const auto isinf_v = (fpc_v == FP_INFINITE);
-
-      if (isinf_u)
-      {
-         if (isinf_v && (isneg_unchecked() != v.isneg_unchecked()))
+         if (fpc_u == FP_NAN)
          {
-            *this = cpp_double_fp_backend::my_value_nan();
+            return *this;
          }
 
-         return *this;
-      }
+         const bool isinf_v { (fpc_v == FP_INFINITE) };
 
-      const auto iszero_u = ((fpc_u == FP_ZERO) || (fpc_u == FP_SUBNORMAL));
-      const auto isnan_v  = (fpc_v == FP_NAN);
-
-      if (iszero_u || (isnan_v || isinf_v))
-      {
-         if (iszero_u)
+         if (fpc_u == FP_INFINITE)
          {
-            data.first  = float_type { 0.0F };
-            data.second = float_type { 0.0F };
+            if (isinf_v && (isneg_unchecked() != v.isneg_unchecked()))
+            {
+               *this = cpp_double_fp_backend::my_value_nan();
+            }
+
+            return *this;
          }
 
-         const auto iszero_v = ((fpc_v == FP_ZERO) || (fpc_v == FP_SUBNORMAL));
+         const bool iszero_u { ((fpc_u == FP_ZERO) || (fpc_u == FP_SUBNORMAL)) };
+         const bool isnan_v  { (fpc_v == FP_NAN) };
 
-         return ((!iszero_v) ? operator=(v) : *this);
+         if (iszero_u || (isnan_v || isinf_v))
+         {
+            if (iszero_u)
+            {
+               data.first  = float_type { 0.0F };
+               data.second = float_type { 0.0F };
+            }
+
+            const bool iszero_v { ((fpc_v == FP_ZERO) || (fpc_v == FP_SUBNORMAL)) };
+
+            return ((!iszero_v) ? operator=(v) : *this);
+         }
       }
 
       const float_type xlo { data.second };
@@ -459,42 +461,45 @@ class cpp_double_fp_backend
 
    constexpr cpp_double_fp_backend& operator-=(const cpp_double_fp_backend& v)
    {
-      const auto fpc_u = eval_fpclassify(*this);
-      const auto fpc_v = eval_fpclassify(v);
+      const int fpc_u { eval_fpclassify(*this) };
+      const int fpc_v { eval_fpclassify(v) };
 
-      const auto isnan_u = (fpc_u == FP_NAN);
-
-      if (isnan_u)
+      if ((fpc_u != FP_NORMAL) || (fpc_v != FP_NORMAL))
       {
-         return *this;
-      }
+         // Handle special cases like zero, inf and NaN.
 
-      const auto isinf_u = (fpc_u == FP_INFINITE);
-      const auto isinf_v = (fpc_v == FP_INFINITE);
-
-      if (isinf_u)
-      {
-         if (isinf_v && (isneg_unchecked() == v.isneg_unchecked()))
+         if (fpc_u == FP_NAN)
          {
-            *this = cpp_double_fp_backend::my_value_nan();
-         }
-         return *this;
-      }
-
-      const auto iszero_u = ((fpc_u == FP_ZERO) || (fpc_u == FP_SUBNORMAL));
-      const auto isnan_v  = (fpc_v == FP_NAN);
-
-      if (iszero_u || (isnan_v || isinf_v))
-      {
-         if (iszero_u)
-         {
-            data.first  = float_type { 0.0F };
-            data.second = float_type { 0.0F };
+            return *this;
          }
 
-         const auto iszero_v = ((fpc_v == FP_ZERO) || (fpc_v == FP_SUBNORMAL));
+         const bool isinf_v { (fpc_v == FP_INFINITE) };
 
-         return ((!iszero_v) ? operator=(-v) : *this);
+         if (fpc_u == FP_INFINITE)
+         {
+            if (isinf_v && (isneg_unchecked() == v.isneg_unchecked()))
+            {
+               *this = cpp_double_fp_backend::my_value_nan();
+            }
+
+            return *this;
+         }
+
+         const bool iszero_u { ((fpc_u == FP_ZERO) || (fpc_u == FP_SUBNORMAL)) };
+         const bool isnan_v  { (fpc_v == FP_NAN) };
+
+         if (iszero_u || (isnan_v || isinf_v))
+         {
+            if (iszero_u)
+            {
+               data.first  = float_type { 0.0F };
+               data.second = float_type { 0.0F };
+            }
+
+            const bool iszero_v { ((fpc_v == FP_ZERO) || (fpc_v == FP_SUBNORMAL)) };
+
+            return ((!iszero_v) ? operator=(-v) : *this);
+         }
       }
 
       if (this == &v)
@@ -525,42 +530,43 @@ class cpp_double_fp_backend
       const int fpc_u { eval_fpclassify(*this) };
       const int fpc_v { eval_fpclassify(v) };
 
-      // Handle special cases like zero, inf and NaN.
-      const bool isinf_u  { (fpc_u == FP_INFINITE) };
-      const bool isinf_v  { (fpc_v == FP_INFINITE) };
-      const bool isnan_u  { (fpc_u == FP_NAN) };
-      const bool isnan_v  { (fpc_v == FP_NAN) };
-      const bool iszero_u { (fpc_u == FP_ZERO) };
-      const bool iszero_v { (fpc_v == FP_ZERO) };
-
-      if ((isnan_u || isnan_v) || (isinf_u && iszero_v) || (isinf_v && iszero_u))
+      if ((fpc_u != FP_NORMAL) || (fpc_v != FP_NORMAL))
       {
-         return operator=( cpp_double_fp_backend::my_value_nan());
-      }
+         // Handle special cases like zero, inf and NaN.
+         const bool isinf_u  { (fpc_u == FP_INFINITE) };
+         const bool isinf_v  { (fpc_v == FP_INFINITE) };
+         const bool iszero_u { (fpc_u == FP_ZERO) };
+         const bool iszero_v { (fpc_v == FP_ZERO) };
 
-      if (isinf_u || isinf_v)
-      {
-         const bool b_neg { (isneg_unchecked() != v.isneg_unchecked()) };
-
-         *this = cpp_double_fp_backend::my_value_inf();
-
-         if (b_neg)
+         if (((fpc_u == FP_NAN) || (fpc_v == FP_NAN)) || (isinf_u && iszero_v) || (isinf_v && iszero_u))
          {
-            negate();
+            return operator=( cpp_double_fp_backend::my_value_nan());
          }
 
-         return *this;
-      }
+         if (isinf_u || isinf_v)
+         {
+            const bool b_neg { (isneg_unchecked() != v.isneg_unchecked()) };
 
-      if (iszero_u || iszero_v)
-      {
-         const bool b_neg { (isneg_unchecked() != v.isneg_unchecked()) };
+            *this = cpp_double_fp_backend::my_value_inf();
 
-         operator=(cpp_double_fp_backend(0));
+            if (b_neg)
+            {
+               negate();
+            }
 
-         if (b_neg) { negate(); }
+            return *this;
+         }
 
-         return *this;
+         if (iszero_u || iszero_v)
+         {
+            const bool b_neg { (isneg_unchecked() != v.isneg_unchecked()) };
+
+            operator=(cpp_double_fp_backend(0));
+
+            if (b_neg) { negate(); }
+
+            return *this;
+         }
       }
 
       // The multiplication algorithm has been taken from Victor Shoup,
@@ -642,76 +648,79 @@ class cpp_double_fp_backend
 
    constexpr cpp_double_fp_backend& operator/=(const cpp_double_fp_backend& v)
    {
-      // Handle special cases like zero, inf and NaN.
       const int fpc_u { eval_fpclassify(*this) };
       const int fpc_v { eval_fpclassify(v) };
 
-      const bool isnan_u { (fpc_u == FP_NAN) };
-      const bool isnan_v { (fpc_v == FP_NAN) };
-
-      if (isnan_u || isnan_v)
+      if ((fpc_u != FP_NORMAL) || (fpc_v != FP_NORMAL))
       {
-         return operator=(cpp_double_fp_backend::my_value_nan());
-      }
+         // Handle special cases like zero, inf and NaN.
+         const bool isnan_u { (fpc_u == FP_NAN) };
+         const bool isnan_v { (fpc_v == FP_NAN) };
 
-      const bool iszero_u { (fpc_u == FP_ZERO) };
-      const bool iszero_v { (fpc_v == FP_ZERO) };
-
-      if (this == &v)
-      {
-         data.first  = float_type { 1.0F };
-         data.second = float_type { 0.0F };
-
-         return *this;
-      }
-
-      if (iszero_u)
-      {
-         if (iszero_v)
+         if (isnan_u || isnan_v)
          {
             return operator=(cpp_double_fp_backend::my_value_nan());
          }
-         else
+
+         const bool iszero_u { (fpc_u == FP_ZERO) };
+         const bool iszero_v { (fpc_v == FP_ZERO) };
+
+         if (this == &v)
+         {
+            data.first  = float_type { 1.0F };
+            data.second = float_type { 0.0F };
+
+            return *this;
+         }
+
+         if (iszero_u)
+         {
+            if (iszero_v)
+            {
+               return operator=(cpp_double_fp_backend::my_value_nan());
+            }
+            else
+            {
+               return operator=(cpp_double_fp_backend(0));
+            }
+         }
+
+         // Handle more special cases like zero, inf and NaN.
+         if (iszero_v)
+         {
+            const bool b_neg = isneg_unchecked();
+
+            *this = cpp_double_fp_backend::my_value_inf();
+
+            if (b_neg)
+            {
+               negate();
+            }
+
+            return *this;
+         }
+
+         const bool isinf_v { (fpc_v == FP_INFINITE) };
+         const bool isinf_u { (fpc_u == FP_INFINITE) };
+
+         if (isinf_u)
+         {
+            if (isinf_v)
+            {
+               return operator=(cpp_double_fp_backend::my_value_nan());
+            }
+            else
+            {
+               const bool b_neg { isneg_unchecked() };
+
+               return operator=((!b_neg) ? cpp_double_fp_backend::my_value_inf() : -cpp_double_fp_backend::my_value_inf());
+            }
+         }
+
+         if (isinf_v)
          {
             return operator=(cpp_double_fp_backend(0));
          }
-      }
-
-      // Handle more special cases like zero, inf and NaN.
-      if (iszero_v)
-      {
-         const bool b_neg = isneg_unchecked();
-
-         *this = cpp_double_fp_backend::my_value_inf();
-
-         if (b_neg)
-         {
-            negate();
-         }
-
-         return *this;
-      }
-
-      const bool isinf_v { (fpc_v == FP_INFINITE) };
-      const bool isinf_u { (fpc_u == FP_INFINITE) };
-
-      if (isinf_u)
-      {
-         if (isinf_v)
-         {
-            return operator=(cpp_double_fp_backend::my_value_nan());
-         }
-         else
-         {
-            const bool b_neg { isneg_unchecked() };
-
-            return operator=((!b_neg) ? cpp_double_fp_backend::my_value_inf() : -cpp_double_fp_backend::my_value_inf());
-         }
-      }
-
-      if (isinf_v)
-      {
-         return operator=(cpp_double_fp_backend(0));
       }
 
       // The division algorithm has been taken from Victor Shoup,
