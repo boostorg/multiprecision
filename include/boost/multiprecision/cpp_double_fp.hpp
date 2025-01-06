@@ -195,8 +195,7 @@ class cpp_double_fp_backend
    // TBD: Did we justify this static assertion during the GSoC?
    // Does anyone remember what the meaning of the number 77 is?
 
-   static_assert(((my_max_exponent - my_digits) >= 77),
-                 "Error: floating-point constituent does not have wide enough exponent range");
+   static_assert(((my_max_exponent - my_digits) >= 77), "Error: floating-point constituent does not have wide enough exponent range");
 
    // Default constructor.
    constexpr cpp_double_fp_backend() noexcept { }
@@ -316,7 +315,7 @@ class cpp_double_fp_backend
 
    // Assignment operator from another kind of cpp_double_fp_backend<> object.
    template <typename OtherFloatType,
-             typename ::std::enable_if<(    cpp_df_qf_detail::is_floating_point<OtherFloatType>::value
+             typename ::std::enable_if<(   cpp_df_qf_detail::is_floating_point<OtherFloatType>::value
                                       && (!std::is_same<FloatingPointType, OtherFloatType>::value))>::type const* = nullptr>
    constexpr cpp_double_fp_backend& operator=(const cpp_double_fp_backend<OtherFloatType>& other)
    {
@@ -352,9 +351,9 @@ class cpp_double_fp_backend
 
       const std::string str_to_hash { str(cpp_double_fp_backend::my_digits10, std::ios::scientific) };
 
-      auto result = static_cast<std::size_t>(UINT8_C(0));
+      std::size_t result { UINT8_C(0) };
 
-      for (auto i = static_cast<std::string::size_type>(UINT8_C(0)); i < str_to_hash.length(); ++i)
+      for (std::size_t i = std::size_t { UINT8_C(0) }; i < str_to_hash.length(); ++i)
       {
          boost::multiprecision::detail::hash_combine(result, str_to_hash.at(i));
       }
@@ -363,20 +362,11 @@ class cpp_double_fp_backend
    }
 
    // Methods
-   constexpr bool isneg_unchecked() const noexcept
-   {
-      return (data.first < 0);
-   }
+   constexpr bool isneg_unchecked() const noexcept { return (data.first < 0); }
 
-   constexpr bool iszero_unchecked() const noexcept
-   {
-      return (data.first  == float_type { 0.0F });
-   }
+   constexpr bool iszero_unchecked() const noexcept { return (data.first  == float_type { 0.0F }); }
 
-   constexpr bool is_one() const noexcept
-   {
-      return ((data.first  == float_type { 1.0F }) && (data.second  == float_type { 0.0F }));
-   }
+   constexpr bool is_one() const noexcept { return ((data.second  == float_type { 0.0F }) && (data.first  == float_type { 1.0F })); }
 
    constexpr void negate()
    {
@@ -818,14 +808,17 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend& operator++() { return *this += cpp_double_fp_backend<float_type>(float_type(1.0F)); }
    constexpr cpp_double_fp_backend& operator--() { return *this -= cpp_double_fp_backend<float_type>(float_type(1.0F)); }
 
+   // Unare minus operator.
    constexpr cpp_double_fp_backend operator-() const
    {
       cpp_double_fp_backend v(*this);
+
       v.negate();
+
       return v;
    }
 
-   // Helper functions
+   // Helper functions.
    constexpr static cpp_double_fp_backend pown(const cpp_double_fp_backend& x, int p)
    {
       using local_float_type = cpp_double_fp_backend;
@@ -879,7 +872,7 @@ class cpp_double_fp_backend
    {
       if (this != &other)
       {
-         const rep_type tmp = data;
+         const rep_type tmp { data };
 
          data = other.data;
 
@@ -889,7 +882,7 @@ class cpp_double_fp_backend
 
    constexpr void swap(cpp_double_fp_backend&& other) noexcept
    {
-      const rep_type tmp = data;
+      const rep_type tmp { static_cast<typename cpp_double_fp_backend::rep_type&&>(data) };
 
       data = other.data;
 
@@ -1493,13 +1486,13 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
 
    if (fpc == FP_ZERO)
    {
-      result = double_float_type(1);
+      result = double_float_type { 1.0F };
    }
    else if (fpc != FP_NORMAL)
    {
       if (fpc == FP_INFINITE)
       {
-         result = (x.isneg_unchecked() ? double_float_type(0) : double_float_type::my_value_inf());
+         result = (x.isneg_unchecked() ? double_float_type { 0.0F } : double_float_type::my_value_inf());
       }
       else if (fpc == FP_NAN)
       {
@@ -1599,7 +1592,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
          const double_float_type n840(840);
          const double_float_type n42(42);
 
-         const double_float_type r2 = r * r;
+         const double_float_type r2 { r * r };
 
          result = double_float_type(1U) + ((n84 * r) * (n7920 + r2 * (n240 + r2))) / (n665280 + r * (-n332640 + r * (n75600 + r * (-n10080 + r * (n840 + (-n42 + r) * r)))));
 
@@ -1754,7 +1747,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
          const double_float_type n2520(2520U);
          const double_float_type n72(72U);
 
-         const double_float_type r2 = r * r;
+         const double_float_type r2 { r * r };
 
          const double_float_type top = (n144 * r) * (n3603600 + r2 * (n120120 + r2 * (n770 + r2)));
          const double_float_type bot = (n518918400 + r * (-n259459200 + r * (n60540480 + r * (-n8648640 + r * (n831600 + r * (-n55440 + r * (n2520 + r * (-n72 + r))))))));
