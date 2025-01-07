@@ -42,7 +42,7 @@ struct pair
   float_type first;
   float_type second;
 
-  constexpr pair() { }
+  constexpr pair() : first { }, second { } { };
   constexpr pair(float_type a, float_type b) : first { a }, second { b } { }
   constexpr pair(const pair& other) : first { other.first }, second { other.second } { }
   constexpr pair(pair&& other) noexcept : first { other.first }, second { other.second } { }

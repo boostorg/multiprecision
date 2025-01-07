@@ -963,24 +963,33 @@ class cpp_double_fp_backend
       // Use the non-normalized sum of two maximum values, where the lower
       // value is "shifted" right in the sense of floating-point ldexp.
 
-      constexpr float_type maxval_hi { (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)() };
-
-      constexpr int expval_lo { -cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits - 1 };
+      // TBD: This value _still_ needs to be independently verified.
 
       constexpr cpp_double_fp_backend
          my_value_max_constexpr
          {
-            cpp_double_fp_backend
-            {
-               maxval_hi,
-               float_type { cpp_df_qf_detail::ccmath::unsafe::ldexp(maxval_hi, expval_lo) }
-            }
+            arithmetic::two_hilo_sum
+            (
+               static_cast<float_type>
+               (
+                    (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)()
+                  * (
+                         static_cast<float_type>(1.0F)
+                       - static_cast<float_type>(1.5F) * cpp_df_qf_detail::ccmath::unsafe::sqrt(cpp_df_qf_detail::ccmath::numeric_limits<float_type>::epsilon())
+                    )
+               ),
+               cpp_df_qf_detail::ccmath::unsafe::ldexp
+               (
+                   (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)(),
+                  -(cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits + 1)
+               )
+            )
          };
 
       static_assert
       (
-         eval_gt(my_value_max_constexpr, cpp_double_fp_backend { maxval_hi }),
-         "Error: maximum value is too small and must exceed the max of its constituent type"
+         eval_gt(my_value_max_constexpr, cpp_double_fp_backend { (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)() / 2 }),
+         "Error: maximum value is too small and must exceed (1/2 * max) of its constituent type"
       );
 
       return my_value_max_constexpr;
@@ -2231,7 +2240,7 @@ constexpr typename ::std::enable_if<cpp_df_qf_detail::is_floating_point<OtherFlo
    }
    else
    {
-      BOOST_IF_CONSTEXPR(cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      BOOST_IF_CONSTEXPR(cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits > cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
       {
          *result  = static_cast<OtherFloatingPointType>(backend.crep().first);
          *result += static_cast<OtherFloatingPointType>(backend.crep().second);
