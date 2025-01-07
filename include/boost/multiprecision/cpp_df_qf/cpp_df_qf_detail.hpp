@@ -30,9 +30,42 @@
 #include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail_ccmath.hpp>
 
-#include <utility>
-
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail {
+
+template <class FloatingPointTypeA, class FloatingPointTypeB>
+struct pair
+{
+  static_assert(std::is_same<FloatingPointTypeA, FloatingPointTypeB>::value, "Error: floating point types A and B must be identical");
+
+  using float_type = FloatingPointTypeA;
+
+  float_type first;
+  float_type second;
+
+  constexpr pair() { }
+  constexpr pair(float_type a, float_type b) : first { a }, second { b } { }
+  constexpr pair(const pair& other) : first { other.first }, second { other.second } { }
+  constexpr pair(pair&& other) noexcept : first { other.first }, second { other.second } { }
+
+  constexpr auto operator=(const pair& other) -> pair&
+  {
+     if (this != &other)
+     {
+        first  = other.first;
+        second = other.second;
+     }
+
+     return *this;
+   }
+
+  constexpr auto operator=(pair&& other) noexcept -> pair&
+  {
+     first  = other.first;
+     second = other.second;
+
+     return *this;
+   }
+};
 
 template <class FloatingPointType>
 struct is_floating_point
@@ -85,7 +118,7 @@ struct exact_arithmetic
    static_assert(is_floating_point<FloatingPointType>::value, "Error: exact_arithmetic<> invoked with unknown floating-point type");
 
    using float_type  = FloatingPointType;
-   using float_pair  = std::pair<float_type, float_type>;
+   using float_pair  = pair<float_type, float_type>;
 
    static constexpr auto two_sum(const float_type a, const float_type b) -> float_pair
    {

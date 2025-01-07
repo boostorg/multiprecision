@@ -162,7 +162,7 @@ class cpp_double_fp_backend
 {
  public:
    using float_type = FloatingPointType;
-   using rep_type   = std::pair<float_type, float_type>;
+   using rep_type   = cpp_df_qf_detail::pair<float_type, float_type>;
    using arithmetic = cpp_df_qf_detail::exact_arithmetic<float_type>;
 
    using signed_types   = std::tuple<signed char, signed short, signed int, signed long, signed long long, std::intmax_t>;
@@ -287,7 +287,7 @@ class cpp_double_fp_backend
 
    constexpr cpp_double_fp_backend(const float_type& a, const float_type& b) noexcept : data(a, b) { }
 
-   constexpr cpp_double_fp_backend(const std::pair<float_type, float_type>& p) noexcept : data(p) { }
+   constexpr cpp_double_fp_backend(const cpp_df_qf_detail::pair<float_type, float_type>& p) noexcept : data(p) { }
 
    cpp_double_fp_backend(const char* s)
    {
@@ -960,84 +960,71 @@ class cpp_double_fp_backend
 
    static constexpr cpp_double_fp_backend my_value_max() noexcept
    {
-      // TBD: Is this value even correct, if there is such a
-      // thing as correct for this unusual data type?
+      // Use the non-normalized sum of two maximum values, where the lower
+      // value is "shifted" right in the sense of floating-point ldexp.
 
-      // TBD: This might involve a recurring run-time calculation.
-      // Can this work be more clearly off-loaded to known
-      // compile-time constexpr?
+      constexpr float_type maxval_hi { (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)() };
 
-      // TBD: Can this be simplified in any way?
-      // Is the use of the square root the best way to go?
-      // Can this be made more friendly to C++14 constexpr?
+      constexpr int expval_lo { -cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits - 1 };
 
-      // TBD: Or should we use the static-initializer trick (as used in cpp_dec_float)
-      // to initialize this and possible other similar values?
+      constexpr cpp_double_fp_backend
+         my_value_max_constexpr
+         {
+            cpp_double_fp_backend
+            {
+               maxval_hi,
+               float_type { cpp_df_qf_detail::ccmath::unsafe::ldexp(maxval_hi, expval_lo) }
+            }
+         };
 
-      return
-         cpp_double_fp_backend
-         (
-            arithmetic::two_hilo_sum
-            (
-               static_cast<float_type>
-               (
-                    (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)()
-                  * (
-                         static_cast<float_type>(1.0F)
-                       - static_cast<float_type>(1.5F) * cpp_df_qf_detail::ccmath::sqrt(cpp_df_qf_detail::ccmath::numeric_limits<float_type>::epsilon())
-                    )
-               ),
-               cpp_df_qf_detail::ccmath::ldexp
-               (
-                   (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)(),
-                  -(cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits + 1)
-               )
-            )
-         );
+      static_assert
+      (
+         eval_gt(my_value_max_constexpr, cpp_double_fp_backend { maxval_hi }),
+         "Error: maximum value is too small and must exceed the max of its constituent type"
+      );
+
+      return my_value_max_constexpr;
    }
 
    static constexpr cpp_double_fp_backend my_value_min() noexcept
    {
-      // TBD: Is this value even correct, if there is such a
-      // thing as correct for this unusual data type?
+      // Use the non-normalized minimum value, where the lower value
+      // is "shifted" left in the sense of floating-point ldexp.
 
-      // TBD: This might involve a recurring run-time calculation.
-      // Can this work be more clearly off-loaded to known
-      // compile-time constexpr?
-
-      // TBD: Or should we use the static-initializer trick (as used in cpp_dec_float)
-      // to initialize this and possible other similar values?
-
-      return
-         cpp_double_fp_backend
-         (
-            cpp_df_qf_detail::ccmath::ldexp
+      constexpr cpp_double_fp_backend
+         my_value_min_constexpr
+         {
+            cpp_df_qf_detail::ccmath::unsafe::ldexp
             (
                (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::min)(),
-                cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits
+               cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits
             )
-         );
+         };
+
+      static_assert
+      (
+         eval_gt(my_value_min_constexpr, cpp_double_fp_backend { (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::min)() }),
+         "Error: minimum value is too small and must exceed the min of its constituent type"
+      );
+
+      return my_value_min_constexpr;
    }
 
    static constexpr cpp_double_fp_backend my_value_eps() noexcept
    {
-      // TBD: Do we need a better value here.
+      constexpr cpp_double_fp_backend
+         my_value_eps_constexpr
+         {
+            cpp_df_qf_detail::ccmath::unsafe::ldexp(float_type { 1 }, int { 3 - my_digits })
+         };
 
-      // Or should we tune the value of epsilon() depending
-      // on the width of the underlying floating-point constituent.
+      static_assert
+      (
+         eval_lt(cpp_double_fp_backend { 1 } - my_value_eps_constexpr, cpp_double_fp_backend { 1 }),
+         "Error: epsilon value is too small and must be large enough to differentiate (1 - epsilon) from 1"
+      );
 
-      // TBD: This might involve a recurring run-time calculation.
-      // Can this work be more clearly off-loaded to known
-      // compile-time constexpr?
-
-      // TBD: Or should we use the static-initializer trick (as used in cpp_dec_float)
-      // to initialize this and possible other similar values?
-
-      cpp_double_fp_backend result;
-
-      eval_ldexp(result, cpp_double_fp_backend { 1 }, 3 - my_digits);
-
-      return result;
+      return my_value_eps_constexpr;
    }
 
    static constexpr cpp_double_fp_backend my_value_nan() noexcept
