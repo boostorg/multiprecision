@@ -60,15 +60,16 @@ the `cpp_double_fp_backend` types.
 
 Things you should know when using the `cpp_double_fp_backend` types:
 
-* Although the types are created from two individual IEEE floating-point components, they specifically and clearly not in their composite forms also IEEE types.
+* Although the types are created from two individual IEEE floating-point components, they specifically and clearly are not IEEE types in their composite forms.
 * As a result these types can behave subtly differently from IEEE floating-point types.
-* There is a `std::numeric_limits` specialization for this type.
-* Conversion to and from string internally uses an  intermediate `cpp_dec_float` value.
+* There are `std::numeric_limits` specializations for these types.
+* Large parts (but not all) of the `cpp_double_fp_backend` implementation are `constexpr`.
+* Conversion to and from string internally uses an  intermediate `cpp_dec_float` value (which may be eliminated in future refinements).
 
 The `cpp_double_fp_backend` back-end has been inspired by original works and types such as the historical `doubledouble`
 and more. These include the following:
 
-* K. Briggs, the doubledouble library, 1998.
+* K. Briggs, the `doubledouble` library, 1998.
 * Yozo Hida, X. Li, and D. H. Bailey, Quad-Double Arithmetic: Algorithms, Implementation, and Application, Lawrence Berkeley National Laboratory Technical Report LBNL-46996 (2000). Also Y. Hida et al., Library for double-double and quad-double arithmetic [@https://web.mit.edu/tabbott/Public/quaddouble-debian/qd-2.3.4-old/docs/qd.pdf].
 * Mioara Maria Joldes, Jean-Michel Muller, Valentina Popescu. Tight and rigorous error bounds for basic building blocks of double-word arithmetic. ACM Transactions on Mathematical Software, 2017, 44 (2), pp. 1 - 27. ff10.1145/3121432ff. ffhal-01351529v3f.
 * The `cpp_double_fp_backend` draft was originally created by Fahad Syed in BoostGSoC2021 _multiprecision_ [@https://github.com/BoostGSoC21/multiprecision].

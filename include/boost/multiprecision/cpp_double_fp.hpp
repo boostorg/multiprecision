@@ -162,6 +162,19 @@ class cpp_double_fp_backend
 {
  public:
    using float_type = FloatingPointType;
+
+   static_assert
+   (
+         cpp_df_qf_detail::is_floating_point<float_type>::value
+      && (
+               (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits ==  24)
+            || (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits ==  53)
+            || (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits ==  64)
+            || (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits == 113)
+         ),
+      "Error: float_type does not fulfil the backend requirements of cpp_double_fp_backend"
+   );
+
    using rep_type   = cpp_df_qf_detail::pair<float_type, float_type>;
    using arithmetic = cpp_df_qf_detail::exact_arithmetic<float_type>;
 
@@ -1204,11 +1217,13 @@ namespace cpp_df_qf_detail {
    // 3.14159265358979323851281,                -5.01655761266833202345176e-20
    // 3.14159265358979323846264338327950279748, 8.67181013012378102479704402604335225411e-35
 
-   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.14159250259L),                            static_cast<FloatingPointType>(1.50995788317e-07L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.141592653589793116L),                     static_cast<FloatingPointType>(1.2246467991473529607e-16L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.14159265358979323851281L),                static_cast<FloatingPointType>(-5.01655761266833202345176e-20L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(3.14159250259L),                            static_cast<FloatingPointType>(1.50995788317e-07L) }; }
+   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(3.141592653589793116L),                     static_cast<FloatingPointType>(1.2246467991473529607e-16L) }; }
+   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(3.14159265358979323851281L),                static_cast<FloatingPointType>(-5.01655761266833202345176e-20L) }; }
    #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
-   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(3.14159265358979323846264338327950279748Q), static_cast<FloatingPointType>(8.67181013012378102479704402604335225411e-35Q)); }
+   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(3.14159265358979323846264338327950279748Q), static_cast<FloatingPointType>(8.67181013012378102479704402604335225411e-35Q) }; }
+   #else
+   template <typename FloatingPointType> constexpr auto constant_df_pi() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(3.14159265358979323846264338327950279748L), static_cast<FloatingPointType>(8.67181013012378102479704402604335225411e-35L) }; }
    #endif
 
    // N[Log[2], 101]
@@ -1219,11 +1234,13 @@ namespace cpp_df_qf_detail {
    // 0.69314718055994530942869,                 -1.14583527267987328094768e-20
    // 0.693147180559945309417232121458176575084, -7.00813947454958516341266200877162272784e-36
 
-   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.69314712286L),                             static_cast<FloatingPointType>(5.76999887869e-08L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.6931471805599451752L),                     static_cast<FloatingPointType>(1.3421277060097865271e-16L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.69314718055994530942869L),                 static_cast<FloatingPointType>(-1.14583527267987328094768e-20L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(0.69314712286L),                             static_cast<FloatingPointType>(5.76999887869e-08L) }; }
+   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(0.6931471805599451752L),                     static_cast<FloatingPointType>(1.3421277060097865271e-16L) }; }
+   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(0.69314718055994530942869L),                 static_cast<FloatingPointType>(-1.14583527267987328094768e-20L) }; }
    #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
-   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(0.693147180559945309417232121458176575084Q), static_cast<FloatingPointType>(-7.00813947454958516341266200877162272784e-36Q)); }
+   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(0.693147180559945309417232121458176575084Q), static_cast<FloatingPointType>(-7.00813947454958516341266200877162272784e-36Q) }; }
+   #else
+   template <typename FloatingPointType> constexpr auto constant_df_ln_two() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(0.693147180559945309417232121458176575084L), static_cast<FloatingPointType>(-7.00813947454958516341266200877162272784e-36L) }; }
    #endif
 
    // N[Exp[1], 101]
@@ -1234,11 +1251,13 @@ namespace cpp_df_qf_detail {
    // 2.71828182845904523521133,                1.4895979785582304563159e-19
    // 2.71828182845904523536028747135266231436, 1.83398825226506410712297736767396397644e-34
 
-   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.71828174591L),                            static_cast<FloatingPointType>(8.25483965627e-08L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.7182818284590450908L),                    static_cast<FloatingPointType>(1.4456468917292501578e-16L)); }
-   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.71828182845904523521133L),                static_cast<FloatingPointType>(1.4895979785582304563159e-19L)); }
+   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  24)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(2.71828174591L),                            static_cast<FloatingPointType>(8.25483965627e-08L) }; }
+   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  53)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(2.7182818284590450908L),                    static_cast<FloatingPointType>(1.4456468917292501578e-16L) }; }
+   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits ==  64)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(2.71828182845904523521133L),                static_cast<FloatingPointType>(1.4895979785582304563159e-19L) }; }
    #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
-   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return cpp_double_fp_backend<FloatingPointType>(static_cast<FloatingPointType>(2.71828182845904523536028747135266231436Q), static_cast<FloatingPointType>(1.83398825226506410712297736767396397644e-34Q)); }
+   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(2.71828182845904523536028747135266231436Q), static_cast<FloatingPointType>(1.83398825226506410712297736767396397644e-34Q) }; }
+   #else
+   template <typename FloatingPointType> constexpr auto constant_df_exp1() -> typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && (cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits == 113)), cpp_double_fp_backend<FloatingPointType>>::type { return { static_cast<FloatingPointType>(2.71828182845904523536028747135266231436L), static_cast<FloatingPointType>(1.83398825226506410712297736767396397644e-34L) }; }
    #endif
 
 } // namespace cpp_df_qf_detail
