@@ -1062,7 +1062,7 @@ class cpp_double_fp_backend
  private:
    rep_type data;
 
-   using cpp_bin_float_read_write_backend_type = boost::multiprecision::backends::cpp_bin_float<static_cast<unsigned>(my_digits), digit_base_2, void, int, my_min_exponent - 1, my_max_exponent>;
+   using cpp_bin_float_read_write_backend_type = boost::multiprecision::backends::cpp_bin_float<static_cast<unsigned>(my_digits), digit_base_2, void, int, cpp_df_qf_detail::ccmath::numeric_limits<float_type>::min_exponent, cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max_exponent>;
    using cpp_bin_float_read_write_exp_type     = typename cpp_bin_float_read_write_backend_type::exponent_type;
 
    using cpp_bin_float_read_write_type = boost::multiprecision::number<cpp_bin_float_read_write_backend_type, boost::multiprecision::et_off>;
@@ -1103,9 +1103,23 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 
       if (b_neg) { f_bin = -f_bin; }
 
+      const int
+         expval_from_f_bin
+         {
+            [&f_bin]()
+            {
+               int expval;
+
+               frexp(f_bin, &expval);
+
+               return expval;
+            }()
+         };
+
       const auto is_zero_or_subnormal =
       (
-         (fpc == FP_ZERO) || (f_bin < (::std::numeric_limits<cpp_bin_float_read_write_type>::min)())
+            (fpc == FP_ZERO)
+         || (expval_from_f_bin < static_cast<cpp_bin_float_read_write_exp_type>(local_double_fp_type::my_min_exponent))
       );
 
       if (is_zero_or_subnormal)
@@ -1132,27 +1146,14 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 
             constexpr int pow2_scaling_for_small_input { cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits };
 
-            const int
-               expval_from_f_bin
-               {
-                  [&f_bin]()
-                  {
-                     int expval;
-
-                     frexp(f_bin, &expval);
-
-                     return expval;
-                  }()
-               };
-
             const auto has_pow2_scaling_for_small_input =
             (
-               expval_from_f_bin <= static_cast<int>(local_double_fp_type::my_min_exponent + cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits)
+               expval_from_f_bin < static_cast<int>(local_double_fp_type::my_min_exponent + pow2_scaling_for_small_input)
             );
 
             if (has_pow2_scaling_for_small_input)
             {
-               f_bin = ldexp(f_bin, cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits);
+               f_bin = ldexp(f_bin, pow2_scaling_for_small_input);
             }
 
             constexpr auto dig_lim =
@@ -1179,7 +1180,7 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 
             if (has_pow2_scaling_for_small_input)
             {
-               eval_ldexp(*this, *this, -cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits);
+               eval_ldexp(*this, *this, -pow2_scaling_for_small_input);
             }
 
             if (b_neg) { negate(); }
