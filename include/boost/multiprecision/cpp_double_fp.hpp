@@ -10,7 +10,7 @@
 #ifndef BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 #define BOOST_MP_CPP_DOUBLE_FP_2021_06_05_HPP
 
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
@@ -927,14 +927,14 @@ class cpp_double_fp_backend
          number_of_digits = cpp_double_fp_backend::my_digits10;
       }
 
-      // Use cpp_dec_float to write string (as is similarly done to read string).
+      // Use cpp_bin_float when writing to string. This is similar
+      // to the use of cpp_bin_float when reading from string.
 
-      cpp_dec_float_read_write_type f_dec { 0 };
+      cpp_bin_float_read_write_type f_bin { data.first };
 
-      f_dec  = data.first;
-      f_dec += data.second;
+      f_bin += data.second;
 
-      return f_dec.str(number_of_digits, format_flags);
+      return f_bin.str(number_of_digits, format_flags);
    }
 
    constexpr int order02() const
@@ -1062,17 +1062,10 @@ class cpp_double_fp_backend
  private:
    rep_type data;
 
-   static constexpr auto cpp_dec_float_read_write_digits10 =
-      static_cast<int>
-      (
-         static_cast<float>
-         (
-            static_cast<float>(my_digits) * 0.9F
-         )
-      );
+   using cpp_bin_float_read_write_backend_type = boost::multiprecision::backends::cpp_bin_float<static_cast<unsigned>(my_digits), digit_base_2, void, int, my_min_exponent, my_max_exponent>;
+   using cpp_bin_float_read_write_exp_type     = typename cpp_bin_float_read_write_backend_type::exponent_type;
 
-   using cpp_dec_float_read_write_type     = boost::multiprecision::cpp_dec_float<static_cast<unsigned>(cpp_dec_float_read_write_digits10), std::int32_t, std::allocator<void>>;
-   using cpp_dec_float_read_write_exp_type = typename cpp_dec_float_read_write_type::exponent_type;
+   using cpp_bin_float_read_write_type = boost::multiprecision::number<cpp_bin_float_read_write_backend_type, boost::multiprecision::et_off>;
 
    bool rd_string(const char* pstr);
 
@@ -1092,13 +1085,11 @@ class cpp_double_fp_backend
 template <typename FloatingPointType>
 bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
 {
-   // TBD: Do we need-to / want-to throw-catch on invalid string input?
-
    using local_double_fp_type = cpp_double_fp_backend<FloatingPointType>;
 
-   cpp_dec_float_read_write_type f_dec = pstr;
+   cpp_bin_float_read_write_type f_bin { pstr };
 
-   const auto fpc = eval_fpclassify(f_dec);
+   const auto fpc = fpclassify(f_bin);
 
    const auto is_definitely_nan = (fpc == FP_NAN);
 
@@ -1108,35 +1099,26 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
    }
    else
    {
-      cpp_dec_float_read_write_type dummy_frexp;
+      const bool b_neg { (signbit(f_bin) == 1) };
 
-      int e2_from_f_dec;
+      if (b_neg) { f_bin = -f_bin; }
 
-      eval_frexp(dummy_frexp, f_dec, &e2_from_f_dec);
-
-      const auto is_definitely_zero =
+      const auto is_zero_or_subnormal =
       (
-         // TBD: A detailed, clear comparison (or something close to a comparison)
-         // is still needed for input values having (e2_from_f_dec == my_min_exponent).
-            (fpc == FP_ZERO)
-         || (e2_from_f_dec < static_cast<cpp_dec_float_read_write_exp_type>(local_double_fp_type::my_min_exponent))
+         (fpc == FP_ZERO) || (f_bin < (::std::numeric_limits<cpp_bin_float_read_write_type>::min)())
       );
 
-      if (is_definitely_zero)
+      if (is_zero_or_subnormal)
       {
          data.first  = float_type { 0.0F };
          data.second = float_type { 0.0F };
       }
       else
       {
-         // TBD: A detailed, clear comparison (or something close to a comparison)
-         // is still needed for input values having (e2_from_f_dec == my_max_exponent).
-         const auto is_definitely_inf = (e2_from_f_dec > static_cast<cpp_dec_float_read_write_exp_type>(local_double_fp_type::my_max_exponent));
+         const auto is_definitely_inf = (f_bin > (::std::numeric_limits<cpp_bin_float_read_write_type>::max)());
 
          if (is_definitely_inf)
          {
-            const bool b_neg { f_dec.isneg() };
-
             static_cast<void>(operator=(local_double_fp_type::my_value_inf()));
 
             if (b_neg) { negate(); }
@@ -1159,47 +1141,18 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
                   * cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits
                );
 
-
-            using local_double_fp_constituent_type = typename local_double_fp_type::float_type;
-
-            constexpr int pow2_scaling_for_small_input { cpp_df_qf_detail::ccmath::numeric_limits<local_double_fp_constituent_type>::digits };
-
-            const auto has_pow2_scaling_for_small_input =
-            (
-               e2_from_f_dec < static_cast<int>(local_double_fp_type::my_min_exponent + pow2_scaling_for_small_input)
-            );
-
-            if (has_pow2_scaling_for_small_input)
-            {
-               f_dec *= cpp_dec_float_read_write_type::pow2(static_cast<long long>(pow2_scaling_for_small_input));
-            }
-
             for(auto i = static_cast<unsigned>(UINT8_C(0));
                      i < dig_lim;
                      i = static_cast<unsigned>(i + static_cast<unsigned>(cpp_df_qf_detail::ccmath::numeric_limits<local_builtin_float_type>::digits)))
             {
-               cpp_dec_float_read_write_type f_dec_abs { };
+               const local_builtin_float_type f { static_cast<local_builtin_float_type>(f_bin) };
 
-               eval_fabs(f_dec_abs, f_dec);
+               f_bin -= f;
 
-               if (f_dec_abs.compare((cpp_dec_float_read_write_type::min)()) <= 0)
-               {
-                  break;
-               }
-
-               auto f = local_builtin_float_type { };
-
-               eval_convert_to(&f, f_dec);
-
-               f_dec -= f;
-
-               eval_add(*this, local_double_fp_type(f));
+               eval_add(*this, local_double_fp_type { f });
             }
 
-            if (has_pow2_scaling_for_small_input)
-            {
-               eval_ldexp(*this, local_double_fp_type { *this }, -pow2_scaling_for_small_input);
-            }
+            if (b_neg) { negate(); }
          }
       }
    }

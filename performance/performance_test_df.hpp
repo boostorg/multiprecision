@@ -204,6 +204,16 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
+   double test_tan()
+   {
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for (unsigned i = 0; i < rounds(); ++i)
+      {
+         for (unsigned j = 0; j < b.size(); ++j)
+            a[j] = exp(b[j]);
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
    double test_str(const std::integral_constant<bool, false>&)
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
@@ -742,6 +752,7 @@ void test(const char* type, unsigned precision)
    report_result(cat, type, "sqrt", precision, t.test_sqrt());
    report_result(cat, type, "log", precision, t.test_log());
    report_result(cat, type, "exp", precision, t.test_exp());
+   report_result(cat, type, "tan", precision, t.test_tan());
    report_result(cat, type, "str", precision, t.test_str());
    // integer ops:
    report_result(cat, type, "+(int)", precision, t.test_add_int());

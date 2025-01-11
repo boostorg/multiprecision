@@ -1,3 +1,11 @@
+///////////////////////////////////////////////////////////////
+//  Copyright Christopher Kormanyos 2024.
+//  Distributed under the Boost
+//  Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+
+// This version of "performance_test_df_local.cpp" is intended
+// for specific function-by-function comparisons with cpp_double_double.
 
 #include <boost/core/lightweight_test.hpp>
 #include <boost/math/special_functions/bessel.hpp>
@@ -281,7 +289,7 @@ auto main() -> int
 
   for(std::size_t count { UINT8_C(0) }; count < trials; ++count)
   {
-    dbl_float_c_vec[count] = pow(dbl_float_a_vec[count], dbl_float_b_vec[count]);
+    dbl_float_c_vec[count] = boost::multiprecision::cyl_bessel_j(dbl_float_a_vec[count], dbl_float_b_vec[count]);
   }
 
   const double elapsed_dbl { stopwatch_type::elapsed_time<double>(my_stopwatch) };
@@ -290,7 +298,7 @@ auto main() -> int
 
   for(std::size_t count { UINT8_C(0) }; count < trials; ++count)
   {
-    dec_float_c_vec[count] = pow(dec_float_a_vec[count], dec_float_b_vec[count]);
+    dec_float_c_vec[count] = boost::multiprecision::cyl_bessel_j(dec_float_a_vec[count], dec_float_b_vec[count]);
   }
 
   const double elapsed_dec { stopwatch_type::elapsed_time<double>(my_stopwatch) };
@@ -300,7 +308,7 @@ auto main() -> int
 
   for(std::size_t count { UINT8_C(0) }; count < trials; ++count)
   {
-    flt_float_c_vec[count] = pow(flt_float_a_vec[count], flt_float_b_vec[count]);
+    flt_float_c_vec[count] = boost::multiprecision::cyl_bessel_j(flt_float_a_vec[count], flt_float_b_vec[count]);
   }
 
   const double elapsed_flt { stopwatch_type::elapsed_time<double>(my_stopwatch) };
