@@ -1062,7 +1062,7 @@ class cpp_double_fp_backend
  private:
    rep_type data;
 
-   using cpp_bin_float_read_write_backend_type = boost::multiprecision::backends::cpp_bin_float<static_cast<unsigned>(my_digits), digit_base_2, void, int, my_min_exponent, my_max_exponent>;
+   using cpp_bin_float_read_write_backend_type = boost::multiprecision::backends::cpp_bin_float<static_cast<unsigned>(my_digits), digit_base_2, void, int, cpp_df_qf_detail::ccmath::numeric_limits<float_type>::min_exponent, cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max_exponent>;
    using cpp_bin_float_read_write_exp_type     = typename cpp_bin_float_read_write_backend_type::exponent_type;
 
    using cpp_bin_float_read_write_type = boost::multiprecision::number<cpp_bin_float_read_write_backend_type, boost::multiprecision::et_off>;
@@ -1147,7 +1147,7 @@ bool cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr)
             {
                const local_builtin_float_type f { static_cast<local_builtin_float_type>(f_bin) };
 
-               f_bin -= f;
+               f_bin -= cpp_bin_float_read_write_type { f };
 
                eval_add(*this, local_double_fp_type { f });
             }
