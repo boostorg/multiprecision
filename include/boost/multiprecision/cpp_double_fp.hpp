@@ -351,17 +351,19 @@ class cpp_double_fp_backend
    std::size_t hash() const
    {
       // Hash the raw values of the data field with direct-memory access.
-      // Use 32-bit (4 byte) chunks as the data size when hashing.
+      // Use 16-bit (2 byte) chunks as the data size when hashing.
 
-      static_assert((sizeof(data.first) == sizeof(data.second)) && (sizeof(data.first) >= sizeof(std::uint32_t)),
-                    "Error: data size is inappropriate for hashing routine");
+      static_assert(   ( sizeof(data.first) == sizeof(data.second))
+                    && ( sizeof(float_type) >= sizeof(std::uint16_t))
+                    && ((sizeof(float_type) %  sizeof(std::uint16_t)) == std::size_t { UINT8_C(0) }),
+                    "Error: float_type size is inappropriate for hashing routine");
 
       auto hash_one
          {
             [](std::size_t& res, const float_type& val)
             {
-               const std::uint32_t* first { reinterpret_cast<const std::uint32_t*>(&val) };
-               const std::uint32_t* last  { first + std::size_t { sizeof(float_type) / sizeof(std::uint32_t) } };
+               const std::uint16_t* first { reinterpret_cast<const std::uint16_t*>(&val) };
+               const std::uint16_t* last  { first + std::size_t { sizeof(float_type) / sizeof(std::uint16_t) } };
 
                while (first != last)
                {

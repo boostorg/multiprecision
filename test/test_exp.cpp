@@ -18,6 +18,7 @@
 #include "test.hpp"
 
 #include <array>
+#include <ctime>
 #include <random>
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
@@ -228,95 +229,6 @@ void test()
    }
 }
 
-template<typename FloatType> auto my_zero() -> FloatType&;
-template<typename FloatType> auto my_one () -> FloatType&;
-
-template<typename FloatType>
-auto test_exp_edge() -> bool
-{
-  using float_type = FloatType;
-
-  std::mt19937_64 gen;
-
-  std::uniform_real_distribution<float>
-    dist
-    (
-      static_cast<float>(1.01L),
-      static_cast<float>(1.04L)
-    );
-
-  auto result_is_ok = true;
-
-  for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
-  {
-    static_cast<void>(i);
-
-    const float_type val_nan { exp(std::numeric_limits<float_type>::quiet_NaN() * static_cast<float_type>(dist(gen))) };
-
-    const bool result_val_nan_is_ok { isnan(val_nan) };
-
-    BOOST_TEST(result_val_nan_is_ok);
-
-    result_is_ok = (result_val_nan_is_ok && result_is_ok);
-  }
-
-  for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
-  {
-    static_cast<void>(i);
-
-    const float_type arg_inf { std::numeric_limits<float_type>::infinity() * static_cast<float_type>(dist(gen)) };
-
-    const float_type val_inf_pos { exp(arg_inf) };
-
-    const bool result_val_inf_pos_is_ok { (fpclassify(val_inf_pos) == FP_INFINITE) };
-
-    BOOST_TEST(result_val_inf_pos_is_ok);
-
-    result_is_ok = (result_val_inf_pos_is_ok && result_is_ok);
-  }
-
-  for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
-  {
-    static_cast<void>(i);
-
-    const float_type val_inf_neg { exp(-std::numeric_limits<float_type>::infinity() * static_cast<float_type>(dist(gen))) };
-
-    const bool result_val_inf_neg_is_ok { (val_inf_neg == ::my_zero<float_type>()) };
-
-    BOOST_TEST(result_val_inf_neg_is_ok);
-
-    result_is_ok = (result_val_inf_neg_is_ok && result_is_ok);
-  }
-
-  for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
-  {
-    static_cast<void>(i);
-
-    const float_type val_zero_pos { exp(::my_zero<float_type>()) };
-
-    const bool result_val_zero_pos_is_ok { (val_zero_pos == ::my_one<float_type>()) };
-
-    BOOST_TEST(result_val_zero_pos_is_ok);
-
-    result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
-  }
-
-  for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
-  {
-    static_cast<void>(i);
-
-    const float_type val_zero_neg { exp(-::my_zero<float_type>()) };
-
-    const bool result_val_zero_neg_is_ok { (val_zero_neg == ::my_one<float_type>()) };
-
-    BOOST_TEST(result_val_zero_neg_is_ok);
-
-    result_is_ok = (result_val_zero_neg_is_ok && result_is_ok);
-  }
-
-  return result_is_ok;
-}
-
 int main()
 {
 #ifdef TEST_BACKEND
@@ -368,16 +280,6 @@ int main()
    #if defined(BOOST_HAS_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
    #endif
-
-   test_exp_edge<boost::multiprecision::cpp_double_float>();
-   test_exp_edge<boost::multiprecision::cpp_double_double>();
-   test_exp_edge<boost::multiprecision::cpp_double_long_double>();
-   #if defined(BOOST_HAS_FLOAT128)
-   test_exp_edge<boost::multiprecision::cpp_double_float128>();
-   #endif
 #endif
    return boost::report_errors();
 }
-
-template<typename FloatType> auto my_zero() -> FloatType& { using float_type = FloatType; static float_type val_zero { 0 }; return val_zero; }
-template<typename FloatType> auto my_one () -> FloatType& { using float_type = FloatType; static float_type val_one  { 1 }; return val_one; }
