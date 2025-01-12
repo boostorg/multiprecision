@@ -122,12 +122,6 @@ template <typename FloatingPointType,
           typename OtherFloatingPointType>
 constexpr typename ::std::enable_if<cpp_df_qf_detail::is_floating_point<OtherFloatingPointType>::value>::type eval_convert_to(OtherFloatingPointType* result, const cpp_double_fp_backend<FloatingPointType>& backend);
 
-template <typename FloatingPointType,
-          typename char_type,
-          typename traits_type>
-::std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os,
-                                                         const cpp_double_fp_backend<FloatingPointType>&  f);
-
 template <typename FloatingPointType>
 ::std::size_t hash_value(const cpp_double_fp_backend<FloatingPointType>& a);
 
@@ -356,20 +350,34 @@ class cpp_double_fp_backend
 
    std::size_t hash() const
    {
-      // Here we first convert to scientific string, then
-      // hash the charactgers in the scientific string.
+      // Hash the raw values of the data field with direct-memory access.
+      // Use 32-bit (4 byte) chunks as the data size when hashing.
 
-      // TBD: Is there a faster or more simple hash method?
-      // TBD: Is there any constexpr support for rudimentary hashing?
+      static_assert((sizeof(data.first) == sizeof(data.second)) && (sizeof(data.first) >= sizeof(std::uint32_t)),
+                    "Error: data size is inappropriate for hashing routine");
 
-      const std::string str_to_hash { str(cpp_double_fp_backend::my_digits10, std::ios::scientific) };
+      auto hash_one
+         {
+            [](std::size_t& res, const float_type& val)
+            {
+               const std::uint32_t* first { reinterpret_cast<std::uint32_t*>(&val) };
+               const std::uint32_t* last  { reinterpret_cast<std::uint32_t*>(&val) + sizeof(float_type) / sizeof(std::uint32_t) };
+
+               while (first != last)
+               {
+                  boost::multiprecision::detail::hash_combine(res, *first);
+
+                  ++first;
+               }
+
+               return res;
+             }
+         };
 
       std::size_t result { UINT8_C(0) };
 
-      for (std::size_t i = std::size_t { UINT8_C(0) }; i < str_to_hash.length(); ++i)
-      {
-         boost::multiprecision::detail::hash_combine(result, str_to_hash.at(i));
-      }
+      static_cast<void>(hash_one(result, data.first));
+      static_cast<void>(hash_one(result, data.second));
 
       return result;
    }
@@ -1269,29 +1277,6 @@ template <typename FloatingPointType>
 constexpr cpp_double_fp_backend<FloatingPointType> operator*(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { return cpp_double_fp_backend<FloatingPointType>(a) *= b; }
 template <typename FloatingPointType>
 constexpr cpp_double_fp_backend<FloatingPointType> operator/(const cpp_double_fp_backend<FloatingPointType>& a, const cpp_double_fp_backend<FloatingPointType>& b) { return cpp_double_fp_backend<FloatingPointType>(a) /= b; }
-
-// Input/Output Streaming
-template <typename FloatingPointType, typename char_type, typename traits_type>
-::std::basic_ostream<char_type, traits_type>&
-operator<<(::std::basic_ostream<char_type, traits_type>& os, const cpp_double_fp_backend<FloatingPointType>& f)
-{
-   const auto str_result = f.str(os.precision(), os.flags());
-
-   return (os << str_result);
-}
-
-template <typename FloatingPointType, typename char_type, typename traits_type>
-::std::basic_istream<char_type, traits_type>&
-operator>>(::std::basic_istream<char_type, traits_type>& is, cpp_double_fp_backend<FloatingPointType>& f)
-{
-   std::string input_str;
-
-   is >> input_str;
-
-   f = input_str.c_str();
-
-   return is;
-}
 
 template <typename FloatingPointType>
 constexpr void eval_add(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x) { result += x; }
