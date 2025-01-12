@@ -360,8 +360,8 @@ class cpp_double_fp_backend
          {
             [](std::size_t& res, const float_type& val)
             {
-               const std::uint32_t* first { reinterpret_cast<std::uint32_t*>(&val) };
-               const std::uint32_t* last  { reinterpret_cast<std::uint32_t*>(&val) + sizeof(float_type) / sizeof(std::uint32_t) };
+               const std::uint32_t* first { reinterpret_cast<const std::uint32_t*>(&val) };
+               const std::uint32_t* last  { first + std::size_t { sizeof(float_type) / sizeof(std::uint32_t) } };
 
                while (first != last)
                {
