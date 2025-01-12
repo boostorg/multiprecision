@@ -1,17 +1,19 @@
 // Copyright 2023 - 2024 Matt Borland
-// Copyright 2023 - 2024 Christopher Kormanyos
+// Copyright 2023 - 2025 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
+
+// Parts taken from the Boost.Decimal project
+
+#include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/multiprecision/cpp_double_fp.hpp>
 
 #include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <random>
-
-#include <boost/multiprecision/cpp_bin_float.hpp>
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/multiprecision/cpp_double_fp.hpp>
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -139,11 +141,86 @@ namespace local
   }
 
   template<typename FloatType>
+  auto test_sqrt_edge() -> bool
+  {
+    using float_type = FloatType;
+
+    std::mt19937_64 gen;
+
+    gen.seed(time_point<typename std::mt19937_64::result_type>());
+
+    std::uniform_real_distribution<float>
+      dist
+      (
+        static_cast<float>(1.01L),
+        static_cast<float>(1.04L)
+      );
+
+    auto result_is_ok = true;
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_nan = sqrt(-std::numeric_limits<float_type>::quiet_NaN() * static_cast<float_type>(dist(gen)));
+
+      const auto result_val_nan_is_ok = isnan(val_nan);
+
+      BOOST_TEST(result_val_nan_is_ok);
+
+      result_is_ok = (result_val_nan_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_inf_pos = sqrt(std::numeric_limits<float_type>::infinity() * static_cast<float_type>(dist(gen)));
+
+      const auto result_val_inf_pos_is_ok = (isinf(val_inf_pos) && (!signbit(val_inf_pos)));
+
+      BOOST_TEST(result_val_inf_pos_is_ok);
+
+      result_is_ok = (result_val_inf_pos_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_one = sqrt(::my_one<float_type>());
+
+      const auto result_val_one_is_ok = (val_one == ::my_one<float_type>());
+
+      BOOST_TEST(result_val_one_is_ok);
+
+      result_is_ok = (result_val_one_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_zero = sqrt(::my_zero<float_type>());
+
+      const auto result_val_zero_is_ok = ((val_zero == ::my_zero<float_type>()) && (!signbit(val_zero)));
+
+      BOOST_TEST(result_val_zero_is_ok);
+
+      result_is_ok = (result_val_zero_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
+  template<typename FloatType>
   auto test_exp_edge() -> bool
   {
     using float_type = FloatType;
 
-    std::mt19937_64 gen(static_cast<typename std::mt19937_64::result_type>(std::clock()));
+    std::mt19937_64 gen;
+
+    gen.seed(time_point<typename std::mt19937_64::result_type>());
 
     std::uniform_real_distribution<float>
       dist
@@ -219,6 +296,7 @@ auto main() -> int
     using float_type = boost::multiprecision::cpp_double_float;
 
     static_cast<void>(local::test_edges<float_type>());
+    local::test_sqrt_edge<float_type>();
     local::test_exp_edge<float_type>();
   }
 
@@ -226,6 +304,7 @@ auto main() -> int
     using float_type = boost::multiprecision::cpp_double_double;
 
     static_cast<void>(local::test_edges<float_type>());
+    local::test_sqrt_edge<float_type>();
     local::test_exp_edge<float_type>();
   }
 
@@ -235,6 +314,7 @@ auto main() -> int
     using float_type = boost::multiprecision::number<float_backend_type, boost::multiprecision::et_off>;
 
     static_cast<void>(local::test_edges<float_type>());
+    local::test_sqrt_edge<float_type>();
     local::test_exp_edge<float_type>();
   }
 
