@@ -16,7 +16,7 @@ namespace boost { namespace multiprecision { namespace backends { namespace cpp_
 namespace detail {
 
 template <class T>
-auto log_impl(T x) -> T
+constexpr auto log_impl(T x) -> T
 {
    // Default to the regular log function.
    using std::log;
@@ -27,7 +27,7 @@ auto log_impl(T x) -> T
 } // namespace detail
 
 template <typename Real>
-auto log(Real x) -> Real
+constexpr auto log(Real x) -> Real
 {
    return cpp_df_qf_detail::ccmath::detail::log_impl<Real>(x);
 }

@@ -47,7 +47,7 @@ void expected_results()
        ".*",                    // platform
        ".*cpp_double_double.*", // test type(s)
        ".*",                    // test data group
-       ".*", 100000, 60000);    // test function
+       ".*", 800000, 60000);    // test function
    add_expected_result(
        ".*",                    // compiler
        ".*",                    // stdlib

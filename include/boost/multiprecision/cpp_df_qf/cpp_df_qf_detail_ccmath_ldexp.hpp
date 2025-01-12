@@ -16,7 +16,7 @@ namespace boost { namespace multiprecision { namespace backends { namespace cpp_
 namespace detail {
 
 template <class T>
-auto ldexp_impl(T arg, int expval) -> T
+constexpr auto ldexp_impl(T arg, int expval) -> T
 {
    // Default to the regular ldexp function.
    using std::ldexp;
@@ -27,10 +27,31 @@ auto ldexp_impl(T arg, int expval) -> T
 } // Namespace detail
 
 template <typename Real>
-auto ldexp(Real arg, int expval) -> Real
+constexpr auto ldexp(Real arg, int expval) -> Real
 {
    return detail::ldexp_impl(arg, expval);
 }
+
+namespace unsafe {
+
+template <typename Real>
+constexpr auto ldexp(Real arg, int exp) noexcept -> Real
+{
+   while(exp > 0)
+   {
+      arg *= 2;
+      --exp;
+   }
+   while(exp < 0)
+   {
+      arg /= 2;
+      ++exp;
+   }
+
+   return arg;
+}
+
+} // namespace unsafe
 
 } } } } } // namespace boost::multiprecision::backends::cpp_df_qf_detail::ccmath
 

@@ -17,7 +17,7 @@ namespace detail
 {
 
 template <class T>
-auto frexp_impl(T arg, int* expptr) -> T
+constexpr auto frexp_impl(T arg, int* expptr) -> T
 {
    // Default to the regular frexp function.
    using std::frexp;
@@ -28,7 +28,7 @@ auto frexp_impl(T arg, int* expptr) -> T
 } // namespace detail
 
 template <typename Real>
-auto frexp(Real arg, int* expptr) -> Real
+constexpr auto frexp(Real arg, int* expptr) -> Real
 {
    return detail::frexp_impl(arg, expptr);
 }
