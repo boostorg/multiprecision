@@ -37,14 +37,16 @@ The full documentation is available on [boost.org](http://www.boost.org/doc/libs
 ## Using Multiprecision
 
 <p align="center">
-  <a href="https://godbolt.org/z/TM5Ta1M69" alt="godbolt">
+  <a href="https://godbolt.org/z/aqGhaqdfK" alt="godbolt">
     <img src="https://img.shields.io/badge/try%20it%20on-godbolt-green" /></a>
 </p>
 
 In the following example, we use Multiprecision's Boost-licensed binary
 floating-point backend type `cpp_bin_float` to compute ${\sim}100$ decimal digits of
 
-$$\sqrt{\pi} = \Gamma \left( \frac{1}{2} \right)~{\approx}~1.772453850905516027298{\ldots}\text{,}$$
+$$
+\sqrt{\pi} = \Gamma \left( \frac{1}{2} \right)~{\approx}~1.772453850905516027298{\ldots}\text{,}
+$$
 
 where we also observe that Multiprecision can seemlesly interoperate with
 [Boost.Math](https://github.com/boostorg/math).

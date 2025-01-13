@@ -1028,7 +1028,7 @@ class cpp_double_fp_backend
             cpp_df_qf_detail::ccmath::unsafe::ldexp
             (
                (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::min)(),
-               cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits
+                cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits
             )
          };
 
