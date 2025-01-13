@@ -986,55 +986,32 @@ class cpp_double_fp_backend
       // Use the non-normalized sum of two maximum values, where the lower
       // value is "shifted" right in the sense of floating-point ldexp.
 
-      // The exact values used are:
-      //     hi-part =  (max_integral_val - 1) * 2^(max_exponent -   numeric_limits<float_type>::digits)
-      //   + lo-part = + max_integral_val      * 2^(max_exponent - 2*numeric_limits<float_type>::digits)
+      constexpr float_type
+         hi_part
+         {
+              (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)()
+            * (
+                   static_cast<float_type>(1.0F)
+                 - static_cast<float_type>(1.5F) * cpp_df_qf_detail::ccmath::unsafe::sqrt(cpp_df_qf_detail::ccmath::numeric_limits<float_type>::epsilon())
+              )
+        };
 
       constexpr float_type
-         max_integral_val
+         lo_part
          {
-            cpp_df_qf_detail::ccmath::unsafe::ldexp((cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)(), -my_max_exponent + cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits)
+            cpp_df_qf_detail::ccmath::unsafe::ldexp
+            (
+               (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::max)(),
+               -cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits
+            )
          };
 
-      constexpr float_type max_integral_val_minus_one { max_integral_val - float_type { 1.0F } };
-
-      constexpr float_type
-         max_scaled_hi
-         {
-            cpp_df_qf_detail::ccmath::unsafe::ldexp(max_integral_val_minus_one, -cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits)
-         };
-
-      constexpr float_type
-         max_scaled_lo
-         {
-            cpp_df_qf_detail::ccmath::unsafe::ldexp(max_integral_val, -2 * cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits)
-         };
-
-      constexpr cpp_double_fp_backend max_scaled { max_scaled_hi, max_scaled_lo };
-
-      constexpr cpp_double_fp_backend
-         my_value_max_constexpr
-         {
-            cpp_double_fp_backend
-            {
-               cpp_double_fp_backend::arithmetic::normalize
-               (
-                  cpp_df_qf_detail::ccmath::unsafe::ldexp(max_scaled.data.first,  my_max_exponent),
-                  cpp_df_qf_detail::ccmath::unsafe::ldexp(max_scaled.data.second, my_max_exponent)
-               )
-            }
-         };
-
-      constexpr cpp_double_fp_backend
-         my_value_max_lower_bound_constexpr
-         {
-           cpp_df_qf_detail::ccmath::unsafe::ldexp(max_integral_val_minus_one, my_max_exponent - cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits)
-         };
+      constexpr cpp_double_fp_backend my_value_max_constexpr { arithmetic::two_hilo_sum(hi_part, lo_part) };
 
       static_assert
       (
-         eval_gt(my_value_max_constexpr, my_value_max_lower_bound_constexpr),
-         "Error: maximum value is too small in relation to maximum of its constituent type"
+         eval_gt(my_value_max_constexpr, cpp_double_fp_backend { hi_part }),
+         "Error: maximum value is too small in relation to the maximum of its constituent type"
       );
 
       return my_value_max_constexpr;
