@@ -334,6 +334,36 @@ namespace local
       result_is_ok = (result_val_zero_is_ok && result_is_ok);
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(16)); ++i)
+    {
+      static_cast<void>(i);
+
+      const float_type arg_large { ldexp(float_type { 3.14F } * static_cast<float_type>(dist(gen)), static_cast<int>(static_cast<float>(std::numeric_limits<float_type>::max_exponent) * 0.8)) };
+
+      const float_type result_exp_large { exp(arg_large) };
+
+      const bool result_exp_large_is_ok { isinf(result_exp_large) };
+
+      BOOST_TEST(result_exp_large_is_ok);
+
+      result_is_ok = (result_exp_large_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(16)); ++i)
+    {
+      static_cast<void>(i);
+
+      const float_type arg_small { ldexp(float_type { -3.14F } * static_cast<float_type>(dist(gen)), static_cast<int>(static_cast<float>(std::numeric_limits<float_type>::max_exponent) * 0.8)) };
+
+      const float_type result_exp_small { exp(arg_small) };
+
+      const bool result_exp_small_is_ok { (fpclassify(result_exp_small) == FP_ZERO) };
+
+      BOOST_TEST(result_exp_small_is_ok);
+
+      result_is_ok = (result_exp_small_is_ok && result_is_ok);
+    }
+
     return result_is_ok;
   }
 

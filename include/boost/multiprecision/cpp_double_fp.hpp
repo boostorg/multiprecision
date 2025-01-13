@@ -688,14 +688,6 @@ class cpp_double_fp_backend
          const bool iszero_u { (fpc_u == FP_ZERO) };
          const bool iszero_v { (fpc_v == FP_ZERO) };
 
-         if (this == &v)
-         {
-            data.first  = float_type { 1.0F };
-            data.second = float_type { 0.0F };
-
-            return *this;
-         }
-
          if (iszero_u)
          {
             if (iszero_v)
@@ -744,6 +736,14 @@ class cpp_double_fp_backend
          {
             return operator=(cpp_double_fp_backend(0));
          }
+      }
+
+      if (this == &v)
+      {
+         data.first  = float_type { 1.0F };
+         data.second = float_type { 0.0F };
+
+         return *this;
       }
 
       // The division algorithm has been taken from Victor Shoup,
@@ -1474,8 +1474,6 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
 {
    const int fpc { eval_fpclassify(x) };
 
-   const bool x_is_zero { fpc == FP_ZERO };
-
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
    if (fpc == FP_ZERO)
@@ -1529,11 +1527,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
          }()
       };
 
-      if (x_is_zero)
-      {
-         result = double_float_type(1U);
-      }
-      else if (eval_lt(x, min_exp_input))
+      if (eval_lt(x, min_exp_input))
       {
          result = double_float_type(0U);
       }
@@ -1628,8 +1622,6 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
 {
    const int fpc { eval_fpclassify(x) };
 
-   const bool x_is_zero { fpc == FP_ZERO };
-
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
    if (fpc == FP_ZERO)
@@ -1683,11 +1675,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
          }()
       };
 
-      if (x_is_zero)
-      {
-         result = double_float_type(1U);
-      }
-      else if (eval_lt(x, min_exp_input))
+      if (eval_lt(x, min_exp_input))
       {
          result = double_float_type(0U);
       }
@@ -1782,8 +1770,6 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
 {
    const int fpc { eval_fpclassify(x) };
 
-   const bool x_is_zero { fpc == FP_ZERO };
-
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
    if (fpc == FP_ZERO)
@@ -1837,11 +1823,7 @@ constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
          }()
       };
 
-      if (x_is_zero)
-      {
-         result = double_float_type(1U);
-      }
-      else if (eval_lt(x, min_exp_input))
+      if (eval_lt(x, min_exp_input))
       {
          result = double_float_type(0U);
       }
