@@ -1,8 +1,8 @@
 [/
-  Copyright 2011 - 2024 John Maddock.
+  Copyright 2011 - 2025 John Maddock.
   Copyright 2013 - 2019 Paul A. Bristow.
-  Copyright 2013 - 2024 Christopher Kormanyos.
-  Copyright 2021 - 2024 Fahad Syed.
+  Copyright 2013 - 2025 Christopher Kormanyos.
+  Copyright 2021 - 2025 Fahad Syed.
 
   Distributed under the Boost Software License, Version 1.0.
   (See accompanying file LICENSE_1_0.txt or copy at
@@ -11,7 +11,7 @@
 
 [library Boost.Multiprecision
     [quickbook 1.7]
-    [copyright 2002-2020 John Maddock and Christopher Kormanyos]
+    [copyright 2002-2025 John Maddock and Christopher Kormanyos]
     [purpose Multiprecision Number library]
     [license
          Distributed under the Boost Software License, Version 1.0.
