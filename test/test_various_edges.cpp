@@ -85,9 +85,7 @@ namespace local
     using float_type = FloatType;
     using ctrl_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off>;
 
-    std::mt19937_64 gen;
-
-    gen.seed(time_point<typename std::mt19937_64::result_type>());
+    std::mt19937_64 gen { time_point<typename std::mt19937_64::result_type>() };
 
     auto dis =
       std::uniform_real_distribution<float>
@@ -285,6 +283,77 @@ namespace local
       BOOST_TEST(result_is_ok = ((conversion_result_min == (std::numeric_limits<signed long long>::min)()) && result_is_ok));
     }
 
+    {
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(16)); ++i)
+      {
+        static_cast<void>(i);
+
+        const float_type flt_factor_inf_pos { std::numeric_limits<float_type>::infinity() * dis(gen) };
+        const float_type flt_factor_inf_neg { std::numeric_limits<float_type>::infinity() * -dis(gen) };
+
+        {
+          const float_type val_inf_pos_neg_add { flt_factor_inf_pos + flt_factor_inf_neg };
+
+          const bool result_inf_pos_neg_add_is_ok { isnan(val_inf_pos_neg_add) };
+
+          BOOST_TEST(result_inf_pos_neg_add_is_ok);
+
+          result_is_ok = (result_inf_pos_neg_add_is_ok && result_is_ok);
+        }
+
+        {
+          const float_type val_inf_pos_pos_add { flt_factor_inf_pos + -flt_factor_inf_neg };
+
+          const bool result_inf_pos_pos_add_is_ok { isinf(val_inf_pos_pos_add) };
+
+          BOOST_TEST(result_inf_pos_pos_add_is_ok);
+
+          result_is_ok = (result_inf_pos_pos_add_is_ok && result_is_ok);
+        }
+
+        {
+          const float_type val_inf_neg_neg_add { -flt_factor_inf_pos + (flt_factor_inf_neg) };
+
+          const bool result_inf_neg_neg_add_is_ok { isinf(val_inf_neg_neg_add) && signbit(val_inf_neg_neg_add) };
+
+          BOOST_TEST(result_inf_neg_neg_add_is_ok);
+
+          result_is_ok = (result_inf_neg_neg_add_is_ok && result_is_ok);
+        }
+
+        {
+          const float_type val_inf_pos_neg_sub { flt_factor_inf_pos - flt_factor_inf_neg };
+
+          const bool result_inf_pos_neg_sub_is_ok { isinf(val_inf_pos_neg_sub) };
+
+          BOOST_TEST(result_inf_pos_neg_sub_is_ok);
+
+          result_is_ok = (result_inf_pos_neg_sub_is_ok && result_is_ok);
+        }
+
+        {
+          const float_type val_inf_pos_pos_sub { flt_factor_inf_pos - (-flt_factor_inf_neg) };
+
+          const bool result_inf_pos_pos_sub_is_ok { isnan(val_inf_pos_pos_sub) };
+
+          BOOST_TEST(result_inf_pos_pos_sub_is_ok);
+
+          result_is_ok = (result_inf_pos_pos_sub_is_ok && result_is_ok);
+        }
+
+        {
+          const float_type val_inf_neg_neg_sub { -flt_factor_inf_pos - (flt_factor_inf_neg) };
+
+          const bool result_inf_neg_neg_sub_is_ok { isnan(val_inf_neg_neg_sub) };
+
+          BOOST_TEST(result_inf_neg_neg_sub_is_ok);
+
+          result_is_ok = (result_inf_neg_neg_sub_is_ok && result_is_ok);
+        }
+
+      }
+    }
+
     return result_is_ok;
   }
 
@@ -293,9 +362,7 @@ namespace local
   {
     using float_type = FloatType;
 
-    std::mt19937_64 gen;
-
-    gen.seed(time_point<typename std::mt19937_64::result_type>());
+    std::mt19937_64 gen { time_point<typename std::mt19937_64::result_type>() };
 
     auto dis =
       std::uniform_real_distribution<float>
@@ -325,9 +392,7 @@ namespace local
   {
     using float_type = FloatType;
 
-    std::mt19937_64 gen;
-
-    gen.seed(time_point<typename std::mt19937_64::result_type>());
+    std::mt19937_64 gen { time_point<typename std::mt19937_64::result_type>() };
 
     std::uniform_real_distribution<float>
       dist
@@ -723,11 +788,13 @@ namespace local
     {
       static_cast<void>(index);
 
-      float_type arg_one_minus =
+      float_type arg_one_minus
+      {
         static_cast<float_type>
         (
           -static_cast<int>(::my_one<float_type>() * static_cast<float_type>(dist(gen)))
-        );
+        )
+      };
 
       const auto log_one_minus = log(arg_one_minus);
 

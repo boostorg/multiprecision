@@ -2030,14 +2030,18 @@ constexpr void eval_convert_to(int128_type* result, const cpp_double_fp_backend<
 
    using c_type = typename std::common_type<int128_type, FloatingPointType>::type;
 
-   constexpr c_type my_max = static_cast<c_type>(my_max_val);
-   const     c_type ct     = cpp_df_qf_detail::ccmath::fabs(backend.crep().first);
+   constexpr c_type my_max { static_cast<c_type>(my_max_val) };
+   constexpr c_type my_min { static_cast<c_type>(my_min_val) };
+
+   const c_type ct { static_cast<c_type>(backend.crep().first) };
 
    if (ct > my_max)
    {
-      *result = backend.crep().first >= typename cpp_double_fp_backend<FloatingPointType>::float_type(0U)
-         ? my_max_val
-         : my_min_val;
+      *result = my_max_val;
+   }
+   if (ct < my_min)
+   {
+      *result = my_min_val;
    }
    else
    {
@@ -2091,8 +2095,9 @@ constexpr void eval_convert_to(uint128_type* result, const cpp_double_fp_backend
 
    using c_type = typename std::common_type<uint128_type, FloatingPointType>::type;
 
-   const c_type my_max = static_cast<c_type>(my_max_val);
-   const c_type ct     = cpp_df_qf_detail::ccmath::fabs(backend.crep().first);
+   constexpr c_type my_max { static_cast<c_type>(my_max_val) };
+
+   const c_type ct { static_cast<c_type>(backend.crep().first) };
 
    if (ct > my_max)
    {
