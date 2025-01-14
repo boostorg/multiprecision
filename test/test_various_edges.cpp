@@ -788,7 +788,7 @@ namespace local
     {
       static_cast<void>(index);
 
-      float_type arg_one_minus
+      float_type arg_one_minus // LCOV_EXCL_LINE
       {
         static_cast<float_type>
         (
