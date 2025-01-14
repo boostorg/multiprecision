@@ -582,13 +582,7 @@ class cpp_double_fp_backend
 
          if (iszero_u || iszero_v)
          {
-            const bool b_neg { (isneg_unchecked() != v.isneg_unchecked()) };
-
-            operator=(cpp_double_fp_backend(0));
-
-            if (b_neg) { negate(); }
-
-            return *this;
+            return operator=(cpp_double_fp_backend(0));
          }
       }
 
@@ -850,56 +844,6 @@ class cpp_double_fp_backend
       return v;
    }
 
-   // Helper functions.
-   constexpr static cpp_double_fp_backend pown(const cpp_double_fp_backend& x, int p)
-   {
-      using local_float_type = cpp_double_fp_backend;
-
-      local_float_type result { };
-
-      if (p < 0)
-         result = pown(local_float_type(1U) / x, -p);
-      else if (p == 0)
-         result = local_float_type(1U);
-      else if (p == 1)
-         result = x;
-      else if (p == 2)
-         result = local_float_type(x * x);
-      else if (p == 3)
-         result = local_float_type((x * x) * x);
-      else if (p == 4)
-         { const local_float_type x2 { x * x }; result = x2 * x2; }
-      else
-      {
-         result = local_float_type(1U);
-
-         local_float_type y(x);
-
-         auto p_local = static_cast<std::uint32_t>(p);
-
-         for (;;)
-         {
-            if (static_cast<std::uint_fast8_t>(p_local & static_cast<std::uint32_t>(UINT8_C(1))) != static_cast<std::uint_fast8_t>(UINT8_C(0)))
-            {
-               result *= y;
-            }
-
-            p_local >>= 1U;
-
-            if (p_local == static_cast<std::uint32_t>(UINT8_C(0)))
-            {
-               break;
-            }
-            else
-            {
-               y *= y;
-            }
-         }
-      }
-
-      return result;
-   }
-
    constexpr void swap(cpp_double_fp_backend& other)
    {
       if (this != &other)
@@ -961,24 +905,6 @@ class cpp_double_fp_backend
       eval_frexp(dummy, *this, &e2);
 
       return e2;
-   }
-
-   constexpr int order10() const { return static_cast<int>(static_cast<float>(order02()) * 0.301F); }
-
-   constexpr bool small_arg() const { return (order10() < static_cast<int>(-my_digits10 / 6)); }
-
-   constexpr bool near_one() const
-   {
-      cpp_double_fp_backend delta_one { };
-
-      eval_subtract(delta_one, cpp_double_fp_backend(1U), *this);
-
-      if (delta_one().isneg_unchecked())
-      {
-         delta_one.negate();
-      }
-
-      return delta_one.small_arg();
    }
 
    static constexpr cpp_double_fp_backend my_value_max() noexcept
@@ -1990,19 +1916,23 @@ constexpr void eval_convert_to(signed long long* result, const cpp_double_fp_bac
       return;
    }
 
-   constexpr signed long long my_max_val = (std::numeric_limits<signed long long>::max)();
-   constexpr signed long long my_min_val = (std::numeric_limits<signed long long>::min)();
+   constexpr signed long long my_max_val { (std::numeric_limits<signed long long>::max)() };
+   constexpr signed long long my_min_val { (std::numeric_limits<signed long long>::min)() };
 
    using c_type = typename std::common_type<signed long long, FloatingPointType>::type;
 
-   constexpr c_type my_max = static_cast<c_type>(my_max_val);
-   const     c_type ct     = cpp_df_qf_detail::ccmath::fabs(backend.crep().first);
+   constexpr c_type my_max { static_cast<c_type>(my_max_val) };
+   constexpr c_type my_min { static_cast<c_type>(my_min_val) };
+
+   const c_type ct { static_cast<c_type>(backend.crep().first) };
 
    if (ct > my_max)
    {
-      *result = backend.crep().first >= typename cpp_double_fp_backend<FloatingPointType>::float_type(0U)
-         ? my_max_val
-         : my_min_val;
+      *result = my_max_val;
+   }
+   else if (ct < my_min)
+   {
+      *result = my_min_val;
    }
    else
    {
@@ -2043,12 +1973,13 @@ constexpr void eval_convert_to(unsigned long long* result, const cpp_double_fp_b
       return;
    }
 
-   constexpr unsigned long long my_max_val = (std::numeric_limits<unsigned long long>::max)();
+   constexpr unsigned long long my_max_val { (std::numeric_limits<unsigned long long>::max)() };
 
    using c_type = typename std::common_type<unsigned long long, FloatingPointType>::type;
 
-   constexpr c_type my_max = static_cast<c_type>(my_max_val);
-   const     c_type ct     = cpp_df_qf_detail::ccmath::fabs(backend.crep().first);
+   constexpr c_type my_max { static_cast<c_type>(my_max_val) };
+
+   const c_type ct { static_cast<c_type>(backend.crep().first) };
 
    if (ct > my_max)
    {
