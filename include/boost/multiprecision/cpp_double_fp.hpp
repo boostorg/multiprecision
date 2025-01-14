@@ -2025,8 +2025,8 @@ constexpr void eval_convert_to(int128_type* result, const cpp_double_fp_backend<
       return;
    }
 
-   constexpr int128_type my_max_val { (std::numeric_limits<int128_type>::max)() };
-   constexpr int128_type my_min_val { (std::numeric_limits<int128_type>::min)() };
+   constexpr int128_type my_max_val = (((static_cast<int128_type>(1) << (sizeof(int128_type) * CHAR_BIT - 2)) - 1) << 1) + 1;
+   constexpr int128_type my_min_val = static_cast<int128_type>(-my_max_val - 1);
 
    using c_type = typename std::common_type<int128_type, FloatingPointType>::type;
 
@@ -2082,7 +2082,12 @@ constexpr void eval_convert_to(uint128_type* result, const cpp_double_fp_backend
       return;
    }
 
-   constexpr uint128_type my_max_val { (std::numeric_limits<uint128_type>::max)() };
+   constexpr uint128_type my_max_val
+   {
+     (std::is_same<FloatingPointType, float>::value && (cpp_df_qf_detail::ccmath::numeric_limits<float>::digits == 24))
+        ? static_cast<uint128_type>(FLT_MAX)
+        : static_cast<uint128_type>(~static_cast<uint128_type>(0))
+   };
 
    using c_type = typename std::common_type<uint128_type, FloatingPointType>::type;
 
