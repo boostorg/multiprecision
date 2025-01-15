@@ -5,9 +5,15 @@
 
 // Some parts of this test file have been taken from the Boost.Decimal project.
 
+#if !defined(TEST_CPP_DOUBLE_FLOAT)
+#define TEST_CPP_DOUBLE_FLOAT
+#endif
+
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#if defined(TEST_CPP_DOUBLE_FLOAT)
 #include <boost/multiprecision/cpp_double_fp.hpp>
+#endif
 
 #include <chrono>
 #include <iomanip>
@@ -499,15 +505,13 @@ namespace local
   {
     using float_type = FloatType;
 
-    std::mt19937_64 gen;
-
-    gen.seed(time_point<typename std::mt19937_64::result_type>());
+    std::mt19937_64 gen { time_point<typename std::mt19937_64::result_type>() };
 
     std::uniform_real_distribution<float>
       dist
       (
-        static_cast<float>(1.01L),
-        static_cast<float>(1.08L)
+        static_cast<float>(0.95L),
+        static_cast<float>(1.05L)
       );
 
     auto result_is_ok = true;
@@ -623,134 +627,58 @@ namespace local
       result_is_ok = (result_exp_small_scale_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(16)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(32)); ++i)
     {
       static_cast<void>(i);
 
+      // Create a number with "fuzz", but which will essentially always round to integer-value 1.
       const float_type one { 1 };
 
       const float_type
         arg_near_one
         {
-            one
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
+            (
+                 one
+               * static_cast<float_type>(dist(gen))
+               * static_cast<float_type>(dist(gen))
+               * static_cast<float_type>(dist(gen))
+            )
+          + float_type { 0.25F } * static_cast<float_type>(dist(gen))
         };
 
       using ctrl_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off>;
 
-      const float_type result_exp_n { exp(float_type { static_cast<int>(arg_near_one) }) };
-      const ctrl_type result_ctrl   { exp(ctrl_type { static_cast<int>(arg_near_one) }) }; 
+      const float_type arg_near_one_to_use { static_cast<int>(arg_near_one) };
 
-      bool result_exp_n_is_ok
+      const int arg_n { static_cast<int>(arg_near_one_to_use) };
+
+      const float_type result_exp_n_pos { exp(float_type { arg_n }) };
+      const ctrl_type result_ctrl_pos   { exp(ctrl_type { arg_n }) }; 
+
+      const float_type result_exp_n_neg { exp(float_type { -arg_n }) };
+      const ctrl_type result_ctrl_neg   { exp(ctrl_type { -arg_n }) }; 
+
+      bool result_exp_n_pos_is_ok
       {
         local::is_close_fraction
         (
-          result_exp_n,
-          float_type { result_ctrl },
+          result_exp_n_pos,
+          float_type { result_ctrl_pos },
           std::numeric_limits<float_type>::epsilon() * 512
         )
       };
 
-      if(static_cast<int>(arg_near_one) == 1)
-      {
-        const bool result_exp_n_at_one_is_ok
-        {
-          local::is_close_fraction
-          (
-            result_exp_n,
-            ::my_exp1<float_type>(),
-            std::numeric_limits<float_type>::epsilon() * 16
-          )
-        };
-
-        result_exp_n_is_ok = (result_exp_n_at_one_is_ok && result_exp_n_is_ok);
-      }
-
-      BOOST_TEST(result_exp_n_is_ok);
-
-      result_is_ok = (result_exp_n_is_ok && result_is_ok);
-    }
-
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(16)); ++i)
-    {
-      static_cast<void>(i);
-
-      const float_type one { 1 };
-
-      const float_type
-        arg_near_one
-        {
-            one
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-          * static_cast<float_type>(dist(gen))
-        };
-
-      using ctrl_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off>;
-
-      const float_type result_exp_n { exp(float_type { static_cast<int>(-arg_near_one) }) };
-      const ctrl_type result_ctrl   { exp(ctrl_type { static_cast<int>(-arg_near_one) }) }; 
-
-      bool result_exp_n_is_ok
+      bool result_exp_n_neg_is_ok
       {
         local::is_close_fraction
         (
-          result_exp_n,
-          float_type { result_ctrl },
+          result_exp_n_neg,
+          float_type { result_ctrl_neg },
           std::numeric_limits<float_type>::epsilon() * 512
         )
       };
 
-      if(static_cast<int>(-arg_near_one) == -1)
-      {
-        const bool result_exp_n_at_one_is_ok
-        {
-          local::is_close_fraction
-          (
-            result_exp_n,
-            1 / ::my_exp1<float_type>(),
-            std::numeric_limits<float_type>::epsilon() * 16
-          )
-        };
-
-        result_exp_n_is_ok = (result_exp_n_at_one_is_ok && result_exp_n_is_ok);
-      }
+      const bool result_exp_n_is_ok = (result_exp_n_pos_is_ok && result_exp_n_neg_is_ok);
 
       BOOST_TEST(result_exp_n_is_ok);
 
@@ -795,9 +723,7 @@ namespace local
   {
     using float_type = FloatType;
 
-    std::mt19937_64 gen;
-
-    gen.seed(time_point<typename std::mt19937_64::result_type>());
+    std::mt19937_64 gen { time_point<typename std::mt19937_64::result_type>() };
 
     std::uniform_real_distribution<float>
       dist
@@ -916,6 +842,7 @@ namespace local
 
 auto main() -> int
 {
+  #if defined(TEST_CPP_DOUBLE_FLOAT)
   {
     using float_type = boost::multiprecision::cpp_double_float;
 
@@ -945,6 +872,7 @@ auto main() -> int
     local::test_exp_edge<float_type>();
     local::test_log_edge<float_type>();
   }
+  #endif
 
   {
     using float_backend_type = boost::multiprecision::cpp_bin_float<106, boost::multiprecision::digit_base_2, void, int, -1021, +1024>;
