@@ -1736,6 +1736,25 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
       }
    }
 
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::has_infinity && std::numeric_limits<Real>::max_exponent10 > 18 && std::numeric_limits<Real>::min_exponent10 < -18)
+   {
+      Real a = (std::numeric_limits<Real>::max)();
+
+      a /= 1000000;
+      a /= 1000000;
+      a /= 1000000;
+
+      BOOST_CHECK((boost::math::isfinite)(a));
+
+      a = (std::numeric_limits<Real>::min)();
+
+      a *= 1000000;
+      a *= 1000000;
+      a *= 1000000;
+
+      BOOST_CHECK((boost::math::isfinite)(a));
+   }
+
    test_float_funcs<Real>(std::integral_constant<bool, std::numeric_limits<Real>::is_specialized>());
 }
 

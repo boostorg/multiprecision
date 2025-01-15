@@ -15,8 +15,11 @@
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
-#include <array>
 #include "test.hpp"
+
+#include <array>
+#include <ctime>
+#include <random>
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
@@ -209,7 +212,6 @@ void test()
             BOOST_CHECK_LE(exp(bug_case), (std::numeric_limits<T>::min)());
          }
       }
-
 
       #if defined(TEST_CPP_DOUBLE_FLOAT)
       // Handle uneven/asymmetric exponents on min/max of cpp_double_fp_backend
