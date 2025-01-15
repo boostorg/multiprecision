@@ -1987,48 +1987,28 @@ constexpr void eval_convert_to(unsigned long long* result, const cpp_double_fp_b
    }
    else
    {
-      BOOST_IF_CONSTEXPR(std::numeric_limits<unsigned long long>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
-      {
-         *result  = static_cast<unsigned long long>(backend.crep().first);
-         *result += static_cast<unsigned long long>(backend.crep().second);
-      }
-      else
-      {
-         cpp_double_fp_backend<FloatingPointType> source = backend;
-
-         *result = 0;
-
-         for(auto digit_count  = 0;
-                  digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
-                  digit_count += std::numeric_limits<unsigned long long>::digits)
-         {
-            const auto next = static_cast<unsigned long long>(source.crep().first);
-
-            *result += next;
-
-            eval_subtract(source, cpp_double_fp_backend<FloatingPointType>(next));
-         }
-      }
+      *result  = static_cast<unsigned long long>(backend.crep().first);
+      *result += static_cast<unsigned long long>(backend.crep().second);
    }
 }
 
 #ifdef BOOST_HAS_INT128
 template <typename FloatingPointType>
-constexpr void eval_convert_to(int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend)
+constexpr void eval_convert_to(boost::int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
    const auto fpc = eval_fpclassify(backend);
 
    if (fpc != FP_NORMAL)
    {
-      *result = static_cast<int128_type>(backend.crep().first);
+      *result = static_cast<boost::int128_type>(backend.crep().first);
 
       return;
    }
 
-   constexpr int128_type my_max_val = (((static_cast<int128_type>(1) << (sizeof(int128_type) * CHAR_BIT - 2)) - 1) << 1) + 1;
-   constexpr int128_type my_min_val = static_cast<int128_type>(-my_max_val - 1);
+   constexpr boost::int128_type my_max_val = (((static_cast<boost::int128_type>(1) << (sizeof(boost::int128_type) * CHAR_BIT - 2)) - 1) << 1) + 1;
+   constexpr boost::int128_type my_min_val = static_cast<boost::int128_type>(-my_max_val - 1);
 
-   using c_type = typename std::common_type<int128_type, FloatingPointType>::type;
+   using c_type = typename std::common_type<boost::int128_type, FloatingPointType>::type;
 
    constexpr c_type my_max { static_cast<c_type>(my_max_val) };
    constexpr c_type my_min { static_cast<c_type>(my_min_val) };
@@ -2045,51 +2025,31 @@ constexpr void eval_convert_to(int128_type* result, const cpp_double_fp_backend<
    }
    else
    {
-      BOOST_IF_CONSTEXPR(static_cast<int>(static_cast<int>(sizeof(int128_type)) * CHAR_BIT) >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
-      {
-         *result  = static_cast<int128_type>(backend.crep().first);
-         *result += static_cast<int128_type>(backend.crep().second);
-      }
-      else
-      {
-         cpp_double_fp_backend<FloatingPointType> source = backend;
-
-         *result = 0;
-
-         for(auto digit_count  = static_cast<int>(0);
-                  digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
-                  digit_count += static_cast<int>(static_cast<int>(sizeof(int128_type)) * CHAR_BIT))
-         {
-            const auto next = static_cast<int128_type>(source.crep().first);
-
-            *result += next;
-
-            eval_subtract(source, cpp_double_fp_backend<FloatingPointType>(next));
-         }
-      }
+      *result  = static_cast<boost::int128_type>(backend.crep().first);
+      *result += static_cast<boost::int128_type>(backend.crep().second);
    }
 }
 
 template <typename FloatingPointType>
-constexpr void eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend)
+constexpr void eval_convert_to(boost::uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend)
 {
    const auto fpc = eval_fpclassify(backend);
 
    if (fpc != FP_NORMAL)
    {
-      *result = static_cast<uint128_type>(backend.crep().first);
+      *result = static_cast<boost::uint128_type>(backend.crep().first);
 
       return;
    }
 
-   constexpr uint128_type my_max_val
+   constexpr boost::uint128_type my_max_val
    {
      (std::is_same<FloatingPointType, float>::value && (cpp_df_qf_detail::ccmath::numeric_limits<float>::digits == 24))
-        ? static_cast<uint128_type>(FLT_MAX)
-        : static_cast<uint128_type>(~static_cast<uint128_type>(0))
+        ? static_cast<boost::uint128_type>(FLT_MAX)
+        : static_cast<boost::uint128_type>(~static_cast<boost::uint128_type>(0))
    };
 
-   using c_type = typename std::common_type<uint128_type, FloatingPointType>::type;
+   using c_type = typename std::common_type<boost::uint128_type, FloatingPointType>::type;
 
    constexpr c_type my_max { static_cast<c_type>(my_max_val) };
 
@@ -2101,28 +2061,10 @@ constexpr void eval_convert_to(uint128_type* result, const cpp_double_fp_backend
    }
    else
    {
-      BOOST_IF_CONSTEXPR(static_cast<int>(static_cast<int>(sizeof(uint128_type)) * CHAR_BIT) >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
-      {
-         *result  = static_cast<int128_type>(backend.crep().first);
-         *result += static_cast<int128_type>(backend.crep().second);
-      }
-      else
-      {
-         cpp_double_fp_backend<FloatingPointType> source = backend;
+      *result  = static_cast<boost::int128_type>(backend.crep().first);
+      *result += static_cast<boost::int128_type>(backend.crep().second);
 
-         *result = 0;
-
-         for(auto digit_count  = static_cast<int>(0);
-                  digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
-                  digit_count += static_cast<int>(static_cast<int>(sizeof(uint128_type)) * CHAR_BIT))
-         {
-            const auto next = static_cast<uint128_type>(source.crep().first);
-
-            *result += next;
-
-            eval_subtract(source, cpp_double_fp_backend<FloatingPointType>(next));
-         }
-      }
+      *result = static_cast<boost::uint128_type>(*result);
    }
 }
 #endif
@@ -2133,7 +2075,7 @@ constexpr typename ::std::enable_if<cpp_df_qf_detail::is_floating_point<OtherFlo
 {
    const auto fpc = eval_fpclassify(backend);
 
-   // TBD: Implement min/max chek for the destination floating-point type result.
+   // TBD: Implement min/max check for the destination floating-point type result.
 
    if (fpc != FP_NORMAL)
    {
