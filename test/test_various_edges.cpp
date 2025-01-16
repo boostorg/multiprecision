@@ -15,11 +15,15 @@
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
+#include <array>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <random>
+#include <string>
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -424,6 +428,21 @@ namespace local
       const unsigned long long conversion_result_max { static_cast<unsigned long long>(flt_x) };
 
       BOOST_TEST(result_is_ok = ((conversion_result_max == (std::numeric_limits<unsigned long long>::max)()) && result_is_ok));
+    }
+
+    {
+      using str_nans_array_type = std::array<std::string, std::size_t { UINT8_C(3) }>;
+
+      const str_nans_array_type str_nan_reps {{ "nan", "NaN", "NAN" }};
+
+      for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < str_nan_reps.size(); ++i)
+      {
+        float_type flt_nan { float_type { str_nan_reps[i].c_str() } * dis(gen) };
+
+        const bool result_nan_str_is_ok { isnan(flt_nan) };
+
+        BOOST_TEST(result_is_ok = (result_nan_str_is_ok && result_is_ok));
+      }
     }
 
     return result_is_ok;

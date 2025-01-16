@@ -58,6 +58,7 @@ public:
    static constexpr int max_exponent10                 = std::numeric_limits<float_type>::max_exponent10;
    static constexpr int min_exponent10                 = std::numeric_limits<float_type>::min_exponent10;
 
+   // LCOV_EXCL_START
    static constexpr auto (min)         () noexcept -> float_type { return (std::numeric_limits<float_type>::min)         (); }
    static constexpr auto (max)         () noexcept -> float_type { return (std::numeric_limits<float_type>::max)         (); }
    static constexpr auto  lowest       () noexcept -> float_type { return  std::numeric_limits<float_type>::lowest       (); }
@@ -67,6 +68,7 @@ public:
    static constexpr auto  infinity     () noexcept -> float_type { return  std::numeric_limits<float_type>::infinity     (); }
    static constexpr auto  quiet_NaN    () noexcept -> float_type { return  std::numeric_limits<float_type>::quiet_NaN    (); }
    static constexpr auto  signaling_NaN() noexcept -> float_type { return  std::numeric_limits<float_type>::signaling_NaN(); }
+   // LCOV_EXCL_STOP
 };
 
 #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
