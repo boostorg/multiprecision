@@ -2338,21 +2338,21 @@ template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates>>>::type::type
 abs(const number<T, ExpressionTemplates>& v)
 {
-   return std::move(boost::math::hypot(real(v), imag(v)));
+   return boost::math::hypot(real(v), imag(v));
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex, component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type>>::type::type
 abs(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
-   return std::move(abs(static_cast<number_type>(v)));
+   return abs(static_cast<number_type>(v));
 }
 
 template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<T>::value == number_kind_complex, typename scalar_result_from_possible_complex<number<T, ExpressionTemplates> >::type>::type
 arg(const number<T, ExpressionTemplates>& v)
 {
-   return std::move(atan2(imag(v), real(v)));
+   return atan2(imag(v), real(v));
 }
 template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<T>::value == number_kind_floating_point, typename scalar_result_from_possible_complex<number<T, ExpressionTemplates> >::type>::type
@@ -2365,7 +2365,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<typename
 arg(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
-   return std::move(arg(static_cast<number_type>(v)));
+   return arg(static_cast<number_type>(v));
 }
 #endif // BOOST_MP_MATH_AVAILABLE
 
@@ -2374,7 +2374,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<T>::valu
 norm(const number<T, ExpressionTemplates>& v)
 {
    typename component_type<number<T, ExpressionTemplates> >::type a(real(v)), b(imag(v));
-   return std::move(a * a + b * b);
+   return a * a + b * b;
 }
 template <class T, expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<T>::value != number_kind_complex, typename scalar_result_from_possible_complex<number<T, ExpressionTemplates> >::type>::type
@@ -2387,7 +2387,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<typ
 norm(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
-   return std::move(norm(static_cast<number_type>(v)));
+   return norm(static_cast<number_type>(v));
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
