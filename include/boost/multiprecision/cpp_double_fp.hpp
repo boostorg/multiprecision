@@ -90,6 +90,10 @@ template <typename FloatingPointType>
 constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& o);
 
 template <typename FloatingPointType,
+          typename IntegralType>
+constexpr typename ::std::enable_if<::std::is_integral<IntegralType>::value, void>::type eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x, IntegralType n);
+
+template <typename FloatingPointType,
           typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<FloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits10 * 2) < 16))>::type const* = nullptr>
 constexpr void eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x);
 
@@ -586,79 +590,7 @@ class cpp_double_fp_backend
          }
       }
 
-      // The multiplication algorithm has been taken from Victor Shoup,
-      // package WinNTL-5_3_2. It might originally be related to the
-      // K. Briggs work. The algorithm has been significantly simplified
-      // while still atempting to retain proper rounding corrections.
-
-      float_type C { cpp_df_qf_detail::split_maker<float_type>::value * data.first };
-
-      float_type hu { };
-
-      if (cpp_df_qf_detail::ccmath::isinf(C))
-      {
-         // Handle overflow by scaling down (and then back up) with the split.
-
-         C = data.first - cpp_df_qf_detail::ccmath::ldexp(data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl);
-
-         hu = cpp_df_qf_detail::ccmath::ldexp(data.first - C, cpp_df_qf_detail::split_maker<float_type>::n_shl);
-      }
-      else
-      {
-         hu = C - float_type { C - data.first };
-      }
-
-      C = data.first * v.data.first;
-
-      if (cpp_df_qf_detail::ccmath::isinf(C))
-      {
-         // Handle overflow.
-         const bool b_neg { (isneg_unchecked() != v.isneg_unchecked()) };
-
-         *this = cpp_double_fp_backend::my_value_inf();
-
-         if (b_neg)
-         {
-            negate();
-         }
-
-         return *this;
-      }
-
-      float_type c { cpp_df_qf_detail::split_maker<float_type>::value * v.data.first };
-
-      float_type hv { };
-
-      if (cpp_df_qf_detail::ccmath::isinf(c))
-      {
-         // Handle overflow by scaling down (and then back up) with the split.
-
-         c = v.data.first - cpp_df_qf_detail::ccmath::ldexp(v.data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl);
-
-         hv = cpp_df_qf_detail::ccmath::ldexp(v.data.first - c, cpp_df_qf_detail::split_maker<float_type>::n_shl);
-      }
-      else
-      {
-         hv = c - float_type { c - v.data.first };
-      }
-
-      const float_type tv { v.data.first - hv };
-
-      float_type t1 { cpp_df_qf_detail::ccmath::unsafe::fma(hu, hv, -C) };
-
-      t1 = cpp_df_qf_detail::ccmath::unsafe::fma(hu, tv, t1);
-
-      const float_type tu { data.first - hu };
-
-      t1 = cpp_df_qf_detail::ccmath::unsafe::fma(tu, hv, t1);
-
-      c =    cpp_df_qf_detail::ccmath::unsafe::fma(tu, tv, t1)
-          + (data.first * v.data.second)
-          + (data.second * v.data.first);
-
-      // Perform even more simplifications compared to Victor Shoup.
-      data.first  = C + c;
-      data.second = float_type { C - data.first } + c;
+      mul_unchecked(v);
 
       return *this;
    }
@@ -844,6 +776,66 @@ class cpp_double_fp_backend
       return v;
    }
 
+   // Helper functions.
+   constexpr static void pown(cpp_double_fp_backend& result, const cpp_double_fp_backend& x, int p)
+   {
+      using local_float_type = cpp_double_fp_backend;
+
+      if (p == 2)
+      {
+         result = x; result.mul_unchecked(x);
+      }
+      else if (p == 3)
+      {
+         result = x; result.mul_unchecked(x); result.mul_unchecked(x);
+      }
+      else if (p == 4)
+      {
+         local_float_type x2 { x };
+         x2.mul_unchecked(x);
+
+         result = x2;
+         result.mul_unchecked(x2);
+      }
+      else if (p == 1)
+      {
+         result = x;
+      }
+      else if (p < 0)
+      {
+         // The case p == 0 is checked in a higher calling layer.
+
+         pown(result, local_float_type(1U) / x, -p);
+      }
+      else
+      {
+         result = local_float_type(1U);
+
+         local_float_type y(x);
+
+         auto p_local = static_cast<std::uint32_t>(p);
+
+         for (;;)
+         {
+            if (static_cast<std::uint_fast8_t>(p_local & static_cast<std::uint32_t>(UINT8_C(1))) != static_cast<std::uint_fast8_t>(UINT8_C(0)))
+            {
+               result.mul_unchecked(y);
+            }
+
+            p_local >>= 1U;
+
+            if (p_local == static_cast<std::uint32_t>(UINT8_C(0)))
+            {
+               break;
+            }
+            else
+            {
+               y.mul_unchecked(y);
+            }
+         }
+      }
+   }
+
    constexpr void swap(cpp_double_fp_backend& other)
    {
       if (this != &other)
@@ -1003,6 +995,83 @@ class cpp_double_fp_backend
    using cpp_bin_float_read_write_type = boost::multiprecision::number<cpp_bin_float_read_write_backend_type, boost::multiprecision::et_off>;
 
    bool rd_string(const char* pstr);
+
+   constexpr void mul_unchecked(const cpp_double_fp_backend& v)
+   {
+      // The multiplication algorithm has been taken from Victor Shoup,
+      // package WinNTL-5_3_2. It might originally be related to the
+      // K. Briggs work. The algorithm has been significantly simplified
+      // while still atempting to retain proper rounding corrections.
+
+      float_type C { cpp_df_qf_detail::split_maker<float_type>::value * data.first };
+
+      float_type hu { };
+
+      if (cpp_df_qf_detail::ccmath::isinf(C))
+      {
+         // Handle overflow by scaling down (and then back up) with the split.
+
+         C = data.first - cpp_df_qf_detail::ccmath::ldexp(data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl);
+
+         hu = cpp_df_qf_detail::ccmath::ldexp(data.first - C, cpp_df_qf_detail::split_maker<float_type>::n_shl);
+      }
+      else
+      {
+         hu = C - float_type { C - data.first };
+      }
+
+      C = data.first * v.data.first;
+
+      if (cpp_df_qf_detail::ccmath::isinf(C))
+      {
+         // Handle overflow.
+         const bool b_neg { (isneg_unchecked() != v.isneg_unchecked()) };
+
+         *this = cpp_double_fp_backend::my_value_inf();
+
+         if (b_neg)
+         {
+            negate();
+         }
+
+         return;
+      }
+
+      float_type c { cpp_df_qf_detail::split_maker<float_type>::value * v.data.first };
+
+      float_type hv { };
+
+      if (cpp_df_qf_detail::ccmath::isinf(c))
+      {
+         // Handle overflow by scaling down (and then back up) with the split.
+
+         c = v.data.first - cpp_df_qf_detail::ccmath::ldexp(v.data.first, -cpp_df_qf_detail::split_maker<float_type>::n_shl);
+
+         hv = cpp_df_qf_detail::ccmath::ldexp(v.data.first - c, cpp_df_qf_detail::split_maker<float_type>::n_shl);
+      }
+      else
+      {
+         hv = c - float_type { c - v.data.first };
+      }
+
+      const float_type tv { v.data.first - hv };
+
+      float_type t1 { cpp_df_qf_detail::ccmath::unsafe::fma(hu, hv, -C) };
+
+      t1 = cpp_df_qf_detail::ccmath::unsafe::fma(hu, tv, t1);
+
+      const float_type tu { data.first - hu };
+
+      t1 = cpp_df_qf_detail::ccmath::unsafe::fma(tu, hv, t1);
+
+      c =    cpp_df_qf_detail::ccmath::unsafe::fma(tu, tv, t1)
+          + (data.first * v.data.second)
+          + (data.second * v.data.first);
+
+      // Perform even more simplifications compared to Victor Shoup.
+      data.first  = C + c;
+      data.second = float_type { C - data.first } + c;
+   }
 
    template <typename OtherFloatingPointType,
              typename ::std::enable_if<(cpp_df_qf_detail::is_floating_point<OtherFloatingPointType>::value && ((cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits10 * 2) < 16))>::type const*>
@@ -1392,6 +1461,76 @@ constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
 
    result.rep().first  = c + cc;
    result.rep().second = local_float_type { c - result.rep().first } + cc;
+}
+
+template <typename FloatingPointType,
+          typename IntegralType>
+constexpr typename ::std::enable_if<::std::is_integral<IntegralType>::value, void>::type eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x, IntegralType p)
+{
+   const int fpc { eval_fpclassify(x) };
+
+   using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+
+   using local_integral_type = IntegralType;
+
+   const bool p_is_odd { (static_cast<local_integral_type>(p & 1) != static_cast<local_integral_type>(0)) };
+
+   if (p == static_cast<local_integral_type>(0))
+   {
+      // pow(base, +/-0) returns 1 for any base, even when base is NaN.
+
+      result = double_float_type { unsigned { UINT8_C(1) } };
+   }
+   else if (fpc != FP_NORMAL)
+   {
+      if (fpc == FP_ZERO)
+      {
+         // pow(  +0, exp), where exp is a negative odd  integer, returns +infinity.
+         // pow(  -0, exp), where exp is a negative odd  integer, returns +infinity.
+         // pow(+/-0, exp), where exp is a negative even integer, returns +infinity.
+
+         // pow(  +0, exp), where exp is a positive odd  integer, returns +0.
+         // pow(  -0, exp), where exp is a positive odd  integer, returns -0.
+         // pow(+/-0, exp), where exp is a positive even integer, returns +0.
+
+         result = ((p < static_cast<local_integral_type>(0)) ? double_float_type::my_value_inf() : double_float_type { unsigned { UINT8_C(0) } });
+      }
+      else if (fpc == FP_INFINITE)
+      {
+         if (eval_signbit(x))
+         {
+            if (p < static_cast<local_integral_type>(0))
+            {
+               // pow(-infinity, exp) returns -0 if exp is a negative odd integer.
+               // pow(-infinity, exp) returns +0 if exp is a negative even integer.
+
+               result = double_float_type { unsigned { UINT8_C(0) } };
+            }
+            else
+            {
+               // pow(-infinity, exp) returns -infinity if exp is a positive odd integer.
+               // pow(-infinity, exp) returns +infinity if exp is a positive even integer.
+
+               result = (p_is_odd ? -double_float_type::my_value_inf() : double_float_type::my_value_inf());
+            }
+         }
+         else
+         {
+            // pow(+infinity, exp) returns +0 for any negative exp.
+            // pow(+infinity, exp) returns +infinity for any positive exp.
+
+            result = ((p < static_cast<local_integral_type>(0)) ? double_float_type { unsigned { UINT8_C(0) } } : double_float_type::my_value_inf());
+         }
+      }
+      else
+      {
+         result = double_float_type::my_value_nan();
+      }
+   }
+   else
+   {
+      double_float_type::pown(result, x, p);
+   }
 }
 
 template <typename FloatingPointType,
