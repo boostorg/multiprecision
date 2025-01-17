@@ -346,7 +346,7 @@ class cpp_bin_float
       m_sign     = false;
       m_exponent = 0;
 
-      constexpr std::ptrdiff_t bits = sizeof(int) * CHAR_BIT - 1 < MaxExponent - 1 ? sizeof(int) * CHAR_BIT - 1 : 3;
+      constexpr std::ptrdiff_t bits = static_cast<Exponent>(sizeof(int) * CHAR_BIT - 1) < MaxExponent - 1 ? sizeof(int) * CHAR_BIT - 1 : 3;
       int              e;
       f = frexpq(f, &e);
       while (f)
