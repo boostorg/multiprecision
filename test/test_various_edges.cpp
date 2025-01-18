@@ -945,7 +945,9 @@ namespace local
 
     for(auto index = static_cast<int>(UINT8_C(3)); index <= static_cast<int>(UINT8_C(11)); index += static_cast<int>(UINT8_C(2)))
     {
-      const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
+      const float_type val_zero { ::my_zero<float_type>() * static_cast<float_type>(dist(gen)) };
+
+      const auto flt_zero_pos = pow(val_zero, static_cast<float_type>(index));
 
       const auto result_val_zero_pos_is_ok = (fpclassify(flt_zero_pos) == FP_ZERO);
 
@@ -956,7 +958,9 @@ namespace local
 
     for(auto index = static_cast<int>(INT8_C(-11)); index <= static_cast<int>(INT8_C(-3)); index += static_cast<int>(INT8_C(2)))
     {
-      const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
+      const float_type val_zero { ::my_zero<float_type>() * static_cast<float_type>(dist(gen)) };
+
+      const auto flt_zero_pos = pow(val_zero, static_cast<float_type>(index));
 
       const auto result_val_zero_pos_is_ok = isinf(flt_zero_pos);
 
@@ -967,13 +971,30 @@ namespace local
 
     for(auto index = static_cast<int>(INT8_C(-10)); index <= static_cast<int>(INT8_C(-2)); index += static_cast<int>(INT8_C(2)))
     {
-      const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
+      const float_type val_zero { ::my_zero<float_type>() * static_cast<float_type>(dist(gen)) };
+
+      const auto flt_zero_pos = pow(val_zero, static_cast<float_type>(index));
 
       const auto result_val_zero_pos_is_ok = isinf(flt_zero_pos);
 
       BOOST_TEST(result_val_zero_pos_is_ok);
 
       result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<int>(INT8_C(-11)); index <= static_cast<int>(INT8_C(-3)); index += static_cast<int>(INT8_C(2)))
+    {
+      const float_type val_something { ::my_one<float_type>() * static_cast<float_type>(dist(gen)) };
+
+      const int n_zero { static_cast<int>(::my_zero<float_type>() * static_cast<float_type>(dist(gen))) };
+
+      const auto flt_pow_zero = pow(val_something, n_zero);
+
+      const bool result_val_pow_zero_is_ok = { flt_pow_zero == float_type { 1.0F } };
+
+      BOOST_TEST(result_val_pow_zero_is_ok);
+
+      result_is_ok = (result_val_pow_zero_is_ok && result_is_ok);
     }
 
     for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
