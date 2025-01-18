@@ -857,6 +857,188 @@ namespace local
     return result_is_ok;
   }
 
+  template<typename FloatType>
+  auto test_pow_n_edge() -> bool
+  {
+    using float_type   = FloatType;
+
+    std::mt19937_64 gen { time_point<typename std::mt19937_64::result_type>() };
+
+    std::uniform_real_distribution<float>
+      dist
+      (
+        static_cast<float>(1.01L),
+        static_cast<float>(1.04L)
+      );
+
+    std::uniform_int_distribution<int>
+      dist_n
+      (
+        static_cast<int>(INT8_C(2)),
+        static_cast<int>(INT8_C(12))
+      );
+
+    using std::fpclassify;
+    using std::isinf;
+    using std::pow;
+    using std::signbit;
+
+    auto result_is_ok = true;
+
+    for(auto index = 0U; index < 8U; ++index)
+    {
+      static_cast<void>(index);
+
+      const float_type flt_x { static_cast<float_type>(dist(gen)) };
+
+      const auto flt_nrm = pow(flt_x, 0);
+
+      const auto result_val_pow_zero_is_ok = (flt_nrm == static_cast<float_type>(1.0L));
+
+      BOOST_TEST(result_val_pow_zero_is_ok);
+
+      result_is_ok = (result_val_pow_zero_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 8U; ++index)
+    {
+      static_cast<void>(index);
+
+      const float_type arg_nan = ::my_nan<float_type>() * static_cast<float_type>(dist(gen));
+
+      const auto val_pow_nan = pow(arg_nan, dist_n(gen));
+
+      const auto result_val_pow_nan_is_ok = (isnan(val_pow_nan) && isnan(arg_nan));
+
+      BOOST_TEST(result_val_pow_nan_is_ok);
+
+      result_is_ok = (result_val_pow_nan_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 8U; ++index)
+    {
+      static_cast<void>(index);
+
+      const float_type arg_x_nrm  = static_cast<float_type>(dist(gen));
+      const float_type arg_p_zero = static_cast<float_type>(dist_n(gen)) * (::my_zero<float_type>() * static_cast<float_type>(dist(gen)));
+      const int        n_p_zero   = static_cast<int>(arg_p_zero);
+
+      const auto val_pow_zero = pow(arg_x_nrm, n_p_zero);
+
+      const auto result_val_pow_zero_is_ok = ((val_pow_zero == float_type { 1 }) && (n_p_zero == 0));
+
+      BOOST_TEST(result_val_pow_zero_is_ok);
+
+      result_is_ok = (result_val_pow_zero_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<int>(UINT8_C(2)); index <= static_cast<int>(UINT8_C(10)); index += static_cast<int>(UINT8_C(2)))
+    {
+      const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
+
+      const auto result_val_zero_pos_is_ok = (fpclassify(flt_zero_pos) == FP_ZERO);
+
+      BOOST_TEST(result_val_zero_pos_is_ok);
+
+      result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<int>(UINT8_C(3)); index <= static_cast<int>(UINT8_C(11)); index += static_cast<int>(UINT8_C(2)))
+    {
+      const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
+
+      const auto result_val_zero_pos_is_ok = (fpclassify(flt_zero_pos) == FP_ZERO);
+
+      BOOST_TEST(result_val_zero_pos_is_ok);
+
+      result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<int>(INT8_C(-11)); index <= static_cast<int>(INT8_C(-3)); index += static_cast<int>(INT8_C(2)))
+    {
+      const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
+
+      const auto result_val_zero_pos_is_ok = isinf(flt_zero_pos);
+
+      BOOST_TEST(result_val_zero_pos_is_ok);
+
+      result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<int>(INT8_C(-10)); index <= static_cast<int>(INT8_C(-2)); index += static_cast<int>(INT8_C(2)))
+    {
+      const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
+
+      const auto result_val_zero_pos_is_ok = isinf(flt_zero_pos);
+
+      BOOST_TEST(result_val_zero_pos_is_ok);
+
+      result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto flt_near_one = static_cast<float_type>(dist(gen));
+
+      const auto flt_inf_neg = pow(-std::numeric_limits<float_type  >::infinity() * flt_near_one, -3);
+
+      const auto result_val_inf_neg_is_ok = (fpclassify(flt_inf_neg) == FP_ZERO);
+
+      BOOST_TEST(result_val_inf_neg_is_ok);
+
+      result_is_ok = (result_val_inf_neg_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto flt_near_one = static_cast<float_type>(dist(gen));
+
+      const auto flt_inf_neg = pow(-std::numeric_limits<float_type>::infinity() * flt_near_one, 3);
+
+      const auto result_val_inf_neg_is_ok = (fpclassify(flt_inf_neg) == FP_INFINITE);
+
+      BOOST_TEST(result_val_inf_neg_is_ok);
+
+      result_is_ok = (result_val_inf_neg_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto flt_near_one = static_cast<float_type>(dist(gen));
+
+      const auto flt_nan = pow(std::numeric_limits<float_type>::quiet_NaN() * static_cast<float_type>(flt_near_one), 0);
+
+      const auto result_val_nan_is_ok = (flt_nan == float_type { 1.0F });
+
+      BOOST_TEST(result_val_nan_is_ok);
+
+      result_is_ok = (result_val_nan_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto flt_near_one = static_cast<float_type>(dist(gen));
+
+      const auto flt_nan = pow(std::numeric_limits<float_type>::quiet_NaN() * static_cast<float_type>(flt_near_one), i + 1);
+
+      const auto result_val_nan_is_ok = isnan(flt_nan);
+
+      BOOST_TEST(result_val_nan_is_ok);
+
+      result_is_ok = (result_val_nan_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
 } // namespace local
 
 auto main() -> int
@@ -870,6 +1052,7 @@ auto main() -> int
     local::test_sqrt_edge<float_type>();
     local::test_exp_edge<float_type>();
     local::test_log_edge<float_type>();
+    local::test_pow_n_edge<float_type>();
   }
 
   {
@@ -880,6 +1063,7 @@ auto main() -> int
     local::test_sqrt_edge<float_type>();
     local::test_exp_edge<float_type>();
     local::test_log_edge<float_type>();
+    local::test_pow_n_edge<float_type>();
   }
 
   {
@@ -890,6 +1074,7 @@ auto main() -> int
     local::test_sqrt_edge<float_type>();
     local::test_exp_edge<float_type>();
     local::test_log_edge<float_type>();
+    local::test_pow_n_edge<float_type>();
   }
   #endif
 
@@ -902,6 +1087,7 @@ auto main() -> int
     local::test_sqrt_edge<float_type>();
     local::test_exp_edge<float_type>();
     local::test_log_edge<float_type>();
+    local::test_pow_n_edge<float_type>();
   }
 
   return boost::report_errors();
