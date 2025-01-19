@@ -445,6 +445,33 @@ namespace local
       }
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(32)); ++i)
+    {
+      static_cast<void>(i);
+
+      using ctrl_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off>;
+
+      const float fuzz { dis(gen) };
+
+      const float_type flt_tiny    { (::std::numeric_limits<float_type>::min)() * fuzz };
+      const float_type flt_finite  { (::std::numeric_limits<float_type>::max)() * flt_tiny };
+      const float_type flt_finite2 { flt_tiny * (::std::numeric_limits<float_type>::max)() };
+
+      const ctrl_type ctrl_tiny   { ctrl_type { (::std::numeric_limits<float_type>::min)() } * fuzz };
+      const ctrl_type ctrl_finite { ctrl_type { (::std::numeric_limits<float_type>::max)() } * ctrl_tiny };
+
+      const bool
+        result_finite_is_ok
+        {
+             isfinite(flt_finite)
+          && isfinite(flt_finite2)
+          && local::is_close_fraction(flt_finite,  float_type { ctrl_finite }, std::numeric_limits<float_type>::epsilon() * 32)
+          && local::is_close_fraction(flt_finite2, float_type { ctrl_finite }, std::numeric_limits<float_type>::epsilon() * 32)
+        };
+
+      BOOST_TEST(result_is_ok = (result_finite_is_ok && result_is_ok));
+    }
+
     return result_is_ok;
   }
 
@@ -932,41 +959,76 @@ namespace local
       result_is_ok = (result_val_pow_zero_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<int>(UINT8_C(2)); index <= static_cast<int>(UINT8_C(10)); index += static_cast<int>(UINT8_C(2)))
+    for(auto index = 0U; index < 8U; ++index)
     {
-      const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
+      static_cast<void>(index);
 
-      const auto result_val_zero_pos_is_ok = (fpclassify(flt_zero_pos) == FP_ZERO);
+      using ctrl_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off>;
+
+      const float_type val_normal { float_type { float_type { 314 } / 100 } * static_cast<float_type>(dist(gen)) };
+      const ctrl_type val_ctrl { val_normal };
+
+      const int n_neg { -dist_n(gen) };
+
+      const float_type flt_zero_nrm { pow(val_normal, n_neg) };
+      const ctrl_type ctl_val { pow(val_ctrl, n_neg) };
+
+      const bool
+        result_val_nrm_n_neg_is_ok
+        {
+             (fpclassify(flt_zero_nrm) == FP_NORMAL)
+          && local::is_close_fraction(flt_zero_nrm, float_type { ctl_val }, std::numeric_limits<float_type>::epsilon() * 32)
+        };
+
+      BOOST_TEST(result_val_nrm_n_neg_is_ok);
+
+      result_is_ok = (result_val_nrm_n_neg_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 8U; ++index)
+    {
+      static_cast<void>(index);
+
+      using ctrl_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off>;
+
+      const float_type val_zero { ::my_zero<float_type>() * static_cast<float_type>(dist(gen)) };
+      const ctrl_type val_ctrl { val_zero };
+
+      const int n_pos { dist_n(gen) };
+
+      const float_type flt_zero_pos { pow(val_zero, n_pos) };
+      const ctrl_type flt_zero_ctrl { pow(val_ctrl, n_pos) };
+
+      const bool
+        result_val_zero_pos_is_ok
+        {
+          (fpclassify(flt_zero_pos) == FP_ZERO) && (fpclassify(flt_zero_pos) == (fpclassify(flt_zero_ctrl)))
+        };
 
       BOOST_TEST(result_val_zero_pos_is_ok);
 
       result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<int>(UINT8_C(3)); index <= static_cast<int>(UINT8_C(11)); index += static_cast<int>(UINT8_C(2)))
+    for(auto index = 0U; index < 8U; ++index)
     {
+      static_cast<void>(index);
+
+      using ctrl_type  = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off>;
+
       const float_type val_zero { ::my_zero<float_type>() * static_cast<float_type>(dist(gen)) };
+      const ctrl_type val_ctrl { val_zero };
 
-      const auto flt_zero_pos = pow(val_zero, static_cast<float_type>(index));
+      const int n_neg { -dist_n(gen) };
 
-      const auto result_val_zero_pos_is_ok = (fpclassify(flt_zero_pos) == FP_ZERO);
+      const float_type flt_zero_neg { pow(val_zero, n_neg) };
+      const ctrl_type flt_zero_ctrl { pow(val_ctrl, n_neg) };
 
-      BOOST_TEST(result_val_zero_pos_is_ok);
+      const bool result_val_zero_neg_is_ok { (isinf(flt_zero_neg) && isinf(flt_zero_ctrl)) };
 
-      result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
-    }
+      BOOST_TEST(result_val_zero_neg_is_ok);
 
-    for(auto index = static_cast<int>(INT8_C(-11)); index <= static_cast<int>(INT8_C(-3)); index += static_cast<int>(INT8_C(2)))
-    {
-      const float_type val_zero { ::my_zero<float_type>() * static_cast<float_type>(dist(gen)) };
-
-      const auto flt_zero_pos = pow(val_zero, static_cast<float_type>(index));
-
-      const auto result_val_zero_pos_is_ok = isinf(flt_zero_pos);
-
-      BOOST_TEST(result_val_zero_pos_is_ok);
-
-      result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
+      result_is_ok = (result_val_zero_neg_is_ok && result_is_ok);
     }
 
     for(auto index = static_cast<int>(INT8_C(-10)); index <= static_cast<int>(INT8_C(-2)); index += static_cast<int>(INT8_C(2)))
@@ -995,6 +1057,36 @@ namespace local
       BOOST_TEST(result_val_pow_zero_is_ok);
 
       result_is_ok = (result_val_pow_zero_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto flt_near_one = static_cast<float_type>(dist(gen));
+
+      const auto flt_inf_pos = pow(std::numeric_limits<float_type  >::infinity() * flt_near_one, dist_n(gen));
+
+      const auto result_val_inf_pos_is_ok = (fpclassify(flt_inf_pos) == FP_INFINITE);
+
+      BOOST_TEST(result_val_inf_pos_is_ok);
+
+      result_is_ok = (result_val_inf_pos_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto flt_near_one = static_cast<float_type>(dist(gen));
+
+      const auto flt_inf_pos_n_neg = pow(std::numeric_limits<float_type  >::infinity() * flt_near_one, -dist_n(gen));
+
+      const auto result_val_inf_pos_n_neg_is_ok = (fpclassify(flt_inf_pos_n_neg) == FP_ZERO);
+
+      BOOST_TEST(result_val_inf_pos_n_neg_is_ok);
+
+      result_is_ok = (result_val_inf_pos_n_neg_is_ok && result_is_ok);
     }
 
     for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
