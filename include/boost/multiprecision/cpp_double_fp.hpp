@@ -745,31 +745,10 @@ class cpp_double_fp_backend
       return *this;
    }
 
-   constexpr cpp_double_fp_backend operator++(int)
-   {
-      cpp_double_fp_backend t(*this);
-
-      ++(*this);
-
-      return t;
-   }
-
-   constexpr cpp_double_fp_backend operator--(int)
-   {
-      cpp_double_fp_backend t(*this);
-
-      --(*this);
-
-      return t;
-   }
-
-   constexpr cpp_double_fp_backend& operator++() { return *this += cpp_double_fp_backend<float_type>(float_type(1.0F)); }
-   constexpr cpp_double_fp_backend& operator--() { return *this -= cpp_double_fp_backend<float_type>(float_type(1.0F)); }
-
    // Unare minus operator.
    constexpr cpp_double_fp_backend operator-() const
    {
-      cpp_double_fp_backend v(*this);
+      cpp_double_fp_backend v { *this };
 
       v.negate();
 
