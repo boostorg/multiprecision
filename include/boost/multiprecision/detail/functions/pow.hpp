@@ -62,6 +62,8 @@ inline void pow_imp(T& result, const T& t, const U& p, const std::integral_const
       eval_multiply(result, t, t);
       eval_multiply(result, result);
       return;
+   default:
+      break;
    }
 
    // This will store the result.
@@ -392,6 +394,8 @@ void eval_log(T& result, const T& arg)
       result.negate();
       errno = ERANGE;
       return;
+   default:
+      break;
    }
    if (s)
    {
