@@ -1278,6 +1278,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_fmod(T& result, const T& a, const T& b
       result = std::numeric_limits<number<T> >::quiet_NaN().backend();
       errno  = EDOM;
       return;
+   default:
+      break;
    }
    switch (eval_fpclassify(b))
    {
@@ -1286,6 +1288,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_fmod(T& result, const T& a, const T& b
       result = std::numeric_limits<number<T> >::quiet_NaN().backend();
       errno  = EDOM;
       return;
+   default:
+      break;
    }
    T n;
    eval_divide(result, a, b);
@@ -1411,6 +1415,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_fdim(T& result, const T& a, const T& b
    case FP_INFINITE:
       result = zero;
       return;
+   default:
+      break;
    }
    switch (eval_fpclassify(a))
    {
@@ -1420,6 +1426,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_fdim(T& result, const T& a, const T& b
    case FP_INFINITE:
       result = a;
       return;
+   default:
+      break;
    }
    if (eval_gt(a, b))
    {
@@ -1442,6 +1450,8 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::d
    case FP_INFINITE:
       result = zero;
       return;
+   default:
+      break;
    }
    switch (eval_fpclassify(a))
    {
@@ -1451,6 +1461,8 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::d
    case FP_INFINITE:
       result = a;
       return;
+   default:
+      break;
    }
    if (eval_gt(a, canonical_b))
    {
@@ -1473,6 +1485,8 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::d
    case FP_INFINITE:
       result = zero;
       return;
+   default:
+      break;
    }
    switch (BOOST_MP_FPCLASSIFY(a))
    {
@@ -1482,6 +1496,8 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<boost::multiprecision::d
    case FP_INFINITE:
       result = std::numeric_limits<number<T> >::infinity().backend();
       return;
+   default:
+      break;
    }
    if (eval_gt(canonical_a, b))
    {
@@ -1504,6 +1520,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_trunc(T& result, const T& a)
    case FP_INFINITE:
       result = a;
       return;
+   default:
+      break;
    }
    if (eval_get_sign(a) < 0)
       eval_ceil(result, a);
@@ -1920,6 +1938,8 @@ inline BOOST_MP_CXX14_CONSTEXPR typename B::exponent_type eval_ilogb(const B& va
       return (std::numeric_limits<typename B::exponent_type>::max)();
    case FP_ZERO:
       return (std::numeric_limits<typename B::exponent_type>::min)();
+   default:
+      break;
    }
    B result;
    eval_frexp(result, val, &e);
@@ -1945,6 +1965,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_logb(B& result, const B& val)
       if (eval_signbit(val))
          result.negate();
       return;
+   default:
+      break;
    }
    using max_t = typename std::conditional<std::is_same<std::intmax_t, long>::value, long long, std::intmax_t>::type;
    result = static_cast<max_t>(eval_ilogb(val));
