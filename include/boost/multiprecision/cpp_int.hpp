@@ -132,6 +132,23 @@ namespace detail {
 
       alloc.deallocate(data, n);
    }
+
+   static BOOST_MP_CXX14_CONSTEXPR std::size_t constexpr_strlen(const char* str)
+   {
+#     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+      if (BOOST_MP_IS_CONST_EVALUATED(str)) {
+         const char* end = str;
+
+         while (*end != '\0') {
+            end++;
+         }
+
+         return end - str;
+      }
+#     endif
+
+      return std::strlen(str);
+   }
 } // Namespace detail
 
 template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, bool trivial = false>
@@ -1756,9 +1773,9 @@ public:
    }
 
  private:
-   void do_assign_string(const char* s, const std::integral_constant<bool, true>&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_string(const char* s, const std::integral_constant<bool, true>&)
    {
-      std::size_t n  = s ? std::strlen(s) : 0;
+      std::size_t n  = s ? detail::constexpr_strlen(s) : 0;
       *this          = 0;
       unsigned radix = 10;
       bool     isneg = false;
@@ -1784,7 +1801,7 @@ public:
       }
       if (n)
       {
-         unsigned val;
+         unsigned val = 0;
          while (*s)
          {
             if (*s >= '0' && *s <= '9')
@@ -1807,11 +1824,11 @@ public:
       if (isneg)
          this->negate();
    }
-   void do_assign_string(const char* s, const std::integral_constant<bool, false>&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_string(const char* s, const std::integral_constant<bool, false>&)
    {
       using default_ops::eval_add;
       using default_ops::eval_multiply;
-      std::size_t n  = s ? std::strlen(s) : 0;
+      std::size_t n  = s ? detail::constexpr_strlen(s) : 0;
       *this          = static_cast<limb_type>(0u);
       unsigned radix = 10;
       bool     isneg = false;
@@ -1847,9 +1864,9 @@ public:
          {
             while (*s == '0')
                ++s;
-            std::size_t bitcount = 4 * std::strlen(s);
-            limb_type   val;
-            std::size_t limb, shift;
+            std::size_t bitcount = 4 * detail::constexpr_strlen(s);
+            limb_type   val = 0;
+            std::size_t limb = 0, shift = 0;
             if (bitcount > 4)
                bitcount -= 4;
             else
@@ -1889,9 +1906,9 @@ public:
          {
             while (*s == '0')
                ++s;
-            std::size_t bitcount = 3 * std::strlen(s);
-            limb_type   val;
-            std::size_t limb, shift;
+            std::size_t bitcount = 3 * detail::constexpr_strlen(s);
+            limb_type   val = 0;
+            std::size_t limb = 0, shift = 0;
             if (bitcount > 3)
                bitcount -= 3;
             else
@@ -1950,7 +1967,7 @@ public:
                limb_type block = 0;
                for (unsigned i = 0; i < digits_per_block_10; ++i)
                {
-                  limb_type val;
+                  limb_type val = 0;
                   if (*s >= '0' && *s <= '9')
                      val = static_cast<limb_type>(*s - '0');
                   else
@@ -1980,7 +1997,7 @@ public:
    }
 
  public:
-   cpp_int_backend& operator=(const char* s)
+   BOOST_MP_CXX14_CONSTEXPR cpp_int_backend& operator=(const char* s)
    {
       do_assign_string(s, trivial_tag());
       return *this;
