@@ -94,6 +94,8 @@ struct tester
    boost::multiprecision::double_limb_type large_ui;
    test_type                      a1, b1, c1, d1;
 
+   BOOST_MP_CXX14_CONSTEXPR test_type z = 0;
+
    void t1()
    {
       using namespace boost::multiprecision;
