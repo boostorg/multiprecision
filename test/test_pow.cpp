@@ -16,7 +16,7 @@
 #include <array>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_QD)
 #define TEST_MPF_50
 //#  define TEST_MPF
 #define TEST_BACKEND
@@ -24,6 +24,7 @@
 #define TEST_MPFR_50
 #define TEST_MPFI_50
 #define TEST_CPP_BIN_FLOAT
+#define TEST_QD
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -54,6 +55,9 @@
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
 #include <boost/multiprecision/cpp_bin_float.hpp>
+#endif
+#ifdef TEST_QD
+#include <boost/multiprecision/quad_double.hpp>
 #endif
 
 template <class T>
@@ -778,14 +782,20 @@ void test()
    unsigned max_err = 0;
    for (unsigned k = 0; k < data.size(); k++)
    {
-      T        val = pow(T(data[k][0]), T(data[k][1]));
+      T        base(data[k][0]);
+      T        expon(data[k][1]);
+      if (base < 0)
+         if (floor(expon) != expon)
+            continue;  // Reading an integer exponent failed - probably quad_float.
+
+      T        val = pow(base, expon);
       T        e   = relative_error(val, T(data[k][2]));
       unsigned err = e.template convert_to<unsigned>();
       if (err > max_err)
       {
          max_err = err;
       }
-      val = pow(T(data[k][0]), -T(data[k][1]));
+      val = pow(base, -expon);
       e   = relative_error(val, T(1 / T(data[k][2])));
       err = e.template convert_to<unsigned>();
       if (err > max_err)
@@ -865,6 +875,9 @@ int main()
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
+#endif
+#ifdef TEST_QD
+   test<boost::multiprecision::quad_double>();
 #endif
    return boost::report_errors();
 }
