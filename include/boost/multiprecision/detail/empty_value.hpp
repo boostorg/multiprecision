@@ -25,7 +25,7 @@
 namespace boost { namespace multiprecision { namespace detail {
 
 template <typename T>
-struct use_empty_value_base 
+struct use_empty_value_base
 {
 #if defined(BOOST_DETAIL_EMPTY_VALUE_BASE)
         static constexpr bool value = __is_empty(T) && !__is_final(T);
@@ -38,7 +38,7 @@ struct empty_init_t {};
 
 namespace empty_impl {
 
-template <typename T, unsigned N = 0, 
+template <typename T, unsigned N = 0,
           bool E = boost::multiprecision::detail::use_empty_value_base<T>::value>
 class empty_value
 {
@@ -48,15 +48,16 @@ private:
 public:
     using type = T;
 
-    empty_value() = default;
-    explicit empty_value(boost::multiprecision::detail::empty_init_t) : value_ {} {}
+    BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR empty_value() = default;
+    explicit BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR empty_value(boost::multiprecision::detail::empty_init_t)
+        : value_ {} {}
 
     template <typename U, typename... Args>
-    empty_value(boost::multiprecision::detail::empty_init_t, U&& value, Args&&... args) :
-        value_ {std::forward<U>(value), std::forward<Args>(args)...} {}
+    BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR empty_value(boost::multiprecision::detail::empty_init_t, U&& value, Args&&... args)
+        : value_ {std::forward<U>(value), std::forward<Args>(args)...} {}
 
-    const T& get() const noexcept { return value_; }
-    T& get() noexcept { return value_; }
+    BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR const T& get() const noexcept { return value_; }
+    BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR T& get() noexcept { return value_; }
 };
 
 template <typename T, unsigned N>
@@ -65,15 +66,16 @@ class empty_value<T, N, true> : T
 public:
     using type = T;
 
-    empty_value() = default;
-    explicit empty_value(boost::multiprecision::detail::empty_init_t) : T{} {}
+    BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR empty_value() = default;
+    explicit BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR empty_value(boost::multiprecision::detail::empty_init_t)
+        : T{} {}
 
     template <typename U, typename... Args>
-    empty_value(boost::multiprecision::detail::empty_init_t, U&& value, Args&&... args) :
-        T{std::forward<U>(value), std::forward<Args>(args)...} {}
+    BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR empty_value(boost::multiprecision::detail::empty_init_t, U&& value, Args&&... args)
+        : T{std::forward<U>(value), std::forward<Args>(args)...} {}
 
-    const T& get() const noexcept { return *this; }
-    T& get() noexcept { return *this; }
+    BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR const T& get() const noexcept { return *this; }
+    BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR T& get() noexcept { return *this; }
 };
 
 } // Namespace empty impl
