@@ -23,6 +23,7 @@
 // TEST_CPP_INT
 // TEST_CPP_INT_RATIONAL
 // TEST_CPP_BIN_FLOAT
+// TEST_CPP_DOUBLE_FLOAT
 //
 
 #include "performance_test.hpp"
@@ -214,6 +215,7 @@ int main()
    test49();
    test50();
    test51();
+   test52();
 
    quickbook_results();
    return 0;
