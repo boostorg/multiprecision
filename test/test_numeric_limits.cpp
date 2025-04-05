@@ -131,6 +131,12 @@ void test_specific(const std::integral_constant<int, boost::multiprecision::numb
          BOOST_TEST(FP_NORMAL == (boost::math::fpclassify)(-std::numeric_limits<Number>::denorm_min()));
          BOOST_TEST(FP_ZERO != (boost::math::fpclassify)(std::numeric_limits<Number>::denorm_min()));
       }
+      BOOST_IF_CONSTEXPR(boost::multiprecision::number_category<Number>::value == boost::multiprecision::number_kind_floating_point)
+      {
+         BOOST_TEST(FP_NORMAL == (boost::math::fpclassify)(std::numeric_limits<Number>::lowest()));
+         BOOST_TEST(std::numeric_limits<Number>::lowest() < Number { 0 });
+         BOOST_TEST(std::numeric_limits<Number>::lowest() < Number { std::numeric_limits<long double>::lowest() });
+      }
    }
    Number n = 0;
    BOOST_TEST((boost::math::fpclassify)(n) == FP_ZERO);
