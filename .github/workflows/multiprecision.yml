@@ -143,7 +143,7 @@ jobs:
       - name: b2 config
         run: cat bin.v2/config.log
         working-directory: ../boost-root/
-  ubuntu-focal:
+  ubuntu-noble:
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -299,7 +299,7 @@ jobs:
         if: steps.retry1.outcome=='failure'
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: sudo apt install g++-11 libgmp-dev libmpfr-dev libtommath-dev
+        run: sudo apt install g++-13 libgmp-dev libmpfr-dev libtommath-dev
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
@@ -361,7 +361,7 @@ jobs:
         if: steps.retry1.outcome=='failure'
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: sudo apt install g++-10 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev
+        run: sudo apt install g++-13 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
@@ -423,7 +423,7 @@ jobs:
         if: steps.retry1.outcome=='failure'
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: sudo apt install g++-10 libgmp-dev libeigen3-dev
+        run: sudo apt install g++-13 libgmp-dev libeigen3-dev
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
