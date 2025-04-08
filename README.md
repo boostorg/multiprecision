@@ -33,10 +33,10 @@ If not needed, expression templates can be disabled when configuring the `number
 
 The full documentation is available on [boost.org](http://www.boost.org/doc/libs/release/libs/multiprecision/index.html).
 
-## Using Multiprecision ##
+## Using Multiprecision
 
 <p align="center">
-  <a href="https://godbolt.org/z/hj75jEqcz" alt="godbolt">
+  <a href="https://godbolt.org/z/Tx4EzEYvz" alt="godbolt">
     <img src="https://img.shields.io/badge/try%20it%20on-godbolt-green" /></a>
 </p>
 
@@ -49,12 +49,19 @@ where we also observe that Multiprecision can seemlesly interoperate with
 [Boost.Math](https://github.com/boostorg/math).
 
 ```cpp
-#include <iomanip>
-#include <iostream>
-#include <sstream>
+// ------------------------------------------------------------------------------
+// Copyright Christopher Kormanyos 2024 - 2025.
+// Distributed under the Boost Software License,
+// Version 1.0. (See accompanying file LICENSE_1_0.txt
+// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
 
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/math/special_functions/gamma.hpp>
+
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 auto main() -> int
 {
@@ -75,7 +82,7 @@ auto main() -> int
 }
 ```
 
-## Standalone ##
+## Standalone
 
 Defining `BOOST_MP_STANDALONE` allows `Boost.Multiprecision`
 to be used with the only dependency being [Boost.Config](https://github.com/boostorg/config).
@@ -87,7 +94,7 @@ A static_assert message will alert you if a particular feature has been disabled
 [Boost.Math](https://github.com/boostorg/math) standalone mode is compatiable,
 and recommended if special functions are required for the floating point types.
 
-## Support, bugs and feature requests ##
+## Support, bugs and feature requests
 
 Bugs and feature requests can be reported through the [Gitub issue tracker](https://github.com/boostorg/multiprecision/issues)
 (see [open issues](https://github.com/boostorg/multiprecision/issues) and
@@ -100,7 +107,7 @@ although you can use the general-purpose Boost [mailing-list](http://lists.boost
 using the tag [multiprecision].
 
 
-## Development ##
+## Development
 
 Clone the whole boost project, which includes the individual Boost projects as submodules
 ([see boost+git doc](https://github.com/boostorg/boost/wiki/Getting-Started)):
@@ -113,7 +120,8 @@ Clone the whole boost project, which includes the individual Boost projects as s
 
 The Boost Multiprecision Library is located in `libs/multiprecision/`.
 
-### Running tests ###
+### Running tests
+
 First, build the `b2` engine by running `bootstrap.sh` in the root of the boost directory. This will generate `b2` configuration in `project-config.jam`.
 
 ```sh
