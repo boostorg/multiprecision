@@ -76,24 +76,17 @@ namespace detail
   class laguerre_l_object BOOST_FINAL
   {
   public:
-    laguerre_l_object(const int n, const T a) noexcept
+    explicit laguerre_l_object(const int n, const T a) noexcept
       : order(n),
-        alpha(a),
-        p1   (0),
-        d2   (0) { }
+        alpha(a) { }
 
-    laguerre_l_object& operator=(const laguerre_l_object& other)
-    {
-      if(this != other)
-      {
-        order = other.order;
-        alpha = other.alpha;
-        p1    = other.p1;
-        d2    = other.d2;
-      }
+    laguerre_l_object(const laguerre_l_object&) = default;
 
-      return *this;
-    }
+    laguerre_l_object(laguerre_l_object&&) noexcept = default;
+
+    laguerre_l_object& operator=(const laguerre_l_object&) = default;
+
+    laguerre_l_object& operator=(laguerre_l_object&&) noexcept = default;
 
     T operator()(const T& x) const noexcept
     {
@@ -150,10 +143,10 @@ namespace detail
     }
 
   private:
-    const   int order;
-    const   T   alpha;
-    mutable T   p1;
-    mutable T   d2;
+    int order;
+    T   alpha;
+    mutable T   p1 { };
+    mutable T   d2 { };
   };
 
   template<typename T>
