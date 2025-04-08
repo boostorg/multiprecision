@@ -1614,6 +1614,8 @@ inline void convert_to_unsigned_int(I* res, const cpp_bin_float<Digits, DigitBas
       return;
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
       BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+      *res = max_val;
+      return;
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
       *res = max_val;
       return;
