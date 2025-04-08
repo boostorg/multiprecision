@@ -38,7 +38,7 @@ The full documentation is available on [boost.org](http://www.boost.org/doc/libs
 ## Using Multiprecision
 
 <p align="center">
-  <a href="https://godbolt.org/z/nGTshfd65" alt="godbolt">
+  <a href="https://godbolt.org/z/eEdT1EMzn" alt="godbolt">
     <img src="https://img.shields.io/badge/try%20it%20on-godbolt-green" /></a>
 </p>
 
@@ -85,8 +85,11 @@ auto main() -> int
 
   std::stringstream strm { };
 
-  strm << std::setprecision(std::numeric_limits<big_float_type>::digits10) << "sqrt_pi   : " << sqrt_pi << '\n';
-  strm << std::setprecision(std::numeric_limits<big_float_type>::digits10) << "gamma_half: " << gamma_half;
+  strm << std::setprecision(std::numeric_limits<big_float_type>::digits10)
+       << "sqrt_pi   : "
+       << sqrt_pi
+       << "\ngamma_half: "
+       << gamma_half;
 
   std::cout << strm.str() << std::endl;
 }
