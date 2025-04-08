@@ -4,7 +4,7 @@ Boost Multiprecision Library
 |                  |  Master  |   Develop   |
 |------------------|----------|-------------|
 | Drone            | [![Build Status](https://drone.cpp.al/api/badges/boostorg/multiprecision/status.svg?ref=refs/heads/master)](https://drone.cpp.al/boostorg/multiprecision)          | [![Build Status](https://drone.cpp.al/api/badges/boostorg/multiprecision/status.svg)](https://drone.cpp.al/boostorg/multiprecision) |
-| Github Actions   | [![Build Status](https://github.com/boostorg/multiprecision/workflows/multiprecision/badge.svg?branch=master)](https://github.com/boostorg/multiprecision/actions) | [![Build Status](https://github.com/boostorg/multiprecision/workflows/multiprecision/badge.svg?branch=develop)](https://github.com/boostorg/multiprecision/actions) |
+| Github Actions   | [![Build Status](https://github.com/boostorg/multiprecision/actions/workflows/multiprecision.yml/badge.svg?branch=master)](https://github.com/boostorg/multiprecision/actions?query=branch%3Amaster) | [![Build Status](https://github.com/boostorg/multiprecision/actions/workflows/multiprecision.yml/badge.svg?branch=develop)](https://github.com/boostorg/multiprecision/actions?query=branch%3Adevelop) |
 | Codecov          | [![codecov](https://codecov.io/gh/boostorg/multiprecision/branch/master/graph/badge.svg)](https://codecov.io/gh/boostorg/multiprecision/branch/master)             | [![codecov](https://codecov.io/gh/boostorg/multiprecision/branch/develop/graph/badge.svg)](https://codecov.io/gh/boostorg/multiprecision/branch/develop) |
 
 
