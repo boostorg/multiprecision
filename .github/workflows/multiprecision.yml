@@ -151,7 +151,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ g++-13, g++-14, clang++-19, clang++-20 ]
+        compiler: [ g++-13, g++-14, clang++-19 ]
         standard: [ c++14, c++17 ]
         suite: [ github_ci_block_1, github_ci_block_2 ]
     steps:
@@ -175,7 +175,7 @@ jobs:
         if: steps.retry1.outcome=='failure'
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: sudo apt install g++-13 g++-14 clang-19 clang-20 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev libmpfi-dev libmpc-dev
+        run: sudo apt install g++-13 g++-14 clang-19 libgmp-dev libmpfr-dev libtommath-dev libeigen3-dev libmpfi-dev libmpc-dev
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/boostdep
