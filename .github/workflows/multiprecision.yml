@@ -337,7 +337,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ g++13 ]
+        compiler: [ g++-13 ]
         standard: [ c++20 ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc ]
     steps:
