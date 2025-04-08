@@ -21,22 +21,24 @@ also interoperate with the built-in types in C++ using clearly defined conversio
 used for all kinds of mathematical calculations involving integer, rational and floating-point types requiring extended range and precision.
 
 Multiprecision consists of a generic interface to the mathematics of large numbers as well as a selection of big number back ends, with
-support for integer, rational and floating-point types. `Boost.Multiprecision` provides a selection of back ends provided off-the-rack in
+support for integer, rational and floating-point types. `Boost.Multiprecision` provides a selection of back ends delivered off-the-rack in
 including interfaces to GMP, MPFR, MPIR, TomMath as well as its own collection of Boost-licensed, header-only back ends for integers,
 rationals, floats and complex. In addition, user-defined back ends can be created and used with the interface of Multiprecision,
-provided the class implementation adheres to the necessary concepts.
+presuming that the class implementation adheres to the necessary concepts.
 
-Depending upon the number type, precision may be arbitrarily large (limited only by available memory), fixed at compile time
-(for example $50$ or $100$ decimal digits), or a variable controlled at run-time by member functions.
-The types are expression-template-enabled by default. This usually provides better performance than naive user-defined types.
-If not needed, expression templates can be disabled when configuring the `number` type with its backend.
+Depending upon the multiprecision type, precision may be arbitrarily large (limited only by available memory),
+fixed at compile time (for example $50$ or $100$ decimal digits),
+or variable controlled at run-time by member functions.
+Expression templates can be enabled or disabled when configuring the `number` type with its backend.
+Most of the multiprecision types are expression-template-enabled by default.
+This usually provides better performance than types configured without expression templates.
 
 The full documentation is available on [boost.org](http://www.boost.org/doc/libs/release/libs/multiprecision/index.html).
 
 ## Using Multiprecision
 
 <p align="center">
-  <a href="https://godbolt.org/z/Tx4EzEYvz" alt="godbolt">
+  <a href="https://godbolt.org/z/nGTshfd65" alt="godbolt">
     <img src="https://img.shields.io/badge/try%20it%20on-godbolt-green" /></a>
 </p>
 
@@ -56,8 +58,8 @@ where we also observe that Multiprecision can seemlesly interoperate with
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/math/special_functions/gamma.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
 
 #include <iomanip>
 #include <iostream>
@@ -65,7 +67,15 @@ where we also observe that Multiprecision can seemlesly interoperate with
 
 auto main() -> int
 {
+  // Configure a multiprecision binary floating-point type with approximately
+  // 100 decimal digits of precision and expression templates enabled.
+  // Note that the popular type cpp_bin_float_100 has already been preconfigured
+  // and aliased in the multiprecision headers.
+
   using big_float_type = boost::multiprecision::cpp_bin_float_100;
+
+  // In the next few lines, compute and compare sqrt(pi) with tgamma(1/2)
+  // using the 100-digit multiprecision type.
 
   const big_float_type sqrt_pi { sqrt(boost::math::constants::pi<big_float_type>()) };
 
@@ -90,7 +100,7 @@ to be used with the only dependency being [Boost.Config](https://github.com/boos
 Our [package on this page](https://github.com/boostorg/multiprecision/releases)
 already includes a copy of Boost.Config so no other downloads are required.
 Some functionality is reduced in this mode.
-A static_assert message will alert you if a particular feature has been disabled by standalone mode.
+A `static_assert` message will alert you if a particular feature has been disabled by standalone mode.
 [Boost.Math](https://github.com/boostorg/math) standalone mode is compatiable,
 and recommended if special functions are required for the floating point types.
 
