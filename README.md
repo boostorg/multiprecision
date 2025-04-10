@@ -32,14 +32,14 @@ fixed at compile time (for example $50$ or $100$ decimal digits),
 or variable controlled at run-time by member functions.
 Expression templates can be enabled or disabled when configuring the `number` type with its backend.
 Most of the multiprecision types are expression-template-enabled by default.
-This usually provides better performance than types configured without expression templates.
+This usually provides better performance than using types configured without expression templates.
 
 The full documentation is available on [boost.org](http://www.boost.org/doc/libs/release/libs/multiprecision/index.html).
 
 ## Using Multiprecision
 
 <p align="center">
-  <a href="https://godbolt.org/z/eEdT1EMzn" alt="godbolt">
+  <a href="https://godbolt.org/z/hd95P3ovK" alt="godbolt">
     <img src="https://img.shields.io/badge/try%20it%20on-godbolt-green" /></a>
 </p>
 
@@ -85,6 +85,8 @@ auto main() -> int
   const big_float_type gamma_half { boost::math::tgamma(half) }; 
 
   std::stringstream strm { };
+
+  // 1.772453850905516027298167483341145182797549456122387128213807789852911284591032181374950656738544665
 
   strm << std::setprecision(std::numeric_limits<big_float_type>::digits10)
        << "sqrt_pi   : "
