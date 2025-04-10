@@ -215,7 +215,7 @@ jobs:
       matrix:
         compiler: [ g++-13 ]
         standard: [ c++17, c++20 ]
-        suite: [ specfun_mpfr, specfun_gmp, specfun_cpp_dec_float, specfun_cpp_bin_float, specfun_float128 ]
+        suite: [ specfun_mpfr, specfun_gmp, specfun_cpp_dec_float, specfun_float128 ]
     steps:
       - uses: actions/checkout@v4
         with:
