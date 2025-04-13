@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//      Copyright Christopher Kormanyos 2012 - 2015, 2020.
+//      Copyright Christopher Kormanyos 2012 - 2025.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,7 @@
 // a high-precision Gauss-Laguerre quadrature integration.
 // The quadrature is used to calculate the airy_ai(x) function
 // for real-valued x on the positive axis with x.ge.1.
+// This is in the non-oscillating region of airy_ai(x).
 
 // In this way, the integral representation could be seen
 // as part of a scheme to calculate real-valued Airy functions
@@ -20,16 +21,29 @@
 // ranging from 21...301, by adjusting the parameter
 // local::my_digits10 at compile time.
 
+// References:
+
 // The quadrature integral representaion of airy_ai(x) used
 // in this example can be found in:
 
 // A. Gil, J. Segura, N.M. Temme, "Numerical Methods for Special
 // Functions" (SIAM Press 2007), Sect. 5.3.3, in particular Eq. 5.110,
-// page 145. Subsequently, Gil et al's book cites the another work:
+// page 145. Subsequently, Gil et al's book cites another work:
 // W. Gautschi, "Computation of Bessel and Airy functions and of
 // related Gaussian quadrature formulae", BIT, 42 (2002), pp. 110-118.
 
+#include <boost/cstdfloat.hpp>
+#include <boost/math/constants/constants.hpp>
+#include <boost/math/special_functions/bessel.hpp>
+#include <boost/math/special_functions/cbrt.hpp>
+#include <boost/math/special_functions/factorials.hpp>
+#include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/tools/roots.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/noncopyable.hpp>
+
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <iomanip>
@@ -38,16 +52,6 @@
 #include <sstream>
 #include <tuple>
 #include <vector>
-
-#include <boost/cstdfloat.hpp>
-#include <boost/math/constants/constants.hpp>
-#include <boost/math/special_functions/cbrt.hpp>
-#include <boost/math/special_functions/bessel.hpp>
-#include <boost/math/special_functions/factorials.hpp>
-#include <boost/math/special_functions/gamma.hpp>
-#include <boost/math/tools/roots.hpp>
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/noncopyable.hpp>
 
 namespace gauss { namespace laguerre {
 
