@@ -514,7 +514,10 @@ eval_integer_modulus(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checke
    return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
 
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, limb_type v)
+namespace detail {
+
+template <class AnyIntegralType>
+inline BOOST_MP_CXX14_CONSTEXPR AnyIntegralType eval_gcd_impl(AnyIntegralType u, AnyIntegralType v)
 {
    // boundary cases
    if (!u || !v)
@@ -535,25 +538,17 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, li
 #endif
 }
 
-inline BOOST_MP_CXX14_CONSTEXPR double_limb_type eval_gcd(double_limb_type u, double_limb_type v)
-{
-#if defined(BOOST_MP_STD_GCD_AVAILABLE)
-   return std::gcd(u, v);
-#else
-   if (u == 0)
-      return v;
+}
 
-   std::size_t shift = boost::multiprecision::detail::find_lsb(u | v);
-   u >>= boost::multiprecision::detail::find_lsb(u);
-   do
-   {
-      v >>= boost::multiprecision::detail::find_lsb(v);
-      if (u > v)
-         std_constexpr::swap(u, v);
-      v -= u;
-   } while (v);
-   return u << shift;
-#endif
+template <class IntegralType>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<IntegralType>::value && !std::is_same<IntegralType, double_limb_type>::value, IntegralType>::type eval_gcd(IntegralType u, IntegralType v)
+{
+   return detail::eval_gcd_impl(u, v);
+}
+
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR double_limb_type eval_gcd(double_limb_type u, double_limb_type v)
+{
+   return detail::eval_gcd_impl(u, v);
 }
 
 template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
