@@ -20,17 +20,19 @@
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
-#include <numeric> // std::gcd
+
+#ifdef BOOST_MP_MATH_AVAILABLE
+#include <boost/math/special_functions/next.hpp>
+#endif
+
 #include <type_traits>
 #include <stdexcept>
 #include <cmath>
 
-#ifndef BOOST_MP_STANDALONE
-#include <boost/integer/common_factor_rt.hpp>
-#endif
+#if (defined(__cpp_lib_gcd_lcm) && (__cpp_lib_gcd_lcm >= 201606L)) && (!defined(BOOST_HAS_INT128) || !defined(__STRICT_ANSI__))
+#include <numeric> // std::gcd
 
-#ifdef BOOST_MP_MATH_AVAILABLE
-#include <boost/math/special_functions/next.hpp>
+#define BOOST_MP_STD_GCD_AVAILABLE
 #endif
 
 #ifdef BOOST_MSVC
@@ -517,7 +519,7 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, li
    // boundary cases
    if (!u || !v)
       return u | v;
-#if (defined(__cpp_lib_gcd_lcm) && (__cpp_lib_gcd_lcm >= 201606L))
+#if defined(BOOST_MP_STD_GCD_AVAILABLE)
    return std::gcd(u, v);
 #else
    std::size_t shift = boost::multiprecision::detail::find_lsb(u | v);
@@ -535,7 +537,7 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, li
 
 inline BOOST_MP_CXX14_CONSTEXPR double_limb_type eval_gcd(double_limb_type u, double_limb_type v)
 {
-#if (defined(__cpp_lib_gcd_lcm) && (__cpp_lib_gcd_lcm >= 201606L)) && (!defined(BOOST_HAS_INT128) || !defined(__STRICT_ANSI__))
+#if defined(BOOST_MP_STD_GCD_AVAILABLE)
    return std::gcd(u, v);
 #else
    if (u == 0)
@@ -1420,21 +1422,6 @@ inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const cpp_int_backend<Min
 
 namespace detail {
 
-#ifndef BOOST_MP_STANDALONE
-template <typename T>
-inline BOOST_CXX14_CONSTEXPR T constexpr_gcd(T a, T b) noexcept
-{
-   return boost::integer::gcd(a, b);
-}
-
-template <typename T>
-inline BOOST_CXX14_CONSTEXPR T constexpr_lcm(T a, T b) noexcept
-{
-   return boost::integer::lcm(a, b);
-}
-
-#else
-
 template <typename T>
 inline BOOST_CXX14_CONSTEXPR T constexpr_gcd(T a, T b) noexcept
 {
@@ -1447,8 +1434,6 @@ inline BOOST_CXX14_CONSTEXPR T constexpr_lcm(T a, T b) noexcept
    const T ab_gcd = boost::multiprecision::detail::constexpr_gcd(a, b);
    return (a * b) / ab_gcd;
 }
-
-#endif // BOOST_MP_STANDALONE
 
 }
 
