@@ -13,7 +13,7 @@
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/math/special_functions/relative_difference.hpp>
 #include "test.hpp"
 

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright Christopher Kormanyos 2002 - 2021.
-// Copyright 2011 -2021 John Maddock. Distributed under the Boost
+// Copyright Christopher Kormanyos 2002 - 2025.
+// Copyright 2011 -2025 John Maddock. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -635,8 +635,8 @@ class cpp_dec_float
       }
       else
       {
-         std::copy(result.cbegin() + 1,
-                   result.cbegin() + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+         std::copy(result.cbegin() + static_cast<std::ptrdiff_t>(1),
+                   result.cbegin() + static_cast<std::ptrdiff_t>(1 + (std::min)(prec_elems_for_multiply, cpp_dec_float_elem_number)),
                    data.begin());
       }
    }
@@ -673,8 +673,8 @@ class cpp_dec_float
          }
          else
          {
-            std::copy(result.cbegin() + 1,
-                      result.cbegin() + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+            std::copy(result.cbegin() + static_cast<std::ptrdiff_t>(1),
+                      result.cbegin() + static_cast<std::ptrdiff_t>(1 + (std::min)(prec_elems_for_multiply, cpp_dec_float_elem_number)),
                       data.begin());
          }
       }
@@ -719,8 +719,8 @@ class cpp_dec_float
          }
          else
          {
-            std::copy(result + 1,
-                      result + (std::min)(static_cast<std::int32_t>(prec_elems_for_multiply + 1), cpp_dec_float_elem_number),
+            std::copy(result + static_cast<std::ptrdiff_t>(1),
+                      result + static_cast<std::ptrdiff_t>(1 + (std::min)(prec_elems_for_multiply, cpp_dec_float_elem_number)),
                       data.begin());
          }
       }
@@ -2088,6 +2088,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 #endif
 
       std::string str(s);
+      static const std::string valid_characters{"0123456789"};
 
       // TBD: Using several regular expressions may significantly reduce
       // the code complexity (and perhaps the run-time) of rd_string().
@@ -2100,11 +2101,13 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       if (((pos = str.find('e')) != std::string::npos) || ((pos = str.find('E')) != std::string::npos))
       {
          // Remove the exponent part from the string.
-         #ifndef BOOST_MP_STANDALONE
+#ifndef BOOST_MP_STANDALONE
          exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(str.c_str() + (pos + 1u)));
-         #else
+#else
+         if (str.find_first_not_of(valid_characters, ((str[pos + 1] == '+') || (str[pos + 1] == '-')) ? pos + 2 : pos + 1) != std::string::npos)
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
          exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
-         #endif
+#endif
          
          str = str.substr(static_cast<std::size_t>(0u), pos);
       }
@@ -2173,6 +2176,12 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
       if (pos != std::string::npos)
       {
+         // Check we have only digits either side of the point:
+         if (str.find_first_not_of(valid_characters) != pos)
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
+         if (str.find_first_not_of(valid_characters, pos + 1) != std::string::npos)
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
+
          // Remove all trailing insignificant zeros.
          const std::string::const_reverse_iterator rit_non_zero = std::find_if(str.rbegin(), str.rend(), char_is_nonzero_predicate);
 
@@ -2217,6 +2226,10 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       }
       else
       {
+         // We should have only digits:
+         if (str.find_first_not_of(valid_characters) != std::string::npos)
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
+
          // Input string has no decimal point: Append decimal point.
          str.append(".");
       }
@@ -3565,20 +3578,27 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_de
    static constexpr bool                    has_infinity      = true;
    static constexpr bool                    has_quiet_NaN     = true;
    static constexpr bool                    has_signaling_NaN = false;
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
    static constexpr std::float_denorm_style has_denorm        = std::denorm_absent;
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
    static constexpr bool                    has_denorm_loss   = false;
    static constexpr bool                    traps             = false;
    static constexpr bool                    tinyness_before   = false;
 
    static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates>(min)() { return (boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::min)(); }
    static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates>(max)() { return (boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::max)(); }
-   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> lowest() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::zero(); }
+   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> lowest() { return -(max)(); }
    static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> epsilon() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::eps(); }
    static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> round_error() { return 0.5L; }
    static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> infinity() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::inf(); }
    static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> quiet_NaN() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::nan(); }
    static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> signaling_NaN() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::zero(); }
-   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> denorm_min() { return boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::zero(); }
+   static constexpr boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> denorm_min() { return (boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::min)(); }
 };
 
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
@@ -3609,8 +3629,15 @@ template <unsigned Digits10, class ExponentType, class Allocator, boost::multipr
 constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_quiet_NaN;
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_signaling_NaN;
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr float_denorm_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_denorm;
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 constexpr bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>, ExpressionTemplates> >::has_denorm_loss;
 template <unsigned Digits10, class ExponentType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
