@@ -88,6 +88,13 @@ void expected_results()
        ".*",                    // compiler
        ".*",                    // stdlib
        ".*",                    // platform
+       ".*cpp_double_double.*", // test type(s)
+       ".*(JN|j).*|.*Tricky.*", // test data group
+       ".*", 24000, 10000);     // test function
+   add_expected_result(
+       ".*",                    // compiler
+       ".*",                    // stdlib
+       ".*",                    // platform
        ".*",                    // test type(s)
        ".*(JN|j).*|.*Tricky.*", // test data group
        ".*", 7000, 3000);       // test function
