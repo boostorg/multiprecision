@@ -41,11 +41,10 @@ namespace local
     return ((fifteen_m1 - six_m2) + m3) / ten_dx;
   }
 
-  using wide_double = boost::multiprecision::cpp_double_double;
-
-  wide_double cyl_bessel_j_of_v(const wide_double& v)
+  template<typename FloatType>
+  FloatType cyl_bessel_j_of_v(const FloatType& v)
   {
-    const auto x = static_cast<wide_double>(static_cast<wide_double>(34U) / 10U);
+    const auto x = static_cast<FloatType>(static_cast<FloatType>(34U) / 10U);
 
     return boost::math::cyl_bessel_j(v, x);
   }
@@ -53,17 +52,19 @@ namespace local
 
 int main()
 {
-  using local::wide_double;
+  using boost::multiprecision::cpp_double_double;
 
   // D[BesselJ[v, 34/10], v]
   // v := 12/10
   // N[Out[1], 30]
   // 0.439649800900385297241807133820
 
-  const auto  v = static_cast<wide_double>(static_cast<wide_double>(12U) /     10U); // 1.2
-  const auto dv = static_cast<wide_double>(static_cast<wide_double> (1U) / 100000U); // 1E-5
+  using std::ldexp;
 
-  const auto del_v_jv = local::derivative(v, dv, local::cyl_bessel_j_of_v);
+  const auto  v = static_cast<cpp_double_double>(static_cast<cpp_double_double>(12U) /     10U); // 1.2
+  const auto dv = ldexp(static_cast<cpp_double_double>(1U), -10);                                // 1 / 1024 (approx. 1e-18)
+
+  const auto del_v_jv = local::derivative(v, dv, local::cyl_bessel_j_of_v<cpp_double_double>);
 
   const auto flg = std::cout.flags();
 

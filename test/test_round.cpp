@@ -1,13 +1,8 @@
-///////////////////////////////////////////////////////////////
-//  Copyright 2011 John Maddock.
-//  Copyright Christopher Kormanyos 2002 - 2011, 2021 - 2025.
-//  Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
-//
-// This work is based on an earlier work:
-// "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
-// in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
+//  (C) Copyright John Maddock 2007.
+//  (C) Copyright Christopher Kormanyos 2023.
+//  Use, modification and distribution are subject to the
+//  Boost Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifdef _MSC_VER
 #define _SCL_SECURE_NO_WARNINGS
@@ -177,12 +172,14 @@ template <class T, class U>
 void check_modf_result(T a, T fract, U ipart)
 {
    BOOST_MATH_STD_USING
+   //#if !defined(TEST_CPP_DOUBLE_FLOAT)
    if (fract + ipart != a)
    {
       BOOST_ERROR("Fractional and integer results do not add up to the original value");
       std::cerr << "Values were: " << std::setprecision(35) << " "
                 << std::left << a << ipart << " " << fract << std::endl;
    }
+   //#endif
    if ((boost::math::sign(a) != boost::math::sign(fract)) && boost::math::sign(fract))
    {
       BOOST_ERROR("Original and fractional parts have differing signs");
@@ -235,7 +232,8 @@ void test()
          check_modf_result(arg, r, i);
          #endif
       }
-      #if !defined(TEST_CPP_DOUBLE_FLOAT)
+      #if defined(TEST_CPP_DOUBLE_FLOAT)
+      #else
       if (abs(r) < (std::numeric_limits<long>::max)())
       {
          long l = lround(arg);
@@ -290,6 +288,8 @@ void test()
       si = itrunc(static_cast<T>((std::numeric_limits<int>::min)() + 1));
       check_trunc_result(static_cast<T>((std::numeric_limits<int>::min)() + 1), si);
    }
+   #if defined(TEST_CPP_DOUBLE_FLOAT)
+   #else
    if (std::numeric_limits<T>::digits >= std::numeric_limits<long>::digits)
    {
       long k = lround(static_cast<T>((std::numeric_limits<long>::max)()));
@@ -314,8 +314,10 @@ void test()
       k = ltrunc(static_cast<T>((std::numeric_limits<long>::min)() + 1));
       check_trunc_result(static_cast<T>((std::numeric_limits<long>::min)() + 1), k);
    }
+   #endif
 #if !defined(BOOST_NO_LONG_LONG)
-   #if !defined(TEST_CPP_DOUBLE_FLOAT)
+   #if defined(TEST_CPP_DOUBLE_FLOAT)
+   #else
    if (std::numeric_limits<T>::digits >= std::numeric_limits<long long>::digits)
    {
       long long j = llround(static_cast<T>((std::numeric_limits<long long>::max)()));

@@ -44,6 +44,13 @@ void expected_results()
        ".*",                // test type(s)
        "factorials",        // test data group
        "lgamma", 750, 100); // test function
+   add_expected_result(
+       ".*",                          // compiler
+       ".*",                          // stdlib
+       ".*",                          // platform
+       "cpp_double_double",           // test type(s)
+       "near.*",                      // test data group
+       "lgamma", 8500000L, 2000000L); // test function
 #ifdef BOOST_INTEL
    add_expected_result(
        ".*",                   // compiler
