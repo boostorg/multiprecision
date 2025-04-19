@@ -45,6 +45,13 @@ void expected_results()
        ".*",                    // compiler
        ".*",                    // stdlib
        ".*",                    // platform
+       ".*cpp_double_double.*", // test type(s)
+       ".*",                    // test data group
+       ".*", 800000, 60000);    // test function
+   add_expected_result(
+       ".*",                    // compiler
+       ".*",                    // stdlib
+       ".*",                    // platform
        ".*",                    // test type(s)
        ".*(Y[nv]|y).*Random.*", // test data group
        ".*", 70000, 4000);      // test function

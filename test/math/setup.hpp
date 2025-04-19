@@ -1,5 +1,5 @@
 //  Copyright John Maddock 2013.
-//  Copyright Christopher Kormanyos 2023.
+//  Copyright Christopher Kormanyos 2023 - 2024.
 //  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
@@ -158,7 +158,7 @@ typedef boost::multiprecision::cpp_double_double test_type_1;
 #ifndef BOOST_MATH_TEST_TYPE
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 #endif
 
 #define ALL_TESTS          \

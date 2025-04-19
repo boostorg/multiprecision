@@ -57,6 +57,13 @@ void expected_results()
        ".*JN.*Integer.*",     // test data group
        ".*", 500000, 150000); // test function
    add_expected_result(
+       ".*",                    // compiler
+       ".*",                    // stdlib
+       ".*",                    // platform
+       ".*cpp_double_double.*", // test type(s)
+       ".*(JN|j).*|.*Tricky.*", // test data group
+       ".*", 100000, 100000);   // test function
+   add_expected_result(
        ".*",                // compiler
        ".*",                // stdlib
        ".*",                // platform

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2023.
+//  Copyright Christopher Kormanyos 2023 - 2025.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -11,8 +11,7 @@
 #include <cfloat>
 #include <cmath>
 #include <limits>
-
-#include <boost/config.hpp>
+#include <type_traits>
 
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail { namespace ccmath {
 
@@ -30,47 +29,49 @@ struct numeric_limits<FloatingPointType,
                                                || std::is_same<FloatingPointType, long double>::value)>::type>
 {
 private:
-   using self_type = FloatingPointType;
+   using float_type = FloatingPointType;
 
 public:
-   static constexpr bool                    is_specialized                = std::numeric_limits<self_type>::is_specialized;
-   static constexpr bool                    is_signed                     = std::numeric_limits<self_type>::is_signed;
-   static constexpr bool                    is_integer                    = std::numeric_limits<self_type>::is_integer;
-   static constexpr bool                    is_exact                      = std::numeric_limits<self_type>::is_exact;
-   static constexpr bool                    is_bounded                    = std::numeric_limits<self_type>::is_bounded;
-   static constexpr bool                    is_modulo                     = std::numeric_limits<self_type>::is_modulo;
-   static constexpr bool                    is_iec559                     = std::numeric_limits<self_type>::is_iec559;
-   static constexpr std::float_denorm_style has_denorm                    = std::numeric_limits<self_type>::has_denorm;
-   static constexpr bool                    has_infinity                  = std::numeric_limits<self_type>::has_infinity;
-   static constexpr bool                    has_quiet_NaN                 = std::numeric_limits<self_type>::has_quiet_NaN;
-   static constexpr bool                    has_signaling_NaN             = std::numeric_limits<self_type>::has_signaling_NaN;
-   static constexpr bool                    has_denorm_loss               = std::numeric_limits<self_type>::has_denorm_loss;
-   static constexpr bool                    traps                         = std::numeric_limits<self_type>::traps;
-   static constexpr bool                    tinyness_before               = std::numeric_limits<self_type>::tinyness_before;
-   static constexpr std::float_round_style  round_style                   = std::numeric_limits<self_type>::round_style;
+   static constexpr bool                    is_specialized                = std::numeric_limits<float_type>::is_specialized;
+   static constexpr bool                    is_signed                     = std::numeric_limits<float_type>::is_signed;
+   static constexpr bool                    is_integer                    = std::numeric_limits<float_type>::is_integer;
+   static constexpr bool                    is_exact                      = std::numeric_limits<float_type>::is_exact;
+   static constexpr bool                    is_bounded                    = std::numeric_limits<float_type>::is_bounded;
+   static constexpr bool                    is_modulo                     = std::numeric_limits<float_type>::is_modulo;
+   static constexpr bool                    is_iec559                     = std::numeric_limits<float_type>::is_iec559;
+   static constexpr std::float_denorm_style has_denorm                    = std::numeric_limits<float_type>::has_denorm;
+   static constexpr bool                    has_infinity                  = std::numeric_limits<float_type>::has_infinity;
+   static constexpr bool                    has_quiet_NaN                 = std::numeric_limits<float_type>::has_quiet_NaN;
+   static constexpr bool                    has_signaling_NaN             = std::numeric_limits<float_type>::has_signaling_NaN;
+   static constexpr bool                    has_denorm_loss               = std::numeric_limits<float_type>::has_denorm_loss;
+   static constexpr bool                    traps                         = std::numeric_limits<float_type>::traps;
+   static constexpr bool                    tinyness_before               = std::numeric_limits<float_type>::tinyness_before;
+   static constexpr std::float_round_style  round_style                   = std::numeric_limits<float_type>::round_style;
 
-   static constexpr int radix                          = std::numeric_limits<self_type>::radix;
-   static constexpr int digits                         = std::numeric_limits<self_type>::digits;
-   static constexpr int digits10                       = std::numeric_limits<self_type>::digits10;
-   static constexpr int max_digits10                   = std::numeric_limits<self_type>::max_digits10;
+   static constexpr int radix                          = std::numeric_limits<float_type>::radix;
+   static constexpr int digits                         = std::numeric_limits<float_type>::digits;
+   static constexpr int digits10                       = std::numeric_limits<float_type>::digits10;
+   static constexpr int max_digits10                   = std::numeric_limits<float_type>::max_digits10;
 
-   static constexpr int max_exponent                   = std::numeric_limits<self_type>::max_exponent;
-   static constexpr int min_exponent                   = std::numeric_limits<self_type>::min_exponent;
-   static constexpr int max_exponent10                 = std::numeric_limits<self_type>::max_exponent10;
-   static constexpr int min_exponent10                 = std::numeric_limits<self_type>::min_exponent10;
+   static constexpr int max_exponent                   = std::numeric_limits<float_type>::max_exponent;
+   static constexpr int min_exponent                   = std::numeric_limits<float_type>::min_exponent;
+   static constexpr int max_exponent10                 = std::numeric_limits<float_type>::max_exponent10;
+   static constexpr int min_exponent10                 = std::numeric_limits<float_type>::min_exponent10;
 
-   static constexpr self_type(min)         () noexcept { return (std::numeric_limits<self_type>::min)         (); }
-   static constexpr self_type(max)         () noexcept { return (std::numeric_limits<self_type>::max)         (); }
-   static constexpr self_type lowest       () noexcept { return  std::numeric_limits<self_type>::lowest       (); }
-   static constexpr self_type epsilon      () noexcept { return  std::numeric_limits<self_type>::epsilon      (); }
-   static constexpr self_type round_error  () noexcept { return  std::numeric_limits<self_type>::round_error  (); }
-   static constexpr self_type denorm_min   () noexcept { return  std::numeric_limits<self_type>::denorm_min   (); }
-   static constexpr self_type infinity     () noexcept { return  std::numeric_limits<self_type>::infinity     (); }
-   static constexpr self_type quiet_NaN    () noexcept { return  std::numeric_limits<self_type>::quiet_NaN    (); }
-   static constexpr self_type signaling_NaN() noexcept { return  std::numeric_limits<self_type>::signaling_NaN(); }
+   // LCOV_EXCL_START
+   static constexpr auto (min)         () noexcept -> float_type { return (std::numeric_limits<float_type>::min)         (); }
+   static constexpr auto (max)         () noexcept -> float_type { return (std::numeric_limits<float_type>::max)         (); }
+   static constexpr auto  lowest       () noexcept -> float_type { return  std::numeric_limits<float_type>::lowest       (); }
+   static constexpr auto  epsilon      () noexcept -> float_type { return  std::numeric_limits<float_type>::epsilon      (); }
+   static constexpr auto  round_error  () noexcept -> float_type { return  std::numeric_limits<float_type>::round_error  (); }
+   static constexpr auto  denorm_min   () noexcept -> float_type { return  std::numeric_limits<float_type>::denorm_min   (); }
+   static constexpr auto  infinity     () noexcept -> float_type { return  std::numeric_limits<float_type>::infinity     (); }
+   static constexpr auto  quiet_NaN    () noexcept -> float_type { return  std::numeric_limits<float_type>::quiet_NaN    (); }
+   static constexpr auto  signaling_NaN() noexcept -> float_type { return  std::numeric_limits<float_type>::signaling_NaN(); }
+   // LCOV_EXCL_STOP
 };
 
-#if defined(BOOST_HAS_FLOAT128)
+#if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
 template <class FloatingPointType>
 struct numeric_limits<FloatingPointType,
                       typename std::enable_if<std::is_same<FloatingPointType, ::boost::float128_type>::value>::type>

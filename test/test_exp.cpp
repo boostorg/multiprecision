@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock.
-//  Copyright Christopher Kormanyos 2002 - 2011, 2021 - 2023.
+//  Copyright Christopher Kormanyos 2002 - 2011, 2021 - 2024.
 //  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
@@ -15,8 +15,11 @@
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
-#include <array>
 #include "test.hpp"
+
+#include <array>
+#include <ctime>
+#include <random>
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
@@ -59,6 +62,9 @@
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
+#if defined(BOOST_MATH_USE_FLOAT128)
+#include <boost/multiprecision/float128.hpp>
+#endif
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
@@ -206,14 +212,17 @@ void test()
             BOOST_CHECK_LE(exp(bug_case), (std::numeric_limits<T>::min)());
          }
       }
-      // Adapt the fractional parts in the following test cases
-      // for TEST_CPP_DOUBLE_FLOAT
+
       #if defined(TEST_CPP_DOUBLE_FLOAT)
-      bug_case = log((std::numeric_limits<T>::max)()) / -1.3;
+      // Handle uneven/asymmetric exponents on min/max of cpp_double_fp_backend
+      bug_case = log(1 / (std::numeric_limits<T>::min)()) / -1.0005;
       #else
       bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
       #endif
-      for (unsigned i = 0; i < 20; ++i, bug_case /= 1.05)
+
+      unsigned i { 0U };
+
+      for ( ; i < 20U; ++i, bug_case /= static_cast<T>(1.05L))
       {
          BOOST_CHECK_GE(exp(bug_case), (std::numeric_limits<T>::min)());
       }

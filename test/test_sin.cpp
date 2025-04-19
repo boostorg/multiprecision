@@ -220,7 +220,7 @@ void test()
          max_err = err;
    }
    std::cout << "Max error was: " << max_err << std::endl;
-   BOOST_TEST(max_err < UINTMAX_C(1000000));
+   BOOST_TEST(max_err < UINTMAX_C(200000));
 
    static const std::array<const char*, 51u> small_data =
    {{

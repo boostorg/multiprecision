@@ -175,6 +175,7 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_ab_3.cpp no_eh_support : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 
    [ run test_cpp_dec_float_round.cpp no_eh_support ]
+   [ run test_various_edges.cpp no_eh_support ]
 
    [ run test_arithmetic_logged_1.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_logged_2.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
@@ -214,6 +215,7 @@ test-suite arithmetic_tests :
    [ run test_mpf_precisions.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] ]
    [ run test_threaded_precision.cpp mpfr gmp : : : [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPF_50 : test_threaded_precision_mpf ]
    [ run test_complex.cpp : : : [ check-target-builds ../config//has_mpc : <define>TEST_MPC <source>mpc <source>mpfr <source>gmp ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
+   [ run test_complex.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] <define>TEST_CPP_DOUBLE_FLOAT : test_complex_df ]
    [ run test_arithmetic_complex_adaptor.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_complex_adaptor_2.cpp : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_complex128.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
@@ -262,7 +264,7 @@ alias precision_tests : test_preserve_source_precision_gmp test_preserve_source_
 rule get_function_tests
 {
    local result ;
-   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_pow_df.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
+   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
    {
          result += [ run $(source) gmp no_eh_support
               : # command line
@@ -321,6 +323,26 @@ rule get_function_tests
    }
    return $(result) ;
 }
+
+rule get_function_tests_df_gnu
+{
+   local result ;
+   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
+   {
+         result += [ run $(source) quadmath
+              : # command line
+              : # input files
+              : # requirements
+               <define>TEST_CPP_DOUBLE_FLOAT
+              : $(source:B)_cpp_double_fp_df_gnu ] ;
+   }
+   return $(result) ;
+}
+
+test-suite functions_df_gnu :
+
+      [ get_function_tests_df_gnu ]
+;
 
 test-suite functions_and_limits :
 
@@ -1543,17 +1565,14 @@ rule get_specfun_tests_cpp_double_double
    local result ;
    for local source in [ glob math/*.cpp ]
    {
-      result += [ run $(source) quadmath 
-            /boost/test//boost_unit_test_framework/<link>static 
-            math/instances//test_instances_cpp_double_double/<link>static
+      result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static 
+               math/instances//test_instances_cpp_double_double/<link>static
            : # command line
            : # input files
            : # requirements
-            [ check-target-builds ../config//has_float128 : : <build>no ]
-            <optimization>speed
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <define>TEST_CPP_DOUBLE_FLOAT
             <define>BOOST_ALL_NO_LIB
-            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <toolset>msvc:<cxxflags>-bigobj
             <include>../../math/include_private
             release

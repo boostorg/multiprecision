@@ -1213,6 +1213,11 @@ void test_float_funcs(const std::integral_constant<bool, true>&)
    a        = 4;
    a        = sqrt(a);
    BOOST_CHECK_CLOSE_FRACTION(a, 2, tol);
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::has_infinity)
+   {
+      a = std::numeric_limits<Real>::infinity();
+      BOOST_CHECK((boost::math::isinf)(a));
+   }
    a = 3;
    a = exp(a);
    BOOST_CHECK_CLOSE_FRACTION(a, Real(exp(Real(3))), tol);
@@ -1729,6 +1734,25 @@ void test_float_ops(const std::integral_constant<int, boost::multiprecision::num
          BOOST_CHECK((boost::math::isnan)(t));
          #endif
       }
+   }
+
+   BOOST_IF_CONSTEXPR(std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::has_infinity && std::numeric_limits<Real>::max_exponent10 > 18 && std::numeric_limits<Real>::min_exponent10 < -18)
+   {
+      Real a = (std::numeric_limits<Real>::max)();
+
+      a /= 1000000;
+      a /= 1000000;
+      a /= 1000000;
+
+      BOOST_CHECK((boost::math::isfinite)(a));
+
+      a = (std::numeric_limits<Real>::min)();
+
+      a *= 1000000;
+      a *= 1000000;
+      a *= 1000000;
+
+      BOOST_CHECK((boost::math::isfinite)(a));
    }
 
    test_float_funcs<Real>(std::integral_constant<bool, std::numeric_limits<Real>::is_specialized>());

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2023.
+//  Copyright Christopher Kormanyos 2023 - 2025.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -11,7 +11,7 @@
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail { namespace ccmath {
 
 template <class FloatingPointType>
-constexpr bool isnan(FloatingPointType x)
+constexpr auto isnan(FloatingPointType x) -> bool
 {
    return (x != x);
 }
