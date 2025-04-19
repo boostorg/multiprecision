@@ -143,7 +143,18 @@ void test_specific(const std::integral_constant<int, boost::multiprecision::numb
       {
          BOOST_TEST(FP_NORMAL == (boost::math::fpclassify)(std::numeric_limits<Number>::lowest()));
          BOOST_TEST(std::numeric_limits<Number>::lowest() < Number { 0 });
-         BOOST_TEST(std::numeric_limits<Number>::lowest() < Number { std::numeric_limits<long double>::lowest() });
+         BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::max_exponent > std::numeric_limits<float>::max_exponent)
+         {
+            BOOST_TEST(std::numeric_limits<Number>::lowest() < Number { std::numeric_limits<float>::lowest() });
+         }
+         BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::max_exponent > std::numeric_limits<double>::max_exponent)
+         {
+            BOOST_TEST(std::numeric_limits<Number>::lowest() < Number { std::numeric_limits<double>::lowest() });
+         }
+         BOOST_IF_CONSTEXPR(std::numeric_limits<Number>::max_exponent > std::numeric_limits<long double>::max_exponent)
+         {
+            BOOST_TEST(std::numeric_limits<Number>::lowest() < Number { std::numeric_limits<long double>::lowest() });
+         }
       }
       #endif
    }
