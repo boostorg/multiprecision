@@ -249,7 +249,8 @@ constexpr typename boost::multiprecision::literals::detail::unsigned_cpp_int_lit
    return boost::multiprecision::literals::detail::make_backend_from_pack<pt, typename boost::multiprecision::literals::detail::unsigned_cpp_int_literal_result_type<static_cast<unsigned>((sizeof...(STR)) - 2u)>::backend_type>::value;
 }
 
-#define BOOST_MP_LIT(P, N) BOOST_JOIN(operator "", BOOST_JOIN(P, N))
+#define BOOST_MP_LIT(P, N) BOOST_JOIN(operator "",P##N)
+
 #define BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(Bits)                                                                                                                                                                       \
    template <char... STR>                                                                                                                                                                                                 \
    constexpr boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<Bits, Bits, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > BOOST_MP_LIT(_cppi, Bits)()    \
