@@ -1634,7 +1634,7 @@ inline void convert_to_unsigned_int(I* res, const cpp_bin_float<Digits, DigitBas
    }
    else if (shift < 0)
    {
-      if (cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - shift <= digits)
+      if ((shift_type)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - shift <= (shift_type)digits)
       {
          // We have more bits in ulong_long_type than the float, so it's OK to left shift:
          eval_convert_to(res, man);
@@ -1644,7 +1644,7 @@ inline void convert_to_unsigned_int(I* res, const cpp_bin_float<Digits, DigitBas
       *res = max_val;
       return;
    }
-   eval_right_shift(man, shift);
+   eval_right_shift(man, static_cast<unsigned>(shift));
    eval_convert_to(res, man);
 }
 
@@ -2035,18 +2035,18 @@ inline void eval_ceil(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE
    }
    bool fractional = (shift_type)eval_lsb(arg.bits()) < shift;
    res             = arg;
-   eval_right_shift(res.bits(), shift);
+   eval_right_shift(res.bits(), static_cast<unsigned>(shift));
    if (fractional && !res.sign())
    {
       eval_increment(res.bits());
-      if ((std::ptrdiff_t)eval_msb(res.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1 - shift)
+      if ((std::ptrdiff_t)eval_msb(res.bits()) != (std::ptrdiff_t)(static_cast<shift_type>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) - 1 - shift))
       {
          // Must have extended result by one bit in the increment:
          --shift;
          ++res.exponent();
       }
    }
-   eval_left_shift(res.bits(), shift);
+   eval_left_shift(res.bits(), static_cast<unsigned>(shift));
 }
 
 template <unsigned D1, backends::digit_base_type B1, class A1, class E1, E1 M1, E1 M2>
