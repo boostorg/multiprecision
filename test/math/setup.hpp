@@ -142,7 +142,7 @@ typedef boost::multiprecision::float128 test_type_1;
 #ifndef BOOST_MATH_TEST_TYPE
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 #endif
 
 #define ALL_TESTS      \
