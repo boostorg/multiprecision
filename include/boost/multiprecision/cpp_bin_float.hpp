@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////
-//  Copyright 2013 - 2022 John Maddock.
-//  Copyright 2022 Christopher Kormanyos.
+//  Copyright 2013 - 2025 John Maddock.
+//  Copyright 2022 - 2025 Christopher Kormanyos.
 //  Distributed under the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt
 //  or copy at https://www.boost.org/LICENSE_1_0.txt)
@@ -1626,10 +1626,29 @@ inline void convert_to_unsigned_int(I* res, const cpp_bin_float<Digits, DigitBas
    }
    typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::rep_type                                                                                                                                                              man(arg.bits());
    using shift_type = typename std::conditional<sizeof(typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type) < sizeof(int), int, typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type>::type;
-   shift_type                                                                                                                                                                                                                                        shift = (shift_type)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1 - arg.exponent();
-   if (shift > (shift_type)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+
+   const shift_type shift = (shift_type)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1 - arg.exponent();
+
+   if (arg.sign())
+   {
+      using si_type = typename boost::multiprecision::detail::make_signed<I>::type;
+
+      si_type val;
+
+      convert_to_signed_int(&val, arg);
+
+      *res = static_cast<I>(val);
+
+      return;
+   }
+   else if (shift > (shift_type)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
    {
       *res = 0;
+      return;
+   }
+   else if (arg.compare(max_val) >= 0)
+   {
+      *res = max_val;
       return;
    }
    else if (shift < 0)
