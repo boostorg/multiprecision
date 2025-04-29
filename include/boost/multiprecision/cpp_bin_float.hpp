@@ -1629,7 +1629,19 @@ inline void convert_to_unsigned_int(I* res, const cpp_bin_float<Digits, DigitBas
 
    const shift_type shift = (shift_type)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1 - arg.exponent();
 
-   if (shift > (shift_type)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+   if (arg.sign())
+   {
+      using local_signed_type = std::make_signed_t<I>;
+
+      local_signed_type val;
+
+      convert_to_signed_int(&val, arg);
+
+      *res = static_cast<I>(val);
+
+      return;
+   }
+   else if (shift > (shift_type)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
    {
       *res = 0;
       return;

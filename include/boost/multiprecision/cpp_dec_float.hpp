@@ -1713,7 +1713,7 @@ long long cpp_dec_float<Digits10, ExponentType, Allocator>::extract_signed_long_
       // See https://svn.boost.org/trac/boost/ticket/9740.
       //
       long long sval = static_cast<long long>(val - 1);
-      sval                       = -sval;
+      sval           = -sval;
       --sval;
       return sval;
    }
