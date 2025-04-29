@@ -1631,13 +1631,9 @@ inline void convert_to_unsigned_int(I* res, const cpp_bin_float<Digits, DigitBas
 
    if (arg.sign())
    {
-      #ifdef BOOST_HAS_INT128
-      using local_signed_type = std::conditional_t<std::is_same<I, unsigned __int128>::value, signed __int128, std::make_signed_t<I>>;
-      #else
-      using local_signed_type = std::make_signed_t<I>;
-      #endif
+      using si_type = typename boost::multiprecision::detail::make_signed<I>::type;
 
-      local_signed_type val;
+      si_type val;
 
       convert_to_signed_int(&val, arg);
 
