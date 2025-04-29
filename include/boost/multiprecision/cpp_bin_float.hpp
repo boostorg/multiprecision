@@ -1626,10 +1626,17 @@ inline void convert_to_unsigned_int(I* res, const cpp_bin_float<Digits, DigitBas
    }
    typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::rep_type                                                                                                                                                              man(arg.bits());
    using shift_type = typename std::conditional<sizeof(typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type) < sizeof(int), int, typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type>::type;
-   shift_type                                                                                                                                                                                                                                        shift = (shift_type)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1 - arg.exponent();
+
+   const shift_type shift = (shift_type)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1 - arg.exponent();
+
    if (shift > (shift_type)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
    {
       *res = 0;
+      return;
+   }
+   else if (arg.compare(max_val) >= 0)
+   {
+      *res = max_val;
       return;
    }
    else if (shift < 0)
