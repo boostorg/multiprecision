@@ -1713,7 +1713,7 @@ long long cpp_dec_float<Digits10, ExponentType, Allocator>::extract_signed_long_
       // See https://svn.boost.org/trac/boost/ticket/9740.
       //
       long long sval = static_cast<long long>(val - 1);
-      sval                       = -sval;
+      sval           = -sval;
       --sval;
       return sval;
    }
@@ -1749,14 +1749,14 @@ unsigned long long cpp_dec_float<Digits10, ExponentType, Allocator>::extract_uns
    else
    {
       // Extract the data into an unsigned long long value.
-      val = static_cast<unsigned long long>(xn.data[0]);
+      val = static_cast<unsigned long long>(xn.data[std::size_t { 0U }]);
 
       const std::int32_t imax = (std::min)(static_cast<std::int32_t>(static_cast<std::int32_t>(xn.exp) / cpp_dec_float_elem_digits10), static_cast<std::int32_t>(cpp_dec_float_elem_number - static_cast<std::int32_t>(1)));
 
       for (std::int32_t i = static_cast<std::int32_t>(1); i <= imax; i++)
       {
          val *= static_cast<unsigned long long>(cpp_dec_float_elem_mask);
-         val += static_cast<unsigned long long>(xn.data[i]);
+         val += static_cast<unsigned long long>(xn.data[static_cast<std::size_t>(i)]);
       }
    }
 
