@@ -11,15 +11,19 @@
 #ifndef BOOST_MP_CPP_INT_MISC_HPP
 #define BOOST_MP_CPP_INT_MISC_HPP
 
-#include <boost/multiprecision/detail/standalone_config.hpp>
-#include <boost/multiprecision/detail/number_base.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
-#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
-#include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
+#include <boost/multiprecision/detail/constexpr.hpp>
+#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/number_base.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
+
+#ifndef BOOST_MP_STANDALONE
+#include <boost/integer/common_factor_rt.hpp>
+#endif
 
 #ifdef BOOST_MP_MATH_AVAILABLE
 #include <boost/math/special_functions/next.hpp>
@@ -31,6 +35,7 @@
 
 #include <cmath>
 #include <numeric>
+#include <stdexcept>
 #include <type_traits>
 
 #ifdef BOOST_MSVC
