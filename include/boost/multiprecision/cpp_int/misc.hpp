@@ -30,9 +30,7 @@
 #endif
 
 #include <cmath>
-#if defined(BOOST_MP_LIB_GCD_LCM_AVAILABLE)
 #include <numeric>
-#endif
 #include <type_traits>
 
 #ifdef BOOST_MSVC
