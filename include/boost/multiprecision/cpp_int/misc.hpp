@@ -11,29 +11,32 @@
 #ifndef BOOST_MP_CPP_INT_MISC_HPP
 #define BOOST_MP_CPP_INT_MISC_HPP
 
-#include <boost/multiprecision/detail/standalone_config.hpp>
-#include <boost/multiprecision/detail/number_base.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
-#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/detail/assert.hpp>
-#include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
+#include <boost/multiprecision/detail/constexpr.hpp>
+#include <boost/multiprecision/detail/float128_functions.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/number_base.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
+
+#ifndef BOOST_MP_STANDALONE
+#include <boost/integer/common_factor_rt.hpp>
+#endif
 
 #ifdef BOOST_MP_MATH_AVAILABLE
 #include <boost/math/special_functions/next.hpp>
 #endif
 
-#include <type_traits>
-#include <stdexcept>
-#include <cmath>
-
 #if (defined(__cpp_lib_gcd_lcm) && (__cpp_lib_gcd_lcm >= 201606L)) && (!defined(BOOST_HAS_INT128) || !defined(__STRICT_ANSI__))
-#include <numeric> // std::gcd
-
-#define BOOST_MP_STD_GCD_AVAILABLE
+#define BOOST_MP_LIB_GCD_LCM_AVAILABLE
 #endif
+
+#include <cmath>
+#include <numeric>
+#include <stdexcept>
+#include <type_traits>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -514,15 +517,12 @@ eval_integer_modulus(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checke
    return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
 
-namespace detail {
-
-template <class AnyIntegralType>
-inline BOOST_MP_CXX14_CONSTEXPR AnyIntegralType eval_gcd_impl(AnyIntegralType u, AnyIntegralType v)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, limb_type v)
 {
    // boundary cases
    if (!u || !v)
       return u | v;
-#if defined(BOOST_MP_STD_GCD_AVAILABLE)
+#if defined(BOOST_MP_LIB_GCD_LCM_AVAILABLE)
    return std::gcd(u, v);
 #else
    std::size_t shift = boost::multiprecision::detail::find_lsb(u | v);
@@ -538,17 +538,25 @@ inline BOOST_MP_CXX14_CONSTEXPR AnyIntegralType eval_gcd_impl(AnyIntegralType u,
 #endif
 }
 
-}
-
-template <class IntegralType>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_integral<IntegralType>::value && !std::is_same<IntegralType, double_limb_type>::value, IntegralType>::type eval_gcd(IntegralType u, IntegralType v)
+inline BOOST_MP_CXX14_CONSTEXPR double_limb_type eval_gcd(double_limb_type u, double_limb_type v)
 {
-   return detail::eval_gcd_impl(u, v);
-}
+#if defined(BOOST_MP_LIB_GCD_LCM_AVAILABLE)
+   return std::gcd(u, v);
+#else
+   if (u == 0)
+      return v;
 
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR double_limb_type eval_gcd(double_limb_type u, double_limb_type v)
-{
-   return detail::eval_gcd_impl(u, v);
+   std::size_t shift = boost::multiprecision::detail::find_lsb(u | v);
+   u >>= boost::multiprecision::detail::find_lsb(u);
+   do
+   {
+      v >>= boost::multiprecision::detail::find_lsb(v);
+      if (u > v)
+         std_constexpr::swap(u, v);
+      v -= u;
+   } while (v);
+   return u << shift;
+#endif
 }
 
 template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
@@ -1417,6 +1425,21 @@ inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const cpp_int_backend<Min
 
 namespace detail {
 
+#ifndef BOOST_MP_STANDALONE
+template <typename T>
+inline BOOST_CXX14_CONSTEXPR T constexpr_gcd(T a, T b) noexcept
+{
+   return boost::integer::gcd(a, b);
+}
+
+template <typename T>
+inline BOOST_CXX14_CONSTEXPR T constexpr_lcm(T a, T b) noexcept
+{
+   return boost::integer::lcm(a, b);
+}
+
+#else
+
 template <typename T>
 inline BOOST_CXX14_CONSTEXPR T constexpr_gcd(T a, T b) noexcept
 {
@@ -1429,6 +1452,8 @@ inline BOOST_CXX14_CONSTEXPR T constexpr_lcm(T a, T b) noexcept
    const T ab_gcd = boost::multiprecision::detail::constexpr_gcd(a, b);
    return (a * b) / ab_gcd;
 }
+
+#endif // BOOST_MP_STANDALONE
 
 }
 
