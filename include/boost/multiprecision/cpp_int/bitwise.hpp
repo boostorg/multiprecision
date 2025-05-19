@@ -700,7 +700,7 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_trivial
 eval_left_shift(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, T s) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
    is_valid_bitwise_op(result, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
-   *result.limbs() = detail::checked_left_shift(*result.limbs(), static_cast<unsigned long long>(s), typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
+   *result.limbs() = detail::checked_left_shift(*result.limbs(), s, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
    result.normalize();
 }
 
@@ -710,7 +710,7 @@ eval_right_shift(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Alloca
 {
    // Nothing to check here... just make sure we don't invoke undefined behavior:
    is_valid_bitwise_op(result, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
-   *result.limbs() = (static_cast<std::size_t>(s) >= static_cast<std::size_t>(sizeof(*result.limbs()) * CHAR_BIT)) ? 0 : (result.sign() ? ((--*result.limbs()) >> s) + 1 : *result.limbs() >> s);
+   *result.limbs() = (static_cast<unsigned>(s) >= sizeof(*result.limbs()) * CHAR_BIT) ? 0 : (result.sign() ? ((--*result.limbs()) >> s) + 1 : *result.limbs() >> s);
    if (result.sign() && (*result.limbs() == 0))
       result = static_cast<signed_limb_type>(-1);
 }
