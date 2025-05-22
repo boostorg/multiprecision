@@ -396,8 +396,9 @@ inline BOOST_MP_CXX14_CONSTEXPR void left_shift_limb(Int& result, double_limb_ty
 template <class Int>
 inline BOOST_MP_CXX14_CONSTEXPR void left_shift_generic(Int& result, double_limb_type s)
 {
-   limb_type offset = static_cast<limb_type>(s / Int::limb_bits);
-   limb_type shift  = static_cast<limb_type>(s % Int::limb_bits);
+   const limb_type offset = static_cast<limb_type>(s / Int::limb_bits);
+   const limb_type shift  = static_cast<limb_type>(s % Int::limb_bits);
+   BOOST_ASSERT(shift < sizeof(pr[0]) * CHAR_BIT);
 
    std::size_t ors = result.size();
    if ((ors == 1) && (!*result.limbs()))
@@ -438,6 +439,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void left_shift_generic(Int& result, double_limb
    }
    for (; rs - i >= static_cast<std::size_t>(static_cast<std::size_t>(2u) + offset); ++i)
    {
+      BOOST_ASSERT(shift < sizeof(pr[0]) * CHAR_BIT);
       pr[rs - 1 - i] = pr[rs - 1 - i - offset] << shift;
       pr[rs - 1 - i] |= pr[rs - 2 - i - offset] >> (Int::limb_bits - shift);
    }
