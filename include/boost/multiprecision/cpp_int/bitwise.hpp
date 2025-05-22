@@ -398,6 +398,8 @@ inline BOOST_MP_CXX14_CONSTEXPR void left_shift_generic(Int& result, double_limb
 {
    const limb_type offset = static_cast<limb_type>(s / Int::limb_bits);
    const limb_type shift  = static_cast<limb_type>(s % Int::limb_bits);
+
+   typename Int::limb_pointer pr = result.limbs();
    BOOST_ASSERT(shift < sizeof(pr[0]) * CHAR_BIT);
 
    std::size_t ors = result.size();
@@ -409,8 +411,6 @@ inline BOOST_MP_CXX14_CONSTEXPR void left_shift_generic(Int& result, double_limb
    rs += offset;
    result.resize(rs, rs);
    bool truncated = result.size() != rs;
-
-   typename Int::limb_pointer pr = result.limbs();
 
    if (offset > rs)
    {
