@@ -12,6 +12,7 @@
 #include <cstring>
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include <type_traits>
 #include <string>
 #include <boost/multiprecision/detail/standalone_config.hpp>
@@ -63,6 +64,91 @@ namespace detail {
    {
       static constexpr std::size_t value = (Value1 > Value2) ? Value1 : Value2;
    };
+
+   template <class DestT, class SrcT>
+   static BOOST_MP_CXX14_CONSTEXPR DestT* constexpr_copy(DestT* dest, const SrcT* src, std::size_t n)
+   {
+      bool use_loop = !std::is_same<DestT, SrcT>::value;
+
+#     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+      use_loop = use_loop || BOOST_MP_IS_CONST_EVALUATED(n);
+#     endif
+
+      if (use_loop)
+      {
+         for (std::size_t i = 0; i < n; ++i)
+            dest[i] = src[i];
+      }
+      else
+      {
+         std::memcpy(dest, src, n * sizeof(DestT));
+      }
+
+      return dest + n;
+   }
+
+   template <class DestT>
+   static BOOST_MP_CXX14_CONSTEXPR DestT* constexpr_zero_trivial(DestT* dest, std::size_t n)
+   {
+#     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+      if (BOOST_MP_IS_CONST_EVALUATED(n))
+      {
+         for (std::size_t i = 0; i < n; ++i)
+            dest[i] = 0;
+      }
+      else
+#     endif
+      {
+         std::memset(static_cast<void*>(dest), 0, n * sizeof(DestT));
+      }
+
+      return dest + n;
+   }
+
+   template <class Allocator>
+   static BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR
+   typename std::allocator_traits<Allocator>::pointer constexpr_allocate_default_constructible(Allocator& alloc, std::size_t const n)
+   {
+      typename std::allocator_traits<Allocator>::pointer ptr = alloc.allocate(n);
+
+#     if !defined(BOOST_MP_NO_CONSTEXPR_DETECTION) && defined(BOOST_MP_HAS_CONSTEXPR_DYNAMIC_ALLOC)
+      if (BOOST_MP_IS_CONST_EVALUATED(n))
+         for (std::size_t i = 0; i < n; ++i)
+            std::construct_at(ptr + i);
+#     endif
+
+      return ptr;
+   }
+
+   template <class Allocator>
+   static BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR
+   void constexpr_deallocate_trivially_destructible(Allocator& alloc, typename std::allocator_traits<Allocator>::pointer data, std::size_t const n)
+   {
+#     if !defined(BOOST_MP_NO_CONSTEXPR_DETECTION) && defined(BOOST_MP_HAS_CONSTEXPR_DYNAMIC_ALLOC)
+      if (BOOST_MP_IS_CONST_EVALUATED(n))
+         for (std::size_t i = 0; i < n; ++i)
+            std::destroy_at(data + i);
+#     endif
+
+      alloc.deallocate(data, n);
+   }
+
+   static BOOST_MP_CXX14_CONSTEXPR std::size_t constexpr_strlen(const char* str)
+   {
+#     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+      if (BOOST_MP_IS_CONST_EVALUATED(str)) {
+         const char* end = str;
+
+         while (*end != '\0') {
+            end++;
+         }
+
+         return end - str;
+      }
+#     endif
+
+      return std::strlen(str);
+   }
 } // Namespace detail
 
 template <std::size_t MinBits, std::size_t MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, bool trivial = false>
@@ -210,37 +296,45 @@ private:
    };
 
  public:
-   static constexpr std::size_t limb_bits           = sizeof(limb_type) * CHAR_BIT;
-   static constexpr limb_type   max_limb_value      = ~static_cast<limb_type>(0u);
-   static constexpr limb_type   sign_bit_mask       = static_cast<limb_type>(1u) << (limb_bits - 1);
-   static constexpr std::size_t internal_limb_count =
-                                       MinBits
-                                           ? (MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0))
-                                           : (sizeof(limb_data) / sizeof(limb_type)) > 1 ? (sizeof(limb_data) / sizeof(limb_type)) : 2;
+   static constexpr std::size_t limb_bits                      = sizeof(limb_type) * CHAR_BIT;
+   static constexpr limb_type   max_limb_value                 = ~static_cast<limb_type>(0u);
+   static constexpr limb_type   sign_bit_mask                  = static_cast<limb_type>(1u) << (limb_bits - 1);
+
+ private:
+   static constexpr std::size_t min_bits_limb_capacity         = (MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0));
+   static constexpr std::size_t limb_data_limb_capacity        = sizeof(limb_data) / sizeof(limb_type);
+   static constexpr std::size_t double_limb_type_limb_capacity = sizeof(double_limb_type) / sizeof(limb_type);
+
+ public:
+   static constexpr std::size_t internal_limb_count            = (std::max)(
+      min_bits_limb_capacity, (std::max)(limb_data_limb_capacity, double_limb_type_limb_capacity)
+   );
+
  private:
    union data_type
    {
       limb_data        ld;
       limb_type        la[internal_limb_count];
-      limb_type        first;
-      double_limb_type double_first;
 
-      constexpr data_type() noexcept : first(0) {}
-      constexpr data_type(limb_type i) noexcept : first(i) {}
-      constexpr data_type(signed_limb_type i) noexcept : first(static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i))) {}
+      constexpr data_type() noexcept : la{0} {}
+      constexpr data_type(limb_type i) noexcept : la{i} {}
+      constexpr data_type(signed_limb_type i) noexcept : data_type(static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i))) {}
 #if BOOST_MP_ENDIAN_LITTLE_BYTE
-      constexpr data_type(double_limb_type i) noexcept : double_first(i)
-      {}
-      constexpr data_type(signed_double_limb_type i) noexcept : double_first(static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i))) {}
+      constexpr data_type(double_limb_type i) noexcept : la{}
+      {
+         for (std::size_t limb_idx = 0; limb_idx < double_limb_type_limb_capacity; ++limb_idx, i >>= limb_bits)
+            la[limb_idx] = static_cast<limb_type>(i & max_limb_value);
+      }
+      constexpr data_type(signed_double_limb_type i) noexcept : data_type(static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i))) {}
 #endif
 #if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) && !(defined(BOOST_MSVC) && (BOOST_MSVC < 1900))
-      constexpr data_type(limb_type* limbs, std::size_t len) noexcept : ld{ len, limbs }
+      constexpr data_type(limb_type* limbs, std::size_t len) noexcept : ld{len, limbs}
       {}
 #else
       constexpr data_type(limb_type* limbs, std::size_t len) noexcept
       {
          ld.capacity = len;
-         ld.data = limbs;
+         ld.data     = limbs;
       }
 #endif
    };
@@ -290,33 +384,33 @@ private:
       std::size_t        capacity;
       std::size_t        allocated;
       bool            is_alias;
-      allocator_type& allocator() noexcept { return boost::multiprecision::detail::empty_value<allocator_type>::get(); }
+      BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR allocator_type& allocator() noexcept { return boost::multiprecision::detail::empty_value<allocator_type>::get(); }
 
     public:
-      scoped_shared_storage(const allocator_type& a, std::size_t len)
+      BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR scoped_shared_storage(const allocator_type& a, std::size_t len)
           : boost::multiprecision::detail::empty_value<allocator_type>(boost::multiprecision::detail::empty_init_t(), a), capacity(len), allocated(0), is_alias(false)
       {
-         data = allocator().allocate(len);
+         data = detail::constexpr_allocate_default_constructible(allocator(), len);
       }
-      scoped_shared_storage(const cpp_int_base& i, std::size_t len)
+      BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR scoped_shared_storage(const cpp_int_base& i, std::size_t len)
           : boost::multiprecision::detail::empty_value<allocator_type>(boost::multiprecision::detail::empty_init_t(), i.allocator()), capacity(len), allocated(0), is_alias(false)
       {
-         data = allocator().allocate(len);
+         data = detail::constexpr_allocate_default_constructible(allocator(), len);
       }
-      scoped_shared_storage(limb_type* limbs, std::size_t n) : data(limbs), capacity(n), allocated(0), is_alias(true) {}
-      ~scoped_shared_storage()
+      BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR scoped_shared_storage(limb_type* limbs, std::size_t n) : data(limbs), capacity(n), allocated(0), is_alias(true) {}
+      BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR ~scoped_shared_storage()
       {
          if(!is_alias)
-            allocator().deallocate(data, capacity);
+            detail::constexpr_deallocate_trivially_destructible(allocator(), data, capacity);
       }
-      limb_type* allocate(std::size_t n) noexcept 
+      BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR limb_type* allocate(std::size_t n) noexcept
       {
          limb_type* result = data + allocated;
          allocated += n;
          BOOST_MP_ASSERT(allocated <= capacity);
-         return result; 
+         return result;
       }
-      void deallocate(std::size_t n)
+      BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR void deallocate(std::size_t n)
       {
          BOOST_MP_ASSERT(n <= allocated);
          allocated -= n;
@@ -337,7 +431,7 @@ private:
          m_sign(false),
          m_internal(false),
          m_alias(true) {}
-   explicit cpp_int_base(scoped_shared_storage& data, std::size_t len) noexcept
+   explicit BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR cpp_int_base(scoped_shared_storage& data, std::size_t len) noexcept
        : m_data(data.allocate(len), len),
          m_limbs(len),
          m_sign(false),
@@ -346,14 +440,14 @@ private:
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_MP_FORCEINLINE allocator_type&       allocator() noexcept { return base_type::get(); }
-   BOOST_MP_FORCEINLINE const allocator_type& allocator() const noexcept { return base_type::get(); }
-   BOOST_MP_FORCEINLINE std::size_t              size() const noexcept { return m_limbs; }
-   BOOST_MP_FORCEINLINE limb_pointer          limbs() noexcept { return m_internal ? m_data.la : m_data.ld.data; }
-   BOOST_MP_FORCEINLINE const_limb_pointer    limbs() const noexcept { return m_internal ? m_data.la : m_data.ld.data; }
-   BOOST_MP_FORCEINLINE std::size_t              capacity() const noexcept { return m_internal ? internal_limb_count : m_data.ld.capacity; }
-   BOOST_MP_FORCEINLINE bool                  sign() const noexcept { return m_sign; }
-   void                                       sign(bool b) noexcept
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR allocator_type&       allocator() noexcept { return base_type::get(); }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR const allocator_type& allocator() const noexcept { return base_type::get(); }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR std::size_t           size() const noexcept { return m_limbs; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR limb_pointer          limbs() noexcept { return m_internal ? m_data.la : m_data.ld.data; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR const_limb_pointer    limbs() const noexcept { return m_internal ? m_data.la : m_data.ld.data; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR std::size_t           capacity() const noexcept { return m_internal ? internal_limb_count : m_data.ld.capacity; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR bool                  sign() const noexcept { return m_sign; }
+   BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR void                                       sign(bool b) noexcept
    {
       m_sign = b;
       // Check for zero value:
@@ -363,7 +457,7 @@ private:
             m_sign = false;
       }
    }
-   void resize(std::size_t new_size, std::size_t min_size)
+   BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR void resize(std::size_t new_size, std::size_t min_size)
    {
       constexpr std::size_t max_limbs = MaxBits / (CHAR_BIT * sizeof(limb_type)) + ((MaxBits % (CHAR_BIT * sizeof(limb_type))) ? 1 : 0);
       // We never resize beyond MaxSize:
@@ -378,10 +472,10 @@ private:
          BOOST_MP_ASSERT(!m_alias);
          // Allocate a new buffer and copy everything over:
          cap             = (std::min)((std::max)(cap * 4, new_size), max_limbs);
-         limb_pointer pl = allocator().allocate(cap);
-         std::memcpy(pl, limbs(), size() * sizeof(limbs()[0]));
+         limb_pointer pl = detail::constexpr_allocate_default_constructible(allocator(), cap);
+         detail::constexpr_copy(pl, limbs(), size());
          if (!m_internal && !m_alias)
-            allocator().deallocate(limbs(), capacity());
+            detail::constexpr_deallocate_trivially_destructible(allocator(), limbs(), capacity());
          else
             m_internal = false;
          m_limbs            = new_size;
@@ -393,14 +487,14 @@ private:
          m_limbs = new_size;
       }
    }
-   BOOST_MP_FORCEINLINE void normalize() noexcept
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR void normalize() noexcept
    {
       limb_pointer p = limbs();
       while ((m_limbs - 1) && !p[m_limbs - 1])
          --m_limbs;
    }
    BOOST_MP_FORCEINLINE constexpr cpp_int_base() noexcept : m_data(), m_limbs(1), m_sign(false), m_internal(true), m_alias(false){}
-   BOOST_MP_FORCEINLINE                 cpp_int_base(const cpp_int_base& o) : base_type(o), m_limbs(o.m_alias ? o.m_limbs : 0), m_sign(o.m_sign), m_internal(o.m_alias ? false : true), m_alias(o.m_alias)
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR cpp_int_base(const cpp_int_base& o) : base_type(o), m_limbs(o.m_alias ? o.m_limbs : 0), m_sign(o.m_sign), m_internal(o.m_alias ? false : true), m_alias(o.m_alias)
    {
       if (m_alias)
       {
@@ -409,16 +503,16 @@ private:
       else
       {
          resize(o.size(), o.size());
-         std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+         detail::constexpr_copy(limbs(), o.limbs(), o.size());
       }
    }
    // rvalue copy:
-   cpp_int_base(cpp_int_base&& o)
+   BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR cpp_int_base(cpp_int_base&& o)
       : base_type(static_cast<base_type&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal), m_alias(o.m_alias)
    {
       if (m_internal)
       {
-         std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+         detail::constexpr_copy(limbs(), o.limbs(), o.size());
       }
       else
       {
@@ -427,67 +521,73 @@ private:
          o.m_internal = true;
       }
    }
-   cpp_int_base& operator=(cpp_int_base&& o) noexcept
+   BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR cpp_int_base& operator=(cpp_int_base&& o) noexcept
    {
-      if (!m_internal && !m_alias)
-         allocator().deallocate(m_data.ld.data, m_data.ld.capacity);
-      *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
-      m_limbs = o.m_limbs;
-      m_sign = o.m_sign;
-      m_internal = o.m_internal;
-      m_alias = o.m_alias;
-      if (m_internal)
+      if (static_cast<const void*>(this) != static_cast<const void*>(&o))
       {
-         std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
-      }
-      else
-      {
-         m_data.ld = o.m_data.ld;
-         o.m_limbs = 0;
-         o.m_internal = true;
+         if (!m_internal && !m_alias)
+            detail::constexpr_deallocate_trivially_destructible(allocator(), m_data.ld.data, m_data.ld.capacity);
+         *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
+         m_limbs = o.m_limbs;
+         m_sign = o.m_sign;
+         m_internal = o.m_internal;
+         m_alias = o.m_alias;
+         if (m_internal)
+         {
+            detail::constexpr_copy(limbs(), o.limbs(), o.size());
+         }
+         else
+         {
+            m_data.ld = o.m_data.ld;
+            o.m_limbs = 0;
+            o.m_internal = true;
+         }
       }
       return *this;
    }
    template <std::size_t MinBits2, std::size_t MaxBits2, cpp_int_check_type Checked2>
-   cpp_int_base& operator=(cpp_int_base<MinBits2, MaxBits2, signed_magnitude, Checked2, Allocator>&& o) noexcept
+   BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR cpp_int_base& operator=(cpp_int_base<MinBits2, MaxBits2, signed_magnitude, Checked2, Allocator>&& o) noexcept
    {
-      if(o.m_internal)
+      if (static_cast<const void*>(this) != static_cast<const void*>(&o))
       {
-         m_sign = o.m_sign;
-         this->resize(o.size(), o.size());
-         std::memcpy(this->limbs(), o.limbs(), o.size() * sizeof(*(o.limbs())));
-         return *this;
+         if(o.m_internal)
+         {
+            m_sign = o.m_sign;
+            this->resize(o.size(), o.size());
+            detail::constexpr_copy(this->limbs(), o.limbs(), o.size());
+            return *this;
+         }
+         if (!m_internal && !m_alias)
+            detail::constexpr_deallocate_trivially_destructible(allocator(), m_data.ld.data, m_data.ld.capacity);
+         *static_cast<base_type*>(this) = static_cast<typename cpp_int_base<MinBits2, MaxBits2, signed_magnitude, Checked2, Allocator>::base_type&&>(o);
+         m_limbs                        = o.m_limbs;
+         m_sign                         = o.m_sign;
+         m_internal                     = o.m_internal;
+         m_alias                        = o.m_alias;
+         m_data.ld.capacity             = o.m_data.ld.capacity;
+         m_data.ld.data                 = o.limbs();
+         o.m_limbs                      = 0;
+         o.m_internal                   = true;
       }
-      if (!m_internal && !m_alias)
-         allocator().deallocate(m_data.ld.data, m_data.ld.capacity);
-      *static_cast<base_type*>(this) = static_cast<typename cpp_int_base<MinBits2, MaxBits2, signed_magnitude, Checked2, Allocator>::base_type&&>(o);
-      m_limbs                        = o.m_limbs;
-      m_sign                         = o.m_sign;
-      m_internal                     = o.m_internal;
-      m_alias                        = o.m_alias;
-      m_data.ld.capacity             = o.m_data.ld.capacity;
-      m_data.ld.data                 = o.limbs();
-      o.m_limbs                      = 0;
-      o.m_internal                   = true;
       return *this;
    }
-   BOOST_MP_FORCEINLINE ~cpp_int_base() noexcept
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR ~cpp_int_base() noexcept
    {
       if (!m_internal && !m_alias)
-         allocator().deallocate(limbs(), capacity());
+         detail::constexpr_deallocate_trivially_destructible(allocator(), limbs(), capacity());
    }
-   void assign(const cpp_int_base& o)
+   BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR void assign(const cpp_int_base& o)
    {
-      if (this != &o)
+      if (static_cast<const void*>(this) != static_cast<const void*>(&o))
       {
          static_cast<base_type&>(*this) = static_cast<const base_type&>(o);
          m_limbs                        = 0;
          resize(o.size(), o.size());
-         std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+         detail::constexpr_copy(limbs(), o.limbs(), o.size());
          m_sign = o.m_sign;
       }
    }
-   BOOST_MP_FORCEINLINE void negate() noexcept
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR void negate() noexcept
    {
       m_sign = !m_sign;
       // Check for zero value:
@@ -497,11 +597,11 @@ private:
             m_sign = false;
       }
    }
-   BOOST_MP_FORCEINLINE bool isneg() const noexcept
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR bool isneg() const noexcept
    {
       return m_sign;
    }
-   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) noexcept
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR void do_swap(cpp_int_base& o) noexcept
    {
       std::swap(m_data, o.m_data);
       std::swap(m_sign, o.m_sign);
@@ -512,7 +612,7 @@ private:
 
  protected:
    template <class A>
-   void check_in_range(const A&) noexcept {}
+   BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR void check_in_range(const A&) noexcept {}
 };
 
 template <std::size_t MinBits, std::size_t MaxBits, cpp_int_check_type Checked, class Allocator>
@@ -678,18 +778,10 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
 
    void BOOST_MP_CXX14_CONSTEXPR assign(const cpp_int_base& o) noexcept
    {
-      if (this != &o)
+      if (static_cast<const void*>(this) != static_cast<const void*>(&o))
       {
          m_limbs = o.m_limbs;
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-         if (BOOST_MP_IS_CONST_EVALUATED(m_limbs))
-         {
-            for (std::size_t i = 0; i < m_limbs; ++i)
-               limbs()[i] = o.limbs()[i];
-         }
-         else
-#endif
-            std::memcpy(limbs(), o.limbs(), o.size() * sizeof(o.limbs()[0]));
+         detail::constexpr_copy(limbs(), o.limbs(), o.size());
          m_sign = o.m_sign;
       }
    }
@@ -872,18 +964,10 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
 
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void assign(const cpp_int_base& o) noexcept
    {
-      if (this != &o)
+      if (static_cast<const void*>(this) != static_cast<const void*>(&o))
       {
          m_limbs = o.m_limbs;
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-         if (BOOST_MP_IS_CONST_EVALUATED(m_limbs))
-         {
-            for (std::size_t i = 0; i < m_limbs; ++i)
-               limbs()[i] = o.limbs()[i];
-         }
-         else
-#endif
-            std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+         detail::constexpr_copy(limbs(), o.limbs(), o.size());
       }
    }
 
@@ -1437,26 +1521,17 @@ struct cpp_int_backend
    {
       // regular non-trivial to non-trivial assign:
       this->resize(other.size(), other.size());
-
-#if !defined(BOOST_MP_HAS_IS_CONSTANT_EVALUATED) && !defined(BOOST_MP_HAS_BUILTIN_IS_CONSTANT_EVALUATED) && !defined(BOOST_NO_CXX14_CONSTEXPR)
       std::size_t count = (std::min)(other.size(), this->size());
+
+      // gcc-6 tests start failing without this check
+#     if !defined(BOOST_MP_HAS_IS_CONSTANT_EVALUATED) && !defined(BOOST_MP_HAS_BUILTIN_IS_CONSTANT_EVALUATED) && !defined(BOOST_NO_CXX14_CONSTEXPR)
       for (std::size_t i = 0; i < count; ++i)
          this->limbs()[i] = other.limbs()[i];
-#else
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-      if (BOOST_MP_IS_CONST_EVALUATED(other.size()))
-      {
-         std::size_t count = (std::min)(other.size(), this->size());
-         for (std::size_t i = 0; i < count; ++i)
-            this->limbs()[i] = other.limbs()[i];
-      }
-      else
-#endif
-      {
-         static_assert(sizeof(other.limbs()[0]) == sizeof(this->limbs()[0]), "This method requires equal limb sizes");
-         std::memcpy(this->limbs(), other.limbs(), (std::min)(other.size() * sizeof(other.limbs()[0]), this->size() * sizeof(this->limbs()[0])));
-      }
-#endif
+
+#     else
+      detail::constexpr_copy(this->limbs(), other.limbs(), count);
+#     endif
+
       this->sign(other.sign());
       this->normalize();
    }
@@ -1698,9 +1773,9 @@ public:
    }
 
  private:
-   void do_assign_string(const char* s, const std::integral_constant<bool, true>&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_string(const char* s, const std::integral_constant<bool, true>&)
    {
-      std::size_t n  = s ? std::strlen(s) : 0;
+      std::size_t n  = s ? detail::constexpr_strlen(s) : 0;
       *this          = 0;
       unsigned radix = 10;
       bool     isneg = false;
@@ -1726,7 +1801,7 @@ public:
       }
       if (n)
       {
-         unsigned val;
+         unsigned val = 0;
          while (*s)
          {
             if (*s >= '0' && *s <= '9')
@@ -1749,11 +1824,11 @@ public:
       if (isneg)
          this->negate();
    }
-   void do_assign_string(const char* s, const std::integral_constant<bool, false>&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_string(const char* s, const std::integral_constant<bool, false>&)
    {
       using default_ops::eval_add;
       using default_ops::eval_multiply;
-      std::size_t n  = s ? std::strlen(s) : 0;
+      std::size_t n  = s ? detail::constexpr_strlen(s) : 0;
       *this          = static_cast<limb_type>(0u);
       unsigned radix = 10;
       bool     isneg = false;
@@ -1789,16 +1864,16 @@ public:
          {
             while (*s == '0')
                ++s;
-            std::size_t bitcount = 4 * std::strlen(s);
-            limb_type   val;
-            std::size_t limb, shift;
+            std::size_t bitcount = 4 * detail::constexpr_strlen(s);
+            limb_type   val = 0;
+            std::size_t limb = 0, shift = 0;
             if (bitcount > 4)
                bitcount -= 4;
             else
                bitcount = 0;
             std::size_t newsize = bitcount / (sizeof(limb_type) * CHAR_BIT) + 1;
             result.resize(static_cast<unsigned>(newsize), static_cast<unsigned>(newsize)); // will throw if this is a checked integer that cannot be resized
-            std::memset(result.limbs(), 0, result.size() * sizeof(limb_type));
+            detail::constexpr_zero_trivial(result.limbs(), result.size());
             while (*s)
             {
                if (*s >= '0' && *s <= '9')
@@ -1831,16 +1906,16 @@ public:
          {
             while (*s == '0')
                ++s;
-            std::size_t bitcount = 3 * std::strlen(s);
-            limb_type   val;
-            std::size_t limb, shift;
+            std::size_t bitcount = 3 * detail::constexpr_strlen(s);
+            limb_type   val = 0;
+            std::size_t limb = 0, shift = 0;
             if (bitcount > 3)
                bitcount -= 3;
             else
                bitcount = 0;
             std::size_t newsize = bitcount / (sizeof(limb_type) * CHAR_BIT) + 1;
             result.resize(static_cast<unsigned>(newsize), static_cast<unsigned>(newsize)); // will throw if this is a checked integer that cannot be resized
-            std::memset(result.limbs(), 0, result.size() * sizeof(limb_type));
+            detail::constexpr_zero_trivial(result.limbs(), result.size());
             while (*s)
             {
                if (*s >= '0' && *s <= '7')
@@ -1892,7 +1967,7 @@ public:
                limb_type block = 0;
                for (unsigned i = 0; i < digits_per_block_10; ++i)
                {
-                  limb_type val;
+                  limb_type val = 0;
                   if (*s >= '0' && *s <= '9')
                      val = static_cast<limb_type>(*s - '0');
                   else
@@ -1922,7 +1997,7 @@ public:
    }
 
  public:
-   cpp_int_backend& operator=(const char* s)
+   BOOST_MP_CXX14_CONSTEXPR cpp_int_backend& operator=(const char* s)
    {
       do_assign_string(s, trivial_tag());
       return *this;
@@ -2157,7 +2232,7 @@ public:
       if (newsize)
       {
          this->resize(newsize, newsize); // May throw
-         std::memset(this->limbs(), 0, this->size());
+         detail::constexpr_zero_trivial(this->limbs(), this->size());
          typename Container::const_iterator i(c.begin()), j(c.end());
          std::size_t                           byte_location = static_cast<unsigned>(c.size() - 1);
          while (i != j)
