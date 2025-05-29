@@ -59,7 +59,7 @@
 [template mpf_class[] [@http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats mpf_class]]
 [template mpfr_class[] [@http://math.berkeley.edu/~wilken/code/gmpfrxx/ mpfr_class]]
 [template mpreal[] [@http://www.holoborodko.com/pavel/mpfr/ mpreal]]
-[template mpir[] [@http://mpir.org/ MPIR]]
+[template mpir[] [@https://github.com/wbhart/mpir/ MPIR]]
 [template tommath[] [@http://libtom.net libtommath]]
 [template quadmath[] [@http://gcc.gnu.org/onlinedocs/libquadmath/ libquadmath]]
 
