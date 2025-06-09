@@ -1,6 +1,6 @@
 # copyright John Maddock 2008
-# Distributed under the Boost Software License, Version 1.0. 
-# (See accompanying file LICENSE_1_0.txt or copy at 
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt.
 
 import-search /boost/config/checks ;
@@ -14,20 +14,20 @@ local mpfr_path = [ modules.peek : MPFR_PATH ] ;
 local mpfi_path = [ modules.peek : MPFI_PATH ] ;
 local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 
-project : requirements 
-   <include>$(gmp_path) 
-   <include>$(gmp_path)/mpfr 
-   <include>$(gmp_path)/gmpfrxx 
+project : requirements
+   <include>$(gmp_path)
+   <include>$(gmp_path)/mpfr
+   <include>$(gmp_path)/gmpfrxx
    <include>$(mpfr_path)
    <include>$(mpfi_path)
    <include>$(mpfi_path)/src
    <include>$(tommath_path)
-   <search>$(gmp_path) 
-   <search>$(mpfr_path) 
+   <search>$(gmp_path)
+   <search>$(mpfr_path)
    <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
-   <search>$(tommath_path) 
-   <search>$(mpfi_path) 
-   <search>$(mpfi_path)/src 
+   <search>$(tommath_path)
+   <search>$(mpfi_path)
+   <search>$(mpfi_path)/src
    # We set these to make it easier to set up and test GMP and MPFR under Win32:
    <toolset>msvc:<runtime-link>static
    <toolset>msvc:<link>static
@@ -38,13 +38,13 @@ project : requirements
    <toolset>gcc:<cxxflags>-Wextra
    ;
 
-searched-lib gmp : : <link>shared ;
-searched-lib mpfr : : <link>shared ;
-searched-lib mpfi : : <link>shared ;
-searched-lib mpc : : <link>shared ;
-searched-lib quadmath : : <link>shared ;
-searched-lib tommath : : <link>shared ;
-searched-lib f2c : : <link>shared ;
+lib gmp ;
+lib mpfr ;
+lib mpfi ;
+lib mpc ;
+lib quadmath ;
+lib tommath ;
+lib f2c ;
 
 actions mp_simple_run_action
 {

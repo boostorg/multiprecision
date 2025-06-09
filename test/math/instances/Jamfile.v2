@@ -35,10 +35,10 @@ project : requirements
    <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
    ;
 
-searched-lib gmp : : <search>$(gmp_path) ;
-searched-lib mpfr : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug ;
-searched-lib mpfi : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug <search>$(mpfi_path) <search>$(mpfi_path)/src ;
-searched-lib quadmath ;
+lib gmp : : <search>$(gmp_path) ;
+lib mpfr : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug ;
+lib mpfi : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug <search>$(mpfi_path) <search>$(mpfi_path)/src ;
+lib quadmath ;
 
 rule generate_objs ( suffix : variant_count : build_opts * )
 {

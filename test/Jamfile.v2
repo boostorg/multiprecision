@@ -94,11 +94,11 @@ project : requirements
 local enable-specfun = [ MATCH (--enable-specfun) : [ modules.peek : ARGV ] ] ;
 local disable-concepts = [ MATCH (--disable-concepts) : [ modules.peek : ARGV ] ] ;
 
-searched-lib gmp : : <search>$(gmp_path) ;
-searched-lib mpfr : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug ;
-searched-lib mpfi : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug <search>$(mpfi_path) <search>$(mpfi_path)/src ;
-searched-lib quadmath ;
-searched-lib mpc ;
+lib gmp : : <search>$(gmp_path) ;
+lib mpfr : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug ;
+lib mpfi : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug <search>$(mpfi_path) <search>$(mpfi_path)/src ;
+lib quadmath ;
+lib mpc ;
 
 if $(tommath_path)
 {
@@ -107,7 +107,7 @@ if $(tommath_path)
 }
 else
 {
-   searched-lib tommath : : <search>$(tommath_path) ;
+   lib tommath : : <search>$(tommath_path) ;
    TOMMATH = tommath ;
 }
 

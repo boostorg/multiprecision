@@ -41,10 +41,10 @@ project : requirements
    ;
 
 
-searched-lib gmp ;
-searched-lib mpfr ;
-searched-lib quadmath ;
-searched-lib f2c ;
+lib gmp ;
+lib mpfr ;
+lib quadmath ;
+lib f2c ;
 
 if $(tommath_path)
 {
@@ -52,7 +52,7 @@ if $(tommath_path)
 }
 else
 {
-   searched-lib tommath ;
+   lib tommath ;
    TOMMATH = tommath ;
 }
 
