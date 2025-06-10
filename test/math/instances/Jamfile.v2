@@ -20,7 +20,6 @@ project : requirements
    <include>$(mpfi_path)
    <include>$(mpfi_path)/src
    <include>$(tommath_path)
-   <include>../../..
    # We set these to make it easier to set up and test GMP and MPFR under Win32:
    #<toolset>msvc:<runtime-link>static
    #<toolset>msvc:<link>static

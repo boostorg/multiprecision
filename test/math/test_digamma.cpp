@@ -8,7 +8,7 @@
 #define TEST_UDT
 
 #include <boost/math/special_functions/math_fwd.hpp>
-#include "libs/math/test/test_digamma.hpp"
+#include "test_digamma.hpp"
 
 void expected_results()
 {
