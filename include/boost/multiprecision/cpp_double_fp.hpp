@@ -89,6 +89,9 @@ constexpr int eval_fpclassify(const cpp_double_fp_backend<FloatingPointType>& o)
 template <typename FloatingPointType>
 constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& o);
 
+template <typename FloatingPointType>
+constexpr void eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x, const cpp_double_fp_backend<FloatingPointType>& a);
+
 template <typename FloatingPointType,
           typename IntegralType>
 constexpr typename ::std::enable_if<::std::is_integral<IntegralType>::value, void>::type eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x, IntegralType n);
@@ -839,10 +842,17 @@ class cpp_double_fp_backend
    constexpr int compare(const cpp_double_fp_backend& other) const
    {
       // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
-      return (my_first() > other.my_first()) ?  1 : (my_first()  < other.my_first())
-                                             ? -1 : (my_second() > other.my_second())
-                                             ?  1 : (my_second() < other.my_second())
-                                             ? -1 : 0;
+      if ((cpp_df_qf_detail::ccmath::isnan)(data.first))
+      {
+        return -1;
+      }
+      else
+      {
+        return (my_first() > other.my_first()) ?  1 : (my_first()  < other.my_first())
+                                               ? -1 : (my_second() > other.my_second())
+                                               ?  1 : (my_second() < other.my_second())
+                                               ? -1 : 0;
+      }
    }
 
    std::string str(std::streamsize number_of_digits, const std::ios::fmtflags format_flags) const
@@ -1440,6 +1450,106 @@ constexpr void eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
 
    result.rep().first  = c + cc;
    result.rep().second = local_float_type { c - result.rep().first } + cc;
+}
+
+template <typename FloatingPointType>
+constexpr void eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x, const cpp_double_fp_backend<FloatingPointType>& a)
+{
+   using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+
+   constexpr double_float_type zero { 0 };
+
+   result = zero;
+
+   signed long long nll; { };
+
+   eval_convert_to(&nll, a);
+
+   const int na { static_cast<int>(nll) };
+
+   const int fpc_a { eval_fpclassify(a) };
+
+   if((fpc_a == FP_NORMAL) && (a.compare(double_float_type(na)) == 0))
+   {
+      eval_pow(result, x, na);
+   }
+   else
+   {
+      constexpr double_float_type one { 1 };
+
+      const int fpc_x { eval_fpclassify(x) };
+      const int fpc_a { eval_fpclassify(a) };
+
+      if (fpc_a == FP_ZERO)
+      {
+         // pow(base, +/-0) returns 1 for any base, even when base is NaN.
+
+         result = one;
+      }
+      else if (fpc_a == FP_NAN)
+      {
+         result = double_float_type::my_value_nan();
+      }
+      else if (fpc_x == FP_ZERO)
+      {
+         if ((fpc_a == FP_NORMAL) || (fpc_a == FP_INFINITE))
+         {
+            // pow(+/-0, exp), where exp is negative and finite, returns +infinity.
+            // pow(+/-0, exp), where exp is positive non-integer, returns +0.
+
+            // pow(+/-0, -infinity) returns +infinity.
+            // pow(+/-0, +infinity) returns +0.
+
+            result = (eval_signbit(a) ? double_float_type::my_value_inf() : zero);
+         }
+         else if (fpc_a == FP_NORMAL)
+         {
+            result = double_float_type { 0 };
+         }
+      }
+      else if (fpc_x == FP_INFINITE)
+      {
+         if ((fpc_a == FP_NORMAL) || (fpc_a == FP_INFINITE))
+         {
+            // pow(+infinity, exp) returns +0 for any negative exp.
+            // pow(-infinity, exp) returns +infinity for any positive exp.
+
+            result = (eval_signbit(a) ? zero : double_float_type::my_value_inf());
+         }
+      }
+      else if (fpc_x != FP_NORMAL)
+      {
+         result = x;
+      }
+      else
+      {
+         if (fpc_a == FP_ZERO)
+         {
+            result = one;
+         }
+         else if (fpc_a == FP_INFINITE)
+         {
+            result =
+               (
+                    (x.compare(one) == -1) ? (eval_signbit(a) ? double_float_type::my_value_inf() : zero)
+                  : (x.compare(one) == +1) ? (eval_signbit(a) ? zero : double_float_type::my_value_inf())
+                  : one
+               );
+         }
+         else
+         {
+            double_float_type log_x { };
+
+            eval_log(log_x, x);
+
+            double_float_type a_log_x { };
+
+            eval_multiply(a_log_x, a, log_x);
+
+            eval_exp(result, a_log_x);
+         }
+      }
+   }
 }
 
 template <typename FloatingPointType,
