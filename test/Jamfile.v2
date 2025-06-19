@@ -1568,17 +1568,17 @@ rule get_specfun_tests_cpp_double_double
    local result ;
    for local source in [ glob math/*.cpp ]
    {
-      result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static 
+      result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static
                math/instances//test_instances_cpp_double_double/<link>static
            : # command line
            : # input files
            : # requirements
-            [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <define>TEST_CPP_DOUBLE_FLOAT
             <define>BOOST_ALL_NO_LIB
             <toolset>msvc:<cxxflags>-bigobj
-            <include>../../math/include_private
+            <library>/boost/math//testing
             release
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
            : $(source:B)_cpp_double_double ] ;
    }
    return $(result) ;
