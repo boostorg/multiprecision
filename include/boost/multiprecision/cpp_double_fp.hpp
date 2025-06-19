@@ -1461,11 +1461,11 @@ constexpr void eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const 
 
    result = zero;
 
-   signed long long nll; { };
+   signed long long val_nll { };
 
-   eval_convert_to(&nll, a);
+   eval_convert_to(&val_nll, a);
 
-   const int na { static_cast<int>(nll) };
+   const int na { static_cast<int>(val_nll) };
 
    const int fpc_a { eval_fpclassify(a) };
 
