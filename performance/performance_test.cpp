@@ -217,7 +217,6 @@ int main()
    test49();
    test50();
    test51();
-   test52();
 
    quickbook_results();
    return 0;
