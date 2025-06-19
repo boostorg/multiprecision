@@ -1,6 +1,6 @@
 [/
-  Copyright 2021 - 2024 Fahad Syed.
-  Copyright 2024 Christopher Kormanyos.
+  Copyright 2021 - 2025 Fahad Syed.
+  Copyright 2025 Christopher Kormanyos.
 
   Distributed under the Boost Software License, Version 1.0.
   (See accompanying file LICENSE_1_0.txt or copy at
@@ -22,7 +22,7 @@
    }} // namespaces
 
 The `cpp_double_fp_backend` back-end is the sum of two IEEE floating-point numbers
-combined to create a type having rougly twice the composite width of one of its parts.
+combined to create a type having roughly twice the composite width of one of its parts.
 The `cpp_double_fp_backend` back-end is used in conjunction with `number`
 and acts as an entirely C++ header only floating-point number type.
 

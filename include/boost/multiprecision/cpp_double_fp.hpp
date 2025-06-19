@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright 2021 Fahad Syed.
+//  Copyright 2021 - 2025 Fahad Syed.
 //  Copyright 2021 - 2025 Christopher Kormanyos.
-//  Copyright 2021 Janek Kozicki.
+//  Copyright 2021 - 2025 Janek Kozicki.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -164,13 +164,13 @@ class cpp_double_fp_backend
    static_assert
    (
          cpp_df_qf_detail::is_floating_point<float_type>::value
-      && (
+      && bool
+         {
                (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits ==  24)
             || (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits ==  53)
             || (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits ==  64)
             || (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits == 113)
-         ),
-      "Error: float_type does not fulfil the backend requirements of cpp_double_fp_backend"
+         }, "Error: float_type does not fulfil the backend requirements of cpp_double_fp_backend"
    );
 
    using rep_type   = cpp_df_qf_detail::pair<float_type, float_type>;
