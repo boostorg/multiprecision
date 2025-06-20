@@ -14,6 +14,7 @@
 #include <boost/multiprecision/cpp_df_qf/cpp_df_qf_detail.hpp>
 #include <boost/multiprecision/detail/hash.hpp>
 #include <boost/multiprecision/traits/max_digits10.hpp>
+#include <boost/multiprecision/traits/std_integer_traits.hpp>
 
 #ifdef BOOST_MP_MATH_AVAILABLE
 //
@@ -270,34 +271,73 @@ class cpp_double_fp_backend
                                         &&  boost::multiprecision::detail::is_unsigned<UnsignedIntegralType>::value
                                         && (static_cast<int>(sizeof(UnsignedIntegralType) * 8u) > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(UnsignedIntegralType u)
-      : data
-        (
-           static_cast<float_type>(u),
-           static_cast<float_type>
-           (
-              static_cast<UnsignedIntegralType>
-              (
-                 u - static_cast<UnsignedIntegralType>(static_cast<float_type>(u))
-              )
-           )
-        ) { }
+   {
+      using local_unsigned_integral_type = UnsignedIntegralType;
+
+      constexpr local_unsigned_integral_type
+         flt_mask
+         {
+            static_cast<local_unsigned_integral_type>
+            (
+               static_cast<local_unsigned_integral_type>
+               (
+                  static_cast<local_unsigned_integral_type>(UINT8_C(1)) << static_cast<unsigned>(std::numeric_limits<float_type>::digits)
+               )
+               - static_cast<local_unsigned_integral_type>(UINT8_C(1))
+            )
+         };
+
+      data.second = static_cast<float_type>(0.0F);
+      data.first  = static_cast<float_type>(u & flt_mask);
+
+      int u_index { 1 };
+
+      while (u > static_cast<local_unsigned_integral_type>(UINT8_C(0)))
+      {
+         u >>= static_cast<unsigned>(std::numeric_limits<float_type>::digits);
+
+         const float_type
+            xhi
+            {
+               cpp_df_qf_detail::ccmath::ldexp
+               (
+                  static_cast<float_type>(u & flt_mask),
+                  std::numeric_limits<float_type>::digits * u_index
+               )
+            };
+
+         eval_add(*this, cpp_double_fp_backend(xhi));
+
+         ++u_index;
+      }
+   }
 
    template <typename SignedIntegralType,
              typename ::std::enable_if<(     boost::multiprecision::detail::is_integral<SignedIntegralType>::value
                                         && (!boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value)
                                         && (static_cast<int>(sizeof(SignedIntegralType) * 8u) > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(SignedIntegralType n)
-      : data
-        (
-           static_cast<float_type>(n),
-           static_cast<float_type>
-           (
-              static_cast<SignedIntegralType>
-              (
-                 n - static_cast<SignedIntegralType>(static_cast<float_type>(n))
-              )
-           )
-        ) { }
+   {
+      const bool is_neg { n < SignedIntegralType { INT8_C(0) } };
+
+      using local_unsigned_integral_type = typename boost::multiprecision::detail::make_unsigned<SignedIntegralType>::type;
+
+      const local_unsigned_integral_type
+         u_val
+         {
+            (!is_neg)
+               ? static_cast<local_unsigned_integral_type>(n)
+               : static_cast<local_unsigned_integral_type>
+                 (
+                      static_cast<local_unsigned_integral_type>(~n)
+                    + static_cast<local_unsigned_integral_type>(UINT8_C(1))
+                 )
+         };
+
+      data = cpp_double_fp_backend(u_val).data;
+
+      if(is_neg) { negate(); }
+   }
 
    constexpr cpp_double_fp_backend(const float_type& a, const float_type& b) noexcept : data(a, b) { }
 
