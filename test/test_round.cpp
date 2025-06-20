@@ -202,8 +202,6 @@ void check_modf_result(T a, T fract, U ipart)
    }
 }
 
-volatile unsigned debug { };
-
 template <class T>
 void test()
 {
@@ -211,11 +209,6 @@ void test()
 
    for (int i = 0; i < 1000; ++i)
    {
-      if (i == 615)
-      {
-         ++debug;
-      }
-
       T arg = get_random<T>();
 
       T r   = round(arg);

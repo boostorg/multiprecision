@@ -22,6 +22,10 @@ int main()
    using boost::multiprecision::cpp_double_float128;
 #endif
 
+   constexpr cpp_double_double one { 1 };
+
+   static_assert(static_cast<int>(one) == 1, "Error:constexpr-ness of cpp_double_double constructor failed");
+
    test<cpp_double_float>();
    test<cpp_double_double>();
    test<cpp_double_long_double>();

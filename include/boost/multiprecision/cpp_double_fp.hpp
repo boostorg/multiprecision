@@ -299,11 +299,8 @@ class cpp_double_fp_backend
          const float_type
             xhi
             {
-               cpp_df_qf_detail::ccmath::ldexp
-               (
-                  static_cast<float_type>(u & flt_mask),
-                  std::numeric_limits<float_type>::digits * u_index
-               )
+                 static_cast<float_type>(u & flt_mask)
+               * cpp_df_qf_detail::pow2_maker<float_type>::value(std::numeric_limits<float_type>::digits * u_index)
             };
 
          eval_add(*this, cpp_double_fp_backend(xhi));

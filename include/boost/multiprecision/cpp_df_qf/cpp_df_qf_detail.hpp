@@ -155,6 +155,15 @@ struct exact_arithmetic
    }
 };
 
+template<typename ArithmeticType>
+struct pow2_maker
+{
+   static constexpr auto value(const int power_value) noexcept -> ArithmeticType
+   {
+     return ((power_value == 0) ? ArithmeticType { 1 } : ArithmeticType { 2 } * pow2_maker<ArithmeticType>::value(power_value - 1));
+   }
+};
+
 } } } } // namespace boost::multiprecision::backends::cpp_df_qf_detail
 
 #endif // BOOST_MP_CPP_DF_QF_DETAIL_2023_01_02_HPP
