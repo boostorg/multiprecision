@@ -175,7 +175,17 @@ void check_modf_result(T a, T fract, U ipart)
 
    const T sum { fract + ipart };
 
+   #if defined(TEST_CPP_DOUBLE_FLOAT)
+   const T ratio { sum / a };
+
+   const T delta { fabs(1 - ratio) };
+   #endif
+
+   #if defined(TEST_CPP_DOUBLE_FLOAT)
+   if(delta > std::numeric_limits<T>::epsilon())
+   #else
    if (sum != a)
+   #endif
    {
       BOOST_ERROR("Fractional and integer results do not add up to the original value");
       std::cerr << "Values were: " << std::setprecision(35) << " "
@@ -207,9 +217,11 @@ void test()
 {
    BOOST_MATH_STD_USING
 
-   for (int i = 0; i < 1000; ++i)
+   for (int index = 0; index < 1000; ++index)
    {
-      T arg = get_random<T>();
+      static_cast<void>(index);
+
+      const T arg { get_random<T>() };
 
       T r   = round(arg);
       check_within_half(arg, r);
@@ -219,22 +231,18 @@ void test()
       BOOST_TEST(r == trunc(arg + 0));
 
       T frac = modf(arg, &r);
-      #if !defined(TEST_CPP_DOUBLE_FLOAT)
       check_modf_result(arg, frac, r);
-      #endif
 
       if (abs(r) < (std::numeric_limits<int>::max)())
       {
-         int i = iround(arg);
-         check_within_half(arg, i);
-         BOOST_TEST(i == iround(arg + 0));
-         i = itrunc(arg);
-         check_trunc_result(arg, i);
-         BOOST_TEST(i == itrunc(arg + 0));
-         r = modf(arg, &i);
-         #if !defined(TEST_CPP_DOUBLE_FLOAT)
-         check_modf_result(arg, r, i);
-         #endif
+         int irnd = iround(arg);
+         check_within_half(arg, irnd);
+         BOOST_TEST(irnd == iround(arg + 0));
+         irnd = itrunc(arg);
+         check_trunc_result(arg, irnd);
+         BOOST_TEST(irnd == itrunc(arg + 0));
+         r = modf(arg, &irnd);
+         check_modf_result(arg, r, irnd);
       }
 
       if (abs(r) < (std::numeric_limits<long>::max)())
@@ -246,9 +254,7 @@ void test()
          check_trunc_result(arg, l);
          BOOST_TEST(l == ltrunc(arg + 0));
          r = modf(arg, &l);
-         #if !defined(TEST_CPP_DOUBLE_FLOAT)
          check_modf_result(arg, r, l);
-         #endif
       }
 
 #if defined(BOOST_HAS_LONG_LONG)
@@ -261,9 +267,7 @@ void test()
          check_trunc_result(arg, ll);
          BOOST_TEST(ll == lltrunc(arg + 0));
          r = modf(arg, &ll);
-         #if !defined(TEST_CPP_DOUBLE_FLOAT)
          check_modf_result(arg, r, ll);
-         #endif
       }
 #endif
    }
