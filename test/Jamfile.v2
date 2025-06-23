@@ -225,6 +225,8 @@ test-suite arithmetic_tests :
    [ run test_complex_signed_zero.cpp : : : <define>TEST_CPP_BIN_FLOAT [ requires cxx17_if_constexpr ] : test_complex_signed_zero_cpp_bin_float ]
    [ run test_complex_signed_zero.cpp mpc mpfr gmp : : : <define>TEST_MPC [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpc : : <build>no ] : test_complex_signed_zero_mpc ]
 
+   [ run test_complex_class.cpp ]
+
    [ run test_preserve_source_precision.cpp gmp : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_gmp : : <build>no ] <define>TEST_MPF : test_preserve_source_precision_gmp ]
    [ run test_preserve_source_precision.cpp gmp mpfr : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPFR  : test_preserve_source_precision_mpfr ]
    [ run test_preserve_source_precision.cpp gmp mpfr mpc : : : [ requires cxx17_if_constexpr ] [ check-target-builds ../config//has_mpc : : <build>no ] <define>TEST_MPC : test_preserve_source_precision_mpc ]
@@ -1270,6 +1272,7 @@ test-suite misc :
       # Eigen interoperability:
       #
       [ run test_eigen_interop_cpp_int.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
+      [ run boost_math_issue_1131.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
       [ run test_eigen_interop_cpp_dec_float.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
       [ run test_eigen_interop_cpp_dec_float_2.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
       [ run test_eigen_interop_cpp_dec_float_3.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
