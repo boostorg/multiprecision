@@ -248,6 +248,7 @@ void test()
       if (abs(r) < (std::numeric_limits<long>::max)())
       {
          long l = lround(arg);
+         std::cerr << "Error at this spot hint: what is going on here?" << std::endl;
          check_within_half(arg, l);
          BOOST_TEST(l == lround(arg + 0));
          l = ltrunc(arg);
@@ -261,6 +262,7 @@ void test()
       if (abs(r) < (std::numeric_limits<long long>::max)())
       {
          long long ll = llround(arg);
+         std::cerr << "Error at this spot hint: what is going on here?" << std::endl;
          check_within_half(arg, ll);
          BOOST_TEST(ll == llround(arg + 0));
          ll = lltrunc(arg);
