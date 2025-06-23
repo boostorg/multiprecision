@@ -302,11 +302,10 @@ rule get_function_tests
               : # requirements
                <define>TEST_CPP_BIN_FLOAT
               : $(source:B)_cpp_bin_float ] ;
-         result += [ run $(source) quadmath no_eh_support
+         result += [ run $(source) no_eh_support
               : # command line
               : # input files
               : # requirements
-               [ check-target-builds ../config//has_float128 : : <build>no ]
                <define>TEST_CPP_DOUBLE_FLOAT
               : $(source:B)_cpp_double_fp ] ;
          result += [ run $(source) quadmath no_eh_support
@@ -326,26 +325,6 @@ rule get_function_tests
    }
    return $(result) ;
 }
-
-rule get_function_tests_df_gnu
-{
-   local result ;
-   for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp
-   {
-         result += [ run $(source) quadmath
-              : # command line
-              : # input files
-              : # requirements
-               <define>TEST_CPP_DOUBLE_FLOAT
-              : $(source:B)_cpp_double_fp_df_gnu ] ;
-   }
-   return $(result) ;
-}
-
-test-suite functions_df_gnu :
-
-      [ get_function_tests_df_gnu ]
-;
 
 test-suite functions_and_limits :
 
@@ -418,12 +397,11 @@ test-suite functions_and_limits :
               <define>TEST_CPP_BIN_FLOAT <define>PRINT_MAX_DIGITS10
               : test_numeric_limits_cpp_bin_float ]
 
-      [ run test_numeric_limits.cpp quadmath no_eh_support
+      [ run test_numeric_limits.cpp no_eh_support
               : # command line
               : # input files
               : # requirements
               <define>TEST_CPP_DOUBLE_FLOAT <define>PRINT_MAX_DIGITS10
-               [ check-target-builds ../config//has_float128 : : <build>no ]
               : test_numeric_limits_cpp_double_fp ]
 
       [ run test_numeric_limits.cpp $(TOMMATH) no_eh_support
@@ -1579,7 +1557,6 @@ rule get_specfun_tests_cpp_double_double
             <toolset>msvc:<cxxflags>-bigobj
             <library>/boost/math//testing
             release
-            [ check-target-builds ../config//has_float128 : <source>quadmath ]
            : $(source:B)_cpp_double_double ] ;
    }
    return $(result) ;
