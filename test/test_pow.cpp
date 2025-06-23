@@ -120,7 +120,7 @@ void test()
       BOOST_CHECK_EQUAL(pow(T(1.25F), -std::numeric_limits<T>::infinity()), T(0));
    }
 
-   BOOST_IF_CONSTEXPR(std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_quiet_NaN)
+   BOOST_IF_CONSTEXPR((!boost::multiprecision::is_interval_number<T>::value) && std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_quiet_NaN)
    {
       BOOST_CHECK((boost::math::isnan)(pow(T(1.25F), std::numeric_limits<T>::quiet_NaN())));
 
