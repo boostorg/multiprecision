@@ -16,6 +16,7 @@
 #include <test.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
@@ -37,27 +38,35 @@
 #endif
 
 #if defined(TEST_MPF_50)
+#include "test_pow_data.hpp"
 #include <boost/multiprecision/gmp.hpp>
 #endif
 #if defined(TEST_MPFR_50)
+#include "test_pow_data.hpp"
 #include <boost/multiprecision/mpfr.hpp>
 #endif
 #if defined(TEST_MPFI_50)
+#include "test_pow_data.hpp"
 #include <boost/multiprecision/mpfi.hpp>
 #endif
 #ifdef TEST_BACKEND
+#include "test_pow_data.hpp"
 #include <boost/multiprecision/concepts/mp_number_archetypes.hpp>
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
+#include "test_pow_data.hpp"
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
 #ifdef TEST_FLOAT128
+#include "test_pow_data.hpp"
 #include <boost/multiprecision/float128.hpp>
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
+#include "test_pow_data.hpp"
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
+#include "test_pow_data_df.hpp"
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
@@ -113,13 +122,11 @@ void test()
 
    BOOST_IF_CONSTEXPR(std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_quiet_NaN)
    {
-      using std::isnan;
-
-      BOOST_CHECK((isnan)(pow(T(1.25F), std::numeric_limits<T>::quiet_NaN())));
+      BOOST_CHECK((boost::math::isnan)(pow(T(1.25F), std::numeric_limits<T>::quiet_NaN())));
 
       BOOST_CHECK_EQUAL(pow(std::numeric_limits<T>::quiet_NaN(), T(0)), T(1));
 
-      BOOST_CHECK((isnan)(pow(std::numeric_limits<T>::quiet_NaN(), T(1.25F))));
+      BOOST_CHECK((boost::math::isnan)(pow(std::numeric_limits<T>::quiet_NaN(), T(1.25F))));
    }
 
    if (!boost::multiprecision::is_interval_number<T>::value)
