@@ -1,0 +1,134 @@
+[/
+  Copyright Nick Thompson, 2020
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]
+
+[section:pslq PSLQ]
+
+    #include <boost/multiprecision/pslq.hpp>
+    namespace boost::multiprecision {
+
+    template<typename Real>
+    std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_solution_norm, std::ostream& = std::cout);
+
+    template<typename Real>
+    bool is_algebraic(std::pair<Real, std::string> const & x, Real max_acceptable_solution_norm, std::ostream& = std::cout);
+
+    template<typename Real>
+    std::string identify(std::pair<Real, std::string> const & x, Real max_acceptable_solution_norm, std::ostream& = std::cout);
+    }
+
+The PSLQ algorithm takes a list /x/ ∈ℝ[super n] of interesting constants, e.g., π, the Euler-Mascheroni constant γ, or the golden ration φ, and determines if there is an /integer relation/ between them.
+By this we mean a list of integers /m/ ∈ℤ[super n], not all zero, such that /m⋅x/ = 0.
+It is not obvious from this definition what the utility of the algorithm is, so let's examine an [@https://www.davidhbailey.com/dhbpapers/pslq-cse.pdf identity discovered by this method:]
+
+[$../equations/pslq_success.svg]
+
+Let's use the Boost implementation to rediscover this relation:
+
+    using Real = cpp_bin_float_100;
+    std::map<Real, std::string> m;
+    m.emplace_back("0.0965512", "β");
+    auto pi = boost::math::constants::pi<Real>();
+    m.emplace_back(pow(pi,6), "π⁶");
+    auto z3 = boost::math::constants::zeta_three<Real>();
+    m.emplace_back(z3*z3, "ζ(3)²");
+    std::string msg = pslq(m, 1e10);
+
+    std::cout << msg << "\n";
+
+We agonized over how to properly communicate this result, and in the end decided to just communicate the success or failure with a human-readable string.
+Should you find a novel relation with `pslq`, it occupies the status of a major event-taking the time to read it should be perfectly acceptable.
+Of course, if this is to be used in unanticipated ways, there is a lower-level API which gives machine readable status codes.
+
+If PSLQ fails to find a relation in a given dictionary, this is not proof of non-existence.
+However, if a relation exists and PSLQ cannot find it, a lower bound on the 2-norm of /m/ is returned.
+In this way, PSLQ can allow us to make statements like "π/e is probably not a rational number, because if π/e=p/q, then PSLQ shows that /p/[super 2] + /q/[super 2] > 10[super 200]."
+
+Conversely, if PSLQ finds an integer relation, that is not proof the relation is real.
+In a large dictionary with each term computed to very low precision, it is easy to produce spurious relations.
+This is why multiprecision is required:
+If the dictionary has length /n/ and we want to find relations whose entries have height at most /d/, then we must compute the entries in our dictionary to /nd/ digits of precision.
+/Try to make sure that every digit in the Real type you provide is correct!/
+If you only know the elements of the dictionary to double precision, do not upcast them to a multiprecision type.
+This breaks various invariants used internally and makes it more likely that you will recover spurious relations.
+
+Even though PSLQ does not produce proofs, pessimism is unwarranted: PSLQ is a tool for discovery, not proof.
+In addition, /verifying/ a suspected relation is much less computationally difficult than discovering it, so once a relation is found, we can compute the relevant terms of the dictionary to much higher precision to give additional evidence for the relation, and then search for a formal proof.
+
+Astute readers will notice that our example requires a very auspicious guess about the form the relation takes.
+If we didn't know that β was somehow related to π⁶ and ζ(3)², we would've never found it.
+This is a general property of the PSLQ algorithm:
+As its runtime scales quartically in the length of the dictionary, having a hunch about the form the relation will take is necessary.
+
+That said, simple modifications of the inputs allow us to recover different classes of relations.
+Let's use the Basel problem as an example:
+
+[$../equations/basel_problem.svg]
+
+As stated, PSLQ cannot recover this relation unless π² is in the dictionary, which is kinda cheating.
+However, we can take logarithms to obtain
+
+[$../equations/ln_basel_problem.svg]
+
+This shows how to recover multiplicative relations: Include the logarithms of small primes and logarithms of suspected terms in the dictionary.
+
+PSLQ can also determine if a number is algebraic.
+A number is algebraic iff it is the root of a polynomial with integer coefficients.
+If we suspect a number α is algebraic, we can apply PSLQ to the vector
+
+[$../equations/algebraic.svg]
+
+and if it is indeed algebraic with reasonable sized polynomial coefficients, then PSLQ will find it.
+Communicating this idea has a somewhat different format than vanilla `pslq`, and hence we have provided a wrapper `is_algebraic` for precisely this purpose.
+
+Quartically scaling algorithms are rare, and users generally have little experience with them.
+It is easy to construct a PSLQ dictionary that induces a computation lasting a few thousand years.
+Hence we have defaulted to printing a progress bar to the terminal.
+
+
+    [======>                                                                ] 10%, iteration 2000/20000, \u2016 m\u2016\u2082\u2265308, ETA:1.145 days
+
+
+The progress bar is to be read as follows: The algorithm will complete in 20000 iterations.
+At the time, it has proven that there are no integer relations with norm less that 308.
+Under the assumption there are no integer relations, the algorithm will complete the demonstration that there are no integer solutions with norm less that `max_acceptable_solution_norm` in 1.145 days.
+(If there are solutions, then they are found at essentially a random time.)
+If the ETA is unacceptably high, note that you don't need to cancel the job.
+You can stop it at any time and the 2-norm bound at the stop time still provides useful information.
+
+The progress bar is very useful, but in some cases it is not helpful (say, during unit tests).
+We can silence the progress bar via by passing a `std::ostream` with the badbit set:
+
+    std::ofstream ofs;
+    ofs.setstate(std::ios_base::badbit);
+    std::string s = boost::multiprecision::pslq(m, max_acceptable_norm_bound, ofs);
+
+Communication of the result is done via strings both decimal strings and unicode characters.
+We have attempted to maintain standard notation for the constants provided in the standard PSLQ dictionary, but if you can't determine the notation, all the constants can be looked up in the Online Encyclopedia of Integer Sequences.
+
+As an example, let's analyze the extreme value skewness:
+The C++ code is
+
+    s = identify(extreme_value_skewness<Real>(), "extreme_value_skewness", Real(1e10));
+    if (!s.empty())
+    {
+        std::cout << s << "\n";
+    }
+    else
+    {
+        std::cout << "No relations found.\n";
+    }
+
+and the output is
+
+    As
+        -2⋅0.130631 + 2⋅0.184034 + 5⋅0.693147 + 3⋅1.09861 - 6⋅1.14473 = 1.90276e-1000,
+    it is likely that
+        -2⋅ln(extreme_value_skewness) + 2⋅ln(ζ(3)) + 5⋅ln(2) + 3⋅ln(3) - 6⋅ln(π) = 0.
+
+We can collect the logarithms to find the correct relation.
+
+[endsect]
