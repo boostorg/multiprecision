@@ -20,7 +20,8 @@ namespace detail {
 template <class T>
 constexpr auto fma_impl(T x, T y, T z) noexcept -> T
 {
-   // Default to the written-out operations.
+   // Default to the written-out operations ...
+   // ... and hope the compiler chooses FMA if available).
 
    return (x * y) + z;
 }

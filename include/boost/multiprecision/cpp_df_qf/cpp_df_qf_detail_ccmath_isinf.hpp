@@ -13,7 +13,7 @@
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail { namespace ccmath {
 
 template <typename FloatingPointType>
-constexpr bool isinf(FloatingPointType x) noexcept
+constexpr auto isinf(FloatingPointType x) noexcept -> bool
 {
    return (   ( x == cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::infinity())
            || (-x == cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::infinity()));

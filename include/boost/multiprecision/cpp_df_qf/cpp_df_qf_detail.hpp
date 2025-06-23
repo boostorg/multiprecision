@@ -112,8 +112,8 @@ public:
 template <typename FloatingPointType>
 struct exact_arithmetic
 {
-   // The exact_arithmetic<> struct implements extended precision
-   // techniques that are used in cpp_double_fp_backend and cpp_quad_float.
+   // The exact_arithmetic<> struct implements a few extended
+   // precision algorithms that are used in cpp_double_fp_backend.
 
    static_assert(is_floating_point<FloatingPointType>::value, "Error: exact_arithmetic<> invoked with unknown floating-point type");
 
