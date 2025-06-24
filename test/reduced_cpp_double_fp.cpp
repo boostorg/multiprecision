@@ -1,0 +1,133 @@
+
+#include <boost/core/lightweight_test.hpp>
+#include <boost/multiprecision/cpp_double_fp.hpp>
+#include <boost/math/special_functions/round.hpp>
+#include <boost/math/special_functions/trunc.hpp>
+#include <boost/math/special_functions/modf.hpp>
+#include <boost/math/special_functions/sign.hpp>
+#include <limits>
+#include <type_traits>
+#include <random>
+
+template <class T, class U>
+typename std::enable_if<!boost::multiprecision::is_interval_number<T>::value>::type check_within_half(T a, U u)
+{
+   BOOST_MATH_STD_USING
+   const auto fabs_res {fabs(a - u)};
+   if (fabs_res > 0.5f)
+   {
+      BOOST_ERROR("Rounded result differed by more than 0.5 from the original");
+      std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
+                << std::left << a << u << std::endl;
+   }
+   if ((fabs(a - u) == 0.5f) && (fabs(static_cast<T>(u)) < fabs(a)))
+   {
+      BOOST_ERROR("Rounded result was towards zero with boost::round");
+      std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
+                << std::left << a << u << std::endl;
+   }
+}
+template <class T, class U>
+typename std::enable_if<boost::multiprecision::is_interval_number<T>::value>::type check_within_half(T a, U u)
+{
+   BOOST_MATH_STD_USING
+   if (upper(T(fabs(a - u))) > 0.5f)
+   {
+      BOOST_ERROR("Rounded result differed by more than 0.5 from the original");
+      std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
+                << std::left << a << u << std::endl;
+   }
+   if ((upper(T(fabs(a - u))) == 0.5f) && (fabs(static_cast<T>(u)) < fabs(a)))
+   {
+      BOOST_ERROR("Rounded result was towards zero with boost::round");
+      std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
+                << std::left << a << u << std::endl;
+   }
+}
+
+//
+// We may not have an abs overload for long long so provide a fall back:
+//
+inline unsigned safe_abs(int const& v)
+{
+   return v < 0 ? static_cast<unsigned>(1u) + static_cast<unsigned>(-(v + 1)) : v;
+}
+inline unsigned long safe_abs(long const& v)
+{
+   return v < 0 ? static_cast<unsigned long>(1u) + static_cast<unsigned long>(-(v + 1)) : v;
+}
+inline unsigned long long safe_abs(long long const& v)
+{
+   return v < 0 ? static_cast<unsigned long long>(1u) + static_cast<unsigned long long>(-(v + 1)) : v;
+}
+template <class T>
+inline typename std::enable_if<!boost::multiprecision::detail::is_integral<T>::value, T>::type safe_abs(T const& v)
+{
+   return v < 0 ? -v : v;
+}
+
+template <class T, class U>
+void check_trunc_result(T a, U u)
+{
+   BOOST_MATH_STD_USING
+   if (fabs(a - u) >= 1)
+   {
+      BOOST_ERROR("Rounded result differed by more than 1 from the original");
+      std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
+                << std::left << a << u << std::endl;
+   }
+   if (abs(a) < safe_abs(u))
+   {
+      BOOST_ERROR("Truncated result had larger absolute value than the original");
+      std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
+                << std::left << abs(a) << safe_abs(u) << std::endl;
+   }
+   if (fabs(static_cast<T>(u)) > fabs(a))
+   {
+      BOOST_ERROR("Rounded result was away from zero with boost::trunc");
+      std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
+                << std::left << a << u << std::endl;
+   }
+}
+
+template <typename T>
+void test()
+{
+    if (std::numeric_limits<T>::digits >= std::numeric_limits<long>::digits)
+    {
+        const auto lhs = static_cast<T>((std::numeric_limits<long>::max)());
+        long k = lround(lhs);
+        check_within_half(lhs, k);
+        BOOST_TEST(k == lround(static_cast<T>((std::numeric_limits<long>::max)()) + 0));
+        k = lround(static_cast<T>((std::numeric_limits<long>::min)()));
+        check_within_half(static_cast<T>((std::numeric_limits<long>::min)()), k);
+        BOOST_TEST(k == lround(static_cast<T>((std::numeric_limits<long>::min)()) + 0));
+        k = ltrunc(static_cast<T>((std::numeric_limits<long>::max)()));
+        check_trunc_result(static_cast<T>((std::numeric_limits<long>::max)()), k);
+        BOOST_TEST(k == ltrunc(static_cast<T>((std::numeric_limits<long>::max)()) + 0));
+        k = ltrunc(static_cast<T>((std::numeric_limits<long>::min)()));
+        check_trunc_result(static_cast<T>((std::numeric_limits<long>::min)()), k);
+        BOOST_TEST(k == ltrunc(static_cast<T>((std::numeric_limits<long>::min)()) + 0));
+
+        k = lround(static_cast<T>((std::numeric_limits<long>::max)() - 1));
+        check_within_half(static_cast<T>((std::numeric_limits<long>::max)() - 1), k);
+        k = lround(static_cast<T>((std::numeric_limits<long>::min)() + 1));
+        check_within_half(static_cast<T>((std::numeric_limits<long>::min)() + 1), k);
+        k = ltrunc(static_cast<T>((std::numeric_limits<long>::max)() - 1));
+        check_trunc_result(static_cast<T>((std::numeric_limits<long>::max)() - 1), k);
+        k = ltrunc(static_cast<T>((std::numeric_limits<long>::min)() + 1));
+        check_trunc_result(static_cast<T>((std::numeric_limits<long>::min)() + 1), k);
+    }
+}
+
+int main()
+{
+   test<boost::multiprecision::cpp_double_float>();
+   test<boost::multiprecision::cpp_double_double>();
+   BOOST_IF_CONSTEXPR (sizeof(double) != sizeof(long double))
+   {
+      test<boost::multiprecision::cpp_double_long_double>();
+   }
+
+   return boost::report_errors();
+}
