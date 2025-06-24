@@ -24,6 +24,7 @@
 #include <limits>
 #include <random>
 #include <string>
+#include <typeinfo>
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -1160,6 +1161,8 @@ auto main() -> int
   {
     using float_type = boost::multiprecision::cpp_double_float;
 
+    std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
+
     static_cast<void>(local::test_edges<float_type>());
     static_cast<void>(local::test_edges_extra<float_type>());
     local::test_sqrt_edge<float_type>();
@@ -1170,6 +1173,8 @@ auto main() -> int
 
   {
     using float_type = boost::multiprecision::cpp_double_double;
+
+    std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
 
     static_cast<void>(local::test_edges<float_type>());
     static_cast<void>(local::test_edges_extra<float_type>());
@@ -1182,6 +1187,8 @@ auto main() -> int
   {
     using float_type = boost::multiprecision::cpp_double_long_double;
 
+    std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
+
     static_cast<void>(local::test_edges<float_type>());
     static_cast<void>(local::test_edges_extra<float_type>());
     local::test_sqrt_edge<float_type>();
@@ -1189,12 +1196,30 @@ auto main() -> int
     local::test_log_edge<float_type>();
     local::test_pow_n_edge<float_type>();
   }
-  #endif
+
+  #if defined(BOOST_HAS_FLOAT128)
+  {
+    using float_type = boost::multiprecision::cpp_double_float128;
+
+    std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
+
+    static_cast<void>(local::test_edges<float_type>());
+    static_cast<void>(local::test_edges_extra<float_type>());
+    local::test_sqrt_edge<float_type>();
+    local::test_exp_edge<float_type>();
+    local::test_log_edge<float_type>();
+    local::test_pow_n_edge<float_type>();
+  }
+  #endif // BOOST_HAS_FLOAT128
+
+  #endif // TEST_CPP_DOUBLE_FLOAT
 
   {
     using float_backend_type = boost::multiprecision::cpp_bin_float<106, boost::multiprecision::digit_base_2, void, int, -1021, +1024>;
 
     using float_type = boost::multiprecision::number<float_backend_type, boost::multiprecision::et_off>;
+
+    std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
 
     static_cast<void>(local::test_edges<float_type>());
     local::test_sqrt_edge<float_type>();

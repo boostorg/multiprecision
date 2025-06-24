@@ -1558,7 +1558,7 @@ constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const 
    {
       // pow(base, +/-0) returns 1 for any base, even when base is NaN.
 
-      result = double_float_type { unsigned { UINT8_C(1) } };
+      result = double_float_type(unsigned { UINT8_C(1) });
    }
    else if (fpc != FP_NORMAL)
    {
@@ -2134,49 +2134,47 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
    else
    {
       using double_float_type = cpp_double_fp_backend<FloatingPointType>;
-      using local_float_type = typename double_float_type::float_type;
-
-      constexpr signed long long my_max_val { (std::numeric_limits<signed long long>::max)() };
-      constexpr signed long long my_min_val { (std::numeric_limits<signed long long>::min)() };
+      using local_float_type =  typename double_float_type::float_type;
 
       constexpr bool
          long_long_is_longer
          {
-            std::numeric_limits<signed long long>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits
+            (std::numeric_limits<signed long long>::digits > cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits)
          };
 
-      using c_type = typename std::conditional<long_long_is_longer, signed long long, local_float_type>::type;
+      using common_type = typename ::std::conditional<long_long_is_longer, signed long long, local_float_type>::type;
 
-      constexpr c_type my_max { static_cast<c_type>(my_max_val) };
-      constexpr c_type my_min { static_cast<c_type>(my_min_val) };
+      constexpr common_type my_max_val { static_cast<common_type>((std::numeric_limits<signed long long>::max)()) };
+      constexpr common_type my_min_val { static_cast<common_type>((std::numeric_limits<signed long long>::min)()) };
 
-      const c_type ct { static_cast<c_type>(backend.crep().first) };
+      constexpr double_float_type my_max_val_dd { static_cast<double_float_type>(my_max_val) };
+      constexpr double_float_type my_min_val_dd { static_cast<double_float_type>(my_min_val) };
 
-      if (ct >= my_max)
+      if (backend.compare(my_max_val_dd) >= 0)
       {
          *result = my_max_val;
       }
-      else if (ct < my_min)
+      else if (backend.compare(my_min_val_dd) <= 0)
       {
          *result = my_min_val;
       }
       else
       {
-         *result = 0;
-
-         unsigned fail_safe { UINT8_C(32) };
-
          double_float_type source { backend };
 
-         constexpr double_float_type zero { UINT8_C(0) };
+         *result = 0;
 
-         while ((source.compare(zero) != 0) && (fail_safe > unsigned { UINT8_C(0) }))
+         unsigned fail_safe { UINT32_C(32) };
+
+         constexpr double_float_type zero { 0 };
+
+         while((source.compare(zero) != 0) && (fail_safe > unsigned { UINT8_C(0) }))
          {
-            const float flt_val { static_cast<float>(source.my_first()) };
+            const float next { static_cast<float>(source.my_first()) };
 
-            *result += static_cast<signed long long>(flt_val);
+            *result += static_cast<signed long long>(next);
 
-            source -= flt_val;
+            eval_subtract(source, double_float_type(next));
 
             --fail_safe;
          }
