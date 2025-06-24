@@ -1552,6 +1552,7 @@ rule get_specfun_tests_cpp_double_double
            : # command line
            : # input files
            : # requirements
+           [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <define>TEST_CPP_DOUBLE_FLOAT
             <define>BOOST_ALL_NO_LIB
             <toolset>msvc:<cxxflags>-bigobj
