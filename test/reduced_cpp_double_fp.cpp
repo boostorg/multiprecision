@@ -130,10 +130,7 @@ int main()
 {
    test<boost::multiprecision::cpp_double_float>();
    test<boost::multiprecision::cpp_double_double>();
-   BOOST_IF_CONSTEXPR (sizeof(double) != sizeof(long double))
-   {
       test<boost::multiprecision::cpp_double_long_double>();
-   }
 
    return boost::report_errors();
 }
