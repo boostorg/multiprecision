@@ -2130,50 +2130,55 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
    if (fpc != FP_NORMAL)
    {
       *result = static_cast<signed long long>(backend.crep().first);
-
-      return;
-   }
-
-   constexpr signed long long my_max_val { (std::numeric_limits<signed long long>::max)() };
-   constexpr signed long long my_min_val { (std::numeric_limits<signed long long>::min)() };
-
-   using c_type = typename std::common_type<signed long long, FloatingPointType>::type;
-
-   constexpr c_type my_max { static_cast<c_type>(my_max_val) };
-   constexpr c_type my_min { static_cast<c_type>(my_min_val) };
-
-   const c_type ct { static_cast<c_type>(backend.crep().first) };
-
-   if (ct > my_max)
-   {
-      *result = my_max_val;
-   }
-   else if (ct < my_min)
-   {
-      *result = my_min_val;
    }
    else
    {
-      BOOST_IF_CONSTEXPR(std::numeric_limits<signed long long>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
+      using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+      using local_float_type = typename double_float_type::float_type;
+
+      constexpr signed long long my_max_val { (std::numeric_limits<signed long long>::max)() };
+      constexpr signed long long my_min_val { (std::numeric_limits<signed long long>::min)() };
+
+      constexpr bool
+         long_long_is_longer
+         {
+            std::numeric_limits<signed long long>::digits >= cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits
+         };
+
+      using c_type = typename std::conditional<long_long_is_longer, signed long long, local_float_type>::type;
+
+      constexpr c_type my_max { static_cast<c_type>(my_max_val) };
+      constexpr c_type my_min { static_cast<c_type>(my_min_val) };
+
+      const c_type ct { static_cast<c_type>(backend.crep().first) };
+
+      if (ct >= my_max)
       {
-         *result  = static_cast<signed long long>(backend.crep().first);
-         *result += static_cast<signed long long>(backend.crep().second);
+         *result = my_max_val;
+      }
+      else if (ct < my_min)
+      {
+         *result = my_min_val;
       }
       else
       {
-         cpp_double_fp_backend<FloatingPointType> source = backend;
-
          *result = 0;
 
-         for(auto digit_count  = 0;
-                  digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
-                  digit_count += std::numeric_limits<signed long long>::digits)
+         unsigned fail_safe { UINT8_C(32) };
+
+         double_float_type source { backend };
+
+         constexpr double_float_type zero { UINT8_C(0) };
+
+         while ((source.compare(zero) != 0) && (fail_safe > unsigned { UINT8_C(0) }))
          {
-            const auto next = static_cast<signed long long>(source.crep().first);
+            const float flt_val { static_cast<float>(source.my_first()) };
 
-            *result += next;
+            *result += static_cast<signed long long>(flt_val);
 
-            eval_subtract(source, cpp_double_fp_backend<FloatingPointType>(next));
+            source -= flt_val;
+
+            --fail_safe;
          }
       }
    }

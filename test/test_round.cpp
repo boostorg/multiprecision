@@ -8,13 +8,16 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
+#include <test.hpp>
+
 #include <boost/detail/lightweight_test.hpp>
-#include <boost/math/special_functions/round.hpp>
-#include <boost/math/special_functions/trunc.hpp>
 #include <boost/math/special_functions/modf.hpp>
+#include <boost/math/special_functions/round.hpp>
 #include <boost/math/special_functions/sign.hpp>
+#include <boost/math/special_functions/trunc.hpp>
 #include <boost/random/mersenne_twister.hpp>
-#include "test.hpp"
+
+#include <typeinfo>
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
@@ -92,6 +95,7 @@ template <class T, class U>
 typename std::enable_if<!boost::multiprecision::is_interval_number<T>::value>::type check_within_half(T a, U u)
 {
    BOOST_MATH_STD_USING
+
    if (fabs(a - u) > 0.5f)
    {
       BOOST_ERROR("Rounded result differed by more than 0.5 from the original");
@@ -148,18 +152,21 @@ template <class T, class U>
 void check_trunc_result(T a, U u)
 {
    BOOST_MATH_STD_USING
+
    if (fabs(a - u) >= 1)
    {
       BOOST_ERROR("Rounded result differed by more than 1 from the original");
       std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
                 << std::left << a << u << std::endl;
    }
+
    if (abs(a) < safe_abs(u))
    {
       BOOST_ERROR("Truncated result had larger absolute value than the original");
       std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
                 << std::left << abs(a) << safe_abs(u) << std::endl;
    }
+
    if (fabs(static_cast<T>(u)) > fabs(a))
    {
       BOOST_ERROR("Rounded result was away from zero with boost::trunc");
@@ -215,6 +222,8 @@ void check_modf_result(T a, T fract, U ipart)
 template <class T>
 void test()
 {
+   std::cout << "Testing type: " << typeid(T).name() << std::endl;
+
    BOOST_MATH_STD_USING
 
    for (int index = 0; index < 1000; ++index)
@@ -248,7 +257,6 @@ void test()
       if (abs(r) < (std::numeric_limits<long>::max)())
       {
          long l = lround(arg);
-         std::cerr << "Error at this spot hint: what is going on here?" << std::endl;
          check_within_half(arg, l);
          BOOST_TEST(l == lround(arg + 0));
          l = ltrunc(arg);
@@ -262,7 +270,6 @@ void test()
       if (abs(r) < (std::numeric_limits<long long>::max)())
       {
          long long ll = llround(arg);
-         std::cerr << "Error at this spot hint: what is going on here?" << std::endl;
          check_within_half(arg, ll);
          BOOST_TEST(ll == llround(arg + 0));
          ll = lltrunc(arg);
