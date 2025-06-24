@@ -2170,7 +2170,7 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
 
          while((source.compare(zero) != 0) && (fail_safe > unsigned { UINT8_C(0) }))
          {
-            const float next_flt_val { static_cast<float>(source.my_first()) };
+            const FloatingPointType next_flt_val { static_cast<FloatingPointType>(source.my_first()) };
 
             *result += static_cast<signed long long>(next_flt_val);
 
@@ -2178,6 +2178,20 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
 
             --fail_safe;
          }
+         #ifdef __APPLE__
+         BOOST_IF_CONSTEXPR (std::is_same<FloatingPointType, double>::value || (std::is_same<FloatingPointType, long double>::value && sizeof(double) == sizeof(long double)))
+         {
+            // This is the last value stored in a double as 9223372036854775808
+            constexpr signed long long upper_bound = 9223372036854775296LL;
+            if (!eval_signbit(backend) && *result >= upper_bound)
+            {
+               // LONG_MAX is stored with .second = -1, so we compensate for the offset
+               // We also only need this at the upper end where the values aren't exactly representable in double
+               // Below a certain point we are fine
+               *result += static_cast<signed long long>(1);
+            }
+         }
+         #endif
       }
    }
 }
