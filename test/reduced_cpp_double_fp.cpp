@@ -100,7 +100,7 @@ void test()
 {
     if (std::numeric_limits<T>::digits >= std::numeric_limits<long>::digits)
     {
-        const auto lhs = static_cast<T>((std::numeric_limits<long>::max)());
+        auto lhs = static_cast<T>((std::numeric_limits<long>::max)());
         long k = lround(lhs);
         check_within_half(lhs, k);
         BOOST_TEST(k == lround(static_cast<T>((std::numeric_limits<long>::max)()) + 0));
@@ -114,8 +114,9 @@ void test()
         check_trunc_result(static_cast<T>((std::numeric_limits<long>::min)()), k);
         BOOST_TEST(k == ltrunc(static_cast<T>((std::numeric_limits<long>::min)()) + 0));
 
-        k = lround(static_cast<T>((std::numeric_limits<long>::max)() - 1));
-        check_within_half(static_cast<T>((std::numeric_limits<long>::max)() - 1), k);
+        lhs = static_cast<T>((std::numeric_limits<long>::max)() - 1);
+        k = lround(lhs);
+        check_within_half(lhs, k);
         k = lround(static_cast<T>((std::numeric_limits<long>::min)() + 1));
         check_within_half(static_cast<T>((std::numeric_limits<long>::min)() + 1), k);
         k = ltrunc(static_cast<T>((std::numeric_limits<long>::max)() - 1));
