@@ -2139,34 +2139,34 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
       constexpr bool
          long_long_is_longer
          {
-            (std::numeric_limits<signed long long>::digits > cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits)
+            (std::numeric_limits<signed long long>::digits > (cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits * 2))
          };
 
-      using common_type = typename ::std::conditional<long_long_is_longer, signed long long, local_float_type>::type;
+      using longer_type = typename ::std::conditional<long_long_is_longer, signed long long, double_float_type>::type;
 
-      constexpr common_type my_max_val { static_cast<common_type>((std::numeric_limits<signed long long>::max)()) };
-      constexpr common_type my_min_val { static_cast<common_type>((std::numeric_limits<signed long long>::min)()) };
+      constexpr longer_type my_max_val { static_cast<longer_type>((std::numeric_limits<signed long long>::max)()) };
+      constexpr longer_type my_min_val { static_cast<longer_type>((std::numeric_limits<signed long long>::min)()) };
 
       constexpr double_float_type my_max_val_dd { static_cast<double_float_type>(my_max_val) };
       constexpr double_float_type my_min_val_dd { static_cast<double_float_type>(my_min_val) };
 
       if (backend.compare(my_max_val_dd) >= 0)
       {
-         *result = my_max_val;
+         *result = (std::numeric_limits<signed long long>::max)();
       }
       else if (backend.compare(my_min_val_dd) <= 0)
       {
-         *result = my_min_val;
+         *result = (std::numeric_limits<signed long long>::min)();
       }
       else
       {
+         constexpr double_float_type zero { 0 };
+
          double_float_type source { backend };
 
          *result = 0;
 
          unsigned fail_safe { UINT32_C(32) };
-
-         constexpr double_float_type zero { 0 };
 
          while((source.compare(zero) != 0) && (fail_safe > unsigned { UINT8_C(0) }))
          {
