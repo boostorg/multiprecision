@@ -255,7 +255,7 @@ class cpp_double_fp_backend
    template <typename SignedIntegralType,
              typename ::std::enable_if<(     boost::multiprecision::detail::is_integral<SignedIntegralType>::value
                                         && (!boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value)
-                                        && (static_cast<int>(sizeof(SignedIntegralType) * 8u) <= cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
+                                        && (static_cast<int>(sizeof(SignedIntegralType) * 8u - 1u) <= cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const SignedIntegralType& n)
       : data(static_cast<float_type>(n), static_cast<float_type>(0.0F)) { }
 
@@ -313,7 +313,7 @@ class cpp_double_fp_backend
    template <typename SignedIntegralType,
              typename ::std::enable_if<(     boost::multiprecision::detail::is_integral<SignedIntegralType>::value
                                         && (!boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value)
-                                        && (static_cast<int>(sizeof(SignedIntegralType) * 8u) > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
+                                        && (static_cast<int>(sizeof(SignedIntegralType) * 8u - 1u) > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(SignedIntegralType n)
    {
       const bool is_neg { n < SignedIntegralType { INT8_C(0) } };
@@ -2164,17 +2164,17 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
 
          double_float_type source { backend };
 
-         *result = 0;
+         *result = static_cast<signed long long>( INT8_C(0));
 
          unsigned fail_safe { UINT32_C(32) };
 
          while((source.compare(zero) != 0) && (fail_safe > unsigned { UINT8_C(0) }))
          {
-            const float next { static_cast<float>(source.my_first()) };
+            const float next_flt_val { static_cast<float>(source.my_first()) };
 
-            *result += static_cast<signed long long>(next);
+            *result += static_cast<signed long long>(next_flt_val);
 
-            eval_subtract(source, double_float_type(next));
+            eval_subtract(source, double_float_type(next_flt_val));
 
             --fail_safe;
          }

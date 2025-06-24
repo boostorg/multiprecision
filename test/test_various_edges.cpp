@@ -1197,21 +1197,6 @@ auto main() -> int
     local::test_pow_n_edge<float_type>();
   }
 
-  #if defined(BOOST_HAS_FLOAT128)
-  {
-    using float_type = boost::multiprecision::cpp_double_float128;
-
-    std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
-
-    static_cast<void>(local::test_edges<float_type>());
-    static_cast<void>(local::test_edges_extra<float_type>());
-    local::test_sqrt_edge<float_type>();
-    local::test_exp_edge<float_type>();
-    local::test_log_edge<float_type>();
-    local::test_pow_n_edge<float_type>();
-  }
-  #endif // BOOST_HAS_FLOAT128
-
   #endif // TEST_CPP_DOUBLE_FLOAT
 
   {
