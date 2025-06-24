@@ -123,6 +123,14 @@ void test()
         check_trunc_result(static_cast<T>((std::numeric_limits<long>::max)() - 1), k);
         k = ltrunc(static_cast<T>((std::numeric_limits<long>::min)() + 1));
         check_trunc_result(static_cast<T>((std::numeric_limits<long>::min)() + 1), k);
+
+        // Further testing of the boundary since the upper end of long is not exactly representable by double
+        for (long i = 2; i < 256; ++i)
+        {
+           lhs = static_cast<T>((std::numeric_limits<long>::max)() - i);
+           k = lround(lhs);
+           check_within_half(lhs, k);
+        }
     }
 }
 
@@ -130,7 +138,7 @@ int main()
 {
    test<boost::multiprecision::cpp_double_float>();
    test<boost::multiprecision::cpp_double_double>();
-      test<boost::multiprecision::cpp_double_long_double>();
+   test<boost::multiprecision::cpp_double_long_double>();
 
    return boost::report_errors();
 }
