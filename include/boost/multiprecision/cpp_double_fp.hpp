@@ -2217,21 +2217,21 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
 
          *result = detail::extract<signed long long>(source);
 
-         #if defined(__APPLE__)
+         #if defined(__aarch64__)
 
-         // It has been "empirically found" that __APPPLE__ needs this workaround.
+         // It has been "empirically found" that ARM64 needs this workaround.
          // Even though the same conditions are met for x86_64 on GCC and MSVC,
          // this workaround will actually break the long long conversion tests
          // on those platforms.
 
          constexpr bool
-            needs_apple_workaround
+            needs_arm64_workaround
             {
                   (sizeof(signed long long) == 8U)
-               && (std::is_same<local_float_type, double>::value || (std::is_same<local_float_type, long double>::value && sizeof(double) == sizeof(long double)))
+               && (std::is_same<local_float_type, double>::value || (std::is_same<local_float_type, long double>::value))
             };
 
-         BOOST_IF_CONSTEXPR (needs_apple_workaround)
+         BOOST_IF_CONSTEXPR (needs_arm64_workaround)
          {
             // This is the last value stored in a double as 9223372036854775808
             constexpr signed long long upper_bound = 9223372036854775296LL;
@@ -2245,7 +2245,7 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
             }
          }
 
-         #endif // __APPLE__
+         #endif // __aarch64__
       }
    }
 }
