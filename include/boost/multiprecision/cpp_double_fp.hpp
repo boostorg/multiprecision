@@ -2134,7 +2134,7 @@ constexpr auto eval_log(cpp_double_fp_backend<FloatingPointType>& result, const 
 namespace detail {
 
 template<typename DestType, typename FloatingPointType>
-auto extract(cpp_double_fp_backend<FloatingPointType>& source) -> DestType
+constexpr auto extract(cpp_double_fp_backend<FloatingPointType>& source) -> DestType
 {
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
    using local_float_type =  typename double_float_type::float_type;
