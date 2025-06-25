@@ -402,6 +402,7 @@ test-suite functions_and_limits :
               : # command line
               : # input files
               : # requirements
+              [ check-target-builds ../config//has_float128 : <source>quadmath ]
               <define>TEST_CPP_DOUBLE_FLOAT <define>PRINT_MAX_DIGITS10
               : test_numeric_limits_cpp_double_fp ]
 
