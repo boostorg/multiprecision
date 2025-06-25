@@ -2,6 +2,7 @@
 //  Copyright 2021 - 2025 Fahad Syed.
 //  Copyright 2021 - 2025 Christopher Kormanyos.
 //  Copyright 2021 - 2025 Janek Kozicki.
+//  Copyright 2025 Matt Borland.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -255,7 +256,7 @@ class cpp_double_fp_backend
    template <typename SignedIntegralType,
              typename ::std::enable_if<(     boost::multiprecision::detail::is_integral<SignedIntegralType>::value
                                         && (!boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value)
-                                        && (static_cast<int>(sizeof(SignedIntegralType) * 8u - 1u) <= cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
+                                        && ((static_cast<int>(sizeof(SignedIntegralType) * 8) - 1) <= cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(const SignedIntegralType& n)
       : data(static_cast<float_type>(n), static_cast<float_type>(0.0F)) { }
 
@@ -313,7 +314,7 @@ class cpp_double_fp_backend
    template <typename SignedIntegralType,
              typename ::std::enable_if<(     boost::multiprecision::detail::is_integral<SignedIntegralType>::value
                                         && (!boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value)
-                                        && (static_cast<int>(sizeof(SignedIntegralType) * 8u - 1u) > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
+                                        && ((static_cast<int>(sizeof(SignedIntegralType) * 8) - 1) > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(SignedIntegralType n)
    {
       const bool is_neg { n < SignedIntegralType { INT8_C(0) } };
@@ -920,6 +921,7 @@ class cpp_double_fp_backend
       // into any potential implementation of eval_ilogb().
 
       int e2 { };
+
       cpp_double_fp_backend dummy { };
 
       eval_frexp(dummy, *this, &e2);
@@ -940,7 +942,7 @@ class cpp_double_fp_backend
                    static_cast<float_type>(1.0F)
                  - static_cast<float_type>(1.5F) * cpp_df_qf_detail::ccmath::unsafe::sqrt(cpp_df_qf_detail::ccmath::numeric_limits<float_type>::epsilon())
               )
-        };
+         };
 
       constexpr float_type
          lo_part
@@ -1558,7 +1560,7 @@ constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const 
    {
       // pow(base, +/-0) returns 1 for any base, even when base is NaN.
 
-      result = double_float_type(unsigned { UINT8_C(1) });
+      result = double_float_type { unsigned { UINT8_C(1) } };
    }
    else if (fpc != FP_NORMAL)
    {
@@ -1713,26 +1715,26 @@ constexpr auto eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
          //   (84 x (7920 + 240 x^2 + x^4))
          // / (665280 + x (-332640 + x (75600 + x (-10080 + x (840 + (-42 + x) x)))))
 
-         const double_float_type n84(84);
-         const double_float_type n240(240);
-         const double_float_type n7920(7920);
+         constexpr double_float_type n84(84);
+         constexpr double_float_type n240(240);
+         constexpr double_float_type n7920(7920);
 
-         const double_float_type n665280(665280);
-         const double_float_type n332640(332640);
-         const double_float_type n75600(75600);
-         const double_float_type n10080(10080);
-         const double_float_type n840(840);
-         const double_float_type n42(42);
+         constexpr double_float_type n665280(665280);
+         constexpr double_float_type n332640(332640);
+         constexpr double_float_type n75600(75600);
+         constexpr double_float_type n10080(10080);
+         constexpr double_float_type n840(840);
+         constexpr double_float_type n42(42);
 
          const double_float_type r2 { r * r };
-
-         result = double_float_type(1U) + ((n84 * r) * (n7920 + r2 * (n240 + r2))) / (n665280 + r * (-n332640 + r * (n75600 + r * (-n10080 + r * (n840 + (-n42 + r) * r)))));
 
          // Use the small-argument Pade approximation having coefficients shown above.
          const double_float_type top = (n84 * r * (n7920 + (n240 + r2) * r2));
          const double_float_type bot = (n665280 + r * (-n332640 + r * (n75600 + r * (-n10080 + r * (n840 + (-n42 + r) * r)))));
 
-         result = double_float_type(1U) + (top / bot);
+         constexpr double_float_type one { 1 };
+
+         result = one + (top / bot);
 
          // Rescale the result.
          if (b_scale)
@@ -1859,26 +1861,28 @@ constexpr auto eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
          // PadeApproximant[Exp[r], {r, 0, 8, 8}]
          // FullSimplify[%]
 
-         const double_float_type n144(144U);
-         const double_float_type n3603600(3603600UL);
-         const double_float_type n120120(120120UL);
-         const double_float_type n770(770U);
+         constexpr double_float_type n144(144U);
+         constexpr double_float_type n3603600(3603600UL);
+         constexpr double_float_type n120120(120120UL);
+         constexpr double_float_type n770(770U);
 
-         const double_float_type n518918400(518918400UL);
-         const double_float_type n259459200(259459200UL);
-         const double_float_type n60540480(60540480UL);
-         const double_float_type n8648640(8648640UL);
-         const double_float_type n831600(831600UL);
-         const double_float_type n55440(55440U);
-         const double_float_type n2520(2520U);
-         const double_float_type n72(72U);
+         constexpr double_float_type n518918400(518918400UL);
+         constexpr double_float_type n259459200(259459200UL);
+         constexpr double_float_type n60540480(60540480UL);
+         constexpr double_float_type n8648640(8648640UL);
+         constexpr double_float_type n831600(831600UL);
+         constexpr double_float_type n55440(55440U);
+         constexpr double_float_type n2520(2520U);
+         constexpr double_float_type n72(72U);
 
          const double_float_type r2 { r * r };
 
          const double_float_type top = (n144 * r) * (n3603600 + r2 * (n120120 + r2 * (n770 + r2)));
          const double_float_type bot = (n518918400 + r * (-n259459200 + r * (n60540480 + r * (-n8648640 + r * (n831600 + r * (-n55440 + r * (n2520 + r * (-n72 + r))))))));
 
-         result = double_float_type(1U) + (top / bot);
+         constexpr double_float_type one { 1 };
+
+         result = one + (top / bot);
 
          // Rescale the result.
          if (b_scale)
@@ -2022,7 +2026,7 @@ constexpr auto eval_exp(cpp_double_fp_backend<FloatingPointType>& result, const 
 
             eval_frexp(dummy, x_pow_n_div_n_fact, &n_tol);
 
-            if ((n > 4U) && (n_tol < -(double_float_type::my_digits - 6)))
+            if ((n > 4U) && (n_tol < -(double_float_type::my_digits - 4)))
             {
                break;
             }
@@ -2063,6 +2067,10 @@ constexpr auto eval_log(cpp_double_fp_backend<FloatingPointType>& result, const 
 {
    using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
+   constexpr double_float_type one { 1 };
+
+   const int result_compare_with_one { x.compare(one) };
+
    const int fpc { eval_fpclassify(x) };
 
    if (fpc == FP_ZERO)
@@ -2077,22 +2085,21 @@ constexpr auto eval_log(cpp_double_fp_backend<FloatingPointType>& result, const 
    {
       result = double_float_type::my_value_inf();
    }
-   else if (eval_lt(x, double_float_type(1)))
+   else if (result_compare_with_one == -1)
    {
-      // TBD: Optimize check with 1.
-      // TBD: Optimize inversion and negation.
+      // Use argument inversion and negation of the result.
 
-      double_float_type x_inv;
-      eval_divide(x_inv, double_float_type(1), x);
+      double_float_type x_inv { };
+
+      eval_divide(x_inv, one, x);
       eval_log(result, x_inv);
+
       result.negate();
    }
-   else if (eval_gt(x, double_float_type(1)))
+   else if (result_compare_with_one == 1)
    {
-      // TBD: Optimize check with 1.
-
-      // TBD: Optimize to only use eval_frexp if (and only if) the exponent
-      // is actually large/small in the sense of above/below a defined cutoff.
+      // Optimize to only use eval_frexp if (and only if) the exponent is
+      // actually large/small in the sense of above/below a defined cutoff.
 
       double_float_type x2 { };
 
@@ -2101,7 +2108,7 @@ constexpr auto eval_log(cpp_double_fp_backend<FloatingPointType>& result, const 
       eval_frexp(x2, x, &n2);
 
       // Get initial estimate using the (wrapped) standard math function log.
-      const double_float_type s(cpp_df_qf_detail::ccmath::log(x2.crep().first));
+      const double_float_type s(cpp_df_qf_detail::ccmath::log(x2.my_first()));
 
       double_float_type E { };
 
@@ -2112,15 +2119,59 @@ constexpr auto eval_log(cpp_double_fp_backend<FloatingPointType>& result, const 
 
       double_float_type xn2 { n2 };
 
-      eval_multiply(xn2, cpp_df_qf_detail::constant_df_ln_two<typename double_float_type::float_type>());
+      using local_float_type = typename double_float_type::float_type;
+
+      eval_multiply(xn2, cpp_df_qf_detail::constant_df_ln_two<local_float_type>());
 
       eval_add(result, xn2);
    }
    else
    {
-      result = 0;
+      result = double_float_type { 0 };
    }
 }
+
+namespace detail {
+
+template<typename DestType, typename FloatingPointType>
+auto extract(cpp_double_fp_backend<FloatingPointType>& source) -> DestType
+{
+   using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+   using local_float_type =  typename double_float_type::float_type;
+
+   using destination_type = DestType;
+
+   destination_type result { };
+
+   constexpr double_float_type zero { 0 };
+
+   result = static_cast<destination_type>(0);
+
+   unsigned fail_safe { UINT32_C(32) };
+
+   constexpr bool
+      destination_type_is_longer
+      {
+         (std::numeric_limits<signed long long>::digits > cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits)
+      };
+
+   using float_extract_type = typename std::conditional<destination_type_is_longer, local_float_type, float>::type;
+
+   while((source.compare(zero) != 0) && (fail_safe > unsigned { UINT8_C(0) }))
+   {
+      const float_extract_type next_flt_val { static_cast<float_extract_type>(source.my_first()) };
+
+      result += static_cast<destination_type>(next_flt_val);
+
+      eval_subtract(source, double_float_type(next_flt_val));
+
+      --fail_safe;
+   }
+
+   return result;
+}
+
+} // namespace detail
 
 template <typename FloatingPointType>
 constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> void
@@ -2162,26 +2213,9 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
       }
       else
       {
-         constexpr double_float_type zero { 0 };
-
          double_float_type source { backend };
 
-         *result = static_cast<signed long long>( INT8_C(0));
-
-         unsigned fail_safe { UINT32_C(32) };
-
-         using float_extract_type = typename std::conditional<long_long_is_longer, local_float_type, float>::type;
-
-         while((source.compare(zero) != 0) && (fail_safe > unsigned { UINT8_C(0) }))
-         {
-            const float_extract_type next_flt_val { static_cast<float_extract_type>(source.my_first()) };
-
-            *result += static_cast<signed long long>(next_flt_val);
-
-            eval_subtract(source, double_float_type(next_flt_val));
-
-            --fail_safe;
-         }
+         *result = detail::extract<signed long long>(source);
 
          #if defined(__APPLE__)
 
@@ -2210,7 +2244,8 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
                *result += static_cast<signed long long>(1);
             }
          }
-         #endif
+
+         #endif // __APPLE__
       }
    }
 }
@@ -2222,27 +2257,31 @@ constexpr auto eval_convert_to(unsigned long long* result, const cpp_double_fp_b
 
    if (fpc != FP_NORMAL)
    {
-      *result = static_cast<unsigned long long>(backend.crep().first);
-
-      return;
-   }
-
-   constexpr unsigned long long my_max_val { (std::numeric_limits<unsigned long long>::max)() };
-
-   using c_type = typename std::common_type<unsigned long long, FloatingPointType>::type;
-
-   constexpr c_type my_max { static_cast<c_type>(my_max_val) };
-
-   const c_type ct { static_cast<c_type>(backend.crep().first) };
-
-   if (ct > my_max)
-   {
-      *result = my_max_val;
+      *result = static_cast<unsigned long long>(backend.my_first());
    }
    else
    {
-      *result  = static_cast<unsigned long long>(backend.crep().first);
-      *result += static_cast<unsigned long long>(backend.crep().second);
+      using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+      using local_float_type =  typename double_float_type::float_type;
+
+      constexpr unsigned long long my_max_val { (std::numeric_limits<unsigned long long>::max)() };
+
+      using c_type = typename std::common_type<unsigned long long, local_float_type>::type;
+
+      constexpr c_type my_max { static_cast<c_type>(my_max_val) };
+
+      const c_type ct { static_cast<c_type>(backend.my_first()) };
+
+      if (ct > my_max)
+      {
+         *result = my_max_val;
+      }
+      else
+      {
+          double_float_type source { backend };
+
+          *result = detail::extract<unsigned long long>(source);
+      }
    }
 }
 
@@ -2254,7 +2293,7 @@ constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_b
 
    if (fpc != FP_NORMAL)
    {
-      *result = static_cast<boost::int128_type>(backend.crep().first);
+      *result = static_cast<boost::int128_type>(backend.my_first());
 
       return;
    }
@@ -2267,7 +2306,7 @@ constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_b
    constexpr c_type my_max { static_cast<c_type>(my_max_val) };
    constexpr c_type my_min { static_cast<c_type>(my_min_val) };
 
-   const c_type ct { static_cast<c_type>(backend.crep().first) };
+   const c_type ct { static_cast<c_type>(backend.my_first()) };
 
    if (ct > my_max)
    {
@@ -2279,8 +2318,8 @@ constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_b
    }
    else
    {
-      *result  = static_cast<boost::int128_type>(backend.crep().first);
-      *result += static_cast<boost::int128_type>(backend.crep().second);
+      *result  = static_cast<boost::int128_type>(backend.my_first());
+      *result += static_cast<boost::int128_type>(backend.my_second());
    }
 }
 
@@ -2291,7 +2330,7 @@ constexpr auto eval_convert_to(boost::uint128_type* result, const cpp_double_fp_
 
    if (fpc != FP_NORMAL)
    {
-      *result = static_cast<boost::uint128_type>(backend.crep().first);
+      *result = static_cast<boost::uint128_type>(backend.my_first());
 
       return;
    }
@@ -2307,7 +2346,7 @@ constexpr auto eval_convert_to(boost::uint128_type* result, const cpp_double_fp_
 
    constexpr c_type my_max { static_cast<c_type>(my_max_val) };
 
-   const c_type ct { static_cast<c_type>(backend.crep().first) };
+   const c_type ct { static_cast<c_type>(backend.my_first()) };
 
    if (ct > my_max)
    {
@@ -2315,8 +2354,8 @@ constexpr auto eval_convert_to(boost::uint128_type* result, const cpp_double_fp_
    }
    else
    {
-      *result  = static_cast<boost::int128_type>(backend.crep().first);
-      *result += static_cast<boost::int128_type>(backend.crep().second);
+      *result  = static_cast<boost::int128_type>(backend.my_first());
+      *result += static_cast<boost::int128_type>(backend.my_second());
 
       *result = static_cast<boost::uint128_type>(*result);
    }
@@ -2333,7 +2372,7 @@ constexpr auto eval_convert_to(OtherFloatingPointType* result, const cpp_double_
 
    if (fpc != FP_NORMAL)
    {
-      *result = static_cast<OtherFloatingPointType>(backend.crep().first);
+      *result = static_cast<OtherFloatingPointType>(backend.my_first());
 
       return;
    }
@@ -2341,8 +2380,8 @@ constexpr auto eval_convert_to(OtherFloatingPointType* result, const cpp_double_
    {
       BOOST_IF_CONSTEXPR(cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits > cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits)
       {
-         *result  = static_cast<OtherFloatingPointType>(backend.crep().first);
-         *result += static_cast<OtherFloatingPointType>(backend.crep().second);
+         *result  = static_cast<OtherFloatingPointType>(backend.my_first());
+         *result += static_cast<OtherFloatingPointType>(backend.my_second());
       }
       else
       {
@@ -2354,7 +2393,7 @@ constexpr auto eval_convert_to(OtherFloatingPointType* result, const cpp_double_
                   digit_count  < cpp_double_fp_backend<FloatingPointType>::my_digits;
                   digit_count += cpp_df_qf_detail::ccmath::numeric_limits<OtherFloatingPointType>::digits)
          {
-            const auto next = static_cast<OtherFloatingPointType>(source.crep().first);
+            const auto next = static_cast<OtherFloatingPointType>(source.my_first());
 
             *result += next;
 
