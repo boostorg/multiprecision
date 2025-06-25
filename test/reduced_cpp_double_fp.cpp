@@ -138,7 +138,11 @@ int main()
 {
    test<boost::multiprecision::cpp_double_float>();
    test<boost::multiprecision::cpp_double_double>();
+
+   // Older PPC64LE have ibm128 instead of ieee128 which is not compatible with this type
+   #if !defined(__PPC__)
    test<boost::multiprecision::cpp_double_long_double>();
+   #endif
 
    return boost::report_errors();
 }
