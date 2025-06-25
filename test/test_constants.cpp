@@ -9,10 +9,11 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#if !defined(TEST_MPF_50) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50)
+#if !defined(TEST_MPF_50) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50) && !defined(TEST_QD)
 #define TEST_MPF_50
 #define TEST_CPP_DEC_FLOAT
 #define TEST_MPFR_50
+#define TEST_QD
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -31,6 +32,9 @@
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#endif
+#ifdef TEST_QD
+#include <boost/multiprecision/quad_double.hpp>
 #endif
 
 #include "test.hpp"
@@ -192,6 +196,9 @@ int main()
 #endif
 #ifdef TEST_MPF_50
    test<boost::multiprecision::number<boost::multiprecision::gmp_float<2000> > >();
+#endif
+#ifdef TEST_QD
+   test<boost::multiprecision::quad_double>();
 #endif
    return boost::report_errors();
 }

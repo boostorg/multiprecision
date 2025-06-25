@@ -1181,6 +1181,18 @@ void test_float_funcs(const std::integral_constant<bool, true>&)
    b = 10;
    a = pow(a, 10);
    BOOST_CHECK_EQUAL(a, 1024);
+   b = 10;
+   a = -2;
+   a = pow(a, 10);
+   BOOST_CHECK_EQUAL(a, 1024);
+   b = 10;
+   a = -2;
+   a = pow(a, b);
+   BOOST_CHECK_EQUAL(a, 1024);
+   b = 9;
+   a = -2;
+   a = pow(a, b);
+   BOOST_CHECK_EQUAL(a, -512);
    a = -2;
    a = abs(a);
    BOOST_CHECK_EQUAL(a, 2);

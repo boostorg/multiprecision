@@ -45,6 +45,7 @@ lib mpc ;
 lib quadmath ;
 lib tommath ;
 lib f2c ;
+lib qd ;
 
 actions mp_simple_run_action
 {
@@ -62,6 +63,7 @@ rule mp-run-simple ( sources + : args * : input-files * : requirements * : targe
 
 mp-run-simple has_gmp.cpp gmp : : :
       <include>$(gmp_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx : has_gmp ;
+mp-run-simple has_qd.cpp qd : : : : has_qd ;
 mp-run-simple has_mpfr.cpp mpfr gmp : : :
       <include>$(mpfr_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx <include>$(gmp_path) : has_mpfr ;
 mp-run-simple has_mpfi.cpp mpfi mpfr gmp : : :
@@ -81,6 +83,7 @@ obj has_big_obj : has_big_obj.cpp : <cxxflags>-Wa,-mbig-obj ;
 obj is_ci_sanitizer_run : is_ci_sanitizer_run.cpp ;
 
 explicit has_gmp ;
+explicit has_qd ;
 explicit has_mpfr ;
 explicit has_mpfi ;
 explicit has_tommath ;
