@@ -1304,6 +1304,7 @@ test-suite misc :
       [ run test_eigen_interop_mpc.cpp mpc mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpc : : <build>no ] ]
       [ run test_eigen_interop_cpp_complex.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
       [ compile git_issue_393.cpp : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
+      [ run reduced_cpp_double_fp.cpp ]
 ;
 
 alias eigen_tests :
