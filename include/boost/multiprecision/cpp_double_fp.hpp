@@ -2217,21 +2217,26 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
 
          *result = detail::extract<signed long long>(source);
 
-         #if defined(__aarch64__)
+         #if !defined(__x86_64__) && !defined(_M_X64)
 
-         // It has been "empirically found" that ARM64 needs this workaround.
+         // It has been "empirically found" that non-X64 needs this workaround.
          // Even though the same conditions are met for x86_64 on GCC and MSVC,
          // this workaround will actually break the long long conversion tests
          // on those platforms.
+         //
+         // Our assumption is that on x64 there is x87 math (double -> long double) being performed in the background
+         // which would aid the conversion of double value to long long
+         //
+         // This workaround has been tested on: ARM64 (linux and mac), s390x and PPC64LE
 
          constexpr bool
-            needs_arm64_workaround
+            needs_workaround
             {
                   (sizeof(signed long long) == 8U)
                && (std::is_same<local_float_type, double>::value || (std::is_same<local_float_type, long double>::value))
             };
 
-         BOOST_IF_CONSTEXPR (needs_arm64_workaround)
+         BOOST_IF_CONSTEXPR (needs_workaround)
          {
             // This is the last value stored in a double as 9223372036854775808
             constexpr signed long long upper_bound = 9223372036854775296LL;
@@ -2245,7 +2250,7 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
             }
          }
 
-         #endif // __aarch64__
+         #endif // non-x64
       }
    }
 }
