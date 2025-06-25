@@ -2136,10 +2136,12 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
       using double_float_type = cpp_double_fp_backend<FloatingPointType>;
       using local_float_type =  typename double_float_type::float_type;
 
+      static_assert(std::is_same<local_float_type, FloatingPointType>::value, "Error something went wrong with the limb type");
+
       constexpr bool
          long_long_is_longer
          {
-            (std::numeric_limits<signed long long>::digits > (cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits * 2))
+            (std::numeric_limits<signed long long>::digits > cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits)
          };
 
       using longer_type = typename ::std::conditional<long_long_is_longer, signed long long, double_float_type>::type;
@@ -2168,9 +2170,11 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
 
          unsigned fail_safe { UINT32_C(32) };
 
+         using float_extract_type = typename std::conditional<long_long_is_longer, local_float_type, float>::type;
+
          while((source.compare(zero) != 0) && (fail_safe > unsigned { UINT8_C(0) }))
          {
-            const FloatingPointType next_flt_val { static_cast<FloatingPointType>(source.my_first()) };
+            const float_extract_type next_flt_val { static_cast<float_extract_type>(source.my_first()) };
 
             *result += static_cast<signed long long>(next_flt_val);
 
@@ -2178,16 +2182,31 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
 
             --fail_safe;
          }
-         #ifdef __APPLE__
-         BOOST_IF_CONSTEXPR (std::is_same<FloatingPointType, double>::value || (std::is_same<FloatingPointType, long double>::value && sizeof(double) == sizeof(long double)))
+
+         #if defined(__APPLE__)
+
+         // It has been "empirically found" that __APPPLE__ needs this workaround.
+         // Even though the same conditions are met for x86_64 on GCC and MSVC,
+         // this workaround will actually break the long long conversion tests
+         // on those platforms.
+
+         constexpr bool
+            needs_apple_workaround
+            {
+                  (sizeof(signed long long) == 8U)
+               && (std::is_same<local_float_type, double>::value || (std::is_same<local_float_type, long double>::value && sizeof(double) == sizeof(long double)))
+            };
+
+         BOOST_IF_CONSTEXPR (needs_apple_workaround)
          {
             // This is the last value stored in a double as 9223372036854775808
             constexpr signed long long upper_bound = 9223372036854775296LL;
+
             if (!eval_signbit(backend) && *result >= upper_bound)
             {
                // LONG_MAX is stored with .second = -1, so we compensate for the offset
-               // We also only need this at the upper end where the values aren't exactly representable in double
-               // Below a certain point we are fine
+               // We also only need this at the upper end where the values aren't exactly
+               // representable in double. Below a certain point we are fine
                *result += static_cast<signed long long>(1);
             }
          }
