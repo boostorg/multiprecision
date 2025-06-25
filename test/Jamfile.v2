@@ -1329,6 +1329,7 @@ test-suite standalone :
       [ run standalone_test_arithmetic_float_128.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ]
       [ run standalone_test_arithmetic_gmp.cpp gmp no_eh_support : : : [ check-target-builds ../config//has_gmp : : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
       [ run standalone_test_arithmetic_mpf_logged_adptr.cpp gmp : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_gmp : : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
+      [ run standalone_test_arithmetic_cpp_double_fp.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 
       [ run standalone_test_miller_rabin.cpp no_eh_support gmp
                 : # command line
