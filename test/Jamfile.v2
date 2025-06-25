@@ -306,7 +306,8 @@ rule get_function_tests
               : # command line
               : # input files
               : # requirements
-               <define>TEST_CPP_DOUBLE_FLOAT
+              [ check-target-builds ../config//has_float128 : <source>quadmath ]
+               <define>TEST_CPP_DOUBLE_FLOAT 
               : $(source:B)_cpp_double_fp ] ;
          result += [ run $(source) quadmath no_eh_support
               : # command line
