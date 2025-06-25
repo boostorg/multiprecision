@@ -10,7 +10,7 @@
 #ifndef BOOST_MP_CPP_DF_QF_DETAIL_2023_01_02_HPP
 #define BOOST_MP_CPP_DF_QF_DETAIL_2023_01_02_HPP
 
-#include <boost/config.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 
 #if defined(BOOST_HAS_FLOAT128)
 #if defined(__has_include)
