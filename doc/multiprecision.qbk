@@ -11,14 +11,14 @@
 
 [library Boost.Multiprecision
     [quickbook 1.7]
-    [copyright 2002-2025 Matthew Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock and Fahad Syed]
+    [copyright 2002-2025 John Maddock, Christopher Kormanyos and Fahad Syed]
     [purpose Multiprecision Number library]
     [license
          Distributed under the Boost Software License, Version 1.0.
          (See accompanying file LICENSE_1_0.txt or copy at
          [@http://www.boost.org/LICENSE_1_0.txt])
     ]
-    [authors [Borland, Matthew], [Bristow, Paul A.], [Kormanyos, Christopher], [Kozicki, Janek], [Maddock, John], [Syed, Fahad]]
+    [authors [Maddock, John], [Kormanyos, Christopher], [Syed, Fahad]]
     [/last-revision $Date$]
 ]
 
