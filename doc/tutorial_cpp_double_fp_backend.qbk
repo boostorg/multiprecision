@@ -11,7 +11,7 @@
 
 `#include <boost/multiprecision/cpp_double_fp_backend.hpp>`
 
-   namespace boost{ namespace multiprecision {
+   namespace boost { namespace multiprecision {
 
    template <class FloatingPointType>
    class cpp_double_fp_backend;
@@ -21,7 +21,7 @@
    typedef number<cpp_double_fp_backend<long double>, et_off> cpp_double_long_double;
    typedef number<cpp_double_fp_backend<boost::float128_type>, et_off> cpp_double_float128; // Only when boost::float128_type is available
 
-   }} // namespaces
+   } } // namespaces
 
 The `cpp_double_fp_backend` back-end is the sum of two IEEE floating-point numbers
 combined to create a type having rougly twice the composite width of one of its parts.
@@ -69,8 +69,8 @@ Things you should know when using the `cpp_double_fp_backend` types:
 * The types can not be used with compiler variations of _fast_-_math_ (i.e., `-ffast-math` on GCC can not be used and `/fp:precise` is mandatory on MSVC compilers). This is because the algorithms (particularly those for addition, subtraction, multiplication and square root) rely on precise floating-point rouunding.
 * The composite types are not as precise as their constituents. For information on error-bounds, see Joldes et al. in the references below.
 * There are `std::numeric_limits` specializations for these types.
-* Large parts (but not all) of the `cpp_double_fp_backend` implementation are `constexpr`.
-* Conversions to and from string internally use an intermediate `cpp_dec_float` value (which may be eliminated in future refinements).
+* Large parts (but not all) of the `cpp_double_fp_backend` implementation are `constexpr`. Future evolution is anticipated to make this library entirely `constexpr`.
+* Conversions to and from string internally use an intermediate `cpp_bin_float` value (which is a bit awkward may be eliminated in future refinements).
 
 The `cpp_double_fp_backend` back-end has been inspired by original works and types such as the historical `doubledouble`
 and more. These include the following:
