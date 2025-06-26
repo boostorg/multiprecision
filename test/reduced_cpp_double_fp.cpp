@@ -6,13 +6,16 @@
 
 #include <boost/core/lightweight_test.hpp>
 #include <boost/multiprecision/cpp_double_fp.hpp>
-#include <boost/math/special_functions/round.hpp>
-#include <boost/math/special_functions/trunc.hpp>
 #include <boost/math/special_functions/modf.hpp>
+#include <boost/math/special_functions/round.hpp>
 #include <boost/math/special_functions/sign.hpp>
+#include <boost/math/special_functions/trunc.hpp>
+
+#include <iomanip>
+#include <iostream>
 #include <limits>
-#include <type_traits>
 #include <random>
+#include <type_traits>
 
 template <class T, class U>
 typename std::enable_if<!boost::multiprecision::is_interval_number<T>::value>::type check_within_half(T a, U u)
@@ -21,15 +24,19 @@ typename std::enable_if<!boost::multiprecision::is_interval_number<T>::value>::t
    const auto fabs_res {fabs(a - u)};
    if (fabs_res > 0.5f)
    {
+      // LCOV_EXCL_START
       BOOST_ERROR("Rounded result differed by more than 0.5 from the original");
       std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
                 << std::left << a << u << std::endl;
+      // LCOV_EXCL_STOP
    }
    if ((fabs(a - u) == 0.5f) && (fabs(static_cast<T>(u)) < fabs(a)))
    {
+      // LCOV_EXCL_START
       BOOST_ERROR("Rounded result was towards zero with boost::round");
       std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
                 << std::left << a << u << std::endl;
+      // LCOV_EXCL_STOP
    }
 }
 template <class T, class U>
@@ -38,15 +45,19 @@ typename std::enable_if<boost::multiprecision::is_interval_number<T>::value>::ty
    BOOST_MATH_STD_USING
    if (upper(T(fabs(a - u))) > 0.5f)
    {
+      // LCOV_EXCL_START
       BOOST_ERROR("Rounded result differed by more than 0.5 from the original");
       std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
                 << std::left << a << u << std::endl;
+      // LCOV_EXCL_STOP
    }
    if ((upper(T(fabs(a - u))) == 0.5f) && (fabs(static_cast<T>(u)) < fabs(a)))
    {
+      // LCOV_EXCL_START
       BOOST_ERROR("Rounded result was towards zero with boost::round");
       std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
                 << std::left << a << u << std::endl;
+      // LCOV_EXCL_STOP
    }
 }
 
@@ -77,21 +88,27 @@ void check_trunc_result(T a, U u)
    BOOST_MATH_STD_USING
    if (fabs(a - u) >= 1)
    {
+      // LCOV_EXCL_START
       BOOST_ERROR("Rounded result differed by more than 1 from the original");
       std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
                 << std::left << a << u << std::endl;
+      // LCOV_EXCL_STOP
    }
    if (abs(a) < safe_abs(u))
    {
+      // LCOV_EXCL_START
       BOOST_ERROR("Truncated result had larger absolute value than the original");
       std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
                 << std::left << abs(a) << safe_abs(u) << std::endl;
+      // LCOV_EXCL_STOP
    }
    if (fabs(static_cast<T>(u)) > fabs(a))
    {
+      // LCOV_EXCL_START
       BOOST_ERROR("Rounded result was away from zero with boost::trunc");
       std::cerr << "Values were: " << std::setprecision(35) << std::setw(40)
                 << std::left << a << u << std::endl;
+      // LCOV_EXCL_STOP
    }
 }
 
