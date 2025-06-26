@@ -106,7 +106,7 @@ public:
    static constexpr int max_exponent10                 = static_cast<int>(static_cast<long long>(static_cast<long long>(max_exponent) * 301LL) / 1000LL);
    static constexpr int min_exponent10                 = static_cast<int>(static_cast<long long>(static_cast<long long>(min_exponent) * 301LL) / 1000LL);
 
-   static constexpr self_type (min)() noexcept
+   static constexpr auto (min)() noexcept -> self_type
    {
      return   static_cast<self_type>(1)
             * static_cast<self_type>(DBL_MIN)
@@ -127,7 +127,7 @@ public:
             * static_cast<self_type>(DBL_MIN) / 1073741824;
    }
 
-   static constexpr self_type (max)() noexcept
+   static constexpr auto (max)() noexcept -> self_type
    {
       // This has one bit set only.
       constexpr double dbl_mult = 8.9884656743115795386e+307;
@@ -151,17 +151,17 @@ public:
              *  static_cast<self_type>(dbl_mult) * 65536;
    }
 
-   static constexpr self_type lowest() noexcept { return -(max)(); }
+   static constexpr auto lowest() noexcept -> self_type { return -(max)(); }
 
-   static constexpr self_type epsilon()
+   static constexpr auto epsilon() -> self_type
    {
      // This double value has only one bit set and so is exact.
      return 1.92592994438723585305597794258492732e-34;
    }
 
-   static constexpr self_type round_error() noexcept { return 0.5; }
+   static constexpr auto round_error() noexcept -> self_type { return static_cast<self_type>(0.5F); }
 
-   static constexpr self_type denorm_min() noexcept
+   static constexpr auto denorm_min() noexcept -> self_type
    {
       return   static_cast<self_type>(1)
              * static_cast<self_type>(DBL_MIN)
@@ -183,9 +183,9 @@ public:
              / 5.5751862996326557854e+42;
    }
 
-   static constexpr self_type infinity     () noexcept { return HUGE_VAL; }
-   static constexpr self_type quiet_NaN    () noexcept { return NAN; }
-   static constexpr self_type signaling_NaN() noexcept { return 0; }
+   static constexpr auto infinity     () noexcept -> self_type { return HUGE_VAL; }
+   static constexpr auto quiet_NaN    () noexcept -> self_type { return NAN; }
+   static constexpr auto signaling_NaN() noexcept -> self_type { return 0; }
 };
 #endif
 

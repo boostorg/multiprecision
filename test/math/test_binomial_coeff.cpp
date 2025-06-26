@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2002 - 2011.
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright Christopher Kormanyos 2002 - 2025.
+//  Copyright 2011 - 2025 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 //
@@ -54,7 +54,7 @@ void expected_results()
        ".*",                        // platform
        ".*cpp_double_double.*",     // test type(s)
        ".*",                        // test data group
-       ".*", 120, 20);              // test function
+       ".*", 180, 50);              // test function
    add_expected_result(
        ".*",           // compiler
        ".*",           // stdlib

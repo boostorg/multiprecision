@@ -1,4 +1,5 @@
-# copyright John Maddock 2012
+# copyright John Maddock 2012 - 2025
+# copyright Christopher Kormanyos 2021 - 2025
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt.
@@ -76,7 +77,6 @@ test-suite performance :
             performance_test_files/test15.cpp  performance_test_files/test32.cpp  performance_test_files/test49.cpp
             performance_test_files/test16.cpp  performance_test_files/test33.cpp  performance_test_files/test50.cpp
             performance_test_files/test17.cpp  performance_test_files/test34.cpp  performance_test_files/test51.cpp
-            performance_test_files/test52.cpp
             /boost/system//boost_system
           :
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <define>TEST_MPQ <source>gmp : ]

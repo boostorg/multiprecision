@@ -10,7 +10,7 @@
 #ifndef BOOST_MP_CPP_DF_QF_DETAIL_2023_01_02_HPP
 #define BOOST_MP_CPP_DF_QF_DETAIL_2023_01_02_HPP
 
-#include <boost/config.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 
 #if defined(BOOST_HAS_FLOAT128)
 #if defined(__has_include)
@@ -112,8 +112,8 @@ public:
 template <typename FloatingPointType>
 struct exact_arithmetic
 {
-   // The exact_arithmetic<> struct implements extended precision
-   // techniques that are used in cpp_double_fp_backend and cpp_quad_float.
+   // The exact_arithmetic<> struct implements a few extended
+   // precision algorithms that are used in cpp_double_fp_backend.
 
    static_assert(is_floating_point<FloatingPointType>::value, "Error: exact_arithmetic<> invoked with unknown floating-point type");
 
@@ -152,6 +152,15 @@ struct exact_arithmetic
          u,
          float_type { a - u } + b
       };
+   }
+};
+
+template<typename ArithmeticType>
+struct pow2_maker
+{
+   static constexpr auto value(const int power_value) noexcept -> ArithmeticType
+   {
+     return ((power_value == 0) ? ArithmeticType { 1 } : ArithmeticType { 2 } * pow2_maker<ArithmeticType>::value(power_value - 1));
    }
 };
 

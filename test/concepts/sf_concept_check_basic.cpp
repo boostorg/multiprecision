@@ -1,5 +1,5 @@
-//  Copyright John Maddock 2012.
-//  Copyright Christopher Kormanyos 2021 - 2023.
+//  Copyright John Maddock 2012 - 2025.
+//  Copyright Christopher Kormanyos 2021 - 2025.
 //  Use, modification and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
