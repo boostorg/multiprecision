@@ -567,6 +567,19 @@ namespace local
     {
       static_cast<void>(i);
 
+      const float_type val_one { exp(::my_one<float_type>() +  ::my_zero<float_type>() * static_cast<float_type>(dist(gen))) };
+
+      const bool result_one_is_ok { val_one == exp(float_type(1)) };
+
+      BOOST_TEST(result_one_is_ok);
+
+      result_is_ok = (result_one_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(16)); ++i)
+    {
+      static_cast<void>(i);
+
       const float_type val_nan { exp(std::numeric_limits<float_type>::quiet_NaN() * static_cast<float_type>(dist(gen))) };
 
       const bool result_val_nan_is_ok { isnan(val_nan) };
