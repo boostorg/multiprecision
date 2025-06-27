@@ -18,8 +18,6 @@
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 
-#include <typeinfo>
-
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
 //#  define TEST_MPF
@@ -38,6 +36,10 @@
 #endif
 
 #endif
+
+#include <test_traits.hpp> // Note: include this AFTER the test-backends are defined
+#include <test_pow_data.hpp>
+#include <test_pow_data_reduced.hpp>
 
 #if defined(TEST_MPF_50)
 #include <boost/multiprecision/gmp.hpp>
@@ -63,10 +65,6 @@
 #ifdef TEST_CPP_DOUBLE_FLOAT
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
-
-#include "test_pow_data.hpp"
-#include "test_pow_data_reduced.hpp"
-
 
 namespace local {
 

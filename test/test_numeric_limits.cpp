@@ -39,6 +39,8 @@
 
 #endif
 
+#include <test_traits.hpp> // Note: include this AFTER the test-backends are defined
+
 #if defined(TEST_MPF_50) || defined(TEST_MPF) || defined(TEST_MPZ) || defined(TEST_MPQ)
 #include <boost/multiprecision/gmp.hpp>
 #endif

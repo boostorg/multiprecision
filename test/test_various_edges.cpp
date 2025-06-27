@@ -15,6 +15,8 @@
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
+#include <test_traits.hpp> // Note: include this AFTER the test-backends are defined
+
 #include <array>
 #include <chrono>
 #include <cstddef>

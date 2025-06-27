@@ -22,7 +22,8 @@
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
-#include "test.hpp"
+#include <test.hpp>
+#include <test_traits.hpp> // Note: include this AFTER the test-backends are defined
 
 #include <cmath>
 #include <iomanip>

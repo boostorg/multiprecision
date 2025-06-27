@@ -17,8 +17,6 @@
 #include <boost/math/special_functions/trunc.hpp>
 #include <boost/random/mersenne_twister.hpp>
 
-#include <typeinfo>
-
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
 #define TEST_MPFR_50
@@ -37,6 +35,8 @@
 #endif
 
 #endif
+
+#include <test_traits.hpp> // Note: include this AFTER the test-backends are defined
 
 #if defined(TEST_MPF_50)
 #include <boost/multiprecision/gmp.hpp>
@@ -178,23 +178,19 @@ void check_trunc_result(T a, U u)
 namespace local {
 
 template <class T>
-auto fail_gate_maker
+static inline auto modf_fail_gate(const T& my_sum, const T& my_a) noexcept -> typename std::enable_if<has_poor_exp_range_or_precision_support<T>::value, bool>::type
 {
-   has_poor_exp_range_or_precision_support<T>::value
-      ?
-         [](const T& my_sum, const T& my_a) -> bool
-         {
-            const T ratio { my_sum / my_a };
-            const T delta { fabs(1 - ratio) };
+   const T ratio { my_sum / my_a };
+   const T delta { fabs(1 - ratio) };
 
-            return (delta > std::numeric_limits<T>::epsilon());
-         }
-      :
-         [](const T& my_sum, const T& my_a) -> bool
-         {
-            return (my_sum != my_a);
-         }
-};
+   return (delta > std::numeric_limits<T>::epsilon());
+}
+
+template <class T>
+static inline auto modf_fail_gate(const T& my_sum, const T& my_a) noexcept -> typename std::enable_if<(!has_poor_exp_range_or_precision_support<T>::value), bool>::type
+{
+   return (my_sum != my_a);
+}
 
 } // namespace local
 
@@ -205,7 +201,7 @@ void check_modf_result(T a, T fract, U ipart)
 
    const T sum { fract + ipart };
 
-   if (local::fail_gate_maker<T>(sum, a))
+   if (local::modf_fail_gate<T>(sum, a))
    {
       BOOST_ERROR("Fractional and integer results do not add up to the original value");
       std::cerr << "Values were: " << std::setprecision(35) << " "

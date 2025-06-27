@@ -14,14 +14,6 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 
-#if defined(TEST_CPP_DOUBLE_FLOAT)
-
-#include <boost/multiprecision/cpp_double_fp.hpp>
-
-#include <type_traits>
-
-#endif // TEST_CPP_DOUBLE_FLOAT
-
 #include <limits>
 #include <cmath>
 #include <typeinfo>
@@ -376,22 +368,5 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
 #define BOOST_CHECK_THROW(x, E) BOOST_MT_CHECK_THROW_IMP(x, E, error_on_fail)
 #define BOOST_WARN_THROW(x, E) BOOST_MT_CHECK_THROW_IMP(x, E, warn_on_fail)
 #define BOOST_REQUIRE_THROW(x, E) BOOST_MT_CHECK_THROW_IMP(x, E, abort_on_fail)
-
-template <class UnknownNumericTestType>
-struct has_poor_exp_range_or_precision_support
-{
-   static constexpr bool value { false };
-};
-
-#if defined(TEST_CPP_DOUBLE_FLOAT)
-
-template <> struct has_poor_exp_range_or_precision_support<::boost::multiprecision::cpp_double_float> final { static constexpr bool value { true }; };
-template <> struct has_poor_exp_range_or_precision_support<::boost::multiprecision::cpp_double_double> final { static constexpr bool value { true }; };
-template <> struct has_poor_exp_range_or_precision_support<::boost::multiprecision::cpp_double_long_double> final { static constexpr bool value { true }; };
-#if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128) // (which is the same as BOOST_HAS_FLOAT128)
-template <> struct has_poor_exp_range_or_precision_support<::boost::multiprecision::cpp_double_float128> final { static constexpr bool value { true }; };
-#endif
-
-#endif // TEST_CPP_DOUBLE_FLOAT
 
 #endif // BOOST_MULTIPRECISION_TEST_HPP
