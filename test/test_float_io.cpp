@@ -15,9 +15,10 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
 
-#if !defined(TEST_MPF_50) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_DOUBLE_FLOAT)
+#if !defined(TEST_MPF_50) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
 #define TEST_CPP_DEC_FLOAT
+#define TEST_CPP_BIN_FLOAT
 #define TEST_MPFR_50
 #define TEST_MPFI_50
 #define TEST_FLOAT128
@@ -408,6 +409,18 @@ int main()
 
    test_to_string<boost::multiprecision::cpp_dec_float_50>();
    test_to_string<boost::multiprecision::cpp_dec_float_100>();
+
+#endif
+#ifdef TEST_CPP_BIN_FLOAT
+   test<boost::multiprecision::cpp_bin_float_50>();
+   test<boost::multiprecision::cpp_bin_float_100>();
+
+   // cpp_dec_float has extra guard digits that messes this up:
+   test_round_trip<boost::multiprecision::cpp_bin_float_50>();
+   test_round_trip<boost::multiprecision::cpp_bin_float_100>();
+
+   test_to_string<boost::multiprecision::cpp_bin_float_50>();
+   test_to_string<boost::multiprecision::cpp_bin_float_100>();
 
 #endif
 #ifdef TEST_MPF_50
