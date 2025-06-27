@@ -745,6 +745,14 @@ test-suite conversions :
               : # command line
               : # input files
               : # requirements
+              <define>TEST_CPP_BIN_FLOAT
+               release # Otherwise [ runtime is slow
+              : test_float_io_cpp_bin_float ]
+
+      [ run test_float_io.cpp no_eh_support
+              : # command line
+              : # input files
+              : # requirements
               <define>TEST_CPP_DEC_FLOAT <define>BOOST_MP_STANDALONE
                release # Otherwise [ runtime is slow
               : test_float_io_cpp_dec_float_standalone ]

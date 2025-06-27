@@ -415,7 +415,6 @@ int main()
    test<boost::multiprecision::cpp_bin_float_50>();
    test<boost::multiprecision::cpp_bin_float_100>();
 
-   // cpp_dec_float has extra guard digits that messes this up:
    test_round_trip<boost::multiprecision::cpp_bin_float_50>();
    test_round_trip<boost::multiprecision::cpp_bin_float_100>();
 
