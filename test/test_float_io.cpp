@@ -6,12 +6,14 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 //
 
-#define TEST_CPP_DEC_FLOAT
-#define TEST_CPP_DOUBLE_FLOAT
-
 #ifdef _MSC_VER
 #define _SCL_SECURE_NO_WARNINGS
 #endif
+
+#include <test.hpp>
+
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
 
 #if !defined(TEST_MPF_50) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_DOUBLE_FLOAT)
 #define TEST_MPF_50
@@ -51,9 +53,6 @@
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
-#include "test.hpp"
 #include <array>
 #include <iostream>
 #include <iomanip>

@@ -10,9 +10,7 @@
 
 #if defined(TEST_CPP_DOUBLE_FLOAT)
 #include <boost/multiprecision/cpp_double_fp.hpp>
-
-#include <type_traits>
-#endif // TEST_CPP_DOUBLE_FLOAT
+#endif
 
 template <class UnknownNumericTestType>
 struct has_poor_exp_range_or_precision_support
