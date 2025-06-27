@@ -1,4 +1,5 @@
-# copyright John Maddock 2011
+# copyright John Maddock 2011 - 2025
+# copyright Christopher Kormanyos 2021 - 2025
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt.
@@ -118,6 +119,7 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_backend_concept.cpp no_eh_support ]
    [ compile test_arithmetic_skeleton.cpp ]
 
+   [ run test_arithmetic_df.cpp              no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_cpp_dec_float_1.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_cpp_dec_float_2.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_cpp_dec_float_3.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
@@ -176,6 +178,7 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_ab_3.cpp no_eh_support : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 
    [ run test_cpp_dec_float_round.cpp no_eh_support ]
+   [ run test_various_edges.cpp no_eh_support ]
 
    [ run test_arithmetic_logged_1.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_logged_2.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
@@ -215,6 +218,7 @@ test-suite arithmetic_tests :
    [ run test_mpf_precisions.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] ]
    [ run test_threaded_precision.cpp mpfr gmp : : : [ check-target-builds ../config//has_mpfr : : <build>no ] <define>TEST_MPF_50 : test_threaded_precision_mpf ]
    [ run test_complex.cpp : : : [ check-target-builds ../config//has_mpc : <define>TEST_MPC <source>mpc <source>mpfr <source>gmp ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
+   [ run test_complex.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] <define>TEST_CPP_DOUBLE_FLOAT : test_complex_df ]
    [ run test_arithmetic_complex_adaptor.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_complex_adaptor_2.cpp : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_complex128.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
@@ -298,6 +302,13 @@ rule get_function_tests
               : # requirements
                <define>TEST_CPP_BIN_FLOAT
               : $(source:B)_cpp_bin_float ] ;
+         result += [ run $(source) no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+              [ check-target-builds ../config//has_float128 : <source>quadmath ]
+               <define>TEST_CPP_DOUBLE_FLOAT 
+              : $(source:B)_cpp_double_fp ] ;
          result += [ run $(source) quadmath no_eh_support
               : # command line
               : # input files
@@ -386,6 +397,14 @@ test-suite functions_and_limits :
               : # requirements
               <define>TEST_CPP_BIN_FLOAT <define>PRINT_MAX_DIGITS10
               : test_numeric_limits_cpp_bin_float ]
+
+      [ run test_numeric_limits.cpp no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+              [ check-target-builds ../config//has_float128 : <source>quadmath ]
+              <define>TEST_CPP_DOUBLE_FLOAT <define>PRINT_MAX_DIGITS10
+              : test_numeric_limits_cpp_double_fp ]
 
       [ run test_numeric_limits.cpp $(TOMMATH) no_eh_support
               : # command line
@@ -721,6 +740,14 @@ test-suite conversions :
               <define>TEST_CPP_DEC_FLOAT
                release # Otherwise [ runtime is slow
               : test_float_io_cpp_dec_float ]
+
+      [ run test_float_io.cpp no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+              <define>TEST_CPP_BIN_FLOAT
+               release # Otherwise [ runtime is slow
+              : test_float_io_cpp_bin_float ]
 
       [ run test_float_io.cpp no_eh_support
               : # command line
@@ -1287,6 +1314,7 @@ test-suite misc :
       [ run test_eigen_interop_mpc.cpp mpc mpfr gmp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpc : : <build>no ] ]
       [ run test_eigen_interop_cpp_complex.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
       [ compile git_issue_393.cpp : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
+      [ run reduced_cpp_double_fp.cpp ]
 ;
 
 alias eigen_tests :
@@ -1311,6 +1339,7 @@ test-suite standalone :
       [ run standalone_test_arithmetic_float_128.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ]
       [ run standalone_test_arithmetic_gmp.cpp gmp no_eh_support : : : [ check-target-builds ../config//has_gmp : : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
       [ run standalone_test_arithmetic_mpf_logged_adptr.cpp gmp : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_gmp : : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
+      [ run standalone_test_arithmetic_cpp_double_fp.cpp no_eh_support  : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 
       [ run standalone_test_miller_rabin.cpp no_eh_support gmp
                 : # command line
@@ -1525,6 +1554,27 @@ rule get_specfun_tests_float128
    return $(result) ;
 }
 
+rule get_specfun_tests_cpp_double_double
+{
+   local result ;
+   for local source in [ glob math/*.cpp ]
+   {
+      result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static
+               math/instances//test_instances_cpp_double_double/<link>static
+           : # command line
+           : # input files
+           : # requirements
+           [ check-target-builds ../config//has_float128 : <source>quadmath ]
+            <define>TEST_CPP_DOUBLE_FLOAT
+            <define>BOOST_ALL_NO_LIB
+            <toolset>msvc:<cxxflags>-bigobj
+            <library>/boost/math//testing
+            release
+           : $(source:B)_cpp_double_double ] ;
+   }
+   return $(result) ;
+}
+
 rule get_specfun_tests_intel_quad
 {
    local result ;
@@ -1560,10 +1610,12 @@ test-suite specfun_cpp_bin_float : [ get_specfun_tests_cpp_bin_float ] ;
 explicit specfun_cpp_bin_float ;
 test-suite specfun_float128 : [ get_specfun_tests_float128 ] ;
 explicit specfun_float128 ;
+test-suite specfun_cpp_double_double : [ get_specfun_tests_cpp_double_double ] ;
+explicit specfun_cpp_double_double ;
 test-suite specfun_intel_quad : [ get_specfun_tests_intel_quad ] ;
 explicit specfun_intel_quad ;
 
-test-suite specfun : specfun_mpfr specfun_gmp specfun_cpp_dec_float specfun_cpp_bin_float specfun_float128 specfun_intel_quad ;
+test-suite specfun : specfun_mpfr specfun_gmp specfun_cpp_dec_float specfun_cpp_bin_float specfun_float128 specfun_cpp_double_double specfun_intel_quad ;
 explicit specfun ;
 
 rule get_compile_fail_tests

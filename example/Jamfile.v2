@@ -92,7 +92,7 @@ test-suite examples :
 
       [ run floating_point_examples.cpp no_eh_eg_support : : : [ check-target-builds ../config//has_big_obj : <cxxflags>-Wa,-mbig-obj <debug-symbols>off ] ]
       [ run gauss_laguerre_quadrature.cpp no_eh_eg_support : : : release [ requires cxx11_lambdas ] ]
-      [ run hypergeometric_luke_algorithms.cpp no_eh_eg_support ../../chrono/build//boost_chrono ../../system/build//boost_system : : : [ requires cxx11_nullptr ]  ]
+      [ run hypergeometric_luke_algorithms.cpp no_eh_eg_support /boost/chrono//boost_chrono /boost/system//boost_system : : : [ requires cxx11_nullptr ]  ]
       [ run integer_examples.cpp no_eh_eg_support ]
       [ run logged_adaptor.cpp no_eh_eg_support mpfi mpfr gmp :  :  : [ check-target-builds ../config//has_mpfi : : <build>no ] ]
       [ run mixed_integer_arithmetic.cpp no_eh_eg_support ]

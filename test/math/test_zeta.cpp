@@ -1,7 +1,9 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright 2011 - 2025 John Maddock. Distributed under the Boost
+//  Copyright Christopher Kormanyos 2021 - 2025.
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+//
 
 #include "setup.hpp"
 #include "table_type.hpp"
@@ -32,6 +34,13 @@ void expected_results()
        ".*close to and less than 1.*", // test data group
        ".*", 10000000L, 2000000L);     // test function
 #endif
+   add_expected_result(
+       ".*",                           // compiler
+       ".*",                           // stdlib
+       ".*",                           // platform
+       "cpp_double_double",            // test type(s)
+       ".*",                           // test data group
+       ".*", 12000L, 3000L);           // test function
    add_expected_result(
        ".*",             // compiler
        ".*",             // stdlib
