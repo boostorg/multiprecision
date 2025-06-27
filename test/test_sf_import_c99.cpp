@@ -84,7 +84,8 @@
 
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include "test.hpp"
+
+#include <test.hpp>
 
 #ifdef signbit
 #undef signbit
@@ -206,6 +207,8 @@ void test_unordered(T a, U b)
 template <class T>
 void test()
 {
+   std::cout << "Testing type: " << typeid(T).name() << std::endl;
+
    //
    // Basic sanity checks for C99 functions which are just imported versions
    // from Boost.Math.  These should still be found via ADL so no using declarations here...
@@ -349,11 +352,8 @@ void test()
    s   = 8 * std::numeric_limits<T>::epsilon();
    val = 2.5;
    {
-      #if defined(TEST_CPP_DOUBLE_FLOAT)
-      const auto my_s = s * 3;
-      #else
-      const auto my_s = s;
-      #endif
+      const T my_s { ::has_poor_exp_range_or_precision_support<T>::value ? s * 3 : s };
+
       BOOST_CHECK_CLOSE_FRACTION(asinh(val), T("1.6472311463710957106248586104436196635044144301932365282203100930843983757633104078778420255069424907777006132075516484778755360595913172299093829522950397895699619540523579875476513967578478619028438291006578604823887119907434"), my_s);
       BOOST_CHECK_CLOSE_FRACTION(asinh(val + T(0)), T("1.6472311463710957106248586104436196635044144301932365282203100930843983757633104078778420255069424907777006132075516484778755360595913172299093829522950397895699619540523579875476513967578478619028438291006578604823887119907434"), my_s);
    }
@@ -361,11 +361,8 @@ void test()
    BOOST_CHECK_CLOSE_FRACTION(acosh(val + T(0)), T("1.5667992369724110786640568625804834938620823510926588639329459980122148134693922696279968499622201141051039184050936311066453565386393240356562374302417843319480223211857615778787272615171906055455922537080327062362258846337050"), s);
    val = 0.5;
    {
-      #if defined(TEST_CPP_DOUBLE_FLOAT)
-      const auto my_s = s * 2;
-      #else
-      const auto my_s = s;
-      #endif
+      const T my_s { ::has_poor_exp_range_or_precision_support<T>::value ? s * 2 : s };
+
       BOOST_CHECK_CLOSE_FRACTION(atanh(val), T("0.5493061443340548456976226184612628523237452789113747258673471668187471466093044834368078774068660443939850145329789328711840021129652599105264009353836387053015813845916906835896868494221804799518712851583979557605727959588753"), my_s);
       BOOST_CHECK_CLOSE_FRACTION(atanh(val + T(0)), T("0.5493061443340548456976226184612628523237452789113747258673471668187471466093044834368078774068660443939850145329789328711840021129652599105264009353836387053015813845916906835896868494221804799518712851583979557605727959588753"), my_s);
    }
@@ -2298,7 +2295,7 @@ int main()
 #ifdef TEST_CPP_DOUBLE_FLOAT
    test<boost::multiprecision::cpp_double_double>();
    test<boost::multiprecision::cpp_double_long_double>();
-   #if defined(BOOST_HAS_FLOAT128)
+   #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
    #endif
 #endif

@@ -9,14 +9,6 @@
 // "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 
-///////////////////////////////////////////////////////////////////////////////
-//  Copyright John Maddock 2016.
-//  Copyright Christopher Kormanyos 2016 - 2024.
-//  Distributed under the Boost Software License,
-//  Version 1.0. (See accompanying file LICENSE_1_0.txt
-//  or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
-
 #include <boost/lexical_cast.hpp>
 #ifdef TEST_MPC
 #include <boost/multiprecision/mpc.hpp>
@@ -170,8 +162,6 @@ void test()
 
 int main()
 {
-
-#if !defined(TEST_CPP_DOUBLE_FLOAT)
 #ifdef TEST_MPC
    local::test<boost::multiprecision::mpc_complex_50>();
    local::test<boost::multiprecision::mpc_complex_100>();
@@ -180,7 +170,6 @@ int main()
    local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_bin_float<50> >, boost::multiprecision::et_off> >();
 #ifdef BOOST_HAS_FLOAT128
    local::test<boost::multiprecision::complex128>();
-#endif
 #endif
 
 #if defined(TEST_CPP_DOUBLE_FLOAT)

@@ -40,50 +40,81 @@
 #endif
 
 #if defined(TEST_MPF_50)
-#include "test_pow_data.hpp"
 #include <boost/multiprecision/gmp.hpp>
 #endif
 #if defined(TEST_MPFR_50)
-#include "test_pow_data.hpp"
 #include <boost/multiprecision/mpfr.hpp>
 #endif
 #if defined(TEST_MPFI_50)
-#include "test_pow_data.hpp"
 #include <boost/multiprecision/mpfi.hpp>
 #endif
 #ifdef TEST_BACKEND
-#include "test_pow_data.hpp"
 #include <boost/multiprecision/concepts/mp_number_archetypes.hpp>
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-#include "test_pow_data.hpp"
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
 #ifdef TEST_FLOAT128
-#include "test_pow_data.hpp"
 #include <boost/multiprecision/float128.hpp>
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
-#include "test_pow_data.hpp"
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
-#include "test_pow_data_df.hpp"
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
-#if defined(TEST_CPP_DOUBLE_FLOAT)
-#include "test_pow_data_df.hpp"
-#else
 #include "test_pow_data.hpp"
-#endif
+#include "test_pow_data_reduced.hpp"
+
+
+namespace local {
+
+   template <class DataArrayType>
+   struct data_maker
+   {
+     static auto get_data() -> const DataArrayType& { static const DataArrayType instance { }; return instance; }
+   };
+
+   template <>
+   struct data_maker<test_pow_data::test_pow_data_array_type_reduced> final
+   {
+      using local_array_type = test_pow_data::test_pow_data_array_type_reduced;
+
+      static auto get_data() -> const local_array_type&
+      {
+         static const local_array_type instance { test_pow_data::data_reduced };
+
+         return instance;
+      }
+   };
+
+   template <>
+   struct data_maker<test_pow_data::test_pow_data_array_type_default> final
+   {
+      using local_array_type = test_pow_data::test_pow_data_array_type_default;
+
+      static auto get_data() -> const local_array_type&
+      {
+         static const local_array_type instance { test_pow_data::data };
+
+         return instance;
+      }
+   };
+
+} // namespace local
 
 template <class T>
 void test()
 {
    std::cout << "Testing type: " << typeid(T).name() << std::endl;
 
-   static const test_pow_data::test_pow_data_array_type data { test_pow_data::data };
+   using local_test_pow_data_array_type =
+      typename std::conditional<::has_poor_exp_range_or_precision_support<T>::value,
+                                test_pow_data::test_pow_data_array_type_reduced,
+                                test_pow_data::test_pow_data_array_type_default>::type;
+
+   const local_test_pow_data_array_type& data = local::data_maker<local_test_pow_data_array_type>::get_data();
 
    unsigned max_err = 0;
    for (unsigned k = 0; k < data.size(); k++)
@@ -192,19 +223,11 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
-   {
-      using boost::multiprecision::cpp_double_double;
-      using boost::multiprecision::cpp_double_long_double;
-      #if defined(BOOST_HAS_FLOAT128)
-      using boost::multiprecision::cpp_double_float128;
-      #endif
-
-      test<cpp_double_double>();
-      test<cpp_double_long_double>();
-      #if defined(BOOST_HAS_FLOAT128)
-      test<cpp_double_float128>();
-      #endif
-   }
+   test<boost::multiprecision::cpp_double_double>();
+   test<boost::multiprecision::cpp_double_long_double>();
+   #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
+   test<boost::multiprecision::cpp_double_float128>();
+   #endif
 #endif
    return boost::report_errors();
 }

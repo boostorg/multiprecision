@@ -236,7 +236,7 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<1000> > >();
 #endif
 #endif
-#if defined(TEST_FLOAT128) && !defined(TEST_CPP_DOUBLE_FLOAT)
+#if defined(TEST_FLOAT128)
    test<boost::multiprecision::float128>();
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
@@ -247,7 +247,7 @@ int main()
    test<boost::multiprecision::cpp_double_float>();
    test<boost::multiprecision::cpp_double_double>();
    test<boost::multiprecision::cpp_double_long_double>();
-   #if defined(BOOST_HAS_FLOAT128)
+   #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
    #endif
 #endif

@@ -9,17 +9,17 @@
 // "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 
-#ifndef BOOST_MP_TEST_POW_DATA_DF_HPP
-   #define BOOST_MP_TEST_POW_DATA_DF_HPP
+#ifndef BOOST_MP_TEST_POW_DATA_REDUCED_HPP
+   #define BOOST_MP_TEST_POW_DATA_REDUCED_HPP
 
    #include <array>
    #include <cstddef>
 
    namespace test_pow_data {
 
-   using test_pow_data_array_type = std::array<std::array<const char*, 3>, std::size_t { UINT32_C(641) }>;
+   using test_pow_data_array_type_reduced = std::array<std::array<const char*, 3>, std::size_t { UINT32_C(641) }>;
 
-   static const test_pow_data_array_type data =
+   static const test_pow_data_array_type_reduced data_reduced =
        {{
          {{"16.5291435510970359246130101382732391357421875", "0.0493652894786225093781695250072516500949859619140625", "1.148521901384917365622791205196683900811417787467438266815171811587512645713503049432985012846475645"}},
          {{"0.272264614486854572561469467473216354846954345703125", "0.0004869544345559033600434606370299661648459732532501220703125", "0.9993666822419621463685898095771200117231983084504331852993667325006778736374601559705472670997199143"}},
@@ -666,4 +666,4 @@
 
    } // namespace test_pow_data
 
-#endif // BOOST_MP_TEST_POW_DATA_DF_HPP
+#endif // BOOST_MP_TEST_POW_DATA_REDUCED_HPP

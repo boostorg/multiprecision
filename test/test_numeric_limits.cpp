@@ -72,6 +72,7 @@
 
 #ifdef BOOST_MSVC
 #pragma warning(disable : 4127)
+#pragma warning(disable : 4723)
 #endif
 
 #define PRINT(x) \
@@ -269,7 +270,7 @@ void test()
 
 #ifdef TEST_CPP_DOUBLE_FLOAT
 
-#if !(defined(_MSC_VER) && (_MSC_VER <= 1900))
+#if !(defined(BOOST_MSVC) && (BOOST_MSVC <= 1900))
 template <class Number>
 void test_constexpr_ness()
 {
@@ -352,16 +353,16 @@ int main()
    test<boost::multiprecision::cpp_double_float>();
    test<boost::multiprecision::cpp_double_double>();
    test<boost::multiprecision::cpp_double_long_double>();
-   #if defined(BOOST_HAS_FLOAT128)
+   #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
    #endif
 
-   #if !(defined(_MSC_VER) && (_MSC_VER <= 1900))
+   #if !(defined(BOOST_MSVC) && (BOOST_MSVC <= 1900))
    test_constexpr_ness<boost::multiprecision::cpp_double_float>();
    test_constexpr_ness<boost::multiprecision::cpp_double_double>();
    test_constexpr_ness<boost::multiprecision::cpp_double_long_double>();
    #endif
-   #if defined(BOOST_HAS_FLOAT128)
+   #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
    test_constexpr_ness<boost::multiprecision::cpp_double_float128>();
    #endif
 #endif

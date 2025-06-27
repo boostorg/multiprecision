@@ -175,6 +175,29 @@ void check_trunc_result(T a, U u)
    }
 }
 
+namespace local {
+
+template <class T>
+auto fail_gate_maker
+{
+   has_poor_exp_range_or_precision_support<T>::value
+      ?
+         [](const T& my_sum, const T& my_a) -> bool
+         {
+            const T ratio { my_sum / my_a };
+            const T delta { fabs(1 - ratio) };
+
+            return (delta > std::numeric_limits<T>::epsilon());
+         }
+      :
+         [](const T& my_sum, const T& my_a) -> bool
+         {
+            return (my_sum != my_a);
+         }
+};
+
+} // namespace local
+
 template <class T, class U>
 void check_modf_result(T a, T fract, U ipart)
 {
@@ -182,17 +205,7 @@ void check_modf_result(T a, T fract, U ipart)
 
    const T sum { fract + ipart };
 
-   #if defined(TEST_CPP_DOUBLE_FLOAT)
-   const T ratio { sum / a };
-
-   const T delta { fabs(1 - ratio) };
-   #endif
-
-   #if defined(TEST_CPP_DOUBLE_FLOAT)
-   if(delta > std::numeric_limits<T>::epsilon())
-   #else
-   if (sum != a)
-   #endif
+   if (local::fail_gate_maker<T>(sum, a))
    {
       BOOST_ERROR("Fractional and integer results do not add up to the original value");
       std::cerr << "Values were: " << std::setprecision(35) << " "
@@ -504,7 +517,7 @@ int main()
    test<boost::multiprecision::cpp_double_float>();
    test<boost::multiprecision::cpp_double_double>();
    test<boost::multiprecision::cpp_double_long_double>();
-   #if defined(BOOST_HAS_FLOAT128)
+   #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
    #endif
 #endif

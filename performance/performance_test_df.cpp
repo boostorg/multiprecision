@@ -192,7 +192,7 @@ int main()
    local::test29();
    local::test32();
    local::test52();
-   #if defined(BOOST_HAS_FLOAT128)
+   #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
    local::test53();
    #endif
 
@@ -250,7 +250,6 @@ void local::test53()
 #endif
 #endif
 }
-
 
 #if 0
 

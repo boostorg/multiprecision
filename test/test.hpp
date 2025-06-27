@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2012 John Maddock. Distributed under the Boost
+//  Copyright 2012 - 2025 John Maddock.
+//  Copyright 2025 Christopher Kormanyos.
+//  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 //
@@ -7,14 +9,22 @@
 #ifndef BOOST_MULTIPRECISION_TEST_HPP
 #define BOOST_MULTIPRECISION_TEST_HPP
 
-#include <limits>
-#include <cmath>
-#include <typeinfo>
-
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/current_function.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/standalone_config.hpp>
+
+#if defined(TEST_CPP_DOUBLE_FLOAT)
+
+#include <boost/multiprecision/cpp_double_fp.hpp>
+
+#include <type_traits>
+
+#endif // TEST_CPP_DOUBLE_FLOAT
+
+#include <limits>
+#include <cmath>
+#include <typeinfo>
 
 namespace detail {
 
@@ -193,7 +203,7 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
 #endif
 
 #define BOOST_CHECK_IMP(x, severity)                                                        \
-   BOOST_MP_TEST_TRY                                                                             \
+   BOOST_MP_TEST_TRY                                                                        \
    {                                                                                        \
       if (x)                                                                                \
       {                                                                                     \
@@ -211,7 +221,7 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
 #define BOOST_REQUIRE(x) BOOST_CHECK_IMP(x, abort_on_fail)
 
 #define BOOST_CLOSE_IMP(x, y, tol, severity)                                                \
-   BOOST_MP_TEST_TRY                                                                             \
+   BOOST_MP_TEST_TRY                                                                        \
    {                                                                                        \
       if (relative_error(x, y) > tol)                                                       \
       {                                                                                     \
@@ -228,7 +238,7 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
    BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
 #define BOOST_EQUAL_IMP(x, y, severity)                                              \
-   BOOST_MP_TEST_TRY                                                                      \
+   BOOST_MP_TEST_TRY                                                                 \
    {                                                                                 \
       if (!((x) == (y)))                                                             \
       {                                                                              \
@@ -243,7 +253,7 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
    BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
 #define BOOST_NE_IMP(x, y, severity)                                                 \
-   BOOST_MP_TEST_TRY                                                                      \
+   BOOST_MP_TEST_TRY                                                                 \
    {                                                                                 \
       if (!(x != y))                                                                 \
       {                                                                              \
@@ -258,7 +268,7 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
    BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
 #define BOOST_LT_IMP(x, y, severity)                                                 \
-   BOOST_MP_TEST_TRY                                                                      \
+   BOOST_MP_TEST_TRY                                                                 \
    {                                                                                 \
       if (!(x < y))                                                                  \
       {                                                                              \
@@ -273,7 +283,7 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
    BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
 #define BOOST_GT_IMP(x, y, severity)                                                 \
-   BOOST_MP_TEST_TRY                                                                      \
+   BOOST_MP_TEST_TRY                                                                 \
    {                                                                                 \
       if (!(x > y))                                                                  \
       {                                                                              \
@@ -288,7 +298,7 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
    BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
 #define BOOST_LE_IMP(x, y, severity)                                                 \
-   BOOST_MP_TEST_TRY                                                                      \
+   BOOST_MP_TEST_TRY                                                                 \
    {                                                                                 \
       if (!(x <= y))                                                                 \
       {                                                                              \
@@ -303,7 +313,7 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
    BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
 #define BOOST_GE_IMP(x, y, severity)                                                 \
-   BOOST_MP_TEST_TRY                                                                      \
+   BOOST_MP_TEST_TRY                                                                 \
    {                                                                                 \
       if (!(x >= y))                                                                 \
       {                                                                              \
@@ -319,7 +329,7 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
 
 #ifndef BOOST_NO_EXCEPTIONS
 #define BOOST_MT_CHECK_THROW_IMP(x, E, severity)                                                                   \
-   BOOST_MP_TEST_TRY                                                                                                    \
+   BOOST_MP_TEST_TRY                                                                                               \
    {                                                                                                               \
       x;                                                                                                           \
       BOOST_MP_REPORT_WHERE << " Expected exception not thrown in expression " << BOOST_STRINGIZE(x) << std::endl; \
@@ -367,4 +377,17 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
 #define BOOST_WARN_THROW(x, E) BOOST_MT_CHECK_THROW_IMP(x, E, warn_on_fail)
 #define BOOST_REQUIRE_THROW(x, E) BOOST_MT_CHECK_THROW_IMP(x, E, abort_on_fail)
 
+#if defined(TEST_CPP_DOUBLE_FLOAT)
+
+template <class NumericTestType> struct has_poor_exp_range_or_precision_support { static constexpr bool value { false }; };
+
+template <> struct has_poor_exp_range_or_precision_support<::boost::multiprecision::cpp_double_float> final { static constexpr bool value { true }; };
+template <> struct has_poor_exp_range_or_precision_support<::boost::multiprecision::cpp_double_double> final { static constexpr bool value { true }; };
+template <> struct has_poor_exp_range_or_precision_support<::boost::multiprecision::cpp_double_long_double> final { static constexpr bool value { true }; };
+#if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128) // (which is the same as BOOST_HAS_FLOAT128)
+template <> struct has_poor_exp_range_or_precision_support<::boost::multiprecision::cpp_double_float128> final { static constexpr bool value { true }; };
 #endif
+
+#endif // TEST_CPP_DOUBLE_FLOAT
+
+#endif // BOOST_MULTIPRECISION_TEST_HPP

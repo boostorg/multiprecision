@@ -6,6 +6,9 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 //
 
+#define TEST_CPP_DEC_FLOAT
+#define TEST_CPP_DOUBLE_FLOAT
+
 #ifdef _MSC_VER
 #define _SCL_SECURE_NO_WARNINGS
 #endif
@@ -118,7 +121,10 @@ void print_flags(std::ios_base::fmtflags f)
 template <class T>
 void test()
 {
-   typedef T                                mp_t;
+   typedef T mp_t;
+
+   std::cout << "Testing type of test: " << typeid(mp_t).name() << std::endl;
+
    std::array<std::ios_base::fmtflags, 9> f =
        {{std::ios_base::fmtflags(0), std::ios_base::showpoint, std::ios_base::showpos, std::ios_base::scientific, std::ios_base::scientific | std::ios_base::showpos,
          std::ios_base::scientific | std::ios_base::showpoint, std::ios_base::fixed, std::ios_base::fixed | std::ios_base::showpoint,
@@ -145,17 +151,10 @@ void test()
             const char* expect = string_data[j][col];
             if (ss.str() != expect)
             {
-               #if defined(TEST_CPP_DOUBLE_FLOAT)
-               if (has_bad_bankers_rounding(mp_t()))
-               {
-                  std::cout << "Ignoring bankers-rounding error with TEST_CPP_DOUBLE_FLOAT.\n";
-               }
-               #else
                if (has_bad_bankers_rounding(mp_t()) && is_bankers_rounding_error(ss.str(), expect))
                {
-                  std::cout << "Ignoring bankers-rounding error with GMP mp_f.\n";
+                  std::cout << "Ignoring bankers-rounding error with " << typeid(T).name() << ".\n";
                }
-               #endif
                else
                {
                   std::cout << std::setprecision(20) << "Testing value " << val << std::endl;
@@ -252,22 +251,22 @@ T generate_random()
    e_type e;
    val = frexp(val, &e);
 
-   #if defined(TEST_CPP_DOUBLE_FLOAT)
    constexpr auto exp_range =
-      static_cast<int>
-      (
-         static_cast<float>
+     (::has_poor_exp_range_or_precision_support<T>::value)
+       ? static_cast<int>
          (
-              static_cast<float>(std::numeric_limits<T>::max_exponent10)
-            - static_cast<float>(static_cast<float>(std::numeric_limits<T>::max_digits10) * 1.1F)
+            static_cast<float>
+            (
+                 static_cast<float>(std::numeric_limits<T>::max_exponent10)
+               - static_cast<float>(static_cast<float>(std::numeric_limits<T>::max_digits10) * 1.1F)
+            )
+            / 0.301F
          )
-         / 0.301F
-      );
-   #else
-   constexpr auto exp_range = std::numeric_limits<T>::max_exponent - 10;
-   #endif
+       : std::numeric_limits<T>::max_exponent - 10
+       ;
 
    static boost::random::uniform_int_distribution<e_type> ui(0, exp_range);
+
    return ldexp(val, ui(gen));
 }
 
@@ -325,6 +324,8 @@ void do_round_trip(const T& val)
 template <class T>
 void test_round_trip()
 {
+   std::cout << "Testing type of test_round_trip: " << typeid(T).name() << std::endl;
+
    for (unsigned i = 0; i < 1000; ++i)
    {
       T val = generate_random<T>();
@@ -338,6 +339,8 @@ void test_round_trip()
 template<typename T>
 void test_to_string()
 {
+   std::cout << "Testing type of test_to_string: " << typeid(T).name() << std::endl;
+
    using std::to_string;
    T x0{"23.43"};
    BOOST_CHECK_EQUAL(to_string(x0), "23.430000");
@@ -433,7 +436,7 @@ int main()
    test_to_string<boost::multiprecision::cpp_double_long_double>();
    test_round_trip<boost::multiprecision::cpp_double_long_double>();
 
-   #if defined(BOOST_HAS_FLOAT128)
+   #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
    test_to_string<boost::multiprecision::cpp_double_float128>();
    test_round_trip<boost::multiprecision::cpp_double_float128>();
