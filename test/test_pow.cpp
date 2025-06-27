@@ -114,7 +114,7 @@ void test()
                                 test_pow_data::test_pow_data_array_type_reduced,
                                 test_pow_data::test_pow_data_array_type_default>::type;
 
-   const local_test_pow_data_array_type& data = local::data_maker<local_test_pow_data_array_type>::get_data();
+   const auto& data = local::data_maker<local_test_pow_data_array_type>::get_data();
 
    unsigned max_err = 0;
    for (unsigned k = 0; k < data.size(); k++)

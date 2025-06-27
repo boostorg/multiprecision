@@ -377,9 +377,13 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
 #define BOOST_WARN_THROW(x, E) BOOST_MT_CHECK_THROW_IMP(x, E, warn_on_fail)
 #define BOOST_REQUIRE_THROW(x, E) BOOST_MT_CHECK_THROW_IMP(x, E, abort_on_fail)
 
-#if defined(TEST_CPP_DOUBLE_FLOAT)
+template <class UnknownNumericTestType>
+struct has_poor_exp_range_or_precision_support
+{
+   static constexpr bool value { false };
+};
 
-template <class NumericTestType> struct has_poor_exp_range_or_precision_support { static constexpr bool value { false }; };
+#if defined(TEST_CPP_DOUBLE_FLOAT)
 
 template <> struct has_poor_exp_range_or_precision_support<::boost::multiprecision::cpp_double_float> final { static constexpr bool value { true }; };
 template <> struct has_poor_exp_range_or_precision_support<::boost::multiprecision::cpp_double_double> final { static constexpr bool value { true }; };
