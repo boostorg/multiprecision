@@ -47,6 +47,9 @@
 #ifdef TEST_CPP_DEC_FLOAT
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
+#ifdef TEST_CPP_BIN_FLOAT
+#include <boost/multiprecision/cpp_bin_float.hpp>
+#endif
 #ifdef TEST_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
