@@ -121,10 +121,10 @@ constexpr auto eval_convert_to(unsigned long long* result, const cpp_double_fp_b
 
 #ifdef BOOST_HAS_INT128
 template <typename FloatingPointType>
-constexpr auto eval_convert_to(int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> void;
+constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> typename std::enable_if<(cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits > 24), void>::type;
 
 template <typename FloatingPointType>
-constexpr auto eval_convert_to(uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> void;
+constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> typename std::enable_if<!(cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits > 24), void>::type;
 #endif
 
 template <typename FloatingPointType,
@@ -2284,39 +2284,74 @@ constexpr auto eval_convert_to(unsigned long long* result, const cpp_double_fp_b
 
 #ifdef BOOST_HAS_INT128
 template <typename FloatingPointType>
-constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> void
+constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> typename std::enable_if<(cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits > 24), void>::type
 {
    const auto fpc = eval_fpclassify(backend);
 
    if (fpc != FP_NORMAL)
    {
-      *result = static_cast<boost::int128_type>(backend.my_first());
-
-      return;
-   }
-
-   constexpr boost::int128_type my_max_val = (((static_cast<boost::int128_type>(1) << (sizeof(boost::int128_type) * CHAR_BIT - 2)) - 1) << 1) + 1;
-   constexpr boost::int128_type my_min_val = static_cast<boost::int128_type>(-my_max_val - 1);
-
-   using c_type = typename std::common_type<boost::int128_type, FloatingPointType>::type;
-
-   constexpr c_type my_max { static_cast<c_type>(my_max_val) };
-   constexpr c_type my_min { static_cast<c_type>(my_min_val) };
-
-   const c_type ct { static_cast<c_type>(backend.my_first()) };
-
-   if (ct > my_max)
-   {
-      *result = my_max_val;
-   }
-   if (ct < my_min)
-   {
-      *result = my_min_val;
+      *result = static_cast<signed long long>(backend.crep().first);
    }
    else
    {
-      *result  = static_cast<boost::int128_type>(backend.my_first());
-      *result += static_cast<boost::int128_type>(backend.my_second());
+      using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+      using local_float_type =  typename double_float_type::float_type;
+
+      static_assert(std::is_same<local_float_type, FloatingPointType>::value, "Error something went wrong with the limb type");
+
+      constexpr bool
+         n128_is_longer
+         {
+            (static_cast<int>(sizeof(boost::int128_type) * static_cast<std::size_t>(CHAR_BIT)) > cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits)
+         };
+
+      using longer_type = typename ::std::conditional<n128_is_longer, boost::int128_type, double_float_type>::type;
+
+      constexpr boost::int128_type my_max_val_n128 = (((static_cast<boost::int128_type>(1) << (sizeof(boost::int128_type) * CHAR_BIT - 2)) - 1) << 1) + 1;
+      constexpr boost::int128_type my_min_val_n128 = static_cast<boost::int128_type>(-my_max_val_n128 - 1);
+
+      constexpr longer_type my_max_val(static_cast<longer_type>(my_max_val_n128));
+      constexpr longer_type my_min_val(static_cast<longer_type>(my_min_val_n128));
+
+      constexpr double_float_type my_max_val_dd(static_cast<double_float_type>(my_max_val));
+      constexpr double_float_type my_min_val_dd(static_cast<double_float_type>(my_min_val));
+
+      if (backend.compare(my_max_val_dd) >= 0)
+      {
+         *result = my_max_val;
+      }
+      else if (backend.compare(my_min_val_dd) <= 0)
+      {
+         *result = my_min_val;
+      }
+      else
+      {
+         double_float_type source { backend };
+
+         *result = detail::extract<boost::int128_type>(source);
+      }
+   }
+}
+
+template <typename FloatingPointType>
+constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> typename std::enable_if<!(cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits > 24), void>::type
+{
+   const auto fpc = eval_fpclassify(backend);
+
+   if (fpc != FP_NORMAL)
+   {
+      *result = static_cast<signed long long>(backend.crep().first);
+   }
+   else
+   {
+      using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+
+      constexpr double_float_type my_max_val_dd { double_float_type::my_value_max() };
+      constexpr double_float_type my_min_val_dd { -double_float_type::my_value_max() };
+
+      double_float_type source { backend };
+
+      *result = detail::extract<boost::int128_type>(source);
    }
 }
 
