@@ -2290,7 +2290,7 @@ constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_b
 
    if (fpc != FP_NORMAL)
    {
-      *result = static_cast<signed long long>(backend.crep().first);
+      *result = static_cast<boost::int128_type>(backend.crep().first);
    }
    else
    {
@@ -2340,7 +2340,7 @@ constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_b
 
    if (fpc != FP_NORMAL)
    {
-      *result = static_cast<signed long long>(backend.crep().first);
+      *result = static_cast<boost::int128_type>(backend.crep().first);
    }
    else
    {
