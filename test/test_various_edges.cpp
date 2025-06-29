@@ -1349,17 +1349,33 @@ namespace local
         const boost::int128_type n128_inf { static_cast<boost::int128_type>(flt_inf) };
         const boost::int128_type n128_zer { static_cast<boost::int128_type>(flt_zer) };
 
+        const boost::uint128_type u128_nan { static_cast<boost::uint128_type>(flt_nan) };
+        const boost::uint128_type u128_inf { static_cast<boost::uint128_type>(flt_inf) };
+        const boost::uint128_type u128_zer { static_cast<boost::uint128_type>(flt_zer) };
+
         const auto result_val_nan_is_ok = (n128_nan == static_cast<boost::int128_type>(std::numeric_limits<float>::quiet_NaN()));
         const auto result_val_inf_is_ok = (n128_inf == static_cast<boost::int128_type>(std::numeric_limits<float>::infinity()));
         const auto result_val_zer_is_ok = (n128_zer == static_cast<boost::int128_type>(0));
+
+        const auto result_val_unan_is_ok = (u128_nan == static_cast<boost::uint128_type>(std::numeric_limits<float>::quiet_NaN()));
+        const auto result_val_uinf_is_ok = (u128_inf == static_cast<boost::uint128_type>(std::numeric_limits<float>::infinity()));
+        const auto result_val_uzer_is_ok = (u128_zer == static_cast<boost::uint128_type>(0));
 
         BOOST_TEST(result_val_nan_is_ok);
         BOOST_TEST(result_val_inf_is_ok);
         BOOST_TEST(result_val_zer_is_ok);
 
+        BOOST_TEST(result_val_unan_is_ok);
+        BOOST_TEST(result_val_uinf_is_ok);
+        BOOST_TEST(result_val_uzer_is_ok);
+
         result_is_ok = (result_val_nan_is_ok && result_is_ok);
         result_is_ok = (result_val_inf_is_ok && result_is_ok);
         result_is_ok = (result_val_zer_is_ok && result_is_ok);
+
+        result_is_ok = (result_val_unan_is_ok && result_is_ok);
+        result_is_ok = (result_val_uinf_is_ok && result_is_ok);
+        result_is_ok = (result_val_uzer_is_ok && result_is_ok);
       }
     }
     else
@@ -1418,17 +1434,33 @@ namespace local
         const boost::int128_type n128_inf { static_cast<boost::int128_type>(flt_inf) };
         const boost::int128_type n128_zer { static_cast<boost::int128_type>(flt_zer) };
 
+        const boost::uint128_type u128_nan { static_cast<boost::uint128_type>(flt_nan) };
+        const boost::uint128_type u128_inf { static_cast<boost::uint128_type>(flt_inf) };
+        const boost::uint128_type u128_zer { static_cast<boost::uint128_type>(flt_zer) };
+
         const auto result_val_nan_is_ok = (n128_nan == static_cast<boost::int128_type>(std::numeric_limits<double>::quiet_NaN()));
         const auto result_val_inf_is_ok = (n128_inf == static_cast<boost::int128_type>(std::numeric_limits<double>::infinity()));
         const auto result_val_zer_is_ok = (n128_zer == static_cast<boost::int128_type>(0));
+
+        const auto result_val_unan_is_ok = (u128_nan == static_cast<boost::uint128_type>(std::numeric_limits<double>::quiet_NaN()));
+        const auto result_val_uinf_is_ok = (u128_inf == static_cast<boost::uint128_type>(std::numeric_limits<double>::infinity()));
+        const auto result_val_uzer_is_ok = (u128_zer == static_cast<boost::uint128_type>(0));
 
         BOOST_TEST(result_val_nan_is_ok);
         BOOST_TEST(result_val_inf_is_ok);
         BOOST_TEST(result_val_zer_is_ok);
 
+        BOOST_TEST(result_val_unan_is_ok);
+        BOOST_TEST(result_val_uinf_is_ok);
+        BOOST_TEST(result_val_uzer_is_ok);
+
         result_is_ok = (result_val_nan_is_ok && result_is_ok);
         result_is_ok = (result_val_inf_is_ok && result_is_ok);
         result_is_ok = (result_val_zer_is_ok && result_is_ok);
+
+        result_is_ok = (result_val_unan_is_ok && result_is_ok);
+        result_is_ok = (result_val_uinf_is_ok && result_is_ok);
+        result_is_ok = (result_val_uzer_is_ok && result_is_ok);
       }
     }
 
