@@ -1273,12 +1273,9 @@ namespace local
       }
     }
 
-    BOOST_IF_CONSTEXPR(std::numeric_limits<float_type>::max_exponent > 132)
     {
       for(auto index = 0U; index < 8U; ++index)
       {
-        static_cast<void>(index);
-
         using std::ldexp;
 
         float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) };
@@ -1302,29 +1299,10 @@ namespace local
         BOOST_TEST(result_ll_min_max_is_ok);
 
         result_is_ok = (result_ll_min_max_is_ok && result_is_ok);
-
-        #ifdef BOOST_HAS_INT128
-        constexpr boost::int128_type my_max_val = (((static_cast<boost::int128_type>(1) << (sizeof(boost::int128_type) * CHAR_BIT - 2)) - 1) << 1) + 1;
-        constexpr boost::int128_type my_min_val = static_cast<boost::int128_type>(-my_max_val - 1);
-
-        const boost::int128_type n128_min_max { static_cast<boost::int128_type>(flt_around_max) };
-
-        const auto
-          result_n128_min_max_is_ok =
-          (
-            is_neg ? (n128_min_max == my_min_val)
-                   : (n128_min_max == my_max_val)
-          );
-
-        BOOST_TEST(result_n128_min_max_is_ok);
-
-        result_is_ok = (result_n128_min_max_is_ok && result_is_ok);
-        #endif
       }
     }
 
     #ifdef BOOST_HAS_INT128
-
     constexpr bool is_24_digit_float { (std::numeric_limits<float>::digits == 24) };
 
     constexpr bool is_cpp_double_float
@@ -1336,8 +1314,6 @@ namespace local
     {
       for(auto index = 0U; index < 8U; ++index)
       {
-        static_cast<void>(index);
-
         using std::ldexp;
 
         float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) };
@@ -1359,6 +1335,38 @@ namespace local
           (
             is_neg ? (my_min_val_n128 < n128_near_min_max)
                    : (my_max_val_n128 > n128_near_min_max)
+          );
+
+        BOOST_TEST(result_n128_min_max_is_ok);
+
+        result_is_ok = (result_n128_min_max_is_ok && result_is_ok);
+      }
+    }
+    else
+    {
+      for(auto index = 0U; index < 8U; ++index)
+      {
+        using std::ldexp;
+
+        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) };
+
+        const bool is_neg { ((index & 1U) != 0U) };
+
+        if(is_neg)
+        {
+          flt_around_max = -flt_around_max;
+        }
+
+        constexpr boost::int128_type my_max_val = (((static_cast<boost::int128_type>(1) << (sizeof(boost::int128_type) * CHAR_BIT - 2)) - 1) << 1) + 1;
+        constexpr boost::int128_type my_min_val = static_cast<boost::int128_type>(-my_max_val - 1);
+
+        const boost::int128_type n128_min_max { static_cast<boost::int128_type>(flt_around_max) };
+
+        const auto
+          result_n128_min_max_is_ok =
+          (
+            is_neg ? (n128_min_max == my_min_val)
+                   : (n128_min_max == my_max_val)
           );
 
         BOOST_TEST(result_n128_min_max_is_ok);
