@@ -46,6 +46,19 @@ template<typename FloatType> auto my_exp1() noexcept -> FloatType&;
 
 namespace local
 {
+  using float_backend_bin_limited_type = boost::multiprecision::cpp_bin_float<106, boost::multiprecision::digit_base_2, void, int, -1021, +1024>;
+
+  using float_bin_limited_type = boost::multiprecision::number<float_backend_bin_limited_type, boost::multiprecision::et_off>;
+} // namespace local
+
+template <>
+struct has_poor_exp_range_or_precision_support<::local::float_bin_limited_type> final
+{
+  static constexpr bool value { true };
+};
+
+namespace local
+{
   template<typename IntegralTimePointType,
            typename ClockType = std::chrono::high_resolution_clock>
   auto time_point() noexcept -> IntegralTimePointType
@@ -193,143 +206,146 @@ namespace local
       }
     }
 
+    if(has_poor_exp_range_or_precision_support<float_type>::value)
     {
-      float_type flt_val { };
-      ctrl_type  ctl_val { };
-
-      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(16)); ++i)
       {
-        static_cast<void>(i);
+        float_type flt_val { };
+        ctrl_type  ctl_val { };
 
-        flt_val = sqrt((std::numeric_limits<float_type>::max)());
-        ctl_val = ctrl_type { flt_val };
-
-        float_type flt_factor { 123.456F * dis(gen) };
-
-        unsigned j { static_cast<unsigned>(UINT8_C(0)) };
-
-        for(; j < static_cast<unsigned>(UINT16_C(8192)); ++j)
+        for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(16)); ++i)
         {
-          if(unsigned { j % unsigned { UINT8_C(3) } } == unsigned { UINT8_C(0)})
+          static_cast<void>(i);
+
+          flt_val = sqrt((std::numeric_limits<float_type>::max)());
+          ctl_val = ctrl_type { flt_val };
+
+          float_type flt_factor { 123.456F * dis(gen) };
+
+          unsigned j { static_cast<unsigned>(UINT8_C(0)) };
+
+          for(; j < static_cast<unsigned>(UINT16_C(8192)); ++j)
           {
-            flt_val = -flt_val;
-            ctl_val = -ctl_val;
+            if(unsigned { j % unsigned { UINT8_C(3) } } == unsigned { UINT8_C(0)})
+            {
+              flt_val = -flt_val;
+              ctl_val = -ctl_val;
+            }
+
+            if(unsigned { j % unsigned { UINT8_C(2) } } == unsigned { UINT8_C(0)})
+            {
+              flt_factor = -flt_factor;
+            }
+
+            flt_val *= flt_factor;
+            ctl_val *= ctrl_type { flt_factor };
+
+            if(isinf(flt_val)) { break; }
+
+            const bool result_finite_mul_is_ok
+            {
+                  local::is_close_fraction(flt_val, float_type { ctl_val }, std::numeric_limits<float_type>::epsilon() * 32)
+              && (signbit(flt_val) == signbit(ctl_val))
+            };
+
+            BOOST_TEST(result_finite_mul_is_ok);
           }
 
-          if(unsigned { j % unsigned { UINT8_C(2) } } == unsigned { UINT8_C(0)})
+          const bool result_mul_is_ok
           {
-            flt_factor = -flt_factor;
-          }
-
-          flt_val *= flt_factor;
-          ctl_val *= ctrl_type { flt_factor };
-
-          if(isinf(flt_val)) { break; }
-
-          const bool result_finite_mul_is_ok
-          {
-                local::is_close_fraction(flt_val, float_type { ctl_val }, std::numeric_limits<float_type>::epsilon() * 32)
+               isinf(flt_val)
+            && (j < unsigned { UINT16_C(8192) })
             && (signbit(flt_val) == signbit(ctl_val))
           };
 
-          BOOST_TEST(result_finite_mul_is_ok);
+          BOOST_TEST(result_mul_is_ok);
+
+          result_is_ok = (result_mul_is_ok && result_is_ok);
         }
-
-        const bool result_mul_is_ok
-        {
-             isinf(flt_val)
-          && (j < unsigned { UINT16_C(8192) })
-          && (signbit(flt_val) == signbit(ctl_val))
-        };
-
-        BOOST_TEST(result_mul_is_ok);
-
-        result_is_ok = (result_mul_is_ok && result_is_ok);
       }
-    }
 
-    {
-      const float_type inf_pos_01 { "1e100001" };
-      const float_type inf_pos_02 { "1e100002" };
-      const float_type inf_pos_03 { "1e100003" };
-      const float_type inf_neg_01 { "-1e100001" };
-      const float_type inf_neg_02 { "-1e100002" };
-      const float_type inf_neg_03 { "-1e100003" };
+      {
+        const float_type inf_pos_01 { "1e100001" };
+        const float_type inf_pos_02 { "1e100002" };
+        const float_type inf_pos_03 { "1e100003" };
+        const float_type inf_neg_01 { "-1e100001" };
+        const float_type inf_neg_02 { "-1e100002" };
+        const float_type inf_neg_03 { "-1e100003" };
 
-      const float_type tiny_01 { "1e-100001" };
-      const float_type tiny_02 { "1e-100002" };
-      const float_type tiny_03 { "1e-100003" };
+        const float_type tiny_01 { "1e-100001" };
+        const float_type tiny_02 { "1e-100002" };
+        const float_type tiny_03 { "1e-100003" };
 
-      BOOST_TEST(result_is_ok = (isinf(inf_pos_01) && result_is_ok));
-      BOOST_TEST(result_is_ok = (isinf(inf_pos_02) && result_is_ok));
-      BOOST_TEST(result_is_ok = (isinf(inf_pos_03) && result_is_ok));
+        BOOST_TEST(result_is_ok = (isinf(inf_pos_01) && result_is_ok));
+        BOOST_TEST(result_is_ok = (isinf(inf_pos_02) && result_is_ok));
+        BOOST_TEST(result_is_ok = (isinf(inf_pos_03) && result_is_ok));
 
-      BOOST_TEST(result_is_ok = (isinf(inf_neg_01) && signbit(inf_neg_01) && result_is_ok));
-      BOOST_TEST(result_is_ok = (isinf(inf_neg_02) && signbit(inf_neg_02) && result_is_ok));
-      BOOST_TEST(result_is_ok = (isinf(inf_neg_03) && signbit(inf_neg_03) && result_is_ok));
+        BOOST_TEST(result_is_ok = (isinf(inf_neg_01) && signbit(inf_neg_01) && result_is_ok));
+        BOOST_TEST(result_is_ok = (isinf(inf_neg_02) && signbit(inf_neg_02) && result_is_ok));
+        BOOST_TEST(result_is_ok = (isinf(inf_neg_03) && signbit(inf_neg_03) && result_is_ok));
 
-      BOOST_TEST(result_is_ok = ((fpclassify(tiny_01) == FP_ZERO) && result_is_ok));
-      BOOST_TEST(result_is_ok = ((fpclassify(tiny_02) == FP_ZERO) && result_is_ok));
-      BOOST_TEST(result_is_ok = ((fpclassify(tiny_03) == FP_ZERO) && result_is_ok));
-    }
+        BOOST_TEST(result_is_ok = ((fpclassify(tiny_01) == FP_ZERO) && result_is_ok));
+        BOOST_TEST(result_is_ok = ((fpclassify(tiny_02) == FP_ZERO) && result_is_ok));
+        BOOST_TEST(result_is_ok = ((fpclassify(tiny_03) == FP_ZERO) && result_is_ok));
+      }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
-    {
-      static_cast<void>(i);
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
+      {
+        static_cast<void>(i);
 
-      float_type flt_x { 2345.6F + static_cast<float>(i) * dis(gen) };
+        float_type flt_x { 2345.6F + static_cast<float>(i) * dis(gen) };
 
-      const float_type quotient_one = flt_x /= flt_x;
+        const float_type quotient_one = flt_x /= flt_x;
 
-      BOOST_TEST(result_is_ok = ((quotient_one == 1) && result_is_ok));
-    }
+        BOOST_TEST(result_is_ok = ((quotient_one == 1) && result_is_ok));
+      }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
-    {
-      static_cast<void>(i);
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
+      {
+        static_cast<void>(i);
 
-      float_type flt_x { 1000.0F + static_cast<float>(i) * dis(gen) };
+        float_type flt_x { 1000.0F + static_cast<float>(i) * dis(gen) };
 
-      const float_type sub_result_zero = flt_x -= flt_x;
+        const float_type sub_result_zero = flt_x -= flt_x;
 
-      BOOST_TEST(result_is_ok = ((fpclassify(sub_result_zero) == FP_ZERO) && result_is_ok));
-    }
+        BOOST_TEST(result_is_ok = ((fpclassify(sub_result_zero) == FP_ZERO) && result_is_ok));
+      }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
-    {
-      static_cast<void>(i);
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
+      {
+        static_cast<void>(i);
 
-      float_type flt_numpos { ::my_one<float_type>() * dis(gen) };
-      float_type flt_numneg { ::my_one<float_type>() * -dis(gen) };
-      float_type flt_denom  { ::my_zero<float_type>() * dis(gen) };
+        float_type flt_numpos { ::my_one<float_type>() * dis(gen) };
+        float_type flt_numneg { ::my_one<float_type>() * -dis(gen) };
+        float_type flt_denom  { ::my_zero<float_type>() * dis(gen) };
 
-      const float_type div_result_zero_pos { flt_numpos / flt_denom };
-      const float_type div_result_zero_neg { flt_numneg / flt_denom };
+        const float_type div_result_zero_pos { flt_numpos / flt_denom };
+        const float_type div_result_zero_neg { flt_numneg / flt_denom };
 
-      BOOST_TEST(result_is_ok = ((fpclassify(div_result_zero_pos) == FP_INFINITE) && result_is_ok));
-      BOOST_TEST(result_is_ok = ((fpclassify(div_result_zero_neg) == FP_INFINITE) && signbit(div_result_zero_neg) && result_is_ok));
-    }
+        BOOST_TEST(result_is_ok = ((fpclassify(div_result_zero_pos) == FP_INFINITE) && result_is_ok));
+        BOOST_TEST(result_is_ok = ((fpclassify(div_result_zero_neg) == FP_INFINITE) && signbit(div_result_zero_neg) && result_is_ok));
+      }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
-    {
-      static_cast<void>(i);
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
+      {
+        static_cast<void>(i);
 
-      float_type flt_x { float_type { (std::numeric_limits<signed long long>::max)() } * static_cast<float>((static_cast<int>(i) + 1) * 2) * dis(gen) };
+        float_type flt_x { float_type { (std::numeric_limits<signed long long>::max)() } * static_cast<float>((static_cast<int>(i) + 1) * 2) * dis(gen) };
 
-      const signed long long conversion_result_max { static_cast<signed long long>(flt_x) };
+        const signed long long conversion_result_max { static_cast<signed long long>(flt_x) };
 
-      BOOST_TEST(result_is_ok = ((conversion_result_max == (std::numeric_limits<signed long long>::max)()) && result_is_ok));
-    }
+        BOOST_TEST(result_is_ok = ((conversion_result_max == (std::numeric_limits<signed long long>::max)()) && result_is_ok));
+      }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
-    {
-      static_cast<void>(i);
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
+      {
+        static_cast<void>(i);
 
-      float_type flt_x { float_type { (std::numeric_limits<signed long long>::min)() } * static_cast<float>((static_cast<int>(i) + 1) * 2) * dis(gen) };
+        float_type flt_x { float_type { (std::numeric_limits<signed long long>::min)() } * static_cast<float>((static_cast<int>(i) + 1) * 2) * dis(gen) };
 
-      const signed long long conversion_result_min { static_cast<signed long long>(flt_x) };
+        const signed long long conversion_result_min { static_cast<signed long long>(flt_x) };
 
-      BOOST_TEST(result_is_ok = ((conversion_result_min == (std::numeric_limits<signed long long>::min)()) && result_is_ok));
+        BOOST_TEST(result_is_ok = ((conversion_result_min == (std::numeric_limits<signed long long>::min)()) && result_is_ok));
+      }
     }
 
     {
@@ -1168,6 +1184,90 @@ namespace local
     return result_is_ok;
   }
 
+  template<typename FloatType>
+  auto test_ops_and_convert() -> bool
+  {
+    using float_type   = FloatType;
+
+    std::mt19937_64 gen { time_point<typename std::mt19937_64::result_type>() };
+
+    std::uniform_real_distribution<float>
+      dist
+      (
+        static_cast<float>(1.01L),
+        static_cast<float>(1.04L)
+      );
+
+    auto result_is_ok = true;
+
+    using std::isnan;
+    using std::isinf;
+
+    for(auto index = 0U; index < 8U; ++index)
+    {
+      const float_type flt_nan { std::numeric_limits<float_type>::quiet_NaN() * static_cast<float_type>(dist(gen)) };
+
+      double dbl_non_finite { static_cast<double>(flt_nan) };
+
+      const auto result_val_nan_is_ok = isnan(dbl_non_finite);
+
+      BOOST_TEST(result_val_nan_is_ok);
+
+      result_is_ok = (result_val_nan_is_ok && result_is_ok);
+
+      const bool is_neg { ((index & 1U) != 0U) };
+
+      const float_type
+        flt_inf
+        {
+          (
+            is_neg ? -std::numeric_limits<float_type>::infinity() * static_cast<float_type>(dist(gen))
+                   : +std::numeric_limits<float_type>::infinity() * static_cast<float_type>(dist(gen))
+          )
+        };
+
+      dbl_non_finite = static_cast<double>(flt_inf);
+
+      const auto result_val_inf_is_ok = (isinf(dbl_non_finite) && (is_neg == (dbl_non_finite < 0)));
+
+      BOOST_TEST(result_val_inf_is_ok);
+
+      result_is_ok = (result_val_inf_is_ok && result_is_ok);
+    }
+
+    if(!has_poor_exp_range_or_precision_support<float_type>::value)
+    {
+      for(auto index = 0U; index < 8U; ++index)
+      {
+        static_cast<void>(index);
+
+        float_type
+          flt_dbl_max_max
+          {
+              static_cast<float_type>(std::numeric_limits<double>::max())
+            * static_cast<float_type>(dist(gen))
+            * static_cast<float_type>(std::numeric_limits<double>::max())
+          };
+
+        const bool is_neg { ((index & 1U) != 0U) };
+
+        if(is_neg)
+        {
+          flt_dbl_max_max = -flt_dbl_max_max;
+        }
+
+        double dbl_non_finite { static_cast<double>(flt_dbl_max_max) };
+
+        const auto result_val_inf_is_ok = (isinf(dbl_non_finite) && (is_neg == (dbl_non_finite < 0)));
+
+        BOOST_TEST(result_val_inf_is_ok);
+
+        result_is_ok = (result_val_inf_is_ok && result_is_ok);
+      }
+    }
+
+    return result_is_ok;
+  }
 } // namespace local
 
 auto main() -> int
@@ -1184,6 +1284,7 @@ auto main() -> int
     local::test_exp_edge<float_type>();
     local::test_log_edge<float_type>();
     local::test_pow_n_edge<float_type>();
+    static_cast<void>(local::test_ops_and_convert<float_type>());
   }
 
   {
@@ -1197,6 +1298,7 @@ auto main() -> int
     local::test_exp_edge<float_type>();
     local::test_log_edge<float_type>();
     local::test_pow_n_edge<float_type>();
+    static_cast<void>(local::test_ops_and_convert<float_type>());
   }
 
   {
@@ -1210,6 +1312,7 @@ auto main() -> int
     local::test_exp_edge<float_type>();
     local::test_log_edge<float_type>();
     local::test_pow_n_edge<float_type>();
+    static_cast<void>(local::test_ops_and_convert<float_type>());
   }
 
   #endif // TEST_CPP_DOUBLE_FLOAT
@@ -1226,6 +1329,22 @@ auto main() -> int
     local::test_exp_edge<float_type>();
     local::test_log_edge<float_type>();
     local::test_pow_n_edge<float_type>();
+    static_cast<void>(local::test_ops_and_convert<float_type>());
+  }
+
+  {
+    using float_backend_type = boost::multiprecision::cpp_dec_float<50>;
+
+    using float_type = boost::multiprecision::number<float_backend_type, boost::multiprecision::et_off>;
+
+    std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
+
+    static_cast<void>(local::test_edges<float_type>());
+    local::test_sqrt_edge<float_type>();
+    local::test_exp_edge<float_type>();
+    local::test_log_edge<float_type>();
+    local::test_pow_n_edge<float_type>();
+    static_cast<void>(local::test_ops_and_convert<float_type>());
   }
 
   return boost::report_errors();
