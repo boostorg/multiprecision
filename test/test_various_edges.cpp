@@ -1340,6 +1340,26 @@ namespace local
         BOOST_TEST(result_n128_min_max_is_ok);
 
         result_is_ok = (result_n128_min_max_is_ok && result_is_ok);
+
+        const float_type flt_nan { std::numeric_limits<float_type>::quiet_NaN() * static_cast<float_type>(dist(gen)) };
+        const float_type flt_inf { std::numeric_limits<float_type>::infinity() * static_cast<float_type>(dist(gen)) };
+        const float_type flt_zer { my_zero<float_type>() * static_cast<float_type>(dist(gen)) };
+
+        const boost::int128_type n128_nan { static_cast<boost::int128_type>(flt_nan) };
+        const boost::int128_type n128_inf { static_cast<boost::int128_type>(flt_inf) };
+        const boost::int128_type n128_zer { static_cast<boost::int128_type>(flt_zer) };
+
+        const auto result_val_nan_is_ok = (n128_nan == static_cast<boost::int128_type>(std::numeric_limits<float>::quiet_NaN()));
+        const auto result_val_inf_is_ok = (n128_inf == static_cast<boost::int128_type>(std::numeric_limits<float>::infinity()));
+        const auto result_val_zer_is_ok = (n128_zer == static_cast<boost::int128_type>(0));
+
+        BOOST_TEST(result_val_nan_is_ok);
+        BOOST_TEST(result_val_inf_is_ok);
+        BOOST_TEST(result_val_zer_is_ok);
+
+        result_is_ok = (result_val_nan_is_ok && result_is_ok);
+        result_is_ok = (result_val_inf_is_ok && result_is_ok);
+        result_is_ok = (result_val_zer_is_ok && result_is_ok);
       }
     }
     else
