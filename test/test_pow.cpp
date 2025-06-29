@@ -66,19 +66,42 @@
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
+#if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+// These were the only ones I checked locally at the moment that use random tests.
+
+#include <ctime>
+#include <random>
+
+#endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+
+template<typename FloatType> auto my_zero() -> FloatType&;
+
 namespace local {
 
    template <class DataArrayType>
    struct data_maker
    {
-     static auto get_data() -> const DataArrayType& { static const DataArrayType instance { }; return instance; }
+   private:
+      using local_array_type = DataArrayType;
+
+   public:
+      static auto get_data() -> const local_array_type&
+      {
+         // We do not expect to ever instantiate this struct.
+
+         static const local_array_type instance { };
+
+         return instance;
+      }
    };
 
    template <>
    struct data_maker<test_pow_data::test_pow_data_array_type_reduced> final
    {
+   private:
       using local_array_type = test_pow_data::test_pow_data_array_type_reduced;
 
+   public:
       static auto get_data() -> const local_array_type&
       {
          static const local_array_type instance { test_pow_data::data_reduced };
@@ -90,8 +113,10 @@ namespace local {
    template <>
    struct data_maker<test_pow_data::test_pow_data_array_type_default> final
    {
+   private:
       using local_array_type = test_pow_data::test_pow_data_array_type_default;
 
+   public:
       static auto get_data() -> const local_array_type&
       {
          static const local_array_type instance { test_pow_data::data };
@@ -145,10 +170,81 @@ void test()
    BOOST_CHECK_EQUAL(pow(T(1), T(2)), 1);
    BOOST_CHECK_EQUAL(pow(T(1), 2), 1);
 
+   #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+   // These were the only ones I checked locally at the moment that use random tests.
+
+   std::mt19937_64 gen { };
+
+   gen.seed(static_cast<typename std::mt19937_64::result_type>(std::clock()));
+
+   std::uniform_real_distribution<float>
+      dist
+      (
+        static_cast<float>(1.01L),
+        static_cast<float>(1.04L)
+      );
+
+   #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+
    BOOST_IF_CONSTEXPR(std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_infinity)
    {
       BOOST_CHECK_EQUAL(pow(T(1.25F), std::numeric_limits<T>::infinity()), std::numeric_limits<T>::infinity());
       BOOST_CHECK_EQUAL(pow(T(1.25F), -std::numeric_limits<T>::infinity()), T(0));
+
+
+      #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+      // These were the only ones I checked locally at the moment that use random tests.
+
+      for (int npow = -8; npow < 8; ++npow)
+      {
+         T zero_arg = my_zero<T>() * dist(gen);
+
+         const T pow_zero_to_a = pow(zero_arg, T(static_cast<float>(npow) * dist(gen)));
+
+         if (npow < 0)
+         {
+            BOOST_CHECK((boost::multiprecision::isinf)(pow_zero_to_a));
+         }
+         else if (npow > 0)
+         {
+            BOOST_CHECK_EQUAL(pow_zero_to_a, T(0));
+         }
+         else
+         {
+            BOOST_CHECK_EQUAL(pow_zero_to_a, T(1));
+         }
+      }
+
+      for (int narg = 2; narg < 8; ++narg)
+      {
+         T finite_arg = T(static_cast<float>(narg) * dist(gen));
+
+         const T pow_finite_to_zero = pow(finite_arg, my_zero<T>() * dist(gen));
+
+         BOOST_CHECK_EQUAL(pow_finite_to_zero, T(1));
+      }
+
+      for (int nexp = -8; nexp < 8; ++nexp)
+      {
+         T finite_exp = T(static_cast<float>(nexp) * dist(gen));
+
+         const T pow_infinite_to_finite = pow(std::numeric_limits<T>::infinity() * dist(gen), finite_exp);
+
+         if (nexp < 0)
+         {
+            BOOST_CHECK_EQUAL(pow_infinite_to_finite, T(0));
+         }
+         else if (nexp > 0)
+         {
+            BOOST_CHECK((boost::multiprecision::isinf)(pow_infinite_to_finite));
+         }
+         else
+         {
+            BOOST_CHECK_EQUAL(pow_infinite_to_finite, T(1));
+         }
+      }
+
+      #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
    }
 
    BOOST_IF_CONSTEXPR((!boost::multiprecision::is_interval_number<T>::value) && std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_quiet_NaN)
@@ -228,4 +324,13 @@ int main()
    #endif
 #endif
    return boost::report_errors();
+}
+
+template<typename FloatType> auto my_zero() -> FloatType&
+{
+   using float_type = FloatType;
+
+   static float_type my_val_zero(0);
+
+   return my_val_zero;
 }
