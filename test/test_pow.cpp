@@ -66,12 +66,13 @@
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
-#if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT))
+#if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+// These were the only ones I checked locally at the moment that use random tests.
 
 #include <ctime>
 #include <random>
 
-#endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT))
+#endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
 
 template<typename FloatType> auto my_zero() -> FloatType&;
 
@@ -169,8 +170,8 @@ void test()
    BOOST_CHECK_EQUAL(pow(T(1), T(2)), 1);
    BOOST_CHECK_EQUAL(pow(T(1), 2), 1);
 
-   // These were the only oned I checked locally at the moment.
-   #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT))
+   #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+   // These were the only ones I checked locally at the moment that use random tests.
 
    std::mt19937_64 gen { };
 
@@ -183,7 +184,7 @@ void test()
         static_cast<float>(1.04L)
       );
 
-   #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT))
+   #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
 
    BOOST_IF_CONSTEXPR(std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_infinity)
    {
@@ -191,8 +192,8 @@ void test()
       BOOST_CHECK_EQUAL(pow(T(1.25F), -std::numeric_limits<T>::infinity()), T(0));
 
 
-      // These were the only oned I checked locally at the moment.
-      #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT))
+      #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+      // These were the only ones I checked locally at the moment that use random tests.
 
       for (int npow = -8; npow < 8; ++npow)
       {
@@ -202,7 +203,7 @@ void test()
 
          if (npow < 0)
          {
-            BOOST_CHECK((isinf)(pow_zero_to_a));
+            BOOST_CHECK((boost::multiprecision::isinf)(pow_zero_to_a));
          }
          else if (npow > 0)
          {
@@ -235,7 +236,7 @@ void test()
          }
          else if (nexp > 0)
          {
-            BOOST_CHECK((isinf)(pow_infinite_to_finite));
+            BOOST_CHECK((boost::multiprecision::isinf)(pow_infinite_to_finite));
          }
          else
          {
@@ -243,7 +244,7 @@ void test()
          }
       }
 
-      #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT))
+      #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
    }
 
    BOOST_IF_CONSTEXPR((!boost::multiprecision::is_interval_number<T>::value) && std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_quiet_NaN)
