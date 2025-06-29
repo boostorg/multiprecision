@@ -1494,10 +1494,6 @@ constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const 
 
             result = (eval_signbit(a) ? double_float_type::my_value_inf() : zero);
          }
-         else if (fpc_a == FP_NORMAL)
-         {
-            result = double_float_type { 0 };
-         }
       }
       else if (fpc_x == FP_INFINITE)
       {
@@ -1515,11 +1511,7 @@ constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const 
       }
       else
       {
-         if (fpc_a == FP_ZERO)
-         {
-            result = one;
-         }
-         else if (fpc_a == FP_INFINITE)
+         if (fpc_a == FP_INFINITE)
          {
             result =
                (
