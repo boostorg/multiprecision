@@ -1451,12 +1451,26 @@ namespace local
 
     BOOST_IF_CONSTEXPR(has_digits_enough && is_cpp_double_double)
     {
-      // Special conversion tests for cpp_double_double.
-      // These do not agree with some tests for other backends.
-      // It is an open question if they should agree or not.
-
       for(auto index = 0U; index < 8U; ++index)
       {
+        using std::ldexp;
+
+        const float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) * static_cast<float_type>(dist(gen)) };
+
+        constexpr boost::uint128_type my_max_val_u128 = static_cast<boost::uint128_type>(~static_cast<boost::uint128_type>(0));
+
+        const boost::uint128_type u128_max { static_cast<boost::uint128_type>(flt_around_max) };
+
+        const auto result_u128_max_is_ok = (u128_max == my_max_val_u128);
+
+        BOOST_TEST(result_u128_max_is_ok);
+
+        result_is_ok = (result_u128_max_is_ok && result_is_ok);
+
+        // Special conversion tests for cpp_double_double.
+        // These do not agree with some tests for other backends.
+        // It is an open question if they should agree or not.
+
         const float_type flt_nan { std::numeric_limits<float_type>::quiet_NaN() * static_cast<float_type>(dist(gen)) };
         const float_type flt_inf { std::numeric_limits<float_type>::infinity() * static_cast<float_type>(dist(gen)) };
         const float_type flt_zer { my_zero<float_type>() * static_cast<float_type>(dist(gen)) };
