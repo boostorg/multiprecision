@@ -6,7 +6,7 @@ jobs:
       - BOOST_LIBRARY=multiprecision
       - CXX_STANDARD=gnu++11
     docker:
-      - image: cimg/base:current
+      - image: gcc:9
     steps:
       - checkout
       - run:
