@@ -1278,7 +1278,7 @@ namespace local
       {
         using std::ldexp;
 
-        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) };
+        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) * static_cast<float_type>(dist(gen)) };
 
         const bool is_neg { ((index & 1U) != 0U) };
 
@@ -1302,6 +1302,27 @@ namespace local
       }
     }
 
+    {
+      for(auto index = 0U; index < 8U; ++index)
+      {
+        using std::ldexp;
+
+        const float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) * static_cast<float_type>(dist(gen)) };
+
+        const unsigned long long ull_max { static_cast<unsigned long long>(flt_around_max) };
+
+        const auto
+          result_ull_max_is_ok =
+          (
+            (ull_max == (std::numeric_limits<unsigned long long>::max)())
+          );
+
+        BOOST_TEST(result_ull_max_is_ok);
+
+        result_is_ok = (result_ull_max_is_ok && result_is_ok);
+      }
+    }
+
     #ifdef BOOST_HAS_INT128
     constexpr bool is_24_digit_float { (std::numeric_limits<float>::digits == 24) };
 
@@ -1316,7 +1337,17 @@ namespace local
       {
         using std::ldexp;
 
-        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) };
+        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) * static_cast<float_type>(dist(gen)) };
+
+        constexpr boost::uint128_type my_max_val_u128 = static_cast<boost::uint128_type>(~static_cast<boost::uint128_type>(0));
+
+        const boost::uint128_type u128_near_max { static_cast<boost::uint128_type>(flt_around_max) };
+
+        const auto result_u128_max_is_ok = (my_max_val_u128 > u128_near_max);
+
+        BOOST_TEST(result_u128_max_is_ok);
+
+        result_is_ok = (result_u128_max_is_ok && result_is_ok);
 
         const bool is_neg { ((index & 1U) != 0U) };
 
@@ -1349,17 +1380,33 @@ namespace local
         const boost::int128_type n128_inf { static_cast<boost::int128_type>(flt_inf) };
         const boost::int128_type n128_zer { static_cast<boost::int128_type>(flt_zer) };
 
+        const boost::uint128_type u128_nan { static_cast<boost::uint128_type>(flt_nan) };
+        const boost::uint128_type u128_inf { static_cast<boost::uint128_type>(flt_inf) };
+        const boost::uint128_type u128_zer { static_cast<boost::uint128_type>(flt_zer) };
+
         const auto result_val_nan_is_ok = (n128_nan == static_cast<boost::int128_type>(std::numeric_limits<float>::quiet_NaN()));
         const auto result_val_inf_is_ok = (n128_inf == static_cast<boost::int128_type>(std::numeric_limits<float>::infinity()));
         const auto result_val_zer_is_ok = (n128_zer == static_cast<boost::int128_type>(0));
+
+        const auto result_val_unan_is_ok = (u128_nan == static_cast<boost::uint128_type>(std::numeric_limits<float>::quiet_NaN()));
+        const auto result_val_uinf_is_ok = (u128_inf == static_cast<boost::uint128_type>(std::numeric_limits<float>::infinity()));
+        const auto result_val_uzer_is_ok = (u128_zer == static_cast<boost::uint128_type>(0));
 
         BOOST_TEST(result_val_nan_is_ok);
         BOOST_TEST(result_val_inf_is_ok);
         BOOST_TEST(result_val_zer_is_ok);
 
+        BOOST_TEST(result_val_unan_is_ok);
+        BOOST_TEST(result_val_uinf_is_ok);
+        BOOST_TEST(result_val_uzer_is_ok);
+
         result_is_ok = (result_val_nan_is_ok && result_is_ok);
         result_is_ok = (result_val_inf_is_ok && result_is_ok);
         result_is_ok = (result_val_zer_is_ok && result_is_ok);
+
+        result_is_ok = (result_val_unan_is_ok && result_is_ok);
+        result_is_ok = (result_val_uinf_is_ok && result_is_ok);
+        result_is_ok = (result_val_uzer_is_ok && result_is_ok);
       }
     }
     else
@@ -1368,7 +1415,7 @@ namespace local
       {
         using std::ldexp;
 
-        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) };
+        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) * static_cast<float_type>(dist(gen)) };
 
         const bool is_neg { ((index & 1U) != 0U) };
 
@@ -1404,12 +1451,26 @@ namespace local
 
     BOOST_IF_CONSTEXPR(has_digits_enough && is_cpp_double_double)
     {
-      // Special conversion tests for cpp_double_double.
-      // These do not agree with some tests for other backends.
-      // It is an open question if they should agree or not.
-
       for(auto index = 0U; index < 8U; ++index)
       {
+        using std::ldexp;
+
+        const float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) * static_cast<float_type>(dist(gen)) };
+
+        constexpr boost::uint128_type my_max_val_u128 = static_cast<boost::uint128_type>(~static_cast<boost::uint128_type>(0));
+
+        const boost::uint128_type u128_max { static_cast<boost::uint128_type>(flt_around_max) };
+
+        const auto result_u128_max_is_ok = (u128_max == my_max_val_u128);
+
+        BOOST_TEST(result_u128_max_is_ok);
+
+        result_is_ok = (result_u128_max_is_ok && result_is_ok);
+
+        // Special conversion tests for cpp_double_double.
+        // These do not agree with some tests for other backends.
+        // It is an open question if they should agree or not.
+
         const float_type flt_nan { std::numeric_limits<float_type>::quiet_NaN() * static_cast<float_type>(dist(gen)) };
         const float_type flt_inf { std::numeric_limits<float_type>::infinity() * static_cast<float_type>(dist(gen)) };
         const float_type flt_zer { my_zero<float_type>() * static_cast<float_type>(dist(gen)) };
@@ -1418,17 +1479,43 @@ namespace local
         const boost::int128_type n128_inf { static_cast<boost::int128_type>(flt_inf) };
         const boost::int128_type n128_zer { static_cast<boost::int128_type>(flt_zer) };
 
+        #define BOOST_MP_TEST_DISABLE_U128_NON_FINITE
+
+        #if !defined(BOOST_MP_TEST_DISABLE_U128_NON_FINITE)
+        const boost::uint128_type u128_nan { static_cast<boost::uint128_type>(flt_nan) };
+        const boost::uint128_type u128_inf { static_cast<boost::uint128_type>(flt_inf) };
+        #endif
+        const boost::uint128_type u128_zer { static_cast<boost::uint128_type>(flt_zer) };
+
         const auto result_val_nan_is_ok = (n128_nan == static_cast<boost::int128_type>(std::numeric_limits<double>::quiet_NaN()));
         const auto result_val_inf_is_ok = (n128_inf == static_cast<boost::int128_type>(std::numeric_limits<double>::infinity()));
         const auto result_val_zer_is_ok = (n128_zer == static_cast<boost::int128_type>(0));
+
+        #if !defined(BOOST_MP_TEST_DISABLE_U128_NON_FINITE)
+        const auto result_val_unan_is_ok = (u128_nan == static_cast<boost::uint128_type>(std::numeric_limits<double>::quiet_NaN()));
+        const auto result_val_uinf_is_ok = (u128_inf == static_cast<boost::uint128_type>(std::numeric_limits<double>::infinity()));
+        #endif
+        const auto result_val_uzer_is_ok = (u128_zer == static_cast<boost::uint128_type>(0));
 
         BOOST_TEST(result_val_nan_is_ok);
         BOOST_TEST(result_val_inf_is_ok);
         BOOST_TEST(result_val_zer_is_ok);
 
+        #if !defined(BOOST_MP_TEST_DISABLE_U128_NON_FINITE)
+        BOOST_TEST(result_val_unan_is_ok);
+        BOOST_TEST(result_val_uinf_is_ok);
+        #endif
+        BOOST_TEST(result_val_uzer_is_ok);
+
         result_is_ok = (result_val_nan_is_ok && result_is_ok);
         result_is_ok = (result_val_inf_is_ok && result_is_ok);
         result_is_ok = (result_val_zer_is_ok && result_is_ok);
+
+        #if !defined(BOOST_MP_TEST_DISABLE_U128_NON_FINITE)
+        result_is_ok = (result_val_unan_is_ok && result_is_ok);
+        result_is_ok = (result_val_uinf_is_ok && result_is_ok);
+        #endif
+        result_is_ok = (result_val_uzer_is_ok && result_is_ok);
       }
     }
 

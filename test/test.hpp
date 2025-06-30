@@ -330,7 +330,10 @@ std::ostream& operator<<(std::ostream& os, __float128 f)
    catch (const E&) {}                                                                                             \
    BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 #else
-#define BOOST_MT_CHECK_THROW_IMP(x, E, severity)
+#define BOOST_MT_CHECK_THROW_IMP(x, E, severity)       \
+   static_cast<void>(x);                               \
+   static_cast<void>(E);                               \
+   static_cast<void>(severity)
 #endif
 
 #define BOOST_CHECK_CLOSE(x, y, tol) BOOST_CLOSE_IMP(x, y, ((tol / (100 * epsilon_of(x)))), error_on_fail)

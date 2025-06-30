@@ -125,6 +125,12 @@ constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_b
 
 template <typename FloatingPointType>
 constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> typename std::enable_if<!(cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits > 24), void>::type;
+
+template <typename FloatingPointType>
+constexpr auto eval_convert_to(boost::uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> typename std::enable_if<(cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits > 24), void>::type;
+
+template <typename FloatingPointType>
+constexpr auto eval_convert_to(boost::uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> typename std::enable_if<!(cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits > 24), void>::type;
 #endif
 
 template <typename FloatingPointType,
@@ -209,11 +215,6 @@ class cpp_double_fp_backend
           )
       );
 
-   // TBD: Did we justify this static assertion during the GSoC?
-   // Does anyone remember what the meaning of the number 77 is?
-
-   static_assert(((my_max_exponent - my_digits) >= 77), "Error: floating-point constituent does not have wide enough exponent range");
-
    // Default constructor.
    constexpr cpp_double_fp_backend() noexcept { }
 
@@ -239,9 +240,6 @@ class cpp_double_fp_backend
 
    // Construtor from another kind of cpp_double_fp_backend<> object.
 
-   // TBD: Need to keep widening conversion implicit,
-   // but ensure that narrowing conversion is explicit.
-
    template <typename OtherFloatType,
              typename ::std::enable_if<(    cpp_df_qf_detail::is_floating_point<OtherFloatType>::value
                                         && (!std::is_same<FloatingPointType, OtherFloatType>::value))>::type const* = nullptr>
@@ -252,7 +250,7 @@ class cpp_double_fp_backend
       operator+=(a.my_second());
    }
 
-   // Constructors from integers
+   // Constructors from integers.
    template <typename SignedIntegralType,
              typename ::std::enable_if<(     boost::multiprecision::detail::is_integral<SignedIntegralType>::value
                                         && (!boost::multiprecision::detail::is_unsigned<SignedIntegralType>::value)
@@ -267,7 +265,7 @@ class cpp_double_fp_backend
    constexpr cpp_double_fp_backend(const UnsignedIntegralType& u)
       : data(static_cast<float_type>(u), static_cast<float_type>(0.0F)) { }
 
-   // Constructors from integers which hold more information than *this can contain
+   // Constructors from integers which hold more information than *this can contain.
    template <typename UnsignedIntegralType,
              typename ::std::enable_if<(    boost::multiprecision::detail::is_integral<UnsignedIntegralType>::value
                                         &&  boost::multiprecision::detail::is_unsigned<UnsignedIntegralType>::value
@@ -430,7 +428,8 @@ class cpp_double_fp_backend
       return result;
    }
 
-   // Methods
+   // The public methods follow.
+
    constexpr auto isneg_unchecked() const noexcept -> bool { return (data.first < 0); }
 
    constexpr auto iszero_unchecked() const noexcept -> bool { return (data.first  == float_type { 0.0F }); }
@@ -787,7 +786,7 @@ class cpp_double_fp_backend
       return *this;
    }
 
-   // Unare minus operator.
+   // Unary minus operator.
    constexpr auto operator-() const -> cpp_double_fp_backend
    {
       cpp_double_fp_backend v { *this };
@@ -797,7 +796,7 @@ class cpp_double_fp_backend
       return v;
    }
 
-   // Helper functions.
+   // Public helper functions.
    static constexpr auto pown(cpp_double_fp_backend& result, const cpp_double_fp_backend& x, int p) -> void
    {
       using local_float_type = cpp_double_fp_backend;
@@ -878,7 +877,7 @@ class cpp_double_fp_backend
       other.data = tmp;
    }
 
-   constexpr auto compare(const cpp_double_fp_backend& other) const -> int
+   constexpr auto compare(const cpp_double_fp_backend& other) const noexcept -> int
    {
       // Return 1 for *this > other, -1 for *this < other, 0 for *this = other.
 
@@ -1401,16 +1400,19 @@ constexpr auto eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
       if (fpc == FP_ZERO)
       {
          result = double_float_type(0);
+
          return;
       }
       else if ((fpc == FP_NAN) || isneg_o)
       {
          result = double_float_type::my_value_nan();
+
          return;
       }
       else if (fpc == FP_INFINITE)
       {
          result = double_float_type::my_value_inf();
+
          return;
       }
    }
@@ -1422,10 +1424,11 @@ constexpr auto eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
 
    local_float_type p { cpp_df_qf_detail::split_maker<local_float_type>::value * c };
 
-   const local_float_type hx { (c - p) + p };
+   const local_float_type hx { local_float_type { c - p } + p };
    const local_float_type tx { c  - hx };
 
    local_float_type q  = hx * tx;
+
    q = q + q;
 
    p = hx * hx;
@@ -2254,30 +2257,36 @@ constexpr auto eval_convert_to(unsigned long long* result, const cpp_double_fp_b
 
    if (fpc != FP_NORMAL)
    {
-      *result = static_cast<unsigned long long>(backend.my_first());
+      *result = static_cast<signed long long>(backend.crep().first);
    }
    else
    {
       using double_float_type = cpp_double_fp_backend<FloatingPointType>;
       using local_float_type =  typename double_float_type::float_type;
 
-      constexpr unsigned long long my_max_val { (std::numeric_limits<unsigned long long>::max)() };
+      static_assert(std::is_same<local_float_type, FloatingPointType>::value, "Error something went wrong with the limb type");
 
-      using c_type = typename std::common_type<unsigned long long, local_float_type>::type;
+      constexpr bool
+         ulong_long_is_longer
+         {
+            (std::numeric_limits<unsigned long long>::digits > cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits)
+         };
 
-      constexpr c_type my_max { static_cast<c_type>(my_max_val) };
+      using longer_type = typename ::std::conditional<ulong_long_is_longer, unsigned long long, double_float_type>::type;
 
-      const c_type ct { static_cast<c_type>(backend.my_first()) };
+      constexpr longer_type my_max_val { static_cast<longer_type>((std::numeric_limits<unsigned long long>::max)()) };
 
-      if (ct > my_max)
+      constexpr double_float_type my_max_val_dd { static_cast<double_float_type>(my_max_val) };
+
+      if (backend.compare(my_max_val_dd) >= 0)
       {
-         *result = my_max_val;
+         *result = (std::numeric_limits<unsigned long long>::max)();
       }
       else
       {
-          double_float_type source { backend };
+         double_float_type source { backend };
 
-          *result = detail::extract<unsigned long long>(source);
+         *result = detail::extract<unsigned long long>(source);
       }
    }
 }
@@ -2302,7 +2311,7 @@ constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_b
       constexpr bool
          n128_is_longer
          {
-            (static_cast<int>(sizeof(boost::int128_type) * static_cast<std::size_t>(CHAR_BIT)) > cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits)
+            ((static_cast<int>(sizeof(boost::int128_type) * static_cast<std::size_t>(CHAR_BIT)) - 1) > cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits)
          };
 
       using longer_type = typename ::std::conditional<n128_is_longer, boost::int128_type, double_float_type>::type;
@@ -2346,9 +2355,6 @@ constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_b
    {
       using double_float_type = cpp_double_fp_backend<FloatingPointType>;
 
-      constexpr double_float_type my_max_val_dd { double_float_type::my_value_max() };
-      constexpr double_float_type my_min_val_dd { -double_float_type::my_value_max() };
-
       double_float_type source { backend };
 
       *result = detail::extract<boost::int128_type>(source);
@@ -2356,40 +2362,64 @@ constexpr auto eval_convert_to(boost::int128_type* result, const cpp_double_fp_b
 }
 
 template <typename FloatingPointType>
-constexpr auto eval_convert_to(boost::uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> void
+constexpr auto eval_convert_to(boost::uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> typename std::enable_if<(cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits > 24), void>::type
 {
    const auto fpc = eval_fpclassify(backend);
 
    if (fpc != FP_NORMAL)
    {
-      *result = static_cast<boost::uint128_type>(backend.my_first());
-
-      return;
-   }
-
-   constexpr boost::uint128_type my_max_val
-   {
-     (std::is_same<FloatingPointType, float>::value && (cpp_df_qf_detail::ccmath::numeric_limits<float>::digits == 24))
-        ? static_cast<boost::uint128_type>(FLT_MAX)
-        : static_cast<boost::uint128_type>(~static_cast<boost::uint128_type>(0))
-   };
-
-   using c_type = typename std::common_type<boost::uint128_type, FloatingPointType>::type;
-
-   constexpr c_type my_max { static_cast<c_type>(my_max_val) };
-
-   const c_type ct { static_cast<c_type>(backend.my_first()) };
-
-   if (ct > my_max)
-   {
-      *result = my_max_val;
+      *result = static_cast<boost::int128_type>(backend.crep().first);
    }
    else
    {
-      *result  = static_cast<boost::int128_type>(backend.my_first());
-      *result += static_cast<boost::int128_type>(backend.my_second());
+      using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+      using local_float_type =  typename double_float_type::float_type;
 
-      *result = static_cast<boost::uint128_type>(*result);
+      static_assert(std::is_same<local_float_type, FloatingPointType>::value, "Error something went wrong with the limb type");
+
+      constexpr bool
+         u128_is_longer
+         {
+            (static_cast<int>(sizeof(boost::uint128_type) * static_cast<std::size_t>(CHAR_BIT)) > cpp_df_qf_detail::ccmath::numeric_limits<local_float_type>::digits)
+         };
+
+      using longer_type = typename ::std::conditional<u128_is_longer, boost::uint128_type, double_float_type>::type;
+
+      constexpr boost::int128_type my_max_val_u128 = static_cast<boost::uint128_type>(~static_cast<boost::uint128_type>(0));
+
+      constexpr longer_type my_max_val(static_cast<longer_type>(my_max_val_u128));
+
+      constexpr double_float_type my_max_val_dd(static_cast<double_float_type>(my_max_val));
+
+      if (backend.compare(my_max_val_dd) >= 0)
+      {
+         *result = my_max_val;
+      }
+      else
+      {
+         double_float_type source { backend };
+
+         *result = detail::extract<boost::uint128_type>(source);
+      }
+   }
+}
+
+template <typename FloatingPointType>
+constexpr auto eval_convert_to(boost::uint128_type* result, const cpp_double_fp_backend<FloatingPointType>& backend) -> typename std::enable_if<!(cpp_df_qf_detail::ccmath::numeric_limits<FloatingPointType>::digits > 24), void>::type
+{
+   const auto fpc = eval_fpclassify(backend);
+
+   if (fpc != FP_NORMAL)
+   {
+      *result = static_cast<boost::uint128_type>(backend.crep().first);
+   }
+   else
+   {
+      using double_float_type = cpp_double_fp_backend<FloatingPointType>;
+
+      double_float_type source { backend };
+
+      *result = detail::extract<boost::uint128_type>(source);
    }
 }
 #endif
@@ -2405,8 +2435,6 @@ constexpr auto eval_convert_to(OtherFloatingPointType* result, const cpp_double_
    if (fpc != FP_NORMAL)
    {
       *result = static_cast<OtherFloatingPointType>(backend.my_first());
-
-      return;
    }
    else
    {
