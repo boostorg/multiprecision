@@ -1278,7 +1278,7 @@ namespace local
       {
         using std::ldexp;
 
-        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) };
+        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) * static_cast<float_type>(dist(gen)) };
 
         const bool is_neg { ((index & 1U) != 0U) };
 
@@ -1302,6 +1302,27 @@ namespace local
       }
     }
 
+    {
+      for(auto index = 0U; index < 8U; ++index)
+      {
+        using std::ldexp;
+
+        const float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) * static_cast<float_type>(dist(gen)) };
+
+        const unsigned long long ull_max { static_cast<unsigned long long>(flt_around_max) };
+
+        const auto
+          result_ull_max_is_ok =
+          (
+            (ull_max == (std::numeric_limits<unsigned long long>::max)())
+          );
+
+        BOOST_TEST(result_ull_max_is_ok);
+
+        result_is_ok = (result_ull_max_is_ok && result_is_ok);
+      }
+    }
+
     #ifdef BOOST_HAS_INT128
     constexpr bool is_24_digit_float { (std::numeric_limits<float>::digits == 24) };
 
@@ -1316,7 +1337,17 @@ namespace local
       {
         using std::ldexp;
 
-        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) };
+        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) * static_cast<float_type>(dist(gen)) };
+
+        constexpr boost::uint128_type my_max_val_u128 = static_cast<boost::uint128_type>(~static_cast<boost::uint128_type>(0));
+
+        const boost::uint128_type u128_near_max { static_cast<boost::uint128_type>(flt_around_max) };
+
+        const auto result_u128_max_is_ok = (my_max_val_u128 > u128_near_max);
+
+        BOOST_TEST(result_u128_max_is_ok);
+
+        result_is_ok = (result_u128_max_is_ok && result_is_ok);
 
         const bool is_neg { ((index & 1U) != 0U) };
 
@@ -1384,7 +1415,7 @@ namespace local
       {
         using std::ldexp;
 
-        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) };
+        float_type flt_around_max { ldexp((std::numeric_limits<float_type>::max)(), -3) * static_cast<float_type>(dist(gen)) };
 
         const bool is_neg { ((index & 1U) != 0U) };
 
