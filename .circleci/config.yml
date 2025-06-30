@@ -46,11 +46,11 @@ jobs:
       - run:
           name: Building inspect
           command: |
-            cd $BOOST/boost/tools/inspect && ../../b2 toolset=gcc variant=release dist-bin
+            cd $BOOST/boost/tools/inspect && ../../b2 -j1 toolset=gcc variant=release dist-bin
       - run:
           name: Building docs
           command: |
-            cd $BOOST_REMOVE/doc && rm -rf html/boost_multiprecision && ../../../b2
+            cd $BOOST_REMOVE/doc && rm -rf html/boost_multiprecision && ../../../b2 -j1
       - run:
           name: Running Inspect
           command: |
