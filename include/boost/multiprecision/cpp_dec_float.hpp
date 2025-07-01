@@ -163,7 +163,7 @@ class cpp_dec_float
       a.prec_elem = cpp_dec_float_elem_number;
 
       return a;
-   }
+   } // LCOV_EXCL_LINE
 
  public:
    // Public Constructors
@@ -501,7 +501,9 @@ class cpp_dec_float
 
       prec_elem = (std::min)(cpp_dec_float_elem_number, (std::max)(elems, static_cast<std::int32_t>(2)));
    }
+
    static cpp_dec_float pow2(long long i);
+
    exponent_type order() const
    {
       const bool bo_order_is_zero = ((!(isfinite)()) || (data[0] == static_cast<std::uint32_t>(0u)));
@@ -515,12 +517,7 @@ class cpp_dec_float
          if (data[0] >= 10000000UL)
          {
             if (data[0] >= 100000000UL)
-            {
-               if (data[0] >= 1000000000UL)
-                  prefix = 9;
-               else
-                  prefix = 8;
-            }
+               prefix = 8;
             else
                prefix = 7;
          }
@@ -1164,7 +1161,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       else
       {
          *this = inf();
-         if (isneg())
+         if (b_neg)
             negate();
          return *this;
       }
@@ -1181,7 +1178,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       cpp_dec_float t;
       t = n;
       return operator/=(t);
-   }
+   } // LCOV_EXCL_LINE
 
    const std::uint32_t nn = static_cast<std::uint32_t>(n);
 
@@ -1645,7 +1642,7 @@ long double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_long_doubl
    // Check if *this cpp_dec_float<Digits10, ExponentType, Allocator> exceeds the maximum of double.
    if (xx.compare(long_double_max()) > 0)
    {
-      return ((!neg) ? std::numeric_limits<long double>::infinity()
+      return ((!neg) ?  std::numeric_limits<long double>::infinity()
                      : -std::numeric_limits<long double>::infinity());
    }
 
@@ -1795,7 +1792,7 @@ int128_type cpp_dec_float<Digits10, ExponentType, Allocator>::extract_signed_int
    }
    else
    {
-      // Extract the data into an unsigned long long value.
+      // Extract the data into an (unsigned) boost::uint128_type value.
       cpp_dec_float<Digits10, ExponentType, Allocator> xn(extract_integer_part());
       if (xn.isneg())
          xn.negate();
@@ -1817,9 +1814,9 @@ int128_type cpp_dec_float<Digits10, ExponentType, Allocator>::extract_signed_int
    }
    else
    {
-      // This strange expression avoids a hardware trap in the corner case
-      // that val is the most negative value permitted in long long.
-      // See https://svn.boost.org/trac/boost/ticket/9740.
+      // This strange expression avoids a hardware trap in the corner case that
+      // val is the most negative value permitted in (signed) boost::int128_type.
+      // See also https://svn.boost.org/trac/boost/ticket/9740.
       //
       int128_type sval = static_cast<int128_type>(val - 1);
       sval                       = -sval;
@@ -3157,7 +3154,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
       default_ops::detail::pow_imp(t, cpp_dec_float<Digits10, ExponentType, Allocator>::two(), static_cast<unsigned long long>(p), std::integral_constant<bool, false>());
 
    return t;
-}
+} // LCOV_EXCL_LINE
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_add(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& o)

@@ -2219,10 +2219,12 @@ constexpr auto eval_convert_to(signed long long* result, const cpp_double_fp_bac
          // this workaround will actually break the long long conversion tests
          // on those platforms.
          //
-         // Our assumption is that on x64 there is x87 math (double -> long double) being performed in the background
-         // which would aid the conversion of double value to long long
+         // Our assumption is that on x64 there is x87 math (double -> long double)
+         // being performed in the background. Seemingly these might "aid" the conversion
+         // of double value to long long. Somehow I get the feeling this issue will arise
+         // in future evolution of the cpp_double_fp_backend.
          //
-         // This workaround has been tested on: ARM64 (linux and mac), s390x and PPC64LE
+         // This workaround has been tested on: ARM64 (linux and mac), s390x and PPC64LE.
 
          constexpr bool
             needs_workaround
