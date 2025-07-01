@@ -6,6 +6,7 @@
 // Some parts of this test file have been taken from the Boost.Decimal project.
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
 
 #include <test_traits.hpp> // Note: include this AFTER the test-backends are defined
 
@@ -299,14 +300,14 @@ namespace local
 
       unsigned index { };
 
-      while((index < 128U) && (!(boost::multiprecision::isinf)(flt_near_max)))
+      while((index < 1024U) && (!(boost::multiprecision::isinf)(flt_near_max)))
       {
         flt_near_max += (flt_less_near_max * dis(gen));
 
         ++index;
       }
 
-      const bool result_ovf_is_ok { ((index > 1U) && (index < 128U)) };
+      const bool result_ovf_is_ok { ((index > 1U) && (index < 1024U)) };
 
       BOOST_TEST(result_ovf_is_ok);
 
@@ -322,14 +323,14 @@ namespace local
 
       unsigned index { };
 
-      while((index < 128U) && (!(boost::multiprecision::isinf)(flt_near_lowest)))
+      while((index < 1024U) && (!(boost::multiprecision::isinf)(flt_near_lowest)))
       {
         flt_near_lowest -= (flt_less_near_max * dis(gen));
 
         ++index;
       }
 
-      const bool result_ovf_is_ok { ((index > 1U) && (index < 128U)) && signbit(flt_near_lowest) };
+      const bool result_ovf_is_ok { ((index > 1U) && (index < 1024U)) && signbit(flt_near_lowest) };
 
       BOOST_TEST(result_ovf_is_ok);
 
@@ -345,14 +346,14 @@ namespace local
 
       unsigned index { };
 
-      while((index < 128U) && (!(boost::multiprecision::isinf)(flt_near_max)))
+      while((index < 1024U) && (!(boost::multiprecision::isinf)(flt_near_max)))
       {
         flt_near_max *= static_cast<unsigned long long>(INT32_C(2));
 
         ++index;
       }
 
-      const bool result_ovf_is_ok { ((index > 1U) && (index < 128U)) };
+      const bool result_ovf_is_ok { ((index > 1U) && (index < 1024U)) };
 
       BOOST_TEST(result_ovf_is_ok);
 
@@ -416,6 +417,16 @@ namespace local
 
 auto main() -> int
 {
+  {
+    using float_backend_type = boost::multiprecision::cpp_bin_float<50>;
+
+    using float_type = boost::multiprecision::number<float_backend_type, boost::multiprecision::et_off>;
+
+    std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
+
+    static_cast<void>(local::test_edges<float_type>());
+  }
+
   {
     using float_backend_type = boost::multiprecision::cpp_dec_float<50>;
 
