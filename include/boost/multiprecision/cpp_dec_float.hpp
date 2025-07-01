@@ -163,7 +163,7 @@ class cpp_dec_float
       a.prec_elem = cpp_dec_float_elem_number;
 
       return a;
-   }
+   } // LCOV_EXCL_LINE
 
  public:
    // Public Constructors

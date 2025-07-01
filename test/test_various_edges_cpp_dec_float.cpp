@@ -86,7 +86,7 @@ namespace local
   }
 
   template<class FloatType>
-  bool test_convert()
+  bool test_edges()
   {
     using float_type = FloatType;
 
@@ -116,19 +116,19 @@ namespace local
 
         flt_non_finite = std::numeric_limits<float_type>::quiet_NaN() * dis(gen);
         ldbl_non_finite = static_cast<long double>(flt_non_finite);
-        result_non_finite_is_ok = isnan(ldbl_non_finite);
+        result_non_finite_is_ok = (isnan)(ldbl_non_finite);
         BOOST_TEST(result_non_finite_is_ok);
         result_is_ok = (result_non_finite_is_ok && result_is_ok);
 
         flt_non_finite = std::numeric_limits<float_type>::infinity() * dis(gen);
         ldbl_non_finite = static_cast<long double>(flt_non_finite);
-        result_non_finite_is_ok = isinf(ldbl_non_finite);
+        result_non_finite_is_ok = (isinf)(ldbl_non_finite);
         BOOST_TEST(result_non_finite_is_ok);
         result_is_ok = (result_non_finite_is_ok && result_is_ok);
 
         flt_non_finite = std::numeric_limits<float_type>::infinity() * -dis(gen);
         ldbl_non_finite = static_cast<long double>(flt_non_finite);
-        result_non_finite_is_ok = (isinf(ldbl_non_finite) && signbit(ldbl_non_finite));
+        result_non_finite_is_ok = ((isinf)(ldbl_non_finite) && signbit(ldbl_non_finite));
         BOOST_TEST(result_non_finite_is_ok);
         result_is_ok = (result_non_finite_is_ok && result_is_ok);
 
@@ -136,7 +136,7 @@ namespace local
                          * float_type { (std::numeric_limits<long double>::max)() }
                          * dis(gen);
         ldbl_non_finite = static_cast<long double>(flt_non_finite);
-        result_non_finite_is_ok = isinf(ldbl_non_finite);
+        result_non_finite_is_ok = (isinf)(ldbl_non_finite);
         BOOST_TEST(result_non_finite_is_ok);
         result_is_ok = (result_non_finite_is_ok && result_is_ok);
 
@@ -144,7 +144,7 @@ namespace local
                          * float_type { (std::numeric_limits<long double>::max)() }
                          * -dis(gen);
         ldbl_non_finite = static_cast<long double>(flt_non_finite);
-        result_non_finite_is_ok = (isinf(ldbl_non_finite) && signbit(ldbl_non_finite));
+        result_non_finite_is_ok = ((isinf)(ldbl_non_finite) && signbit(ldbl_non_finite));
         BOOST_TEST(result_non_finite_is_ok);
         result_is_ok = (result_non_finite_is_ok && result_is_ok);
       }
@@ -271,6 +271,97 @@ namespace local
       result_is_ok = (result_funky_strings_is_ok && result_is_ok);
     }
 
+    {
+      using std::ldexp;
+
+      float_type flt_near_max { ldexp((std::numeric_limits<float_type>::max)(), -1) };
+
+      const float_type flt_less_near_max { ldexp((std::numeric_limits<float_type>::max)(), -4) };
+
+      unsigned index { };
+
+      while((index < 128U) && (!(boost::multiprecision::isinf)(flt_near_max)))
+      {
+        flt_near_max += (flt_less_near_max * dis(gen));
+
+        ++index;
+      }
+
+      const bool result_ovf_is_ok { ((index > 1U) && (index < 128U)) };
+
+      BOOST_TEST(result_ovf_is_ok);
+
+      result_is_ok = (result_ovf_is_ok && result_is_ok);
+    }
+
+    {
+      using std::ldexp;
+
+      float_type flt_near_lowest { -ldexp((std::numeric_limits<float_type>::max)(), -1) };
+
+      const float_type flt_less_near_max {  ldexp((std::numeric_limits<float_type>::max)(), -4) };
+
+      unsigned index { };
+
+      while((index < 128U) && (!(boost::multiprecision::isinf)(flt_near_lowest)))
+      {
+        flt_near_lowest -= (flt_less_near_max * dis(gen));
+
+        ++index;
+      }
+
+      const bool result_ovf_is_ok { ((index > 1U) && (index < 128U)) && signbit(flt_near_lowest) };
+
+      BOOST_TEST(result_ovf_is_ok);
+
+      result_is_ok = (result_ovf_is_ok && result_is_ok);
+    }
+
+    for(int n_loop = static_cast<int>(INT8_C(-16)); n_loop < static_cast<int>(INT8_C(-8)); ++n_loop)
+    {
+      using std::ldexp;
+      using std::fabs;
+
+      float_type flt_near_max { ldexp((std::numeric_limits<float_type>::max)(), n_loop) * dis(gen) };
+
+      unsigned index { };
+
+      while((index < 128U) && (!(boost::multiprecision::isinf)(flt_near_max)))
+      {
+        flt_near_max *= static_cast<unsigned long long>(INT32_C(2));
+
+        ++index;
+      }
+
+      const bool result_ovf_is_ok { ((index > 1U) && (index < 128U)) };
+
+      BOOST_TEST(result_ovf_is_ok);
+
+      result_is_ok = (result_ovf_is_ok && result_is_ok);
+    }
+
+    {
+      for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(16)); ++index)
+      {
+        static_cast<void>(index);
+
+        const float_type flt_nan_denominator { float_type { std::numeric_limits<float>::quiet_NaN() } * dis(gen) };
+
+        float_type flt_zero_numerator { ::my_zero<float_type>() * dis(gen) };
+
+        const bool
+          result_div_zero_by_nan_is_ok
+          {
+               (boost::multiprecision::isnan)(flt_nan_denominator)
+            && (boost::multiprecision::isnan)(flt_zero_numerator /= flt_nan_denominator)
+          };
+
+        BOOST_TEST(result_div_zero_by_nan_is_ok);
+
+        result_is_ok = (result_div_zero_by_nan_is_ok && result_is_ok);
+      }
+    }
+
     return result_is_ok;
   }
 
@@ -285,7 +376,7 @@ auto main() -> int
 
     std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
 
-    static_cast<void>(local::test_convert<float_type>());
+    static_cast<void>(local::test_edges<float_type>());
   }
 
   return boost::report_errors();
