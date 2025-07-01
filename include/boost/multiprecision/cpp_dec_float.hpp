@@ -501,7 +501,9 @@ class cpp_dec_float
 
       prec_elem = (std::min)(cpp_dec_float_elem_number, (std::max)(elems, static_cast<std::int32_t>(2)));
    }
+
    static cpp_dec_float pow2(long long i);
+
    exponent_type order() const
    {
       const bool bo_order_is_zero = ((!(isfinite)()) || (data[0] == static_cast<std::uint32_t>(0u)));
@@ -515,12 +517,7 @@ class cpp_dec_float
          if (data[0] >= 10000000UL)
          {
             if (data[0] >= 100000000UL)
-            {
-               if (data[0] >= 1000000000UL)
-                  prefix = 9;
-               else
-                  prefix = 8;
-            }
+               prefix = 8;
             else
                prefix = 7;
          }
@@ -1164,7 +1161,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       else
       {
          *this = inf();
-         if (isneg())
+         if (b_neg)
             negate();
          return *this;
       }
@@ -1181,7 +1178,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       cpp_dec_float t;
       t = n;
       return operator/=(t);
-   }
+   } // LCOV_EXCL_LINE
 
    const std::uint32_t nn = static_cast<std::uint32_t>(n);
 

@@ -233,6 +233,25 @@ namespace local
         result_is_ok = (result_val_n128_is_ok && result_is_ok);
       }
     }
+
+    {
+      for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(16)); ++index)
+      {
+        static_cast<void>(index);
+
+        const float_type flt_under_one { float_type { ::my_one<float_type>() / dis(gen) } / dis(gen) };
+
+        const bool
+          result_under_one_is_ok
+          {
+            (static_cast<boost::int128_type>(flt_under_one) == static_cast<boost::int128_type>(INT8_C(0)))
+          };
+
+        BOOST_TEST(result_under_one_is_ok);
+
+        result_is_ok = (result_under_one_is_ok && result_is_ok);
+      }
+    }
     #endif
 
     {
@@ -359,6 +378,34 @@ namespace local
         BOOST_TEST(result_div_zero_by_nan_is_ok);
 
         result_is_ok = (result_div_zero_by_nan_is_ok && result_is_ok);
+      }
+    }
+
+    {
+      for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(16)); ++index)
+      {
+        static_cast<void>(index);
+
+        float_type flt_zero_numerator { ::my_zero<float_type>() * dis(gen) };
+        float_type flt_finite_numerator { ::my_one<float_type>() * dis(gen) };
+        float_type flt_nan_numerator { ::my_nan<float_type>() * dis(gen) };
+
+        const float_type flt_infinite_result_neg { -flt_finite_numerator /= static_cast<signed long long>(INT8_C(0)) };
+
+        const bool result_edge_00 { (boost::multiprecision::isnan)(flt_zero_numerator /= static_cast<signed long long>(INT8_C(0))) };
+        const bool result_edge_01 { (boost::multiprecision::isinf)(flt_finite_numerator /= static_cast<signed long long>(INT8_C(0))) };
+        const bool result_edge_02 { (boost::multiprecision::isinf)(flt_infinite_result_neg) && (boost::multiprecision::signbit)(flt_infinite_result_neg) };
+        const bool result_edge_03 { (boost::multiprecision::isnan)(flt_nan_numerator /= static_cast<signed long long>(index + 2U)) };
+
+        const bool
+          result_divs_are_ok
+          {
+            (result_edge_00 && result_edge_01 && result_edge_02 && result_edge_03)
+          };
+
+        BOOST_TEST(result_divs_are_ok);
+
+        result_is_ok = (result_divs_are_ok && result_is_ok);
       }
     }
 
