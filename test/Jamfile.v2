@@ -179,6 +179,7 @@ test-suite arithmetic_tests :
 
    [ run test_cpp_dec_float_round.cpp no_eh_support ]
    [ run test_various_edges.cpp no_eh_support ]
+   [ run test_various_edges_cpp_dec_float.cpp no_eh_support ]
 
    [ run test_arithmetic_logged_1.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_logged_2.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
