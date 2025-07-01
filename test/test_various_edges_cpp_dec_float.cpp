@@ -5,7 +5,6 @@
 
 // Some parts of this test file have been taken from the Boost.Decimal project.
 
-#include <boost/lexical_cast.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
 #include <test_traits.hpp> // Note: include this AFTER the test-backends are defined
@@ -15,6 +14,7 @@
 #include <random>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -167,24 +167,25 @@ namespace local
 
         bool result_val_n128_is_ok { };
 
-        const std::string str_n128 { boost::lexical_cast<std::string>(val_n128) };
-
-        const std::string
-          str_ctrl
+        const auto
+          str128_maker
           {
-            [&flt_n128]()
+            [](const float_type& flt)
             {
               std::stringstream strm { };
 
-              strm << std::fixed << flt_n128;
+              strm << std::fixed << flt;
 
               std::string str_local { strm.str() };
 
               str_local = str_local.substr(std::size_t { UINT8_C(0) }, str_local.find('.'));
 
               return str_local;
-            }()
+            }
           };
+
+        const std::string str_ctrl { str128_maker(flt_n128) };
+        const std::string str_n128 { str128_maker(static_cast<float_type>(val_n128)) };
 
         result_val_n128_is_ok =
           (
@@ -227,6 +228,33 @@ namespace local
       }
     }
     #endif
+
+    {
+      const std::initializer_list<std::string>
+        funky_strings_list
+        {
+          std::string("3.14u"),   std::string("3.14l"),   std::string("3.14U"),   std::string("3.14L"),
+          std::string("3.14ul"),  std::string("3.14Ul"),  std::string("3.14uL"),  std::string("3.14UL"),
+          std::string("3.14ull"), std::string("3.14Ull"), std::string("3.14ULl"), std::string("3.14ULL"), std::string("3.14uLL"),  std::string("3.14ulL")
+        };
+
+      const std::vector<std::string> funky_strings(funky_strings_list);
+
+      std::size_t funky_count { };
+
+      try
+      {
+        static_cast<void>(false);
+      }
+      catch(const std::runtime_error& excp)
+      {
+        static_cast<void>(excp.what());
+
+        ++funky_count;
+      }
+
+      result_is_ok = ((funky_count == funky_strings.size()) && result_is_ok);
+    }
 
     return result_is_ok;
   }
