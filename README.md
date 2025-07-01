@@ -24,12 +24,11 @@ The big number types adhere to clearly defined conversion rules. This allows `Bo
 used for all kinds of mathematical calculations involving integer, rational and floating-point types
 requiring extended range and precision.
 
-Multiprecision consists of a generic interface to the mathematics of large numbers as well as a selection of big number backends.
-There is support for integer, rational and floating-point types.
-`Boost.Multiprecision` provides a selection of backends delivered off-the-rack.
-These include interfaces to GMP, MPFR, MPIR, TomMath as well as Multiprecision's
-own collection of Boost-licensed, header-only backends for integers,
-rationals, floats and complex-floats.
+Multiprecision consists of a generic interface to the mathematics
+of large numbers as well as a selection of big number backends.
+This includes interfaces to GMP, MPFR, MPIR and TomMath
+and also Multiprecision's own collection of Boost-licensed,
+header-only backends for integers, rationals, floats and complex-floats.
 
 In addition, user-defined backends can be created and used with the interface of Multiprecision,
 presuming that the class implementation adheres to the necessary concepts.
