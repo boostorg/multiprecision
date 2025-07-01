@@ -40,16 +40,22 @@ namespace local
     using local_integral_time_point_type = IntegralTimePointType;
     using local_clock_type               = ClockType;
 
-    const auto current_now =
-      static_cast<std::uintmax_t>
-      (
-        std::chrono::duration_cast<std::chrono::nanoseconds>
-        (
-          local_clock_type::now().time_since_epoch()
-        ).count()
-      );
+    typename local_clock_type::time_point tp_zero { };
 
-    return static_cast<local_integral_time_point_type>(current_now);
+    const auto my_now = local_clock_type::now();
+
+    const auto duration { my_now - tp_zero };
+
+    const std::uintmax_t
+      value
+      {
+        static_cast<std::uintmax_t>
+        (
+          std::chrono::duration_cast<std::chrono::nanoseconds>(my_now - tp_zero).count()
+        )
+      };
+
+    return static_cast<local_integral_time_point_type>(value);
   }
 
   template<typename NumericType>
@@ -242,18 +248,27 @@ namespace local
 
       std::size_t funky_count { };
 
-      try
+      for(const auto& str : funky_strings)
       {
-        static_cast<void>(false);
-      }
-      catch(const std::runtime_error& excp)
-      {
-        static_cast<void>(excp.what());
+        try
+        {
+          const float_type flt_from_bad_string(str);
 
-        ++funky_count;
+          static_cast<void>(flt_from_bad_string);
+        }
+        catch(const std::runtime_error& excp)
+        {
+          static_cast<void>(excp.what());
+
+          ++funky_count;
+        }
       }
 
-      result_is_ok = ((funky_count == funky_strings.size()) && result_is_ok);
+      const bool result_funky_strings_is_ok { (funky_count == funky_strings.size()) };
+
+      BOOST_TEST(result_funky_strings_is_ok);
+
+      result_is_ok = (result_funky_strings_is_ok && result_is_ok);
     }
 
     return result_is_ok;
