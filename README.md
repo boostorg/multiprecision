@@ -17,14 +17,20 @@ Language adherence:
   - It is compatible with C++14, 17, 20, 23 and beyond.
 
 The big number types in `Boost.Multiprecision` can be used with a wide selection of basic
-mathematical operations, elementary transcendental functions as well as the functions in Boost.Math. The Multiprecision types can
-also interoperate with the built-in types in C++ using clearly defined conversion rules. This allows `Boost.Multiprecision` to be
-used for all kinds of mathematical calculations involving integer, rational and floating-point types requiring extended range and precision.
+mathematical operations, elementary transcendental functions as well as the functions in Boost.Math.
+The Multiprecision types also interoperate with built-in types in C++.
+The big number types adhere to clearly defined conversion rules. This allows `Boost.Multiprecision` to be
+used for all kinds of mathematical calculations involving integer, rational and floating-point types
+requiring extended range and precision.
 
-Multiprecision consists of a generic interface to the mathematics of large numbers as well as a selection of big number back ends, with
-support for integer, rational and floating-point types. `Boost.Multiprecision` provides a selection of back ends delivered off-the-rack in
-including interfaces to GMP, MPFR, MPIR, TomMath as well as its own collection of Boost-licensed, header-only back ends for integers,
-rationals, floats and complex. In addition, user-defined back ends can be created and used with the interface of Multiprecision,
+Multiprecision consists of a generic interface to the mathematics of large numbers as well as a selection of big number back ends.
+There is support for integer, rational and floating-point types.
+`Boost.Multiprecision` provides a selection of back ends delivered off-the-rack in
+including interfaces to GMP, MPFR, MPIR, TomMath as well as its own collection
+of Boost-licensed, header-only back ends for integers,
+rationals, floats and complex.
+
+In addition, user-defined back ends can be created and used with the interface of Multiprecision,
 presuming that the class implementation adheres to the necessary concepts.
 
 Depending upon the multiprecision type, precision may be arbitrarily large (limited only by available memory),
