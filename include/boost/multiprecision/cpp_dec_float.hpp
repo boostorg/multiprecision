@@ -445,8 +445,6 @@ class cpp_dec_float
       return ((fpclass == cpp_dec_float_finite) && (data[0u] == 0u));
    }
 
-   bool isone() const;
-   bool isone_minus() const;
    bool isint() const;
    bool isneg() const { return neg; }
 
@@ -570,6 +568,17 @@ class cpp_dec_float
 
    // Inversion.
    cpp_dec_float& calculate_inv();
+
+   bool isone() const
+   {
+      bool b_neg;
+
+      const bool result_one_is_ok = is_one_or_minus_one(&b_neg);
+
+      return (result_one_is_ok && (!b_neg));
+   }
+
+   bool is_one_or_minus_one(bool* p_sign) const;
 
    void from_unsigned_long_long(const unsigned long long u);
 
@@ -1231,18 +1240,19 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 
    // Handle the special cases of inf, NaN, and +1 or -1.
 
-   if ((isnan)() || (isone() || isone_minus()))
-   {
-      return *this;
-   }
-
    if ((isinf)())
    {
       return *this = zero();
    }
 
+   bool b_neg;
+
+   if ((isnan)() || is_one_or_minus_one(&b_neg))
+   {
+      return *this;
+   }
+
    // Compute the inverse of *this.
-   const bool b_neg = neg;
 
    neg = false;
 
@@ -1291,7 +1301,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 {
    // Compute the square root of *this.
 
-   if ((isinf)() && !isneg())
+   if ((isinf)() && (!isneg()))
    {
       return *this;
    }
@@ -1420,8 +1430,7 @@ int cpp_dec_float<Digits10, ExponentType, Allocator>::compare(const cpp_dec_floa
    if (iszero())
    {
       // The value of *this is zero and v is either zero or non-zero.
-      return (v.iszero() ? 0
-                         : (v.neg ? 1 : -1));
+      return (v.iszero() ? 0 : (v.neg ? 1 : -1));
    }
    else if (v.iszero())
    {
@@ -1456,47 +1465,30 @@ int cpp_dec_float<Digits10, ExponentType, Allocator>::compare(const cpp_dec_floa
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-bool cpp_dec_float<Digits10, ExponentType, Allocator>::isone() const
+bool cpp_dec_float<Digits10, ExponentType, Allocator>::is_one_or_minus_one(bool* p_sign) const
 {
    // Check if the value of *this is identically 1 or very close to 1.
 
-   const bool not_negative_and_is_finite = ((!neg) && (isfinite)());
+   if(p_sign != nullptr)
+      *p_sign = neg;
 
-   if (not_negative_and_is_finite)
+   if ((isfinite)())
    {
       if ((data[0u] == static_cast<std::uint32_t>(1u)) && (exp == static_cast<exponent_type>(0)))
       {
          const typename array_type::const_iterator it_non_zero = std::find_if(data.begin(), data.end(), data_elem_is_non_zero_predicate);
-         return (it_non_zero == data.end());
+
+         const bool result_one_is_ok = (it_non_zero == data.end());
+
+         return result_one_is_ok;
       }
       else if ((data[0u] == static_cast<std::uint32_t>(cpp_dec_float_elem_mask - 1)) && (exp == static_cast<exponent_type>(-cpp_dec_float_elem_digits10)))
       {
          const typename array_type::const_iterator it_non_nine = std::find_if(data.begin(), data.end(), data_elem_is_non_nine_predicate);
-         return (it_non_nine == data.end());
-      }
-   }
 
-   return false;
-}
+         const bool result_one_is_ok = (it_non_nine == data.end());
 
-template <unsigned Digits10, class ExponentType, class Allocator>
-bool cpp_dec_float<Digits10, ExponentType, Allocator>::isone_minus() const
-{
-   // Check if the value of *this is identically 1 or very close to 1.
-
-   const bool is_negative_and_is_finite = (neg && (isfinite)());
-
-   if (is_negative_and_is_finite)
-   {
-      if ((data[0u] == static_cast<std::uint32_t>(1u)) && (exp == static_cast<exponent_type>(0)))
-      {
-         const typename array_type::const_iterator it_non_zero = std::find_if(data.begin(), data.end(), data_elem_is_non_zero_predicate);
-         return (it_non_zero == data.end());
-      }
-      else if ((data[0u] == static_cast<std::uint32_t>(cpp_dec_float_elem_mask - 1)) && (exp == static_cast<exponent_type>(-cpp_dec_float_elem_digits10)))
-      {
-         const typename array_type::const_iterator it_non_nine = std::find_if(data.begin(), data.end(), data_elem_is_non_nine_predicate);
-         return (it_non_nine == data.end());
+         return result_one_is_ok;
       }
    }
 
