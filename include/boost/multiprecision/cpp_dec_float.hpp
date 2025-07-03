@@ -446,6 +446,7 @@ class cpp_dec_float
    }
 
    bool isone() const;
+   bool isone_minus() const;
    bool isint() const;
    bool isneg() const { return neg; }
 
@@ -1228,9 +1229,9 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       return *this;
    }
 
-   // Handle the special cases of inf and NaN.
+   // Handle the special cases of inf, NaN, and +1 or -1.
 
-   if ((isnan)())
+   if ((isnan)() || (isone() || isone_minus()))
    {
       return *this;
    }
@@ -1462,6 +1463,30 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::isone() const
    const bool not_negative_and_is_finite = ((!neg) && (isfinite)());
 
    if (not_negative_and_is_finite)
+   {
+      if ((data[0u] == static_cast<std::uint32_t>(1u)) && (exp == static_cast<exponent_type>(0)))
+      {
+         const typename array_type::const_iterator it_non_zero = std::find_if(data.begin(), data.end(), data_elem_is_non_zero_predicate);
+         return (it_non_zero == data.end());
+      }
+      else if ((data[0u] == static_cast<std::uint32_t>(cpp_dec_float_elem_mask - 1)) && (exp == static_cast<exponent_type>(-cpp_dec_float_elem_digits10)))
+      {
+         const typename array_type::const_iterator it_non_nine = std::find_if(data.begin(), data.end(), data_elem_is_non_nine_predicate);
+         return (it_non_nine == data.end());
+      }
+   }
+
+   return false;
+}
+
+template <unsigned Digits10, class ExponentType, class Allocator>
+bool cpp_dec_float<Digits10, ExponentType, Allocator>::isone_minus() const
+{
+   // Check if the value of *this is identically 1 or very close to 1.
+
+   const bool is_negative_and_is_finite = (neg && (isfinite)());
+
+   if (is_negative_and_is_finite)
    {
       if ((data[0u] == static_cast<std::uint32_t>(1u)) && (exp == static_cast<exponent_type>(0)))
       {

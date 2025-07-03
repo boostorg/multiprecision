@@ -991,8 +991,7 @@ class cpp_double_fp_backend
       constexpr cpp_double_fp_backend
          my_value_eps_constexpr
          {
-              cpp_double_fp_backend(cpp_df_qf_detail::ccmath::numeric_limits<float_type>::epsilon())
-            * cpp_double_fp_backend(cpp_df_qf_detail::ccmath::numeric_limits<float_type>::epsilon())
+            cpp_df_qf_detail::ccmath::unsafe::ldexp(float_type { 1 }, int { 3 - my_digits })
          };
 
       static_assert
