@@ -427,7 +427,6 @@ class cpp_dec_float
    cpp_dec_float& div_unsigned_long_long(const unsigned long long n);
 
    // Elementary primitives.
-   cpp_dec_float& calculate_inv();
    cpp_dec_float& calculate_sqrt();
 
    void negate()
@@ -567,6 +566,9 @@ class cpp_dec_float
    static bool data_elem_is_non_zero_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(0u)); }
    static bool data_elem_is_non_nine_predicate(const std::uint32_t& d) { return (d != static_cast<std::uint32_t>(cpp_dec_float::cpp_dec_float_elem_mask - 1)); }
    static bool char_is_nonzero_predicate(const char& c) { return (c != static_cast<char>('0')); }
+
+   // Inversion.
+   cpp_dec_float& calculate_inv();
 
    void from_unsigned_long_long(const unsigned long long u);
 
@@ -1218,19 +1220,15 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 template <unsigned Digits10, class ExponentType, class Allocator>
 cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, ExponentType, Allocator>::calculate_inv()
 {
-   // Compute the inverse of *this.
-   const bool b_neg = neg;
-
-   neg = false;
-
-   // Handle special cases like zero, inf and NaN.
+   // Handle the special case of zero.
    if (iszero())
    {
       *this = inf();
-      if (b_neg)
-         negate();
+
       return *this;
    }
+
+   // Handle the special cases of inf and NaN.
 
    if ((isnan)())
    {
@@ -1242,14 +1240,12 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       return *this = zero();
    }
 
-   if (isone())
-   {
-      if (b_neg)
-         negate();
-      return *this;
-   }
+   // Compute the inverse of *this.
+   const bool b_neg = neg;
 
-   // Save the original *this.
+   neg = false;
+
+   // Save the original (absolute value of) *this.
    cpp_dec_float<Digits10, ExponentType, Allocator> x(*this);
 
    // Generate the initial estimate using division.

@@ -14,8 +14,9 @@
 #pragma warning(disable : 4127)
 #endif
 
+#include <test.hpp>
+
 #include <boost/detail/lightweight_test.hpp>
-#include "test.hpp"
 
 #include <array>
 #include <ctime>

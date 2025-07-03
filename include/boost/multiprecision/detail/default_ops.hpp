@@ -499,7 +499,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if< !std::is_same<T, U>::va
    T t;
    t = number<T>::canonical_value(u);
    return t;
-}
+} // LCOV_EXCL_LINE
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR const T& make_T(const T& t)
 {
@@ -1803,6 +1803,9 @@ BOOST_MP_CXX14_CONSTEXPR void eval_karatsuba_sqrt(Backend& result, const Backend
    result = s;
 }
 
+// LCOV_EXCL_START
+// This is known tested in the test-file test_various_edges.cpp.
+
 template <class B>
 void BOOST_MP_CXX14_CONSTEXPR eval_integer_sqrt_bitwise(B& s, B& r, const B& x)
 {
@@ -1860,6 +1863,8 @@ void BOOST_MP_CXX14_CONSTEXPR eval_integer_sqrt_bitwise(B& s, B& r, const B& x)
       --g;
    } while (g >= 0);
 }
+
+// LCOV_EXCL_STOP
 
 template <class Backend>
 BOOST_MP_CXX14_CONSTEXPR void eval_integer_sqrt(Backend& result, Backend& r, const Backend& x)
@@ -3867,7 +3872,7 @@ conj(const number<Backend, et_off>& arg)
    using default_ops::eval_conj;
    eval_conj(result.backend(), arg.backend());
    return result;
-}
+} // LCOV_EXCL_LINE
 
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR detail::expression<
