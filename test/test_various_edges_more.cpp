@@ -126,9 +126,9 @@ namespace local
 
       for(std::size_t index { std::size_t { UINT8_C(0) }}; index < std::tuple_size<string_data_array_type>::value; ++index)
       {
-        const any_float_type start(any_float_type(float_number_strings[index]) * (dis(gen)* dis(gen)));
-        const other_float_type other(start);
-        const any_float_type backto(other);
+        const any_float_type start(boost::lexical_cast<any_float_type>(float_number_strings[index]) * (dis(gen)* dis(gen)));
+        const other_float_type other(static_cast<other_float_type>(start));
+        const any_float_type backto(static_cast<any_float_type>(other));
 
         const bool
           result_of_trip_is_ok
@@ -732,6 +732,7 @@ auto main() -> int
 
     static_cast<void>(local::test_edges<float_type>());
     local::test_cpp_dec_float_rd_ovf_unf<float_type>();
+    local::test_convert_and_back<double, float_type>(0.0F);
   }
 
   {

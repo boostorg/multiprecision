@@ -505,45 +505,8 @@ class cpp_dec_float
    exponent_type order() const
    {
       const bool bo_order_is_zero = ((!(isfinite)()) || (data[0] == static_cast<std::uint32_t>(0u)));
-      //
-      // Binary search to find the order of the leading term:
-      //
-      exponent_type prefix = 0;
 
-      if (data[0] >= 100000UL)
-      {
-         if (data[0] >= 10000000UL)
-         {
-            if (data[0] >= 100000000UL)
-               prefix = 8;
-            else
-               prefix = 7;
-         }
-         else
-         {
-            if (data[0] >= 1000000UL)
-               prefix = 6;
-            else
-               prefix = 5;
-         }
-      }
-      else
-      {
-         if (data[0] >= 1000UL)
-         {
-            if (data[0] >= 10000UL)
-               prefix = 4;
-            else
-               prefix = 3;
-         }
-         else
-         {
-            if (data[0] >= 100)
-               prefix = 2;
-            else if (data[0] >= 10)
-               prefix = 1;
-         }
-      }
+      exponent_type prefix = limb_order(data[static_cast<std::size_t>(UINT8_C(0))]);
 
       return (bo_order_is_zero ? static_cast<exponent_type>(0) : static_cast<exponent_type>(exp + prefix));
    }
@@ -569,6 +532,51 @@ class cpp_dec_float
 
    // Inversion.
    cpp_dec_float& calculate_inv();
+
+   static exponent_type limb_order(const limb_type limb)
+   {
+      //
+      // Binary search to find the order of the leading term:
+      //
+      exponent_type prefix = 0;
+
+      if (limb >= 100000UL)
+      {
+         if (limb >= 10000000UL)
+         {
+            if (limb >= 100000000UL)
+               prefix = 8;
+            else
+               prefix = 7;
+         }
+         else
+         {
+            if (limb >= 1000000UL)
+               prefix = 6;
+            else
+               prefix = 5;
+         }
+      }
+      else
+      {
+         if (limb >= 1000UL)
+         {
+            if (limb >= 10000UL)
+               prefix = 4;
+            else
+               prefix = 3;
+         }
+         else
+         {
+            if (limb >= 100)
+               prefix = 2;
+            else if (limb >= 10)
+               prefix = 1;
+         }
+      }
+
+      return prefix;
+   }
 
    bool isone() const
    {
@@ -1531,49 +1539,52 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::isint() const
 template <unsigned Digits10, class ExponentType, class Allocator>
 void cpp_dec_float<Digits10, ExponentType, Allocator>::extract_parts(double& mantissa, ExponentType& exponent) const
 {
-   // Extract the approximate parts mantissa and base-10 exponent from the input cpp_dec_float<Digits10, ExponentType, Allocator> value x.
+   // Extract the approximate parts mantissa and base-10 exponent from
+   // the input cpp_dec_float<Digits10, ExponentType, Allocator> value x.
+   // This subroutine is designed to be fast and does not round.
 
-   // Extracts the mantissa and exponent.
-   exponent = exp;
+   // Extract the mantissa and exponent.
 
-   std::uint32_t p10  = static_cast<std::uint32_t>(1u);
-   std::uint32_t test = data[0u];
+   using local_exponent_type = ExponentType;
 
-   for (;;)
-   {
-      test /= static_cast<std::uint32_t>(10u);
+   std::size_t index { static_cast<std::size_t>(UINT8_C(0)) };
 
-      if (test == static_cast<std::uint32_t>(0u))
-      {
-         break;
-      }
+   const local_exponent_type my_order_limb0 { limb_order(data[index]) };
 
-      p10 *= static_cast<std::uint32_t>(10u);
-      ++exponent;
-   }
-
-   // Establish the upper bound of limbs for extracting the double.
-   const int max_elem_in_double_count = static_cast<int>(static_cast<std::int32_t>(std::numeric_limits<double>::digits10) / cpp_dec_float_elem_digits10) + (static_cast<int>(static_cast<std::int32_t>(std::numeric_limits<double>::digits10) % cpp_dec_float_elem_digits10) != 0 ? 1 : 0) + 1;
-
-   // And make sure this upper bound stays within bounds of the elems.
-   const std::size_t max_elem_extract_count = static_cast<std::size_t>((std::min)(static_cast<std::int32_t>(max_elem_in_double_count), cpp_dec_float_elem_number));
+   exponent = static_cast<local_exponent_type>(exp + my_order_limb0);
 
    // Extract into the mantissa the first limb, extracted as a double.
-   mantissa     = static_cast<double>(data[0]);
-   double scale = 1.0;
 
-   // Extract the rest of the mantissa piecewise from the limbs.
-   for (std::size_t i = 1u; i < max_elem_extract_count; i++)
+   mantissa = ((!neg) ? static_cast<double>(data[index]) : -static_cast<double>(data[index]));
+
+   ++index;
+
+   int digit_counter { };
+
+   double p10 { 1.0 };
+
+   // Scale the first limb with its order.
+   for ( ; digit_counter < static_cast<int>(my_order_limb0); ++digit_counter)
    {
-      scale /= static_cast<double>(cpp_dec_float_elem_mask);
-      mantissa += (static_cast<double>(data[i]) * scale);
+      mantissa /= 10.0;
+
+      p10 *= 10.0;
    }
 
-   mantissa /= static_cast<double>(p10);
+   // Extract the rest of the mantissa piecewise from the limbs.
+   // Keep a running power-of-ten scale in the variable p10.
+   // This loop does not round.
 
-   if (neg)
+   while (   (digit_counter < std::numeric_limits<double>::max_digits10 + 2)
+          && (index < static_cast<std::size_t>(cpp_dec_float_elem_number)))
    {
-      mantissa = -mantissa;
+      p10 *= static_cast<double>(cpp_dec_float_elem_mask);
+
+      mantissa += static_cast<double>(static_cast<double>(data[index]) / p10);
+
+      ++index;
+
+      digit_counter += static_cast<int>(cpp_dec_float_elem_digits10);
    }
 }
 
@@ -1591,12 +1602,13 @@ double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_double() const
       }
       else
       {
-         return ((!neg) ? std::numeric_limits<double>::infinity()
+         return ((!neg) ? +std::numeric_limits<double>::infinity()
                         : -std::numeric_limits<double>::infinity());
       }
    }
 
    cpp_dec_float<Digits10, ExponentType, Allocator> xx(*this);
+
    if (xx.isneg())
       xx.negate();
 
@@ -1609,11 +1621,12 @@ double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_double() const
    // Check if *this cpp_dec_float<Digits10, ExponentType, Allocator> exceeds the maximum of double.
    if (xx.compare(double_max()) > 0)
    {
-      return ((!neg) ? std::numeric_limits<double>::infinity()
+      return ((!neg) ? +std::numeric_limits<double>::infinity()
                      : -std::numeric_limits<double>::infinity());
    }
 
-   std::stringstream strm;
+   std::stringstream strm { };
+
    strm.imbue(std::locale::classic());
 
    strm << str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific);
