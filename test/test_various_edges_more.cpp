@@ -650,8 +650,6 @@ namespace local
     using local_cpp_dec_float_type = CppDecFloatType;
 
     {
-      typename local_cpp_dec_float_type::backend_type::exponent_type max_exp { };
-
       std::string str_max_pos_01("+1.0E+");
       std::string str_max_pos_02("+2.0E+");
       std::string str_max_pos_03("+3.0E+");
