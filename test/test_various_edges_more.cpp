@@ -610,6 +610,105 @@ namespace local
 
     return result_of_trip_is_ok;
   }
+
+
+  template<class CppDecFloatType>
+  auto test_cpp_dec_float_rd_ovf_unf() -> void
+  {
+    using local_cpp_dec_float_type = CppDecFloatType;
+
+    {
+      typename local_cpp_dec_float_type::backend_type::exponent_type max_exp { };
+
+      std::string str_max_pos_01("+1.0E+");
+      std::string str_max_pos_02("+2.0E+");
+      std::string str_max_pos_03("+3.0E+");
+      std::string str_max_pos_04("+0.9E+");
+
+      std::string str_max_neg_01("-1.0E+");
+      std::string str_max_neg_02("-2.0E+");
+      std::string str_max_neg_03("-3.0E+");
+      std::string str_max_neg_04("-0.9E+");
+
+      {
+        std::stringstream strm { };
+
+        strm << std::numeric_limits<local_cpp_dec_float_type>::max_exponent10;
+
+        str_max_pos_01 += strm.str();
+        str_max_pos_02 += strm.str();
+        str_max_pos_03 += strm.str();
+        str_max_pos_04 += strm.str();
+
+        str_max_neg_01 += strm.str();
+        str_max_neg_02 += strm.str();
+        str_max_neg_03 += strm.str();
+        str_max_neg_04 += strm.str();
+      }
+
+      const local_cpp_dec_float_type max_pos_01(str_max_pos_01);
+      const local_cpp_dec_float_type max_pos_02(str_max_pos_02);
+      const local_cpp_dec_float_type max_pos_03(str_max_pos_03);
+      const local_cpp_dec_float_type max_pos_04(str_max_pos_04);
+
+      const local_cpp_dec_float_type max_neg_01(str_max_neg_01);
+      const local_cpp_dec_float_type max_neg_02(str_max_neg_02);
+      const local_cpp_dec_float_type max_neg_03(str_max_neg_03);
+      const local_cpp_dec_float_type max_neg_04(str_max_neg_04);
+
+      using std::signbit;
+
+      BOOST_TEST(max_pos_01 == (std::numeric_limits<local_cpp_dec_float_type>::max)());
+      BOOST_TEST((boost::multiprecision::isinf)(max_pos_02) && (!signbit(max_pos_02)));
+      BOOST_TEST((boost::multiprecision::isinf)(max_pos_03) && (!signbit(max_pos_03)));
+      BOOST_TEST(((boost::multiprecision::fpclassify)(max_pos_04) == FP_NORMAL) && (!signbit(max_pos_04)));
+
+      BOOST_TEST(max_neg_01 == (std::numeric_limits<local_cpp_dec_float_type>::lowest)());
+      BOOST_TEST((boost::multiprecision::isinf)(max_neg_02) && signbit(max_neg_02));
+      BOOST_TEST((boost::multiprecision::isinf)(max_neg_03) && signbit(max_neg_03));
+      BOOST_TEST(((boost::multiprecision::fpclassify)(max_neg_04) == FP_NORMAL) && signbit(max_neg_04));
+    }
+
+    {
+      std::string str_min_pos_01("+1.0E");
+      std::string str_min_pos_02("+1.1E");
+      std::string str_min_pos_03("+0.9E");
+
+      std::string str_min_neg_01("-1.0E");
+      std::string str_min_neg_02("-1.1E");
+      std::string str_min_neg_03("-0.9E");
+
+      {
+        std::stringstream strm { };
+
+        strm << std::numeric_limits<local_cpp_dec_float_type>::min_exponent10;
+
+        str_min_pos_01 += strm.str();
+        str_min_pos_02 += strm.str();
+        str_min_pos_03 += strm.str();
+
+        str_min_neg_01 += strm.str();
+        str_min_neg_02 += strm.str();
+        str_min_neg_03 += strm.str();
+      }
+
+      const local_cpp_dec_float_type min_pos_01(str_min_pos_01);
+      const local_cpp_dec_float_type min_pos_02(str_min_pos_02);
+      const local_cpp_dec_float_type min_pos_03(str_min_pos_03);
+
+      const local_cpp_dec_float_type min_neg_01(str_min_neg_01);
+      const local_cpp_dec_float_type min_neg_02(str_min_neg_02);
+      const local_cpp_dec_float_type min_neg_03(str_min_neg_03);
+
+      BOOST_TEST(min_pos_01 == (std::numeric_limits<local_cpp_dec_float_type>::min)());
+      BOOST_TEST(((boost::multiprecision::fpclassify)(min_pos_02) == FP_NORMAL) && (!signbit(min_pos_02)));
+      BOOST_TEST(((boost::multiprecision::fpclassify)(min_pos_03) == FP_ZERO) && (!signbit(min_pos_03)));
+
+      BOOST_TEST(min_neg_01 == -(std::numeric_limits<local_cpp_dec_float_type>::min)());
+      BOOST_TEST(((boost::multiprecision::fpclassify)(min_neg_02) == FP_NORMAL) && signbit(min_neg_02));
+      BOOST_TEST(((boost::multiprecision::fpclassify)(min_neg_03) == FP_ZERO) && (!signbit(min_neg_03)));
+    }
+  }
 } // namespace local
 
 auto main() -> int
@@ -632,6 +731,7 @@ auto main() -> int
     std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
 
     static_cast<void>(local::test_edges<float_type>());
+    local::test_cpp_dec_float_rd_ovf_unf<float_type>();
   }
 
   {

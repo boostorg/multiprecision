@@ -553,11 +553,12 @@ class cpp_dec_float
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
       for (unsigned i = 0; i < data.size(); ++i)
-         ar& boost::make_nvp("digit", data[i]);
-      ar& boost::make_nvp("exponent", exp);
-      ar& boost::make_nvp("sign", neg);
-      ar& boost::make_nvp("class-type", fpclass);
-      ar& boost::make_nvp("precision", prec_elem);
+         ar & boost::make_nvp("digit", data[i]);
+
+      ar & boost::make_nvp("exponent", exp);
+      ar & boost::make_nvp("sign", neg);
+      ar & boost::make_nvp("class-type", fpclass);
+      ar & boost::make_nvp("precision", prec_elem);
    }
    #endif
 
@@ -1612,13 +1613,13 @@ double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_double() const
                      : -std::numeric_limits<double>::infinity());
    }
 
-   std::stringstream ss;
-   ss.imbue(std::locale::classic());
+   std::stringstream strm;
+   strm.imbue(std::locale::classic());
 
-   ss << str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific);
+   strm << str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific);
 
    double d;
-   ss >> d;
+   strm >> d;
 
    return d;
 }
@@ -1659,13 +1660,13 @@ long double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_long_doubl
                      : -std::numeric_limits<long double>::infinity());
    }
 
-   std::stringstream ss;
-   ss.imbue(std::locale::classic());
+   std::stringstream strm;
+   strm.imbue(std::locale::classic());
 
-   ss << str(std::numeric_limits<long double>::digits10 + (2 + 1), std::ios_base::scientific);
+   strm << str(std::numeric_limits<long double>::digits10 + (2 + 1), std::ios_base::scientific);
 
    long double ld;
-   ss >> ld;
+   strm >> ld;
 
    return ld;
 }
@@ -1936,9 +1937,9 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
       return "nan";
    }
 
-   std::string     str;
+   std::string   my_str;
    std::intmax_t org_digits(number_of_digits);
-   exponent_type    my_exp = order();
+   exponent_type my_exp = order();
 
    if (!(f & std::ios_base::fixed) && (number_of_digits == 0))
       number_of_digits = cpp_dec_float_max_digits10;
@@ -1954,17 +1955,17 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
                                                      static_cast<std::size_t>(cpp_dec_float_elem_number));
 
    // Extract the remaining digits from cpp_dec_float<Digits10, ExponentType, Allocator> after the decimal point.
-   std::stringstream ss;
-   ss.imbue(std::locale::classic());
-   ss << data[0];
+   std::stringstream strm;
+   strm.imbue(std::locale::classic());
+   strm << data[0];
    // Extract all of the digits from cpp_dec_float<Digits10, ExponentType, Allocator>, beginning with the first data element.
    for (std::size_t i = static_cast<std::size_t>(1u); i < number_of_elements; i++)
    {
-      ss << std::setw(static_cast<std::streamsize>(cpp_dec_float_elem_digits10))
-         << std::setfill(static_cast<char>('0'))
-         << data[i];
+      strm << std::setw(static_cast<std::streamsize>(cpp_dec_float_elem_digits10))
+           << std::setfill(static_cast<char>('0'))
+           << data[i];
    }
-   str += ss.str();
+   my_str += strm.str();
 
    bool have_leading_zeros = false;
 
@@ -1975,37 +1976,37 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
       number_of_digits -= my_exp + 1; // reset to original value
       if (number_of_digits)
       {
-         str.insert(static_cast<std::string::size_type>(0), std::string::size_type(number_of_digits), '0');
+         my_str.insert(static_cast<std::string::size_type>(0), std::string::size_type(number_of_digits), '0');
          have_leading_zeros = true;
       }
    }
 
    if (number_of_digits < 0)
    {
-      str = "0";
+      my_str = "0";
       if (isneg())
-         str.insert(static_cast<std::string::size_type>(0), 1, '-');
-      boost::multiprecision::detail::format_float_string(str, 0, number_of_digits - my_exp - 1, f, this->iszero());
-      return str;
+         my_str.insert(static_cast<std::string::size_type>(0), 1, '-');
+      boost::multiprecision::detail::format_float_string(my_str, 0, number_of_digits - my_exp - 1, f, this->iszero());
+      return my_str;
    }
    else
    {
       // Cut the output to the size of the precision.
-      if (str.length() > static_cast<std::string::size_type>(number_of_digits))
+      if (my_str.length() > static_cast<std::string::size_type>(number_of_digits))
       {
          // Get the digit after the last needed digit for rounding
-         const std::uint32_t round = static_cast<std::uint32_t>(static_cast<std::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits)]) - static_cast<std::uint32_t>('0'));
+         const std::uint32_t round = static_cast<std::uint32_t>(static_cast<std::uint32_t>(my_str[static_cast<std::string::size_type>(number_of_digits)]) - static_cast<std::uint32_t>('0'));
 
          bool need_round_up = round >= 5u;
 
          if (round == 5u)
          {
-            const std::uint32_t ix = number_of_digits == 0 ? 0 : static_cast<std::uint32_t>(static_cast<std::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits - 1)]) - static_cast<std::uint32_t>('0'));
+            const std::uint32_t ix = number_of_digits == 0 ? 0 : static_cast<std::uint32_t>(static_cast<std::uint32_t>(my_str[static_cast<std::string::size_type>(number_of_digits - 1)]) - static_cast<std::uint32_t>('0'));
             if ((ix & 1u) == 0)
             {
                // We have an even digit followed by a 5, so we might not actually need to round up
                // if all the remaining digits are zero:
-               if (str.find_first_not_of('0', static_cast<std::string::size_type>(number_of_digits + 1)) == std::string::npos)
+               if (my_str.find_first_not_of('0', static_cast<std::string::size_type>(number_of_digits + 1)) == std::string::npos)
                {
                   bool all_zeros = true;
                   // No none-zero trailing digits in the string, now check whatever parts we didn't convert to the string:
@@ -2024,45 +2025,45 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
          }
 
          // Truncate the string
-         str.erase(static_cast<std::string::size_type>(number_of_digits));
+         my_str.erase(static_cast<std::string::size_type>(number_of_digits));
 
          if (need_round_up)
          {
-            if (str.size())
+            if (my_str.size())
             {
-               std::size_t ix = static_cast<std::size_t>(str.length() - 1u);
+               std::size_t ix = static_cast<std::size_t>(my_str.length() - 1u);
 
                // Every trailing 9 must be rounded up
-               while (ix && (static_cast<std::int32_t>(str.at(ix)) - static_cast<std::int32_t>('0') == static_cast<std::int32_t>(9)))
+               while (ix && (static_cast<std::int32_t>(my_str.at(ix)) - static_cast<std::int32_t>('0') == static_cast<std::int32_t>(9)))
                {
-                  str.at(ix) = static_cast<char>('0');
+                  my_str.at(ix) = static_cast<char>('0');
                   --ix;
                }
 
                if (!ix)
                {
                   // There were nothing but trailing nines.
-                  if (static_cast<std::int32_t>(static_cast<std::int32_t>(str.at(ix)) - static_cast<std::int32_t>(0x30)) == static_cast<std::int32_t>(9))
+                  if (static_cast<std::int32_t>(static_cast<std::int32_t>(my_str.at(ix)) - static_cast<std::int32_t>(0x30)) == static_cast<std::int32_t>(9))
                   {
                      // Increment up to the next order and adjust exponent.
-                     str.at(ix) = static_cast<char>('1');
+                     my_str.at(ix) = static_cast<char>('1');
                      ++my_exp;
                   }
                   else
                   {
                      // Round up this digit.
-                     ++str.at(ix);
+                     ++my_str.at(ix);
                   }
                }
                else
                {
                   // Round up the last digit.
-                  ++str[ix];
+                  ++my_str[ix];
                }
             }
             else
             {
-               str = "1";
+               my_str = "1";
                ++my_exp;
             }
          }
@@ -2073,20 +2074,20 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
    {
       // We need to take the zeros back out again, and correct the exponent
       // if we rounded up:
-      if (str[std::string::size_type(number_of_digits - 1)] != '0')
+      if (my_str[std::string::size_type(number_of_digits - 1)] != '0')
       {
          ++my_exp;
-         str.erase(0, std::string::size_type(number_of_digits - 1));
+         my_str.erase(0, std::string::size_type(number_of_digits - 1));
       }
       else
-         str.erase(0, std::string::size_type(number_of_digits));
+         my_str.erase(0, std::string::size_type(number_of_digits));
    }
 
    if (isneg())
-      str.insert(static_cast<std::string::size_type>(0), 1, '-');
+      my_str.insert(static_cast<std::string::size_type>(0), 1, '-');
 
-   boost::multiprecision::detail::format_float_string(str, my_exp, org_digits, f, this->iszero());
-   return str;
+   boost::multiprecision::detail::format_float_string(my_str, my_exp, org_digits, f, this->iszero());
+   return my_str;
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -2097,7 +2098,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
    {
 #endif
 
-      std::string str(s);
+      std::string my_str(s);
       static const std::string valid_characters{"0123456789"};
 
       // TBD: Using several regular expressions may significantly reduce
@@ -2108,39 +2109,39 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
       std::size_t pos;
 
-      if (((pos = str.find('e')) != std::string::npos) || ((pos = str.find('E')) != std::string::npos))
+      if (((pos = my_str.find('e')) != std::string::npos) || ((pos = my_str.find('E')) != std::string::npos))
       {
          // Remove the exponent part from the string.
 #ifndef BOOST_MP_STANDALONE
-         exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(str.c_str() + (pos + 1u)));
+         exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(my_str.c_str() + (pos + 1u)));
 #else
-         if (str.find_first_not_of(valid_characters, ((str[pos + 1] == '+') || (str[pos + 1] == '-')) ? pos + 2 : pos + 1) != std::string::npos)
+         if (my_str.find_first_not_of(valid_characters, ((my_str[pos + 1] == '+') || (my_str[pos + 1] == '-')) ? pos + 2 : pos + 1) != std::string::npos)
             BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
-         exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(str.c_str() + (pos + 1u))));
+         exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(my_str.c_str() + (pos + 1u))));
 #endif
-         
-         str = str.substr(static_cast<std::size_t>(0u), pos);
+
+         my_str = my_str.substr(static_cast<std::size_t>(0u), pos);
       }
 
       // Get a possible +/- sign and remove it.
       neg = false;
 
-      if (str.size())
+      if (my_str.size())
       {
-         if (str[0] == '-')
+         if (my_str[0] == '-')
          {
             neg = true;
-            str.erase(0, 1);
+            my_str.erase(0, 1);
          }
-         else if (str[0] == '+')
+         else if (my_str[0] == '+')
          {
-            str.erase(0, 1);
+            my_str.erase(0, 1);
          }
       }
       //
       // Special cases for infinities and NaN's:
       //
-      if ((str == "inf") || (str == "INF") || (str == "infinity") || (str == "INFINITY"))
+      if ((my_str == "inf") || (my_str == "INF") || (my_str == "infinity") || (my_str == "INFINITY"))
       {
          if (neg)
          {
@@ -2151,18 +2152,18 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
             *this = this->inf();
          return true;
       }
-      if ((str.size() >= 3) && ((str.substr(0, 3) == "nan") || (str.substr(0, 3) == "NAN") || (str.substr(0, 3) == "NaN")))
+      if ((my_str.size() >= 3) && ((my_str.substr(0, 3) == "nan") || (my_str.substr(0, 3) == "NAN") || (my_str.substr(0, 3) == "NaN")))
       {
          *this = this->nan();
          return true;
       }
 
       // Remove the leading zeros for all input types.
-      const std::string::iterator fwd_it_leading_zero = std::find_if(str.begin(), str.end(), char_is_nonzero_predicate);
+      const std::string::iterator fwd_it_leading_zero = std::find_if(my_str.begin(), my_str.end(), char_is_nonzero_predicate);
 
-      if (fwd_it_leading_zero != str.begin())
+      if (fwd_it_leading_zero != my_str.begin())
       {
-         if (fwd_it_leading_zero == str.end())
+         if (fwd_it_leading_zero == my_str.end())
          {
             // The string contains nothing but leading zeros.
             // This string represents zero.
@@ -2171,7 +2172,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          }
          else
          {
-            str.erase(str.begin(), fwd_it_leading_zero);
+            my_str.erase(my_str.begin(), fwd_it_leading_zero);
          }
       }
 
@@ -2182,32 +2183,33 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // even multiple of cpp_dec_float_elem_digits10.
 
       // Find a possible decimal point.
-      pos = str.find(static_cast<char>('.'));
+      pos = my_str.find(static_cast<char>('.'));
 
       if (pos != std::string::npos)
       {
          // Check we have only digits either side of the point:
-         if (str.find_first_not_of(valid_characters) != pos)
+         if (my_str.find_first_not_of(valid_characters) != pos)
             BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
-         if (str.find_first_not_of(valid_characters, pos + 1) != std::string::npos)
+         if (my_str.find_first_not_of(valid_characters, pos + 1) != std::string::npos)
             BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
 
          // Remove all trailing insignificant zeros.
-         const std::string::const_reverse_iterator rit_non_zero = std::find_if(str.rbegin(), str.rend(), char_is_nonzero_predicate);
+         const std::string::const_reverse_iterator rit_non_zero = std::find_if(my_str.rbegin(), my_str.rend(), char_is_nonzero_predicate);
 
-         if (rit_non_zero != static_cast<std::string::const_reverse_iterator>(str.rbegin()))
+         if (rit_non_zero != static_cast<std::string::const_reverse_iterator>(my_str.rbegin()))
          {
             const std::string::size_type ofs =
                static_cast<std::string::size_type>
                (
-                    static_cast<std::ptrdiff_t>(str.length())
-                  - std::distance<std::string::const_reverse_iterator>(str.rbegin(), rit_non_zero)
+                    static_cast<std::ptrdiff_t>(my_str.length())
+                  - std::distance<std::string::const_reverse_iterator>(my_str.rbegin(), rit_non_zero)
                );
-            str.erase(str.begin() + static_cast<std::ptrdiff_t>(ofs), str.end());
+
+            my_str.erase(my_str.begin() + static_cast<std::ptrdiff_t>(ofs), my_str.end());
          }
 
          // Check if the input is identically zero.
-         if (str == std::string("."))
+         if (my_str == std::string("."))
          {
             operator=(zero());
             return true;
@@ -2217,31 +2219,31 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          // and adjust the exponent accordingly.
          // Note that the while-loop operates only on strings of the form ".000abcd..."
          // and peels away the zeros just after the decimal point.
-         if (str.at(static_cast<std::size_t>(0u)) == static_cast<char>('.'))
+         if (my_str.at(static_cast<std::size_t>(0u)) == static_cast<char>('.'))
          {
-            const std::string::iterator it_non_zero = std::find_if(str.begin() + 1u, str.end(), char_is_nonzero_predicate);
+            const std::string::iterator it_non_zero = std::find_if(my_str.begin() + 1u, my_str.end(), char_is_nonzero_predicate);
 
             std::size_t delta_exp = static_cast<std::size_t>(0u);
 
-            if (str.at(static_cast<std::size_t>(1u)) == static_cast<char>('0'))
+            if (my_str.at(static_cast<std::size_t>(1u)) == static_cast<char>('0'))
             {
-               delta_exp = static_cast<std::size_t>(std::distance<std::string::const_iterator>(str.begin() + 1u, it_non_zero));
+               delta_exp = static_cast<std::size_t>(std::distance<std::string::const_iterator>(my_str.begin() + 1u, it_non_zero));
             }
 
             // Bring one single digit into the mantissa and adjust the exponent accordingly.
-            str.erase(str.begin(), it_non_zero);
-            str.insert(static_cast<std::string::size_type>(1u), ".");
+            my_str.erase(my_str.begin(), it_non_zero);
+            my_str.insert(static_cast<std::string::size_type>(1u), ".");
             exp -= static_cast<exponent_type>(delta_exp + 1u);
          }
       }
       else
       {
          // We should have only digits:
-         if (str.find_first_not_of(valid_characters) != std::string::npos)
+         if (my_str.find_first_not_of(valid_characters) != std::string::npos)
             BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
 
          // Input string has no decimal point: Append decimal point.
-         str.append(".");
+         my_str.append(".");
       }
 
       // Shift the decimal point such that the exponent is an even multiple of cpp_dec_float_elem_digits10.
@@ -2256,29 +2258,29 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       }
 
       // Make sure that there are enough digits for the decimal point shift.
-      pos = str.find(static_cast<char>('.'));
+      pos = my_str.find(static_cast<char>('.'));
 
       std::ptrdiff_t pos_plus_one = static_cast<std::ptrdiff_t>(pos + 1);
 
-      if ((static_cast<std::ptrdiff_t>(str.length()) - pos_plus_one) < n_shift)
+      if ((static_cast<std::ptrdiff_t>(my_str.length()) - pos_plus_one) < n_shift)
       {
-         const std::ptrdiff_t sz = static_cast<std::ptrdiff_t>(n_shift - (static_cast<std::ptrdiff_t>(str.length()) - pos_plus_one));
+         const std::ptrdiff_t sz = static_cast<std::ptrdiff_t>(n_shift - (static_cast<std::ptrdiff_t>(my_str.length()) - pos_plus_one));
 
-         str.append(std::string(static_cast<std::string::size_type>(sz), static_cast<char>('0')));
+         my_str.append(std::string(static_cast<std::string::size_type>(sz), static_cast<char>('0')));
       }
 
       // Do the decimal point shift.
       if (n_shift != static_cast<std::ptrdiff_t>(0))
       {
-         str.insert(static_cast<std::string::size_type>(pos_plus_one + n_shift), ".");
+         my_str.insert(static_cast<std::string::size_type>(pos_plus_one + n_shift), ".");
 
-         str.erase(pos, static_cast<std::ptrdiff_t>(1));
+         my_str.erase(pos, static_cast<std::ptrdiff_t>(1));
 
          exp -= static_cast<exponent_type>(n_shift);
       }
 
       // Cut the size of the mantissa to <= cpp_dec_float_elem_digits10.
-      pos          = str.find(static_cast<char>('.'));
+      pos          = my_str.find(static_cast<char>('.'));
       pos_plus_one = static_cast<std::ptrdiff_t>(pos + 1u);
 
       if (pos > static_cast<std::size_t>(cpp_dec_float_elem_digits10))
@@ -2287,25 +2289,25 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          const std::int32_t n_rem_is_zero = ((static_cast<std::int32_t>(n_pos % cpp_dec_float_elem_digits10) == static_cast<std::int32_t>(0)) ? static_cast<std::int32_t>(1) : static_cast<std::int32_t>(0));
          const std::int32_t n             = static_cast<std::int32_t>(static_cast<std::int32_t>(n_pos / cpp_dec_float_elem_digits10) - n_rem_is_zero);
 
-         str.insert(static_cast<std::size_t>(static_cast<std::int32_t>(n_pos - static_cast<std::int32_t>(n * cpp_dec_float_elem_digits10))), ".");
+         my_str.insert(static_cast<std::size_t>(static_cast<std::int32_t>(n_pos - static_cast<std::int32_t>(n * cpp_dec_float_elem_digits10))), ".");
 
-         str.erase(static_cast<std::size_t>(pos_plus_one), static_cast<std::size_t>(1u));
+         my_str.erase(static_cast<std::size_t>(pos_plus_one), static_cast<std::size_t>(1u));
 
          exp += static_cast<exponent_type>(static_cast<exponent_type>(n) * static_cast<exponent_type>(cpp_dec_float_elem_digits10));
       }
 
       // Pad the decimal part such that its value is an even
       // multiple of cpp_dec_float_elem_digits10.
-      pos          = str.find(static_cast<char>('.'));
+      pos          = my_str.find(static_cast<char>('.'));
       pos_plus_one = static_cast<std::ptrdiff_t>(pos + 1u);
 
       // Throws an error for a strange construction like 3.14L
-      if(pos != std::string::npos && (str.back() == 'L' || str.back() == 'l' || str.back() == 'u' || str.back() == 'U'))
+      if(pos != std::string::npos && (my_str.back() == 'L' || my_str.back() == 'l' || my_str.back() == 'u' || my_str.back() == 'U'))
       {
          BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with an integer literal"));
       }
 
-      const std::int32_t n_dec = static_cast<std::int32_t>(static_cast<std::int32_t>(str.length() - 1u) - static_cast<std::int32_t>(pos));
+      const std::int32_t n_dec = static_cast<std::int32_t>(static_cast<std::int32_t>(my_str.length() - 1u) - static_cast<std::int32_t>(pos));
       const std::int32_t n_rem = static_cast<std::int32_t>(n_dec % cpp_dec_float_elem_digits10);
 
       std::int32_t n_cnt = ((n_rem != static_cast<std::int32_t>(0))
@@ -2314,16 +2316,16 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
       if (n_cnt != static_cast<std::int32_t>(0))
       {
-         str.append(static_cast<std::size_t>(n_cnt), static_cast<char>('0'));
+         my_str.append(static_cast<std::size_t>(n_cnt), static_cast<char>('0'));
       }
 
       // Truncate decimal part if it is too long.
       const std::size_t max_dec = static_cast<std::size_t>((cpp_dec_float_elem_number - 1) * cpp_dec_float_elem_digits10);
 
-      if (static_cast<std::size_t>(str.length() - pos) > max_dec)
+      if (static_cast<std::size_t>(my_str.length() - pos) > max_dec)
       {
-         str = str.substr(static_cast<std::size_t>(0u),
-                          static_cast<std::size_t>(pos_plus_one + static_cast<std::ptrdiff_t>(max_dec)));
+         my_str = my_str.substr(static_cast<std::size_t>(0u),
+                                static_cast<std::size_t>(pos_plus_one + static_cast<std::ptrdiff_t>(max_dec)));
       }
 
       // Now the input string has the standard cpp_dec_float<Digits10, ExponentType, Allocator> input form.
@@ -2335,19 +2337,19 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // Extract the data.
 
       // First get the digits to the left of the decimal point...
-      data[0u] = static_cast<std::uint32_t>(std::stol(str.substr(static_cast<std::size_t>(0u), pos)));
+      data[0u] = static_cast<std::uint32_t>(std::stol(my_str.substr(static_cast<std::size_t>(0u), pos)));
 
       // ...then get the remaining digits to the right of the decimal point.
       const std::string::size_type i_end =
       (
-           static_cast<std::string::size_type>(str.length() - static_cast<std::string::size_type>(pos_plus_one))
+           static_cast<std::string::size_type>(my_str.length() - static_cast<std::string::size_type>(pos_plus_one))
          / static_cast<std::string::size_type>(cpp_dec_float_elem_digits10)
       );
 
       for (std::string::size_type i = static_cast<std::string::size_type>(0u); i < i_end; i++)
       {
          const std::string::const_iterator it =
-              str.begin()
+              my_str.begin()
             + static_cast<std::ptrdiff_t>
               (
                    static_cast<std::string::size_type>(pos_plus_one)
@@ -2358,35 +2360,41 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       }
 
       // Check for overflow...
-      if (exp > cpp_dec_float_max_exp10)
+      if (exp >= cpp_dec_float_max_exp10)
       {
-         const bool b_result_is_neg = neg;
+         const bool neg_tmp { neg };
 
-         *this = inf();
-         if (b_result_is_neg)
-            negate();
+         neg = false;
+
+         const int compare_result { compare((cpp_dec_float::max)()) };
+
+         if(compare_result > 0)
+         {
+            *this = inf();
+         }
+
+         neg = neg_tmp;
       }
 
       // ...and check for underflow.
       if (exp <= cpp_dec_float_min_exp10)
       {
-         if (exp == cpp_dec_float_min_exp10)
-         {
-            // Check for identity with the minimum value.
-            cpp_dec_float<Digits10, ExponentType, Allocator> test = *this;
+         const bool neg_tmp { neg };
 
-            test.exp = static_cast<exponent_type>(0);
+         neg = false;
 
-            if (test.isone())
-            {
-               *this = zero();
-            }
-         }
-         else
+         const int compare_result { compare((cpp_dec_float::min)()) };
+
+         if(compare_result < 0)
          {
             *this = zero();
          }
+         else
+         {
+            neg = neg_tmp;
+         }
       }
+
 
 #ifndef BOOST_NO_EXCEPTIONS
    }
