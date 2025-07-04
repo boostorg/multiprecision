@@ -1620,6 +1620,7 @@ namespace local
 
   auto test_sqrt_integral_and_constexpr() -> void
   {
+    #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
     {
       // Select some pseudo-random integers
 
@@ -1676,6 +1677,7 @@ namespace local
       BOOST_TEST(sqrt(boost::multiprecision::uint128_t("1")) == boost::multiprecision::uint128_t(UINT8_C(1)));
       BOOST_TEST(sqrt(boost::multiprecision::uint128_t("2")) == boost::multiprecision::uint128_t(UINT8_C(1)));
     }
+    #endif // !BOOST_MP_NO_CONSTEXPR_DETECTION
   }
 } // namespace local
 

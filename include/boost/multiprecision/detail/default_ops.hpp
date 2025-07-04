@@ -1803,9 +1803,7 @@ BOOST_MP_CXX14_CONSTEXPR void eval_karatsuba_sqrt(Backend& result, const Backend
    result = s;
 }
 
-// LCOV_EXCL_START
-// This is known tested in the test-file test_various_edges.cpp.
-
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
 template <class B>
 void BOOST_MP_CXX14_CONSTEXPR eval_integer_sqrt_bitwise(B& s, B& r, const B& x)
 {
@@ -1863,8 +1861,7 @@ void BOOST_MP_CXX14_CONSTEXPR eval_integer_sqrt_bitwise(B& s, B& r, const B& x)
       --g;
    } while (g >= 0);
 }
-
-// LCOV_EXCL_STOP
+#endif // !BOOST_MP_NO_CONSTEXPR_DETECTION
 
 template <class Backend>
 BOOST_MP_CXX14_CONSTEXPR void eval_integer_sqrt(Backend& result, Backend& r, const Backend& x)
@@ -1873,7 +1870,8 @@ BOOST_MP_CXX14_CONSTEXPR void eval_integer_sqrt(Backend& result, Backend& r, con
    // recursive Karatsuba sqrt can cause issues in constexpr context:
    if (BOOST_MP_IS_CONST_EVALUATED(result.size()))
       return eval_integer_sqrt_bitwise(result, r, x);
-#endif
+#endif // !BOOST_MP_NO_CONSTEXPR_DETECTION
+
    using small_uint = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
 
    constexpr small_uint zero = 0u;
