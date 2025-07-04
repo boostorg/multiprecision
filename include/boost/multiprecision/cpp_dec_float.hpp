@@ -2017,12 +2017,14 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
             const std::uint32_t ix = number_of_digits == 0 ? 0 : static_cast<std::uint32_t>(static_cast<std::uint32_t>(my_str[static_cast<std::string::size_type>(number_of_digits - 1)]) - static_cast<std::uint32_t>('0'));
             if ((ix & 1u) == 0)
             {
-               // We have an even digit followed by a 5, so we might not actually need to round up
-               // if all the remaining digits are zero:
+               // We have an even digit followed by a 5, so we might not actually
+               // need to round up if all the remaining digits are zero:
                if (my_str.find_first_not_of('0', static_cast<std::string::size_type>(number_of_digits + 1)) == std::string::npos)
                {
                   bool all_zeros = true;
-                  // No none-zero trailing digits in the string, now check whatever parts we didn't convert to the string:
+
+                  // There are no non-zero trailing digits in the string,
+                  // now check whatever parts we didn't convert to the string:
                   for (std::size_t i = number_of_elements; i < data.size(); i++)
                   {
                      if (data[i])
@@ -2139,11 +2141,12 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // Get a possible +/- sign and remove it.
       neg = false;
 
-      if (my_str.size())
+      if (!my_str.empty())
       {
          if (my_str[0] == '-')
          {
             neg = true;
+
             my_str.erase(0, 1);
          }
          else if (my_str[0] == '+')
@@ -2151,23 +2154,25 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
             my_str.erase(0, 1);
          }
       }
+
       //
       // Special cases for infinities and NaN's:
       //
       if ((my_str == "inf") || (my_str == "INF") || (my_str == "infinity") || (my_str == "INFINITY"))
       {
-         if (neg)
-         {
-            *this = this->inf();
-            this->negate();
-         }
-         else
-            *this = this->inf();
+         const bool tmp_neg { neg };
+
+         *this = this->inf();
+
+         neg = tmp_neg;
+
          return true;
       }
+
       if ((my_str.size() >= 3) && ((my_str.substr(0, 3) == "nan") || (my_str.substr(0, 3) == "NAN") || (my_str.substr(0, 3) == "NaN")))
       {
          *this = this->nan();
+
          return true;
       }
 
@@ -2485,7 +2490,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
       d -= static_cast<double>(n);
       d *= static_cast<double>(cpp_dec_float_elem_mask);
    }
-}
+} // LCOV_EXCL_LINE
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 template <class Float>

@@ -359,6 +359,38 @@ namespace local
     }
 
     {
+      const std::initializer_list<std::string>
+        infty_strings_list
+        {
+          std::string("inf"),   std::string("INF"),   std::string("infinity"),   std::string("INFINITY"),
+          std::string("+inf"),   std::string("+INF"),   std::string("+infinity"),   std::string("+INFINITY"),
+          std::string("-inf"),   std::string("-INF"),   std::string("-infinity"),   std::string("-INFINITY")
+        };
+
+      const std::vector<std::string> infty_strings(infty_strings_list);
+
+      std::size_t infty_count { };
+
+      for(const auto& str : infty_strings)
+      {
+        const float_type flt_from_inf_string(str);
+
+        const bool
+          result_infty_strings_is_ok
+          {
+               (boost::multiprecision::isinf)(flt_from_inf_string)
+            && ((infty_count < std::size_t { UINT8_C(8) }) ? (!signbit(flt_from_inf_string)) : signbit(flt_from_inf_string))
+          };
+
+        ++infty_count;
+
+        BOOST_TEST(result_infty_strings_is_ok);
+
+        result_is_ok = (result_infty_strings_is_ok && result_is_ok);
+      }
+    }
+
+    {
       for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(16)); ++index)
       {
         static_cast<void>(index);
