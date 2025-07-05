@@ -1948,13 +1948,13 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
       if (number_of_digits)
       {
          my_str.insert(static_cast<std::string::size_type>(0), std::string::size_type(number_of_digits), '0');
-         have_leading_zeros = true;
+         have_leading_zeros = true; // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
       }
    }
 
    if (number_of_digits < 0)
    {
-      my_str = "0";
+      my_str = "0"; // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
       if (isneg())
          my_str.insert(static_cast<std::string::size_type>(0), 1, '-');
       boost::multiprecision::detail::format_float_string(my_str, 0, number_of_digits - my_exp - 1, f, this->iszero());
@@ -2036,7 +2036,7 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(std::intmax_t 
             }
             else
             {
-               my_str = "1";
+               my_str = "1"; // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
                ++my_exp;
             }
          }
@@ -2089,7 +2089,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
          exp = boost::lexical_cast<exponent_type>(static_cast<const char*>(my_str.c_str() + (pos + 1u)));
 #else
          if (my_str.find_first_not_of(valid_characters, ((my_str[pos + 1] == '+') || (my_str[pos + 1] == '-')) ? pos + 2 : pos + 1) != std::string::npos)
-            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content")); // LCOV_EXCL_LINE
          exp = static_cast<exponent_type>(std::atoll(static_cast<const char*>(my_str.c_str() + (pos + 1u))));
 #endif
 
@@ -2165,9 +2165,9 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       {
          // Check we have only digits either side of the point:
          if (my_str.find_first_not_of(valid_characters) != pos)
-            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content")); // LCOV_EXCL_LINE
          if (my_str.find_first_not_of(valid_characters, pos + 1) != std::string::npos)
-            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content")); // LCOV_EXCL_LINE
 
          // Remove all trailing insignificant zeros.
          const std::string::const_reverse_iterator rit_non_zero = std::find_if(my_str.rbegin(), my_str.rend(), char_is_nonzero_predicate);
@@ -2216,7 +2216,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       {
          // We should have only digits:
          if (my_str.find_first_not_of(valid_characters) != std::string::npos)
-            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content"));
+            BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with non-numeric content")); // LCOV_EXCL_LINE
 
          // Input string has no decimal point: Append decimal point.
          my_str.append(".");
@@ -2280,7 +2280,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // Throws an error for a strange construction like 3.14L
       if(pos != std::string::npos && (my_str.back() == 'L' || my_str.back() == 'l' || my_str.back() == 'u' || my_str.back() == 'U'))
       {
-         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with an integer literal"));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Can not construct a floating point with an integer literal")); // LCOV_EXCL_LINE
       }
 
       const std::int32_t n_dec = static_cast<std::int32_t>(static_cast<std::int32_t>(my_str.length() - 1u) - static_cast<std::int32_t>(pos));
@@ -2396,18 +2396,30 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
    // Create *this cpp_dec_float<Digits10, ExponentType, Allocator> from a given mantissa and exponent.
    // Note: This constructor does not maintain the full precision of double.
 
-   const bool mantissa_is_iszero = (::fabs(mantissa) < ((std::numeric_limits<double>::min)() * (1.0 + std::numeric_limits<double>::epsilon())));
+   std::fill(data.begin(), data.end(), static_cast<std::uint32_t>(0u));
+
+   constexpr double
+      dbl_min_check
+      {
+        static_cast<double>
+        (
+           (std::numeric_limits<double>::min)() * (1.0 + std::numeric_limits<double>::epsilon())
+        )
+      };
+
+   using std::fabs;
+
+   const bool mantissa_is_iszero = (fabs(mantissa) < dbl_min_check);
 
    if (mantissa_is_iszero)
    {
-      std::fill(data.begin(), data.end(), static_cast<std::uint32_t>(0u));
       return;
    }
 
-   const bool b_neg = (mantissa < 0.0);
+   const bool b_neg { (mantissa < 0.0) };
 
-   double       d = ((!b_neg) ? mantissa : -mantissa);
-   exponent_type e = exponent;
+   double        d { ((!b_neg) ? mantissa : -mantissa) };
+   exponent_type e { exponent };
 
    while (d > 10.0)
    {
@@ -2430,8 +2442,6 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
 
    exp = e;
    neg = b_neg;
-
-   std::fill(data.begin(), data.end(), static_cast<std::uint32_t>(0u));
 
    constexpr std::int32_t digit_ratio = static_cast<std::int32_t>(static_cast<std::int32_t>(std::numeric_limits<double>::digits10) / static_cast<std::int32_t>(cpp_dec_float_elem_digits10));
    constexpr std::int32_t digit_loops = static_cast<std::int32_t>(digit_ratio + static_cast<std::int32_t>(2));
@@ -3408,7 +3418,7 @@ inline void eval_ldexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
    if (   (static_cast<local_common_type>(the_exp) > static_cast<local_common_type>((std::numeric_limits<local_exponent_type>::max)()))
        || (static_cast<local_common_type>(the_exp) < static_cast<local_common_type>((std::numeric_limits<local_exponent_type>::min)())))
    {
-      BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Exponent value is out of range.")));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Exponent value is out of range."))); // LCOV_EXCL_LINE
    }
 
    result = x;
@@ -3492,21 +3502,21 @@ inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
       eval_frexp(r2, result, &e2);
       // overflow protection:
       if ((t > 0) && (e2 > 0) && (t > (std::numeric_limits<local_exponent_type>::max)() - e2))
-         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2.")); // LCOV_EXCL_LINE
       if ((t < 0) && (e2 < 0) && (t < (std::numeric_limits<local_exponent_type>::min)() - e2))
-         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
+         BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2.")); // LCOV_EXCL_LINE
       t += e2;
       result = r2;
    }
 
    while (result.compare(local_cpp_dec_float_type::one()) >= 0)
    {
-      result /= local_cpp_dec_float_type::two();
+      result.div_unsigned_long_long(2ULL);
       ++t;
    }
    while (result.compare(local_cpp_dec_float_type::half()) < 0)
    {
-      result *= local_cpp_dec_float_type::two();
+      result.mul_unsigned_long_long(2ULL);
       --t;
    }
    *e = t;
@@ -3528,7 +3538,7 @@ inline typename std::enable_if< !std::is_same<ExponentType, int>::value>::type e
    if (   (static_cast<local_common_type>(t) > static_cast<local_common_type>((std::numeric_limits<int>::max)()))
        || (static_cast<local_common_type>(t) < static_cast<local_common_type>((std::numeric_limits<int>::min)())))
    {
-      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is outside the range of an int"));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is outside the range of an int")); // LCOV_EXCL_LINE
    }
 
    *e = static_cast<int>(t);

@@ -363,8 +363,8 @@ namespace local
         infty_strings_list
         {
           std::string("inf"),   std::string("INF"),   std::string("infinity"),   std::string("INFINITY"),
-          std::string("+inf"),   std::string("+INF"),   std::string("+infinity"),   std::string("+INFINITY"),
-          std::string("-inf"),   std::string("-INF"),   std::string("-infinity"),   std::string("-INFINITY")
+          std::string("+inf"),  std::string("+INF"),  std::string("+infinity"),  std::string("+INFINITY"),
+          std::string("-inf"),  std::string("-INF"),  std::string("-infinity"),  std::string("-INFINITY")
         };
 
       const std::vector<std::string> infty_strings(infty_strings_list);
