@@ -70,7 +70,7 @@ struct number_category<backends::cpp_dec_float<Digits10, ExponentType, Allocator
 namespace backends {
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-class cpp_dec_float
+class cpp_dec_float // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
 {
  private:
    // Perform some static sanity checks.
@@ -157,7 +157,7 @@ class cpp_dec_float
       a.prec_elem = cpp_dec_float_elem_number;
 
       return a;
-   } // LCOV_EXCL_LINE
+   } // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
 
  public:
    // Public Constructors
@@ -1167,7 +1167,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       cpp_dec_float t;
       t = n;
       return operator/=(t);
-   } // LCOV_EXCL_LINE
+   } // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
 
    const std::uint32_t nn = static_cast<std::uint32_t>(n);
 
@@ -2453,7 +2453,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
       d -= static_cast<double>(n);
       d *= static_cast<double>(cpp_dec_float_elem_mask);
    }
-} // LCOV_EXCL_LINE
+} // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 template <class Float>
@@ -3158,7 +3158,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
       default_ops::detail::pow_imp(t, cpp_dec_float<Digits10, ExponentType, Allocator>::two(), static_cast<unsigned long long>(p), std::integral_constant<bool, false>());
 
    return t;
-} // LCOV_EXCL_LINE
+} // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_add(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& o)
@@ -3443,7 +3443,7 @@ inline void eval_ldexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
          if (2 * half_exp != e)
             t *= 2;
          result *= t;
-      } // LCOV_EXCL_LINE
+      } // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
       else
          result *= local_cpp_dec_float_type::pow2(e);
    }
