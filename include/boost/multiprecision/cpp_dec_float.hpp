@@ -3400,34 +3400,50 @@ inline void eval_ldexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
 {
    const long long the_exp = static_cast<long long>(e);
 
-   if ((the_exp > (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)()) || (the_exp < (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::min)()))
+   using local_cpp_dec_float_type = cpp_dec_float<Digits10, ExponentType, Allocator>;
+   using local_exponent_type = typename local_cpp_dec_float_type::exponent_type;
+
+   using local_common_type = typename std::common_type<local_exponent_type, long long>::type;
+
+   if (   (static_cast<local_common_type>(the_exp) > static_cast<local_common_type>((std::numeric_limits<local_exponent_type>::max)()))
+       || (static_cast<local_common_type>(the_exp) < static_cast<local_common_type>((std::numeric_limits<local_exponent_type>::min)())))
+   {
       BOOST_MP_THROW_EXCEPTION(std::runtime_error(std::string("Exponent value is out of range.")));
+   }
 
    result = x;
 
-   if ((the_exp > static_cast<long long>(-std::numeric_limits<long long>::digits)) && (the_exp < static_cast<long long>(0)))
+   if (   (static_cast<local_common_type>(the_exp) > static_cast<local_common_type>(-std::numeric_limits<long long>::digits))
+       && (static_cast<local_common_type>(the_exp) < static_cast<local_common_type>(0)))
+   {
       result.div_unsigned_long_long(1ULL << static_cast<long long>(-the_exp));
-   else if ((the_exp < static_cast<long long>(std::numeric_limits<long long>::digits)) && (the_exp > static_cast<long long>(0)))
+   }
+   else if (   (static_cast<local_common_type>(the_exp) < static_cast<local_common_type>(std::numeric_limits<long long>::digits))
+            && (static_cast<local_common_type>(the_exp) > static_cast<local_common_type>(0)))
+   {
       result.mul_unsigned_long_long(1ULL << the_exp);
+   }
    else if (the_exp != static_cast<long long>(0))
    {
-      if ((the_exp < cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp / 2) && (x.order() > 0))
+      if ((the_exp < local_cpp_dec_float_type::cpp_dec_float_min_exp / 2) && (x.order() > 0))
       {
          long long half_exp = e / 2;
-         cpp_dec_float<Digits10, ExponentType, Allocator> t = cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(half_exp);
+         local_cpp_dec_float_type t { local_cpp_dec_float_type::pow2(half_exp) };
          result *= t;
          if (2 * half_exp != e)
             t *= 2;
          result *= t;
-      }
+      } // LCOV_EXCL_LINE
       else
-         result *= cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(e);
+         result *= local_cpp_dec_float_type::pow2(e);
    }
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x, ExponentType* e)
 {
+   const bool b_neg { x.isneg() };
+
    result = x;
 
    if (result.iszero() || (result.isinf)() || (result.isnan)())
@@ -3436,12 +3452,16 @@ inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
       return;
    }
 
-   if (result.isneg())
+   if (b_neg)
       result.negate();
 
-   typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type t = result.order();
+   using local_cpp_dec_float_type = cpp_dec_float<Digits10, ExponentType, Allocator>;
+   using local_exponent_type = typename local_cpp_dec_float_type::exponent_type;
+
+   local_exponent_type t { result.order() };
+
    BOOST_MP_USING_ABS
-   if (abs(t) < ((std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)() / 1000))
+   if (abs(t) < ((std::numeric_limits<local_exponent_type>::max)() / 1000))
    {
       t *= 1000;
       t /= 301;
@@ -3452,55 +3472,65 @@ inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
       t *= 1000;
    }
 
-   result *= cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(-t);
+   result *= local_cpp_dec_float_type::pow2(-t);
 
    if (result.iszero() || (result.isinf)() || (result.isnan)())
    {
       // pow2 overflowed, slip the calculation up:
       result = x;
-      if (result.isneg())
+      if (b_neg)
          result.negate();
       t /= 2;
-      result *= cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(-t);
+      result *= local_cpp_dec_float_type::pow2(-t);
    }
    BOOST_MP_USING_ABS
    if (abs(result.order()) > 5)
    {
       // If our first estimate doesn't get close enough then try recursion until we do:
-      typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type e2;
-      cpp_dec_float<Digits10, ExponentType, Allocator>                         r2;
+      local_exponent_type e2;
+      cpp_dec_float<Digits10, ExponentType, Allocator> r2;
       eval_frexp(r2, result, &e2);
       // overflow protection:
-      if ((t > 0) && (e2 > 0) && (t > (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::max)() - e2))
+      if ((t > 0) && (e2 > 0) && (t > (std::numeric_limits<local_exponent_type>::max)() - e2))
          BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
-      if ((t < 0) && (e2 < 0) && (t < (std::numeric_limits<typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type>::min)() - e2))
+      if ((t < 0) && (e2 < 0) && (t < (std::numeric_limits<local_exponent_type>::min)() - e2))
          BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
       t += e2;
       result = r2;
    }
 
-   while (result.compare(cpp_dec_float<Digits10, ExponentType, Allocator>::one()) >= 0)
+   while (result.compare(local_cpp_dec_float_type::one()) >= 0)
    {
-      result /= cpp_dec_float<Digits10, ExponentType, Allocator>::two();
+      result /= local_cpp_dec_float_type::two();
       ++t;
    }
-   while (result.compare(cpp_dec_float<Digits10, ExponentType, Allocator>::half()) < 0)
+   while (result.compare(local_cpp_dec_float_type::half()) < 0)
    {
-      result *= cpp_dec_float<Digits10, ExponentType, Allocator>::two();
+      result *= local_cpp_dec_float_type::two();
       --t;
    }
    *e = t;
-   if (x.isneg())
+   if (b_neg)
       result.negate();
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline typename std::enable_if< !std::is_same<ExponentType, int>::value>::type eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x, int* e)
 {
-   typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type t;
+   using local_exponent_type = typename cpp_dec_float<Digits10, ExponentType, Allocator>::exponent_type;
+
+   local_exponent_type t { };
+
    eval_frexp(result, x, &t);
-   if ((t > (std::numeric_limits<int>::max)()) || (t < (std::numeric_limits<int>::min)()))
+
+   using local_common_type = typename std::common_type<local_exponent_type, int>::type;
+
+   if (   (static_cast<local_common_type>(t) > static_cast<local_common_type>((std::numeric_limits<int>::max)()))
+       || (static_cast<local_common_type>(t) < static_cast<local_common_type>((std::numeric_limits<int>::min)())))
+   {
       BOOST_MP_THROW_EXCEPTION(std::runtime_error("Exponent is outside the range of an int"));
+   }
+
    *e = static_cast<int>(t);
 }
 

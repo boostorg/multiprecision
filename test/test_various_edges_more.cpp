@@ -643,7 +643,6 @@ namespace local
     return result_of_trip_is_ok;
   }
 
-
   template<class CppDecFloatType>
   auto test_cpp_dec_float_rd_ovf_unf() -> void
   {
@@ -739,6 +738,54 @@ namespace local
       BOOST_TEST(((boost::multiprecision::fpclassify)(min_neg_03) == FP_ZERO) && (!signbit(min_neg_03)));
     }
   }
+
+  template<class CppDecFloatType>
+  auto test_cpp_dec_float_frexp_edge() -> void
+  {
+    using float_type = CppDecFloatType;
+
+    using float_backend_ctrl_type = boost::multiprecision::cpp_bin_float<50, boost::multiprecision::digit_base_10, void, std::int32_t>;
+
+    using float_ctrl_type = boost::multiprecision::number<float_backend_ctrl_type, boost::multiprecision::et_off>;
+
+    std::mt19937_64 gen { time_point<typename std::mt19937_64::result_type>() };
+
+    auto dis =
+      std::uniform_real_distribution<float>
+      {
+        static_cast<float>(1.01F),
+        static_cast<float>(1.04F)
+      };
+
+    {
+      for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(32)); ++index)
+      {
+        static_cast<void>(index);
+
+        using local_exponent_type = typename float_type::backend_type::exponent_type;
+
+        local_exponent_type exp_val { };
+        std::int32_t exp_val_ctrl { };
+
+        float_type arg_near_max { (std::numeric_limits<float_type>::max)() / dis(gen) };
+
+        const bool is_neg { ((index & 1U) != 0U) };
+
+        if(is_neg)
+        {
+          arg_near_max = -arg_near_max;
+        }
+
+        float_type frexp_near_max { frexp(arg_near_max, &exp_val) };
+        const float_ctrl_type frexp_near_max_ctrl { frexp(float_ctrl_type(arg_near_max), &exp_val_ctrl) };
+
+        BOOST_TEST((boost::multiprecision::isfinite)(frexp_near_max));
+        BOOST_TEST(exp_val >= (std::numeric_limits<float_type>::max_exponent - 8));
+        BOOST_TEST(exp_val == exp_val_ctrl);
+        BOOST_TEST(is_close_fraction(float_type(frexp_near_max_ctrl), frexp_near_max, std::numeric_limits<float_type>::epsilon() * 8));
+      }
+    }
+  }
 } // namespace local
 
 auto main() -> int
@@ -763,6 +810,7 @@ auto main() -> int
     static_cast<void>(local::test_edges<float_type>());
     local::test_cpp_dec_float_rd_ovf_unf<float_type>();
     local::test_convert_and_back<double, float_type>(0.0F);
+    local::test_cpp_dec_float_frexp_edge<float_type>();
   }
 
   {
