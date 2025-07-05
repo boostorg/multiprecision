@@ -75,7 +75,7 @@ void test()
 
    unsigned max_err = 0;
 
-   BOOST_IF_CONSTEXPR (!::has_poor_exp_range_or_precision_support<T>::value)
+   BOOST_IF_CONSTEXPR (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::max_exponent10 > 4000))
    {
       static const std::array<const char*, 51u> data =
       {{
@@ -159,7 +159,7 @@ void test()
 #else
       BOOST_TEST(max_err < 5000);
 #endif
-   } // !::has_poor_exp_range_or_precision_support<T>::value
+   } // (std::numeric_limits<T>::max_exponent10 > 4000)
 
    using std::ldexp;
 
@@ -205,8 +205,11 @@ void test()
    if (!boost::multiprecision::is_interval_number<T>::value)
    {
       T bug_case = -1.05 * log((std::numeric_limits<T>::max)());
-      for (unsigned i = 0; bug_case > -20 / std::numeric_limits<T>::epsilon(); ++i, bug_case *= 1.05)
+
+      for (unsigned i = 0U; bug_case > -20 / std::numeric_limits<T>::epsilon(); ++i, bug_case *= 1.05)
       {
+         static_cast<void>(i);
+
          if (std::numeric_limits<T>::has_infinity)
          {
             BOOST_CHECK_EQUAL(exp(bug_case), 0);
@@ -217,20 +220,19 @@ void test()
          }
       }
 
-      // Handle uneven/asymmetric exponents on min/max of cpp_double_fp_backend
       BOOST_IF_CONSTEXPR (::has_poor_exp_range_or_precision_support<T>::value)
       {
-         bug_case = log(1 / (std::numeric_limits<T>::min)()) / -1.0005;
+         bug_case = log(T(1) / (std::numeric_limits<T>::min)()) / -1.0005;
       }
       else
       {
          bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
       }
 
-      unsigned i { 0U };
-
-      for ( ; i < 20U; ++i, bug_case /= static_cast<T>(1.05L))
+      for (unsigned i { 0U }; i < 20U; ++i, bug_case /= static_cast<T>(1.05L))
       {
+         static_cast<void>(i);
+
          BOOST_CHECK_GE(exp(bug_case), (std::numeric_limits<T>::min)());
       }
    }

@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Copyright Christopher Kormanyos 2002 - 2025.
-// Copyright 2011 -2025 John Maddock. Distributed under the Boost
+// Copyright John Maddock 2011 -2025.
+// Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -8,27 +9,10 @@
 // "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 //
-// There are some "noexcept" specifications on the functions in this file.
-// Unlike in pre-C++11 versions, compilers can now detect noexcept misuse
-// at compile time, allowing for simple use of it here.
-//
 
 #ifndef BOOST_MP_CPP_DEC_FLOAT_HPP
 #define BOOST_MP_CPP_DEC_FLOAT_HPP
 
-#include <cmath>
-#include <cstdint>
-#include <cstdlib>
-#include <algorithm>
-#include <array>
-#include <initializer_list>
-#include <iomanip>
-#include <string>
-#include <limits>
-#include <stdexcept>
-#include <sstream>
-#include <locale>
-#include <ios>
 #include <boost/multiprecision/detail/standalone_config.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/fpclassify.hpp>
@@ -56,6 +40,20 @@
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #endif
+
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
+#include <initializer_list>
+#include <iomanip>
+#include <ios>
+#include <limits>
+#include <locale>
+#include <stdexcept>
+#include <sstream>
+#include <string>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -135,18 +133,14 @@ class cpp_dec_float
       cpp_dec_float_NaN
    } fpclass_type;
 
-   array_type    data;
-   exponent_type exp;
-   bool          neg;
-   fpclass_type  fpclass;
-   std::int32_t  prec_elem;
+   array_type    data      { };
+   exponent_type exp       { };
+   bool          neg       { };
+   fpclass_type  fpclass   { cpp_dec_float_finite };
+   std::int32_t  prec_elem { cpp_dec_float_elem_number };
 
    // Private constructor from the floating-point class type.
-   explicit cpp_dec_float(fpclass_type c) : data(),
-                                            exp(static_cast<exponent_type>(0)),
-                                            neg(false),
-                                            fpclass(c),
-                                            prec_elem(cpp_dec_float_elem_number) {}
+   explicit cpp_dec_float(fpclass_type c) : fpclass(c) { }
 
    // Constructor from an initializer_list, an optional
    // (value-aligned) exponent and a Boolean sign.
@@ -167,29 +161,16 @@ class cpp_dec_float
 
  public:
    // Public Constructors
-   cpp_dec_float() noexcept(noexcept(array_type())) : data(),
-                                                      exp(static_cast<exponent_type>(0)),
-                                                      neg(false),
-                                                      fpclass(cpp_dec_float_finite),
-                                                      prec_elem(cpp_dec_float_elem_number) {}
+   cpp_dec_float() noexcept(noexcept(array_type())) { }
 
-   cpp_dec_float(const char* s) : data(),
-                                  exp(static_cast<exponent_type>(0)),
-                                  neg(false),
-                                  fpclass(cpp_dec_float_finite),
-                                  prec_elem(cpp_dec_float_elem_number)
+   cpp_dec_float(const char* s)
    {
       *this = s;
    }
 
    template <class I>
-   cpp_dec_float(I i,
-                 typename std::enable_if<boost::multiprecision::detail::is_unsigned<I>::value && (sizeof(I) <= sizeof(long long))>::type* = nullptr)
-      : data(),
-        exp(static_cast<exponent_type>(0)),
-        neg(false),
-        fpclass(cpp_dec_float_finite),
-        prec_elem(cpp_dec_float_elem_number)
+   cpp_dec_float(I i, typename std::enable_if<(   boost::multiprecision::detail::is_unsigned<I>::value
+                                               && (sizeof(I) <= sizeof(long long)))>::type* = nullptr)
    {
       from_unsigned_long_long(i);
    }
@@ -199,11 +180,6 @@ class cpp_dec_float
                  typename std::enable_if<(   boost::multiprecision::detail::is_signed<I>::value
                                           && boost::multiprecision::detail::is_integral<I>::value
                                           && (sizeof(I) <= sizeof(long long)))>::type* = nullptr)
-      : data(),
-        exp(static_cast<exponent_type>(0)),
-        neg(false),
-        fpclass(cpp_dec_float_finite),
-        prec_elem(cpp_dec_float_elem_number)
    {
       if (i < 0)
       {
@@ -218,38 +194,30 @@ class cpp_dec_float
       : data(f.data),
         exp(f.exp),
         neg(f.neg),
-        fpclass(f.fpclass),
+        fpclass(static_cast<enum_fpclass_type>(static_cast<int>(f.fpclass))),
         prec_elem(f.prec_elem) {}
 
    template <unsigned D, class ET, class A>
    cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if<D <= Digits10>::type* = nullptr)
-      : data(),
-        exp(f.exp),
+      : exp(f.exp),
         neg(f.neg),
-        fpclass(static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
-        prec_elem(cpp_dec_float_elem_number)
+        fpclass(static_cast<enum_fpclass_type>(static_cast<int>(f.fpclass)))
    {
       std::copy(f.data.begin(), f.data.begin() + f.prec_elem, data.begin());
    }
+
    template <unsigned D, class ET, class A>
    explicit cpp_dec_float(const cpp_dec_float<D, ET, A>& f, typename std::enable_if< !(D <= Digits10)>::type* = nullptr)
-      : data(),
-        exp(f.exp),
+      : exp(f.exp),
         neg(f.neg),
-        fpclass(static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
-        prec_elem(cpp_dec_float_elem_number)
+        fpclass(static_cast<enum_fpclass_type>(static_cast<int>(f.fpclass)))
    {
       // TODO: this doesn't round!
       std::copy(f.data.begin(), f.data.begin() + prec_elem, data.begin());
    }
 
    template <class F>
-   cpp_dec_float(const F val, typename std::enable_if<std::is_floating_point<F>::value
-                                                   >::type* = nullptr) : data(),
-                                                                         exp(static_cast<exponent_type>(0)),
-                                                                         neg(false),
-                                                                         fpclass(cpp_dec_float_finite),
-                                                                         prec_elem(cpp_dec_float_elem_number)
+   cpp_dec_float(const F val, typename std::enable_if<std::is_floating_point<F>::value>::type* = nullptr)
    {
       *this = val;
    }
@@ -1547,42 +1515,32 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::extract_parts(double& man
 
    using local_exponent_type = ExponentType;
 
-   std::size_t index { static_cast<std::size_t>(UINT8_C(0)) };
-
-   const local_exponent_type my_order_limb0 { limb_order(data[index]) };
+   const local_exponent_type my_order_limb0 { limb_order(data.front()) };
 
    exponent = static_cast<local_exponent_type>(exp + my_order_limb0);
 
    // Extract into the mantissa the first limb, extracted as a double.
 
-   mantissa = ((!neg) ? static_cast<double>(data[index]) : -static_cast<double>(data[index]));
+   mantissa = ((!neg) ? static_cast<double>(data.front()) : -static_cast<double>(data.front()));
 
-   ++index;
+   int digit_counter { static_cast<int>(my_order_limb0) };
 
-   int digit_counter { };
-
-   double p10 { 1.0 };
+   // Keep a running power-of-ten scale in the variable p10.
+   double p10 { static_cast<double>(detail::pow10_maker(static_cast<std::uint32_t>(my_order_limb0))) };
 
    // Scale the first limb with its order.
-   for ( ; digit_counter < static_cast<int>(my_order_limb0); ++digit_counter)
-   {
-      mantissa /= 10.0;
-
-      p10 *= 10.0;
-   }
+   mantissa /= p10;
 
    // Extract the rest of the mantissa piecewise from the limbs.
-   // Keep a running power-of-ten scale in the variable p10.
    // This loop does not round.
 
-   while (   (digit_counter < std::numeric_limits<double>::max_digits10 + 2)
-          && (index < static_cast<std::size_t>(cpp_dec_float_elem_number)))
+   auto itr_data = data.cbegin() + static_cast<std::size_t>(UINT8_C(1));
+
+   while ((itr_data != data.cend()) && (digit_counter <= std::numeric_limits<double>::max_digits10))
    {
       p10 *= static_cast<double>(cpp_dec_float_elem_mask);
 
-      mantissa += static_cast<double>(static_cast<double>(data[index]) / p10);
-
-      ++index;
+      mantissa += static_cast<double>(static_cast<double>(*itr_data++) / p10);
 
       digit_counter += static_cast<int>(cpp_dec_float_elem_digits10);
    }
@@ -1629,7 +1587,7 @@ double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_double() const
 
    strm.imbue(std::locale::classic());
 
-   strm << str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific);
+   strm << str(std::numeric_limits<double>::max_digits10, std::ios_base::scientific);
 
    double d;
    strm >> d;
@@ -1676,7 +1634,7 @@ long double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_long_doubl
    std::stringstream strm;
    strm.imbue(std::locale::classic());
 
-   strm << str(std::numeric_limits<long double>::digits10 + (2 + 1), std::ios_base::scientific);
+   strm << str(std::numeric_limits<long double>::max_digits10, std::ios_base::scientific);
 
    long double ld;
    strm >> ld;
@@ -2434,11 +2392,6 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double mantissa, const ExponentType exponent)
-    : data(),
-      exp(static_cast<ExponentType>(0)),
-      neg(false),
-      fpclass(cpp_dec_float_finite),
-      prec_elem(cpp_dec_float_elem_number)
 {
    // Create *this cpp_dec_float<Digits10, ExponentType, Allocator> from a given mantissa and exponent.
    // Note: This constructor does not maintain the full precision of double.
@@ -2496,9 +2449,11 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 template <class Float>
 typename std::enable_if<std::is_floating_point<Float>::value, cpp_dec_float<Digits10, ExponentType, Allocator>&>::type cpp_dec_float<Digits10, ExponentType, Allocator>::operator=(Float a)
 {
-   // Christopher Kormanyos's original code used a cast to long long here, but that fails
-   // when long double has more digits than a long long.
+   // Christopher Kormanyos's original code used a cast to long long here,
+   // but that fails when long double has more digits than a long long.
+
    BOOST_MP_FLOAT128_USING
+
    using std::floor;
    using std::frexp; 
    using std::ldexp;
