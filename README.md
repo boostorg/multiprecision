@@ -26,7 +26,7 @@ requiring extended range and precision.
 
 Multiprecision consists of a generic interface to the mathematics
 of large numbers as well as a selection of big number backends.
-This includes interfaces to GMP, MPFR, MPIR and TomMath
+These include interfaces to GMP, MPFR, MPIR and TomMath
 and also Multiprecision's own collection of Boost-licensed,
 header-only backends for integers, rationals, floats and complex-floats.
 
