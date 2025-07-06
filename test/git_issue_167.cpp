@@ -16,6 +16,9 @@ int main()
 {
    std::string str { };
 
+   // Test strings with a decimal point. Keep in the spirit of the
+   // original test case. But don't simply try-catch out of it.
+
    try
    {
       using local_dec_float_type = boost::multiprecision::cpp_dec_float_50;
@@ -25,13 +28,14 @@ int main()
       str = d_first.str();
       BOOST_CHECK(str == "1234.56");
 
-      // Set a new local locale.
-      #if (defined(__GNUC__) && defined(__x86_64__))
-      // We really want to pick up these lines on GHA coverage runners.
+      #if (defined(__GNUC__) && defined(__x86_64__) && !defined(WIN32) && !defined(__APPLE__))
+
+      // Set a new local locale. All these compilers have different
+      // locale names. In this particular case, we stay with the
+      // original spirit of the test in issue167 at least on Ubuntu
+      // GHA runners. We also wanto to pick up these lines of coverage.
+
       const char* p_str_loc = std::setlocale(LC_ALL, "C.UTF-8");
-      #else
-      const char* p_str_loc = std::setlocale(LC_ALL, "en_US.UTF-8");
-      #endif
 
       std::cout << "A local locale was set: " << p_str_loc << std::endl;
 
@@ -43,8 +47,8 @@ int main()
          // Check the new local locale.
          BOOST_CHECK(strm.str().find("UTF") != std::string::npos);
       }
+      #endif
 
-      // Test another string with a decimal point.
       local_dec_float_type d_other("123.789");
       str = d_other.str();
 
