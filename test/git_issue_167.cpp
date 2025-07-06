@@ -28,7 +28,10 @@ int main()
       str = d_first.str();
       BOOST_CHECK(str == "1234.56");
 
-      #if (defined(__GNUC__) && defined(__x86_64__) && !defined(WIN32) && !defined(__APPLE__))
+      #if (defined(__GNUC__) && defined(__x86_64__) && !(defined(_WIN32) || defined(__MINGW32__)) && !defined(__APPLE__))
+
+      // That preprocessor line is detailed, but it really essentially is
+      // just trying to isolate Ubuntu runners on GHA for test and coverage.
 
       // Set a new local locale. All these compilers have different
       // locale names. In this particular case, we stay with the
