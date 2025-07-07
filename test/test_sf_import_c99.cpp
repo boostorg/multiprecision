@@ -802,10 +802,10 @@ void test_c99_appendix_F()
    {
       arg = std::numeric_limits<T>::infinity();
       val = atan(arg);
-      BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>());
+      BOOST_IF_CONSTEXPR (!has_poor_exp_range_or_precision_support<T>::value) { BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>()) } else { BOOST_CHECK_CLOSE_FRACTION(val, boost::math::constants::half_pi<T>(), std::numeric_limits<T>::epsilon() * 8); }
       arg = -std::numeric_limits<T>::infinity();
       val = atan(arg);
-      BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>());
+      BOOST_IF_CONSTEXPR (!has_poor_exp_range_or_precision_support<T>::value) { BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>()) } else { BOOST_CHECK_CLOSE_FRACTION(val, -boost::math::constants::half_pi<T>(), std::numeric_limits<T>::epsilon() * 8); }
    }
    if (std::numeric_limits<T>::has_quiet_NaN)
    {
@@ -842,7 +842,7 @@ void test_c99_appendix_F()
    arg  = 0;
    arg2 = -2;
    val  = atan2(arg, arg2);
-   BOOST_CHECK_EQUAL(val, boost::math::constants::pi<T>());
+   BOOST_IF_CONSTEXPR (!has_poor_exp_range_or_precision_support<T>::value) { BOOST_CHECK_EQUAL(val, boost::math::constants::pi<T>()) } else { BOOST_CHECK_CLOSE_FRACTION(val, boost::math::constants::pi<T>(), std::numeric_limits<T>::epsilon() * 8); }
    arg = -arg;
    if (signbit(arg))
    {
@@ -864,7 +864,7 @@ void test_c99_appendix_F()
    arg  = -2;
    arg2 = 0;
    val  = atan2(arg, arg2);
-   BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>());
+   BOOST_IF_CONSTEXPR (!has_poor_exp_range_or_precision_support<T>::value) { BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>()) } else { BOOST_CHECK_CLOSE_FRACTION(val, -boost::math::constants::half_pi<T>(), std::numeric_limits<T>::epsilon() * 8); }
    arg2 = -arg2;
    if (signbit(arg2))
    {
@@ -874,7 +874,7 @@ void test_c99_appendix_F()
    arg  = 2;
    arg2 = 0;
    val  = atan2(arg, arg2);
-   BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>());
+   BOOST_IF_CONSTEXPR (!has_poor_exp_range_or_precision_support<T>::value) { BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>()) } else { BOOST_CHECK_CLOSE_FRACTION(val, boost::math::constants::half_pi<T>(), std::numeric_limits<T>::epsilon() * 8); }
    arg2 = -arg2;
    if (signbit(arg2))
    {
@@ -886,10 +886,10 @@ void test_c99_appendix_F()
       arg  = 2;
       arg2 = -std::numeric_limits<T>::infinity();
       val  = atan2(arg, arg2);
-      BOOST_CHECK_EQUAL(val, boost::math::constants::pi<T>());
+      BOOST_IF_CONSTEXPR (!has_poor_exp_range_or_precision_support<T>::value) { BOOST_CHECK_EQUAL(val, boost::math::constants::pi<T>()) } else { BOOST_CHECK_CLOSE_FRACTION(val, boost::math::constants::pi<T>(), std::numeric_limits<T>::epsilon() * 8); }
       arg = -arg;
       val = atan2(arg, arg2);
-      BOOST_CHECK_EQUAL(val, -boost::math::constants::pi<T>());
+      BOOST_IF_CONSTEXPR (!has_poor_exp_range_or_precision_support<T>::value) { BOOST_CHECK_EQUAL(val, -boost::math::constants::pi<T>()) } else { BOOST_CHECK_CLOSE_FRACTION(val, -boost::math::constants::pi<T>(), std::numeric_limits<T>::epsilon() * 8); }
       arg  = 2;
       arg2 = std::numeric_limits<T>::infinity();
       val  = atan2(arg, arg2);
@@ -905,17 +905,17 @@ void test_c99_appendix_F()
       arg  = std::numeric_limits<T>::infinity();
       arg2 = 2;
       val  = atan2(arg, arg2);
-      BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>());
+      BOOST_IF_CONSTEXPR (!has_poor_exp_range_or_precision_support<T>::value) { BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>()) } else { BOOST_CHECK_CLOSE_FRACTION(val, boost::math::constants::half_pi<T>(), std::numeric_limits<T>::epsilon() * 8); }
       arg = -arg;
       val = atan2(arg, arg2);
-      BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>());
+      BOOST_IF_CONSTEXPR (!has_poor_exp_range_or_precision_support<T>::value) { BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>()) } else { BOOST_CHECK_CLOSE_FRACTION(val, -boost::math::constants::half_pi<T>(), std::numeric_limits<T>::epsilon() * 8); }
       arg  = std::numeric_limits<T>::infinity();
       arg2 = -2;
       val  = atan2(arg, arg2);
-      BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>());
+      BOOST_IF_CONSTEXPR (!has_poor_exp_range_or_precision_support<T>::value) { BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>()) } else { BOOST_CHECK_CLOSE_FRACTION(val, boost::math::constants::half_pi<T>(), std::numeric_limits<T>::epsilon() * 8); }
       arg = -arg;
       val = atan2(arg, arg2);
-      BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>());
+      BOOST_IF_CONSTEXPR (!has_poor_exp_range_or_precision_support<T>::value) { BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>()) } else { BOOST_CHECK_CLOSE_FRACTION(val, -boost::math::constants::half_pi<T>(), std::numeric_limits<T>::epsilon() * 8); }
       arg  = std::numeric_limits<T>::infinity();
       arg2 = -std::numeric_limits<T>::infinity();
       val  = atan2(arg, arg2);

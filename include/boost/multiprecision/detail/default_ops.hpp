@@ -2619,8 +2619,6 @@ inline BOOST_MP_CXX14_CONSTEXPR typename multiprecision::detail::expression<tag,
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> erf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   using local_number_type = multiprecision::number<Backend, ExpressionTemplates>;
-
    const int fpc_arg { (boost::multiprecision::fpclassify)(arg) };
 
    if (fpc_arg == FP_ZERO)
