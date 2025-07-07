@@ -638,50 +638,58 @@ void test_poison()
 }
 
 template <class T>
-bool type_sets_errno(const T&)
+static bool type_sets_errno(const T&)
 {
    return true;
 }
 #ifdef TEST_MPFR_50
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
-bool type_sets_errno(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>&)
+static bool type_sets_errno(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>&)
 {
    return false;
 }
 #endif
 #ifdef TEST_MPFR_DEBUG_ADAPTOR
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
-bool type_sets_errno(const boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>&)
+static bool type_sets_errno(const boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>&)
 {
    return false;
 }
 #endif
 #ifdef TEST_MPFI_DEBUG_ADAPTOR
 template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
-bool type_sets_errno(const boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>&)
+static bool type_sets_errno(const boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>&)
 {
    return false;
 }
 #endif
 #ifdef TEST_MPFR_LOGGED_ADAPTOR
 template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
-bool type_sets_errno(const boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>&)
+static bool type_sets_errno(const boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>&)
 {
    return false;
 }
 #endif
 #ifdef TEST_MPFI_LOGGED_ADAPTOR
 template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
-bool type_sets_errno(const boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>&)
+static bool type_sets_errno(const boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::mpfi_float_backend<Digits10> >, ExpressionTemplates>&)
 {
    return false;
 }
 #endif
 #ifdef TEST_FLOAT128
-bool type_sets_errno(const boost::multiprecision::float128&)
+static bool type_sets_errno(const boost::multiprecision::float128&)
 {
    return false;
 }
+#endif
+#ifdef TEST_CPP_DOUBLE_FLOAT
+static bool type_sets_errno(const boost::multiprecision::cpp_double_float&) { return false; }
+static bool type_sets_errno(const boost::multiprecision::cpp_double_double&) { return false; }
+static bool type_sets_errno(const boost::multiprecision::cpp_double_long_double&) { return false; }
+#if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
+static bool type_sets_errno(const boost::multiprecision::cpp_double_float128&) { return false; }
+#endif
 #endif
 
 template <class T>
@@ -2263,6 +2271,7 @@ int main()
    #endif
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
+   test_c99_appendix_F<boost::multiprecision::cpp_bin_float_50>();
    test<boost::multiprecision::cpp_bin_float_50>();
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<100>, boost::multiprecision::et_on> >();
 #endif
@@ -2297,8 +2306,14 @@ int main()
 #ifdef TEST_CPP_DOUBLE_FLOAT
    test<boost::multiprecision::cpp_double_double>();
    test<boost::multiprecision::cpp_double_long_double>();
+
+   test_c99_appendix_F<boost::multiprecision::cpp_double_double>();
+   test_c99_appendix_F<boost::multiprecision::cpp_double_long_double>();
+
    #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
+
+   test_c99_appendix_F<boost::multiprecision::cpp_double_float128>();
    #endif
 #endif
 

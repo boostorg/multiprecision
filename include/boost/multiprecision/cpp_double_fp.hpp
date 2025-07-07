@@ -1479,10 +1479,6 @@ constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const 
 
          result = one;
       }
-      else if (fpc_a == FP_NAN)
-      {
-         result = double_float_type::my_value_nan();
-      }
       else if (fpc_x == FP_ZERO)
       {
          if ((fpc_a == FP_NORMAL) || (fpc_a == FP_INFINITE))
@@ -1495,6 +1491,10 @@ constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const 
 
             result = (eval_signbit(a) ? double_float_type::my_value_inf() : zero);
          }
+         else if (fpc_a == FP_NAN)
+         {
+            result = double_float_type::my_value_nan();
+         }
       }
       else if (fpc_x == FP_INFINITE)
       {
@@ -1505,6 +1505,10 @@ constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const 
 
             result = (eval_signbit(a) ? zero : double_float_type::my_value_inf());
          }
+         else if (fpc_a == FP_NAN)
+         {
+            result = double_float_type::my_value_nan();
+         }
       }
       else if (fpc_x != FP_NORMAL)
       {
@@ -1512,14 +1516,37 @@ constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const 
       }
       else
       {
-         if (fpc_a == FP_INFINITE)
+         if (fpc_a == FP_ZERO)
          {
-            result =
-               (
-                    (x.compare(one) == -1) ? (eval_signbit(a) ? double_float_type::my_value_inf() : zero)
-                  : (x.compare(one) == +1) ? (eval_signbit(a) ? zero : double_float_type::my_value_inf())
-                  : one
-               );
+            result = one;
+         }
+         else if (fpc_a == FP_INFINITE)
+         {
+            constexpr double_float_type one_minus { -1 };
+
+            if (x.compare(one_minus) == 0)
+            {
+               result = one;
+            }
+            else
+            {
+               double_float_type xabs { };
+
+               eval_fabs(xabs, x);
+
+               const int compare_one_result { xabs.compare(one) };
+
+               result =
+                  (
+                       (compare_one_result < 0) ? (eval_signbit(a) ? double_float_type::my_value_inf() : zero)
+                     : (compare_one_result > 0) ? (eval_signbit(a) ? zero : double_float_type::my_value_inf())
+                     : one
+                  );
+            }
+         }
+         else if (fpc_a == FP_NAN)
+         {
+            result = (x.compare(one) == 0) ? one : double_float_type::my_value_nan();
          }
          else
          {
