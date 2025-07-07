@@ -2619,6 +2619,15 @@ inline BOOST_MP_CXX14_CONSTEXPR typename multiprecision::detail::expression<tag,
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> erf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
+   using local_number_type = multiprecision::number<Backend, ExpressionTemplates>;
+
+   const int fpc_arg { (boost::multiprecision::fpclassify)(arg) };
+
+   if (fpc_arg == FP_ZERO)
+   {
+      return arg;
+   }
+
    detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(arg);
    return boost::math::erf(arg, c99_error_policy());
 }
@@ -2626,7 +2635,15 @@ template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type erf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
-   detail::scoped_default_precision<value_type>                                          precision_guard(arg);
+   detail::scoped_default_precision<value_type> precision_guard(arg);
+
+   const int fpc_arg { (boost::multiprecision::fpclassify)(arg) };
+
+   if (fpc_arg == FP_ZERO)
+   {
+      return arg;
+   }
+
    return erf(value_type(arg));
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
@@ -2678,11 +2695,26 @@ inline BOOST_MP_CXX14_CONSTEXPR typename multiprecision::detail::expression<tag,
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(arg);
-   if ((arg == 0) && std::numeric_limits<multiprecision::number<Backend, ExpressionTemplates> >::has_infinity)
+   using local_number_type = multiprecision::number<Backend, ExpressionTemplates>;
+
+   detail::scoped_default_precision<local_number_type> precision_guard(arg);
+
+   const int fpc_arg { (boost::multiprecision::fpclassify)(arg) };
+
+   if ((fpc_arg == FP_ZERO) && std::numeric_limits<local_number_type>::has_infinity)
    {
       errno = ERANGE;
       return 1 / arg;
+   }
+   else if ((fpc_arg == FP_NAN) && std::numeric_limits<local_number_type>::has_quiet_NaN)
+   {
+      return arg;
+   }
+   else if ((fpc_arg == FP_INFINITE) && std::numeric_limits<local_number_type>::has_infinity && std::numeric_limits<local_number_type>::has_quiet_NaN)
+   {
+      const bool is_neg { arg.compare(local_number_type(0)) < 0 };
+
+      return ((!is_neg) ? std::numeric_limits<local_number_type>::infinity() : std::numeric_limits<local_number_type>::quiet_NaN());
    }
    return boost::math::tgamma(arg, c99_error_policy());
 }
