@@ -222,7 +222,7 @@ class cpp_dec_float // LCOV_EXCL_LINE This causes a false negative on lcov cover
       *this = val;
    }
 
-   cpp_dec_float(const double mantissa, const exponent_type exponent);
+   cpp_dec_float(const double mantissa, const exponent_type exp10);
 
    std::size_t hash() const
    {
@@ -2391,10 +2391,13 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double mantissa, const ExponentType exponent)
+cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double mantissa, const ExponentType exp10)
 {
-   // Create *this cpp_dec_float<Digits10, ExponentType, Allocator> from a given mantissa and exponent.
-   // Note: This constructor does not maintain the full precision of double.
+   // Create *this cpp_dec_float<Digits10, ExponentType, Allocator>
+   // from a given mantissa and base-10 exponent. It is important
+   // to note that this constructor does *not* maintain the full
+   // precision of double. It is used internally (privately), mostly
+   // as a first guess for Newton iteration in square root and inversion.
 
    std::fill(data.begin(), data.end(), static_cast<std::uint32_t>(0u));
 
@@ -2407,51 +2410,48 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
         )
       };
 
-   using std::fabs;
-
-   const bool mantissa_is_iszero = (fabs(mantissa) < dbl_min_check);
-
-   if (mantissa_is_iszero)
-   {
-      return;
-   }
-
    const bool b_neg { (mantissa < 0.0) };
 
-   double        d { ((!b_neg) ? mantissa : -mantissa) };
-   exponent_type e { exponent };
+   double d_mant { ((!b_neg) ? mantissa : -mantissa) };
 
-   while (d > 10.0)
+   const bool mantissa_is_non_zero { (d_mant > dbl_min_check) };
+
+   if (mantissa_is_non_zero)
    {
-      d /= 10.0;
-      ++e;
-   }
-   while (d < 1.0)
-   {
-      d *= 10.0;
-      --e;
-   }
+      exponent_type exp10_val { exp10 };
 
-   std::int32_t shift = static_cast<std::int32_t>(e % static_cast<std::int32_t>(cpp_dec_float_elem_digits10));
+      while (d_mant > 10.0)
+      {
+         d_mant /= 10.0;
+         ++exp10_val;
+      }
+      while (d_mant < 1.0)
+      {
+         d_mant *= 10.0;
+         --exp10_val;
+      }
 
-   while (static_cast<std::int32_t>(shift-- % cpp_dec_float_elem_digits10) != static_cast<std::int32_t>(0))
-   {
-      d *= 10.0;
-      --e;
-   }
+      std::int32_t shift = static_cast<std::int32_t>(exp10_val % static_cast<std::int32_t>(cpp_dec_float_elem_digits10));
 
-   exp = e;
-   neg = b_neg;
+      while (static_cast<std::int32_t>(shift-- % cpp_dec_float_elem_digits10) != static_cast<std::int32_t>(0))
+      {
+         d_mant *= 10.0;
+         --exp10_val;
+      }
 
-   constexpr std::int32_t digit_ratio = static_cast<std::int32_t>(static_cast<std::int32_t>(std::numeric_limits<double>::digits10) / static_cast<std::int32_t>(cpp_dec_float_elem_digits10));
-   constexpr std::int32_t digit_loops = static_cast<std::int32_t>(digit_ratio + static_cast<std::int32_t>(2));
+      exp = exp10_val;
+      neg = b_neg;
 
-   for (std::int32_t i = static_cast<std::int32_t>(0); i < digit_loops; i++)
-   {
-      std::uint32_t n = static_cast<std::uint32_t>(static_cast<std::uint64_t>(d));
-      data[static_cast<std::size_t>(i)] = static_cast<std::uint32_t>(n);
-      d -= static_cast<double>(n);
-      d *= static_cast<double>(cpp_dec_float_elem_mask);
+      constexpr std::int32_t digit_ratio = static_cast<std::int32_t>(static_cast<std::int32_t>(std::numeric_limits<double>::digits10) / static_cast<std::int32_t>(cpp_dec_float_elem_digits10));
+      constexpr std::int32_t digit_loops = static_cast<std::int32_t>(digit_ratio + static_cast<std::int32_t>(2));
+
+      for (std::int32_t i = static_cast<std::int32_t>(0); i < digit_loops; i++)
+      {
+         std::uint32_t n = static_cast<std::uint32_t>(static_cast<std::uint64_t>(d_mant));
+         data[static_cast<std::size_t>(i)] = static_cast<std::uint32_t>(n);
+         d_mant -= static_cast<double>(n);
+         d_mant *= static_cast<double>(cpp_dec_float_elem_mask);
+      }
    }
 } // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
 
