@@ -208,7 +208,7 @@ if we were using the [mpfr_class] C++ wrapper for [mpfr] - then this expression 
 temporaries (this is true even though [mpfr_class] does use expression templates to reduce the number of temporaries somewhat).  Had
 we used an even simpler wrapper around [mpfr] like [mpreal] things would have been even worse and no less that 24 temporaries
 are created for this simple expression (note - we actually measure the number of memory allocations performed rather than
-the number of temporaries directly, note also that the [mpf_class] wrapper that will be supplied with GMP-5.1 reduces the number of
+the number of temporaries directly, note also that the [mpf_class] wrapper supplied with GMP-5.1 or later reduces the number of
 temporaries to pretty much zero).  Note that if we compile with expression templates disabled and rvalue-reference support
 on, then actually still have no wasted memory allocations as even though temporaries are created, their contents are moved
 rather than copied.
