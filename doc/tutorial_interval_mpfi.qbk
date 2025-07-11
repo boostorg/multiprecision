@@ -141,7 +141,7 @@ Returns `true` if `lower(a) == upper(a)`.
 
 [mpfi_eg]
 
-[endsect] [ section:mpfi mpfi_float]
+[endsect] [section:mpfi mpfi_float]
 
 [endsect] [/section:interval Interval Number Types]
 
