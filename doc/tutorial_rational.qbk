@@ -24,7 +24,6 @@ The following back-ends provide rational number arithmetic:
 [include tutorial_cpp_rational.qbk]
 [include tutorial_gmp_rational.qbk]
 [include tutorial_tommath_rational.qbk]
-[include tutorial_boost_rational.qbk]
 [include tutorial_rational_adaptor.qbk]
 
 [endsect] [/section:rational Rational Number Types]
