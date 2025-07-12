@@ -2306,6 +2306,7 @@ int main()
    test_c99_appendix_F<boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::mpfr_float_backend<50> > > >();
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
+   test<boost::multiprecision::cpp_double_float>();
    test<boost::multiprecision::cpp_double_double>();
    test<boost::multiprecision::cpp_double_long_double>();
 

@@ -511,11 +511,12 @@ inline void eval_pow(T& result, const T& x, const T& a)
    }
 
    int type = eval_fpclassify(x);
+   int fpc_a = eval_fpclassify(a);
 
    switch (type)
    {
    case FP_ZERO:
-      switch (eval_fpclassify(a))
+      switch (fpc_a)
       {
       case FP_ZERO:
          result = si_type(1);
@@ -643,7 +644,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
 
       eval_floor(result, a);
       // -1^INF is a special case in C99:
-      if ((x.compare(si_type(-1)) == 0) && (eval_fpclassify(a) == FP_INFINITE))
+      if ((x.compare(si_type(-1)) == 0) && (fpc_a == FP_INFINITE))
       {
          result = si_type(1);
       }
@@ -661,7 +662,21 @@ inline void eval_pow(T& result, const T& x, const T& a)
       }
       else if (type == FP_INFINITE)
       {
-         result = std::numeric_limits<number<T, et_on> >::infinity().backend();
+         BOOST_IF_CONSTEXPR (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+         {
+            if (fpc_a == FP_NAN)
+            {
+               result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
+            }
+            else
+            {
+               result = std::numeric_limits<number<T, et_on> >::infinity().backend();
+            }
+         }
+         else
+         {
+            result = std::numeric_limits<number<T, et_on> >::infinity().backend();
+         }
       }
       else BOOST_IF_CONSTEXPR (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
