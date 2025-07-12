@@ -32,13 +32,7 @@ multiprecision values can easily be inspected in the debugger by looking at the 
 The down side of this approach is that runtimes are much slower when using this type.  Set against that it can make
 debugging very much easier, certainly much easier than sprinkling code with `printf` statements.
 
-When used in conjunction with the Visual C++ debugger visualisers, the value of a multiprecision type that uses this
-backend is displayed in the debugger just a __fundamental value would be, here we're inspecting a value of type
-`number<debug_adaptor<cpp_dec_float<50> > >`:
-
-[$../debugger1.png]
-
-Otherwise you will need to expand out the view and look at the "debug_value" member:
+You will need to expand out the view and look at the "debug_value" member:
 
 [$../debugger2.png]
 
