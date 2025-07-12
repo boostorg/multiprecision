@@ -1516,11 +1516,7 @@ constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const 
       }
       else
       {
-         if (fpc_a == FP_ZERO)
-         {
-            result = one;
-         }
-         else if (fpc_a == FP_INFINITE)
+         if (fpc_a == FP_INFINITE)
          {
             constexpr double_float_type one_minus { -1 };
 

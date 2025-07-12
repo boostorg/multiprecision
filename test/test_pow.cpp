@@ -244,6 +244,35 @@ void test()
          }
       }
 
+      BOOST_IF_CONSTEXPR(std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_quiet_NaN)
+      {
+         for (int index = 0; index < 8; ++index)
+         {
+            static_cast<void>(index);
+
+            T inf_or_zero_arg = T(::my_zero<T>() * dist(gen));
+
+            T pow_inf_or_zero_to_the_nan = pow(inf_or_zero_arg, std::numeric_limits<T>::quiet_NaN() * dist(gen));
+
+            BOOST_CHECK((boost::multiprecision::isnan)(pow_inf_or_zero_to_the_nan));
+
+            inf_or_zero_arg = T(std::numeric_limits<T>::infinity() * dist(gen));
+
+            pow_inf_or_zero_to_the_nan = pow(inf_or_zero_arg, std::numeric_limits<T>::quiet_NaN() * dist(gen));
+
+            BOOST_CHECK((boost::multiprecision::isnan)(pow_inf_or_zero_to_the_nan));
+
+            BOOST_IF_CONSTEXPR(std::is_same<T, boost::multiprecision::cpp_double_double>::value)
+            {
+               inf_or_zero_arg = T(-std::numeric_limits<T>::infinity() * dist(gen));
+
+               pow_inf_or_zero_to_the_nan = pow(inf_or_zero_arg, std::numeric_limits<T>::quiet_NaN() * dist(gen));
+
+               BOOST_CHECK((boost::multiprecision::isnan)(pow_inf_or_zero_to_the_nan));
+            }
+         }
+      }
+
       #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
    }
 
