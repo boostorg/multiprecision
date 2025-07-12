@@ -127,6 +127,43 @@ namespace local {
 
 } // namespace local
 
+#if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+
+// These were the only ones I checked locally at the moment.
+// TEST_MPF_50 is included because it does its has_quiet_NaN is false.
+// And this helps verify the constexpr logic of test_issue722().
+
+template <class T>
+void test_issue722()
+{
+   BOOST_IF_CONSTEXPR (std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_infinity && std::numeric_limits<T>::has_quiet_NaN)
+   {
+      std::mt19937_64 gen { };
+
+      gen.seed(static_cast<typename std::mt19937_64::result_type>(std::clock()));
+
+      std::uniform_real_distribution<float>
+         dist
+         (
+           static_cast<float>(1.01L),
+           static_cast<float>(1.04L)
+         );
+
+      for (int index = 0; index < 8; ++index)
+      {
+         static_cast<void>(index);
+
+         const T neg_inf = T(-std::numeric_limits<T>::infinity() * dist(gen));
+
+         const T pow_neg_inf_to_the_nan = pow(neg_inf, std::numeric_limits<T>::quiet_NaN() * dist(gen));
+
+         BOOST_CHECK((boost::multiprecision::isnan)(pow_neg_inf_to_the_nan));
+      }
+   }
+}
+
+#endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+
 template <class T>
 void test()
 {
@@ -171,7 +208,7 @@ void test()
    BOOST_CHECK_EQUAL(pow(T(1), 2), 1);
 
    #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
-   // These were the only ones I checked locally at the moment that use random tests.
+   // These were the only ones I checked locally at the moment.
 
    std::mt19937_64 gen { };
 
@@ -193,7 +230,7 @@ void test()
 
 
       #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
-      // These were the only ones I checked locally at the moment that use random tests.
+      // These were the only ones I checked locally at the moment.
 
       for (int npow = -8; npow < 8; ++npow)
       {
@@ -244,6 +281,26 @@ void test()
          }
       }
 
+      BOOST_IF_CONSTEXPR(std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_quiet_NaN)
+      {
+         for (int index = 0; index < 8; ++index)
+         {
+            static_cast<void>(index);
+
+            T inf_or_zero_arg = T(::my_zero<T>() * dist(gen));
+
+            T pow_inf_or_zero_to_the_nan = pow(inf_or_zero_arg, std::numeric_limits<T>::quiet_NaN() * dist(gen));
+
+            BOOST_CHECK((boost::multiprecision::isnan)(pow_inf_or_zero_to_the_nan));
+
+            inf_or_zero_arg = T(std::numeric_limits<T>::infinity() * dist(gen));
+
+            pow_inf_or_zero_to_the_nan = pow(inf_or_zero_arg, std::numeric_limits<T>::quiet_NaN() * dist(gen));
+
+            BOOST_CHECK((boost::multiprecision::isnan)(pow_inf_or_zero_to_the_nan));
+         }
+      }
+
       #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
    }
 
@@ -282,6 +339,7 @@ int main()
 #ifdef TEST_MPF_50
    test<boost::multiprecision::mpf_float_50>();
    test<boost::multiprecision::mpf_float_100>();
+   test_issue722<boost::multiprecision::mpf_float_50>();
 #endif
 #ifdef TEST_MPFR_50
    test<boost::multiprecision::mpfr_float_50>();
@@ -294,6 +352,7 @@ int main()
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
    test<boost::multiprecision::cpp_dec_float_100>();
+   test_issue722<boost::multiprecision::cpp_dec_float_50>();
 #ifndef SLOW_COMPLER
    // Some "peculiar" digit counts which stress our code:
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65> > >();
@@ -315,6 +374,7 @@ int main()
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
+   test_issue722<boost::multiprecision::cpp_bin_float_50>();
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
    test<boost::multiprecision::cpp_double_double>();
@@ -322,6 +382,7 @@ int main()
    #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
    #endif
+   test_issue722<boost::multiprecision::cpp_double_double>();
 #endif
    return boost::report_errors();
 }

@@ -9,34 +9,72 @@
 // "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 
+#include <test.hpp>
+
 #include <boost/lexical_cast.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/multiprecision/complex_adaptor.hpp>
+
 #ifdef TEST_MPC
 #include <boost/multiprecision/mpc.hpp>
 #endif
-#include <boost/multiprecision/cpp_bin_float.hpp>
-#include <boost/multiprecision/complex_adaptor.hpp>
 #ifdef BOOST_HAS_FLOAT128
 #include <boost/multiprecision/complex128.hpp>
 #endif
+#if 0  // Testing cpp_dec_float does not (yet) work.
+#ifdef TEST_CPP_DEC_FLOAT
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#endif
+#endif // Testing cpp_dec_float does not (yet) work.
 #ifdef TEST_CPP_DOUBLE_FLOAT
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
-#include <test.hpp>
 #include <test_traits.hpp> // Note: include this AFTER the test-backends are defined
 
+#include <chrono>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <string>
 
+template<typename FloatType> auto my_zero() noexcept -> FloatType&;
+
 namespace local {
+
+template<typename IntegralTimePointType,
+         typename ClockType = std::chrono::high_resolution_clock>
+auto time_point() noexcept -> IntegralTimePointType
+{
+   using local_integral_time_point_type = IntegralTimePointType;
+   using local_clock_type               = ClockType;
+
+   typename local_clock_type::time_point tp_zero { };
+
+   const auto my_now = local_clock_type::now();
+
+   const auto duration { my_now - tp_zero };
+
+   const std::uintmax_t
+      value
+      {
+         static_cast<std::uintmax_t>
+         (
+            std::chrono::duration_cast<std::chrono::nanoseconds>(my_now - tp_zero).count()
+         )
+      };
+
+   return static_cast<local_integral_time_point_type>(value);
+}
+
 template <typename complex_type>
 void test()
 {
+   std::cout << "Testing type: " << typeid(complex_type).name() << std::endl;
 
-   typedef typename complex_type::value_type float_type;
+   using float_type = typename complex_type::value_type;
 
    const std::string str_tol("0." + std::string(std::size_t(std::numeric_limits<float_type>::digits10 - 2), char('0')) + std::string(std::size_t(2U), char('9')));
 
@@ -158,6 +196,72 @@ void test()
    BOOST_CHECK_CLOSE_FRACTION(result_26.imag(), control_26.imag(), tol);
 
    BOOST_CHECK_CLOSE_FRACTION(abs(z1), boost::lexical_cast<float_type>("3.60555127546398929311922126747049594625129657384524621271045305622716694829301044520461908201849071767351418202406"), tol)
+
+   {
+      std::mt19937_64 gen { time_point<typename std::mt19937_64::result_type>() };
+
+      auto dis =
+         std::uniform_real_distribution<float>
+         {
+            static_cast<float>(1.1F),
+            static_cast<float>(1.5E10F)
+         };
+
+      float_type around_three_base("3.60555127546398929311922126747049594625129657384524621271045305622716694829301044520461908201849071767351418202406");
+
+      for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(16)); ++index)
+      {
+         static_cast<void>(index);
+
+         const float_type real_val = around_three_base * dis(gen);
+
+         const complex_type cpx(real_val);
+
+         {
+            const complex_type sqrt_cpx = sqrt(cpx);
+            const float_type sqrt_ctrl = sqrt(real_val);
+
+            BOOST_CHECK_CLOSE_FRACTION(sqrt_cpx.real(), sqrt_ctrl, tol);
+            BOOST_TEST((boost::multiprecision::fpclassify)(sqrt_cpx.imag()) == FP_ZERO);
+         }
+
+         {
+            const complex_type exp_cpx = exp(cpx);
+            const float_type exp_ctrl = exp(real_val);
+
+            BOOST_CHECK_CLOSE_FRACTION(exp_cpx.real(), exp_ctrl, tol);
+            BOOST_TEST((boost::multiprecision::fpclassify)(exp_cpx.imag()) == FP_ZERO);
+         }
+      }
+
+      for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(16)); ++index)
+      {
+         static_cast<void>(index);
+
+         const complex_type cpx(around_three_base * dis(gen), around_three_base * dis(gen));
+
+         const complex_type cpx_zero(::my_zero<float_type>() * dis(gen), ::my_zero<float_type>() * dis(gen));
+         const complex_type cpx_result = pow(cpx, cpx_zero);
+
+         const bool result_pow_zero_is_ok
+            {
+                  (cpx_result.real() == 1)
+               && ((boost::multiprecision::fpclassify)(cpx_result.imag()) == FP_ZERO)
+            };
+
+         BOOST_TEST(result_pow_zero_is_ok);
+
+         const complex_type cpx_asin_zero = asin(cpx_zero);
+
+         const bool result_asin_zero_is_ok
+            {
+                  ((boost::multiprecision::fpclassify)(cpx_asin_zero.real()) == FP_ZERO)
+               && ((boost::multiprecision::fpclassify)(cpx_asin_zero.imag()) == FP_ZERO)
+            };
+
+         BOOST_TEST(result_asin_zero_is_ok);
+      }
+   }
 }
 } // namespace local
 
@@ -173,6 +277,18 @@ int main()
    local::test<boost::multiprecision::complex128>();
 #endif
 
+#if 0  // Testing cpp_dec_float does not (yet) work.
+#ifdef TEST_CPP_DEC_FLOAT
+   {
+      using dec_float_backend_type = boost::multiprecision::cpp_dec_float<50>;
+
+      using dec_float_type = boost::multiprecision::number<dec_float_backend_type, boost::multiprecision::et_off>;
+
+      local::test<dec_float_type>();
+   }
+#endif
+#endif // Testing cpp_dec_float does not (yet) work.
+
 #if defined(TEST_CPP_DOUBLE_FLOAT)
    {
       local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_double_fp_backend<double>>, boost::multiprecision::et_off>>();
@@ -185,3 +301,5 @@ int main()
 
    return boost::report_errors();
 }
+
+template<typename FloatType> auto my_zero() noexcept -> FloatType& { using float_type = FloatType; static float_type val_zero { 0 }; return val_zero; }
