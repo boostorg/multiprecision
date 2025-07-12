@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2018 Nick Thompson. Distributed under the Boost
+//  Copyright 2018 - 2025 Nick Thompson.
+//  Copyright 2025 John Maddock.
+//  Copyright 2025 Christopher Kormanyos.
+//  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
@@ -8,9 +11,10 @@ In the following, we will show how using MPC backend allows for the same operati
 */
 
 //[cpp_complex_eg
-#include <iostream>
-#include <complex>
 #include <boost/multiprecision/cpp_complex.hpp>
+
+#include <complex>
+#include <iostream>
 
 template<class Complex>
 void complex_number_examples()
@@ -35,39 +39,22 @@ void complex_number_examples()
     std::cout << "Polar coordinates (phase !=0)    : " << polar(r, theta) << std::endl;
 
     std::cout << "\nElementary special functions:\n";
-    using std::exp;
     std::cout << "exp(z1) = " << exp(z1) << std::endl;
-    using std::log;
     std::cout << "log(z1) = " << log(z1) << std::endl;
-    using std::log10;
     std::cout << "log10(z1) = " << log10(z1) << std::endl;
-    using std::pow;
     std::cout << "pow(z1, z1) = " << pow(z1, z1) << std::endl;
-    using std::sqrt;
     std::cout << "Take its square root  : " << sqrt(z1) << std::endl;
-    using std::sin;
     std::cout << "sin(z1) = " << sin(z1) << std::endl;
-    using std::cos;
     std::cout << "cos(z1) = " << cos(z1) << std::endl;
-    using std::tan;
     std::cout << "tan(z1) = " << tan(z1) << std::endl;
-    using std::asin;
     std::cout << "asin(z1) = " << asin(z1) << std::endl;
-    using std::acos;
     std::cout << "acos(z1) = " << acos(z1) << std::endl;
-    using std::atan;
     std::cout << "atan(z1) = " << atan(z1) << std::endl;
-    using std::sinh;
     std::cout << "sinh(z1) = " << sinh(z1) << std::endl;
-    using std::cosh;
     std::cout << "cosh(z1) = " << cosh(z1) << std::endl;
-    using std::tanh;
     std::cout << "tanh(z1) = " << tanh(z1) << std::endl;
-    using std::asinh;
     std::cout << "asinh(z1) = " << asinh(z1) << std::endl;
-    using std::acosh;
     std::cout << "acosh(z1) = " << acosh(z1) << std::endl;
-    using std::atanh;
     std::cout << "atanh(z1) = " << atanh(z1) << std::endl;
 }
 
