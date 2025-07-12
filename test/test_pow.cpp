@@ -127,6 +127,43 @@ namespace local {
 
 } // namespace local
 
+#if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+
+// These were the only ones I checked locally at the moment that use random tests.
+
+template <class T>
+void test_issue722()
+{
+   // TBD: When issue722 gets resolved, test some of the other types.
+   #if defined(TEST_CPP_DEC_FLOAT)
+
+   std::mt19937_64 gen { };
+
+   gen.seed(static_cast<typename std::mt19937_64::result_type>(std::clock()));
+
+   std::uniform_real_distribution<float>
+      dist
+      (
+        static_cast<float>(1.01L),
+        static_cast<float>(1.04L)
+      );
+
+   for (int index = 0; index < 8; ++index)
+   {
+      static_cast<void>(index);
+
+      const T inf_or_zero_arg = T(-std::numeric_limits<T>::infinity() * dist(gen));
+
+      const T pow_inf_or_zero_to_the_nan = pow(inf_or_zero_arg, std::numeric_limits<T>::quiet_NaN() * dist(gen));
+
+      BOOST_CHECK((boost::multiprecision::isnan)(pow_inf_or_zero_to_the_nan));
+   }
+
+   #endif
+}
+
+#endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+
 template <class T>
 void test()
 {
@@ -261,15 +298,6 @@ void test()
             pow_inf_or_zero_to_the_nan = pow(inf_or_zero_arg, std::numeric_limits<T>::quiet_NaN() * dist(gen));
 
             BOOST_CHECK((boost::multiprecision::isnan)(pow_inf_or_zero_to_the_nan));
-
-            BOOST_IF_CONSTEXPR(std::is_same<T, boost::multiprecision::cpp_double_double>::value)
-            {
-               inf_or_zero_arg = T(-std::numeric_limits<T>::infinity() * dist(gen));
-
-               pow_inf_or_zero_to_the_nan = pow(inf_or_zero_arg, std::numeric_limits<T>::quiet_NaN() * dist(gen));
-
-               BOOST_CHECK((boost::multiprecision::isnan)(pow_inf_or_zero_to_the_nan));
-            }
          }
       }
 
@@ -351,6 +379,7 @@ int main()
    #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
    test<boost::multiprecision::cpp_double_float128>();
    #endif
+   test_issue722<boost::multiprecision::cpp_double_double>();
 #endif
    return boost::report_errors();
 }
