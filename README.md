@@ -42,6 +42,9 @@ This usually provides better performance than using types configured without exp
 
 The full documentation is available on [boost.org](http://www.boost.org/doc/libs/release/libs/multiprecision/index.html).
 
+A practical, comprehensive, instructive, clear and very helpful video regarding the use of Multiprecision
+can be found [here](https://www.youtube.com/watch?v=mK4WjpvLj4c).
+
 ## Using Multiprecision
 
 <p align="center">
