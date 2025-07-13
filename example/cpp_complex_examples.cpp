@@ -30,22 +30,39 @@ void elementary_functions(const NumericType z1)
     std::cout << "Complex conjugate      : " << conj(z1) << std::endl;
     using std::proj;
     std::cout << "Proj on Riemann sphere : " << proj(z1) << std::endl;
+    using std::exp;
     std::cout << "exp(z1)                : " << exp(z1) << std::endl;
+    using std::log;
     std::cout << "log(z1)                : " << log(z1) << std::endl;
+    using std::log10;
     std::cout << "log10(z1)              : " << log10(z1) << std::endl;
+    using std::pow;
     std::cout << "pow(z1, z1)            : " << pow(z1, z1) << std::endl;
+    using std::sqrt;
     std::cout << "Take its square root   : " << sqrt(z1) << std::endl;
+    using std::sin;
     std::cout << "sin(z1)                : " << sin(z1) << std::endl;
+    using std::cos;
     std::cout << "cos(z1)                : " << cos(z1) << std::endl;
+    using std::tan;
     std::cout << "tan(z1)                : " << tan(z1) << std::endl;
+    using std::asin;
     std::cout << "asin(z1)               : " << asin(z1) << std::endl;
+    using std::acos;
     std::cout << "acos(z1)               : " << acos(z1) << std::endl;
+    using std::atan;
     std::cout << "atan(z1)               : " << atan(z1) << std::endl;
+    using std::sinh;
     std::cout << "sinh(z1)               : " << sinh(z1) << std::endl;
+    using std::cosh;
     std::cout << "cosh(z1)               : " << cosh(z1) << std::endl;
+    using std::tanh;
     std::cout << "tanh(z1)               : " << tanh(z1) << std::endl;
+    using std::asinh;
     std::cout << "asinh(z1)              : " << asinh(z1) << std::endl;
+    using std::acosh;
     std::cout << "acosh(z1)              : " << acosh(z1) << std::endl;
+    using std::atanh;
     std::cout << "atanh(z1)              : " << atanh(z1) << std::endl;
 }
 
@@ -85,9 +102,10 @@ int main()
     std::cout << std::setprecision(std::numeric_limits<typename boost::multiprecision::cpp_complex_quad::value_type>::digits10);
     complex_number_examples<boost::multiprecision::cpp_complex_quad>();
 
-    std::cout << "\nNow the same elementary functions performed using built-in real-valued numbers:\n";
-    std::cout << std::setprecision(std::numeric_limits<float>::digits10);
-    elementary_functions(0.125F);
+    std::cout << "\nNow the elementary functions performed using built-in, real-valued long double numbers:\n";
+    std::cout << std::setprecision(std::numeric_limits<long double>::digits10);
+    const long double ld_arg { 0.125L };
+    elementary_functions(ld_arg);
 
     std::cout.flags(flags_orig);
 }
