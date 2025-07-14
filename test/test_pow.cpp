@@ -14,6 +14,8 @@
 #endif
 
 #include <test.hpp>
+#include <test_pow_data.hpp>
+#include <test_pow_data_reduced.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -38,8 +40,6 @@
 #endif
 
 #include <test_traits.hpp> // Note: include this AFTER the test-backends are defined
-#include <test_pow_data.hpp>
-#include <test_pow_data_reduced.hpp>
 
 #if defined(TEST_MPF_50)
 #include <boost/multiprecision/gmp.hpp>
@@ -130,8 +130,11 @@ namespace local {
 #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
 
 // These were the only ones I checked locally at the moment.
-// TEST_MPF_50 is included because it does its has_quiet_NaN is false.
-// And this helps verify the constexpr logic of test_issue722().
+
+// TEST_MPF_50 is included (even though it won't be tested)
+// because its value of has_quiet_NaN is false. This has been
+// done intentionally. Its inclusion here is intended to verify
+// the constexpr logic implemented in test_issue722().
 
 template <class T>
 void test_issue722()
