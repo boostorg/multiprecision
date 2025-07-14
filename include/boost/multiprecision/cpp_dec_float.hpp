@@ -3168,18 +3168,7 @@ inline void eval_add(cpp_dec_float<Digits10, ExponentType, Allocator>& result, c
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_add(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& a, const cpp_dec_float<Digits10, ExponentType, Allocator>& b)
 {
-   if (&result == &b)
-   {
-      const cpp_dec_float<Digits10, ExponentType, Allocator> b_local(b);
-
-      result  = a;
-      result += b_local;
-   }
-   else
-   {
-      result  = a;
-      result += b;
-   }
+   result = cpp_dec_float<Digits10, ExponentType, Allocator>(a) += b;
 }
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_subtract(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& o)
@@ -3189,18 +3178,7 @@ inline void eval_subtract(cpp_dec_float<Digits10, ExponentType, Allocator>& resu
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_subtract(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& a, const cpp_dec_float<Digits10, ExponentType, Allocator>& b)
 {
-   if (&result == &b)
-   {
-      const cpp_dec_float<Digits10, ExponentType, Allocator> b_local(b);
-
-      result  = a;
-      result -= b_local;
-   }
-   else
-   {
-      result = a;
-      result -= b;
-   }
+   result = cpp_dec_float<Digits10, ExponentType, Allocator>(a) -= b;
 }
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_multiply(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& o)
@@ -3210,18 +3188,7 @@ inline void eval_multiply(cpp_dec_float<Digits10, ExponentType, Allocator>& resu
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_multiply(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& a, const cpp_dec_float<Digits10, ExponentType, Allocator>& b)
 {
-   if (&result == &b)
-   {
-      const cpp_dec_float<Digits10, ExponentType, Allocator> b_local(b);
-
-      result  = a;
-      result *= b_local;
-   }
-   else
-   {
-      result  = a;
-      result *= b;
-   }
+   result = cpp_dec_float<Digits10, ExponentType, Allocator>(a) *= b;
 }
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_divide(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& o)
@@ -3231,18 +3198,7 @@ inline void eval_divide(cpp_dec_float<Digits10, ExponentType, Allocator>& result
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_divide(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& a, const cpp_dec_float<Digits10, ExponentType, Allocator>& b)
 {
-   if (&result == &b)
-   {
-      const cpp_dec_float<Digits10, ExponentType, Allocator> b_local(b);
-
-      result  = a;
-      result /= b_local;
-   }
-   else
-   {
-      result  = a;
-      result /= b;
-   }
+   result = cpp_dec_float<Digits10, ExponentType, Allocator>(a) /= b;
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
