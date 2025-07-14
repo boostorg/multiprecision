@@ -488,8 +488,6 @@ template <typename T>
 inline void eval_pow(T& result, const T& x, const T& a)
 {
    static_assert(number_category<T>::value == number_kind_floating_point, "The pow function is only valid for floating point types.");
-   using si_type = typename boost::multiprecision::detail::canonical<int, T>::type;
-   using fp_type = typename std::tuple_element<0, typename T::float_types>::type             ;
 
    if ((&result == &x) || (&result == &a))
    {
@@ -499,21 +497,25 @@ inline void eval_pow(T& result, const T& x, const T& a)
       return;
    }
 
+   using si_type = typename boost::multiprecision::detail::canonical<int, T>::type;
+   using fp_type = typename std::tuple_element<0, typename T::float_types>::type;
+
    if ((a.compare(si_type(1)) == 0) || (x.compare(si_type(1)) == 0))
    {
       result = x;
       return;
    }
-   if (a.compare(si_type(0)) == 0)
+
+   const int fpc_x { eval_fpclassify(x) };
+   const int fpc_a { eval_fpclassify(a) };
+
+   if (fpc_a == FP_ZERO)
    {
       result = si_type(1);
       return;
    }
 
-   int type = eval_fpclassify(x);
-   int fpc_a = eval_fpclassify(a);
-
-   switch (type)
+   switch (fpc_x)
    {
    case FP_ZERO:
       switch (fpc_a)
@@ -657,7 +659,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
             result = si_type(0);
          }
       }
-      else if (type == FP_INFINITE)
+      else if (fpc_x == FP_INFINITE)
       {
          BOOST_IF_CONSTEXPR (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
          {
