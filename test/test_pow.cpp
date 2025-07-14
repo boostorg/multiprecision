@@ -159,6 +159,18 @@ void test_issue722()
 
          BOOST_CHECK((boost::multiprecision::isnan)(pow_neg_inf_to_the_nan));
       }
+
+      for (int index = 0; index < 8; ++index)
+      {
+         static_cast<void>(index);
+
+         const T val_x_zero { ::my_zero<T>() * dist(gen) };
+         const T val_a_zero { ::my_zero<T>() * dist(gen) };
+
+         const T pow_zero_to_the_zero = pow(val_x_zero, val_a_zero);
+
+         BOOST_CHECK(pow_zero_to_the_zero == 1);
+      }
    }
 }
 

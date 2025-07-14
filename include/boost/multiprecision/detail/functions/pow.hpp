@@ -518,9 +518,6 @@ inline void eval_pow(T& result, const T& x, const T& a)
    case FP_ZERO:
       switch (fpc_a)
       {
-      case FP_ZERO:
-         result = si_type(1);
-         break;
       case FP_NAN:
          result = a;
          break;
