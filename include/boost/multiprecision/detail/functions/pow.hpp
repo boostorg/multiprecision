@@ -458,16 +458,16 @@ void eval_log(T& result, const T& arg)
 template <class T>
 const T& get_constant_log10()
 {
-   static const BOOST_MP_THREAD_LOCAL T result =
-      []()
-      {
-         using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
-         T ten;
-         ten = ui_type(10u);
-         T tmp_val;
-         eval_log(tmp_val, ten);
-         return tmp_val;
-      }();
+   static BOOST_MP_THREAD_LOCAL T             result;
+   static BOOST_MP_THREAD_LOCAL long digits = 0;
+   if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
+      using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
+      T                                                                            ten;
+      ten = ui_type(10u);
+      eval_log(result, ten);
+      digits = boost::multiprecision::detail::digits2<number<T> >::value();
+   }
 
    return result;
 }
