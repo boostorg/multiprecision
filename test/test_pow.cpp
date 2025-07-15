@@ -9,6 +9,14 @@
 // "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 
+#define TEST_CPP_BIN_FLOAT
+#define TEST_CPP_DEC_FLOAT
+#define TEST_CPP_DOUBLE_FLOAT
+#if defined(__GNUC__)
+#define TEST_FLOAT128
+#define TEST_MPF_50
+#endif
+
 #ifdef _MSC_VER
 #define _SCL_SECURE_NO_WARNINGS
 #endif
@@ -66,13 +74,14 @@
 #include <boost/multiprecision/cpp_double_fp.hpp>
 #endif
 
-#if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+#if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50) || defined(TEST_FLOAT128))
 // These were the only ones I checked locally at the moment that use random tests.
 
+#include <array>
 #include <ctime>
 #include <random>
 
-#endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+#endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50) || defined(TEST_FLOAT128))
 
 template<typename FloatType> auto my_zero() -> FloatType&;
 
@@ -127,7 +136,7 @@ namespace local {
 
 } // namespace local
 
-#if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+#if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50) || defined(TEST_FLOAT128))
 
 // These were the only ones I checked locally at the moment.
 
@@ -195,26 +204,26 @@ void test_small_a_in_default_ops()
       T("0.99999976301106994561811131758260769485991144451216442896857591003045319114657385381607667593523204524")
    }};
 
-   unsigned max_err = 0;
+   unsigned max_err = 0U;
 
-   std::size_t k { UINT8_C(0) };
+   const T x_val(T(789U) / 1000);
 
-   const T x_val { T { 789U } / 1000 };
+   const T local_tol { std::numeric_limits<T>::epsilon() / 8 };
 
-   const T local_tol { std::numeric_limits<T>::epsilon() / 4 };
+   T small_a = pow(T(10), -12);
 
-   for (int p10 = -12; p10 < -5; ++p10)
+   for (std::size_t k { UINT8_C(0) }; k < std::tuple_size<small_a_data_array_type>::value; ++k)
    {
-      const T small_a { pow(T(10), p10) };
+      const T val = pow(x_val, small_a);
 
-      T val = pow(x_val, small_a);
+      small_a *= 10;
 
       using std::fabs;
 
       const T delta { val / small_a_data[k] };
       const T closeness { fabs(1 - delta) };
 
-      T rel = closeness / local_tol;
+      const T rel = closeness / local_tol;
 
       unsigned err = rel.template convert_to<unsigned>();
 
@@ -222,16 +231,14 @@ void test_small_a_in_default_ops()
       {
          max_err = err;
       }
-
-      ++k;
    }
 
    std::cout << "Max error data having small a: " << max_err << std::endl;
 
-   BOOST_TEST(max_err < 32);
+   BOOST_TEST(max_err < 64U);
 }
 
-#endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+#endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50) || defined(TEST_FLOAT128))
 
 template <class T>
 void test()
@@ -245,7 +252,7 @@ void test()
 
    const auto& data = local::data_maker<local_test_pow_data_array_type>::get_data();
 
-   unsigned max_err = 0;
+   unsigned max_err = 0U;
    for (unsigned k = 0; k < data.size(); k++)
    {
       T        val = pow(T(data[k][0]), T(data[k][1]));
@@ -266,9 +273,9 @@ void test()
 
    std::cout << "Max error from data table was: " << max_err << std::endl;
 #if defined(BOOST_INTEL) && defined(TEST_FLOAT128)
-   BOOST_TEST(max_err < 40000);
+   BOOST_TEST(max_err < 40000U);
 #else
-   BOOST_TEST(max_err < 8000);
+   BOOST_TEST(max_err < 8000U);
 #endif
 
    //
@@ -283,7 +290,7 @@ void test()
    BOOST_CHECK_EQUAL(pow(T(1), T(2)), 1);
    BOOST_CHECK_EQUAL(pow(T(1), 2), 1);
 
-   #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+   #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50) || defined(TEST_FLOAT128))
    // These were the only ones I checked locally at the moment.
 
    std::mt19937_64 gen { };
@@ -297,7 +304,7 @@ void test()
         static_cast<float>(1.04L)
       );
 
-   #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+   #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50) || defined(TEST_FLOAT128))
 
    BOOST_IF_CONSTEXPR(std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_infinity)
    {
@@ -305,7 +312,7 @@ void test()
       BOOST_CHECK_EQUAL(pow(T(1.25F), -std::numeric_limits<T>::infinity()), T(0));
 
 
-      #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+      #if (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50) || defined(TEST_FLOAT128))
       // These were the only ones I checked locally at the moment.
 
       for (int npow = -8; npow < 8; ++npow)
@@ -377,7 +384,7 @@ void test()
          }
       }
 
-      #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
+      #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50) || defined(TEST_FLOAT128))
    }
 
    BOOST_IF_CONSTEXPR((!boost::multiprecision::is_interval_number<T>::value) && std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::has_quiet_NaN)
@@ -448,6 +455,8 @@ int main()
 #endif
 #ifdef TEST_FLOAT128
    test<boost::multiprecision::float128>();
+   test_issue722<boost::multiprecision::float128>();
+   test_small_a_in_default_ops<boost::multiprecision::float128>();
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
