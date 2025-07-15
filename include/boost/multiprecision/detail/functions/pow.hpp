@@ -461,7 +461,9 @@ const T& get_constant_log10()
    static const BOOST_MP_THREAD_LOCAL T result =
       []()
       {
-         const T ten(10);
+         using ui_type = typename boost::multiprecision::detail::canonical<unsigned, T>::type;
+         T ten;
+         ten = ui_type(10u);
          T tmp_val;
          eval_log(tmp_val, ten);
          return tmp_val;
