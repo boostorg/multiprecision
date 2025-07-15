@@ -580,12 +580,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
    default:;
    }
 
-   int s = eval_get_sign(a);
-   if (s == 0)
-   {
-      result = si_type(1);
-      return;
-   }
+   const int s = eval_get_sign(a);
 
    if (s < 0)
    {

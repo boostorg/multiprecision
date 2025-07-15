@@ -177,6 +177,60 @@ void test_issue722()
    }
 }
 
+template <class T>
+void test_small_a_in_default_ops()
+{
+   // Table[N[(789/1000)^(10^(n)), 101], {n, -12, -6, 1}]
+
+   using small_a_data_array_type = std::array<T, std::size_t { UINT8_C(7) }>;
+
+   const small_a_data_array_type small_a_data =
+   {{
+      T("0.99999999999976301104186376527231033639051940385775656688844414344774455623761946001430627233999497696"),
+      T("0.99999999999763011041864018009258589471870605197334212386735372254907219885974849025436678031854699987"),
+      T("0.99999999997630110418665453787411005197468225239383193650701563365941781771201272808876889833419359752"),
+      T("0.99999999976301104189181907356423443492950586157450272561606631208248254028299217451384055629333440182"),
+      T("0.99999999763011042144556021597917228924335227306284422554015278215963516103516330474932028841209422025"),
+      T("0.99999997630110446719254821691095026610571257635164394962451615449422537744479656992450152929555193362"),
+      T("0.99999976301106994561811131758260769485991144451216442896857591003045319114657385381607667593523204524")
+   }};
+
+   unsigned max_err = 0;
+
+   std::size_t k { UINT8_C(0) };
+
+   const T x_val { T { 789U } / 1000 };
+
+   const T local_tol { std::numeric_limits<T>::epsilon() / 4 };
+
+   for (int p10 = -12; p10 < -5; ++p10)
+   {
+      const T small_a { pow(T(10), p10) };
+
+      T val = pow(x_val, small_a);
+
+      using std::fabs;
+
+      const T delta { val / small_a_data[k] };
+      const T closeness { fabs(1 - delta) };
+
+      T rel = closeness / local_tol;
+
+      unsigned err = rel.template convert_to<unsigned>();
+
+      if (err > max_err)
+      {
+         max_err = err;
+      }
+
+      ++k;
+   }
+
+   std::cout << "Max error data having small a: " << max_err << std::endl;
+
+   BOOST_TEST(max_err < 32);
+}
+
 #endif // (defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_BIN_FLOAT) || defined(TEST_CPP_DOUBLE_FLOAT) || defined(TEST_MPF_50))
 
 template <class T>
@@ -209,9 +263,16 @@ void test()
          max_err = err;
       }
    }
-   std::cout << "Max error was: " << max_err << std::endl;
+
+   std::cout << "Max error from data table was: " << max_err << std::endl;
+#if defined(BOOST_INTEL) && defined(TEST_FLOAT128)
+   BOOST_TEST(max_err < 40000);
+#else
+   BOOST_TEST(max_err < 8000);
+#endif
+
    //
-   // Special cases come last:
+   // Special cases and edge-cases come last:
    //
    BOOST_CHECK_EQUAL(pow(T(0), T(0)), 1);
    BOOST_CHECK_EQUAL(pow(T(0), 0), 1);
@@ -355,6 +416,7 @@ int main()
    test<boost::multiprecision::mpf_float_50>();
    test<boost::multiprecision::mpf_float_100>();
    test_issue722<boost::multiprecision::mpf_float_50>();
+   test_small_a_in_default_ops<boost::multiprecision::mpf_float_50>();
 #endif
 #ifdef TEST_MPFR_50
    test<boost::multiprecision::mpfr_float_50>();
@@ -368,6 +430,7 @@ int main()
    test<boost::multiprecision::cpp_dec_float_50>();
    test<boost::multiprecision::cpp_dec_float_100>();
    test_issue722<boost::multiprecision::cpp_dec_float_50>();
+   test_small_a_in_default_ops<boost::multiprecision::cpp_dec_float_50>();
 #ifndef SLOW_COMPLER
    // Some "peculiar" digit counts which stress our code:
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65> > >();
@@ -390,6 +453,7 @@ int main()
    test<boost::multiprecision::cpp_bin_float_50>();
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, long long> > >();
    test_issue722<boost::multiprecision::cpp_bin_float_50>();
+   test_small_a_in_default_ops<boost::multiprecision::cpp_bin_float_50>();
 #endif
 #ifdef TEST_CPP_DOUBLE_FLOAT
    test<boost::multiprecision::cpp_double_double>();
@@ -398,6 +462,11 @@ int main()
    test<boost::multiprecision::cpp_double_float128>();
    #endif
    test_issue722<boost::multiprecision::cpp_double_double>();
+   test_small_a_in_default_ops<boost::multiprecision::cpp_double_double>();
+   test_small_a_in_default_ops<boost::multiprecision::cpp_double_long_double>();
+   #if defined(BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128)
+   test_small_a_in_default_ops<boost::multiprecision::cpp_double_float128>();
+   #endif
 #endif
    return boost::report_errors();
 }
