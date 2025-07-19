@@ -25,6 +25,7 @@
 //#  define TEST_MPF
 #define TEST_BACKEND
 #define TEST_CPP_DEC_FLOAT
+#define TEST_FLOAT128
 #define TEST_MPFR_50
 #define TEST_MPFI_50
 #define TEST_CPP_BIN_FLOAT

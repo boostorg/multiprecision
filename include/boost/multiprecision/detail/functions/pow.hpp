@@ -672,7 +672,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
          }
          else
          {
-            result = std::numeric_limits<number<T, et_on> >::infinity().backend();
+            result = std::numeric_limits<number<T, et_on> >::infinity().backend(); // LCOV_EXCL_LINE There is no NaN for this number type.
          }
       }
       else BOOST_IF_CONSTEXPR (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)

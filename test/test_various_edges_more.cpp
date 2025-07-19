@@ -625,6 +625,47 @@ namespace local
     return result_is_ok;
   }
 
+  template<class FloatType>
+  bool test_edges_trig()
+  {
+    using float_type = FloatType;
+
+    auto dis =
+      std::uniform_real_distribution<float>
+      {
+        static_cast<float>(1.01F),
+        static_cast<float>(1.04F)
+      };
+
+    bool result_is_ok { true };
+
+    using std::isinf;
+    using std::isnan;
+    using std::signbit;
+
+    BOOST_IF_CONSTEXPR(std::numeric_limits<float_type>::has_quiet_NaN)
+    {
+      std::mt19937_64 gen { UINT64_C(0xF00DCAFEDEADBEEF) };
+
+      for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(8)); ++index)
+      {
+        static_cast<void>(index);
+
+        float_type flt_nan = std::numeric_limits<float_type>::quiet_NaN() * dis(gen);
+
+        const float_type atan_nan = atan(flt_nan);
+
+        const bool result_atan_nan_is_ok { (boost::multiprecision::isnan)(atan_nan) && ((boost::multiprecision::fpclassify)(atan_nan) == FP_NAN) };
+
+        BOOST_TEST(result_atan_nan_is_ok);
+
+        result_is_ok = (result_atan_nan_is_ok && result_is_ok);
+      }
+    }
+
+    return result_is_ok;
+  }
+
   template<class OtherFloatType>
   auto test_convert_and_back_caller(const float epsilon_factor = 0.0F) -> bool
   {
@@ -790,27 +831,27 @@ namespace local
 
 auto main() -> int
 {
+    using bin_float_backend_type = boost::multiprecision::cpp_bin_float<50>;
+    using dec_float_backend_type = boost::multiprecision::cpp_dec_float<50>;
+
+    using bin_float_type = boost::multiprecision::number<bin_float_backend_type, boost::multiprecision::et_off>;
+    using dec_float_type = boost::multiprecision::number<dec_float_backend_type, boost::multiprecision::et_off>;
+
   {
-    using float_backend_type = boost::multiprecision::cpp_bin_float<50>;
+    std::cout << "Testing type: " << typeid(bin_float_type).name() << std::endl;
 
-    using float_type = boost::multiprecision::number<float_backend_type, boost::multiprecision::et_off>;
-
-    std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
-
-    static_cast<void>(local::test_edges<float_type>());
+    static_cast<void>(local::test_edges<bin_float_type>());
+    static_cast<void>(local::test_edges_trig<bin_float_type>());
   }
 
   {
-    using float_backend_type = boost::multiprecision::cpp_dec_float<50>;
+    std::cout << "Testing type: " << typeid(dec_float_type).name() << std::endl;
 
-    using float_type = boost::multiprecision::number<float_backend_type, boost::multiprecision::et_off>;
-
-    std::cout << "Testing type: " << typeid(float_type).name() << std::endl;
-
-    static_cast<void>(local::test_edges<float_type>());
-    local::test_cpp_dec_float_rd_ovf_unf<float_type>();
-    local::test_convert_and_back<double, float_type>(0.0F);
-    local::test_cpp_dec_float_frexp_edge<float_type>();
+    static_cast<void>(local::test_edges<dec_float_type>());
+    static_cast<void>(local::test_edges_trig<dec_float_type>());
+    local::test_cpp_dec_float_rd_ovf_unf<dec_float_type>();
+    local::test_convert_and_back<double, dec_float_type>(0.0F);
+    local::test_cpp_dec_float_frexp_edge<dec_float_type>();
   }
 
   {

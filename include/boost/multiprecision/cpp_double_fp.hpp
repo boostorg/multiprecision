@@ -168,6 +168,9 @@ namespace backends {
 // The type of the floating-point constituents should adhere to IEEE754.
 // This class has been tested with floats having single-precision (4 byte),
 // double-precision (8 byte) and quad precision (16 byte, such as GCC's __float128).
+// Although the constituent parts (a0 and a1) satisfy |a1| <= (1 / 2) * ulp(a0),
+// the composite type does not adhere to these strict error bounds. Its error
+// bounds are larger.
 
 template <typename FloatingPointType>
 class cpp_double_fp_backend
@@ -184,7 +187,7 @@ class cpp_double_fp_backend
             || ((cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits ==  53) && std::numeric_limits<float_type>::is_specialized && std::numeric_limits<float_type>::is_iec559)
             || ((cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits ==  64) && std::numeric_limits<float_type>::is_specialized && std::numeric_limits<float_type>::is_iec559)
             ||  (cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits == 113)
-         }, "Error: float_type does not fulfil the backend requirements of cpp_double_fp_backend"
+         }, "Error: float_type does not fulfill the backend requirements of cpp_double_fp_backend"
    );
 
    using rep_type   = cpp_df_qf_detail::pair<float_type, float_type>;
@@ -317,7 +320,7 @@ class cpp_double_fp_backend
                                         && ((static_cast<int>(sizeof(SignedIntegralType) * 8) - 1) > cpp_df_qf_detail::ccmath::numeric_limits<float_type>::digits))>::type const* = nullptr>
    constexpr cpp_double_fp_backend(SignedIntegralType n)
    {
-      const bool is_neg { n < SignedIntegralType { INT8_C(0) } };
+      const bool is_neg { (n < SignedIntegralType { INT8_C(0) }) };
 
       using local_unsigned_integral_type = typename boost::multiprecision::detail::make_unsigned<SignedIntegralType>::type;
 
@@ -436,7 +439,14 @@ class cpp_double_fp_backend
 
    constexpr auto iszero_unchecked() const noexcept -> bool { return (data.first  == float_type { 0.0F }); }
 
-   constexpr auto is_one() const noexcept -> bool { return ((data.second  == float_type { 0.0F }) && (data.first  == float_type { 1.0F })); }
+   constexpr auto is_one() const noexcept -> bool 
+   {
+      return
+         (
+               (data.second  == float_type { 0.0F })
+            && (data.first  == float_type { 1.0F })
+         );
+   }
 
    constexpr auto negate() -> void
    {
@@ -714,7 +724,8 @@ class cpp_double_fp_backend
       // The division algorithm has been taken from Victor Shoup,
       // package WinNTL-5_3_2. It might originally be related to the
       // K. Briggs work. The algorithm has been significantly simplified
-      // while still atempting to retain proper rounding corrections.
+      // while still attempting to retain proper rounding corrections.
+      // Checks for overflow and underflow have been added.
 
       const float_type C { data.first / v.data.first };
 
@@ -762,11 +773,11 @@ class cpp_double_fp_backend
 
       u = cpp_df_qf_detail::ccmath::unsafe::fma(hc, hv, -U);
 
-      const float_type tv { v.data.first - hv };
-
-      u = cpp_df_qf_detail::ccmath::unsafe::fma(hc, tv, u);
-
       {
+         const float_type tv { v.data.first - hv };
+
+         u = cpp_df_qf_detail::ccmath::unsafe::fma(hc, tv, u);
+
          const float_type tc { C - hc };
 
          u = cpp_df_qf_detail::ccmath::unsafe::fma(tc, hv, u);
@@ -1028,7 +1039,8 @@ class cpp_double_fp_backend
       // The multiplication algorithm has been taken from Victor Shoup,
       // package WinNTL-5_3_2. It might originally be related to the
       // K. Briggs work. The algorithm has been significantly simplified
-      // while still atempting to retain proper rounding corrections.
+      // while still attempting to retain proper rounding corrections.
+      // Checks for overflow and underflow have been added.
 
       float_type C { cpp_df_qf_detail::split_maker<float_type>::value * data.first };
 
@@ -1081,19 +1093,26 @@ class cpp_double_fp_backend
          hv = c - float_type { c - v.data.first };
       }
 
-      const float_type tv { v.data.first - hv };
+      {
+         const float_type tv { v.data.first - hv };
 
-      float_type t1 { cpp_df_qf_detail::ccmath::unsafe::fma(hu, hv, -C) };
+         const float_type
+            t1
+            {
+               cpp_df_qf_detail::ccmath::unsafe::fma
+               (
+                  hu,
+                  tv,
+                  cpp_df_qf_detail::ccmath::unsafe::fma(hu, hv, -C)
+               )
+            };
 
-      t1 = cpp_df_qf_detail::ccmath::unsafe::fma(hu, tv, t1);
+         const float_type tu { data.first - hu };
 
-      const float_type tu { data.first - hu };
-
-      t1 = cpp_df_qf_detail::ccmath::unsafe::fma(tu, hv, t1);
-
-      c =    cpp_df_qf_detail::ccmath::unsafe::fma(tu, tv, t1)
-          + (data.first * v.data.second)
-          + (data.second * v.data.first);
+         c =    cpp_df_qf_detail::ccmath::unsafe::fma(tu, tv, cpp_df_qf_detail::ccmath::unsafe::fma(tu, hv, t1))
+             + (data.first * v.data.second)
+             + (data.second * v.data.first);
+      }
 
       // Perform even more simplifications compared to Victor Shoup.
       data.first  = C + c;
@@ -1116,13 +1135,13 @@ class cpp_double_fp_backend
 template <typename FloatingPointType>
 auto cpp_double_fp_backend<FloatingPointType>::rd_string(const char* pstr) -> bool
 {
-   using local_double_fp_type = cpp_double_fp_backend<FloatingPointType>;
-
    cpp_bin_float_read_write_type f_bin { pstr };
 
-   const auto fpc = fpclassify(f_bin);
+   const int fpc { fpclassify(f_bin) };
 
-   const auto is_definitely_nan = (fpc == FP_NAN);
+   const bool is_definitely_nan { (fpc == FP_NAN) };
+
+   using local_double_fp_type = cpp_double_fp_backend<FloatingPointType>;
 
    if (is_definitely_nan)
    {
@@ -1562,7 +1581,7 @@ constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const 
 
 template <typename FloatingPointType,
           typename IntegralType>
-constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x, IntegralType p) -> typename ::std::enable_if<boost::multiprecision::detail::is_integral<IntegralType>::value, void>::type
+constexpr auto eval_pow(cpp_double_fp_backend<FloatingPointType>& result, const cpp_double_fp_backend<FloatingPointType>& x, IntegralType p) -> typename ::std::enable_if<::boost::multiprecision::detail::is_integral<IntegralType>::value, void>::type
 {
    const int fpc { eval_fpclassify(x) };
 
@@ -2503,11 +2522,11 @@ auto hash_value(const cpp_double_fp_backend<FloatingPointType>& a) -> ::std::siz
 
 using backends::cpp_double_fp_backend;
 
-using cpp_double_float       = number<cpp_double_fp_backend<float>,                  boost::multiprecision::et_off>;
-using cpp_double_double      = number<cpp_double_fp_backend<double>,                 boost::multiprecision::et_off>;
-using cpp_double_long_double = number<cpp_double_fp_backend<long double>,            boost::multiprecision::et_off>;
+using cpp_double_float       = number<cpp_double_fp_backend<float>,       ::boost::multiprecision::et_off>;
+using cpp_double_double      = number<cpp_double_fp_backend<double>,      ::boost::multiprecision::et_off>;
+using cpp_double_long_double = number<cpp_double_fp_backend<long double>, ::boost::multiprecision::et_off>;
 #ifdef BOOST_MP_CPP_DOUBLE_FP_HAS_FLOAT128
-using cpp_double_float128    = number<cpp_double_fp_backend<::boost::float128_type>, boost::multiprecision::et_off>;
+using cpp_double_float128    = number<cpp_double_fp_backend<::boost::float128_type>, ::boost::multiprecision::et_off>;
 #endif
 
 } } // namespace boost::multiprecision
