@@ -1246,7 +1246,11 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    exponent_type ne;
    x.extract_parts(dd, ne);
 
-   // Do the inverse estimate using double precision estimates of mantissa and exponent.
+   // Setup the iteration.
+
+   // Calculate the initial estimate of the inverse using double
+   // precision approximations of mantissa and exponent.
+
    operator=(cpp_dec_float<Digits10, ExponentType, Allocator>(1.0 / dd, -ne));
 
    // Compute the inverse of *this. Quadratically convergent Newton-Raphson iteration
@@ -1316,7 +1320,10 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    }
 
    // Setup the iteration.
-   // Estimate the square root using simple manipulations.
+
+   // Calculate the initial estimate of the root using double
+   // precision approximations of mantissa and exponent.
+
    const double sqd = std::sqrt(dd);
 
    *this = cpp_dec_float<Digits10, ExponentType, Allocator>(sqd, static_cast<ExponentType>(ne / static_cast<ExponentType>(2)));
@@ -1535,7 +1542,8 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::extract_parts(double& man
    mantissa /= p10;
 
    // Extract the rest of the mantissa piecewise from the limbs.
-   // This loop does not round.
+   // This loop does not round. For finite values, the absolute
+   // value of the mantissa is scaled and between 1 and 10.
 
    auto itr_data = data.cbegin() + static_cast<std::size_t>(UINT8_C(1));
 
@@ -2423,11 +2431,14 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
    {
       exponent_type exp10_val { exp10 };
 
-      while (d_mant > 10.0)
-      {
-         d_mant /= 10.0;
-         ++exp10_val;
-      }
+      // This subroutine is used after a call to extract_parts().
+      // The corresponding scaling loop for (d_mant > 10.0) is not
+      // needed here since extract_parts() returns a mantissa value
+      // between 1 and 10. The loop for (d_mant < 1.0) is needed
+      // since the initial guess of the square root in tghe subroutine
+      // calculate_root() might have been divided by 10 in order
+      // to obtain an exponent value that is a multiple of 2.
+
       while (d_mant < 1.0)
       {
          d_mant *= 10.0;

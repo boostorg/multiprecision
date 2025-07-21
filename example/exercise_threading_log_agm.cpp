@@ -71,7 +71,7 @@
 //#define BOOST_MP_EXERCISE_THREADING_BACKEND_TYPE BOOST_MP_EXERCISE_THREADING_BACKEND_MPFR_FLOAT
 #endif
 
-constexpr unsigned local_mp_digits { 101U };
+constexpr unsigned local_mp_digits { 301U };
 
 #if  (BOOST_MP_EXERCISE_THREADING_BACKEND_TYPE == BOOST_MP_EXERCISE_THREADING_BACKEND_CPP_DEC_FLOAT)
 #include <boost/multiprecision/cpp_dec_float.hpp>
