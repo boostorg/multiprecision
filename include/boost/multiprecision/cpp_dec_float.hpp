@@ -472,11 +472,14 @@ class cpp_dec_float // LCOV_EXCL_LINE This causes a false negative on lcov cover
 
    exponent_type order() const
    {
-      const bool bo_order_is_zero = ((!(isfinite)()) || (data[0] == static_cast<std::uint32_t>(0u)));
+      const bool
+         bo_order_is_zero
+         {
+            ((!(isfinite)()) || (data[0] == static_cast<std::uint32_t>(0u)))
+         };
 
-      exponent_type prefix = limb_order(data[static_cast<std::size_t>(UINT8_C(0))]);
-
-      return (bo_order_is_zero ? static_cast<exponent_type>(0) : static_cast<exponent_type>(exp + prefix));
+      return (bo_order_is_zero ? static_cast<exponent_type>(0)
+                               : static_cast<exponent_type>(exp + limb_order(data[static_cast<std::size_t>(UINT8_C(0))])));
    }
 
    #ifndef BOOST_MP_STANDALONE

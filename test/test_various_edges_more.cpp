@@ -622,6 +622,50 @@ namespace local
       }
     }
 
+    BOOST_IF_CONSTEXPR((std::numeric_limits<float>::digits >= 24) && std::numeric_limits<float_type>::is_specialized)
+    {
+      for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(16)); ++index)
+      {
+        // This test is specifically designed to pick up hard-to-reach lines
+        // in cpp_dec_float. Notice how the printed string is expected to have
+        // (or not have) rounding at the 8th fixed-point digit.
+
+        // N[1 + 1/2^4 + 1/2^5 + 1/2^7  + 1/2^9, 20]
+        const float flt_builtin { 1.1035156250000000000F };
+
+        const float_type delta = std::numeric_limits<float_type>::epsilon() * dis(gen) * static_cast<float>(index + 1U);
+
+        const float_type flt_val_base  { flt_builtin };
+
+        const float_type flt_val_close_upper { flt_builtin + delta };
+        const float_type flt_val_close_lower { flt_builtin - delta };
+
+        {
+          std::stringstream strm { };
+
+          strm << std::fixed << std::setprecision(std::streamsize { INT8_C(8) }) << flt_val_base;
+
+          BOOST_TEST(strm.str() == "1.10351562");
+        }
+
+        {
+          std::stringstream strm { };
+
+          strm << std::fixed << std::setprecision(std::streamsize { INT8_C(8) }) << flt_val_close_upper;
+
+          BOOST_TEST(strm.str() > "1.10351562");
+        }
+
+        {
+          std::stringstream strm { };
+
+          strm << std::fixed << std::setprecision(std::streamsize { INT8_C(8) }) << flt_val_close_lower;
+
+          BOOST_TEST(strm.str() == "1.10351562");
+        }
+      }
+    }
+
     return result_is_ok;
   }
 

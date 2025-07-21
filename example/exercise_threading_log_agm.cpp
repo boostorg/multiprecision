@@ -30,7 +30,7 @@
 //
 // cpp_dec_float:
 // result_is_ok_concurrent: true, calculation_time_concurrent: 2.1s
-// result_is_ok_sequential: true, calculation_time_sequential: 15.2s
+// result_is_ok_sequential: true, calculation_time_sequential: 14.7s
 //
 // cpp_bin_float:
 // result_is_ok_concurrent: true, calculation_time_concurrent: 0.28s
@@ -52,6 +52,7 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <sstream>
 #include <thread>
 #include <vector>
 
@@ -70,7 +71,7 @@
 //#define BOOST_MP_EXERCISE_THREADING_BACKEND_TYPE BOOST_MP_EXERCISE_THREADING_BACKEND_MPFR_FLOAT
 #endif
 
-constexpr unsigned local_mp_digits { 301U };
+constexpr unsigned local_mp_digits { 101U };
 
 #if  (BOOST_MP_EXERCISE_THREADING_BACKEND_TYPE == BOOST_MP_EXERCISE_THREADING_BACKEND_CPP_DEC_FLOAT)
 #include <boost/multiprecision/cpp_dec_float.hpp>
@@ -379,7 +380,10 @@ bool log_agm_concurrent(float& calculation_time)
     result_is_ok &= (close_fraction < tol);
   }
 
-  std::cout << std::boolalpha << result_is_ok << std::endl;
+  std::stringstream strm { };
+  strm << std::boolalpha << result_is_ok;
+
+  std::cout << strm.str() << std::endl;
 
   return result_is_ok;
 }
@@ -440,7 +444,10 @@ bool log_agm_sequential(float& calculation_time)
     result_is_ok &= (close_fraction < tol);
   }
 
-  std::cout << std::boolalpha << result_is_ok << std::endl;
+  std::stringstream strm { };
+  strm << std::boolalpha << result_is_ok;
+
+  std::cout << strm.str() << std::endl;
 
   return result_is_ok;
 }
