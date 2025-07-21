@@ -2531,26 +2531,53 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::from_unsigned_long_long(c
       return;
    }
 
-   std::size_t i = static_cast<std::size_t>(0u);
+   std::size_t index { static_cast<std::size_t>(0u) };
 
-   unsigned long long uu = u;
+   unsigned long long uu { u };
 
-   std::uint32_t temp[(std::numeric_limits<unsigned long long>::digits10 / static_cast<int>(cpp_dec_float_elem_digits10)) + 3] = {static_cast<std::uint32_t>(0u)};
+   constexpr std::size_t
+      local_storage_size
+      {
+         static_cast<std::size_t>
+         (
+           (std::numeric_limits<unsigned long long>::digits10 / static_cast<int>(cpp_dec_float_elem_digits10)) + 3
+         )
+      };
+
+   using local_limb_type = std::uint32_t;
+
+   using local_tmp_array_type = std::array<local_limb_type, local_storage_size>;
+
+   local_tmp_array_type temp { };
 
    while (uu != static_cast<unsigned long long>(0u))
    {
-      temp[i] = static_cast<std::uint32_t>(uu % static_cast<unsigned long long>(cpp_dec_float_elem_mask));
-      uu      = static_cast<unsigned long long>(uu / static_cast<unsigned long long>(cpp_dec_float_elem_mask));
-      ++i;
+      temp[index] = static_cast<local_limb_type>(uu % static_cast<unsigned long long>(cpp_dec_float_elem_mask));
+
+      uu = static_cast<unsigned long long>(uu / static_cast<unsigned long long>(cpp_dec_float_elem_mask));
+
+      ++index;
    }
 
-   if (i > static_cast<std::size_t>(1u))
+   if (index > static_cast<std::size_t>(1u))
    {
-      exp += static_cast<exponent_type>((i - 1u) * static_cast<std::size_t>(cpp_dec_float_elem_digits10));
+      exp += static_cast<exponent_type>((index - 1u) * static_cast<std::size_t>(cpp_dec_float_elem_digits10));
    }
 
-   std::reverse(temp, temp + i);
-   std::copy(temp, temp + (std::min)(i, static_cast<std::size_t>(cpp_dec_float_elem_number)), data.begin());
+   const std::size_t
+      copy_size
+      {
+         (std::min)(index, static_cast<std::size_t>(cpp_dec_float_elem_number))
+      };
+
+   using local_const_reverse_iterator_type = std::reverse_iterator<const local_limb_type*>;
+
+   std::copy
+   (
+      local_const_reverse_iterator_type(temp.data() + copy_size),
+      local_const_reverse_iterator_type(temp.data()),
+      data.begin()
+   );
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
