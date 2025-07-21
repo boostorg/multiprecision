@@ -5,6 +5,10 @@
 
 // Some parts of this test file have been taken from the Boost.Decimal project.
 
+#define TEST_CPP_BIN_FLOAT
+#define TEST_CPP_DEC_FLOAT
+#define TEST_CPP_DOUBLE_FLOAT
+
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_double_fp.hpp>
@@ -29,6 +33,9 @@ template<typename FloatType> auto my_zero() noexcept -> FloatType&;
 template<typename FloatType> auto my_one () noexcept -> FloatType&;
 template<typename FloatType> auto my_inf () noexcept -> FloatType&;
 template<typename FloatType> auto my_nan () noexcept -> FloatType&;
+
+template<typename FloatType> auto my_generator_overflow() noexcept -> FloatType;
+template<typename FloatType> auto my_generator_underflow() noexcept -> FloatType;
 
 namespace local
 {
@@ -216,6 +223,8 @@ namespace local
     }
 
     #ifdef BOOST_HAS_INT128
+    // TBD: Is this supposed to work for cpp_double_double?
+    BOOST_IF_CONSTEXPR(!::has_poor_exp_range_or_precision_support<float_type>::value)
     {
       for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(64)); ++index)
       {
@@ -266,7 +275,7 @@ namespace local
                (str_n128 == str_ctrl)
             && (
                  (!is_neg) ? (val_n128 >= static_cast<boost::int128_type>((std::numeric_limits<signed long long>::max)()))
-                           : (val_n128 <= static_cast<boost::int128_type>((std::numeric_limits<signed long long>::max)()))
+                           : (val_n128 <= static_cast<boost::int128_type>(std::numeric_limits<signed long long>::lowest()))
                )
           );
 
@@ -490,6 +499,8 @@ namespace local
       result_is_ok = (result_unf_is_ok && result_is_ok);
     }
 
+    // TBD: See open issues for reminder to get this working in cpp_double_fp_backend.
+    BOOST_IF_CONSTEXPR(!::has_poor_exp_range_or_precision_support<float_type>::value)
     {
       using std::ldexp;
 
@@ -513,6 +524,8 @@ namespace local
       result_is_ok = (result_ovf_is_ok && result_is_ok);
     }
 
+    // TBD: See open issues for reminder to get this working in cpp_double_fp_backend.
+    BOOST_IF_CONSTEXPR(!::has_poor_exp_range_or_precision_support<float_type>::value)
     {
       using std::ldexp;
 
@@ -670,9 +683,50 @@ namespace local
   }
 
   template<class FloatType>
+  bool test_edges_ovf_und()
+  {
+    using float_type = FloatType;
+
+    std::mt19937_64 gen { time_point<typename std::mt19937_64::result_type>() };
+
+    auto dis =
+      std::uniform_real_distribution<float>
+      {
+        static_cast<float>(1.01F),
+        static_cast<float>(1.04F)
+      };
+
+    bool result_is_ok { true };
+
+    {
+      for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(16)); ++index)
+      {
+        static_cast<void>(index);
+
+        const float_type flt_ovf = ::my_generator_overflow<float_type>() * dis(gen);
+        const float_type flt_und = ::my_generator_underflow<float_type>() * dis(gen);
+
+        const bool
+          result_ovf_und_is_ok
+          {
+            ((boost::multiprecision::isinf)(flt_ovf) && ((boost::multiprecision::fpclassify)(flt_und) == FP_ZERO))
+          };
+
+        BOOST_TEST(result_ovf_und_is_ok);
+
+        result_is_ok = (result_ovf_und_is_ok && result_is_ok);
+      }
+    }
+
+    return result_is_ok;
+  }
+
+  template<class FloatType>
   bool test_edges_trig()
   {
     using float_type = FloatType;
+
+    std::mt19937_64 gen { time_point<typename std::mt19937_64::result_type>() };
 
     auto dis =
       std::uniform_real_distribution<float>
@@ -689,8 +743,6 @@ namespace local
 
     BOOST_IF_CONSTEXPR(std::numeric_limits<float_type>::has_quiet_NaN)
     {
-      std::mt19937_64 gen { UINT64_C(0xF00DCAFEDEADBEEF) };
-
       for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(8)); ++index)
       {
         static_cast<void>(index);
@@ -875,27 +927,40 @@ namespace local
 
 auto main() -> int
 {
-    using bin_float_backend_type = boost::multiprecision::cpp_bin_float<50>;
+  {
     using dec_float_backend_type = boost::multiprecision::cpp_dec_float<50>;
-
-    using bin_float_type = boost::multiprecision::number<bin_float_backend_type, boost::multiprecision::et_off>;
     using dec_float_type = boost::multiprecision::number<dec_float_backend_type, boost::multiprecision::et_off>;
 
-  {
-    std::cout << "Testing type: " << typeid(bin_float_type).name() << std::endl;
-
-    static_cast<void>(local::test_edges<bin_float_type>());
-    static_cast<void>(local::test_edges_trig<bin_float_type>());
-  }
-
-  {
     std::cout << "Testing type: " << typeid(dec_float_type).name() << std::endl;
 
     static_cast<void>(local::test_edges<dec_float_type>());
+    static_cast<void>(local::test_edges_ovf_und<dec_float_type>());
     static_cast<void>(local::test_edges_trig<dec_float_type>());
     local::test_cpp_dec_float_rd_ovf_unf<dec_float_type>();
     local::test_convert_and_back<double, dec_float_type>(0.0F);
     local::test_cpp_dec_float_frexp_edge<dec_float_type>();
+  }
+
+  {
+    using bin_float_backend_type = boost::multiprecision::cpp_bin_float<50>;
+    using bin_float_type = boost::multiprecision::number<bin_float_backend_type, boost::multiprecision::et_off>;
+
+    std::cout << "Testing type: " << typeid(bin_float_type).name() << std::endl;
+
+    static_cast<void>(local::test_edges<bin_float_type>());
+    // TBD: This seemingly trivial test fails for cpp_bin_float.
+    //static_cast<void>(local::test_edges_ovf_und<bin_float_type>());
+    static_cast<void>(local::test_edges_trig<bin_float_type>());
+  }
+
+  {
+    using double_float_type = boost::multiprecision::cpp_double_double;
+
+    std::cout << "Testing type: " << typeid(double_float_type).name() << std::endl;
+
+    static_cast<void>(local::test_edges<double_float_type>());
+    static_cast<void>(local::test_edges_ovf_und<double_float_type>());
+    static_cast<void>(local::test_edges_trig<double_float_type>());
   }
 
   {
@@ -916,6 +981,62 @@ template<typename FloatType> auto my_zero() noexcept -> FloatType& { using float
 template<typename FloatType> auto my_one () noexcept -> FloatType& { using float_type = FloatType; static float_type val_one  { 1 }; return val_one; }
 template<typename FloatType> auto my_inf () noexcept -> FloatType& { using float_type = FloatType; static float_type val_inf  { std::numeric_limits<float_type>::infinity() }; return val_inf; }
 template<typename FloatType> auto my_nan () noexcept -> FloatType& { using float_type = FloatType; static float_type val_nan  { std::numeric_limits<float_type>::quiet_NaN() }; return val_nan; }
+
+template<class FloatType>
+static auto
+  overflow_expval_maker
+  {
+    []()
+    {
+      std::stringstream strm { };
+
+      using float_type = FloatType;
+
+      strm << std::numeric_limits<float_type>::max_exponent10 + 4;
+
+      return strm.str();
+    }
+  };
+
+template<class FloatType>
+static auto
+  underflow_expval_maker
+  {
+    []()
+    {
+      std::stringstream strm { };
+
+      using float_type = FloatType;
+
+      strm << std::numeric_limits<float_type>::min_exponent10 - 4;
+
+      return strm.str();
+    }
+  };
+
+template<typename FloatType>
+auto my_generator_overflow() noexcept -> FloatType
+{
+  using float_type = FloatType;
+
+  const float_type flt_ovf("1.23E" + overflow_expval_maker<float_type>());
+
+  const float_type result(flt_ovf);
+
+  return result;
+}
+
+template<typename FloatType>
+auto my_generator_underflow() noexcept -> FloatType
+{
+  using float_type = FloatType;
+
+  float_type flt_und("1.23E" + underflow_expval_maker<float_type>());
+
+  const float_type result(flt_und);
+
+  return result;
+}
 
 #if (defined(__clang__) || defined(__GNUC__))
 #  pragma GCC diagnostic pop
