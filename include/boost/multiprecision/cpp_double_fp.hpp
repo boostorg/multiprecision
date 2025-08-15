@@ -166,11 +166,12 @@ namespace backends {
 // A cpp_double_fp_backend is represented by an unevaluated sum of two
 // floating-point units, a0 and a1, which satisfy |a1| <= (1 / 2) * ulp(a0).
 // The type of the floating-point constituents should adhere to IEEE754.
-// This class has been tested with floats having single-precision (4 byte),
-// double-precision (8 byte) and quad precision (16 byte, such as GCC's __float128).
 // Although the constituent parts (a0 and a1) satisfy |a1| <= (1 / 2) * ulp(a0),
 // the composite type does not adhere to these strict error bounds. Its error
 // bounds are larger.
+
+// This class has been tested with floats having single-precision (4 byte),
+// double-precision (8 byte) and quad precision (16 byte, such as GCC's __float128).
 
 template <typename FloatingPointType>
 class cpp_double_fp_backend
@@ -1461,7 +1462,7 @@ constexpr auto eval_sqrt(cpp_double_fp_backend<FloatingPointType>& result, const
       };
 
    result.rep().first  = c + cc;
-   result.rep().second = local_float_type { c - result.rep().first } + cc;
+   result.rep().second = local_float_type { c - result.my_first() } + cc;
 }
 
 template <typename FloatingPointType>
@@ -2663,16 +2664,16 @@ struct precision<boost::multiprecision::number<boost::multiprecision::cpp_double
 private:
    using my_multiprecision_backend_type = boost::multiprecision::cpp_double_fp_backend<FloatingPointType>;
 
-   using digits_2 = digits2<my_multiprecision_backend_type::my_digits>;
+   using digits2_type = digits2<my_multiprecision_backend_type::my_digits>;
 
 public:
    using precision_type = typename Policy::precision_type;
 
    using type =
       typename std::conditional<
-         ((digits_2::value <= precision_type::value) || (precision_type::value <= 0)),
-         digits_2,                  // Default case: Full precision for RealType.
-         precision_type>::type;     // User customized precision.
+         ((digits2_type::value <= precision_type::value) || (precision_type::value <= 0)),
+         digits2_type,             // This is the default case: Use full precision for RealType.
+         precision_type>::type;    // Here we find (and use) user-customized precision.
 };
 
 } } } // namespace boost::math::policies
