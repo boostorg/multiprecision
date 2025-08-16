@@ -595,6 +595,30 @@ namespace local
     }
 
     {
+      const float_type flt_nan { ::my_nan<float_type>() };
+      const float_type flt_inf { ::my_inf<float_type>() };
+
+      for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(16)); ++index)
+      {
+        static_cast<void>(index);
+
+        flt_nan * dis(gen);
+        flt_inf * dis(gen);
+
+        const float_type finite { float_type { 123 } / 100 };
+
+        const float_type eq_nan = finite + flt_nan;
+        const float_type eq_inf = finite + flt_inf;
+
+        const bool result_nan_is_ok = (boost::multiprecision::isnan)(eq_nan);
+        const bool result_inf_is_ok = (boost::multiprecision::isinf)(eq_inf);
+
+        BOOST_TEST(result_nan_is_ok);
+        BOOST_TEST(result_inf_is_ok);
+      }
+    }
+
+    {
       for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(16)); ++index)
       {
         static_cast<void>(index);
@@ -876,10 +900,10 @@ namespace local
     }
   }
 
-  template<class CppDecFloatType>
-  auto test_cpp_dec_float_frexp_edge() -> void
+  template<class AnyFloatType>
+  auto test_frexp_edge() -> void
   {
-    using float_type = CppDecFloatType;
+    using float_type = AnyFloatType;
 
     using float_backend_ctrl_type = boost::multiprecision::cpp_bin_float<50, boost::multiprecision::digit_base_10, void, std::int32_t>;
 
@@ -938,7 +962,7 @@ auto main() -> int
     static_cast<void>(local::test_edges_trig<dec_float_type>());
     local::test_cpp_dec_float_rd_ovf_unf<dec_float_type>();
     local::test_convert_and_back<double, dec_float_type>(0.0F);
-    local::test_cpp_dec_float_frexp_edge<dec_float_type>();
+    local::test_frexp_edge<dec_float_type>();
   }
 
   {
@@ -951,6 +975,7 @@ auto main() -> int
     // TBD: This seemingly trivial test fails for cpp_bin_float.
     //static_cast<void>(local::test_edges_ovf_und<bin_float_type>());
     static_cast<void>(local::test_edges_trig<bin_float_type>());
+    local::test_frexp_edge<bin_float_type>();
   }
 
   {
@@ -961,6 +986,7 @@ auto main() -> int
     static_cast<void>(local::test_edges<double_float_type>());
     static_cast<void>(local::test_edges_ovf_und<double_float_type>());
     static_cast<void>(local::test_edges_trig<double_float_type>());
+    local::test_frexp_edge<double_float_type>();
   }
 
   {
