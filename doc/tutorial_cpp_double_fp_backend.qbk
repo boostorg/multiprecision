@@ -56,8 +56,8 @@ also in strict ANSI mode.
 
 Run-time performance is a top-level requirement for the `cpp_double_fp_backend` types.
 The types still do, however, support infinities, NaNs and (of course) zeros.
-Signed negative zero, however, is not supported (in favor of efficiency)
-and all zeros are treated as positive.
+Signed negative zero, however, is not supported (in favor of efficiency).
+All zeros are treated as positive.
 
 The `cpp_double_fp_backend` types interoperate with Boost.Math and Boost.Math.Constants.
 This offers the wealth of Boost-related mathematical tools instantiated with
