@@ -398,6 +398,17 @@ void test_rational(const std::integral_constant<bool, false>&)
 #endif
    b = Real("2/3");
    BOOST_CHECK_EQUAL(a, b);
+
+   const static int floor_ceil_data[][4] = {{-11, 10, -2, -1}, {-10, 10, -1, -1}, {-9, 10, -1, 0},
+                                            {-1, 10, -1, 0}, {0, 10, 0, 0}, {1, 10, 0, 1},
+                                            {9, 10, 0, 1}, {10, 10, 1, 1}, {11, 10, 1, 2}};
+   for (unsigned int i = 0; i < sizeof(floor_ceil_data) / sizeof(floor_ceil_data[0]); i++) {
+       Real c(floor_ceil_data[i][0]);
+       c /= floor_ceil_data[i][1];
+       BOOST_CHECK_EQUAL(floor(c), floor_ceil_data[i][2]);
+       BOOST_CHECK_EQUAL(ceil(c), floor_ceil_data[i][3]);
+   }
+
    //
    // Check IO code:
    //
