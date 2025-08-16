@@ -3385,6 +3385,27 @@ namespace detail {
 template <>
 struct is_variable_precision<backends::gmp_float<0> > : public std::integral_constant<bool, true>
 {};
+
+#ifndef BOOST_NO_CXX20_HDR_FORMAT
+template <expression_template_option ExpressionTemplates>
+std::string print_binary_string(const number<gmp_int, ExpressionTemplates>& value)
+{
+   if (value < 0)
+      throw std::format_error("Binary string not supported negative values in sign-magnitude format.");
+
+   boost::multiprecision::backends::detail::gmp_char_ptr ps(mpz_get_str(nullptr, 2, value.backend().data()));
+
+   std::string result(ps.get());
+
+   // remove leading zeros:
+   std::string::size_type pos = result.find('1');
+   if (pos != std::string::npos)
+      result.erase(0, pos);
+
+   return result;
+}
+#endif
+
 } // namespace detail
 
 } // namespace multiprecision

@@ -1730,6 +1730,15 @@ rule get_concept_checks
    return $(result) ;
 }
 
+test-suite format :
+    [ run test_format_cpp_int.cpp : : : [ requires cxx20_hdr_format ] : test_format_cpp_int_narrow ]
+    [ run test_format_cpp_int.cpp : : : [ requires cxx20_hdr_format ] <define>TEST_WIDE_CHAR : test_format_cpp_int_wide ]
+    [ run test_format_mpz_int.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] [ requires cxx20_hdr_format ] : test_format_mpz_int_narrow ]
+    [ run test_format_mpz_int.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] [ requires cxx20_hdr_format ] <define>TEST_WIDE_CHAR : test_format_mpz_int_wide ]
+    [ run test_format_tom_int.cpp tommath : : : [ check-target-builds ../config//has_tommath : : <build>no ] [ requires cxx20_hdr_format ] : test_format_tom_int_narrow ]
+    [ run test_format_tom_int.cpp tommath : : : [ check-target-builds ../config//has_tommath : : <build>no ] [ requires cxx20_hdr_format ] <define>TEST_WIDE_CHAR : test_format_tom_int_wide ]
+;
+
 test-suite concepts : [ get_concept_checks ] ;
 
 test-suite examples : ../example//examples ;
@@ -1737,7 +1746,7 @@ test-suite performance : ../performance//performance ;
 
 # Some aliases which group blocks of tests for CI testing:
 
-alias github_ci_block_1 : arithmetic_tests functions_and_limits conversions ;
+alias github_ci_block_1 : arithmetic_tests functions_and_limits conversions format ;
 alias github_ci_block_2 : cpp_int_tests misc compile_fail concepts examples ;
 explicit github_ci_block_1 ;
 explicit github_ci_block_2 ;
