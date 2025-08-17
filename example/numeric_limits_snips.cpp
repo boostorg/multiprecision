@@ -392,7 +392,7 @@ so the default expression template parameter has been replaced by `et_off`.]
 
     cpp_bin_float_quad expected = NaN;
     cpp_bin_float_quad calculated = 2 * NaN;
-    // Comparisons of NaN's always fail:
+    // Comparisons of NaNs always fail:
     bool b = expected == calculated;
     std::cout << b << std::endl;
     BOOST_CHECK_NE(expected, expected);
