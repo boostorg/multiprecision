@@ -34,7 +34,7 @@ The chosen backend often determines how completely `std::numeric_limits` is avai
 Compiler options, processor type, and definition of macros or assembler instructions to control denormal numbers will alter
 the values in the tables given below.
 
-[warning GMP's extendable floatin-point `mpf_t` does not have a concept of overflow:
+[warning GMP's extendable floating-point `mpf_t` does not have a concept of overflow:
 operations that lead to overflow eventually run of out of resources
 and terminate with stack overflow (often after several seconds).]
 
