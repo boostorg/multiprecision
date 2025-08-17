@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
   }
   {
 //[max_digits10_4
-/*`and similarly for a much higher precision type:
+/*`And similarly for a much higher precision type:
 */
 
   using namespace boost::multiprecision;
