@@ -12,7 +12,7 @@
 
 [important This section is seriously out of date compared to recent Visual C++ releases. A modernization of Multiprecision's visualizers is planned for Visual Studio 2022 (and beyond). The legacy description has been maintained and is provided below.]
 
-Let's face it debugging multiprecision numbers is challenging - simply because we can't easily inspect the value of the numbers.
+Let's face it, debugging multiprecision numbers is challenging - simply because we can't easily inspect the value of the numbers.
 Visual C++ provides a partial solution in the shape of "visualizers" which provide improved views of complex data structures.
 
 Previously, there was preliminary support for visualizers within older versions of Visual Studio.
