@@ -327,9 +327,9 @@ and references therein
 and
 [@https://arxiv.org/pdf/1310.8121.pdf  Easy Accurate Reading and Writing of Floating-Point Numbers, Aubrey Jaffer (August 2018)].
 
-Microsoft VS2017 and other recent compilers, now use the
+Microsoft VS2017 and other recent compilers now use the
 [@https://doi.org/10.1145/3192366.3192369 Ryu fast float-to-string conversion by Ulf Adams]
-algorithm, claimed to be both exact and fast for 32 and 64-bit floating-point numbers.
+algorithm, claimed to be both exact and fast for 32- and 64-bit floating-point numbers.
 ] [/note]
 
 [h4 round_style]
@@ -382,7 +382,7 @@ gradual underflow, so that, if type T is `double`.
 A type may have any of the following `enum float_denorm_style` values:
 
 * `std::denorm_absent`, if it does not allow denormalized values.
-(Always used for all integer and exact types).
+(Always used for all integer and exact types.)
 * `std::denorm_present`, if the floating-point type allows denormalized values.
 *`std::denorm_indeterminate`, if indeterminate at compile time.
 
@@ -391,9 +391,9 @@ A type may have any of the following `enum float_denorm_style` values:
 `bool std::numeric_limits<T>::tinyness_before`
 
 `true` if a type can determine that a value is too small
-to be represent as a normalized value before rounding it.
+to be represented as a normalized value before rounding it.
 
-Generally true for `is_iec559` floating-point __fundamantal types,
+Generally true for `is_iec559` floating-point __fundamental types,
 but false for integer types.
 
 Standard-compliant IEEE 754 floating-point implementations may detect the floating-point underflow at three predefined moments:
@@ -591,7 +591,7 @@ used thus:
   BOOST_CHECK_CLOSE_FRACTION(expected, calculated, tolerance);
 
 (There is also a version BOOST_CHECK_CLOSE using tolerance as a [*percentage] rather than a fraction;
-usually the fraction version is simpler to use).
+usually the fraction version is simpler to use.)
 
 [tolerance_2]
 
@@ -607,7 +607,7 @@ For IEEE754 system (for which `std::numeric_limits<T>::is_iec559 == true`)
 [@http://en.wikipedia.org/wiki/IEEE_754-1985#Positive_and_negative_infinity positive and negative infinity]
 are assigned bit patterns for all defined floating-point types.
 
-Confusingly, the string resulting from outputting this representation, is also
+Confusingly, the string resulting from outputting this representation is also
 implementation-defined. And the string that can be input to generate the representation is also implementation-defined.
 
 For example, the output is `1.#INF` on Microsoft systems, but `inf` on most *nix platforms.
@@ -615,7 +615,7 @@ For example, the output is `1.#INF` on Microsoft systems, but `inf` on most *nix
 This implementation-defined-ness has hampered use of infinity (and NaNs)
 but __Boost_Math and __Boost_Multiprecision work hard to provide a sensible representation
 for [*all] floating-point types, not just the __fundamental_types,
-which with the use of suitable facets to define the input and output strings, makes it possible
+which with the use of suitable facets to define the input and output strings makes it possible
 to use these useful features portably and including __Boost_Serialization.
 
 [h4 Not-A-Number NaN]
@@ -631,11 +631,11 @@ provides an implementation-defined representation for NaN.
 result of an assignment or computation is meaningless.
 A typical example is `0/0` but there are many others.
 
-NaNs may also be used, to represent missing values: for example,
+NaNs may also be used to represent missing values: for example,
 these could, by convention, be ignored in calculations of statistics like means.
 
 Many of the problems with a representation for
-[@http://en.wikipedia.org/wiki/NaN Not-A-Number] has hampered portable use,
+[@http://en.wikipedia.org/wiki/NaN Not-A-Number] have hampered portable use,
 similar to those with infinity.
 
 [nan_1]
