@@ -445,7 +445,7 @@ Then we can equally well use a multiprecision type cpp_bin_float_quad:
   infinity output was inf
   infinity input was inf
 ``
-Similarly we can do the same with NaN (except that we cannot use `assert` (because any comparisons with NaN always return false).
+Similarly we can do the same with NaN (except that we cannot use `assert` (because any comparisons with NaN always return false)).
 */
   {
     std::locale old_locale;
