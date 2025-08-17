@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
   double write = 2./3; // Any arbitrary value that cannot be represented exactly.
   double read = 0;
   std::stringstream s;
-  s.precision(std::numeric_limits<double>::digits10); // or `float64_t` for 64-bit IEE754 double.
+  s.precision(std::numeric_limits<double>::digits10); // or `float64_t` for 64-bit IEEE 754 double.
   s << write;
   s >> read;
   if(read != write)
