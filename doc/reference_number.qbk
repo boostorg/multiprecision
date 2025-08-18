@@ -693,7 +693,7 @@ here are exact (tested on Win32 with VC++10, MPFR-3.0.0, MPIR-2.1.1):
 [[acos][0eps][0eps][0eps]]
 [[asin][0eps][0eps][0eps]]
 [[atan][1eps][0eps][0eps]]
-[[cosh][1045eps[footnote It's likely that the inherent error in the input values to our test cases is to blame here.]][0eps][0eps]]
+[[cosh][1045eps[footnote It's likely that inherent errors in the input values to our test cases are to blame here.]][0eps][0eps]]
 [[sinh][2eps][0eps][0eps]]
 [[tanh][1eps][0eps][0eps]]
 [[pow][0eps][4eps][3eps]]
