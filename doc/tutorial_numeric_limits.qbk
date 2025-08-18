@@ -118,7 +118,7 @@ store a [*fixed precision], so half cents or pennies (or less) cannot be stored.
 The results of computations are rounded up or down,
 just like the result of integer division stored as an integer result.
 
-There is a number of proposals to
+There are various proposals to
 [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3407.html
 add Decimal floating-point Support to C++].
 
