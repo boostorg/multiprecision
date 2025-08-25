@@ -21,15 +21,15 @@ template <typename Real>
 constexpr Real fma_impl(const Real x, const Real y, const Real z) noexcept
 {
    #if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
-   BOOST_IF_CONSTEXPR (std::is_same_v<Real, float>)
+   BOOST_IF_CONSTEXPR (std::is_same<Real, float>::value)
    {
       return __builtin_fmaf(x, y, z);
    }
-   else BOOST_IF_CONSTEXPR (std::is_same_v<Real, double>)
+   else BOOST_IF_CONSTEXPR (std::is_same<Real, double>::value)
    {
       return __builtin_fma(x, y, z);
    }
-   else BOOST_IF_CONSTEXPR (std::is_same_v<Real, long double>)
+   else BOOST_IF_CONSTEXPR (std::is_same<Real, long double>::value)
    {
       return __builtin_fmal(x, y, z);
    }
