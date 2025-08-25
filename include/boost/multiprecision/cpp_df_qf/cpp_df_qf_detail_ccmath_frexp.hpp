@@ -13,16 +13,50 @@
 
 namespace boost { namespace multiprecision { namespace backends { namespace cpp_df_qf_detail { namespace ccmath {
 
-namespace detail
-{
+namespace unsafe {
 
-template <class T>
-constexpr auto frexp_impl(T arg, int* expptr) -> T
-{
-   // Default to the regular frexp function.
-   using std::frexp;
+namespace detail {
 
-   return frexp(arg, expptr);
+template <class Real>
+constexpr auto frexp_impl(Real arg, int* expptr) noexcept -> Real
+{
+   const bool negative_arg { (arg < static_cast<Real>(0)) };
+
+   Real f { negative_arg ? -arg : arg };
+
+   int e2 { };
+
+   constexpr Real two_pow_16_plus { static_cast<Real>(INT32_C(0x10000)) };
+
+   while (f >= two_pow_16_plus)
+   {
+      f = f / two_pow_16_plus;
+      e2 += 16;
+   }
+
+   constexpr Real two_pow_16_minus { static_cast<Real>(0.0000152587890625L) };
+
+   while (f <= two_pow_16_minus)
+   {
+      f = f * two_pow_16_plus;
+      e2 -= 16;
+   }
+
+   while(f >= static_cast<Real>(INT8_C(1)))
+   {
+      f = f / static_cast<Real>(INT8_C(2));
+      ++e2;
+   }
+
+   while(f < static_cast<Real>(0.5L))
+   {
+      f = f * static_cast<Real>(INT8_C(2));
+      --e2;
+   }
+
+   *expptr = e2;
+
+   return ((!negative_arg) ? f : -f);
 }
 
 } // namespace detail
@@ -30,8 +64,29 @@ constexpr auto frexp_impl(T arg, int* expptr) -> T
 template <typename Real>
 constexpr auto frexp(Real arg, int* expptr) -> Real
 {
-   return detail::frexp_impl(arg, expptr);
+   if (BOOST_MP_IS_CONST_EVALUATED(arg))
+   {
+      if (arg == static_cast<Real>(0))
+      {
+         *expptr = 0;
+
+         return arg;
+      }
+      else
+      {
+         return detail::frexp_impl(arg, expptr);
+      }
+   }
+   else
+   {
+      // Default to the regular frexp function.
+      using std::frexp;
+
+      return frexp(arg, expptr);
+   }
 }
+
+} // namespace unsafe
 
 } } } } } // namespace boost::multiprecision::backends::cpp_df_qf_detail::ccmath
 
