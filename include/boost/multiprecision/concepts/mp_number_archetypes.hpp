@@ -214,7 +214,8 @@ inline int eval_fpclassify(const number_backend_float_architype& arg)
 
 inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const number_backend_float_architype& v)
 {
-   std::hash<long double> hasher;
+   std::hash<long double> hasher { };
+
    return hasher(v.m_value);
 }
 
