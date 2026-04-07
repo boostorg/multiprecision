@@ -1384,7 +1384,7 @@ inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
 }
 
 template <unsigned Digits10>
-inline std::size_t hash_value(const gmp_float<Digits10>& val)
+constexpr std::size_t hash_value(const gmp_float<Digits10>& val)
 {
    std::size_t result = 0;
    for (int i = 0; i < std::abs(val.data()[0]._mp_size); ++i)
@@ -2353,7 +2353,7 @@ eval_powm(gmp_int& result, const gmp_int& base, Integer p, const gmp_int& m)
    mpz_powm_ui(result.data(), base.data(), p, m.data());
 }
 
-inline std::size_t hash_value(const gmp_int& val)
+constexpr std::size_t hash_value(const gmp_int& val)
 {
    // We should really use mpz_limbs_read here, but that's unsupported on older versions:
    std::size_t result = 0;
@@ -3131,7 +3131,7 @@ void assign_components(gmp_rational& result, const T& a, const gmp_int& b)
 }
 
 
-inline std::size_t hash_value(const gmp_rational& val)
+constexpr std::size_t hash_value(const gmp_rational& val)
 {
    std::size_t result = 0;
    for (int i = 0; i < std::abs(val.data()[0]._mp_num._mp_size); ++i)

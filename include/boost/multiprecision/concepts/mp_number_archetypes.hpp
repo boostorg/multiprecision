@@ -212,7 +212,7 @@ inline int eval_fpclassify(const number_backend_float_architype& arg)
    return BOOST_MP_FPCLASSIFY(arg.m_value);
 }
 
-inline std::size_t hash_value(const number_backend_float_architype& v)
+constexpr std::size_t hash_value(const number_backend_float_architype& v)
 {
    std::hash<long double> hasher;
    return hasher(v.m_value);

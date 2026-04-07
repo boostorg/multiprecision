@@ -2364,7 +2364,7 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void swap(number<Backend, Expressi
 // Boost.Hash support, just call hash_value for the backend, which may or may not be supported:
 //
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const number<Backend, ExpressionTemplates>& val)
+constexpr std::size_t hash_value(const number<Backend, ExpressionTemplates>& val)
 {
    return hash_value(val.backend());
 }
@@ -2443,7 +2443,7 @@ inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<T, ExpressionTemplates> d
 }
 
 template <class T, multiprecision::expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const rational<multiprecision::number<T, ExpressionTemplates> >& val)
+constexpr std::size_t hash_value(const rational<multiprecision::number<T, ExpressionTemplates> >& val)
 {
    std::size_t result = hash_value(val.numerator());
    boost::multiprecision::detail::hash_combine(result, hash_value(val.denominator()));
@@ -2471,12 +2471,12 @@ namespace std {
 template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct hash<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
-   BOOST_MP_CXX14_CONSTEXPR std::size_t operator()(const boost::multiprecision::number<Backend, ExpressionTemplates>& val) const { return hash_value(val); }
+   constexpr std::size_t operator()(const boost::multiprecision::number<Backend, ExpressionTemplates>& val) const { return hash_value(val); }
 };
 template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct hash<boost::rational<boost::multiprecision::number<Backend, ExpressionTemplates> > >
 {
-   BOOST_MP_CXX14_CONSTEXPR std::size_t operator()(const boost::rational<boost::multiprecision::number<Backend, ExpressionTemplates> >& val) const
+   constexpr std::size_t operator()(const boost::rational<boost::multiprecision::number<Backend, ExpressionTemplates> >& val) const
    {
       std::size_t result = hash_value(val.numerator());
       boost::multiprecision::detail::hash_combine(result, hash_value(val.denominator()));

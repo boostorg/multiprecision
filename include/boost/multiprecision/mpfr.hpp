@@ -1979,7 +1979,7 @@ inline int eval_signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const mpfr_float_backen
 }
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
-inline std::size_t hash_value(const mpfr_float_backend<Digits10, AllocateType>& val)
+constexpr std::size_t hash_value(const mpfr_float_backend<Digits10, AllocateType>& val)
 {
    std::size_t result = 0;
    std::size_t len    = val.data()[0]._mpfr_prec / mp_bits_per_limb;

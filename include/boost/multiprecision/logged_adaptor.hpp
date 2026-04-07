@@ -645,7 +645,7 @@ int eval_signbit(const logged_adaptor<Backend>& val)
 }
 
 template <class Backend>
-std::size_t hash_value(const logged_adaptor<Backend>& val)
+constexpr std::size_t hash_value(const logged_adaptor<Backend>& val)
 {
    return hash_value(val.value());
 }

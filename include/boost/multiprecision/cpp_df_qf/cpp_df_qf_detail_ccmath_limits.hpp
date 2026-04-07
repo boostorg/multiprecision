@@ -180,7 +180,9 @@ public:
    static constexpr auto epsilon() -> self_type
    {
      // This double value has only one bit set and so is exact.
-     return 1.92592994438723585305597794258492732e-34;
+     // N[2^-112, 84]
+
+     return 1.92592994438723585305597794258492731853810164821538819523993879556655883789062500000e-34;
    }
 
    static constexpr auto round_error() noexcept -> self_type { return static_cast<self_type>(0.5F); }

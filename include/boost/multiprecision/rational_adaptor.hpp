@@ -417,7 +417,7 @@ inline typename std::enable_if<number_category<R>::value == number_kind_integer>
 // Hashing support, not strictly required, but it is used in our tests:
 //
 template <class Backend>
-inline std::size_t hash_value(const rational_adaptor<Backend>& arg)
+constexpr std::size_t hash_value(const rational_adaptor<Backend>& arg)
 {
    std::size_t result = hash_value(arg.num());
    std::size_t result2 = hash_value(arg.denom());

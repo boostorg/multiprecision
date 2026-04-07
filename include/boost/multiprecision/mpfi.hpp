@@ -1310,7 +1310,7 @@ inline void eval_log2(mpfi_float_backend<Digits10>& result, const mpfi_float_bac
 }
 
 template <unsigned Digits10>
-inline std::size_t hash_value(const mpfi_float_backend<Digits10>& val)
+constexpr std::size_t hash_value(const mpfi_float_backend<Digits10>& val)
 {
    std::size_t result = 0;
    std::size_t len    = val.left_data()[0]._mpfr_prec / mp_bits_per_limb;

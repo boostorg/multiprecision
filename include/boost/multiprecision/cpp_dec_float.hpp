@@ -3632,7 +3632,7 @@ inline int eval_signbit(const cpp_dec_float<Digits10, ExponentType, Allocator>& 
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-inline std::size_t hash_value(const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
+constexpr std::size_t hash_value(const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
 {
    return val.hash();
 }

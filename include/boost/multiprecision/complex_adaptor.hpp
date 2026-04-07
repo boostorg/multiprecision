@@ -983,7 +983,7 @@ inline void eval_set_real(complex_adaptor<Backend>& result, const T& arg)
 }
 
 template <class Backend>
-inline std::size_t hash_value(const complex_adaptor<Backend>& val)
+constexpr std::size_t hash_value(const complex_adaptor<Backend>& val)
 {
    std::size_t result  = hash_value(val.real_data());
    std::size_t result2 = hash_value(val.imag_data());

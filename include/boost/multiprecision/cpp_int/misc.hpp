@@ -1406,7 +1406,7 @@ eval_msb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
 }
 
 template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
-inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& val) noexcept
+constexpr std::size_t hash_value(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& val) noexcept
 {
    std::size_t result = 0;
    for (std::size_t i = 0; i < val.size(); ++i)

@@ -899,7 +899,7 @@ inline typename std::enable_if<boost::multiprecision::detail::is_signed<Integer>
    return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
 
-inline std::size_t hash_value(const tommath_int& val)
+constexpr std::size_t hash_value(const tommath_int& val)
 {
    std::size_t result = 0;
    std::size_t len    = val.data().used;

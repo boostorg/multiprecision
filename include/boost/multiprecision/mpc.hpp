@@ -1650,7 +1650,7 @@ inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const long long
 #endif
 
 template <unsigned Digits10>
-inline std::size_t hash_value(const mpc_complex_backend<Digits10>& val)
+constexpr std::size_t hash_value(const mpc_complex_backend<Digits10>& val)
 {
    std::size_t result = 0;
    std::size_t len    = val.data()[0].re[0]._mpfr_prec / mp_bits_per_limb;
