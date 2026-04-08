@@ -112,9 +112,11 @@ namespace detail {
       typename std::allocator_traits<Allocator>::pointer ptr = alloc.allocate(n);
 
 #     if !defined(BOOST_MP_NO_CONSTEXPR_DETECTION) && defined(BOOST_MP_HAS_CONSTEXPR_DYNAMIC_ALLOC)
-      if (BOOST_MP_IS_CONST_EVALUATED(n))
+      if (BOOST_MP_IS_CONST_EVALUATED(n)) 
+      {
          for (std::size_t i = 0; i < n; ++i)
             std::construct_at(ptr + i);
+      }
 #     endif
 
       return ptr;
@@ -125,9 +127,11 @@ namespace detail {
    void constexpr_deallocate_trivially_destructible(Allocator& alloc, typename std::allocator_traits<Allocator>::pointer data, std::size_t const n)
    {
 #     if !defined(BOOST_MP_NO_CONSTEXPR_DETECTION) && defined(BOOST_MP_HAS_CONSTEXPR_DYNAMIC_ALLOC)
-      if (BOOST_MP_IS_CONST_EVALUATED(n))
+      if (BOOST_MP_IS_CONST_EVALUATED(n)) 
+      {
          for (std::size_t i = 0; i < n; ++i)
             std::destroy_at(data + i);
+      }
 #     endif
 
       alloc.deallocate(data, n);
@@ -136,10 +140,12 @@ namespace detail {
    static BOOST_MP_CXX14_CONSTEXPR std::size_t constexpr_strlen(const char* str)
    {
 #     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-      if (BOOST_MP_IS_CONST_EVALUATED(str)) {
+      if (BOOST_MP_IS_CONST_EVALUATED(str)) 
+      {
          const char* end = str;
 
-         while (*end != '\0') {
+         while (*end != '\0') 
+         {
             end++;
          }
 
