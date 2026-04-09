@@ -441,7 +441,7 @@ inline int run_constexpr_cpp_int_tests()
     // limits
     static_assert(
       (std::numeric_limits<int_backend_512>::min)()
-      == int_backend_inf(
+      == int_backend_512(
         "-13407807929942597099574024998205846127479365820592393377723561443721764030073546"
         "976801874298166903427690031858186486050853753882811946569946433649006084095"
       )
@@ -449,7 +449,7 @@ inline int run_constexpr_cpp_int_tests()
 
     static_assert(
       (std::numeric_limits<int_backend_512>::min)()
-      == int_backend_inf(
+      == int_backend_512(
         "-0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
         "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
       )
@@ -457,7 +457,7 @@ inline int run_constexpr_cpp_int_tests()
 
     static_assert(
       (std::numeric_limits<int_backend_512>::min)()
-      == int_backend_inf(
+      == int_backend_512(
         "-03777777777777777777777777777777777777777777777777777777777777777777777777777777777777"
         "77777777777777777777777777777777777777777777777777777777777777777777777777777777777777"
       )
@@ -465,7 +465,7 @@ inline int run_constexpr_cpp_int_tests()
 
     static_assert(
       (std::numeric_limits<int_backend_512>::max)()
-      == int_backend_inf(
+      == int_backend_512(
         "13407807929942597099574024998205846127479365820592393377723561443721764030073546"
         "976801874298166903427690031858186486050853753882811946569946433649006084095"
       )
@@ -473,7 +473,7 @@ inline int run_constexpr_cpp_int_tests()
 
     static_assert(
       (std::numeric_limits<int_backend_512>::max)()
-      == int_backend_inf(
+      == int_backend_512(
         "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
         "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
       )
@@ -481,13 +481,14 @@ inline int run_constexpr_cpp_int_tests()
 
     static_assert(
       (std::numeric_limits<int_backend_512>::max)()
-      == int_backend_inf(
+      == int_backend_512(
         "03777777777777777777777777777777777777777777777777777777777777777777777777777777777777"
         "77777777777777777777777777777777777777777777777777777777777777777777777777777777777777"
       )
     );
   }
-   return boost::report_errors();
+
+  return boost::report_errors();
 }
 #else
 inline int run_constexpr_cpp_int_tests(){}
