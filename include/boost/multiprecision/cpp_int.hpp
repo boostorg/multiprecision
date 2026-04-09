@@ -71,8 +71,10 @@ namespace detail {
 #     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
       if (BOOST_MP_IS_CONST_EVALUATED(n))
       {
+         // LCOV_EXCL_START
          for (std::size_t i = 0; i < n; ++i)
             dest[i] = src[i];
+         // LCOV_EXCL_STOP
       }
       else
 #     endif
@@ -89,8 +91,10 @@ namespace detail {
 #     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
       if (BOOST_MP_IS_CONST_EVALUATED(n))
       {
+         // LCOV_EXCL_START
          for (std::size_t i = 0; i < n; ++i)
             dest[i] = 0;
+         // LCOV_EXCL_STOP
       }
       else
 #     endif
@@ -108,10 +112,12 @@ namespace detail {
       typename std::allocator_traits<Allocator>::pointer ptr = alloc.allocate(n);
 
 #     if !defined(BOOST_MP_NO_CONSTEXPR_DETECTION) && defined(BOOST_MP_HAS_CONSTEXPR_DYNAMIC_ALLOC)
-      if (BOOST_MP_IS_CONST_EVALUATED(n)) 
+      if (BOOST_MP_IS_CONST_EVALUATED(n))
       {
+         // LCOV_EXCL_START
          for (std::size_t i = 0; i < n; ++i)
             std::construct_at(ptr + i);
+         // LCOV_EXCL_STOP
       }
 #     endif
 
@@ -123,10 +129,12 @@ namespace detail {
    void constexpr_deallocate_trivially_destructible(Allocator& alloc, typename std::allocator_traits<Allocator>::pointer data, std::size_t const n)
    {
 #     if !defined(BOOST_MP_NO_CONSTEXPR_DETECTION) && defined(BOOST_MP_HAS_CONSTEXPR_DYNAMIC_ALLOC)
-      if (BOOST_MP_IS_CONST_EVALUATED(n)) 
+      if (BOOST_MP_IS_CONST_EVALUATED(n))
       {
+         // LCOV_EXCL_START
          for (std::size_t i = 0; i < n; ++i)
             std::destroy_at(data + i);
+         // LCOV_EXCL_STOP
       }
 #     endif
 
@@ -136,16 +144,18 @@ namespace detail {
    static BOOST_MP_CXX14_CONSTEXPR std::size_t constexpr_strlen(const char* str)
    {
 #     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-      if (BOOST_MP_IS_CONST_EVALUATED(str)) 
+      if (BOOST_MP_IS_CONST_EVALUATED(str))
       {
+         // LCOV_EXCL_START
          const char* end = str;
 
-         while (*end != '\0') 
+         while (*end != '\0')
          {
             end++;
          }
 
          return end - str;
+         // LCOV_EXCL_STOP
       }
 #     endif
 
@@ -687,8 +697,10 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
          if (BOOST_MP_IS_CONST_EVALUATED(m_double_first_limb))
          {
+            // LCOV_EXCL_START
             data_type t(static_cast<limb_type>(i & max_limb_value), static_cast<limb_type>(i >> limb_bits));
             *this = t;
+            // LCOV_EXCL_STOP
          }
 #endif
       }
@@ -872,8 +884,10 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
          if (BOOST_MP_IS_CONST_EVALUATED(m_double_first_limb))
          {
+            // LCOV_EXCL_START
             data_type t(static_cast<limb_type>(i & max_limb_value), static_cast<limb_type>(i >> limb_bits));
             *this = t;
+            // LCOV_EXCL_STOP
          }
 #endif
       }
