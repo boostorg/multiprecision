@@ -231,7 +231,7 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_inf(int_backend_64(12345678)) == 12345678);
     static_assert(int_backend_inf(int_backend_128(12345678)) == 12345678);
     static_assert(int_backend_inf(int_backend_256(12345678)) == 12345678);
-    static_assert(int_backend_inf(int_backend_inf(12345678)) == 12345678);
+    static_assert(int_backend_inf(int_backend_512(12345678)) == 12345678);
     static_assert(int_backend_inf(int_backend_inf(12345678)) == 12345678);
     static_assert(int_backend_inf(int_backend_inf_et(12345678)) == 12345678);
     static_assert(int_backend_inf(boost::multiprecision::uint1024_t(12345678)) == 12345678);
@@ -242,7 +242,7 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_inf_et(int_backend_64(12345678)) == 12345678);
     static_assert(int_backend_inf_et(int_backend_128(12345678)) == 12345678);
     static_assert(int_backend_inf_et(int_backend_256(12345678)) == 12345678);
-    static_assert(int_backend_inf_et(int_backend_inf(12345678)) == 12345678);
+    static_assert(int_backend_inf_et(int_backend_512(12345678)) == 12345678);
     static_assert(int_backend_inf_et(int_backend_inf(12345678)) == 12345678);
     static_assert(int_backend_inf_et(int_backend_inf_et(12345678)) == 12345678);
     static_assert(int_backend_inf_et(boost::multiprecision::uint1024_t(12345678)) == 12345678);
