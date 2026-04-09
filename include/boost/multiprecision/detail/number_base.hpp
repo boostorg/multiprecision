@@ -103,7 +103,8 @@
 #endif
 
 #if defined(__cpp_constexpr_dynamic_alloc) && __cpp_constexpr_dynamic_alloc >= 201907L \
-   && defined(__cpp_lib_constexpr_dynamic_alloc) && __cpp_lib_constexpr_dynamic_alloc >= 201907L
+   && defined(__cpp_lib_constexpr_dynamic_alloc) && __cpp_lib_constexpr_dynamic_alloc >= 201907L \
+   && !defined(BOOST_NO_CXX20_CONSTEXPR) && !defined(BOOST_MP_NO_CXX20_DYNAMIC_ALLOC_CONSTEXPR)
 #  undef BOOST_MP_HAS_CONSTEXPR_DYNAMIC_ALLOC
 #  define BOOST_MP_HAS_CONSTEXPR_DYNAMIC_ALLOC
 
