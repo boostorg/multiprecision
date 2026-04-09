@@ -65,23 +65,19 @@ namespace detail {
       static constexpr std::size_t value = (Value1 > Value2) ? Value1 : Value2;
    };
 
-   template <class DestT, class SrcT>
-   static BOOST_MP_CXX14_CONSTEXPR DestT* constexpr_copy(DestT* dest, const SrcT* src, std::size_t n)
+   template <class ValT>
+   static BOOST_MP_CXX14_CONSTEXPR ValT* constexpr_copy(ValT* dest, const ValT* src, std::size_t n)
    {
-      bool use_loop = !std::is_same<DestT, SrcT>::value;
-
 #     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-      use_loop = use_loop || BOOST_MP_IS_CONST_EVALUATED(n);
-#     endif
-
-      if (use_loop)
+      if (BOOST_MP_IS_CONST_EVALUATED(n))
       {
          for (std::size_t i = 0; i < n; ++i)
             dest[i] = src[i];
       }
       else
+#     endif
       {
-         std::memcpy(dest, src, n * sizeof(DestT));
+         std::memcpy(dest, src, n * sizeof(ValT));
       }
 
       return dest + n;
