@@ -327,26 +327,48 @@ private:
    {
       limb_data        ld;
       limb_type        la[internal_limb_count];
+      double_limb_type double_first;
 
-      constexpr data_type() noexcept : la{0} {}
-      constexpr data_type(limb_type i) noexcept : la{i} {}
-      constexpr data_type(signed_limb_type i) noexcept : data_type(static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i))) {}
+      constexpr data_type() noexcept 
+         : la{0} 
+      {}
+      constexpr data_type(limb_type i) noexcept 
+         : la{i} 
+      {}
+      constexpr data_type(signed_limb_type i) noexcept 
+         : data_type(static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i))) 
+      {}
 #if BOOST_MP_ENDIAN_LITTLE_BYTE
-      constexpr data_type(double_limb_type i) noexcept : la{}
+# ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+      constexpr data_type(limb_type i, limb_type j) : la{i, j} 
+      {}
+# endif
+      constexpr data_type(double_limb_type i) noexcept 
+         : double_first(i)
       {
-         for (std::size_t limb_idx = 0; limb_idx < double_limb_type_limb_capacity; ++limb_idx, i >>= limb_bits)
-            la[limb_idx] = static_cast<limb_type>(i & max_limb_value);
+# ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+         if (BOOST_MP_IS_CONST_EVALUATED(double_first))
+         {
+            // LCOV_EXCL_START
+            data_type t(static_cast<limb_type>(i & max_limb_value), static_cast<limb_type>(i >> limb_bits));
+            *this = t;
+            // LCOV_EXCL_STOP
+         }
+# endif
       }
-      constexpr data_type(signed_double_limb_type i) noexcept : data_type(static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i))) {}
+      constexpr data_type(signed_double_limb_type i) noexcept 
+         : data_type(static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i))) 
+      {}
 #endif
 #if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) && !(defined(BOOST_MSVC) && (BOOST_MSVC < 1900))
-      constexpr data_type(limb_type* limbs, std::size_t len) noexcept : ld{len, limbs}
+      constexpr data_type(limb_type* limbs, std::size_t len) noexcept 
+         : ld{len, limbs}
       {}
 #else
       constexpr data_type(limb_type* limbs, std::size_t len) noexcept
       {
          ld.capacity = len;
-         ld.data     = limbs;
+         ld.data = limbs;
       }
 #endif
    };
