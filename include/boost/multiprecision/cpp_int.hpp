@@ -557,7 +557,7 @@ private:
    }
    BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR cpp_int_base& operator=(cpp_int_base&& o) noexcept
    {
-      if (static_cast<const void*>(this) != static_cast<const void*>(&o))
+      if (this != &o)
       {
          if (!m_internal && !m_alias)
             detail::constexpr_deallocate_trivially_destructible(allocator(), m_data.ld.data, m_data.ld.capacity);
@@ -582,27 +582,25 @@ private:
    template <std::size_t MinBits2, std::size_t MaxBits2, cpp_int_check_type Checked2>
    BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR cpp_int_base& operator=(cpp_int_base<MinBits2, MaxBits2, signed_magnitude, Checked2, Allocator>&& o) noexcept
    {
-      if (static_cast<const void*>(this) != static_cast<const void*>(&o))
+      // `&o` will never be the same as `this` because they are of different types and same types are handled by another overload
+      if(o.m_internal)
       {
-         if(o.m_internal)
-         {
-            m_sign = o.m_sign;
-            this->resize(o.size(), o.size());
-            detail::constexpr_copy(this->limbs(), o.limbs(), o.size());
-            return *this;
-         }
-         if (!m_internal && !m_alias)
-            detail::constexpr_deallocate_trivially_destructible(allocator(), m_data.ld.data, m_data.ld.capacity);
-         *static_cast<base_type*>(this) = static_cast<typename cpp_int_base<MinBits2, MaxBits2, signed_magnitude, Checked2, Allocator>::base_type&&>(o);
-         m_limbs                        = o.m_limbs;
-         m_sign                         = o.m_sign;
-         m_internal                     = o.m_internal;
-         m_alias                        = o.m_alias;
-         m_data.ld.capacity             = o.m_data.ld.capacity;
-         m_data.ld.data                 = o.limbs();
-         o.m_limbs                      = 0;
-         o.m_internal                   = true;
+         m_sign = o.m_sign;
+         this->resize(o.size(), o.size());
+         detail::constexpr_copy(this->limbs(), o.limbs(), o.size());
+         return *this;
       }
+      if (!m_internal && !m_alias)
+         detail::constexpr_deallocate_trivially_destructible(allocator(), m_data.ld.data, m_data.ld.capacity);
+      *static_cast<base_type*>(this) = static_cast<typename cpp_int_base<MinBits2, MaxBits2, signed_magnitude, Checked2, Allocator>::base_type&&>(o);
+      m_limbs                        = o.m_limbs;
+      m_sign                         = o.m_sign;
+      m_internal                     = o.m_internal;
+      m_alias                        = o.m_alias;
+      m_data.ld.capacity             = o.m_data.ld.capacity;
+      m_data.ld.data                 = o.limbs();
+      o.m_limbs                      = 0;
+      o.m_internal                   = true;
       return *this;
    }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR ~cpp_int_base() noexcept
@@ -612,7 +610,7 @@ private:
    }
    BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR void assign(const cpp_int_base& o)
    {
-      if (static_cast<const void*>(this) != static_cast<const void*>(&o))
+      if (this != &o)
       {
          static_cast<base_type&>(*this) = static_cast<const base_type&>(o);
          m_limbs                        = 0;
@@ -814,7 +812,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
 
    void BOOST_MP_CXX14_CONSTEXPR assign(const cpp_int_base& o) noexcept
    {
-      if (static_cast<const void*>(this) != static_cast<const void*>(&o))
+      if (this != &o)
       {
          m_limbs = o.m_limbs;
          detail::constexpr_copy(limbs(), o.limbs(), o.size());
@@ -1002,7 +1000,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
 
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void assign(const cpp_int_base& o) noexcept
    {
-      if (static_cast<const void*>(this) != static_cast<const void*>(&o))
+      if (this != &o)
       {
          m_limbs = o.m_limbs;
          detail::constexpr_copy(limbs(), o.limbs(), o.size());
