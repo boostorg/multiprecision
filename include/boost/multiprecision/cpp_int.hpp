@@ -66,7 +66,7 @@ namespace detail {
    };
 
    template <class ValT>
-   static BOOST_MP_CXX14_CONSTEXPR ValT* constexpr_copy(ValT* dest, const ValT* src, std::size_t n)
+   static inline BOOST_MP_CXX14_CONSTEXPR ValT* constexpr_copy(ValT* dest, const ValT* src, std::size_t n)
    {
 #     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
       if (BOOST_MP_IS_CONST_EVALUATED(n))
@@ -85,8 +85,8 @@ namespace detail {
       return dest + n;
    }
 
-   template <class DestT>
-   static BOOST_MP_CXX14_CONSTEXPR DestT* constexpr_zero_trivial(DestT* dest, std::size_t n)
+   template <class ValT>
+   static inline BOOST_MP_CXX14_CONSTEXPR ValT* constexpr_zero_trivial(ValT* dest, std::size_t n)
    {
 #     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
       if (BOOST_MP_IS_CONST_EVALUATED(n))
@@ -99,14 +99,14 @@ namespace detail {
       else
 #     endif
       {
-         std::memset(static_cast<void*>(dest), 0, n * sizeof(DestT));
+         std::memset(static_cast<void*>(dest), 0, n * sizeof(ValT));
       }
 
       return dest + n;
    }
 
    template <class Allocator>
-   static BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR
+   static inline BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR
    typename std::allocator_traits<Allocator>::pointer constexpr_allocate_default_constructible(Allocator& alloc, std::size_t const n)
    {
       typename std::allocator_traits<Allocator>::pointer ptr = alloc.allocate(n);
@@ -125,7 +125,7 @@ namespace detail {
    }
 
    template <class Allocator>
-   static BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR
+   static inline BOOST_MP_CXX20_DYNAMIC_ALLOC_CONSTEXPR
    void constexpr_deallocate_trivially_destructible(Allocator& alloc, typename std::allocator_traits<Allocator>::pointer data, std::size_t const n)
    {
 #     if !defined(BOOST_MP_NO_CONSTEXPR_DETECTION) && defined(BOOST_MP_HAS_CONSTEXPR_DYNAMIC_ALLOC)
@@ -141,7 +141,7 @@ namespace detail {
       alloc.deallocate(data, n);
    }
 
-   static BOOST_MP_CXX14_CONSTEXPR std::size_t constexpr_strlen(const char* str)
+   static inline BOOST_MP_CXX14_CONSTEXPR std::size_t constexpr_strlen(const char* str)
    {
 #     ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
       if (BOOST_MP_IS_CONST_EVALUATED(str))
