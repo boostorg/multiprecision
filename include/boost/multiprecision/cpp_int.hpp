@@ -699,7 +699,6 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    union data_type
    {
       limb_type        m_data[internal_limb_count];
-      limb_type        m_first_limb;
       double_limb_type m_double_first_limb;
 
       constexpr data_type()
@@ -886,7 +885,6 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    union data_type
    {
       limb_type        m_data[internal_limb_count];
-      limb_type        m_first_limb;
       double_limb_type m_double_first_limb;
 
       constexpr data_type()
