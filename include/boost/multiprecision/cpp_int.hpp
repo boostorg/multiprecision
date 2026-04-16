@@ -676,7 +676,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    using const_limb_pointer = const limb_type*  ;
    using checked_type = std::integral_constant<int, Checked>;
 
-   struct scoped_shared_storage 
+   struct scoped_shared_storage
    {
       BOOST_MP_CXX14_CONSTEXPR  scoped_shared_storage(const cpp_int_base&, std::size_t) {}
       BOOST_MP_CXX14_CONSTEXPR void deallocate(std::size_t) {}
@@ -863,7 +863,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    using const_limb_pointer = const limb_type*  ;
    using checked_type = std::integral_constant<int, Checked>;
 
-   struct scoped_shared_storage 
+   struct scoped_shared_storage
    {
       BOOST_MP_CXX14_CONSTEXPR scoped_shared_storage(const cpp_int_base&, std::size_t) {}
       BOOST_MP_CXX14_CONSTEXPR void deallocate(std::size_t) {}
@@ -1083,7 +1083,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    using const_limb_pointer = const local_limb_type*;
    using checked_type = std::integral_constant<int, Checked>;
 
-   struct scoped_shared_storage 
+   struct scoped_shared_storage
    {
       BOOST_MP_CXX14_CONSTEXPR      scoped_shared_storage(const cpp_int_base&, std::size_t) {}
       BOOST_MP_CXX14_CONSTEXPR void deallocate(std::size_t) {}
@@ -1161,7 +1161,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
        : m_data(static_cast<local_limb_type>(i < 0 ? -i : i) & limb_mask), m_sign(i < 0) { check_in_range(i); }
 #else
    //
-   // conversion from float to __int128 is broken on clang/mingw, 
+   // conversion from float to __int128 is broken on clang/mingw,
    // see: https://bugs.llvm.org/show_bug.cgi?id=48940
    // Since no floating point type has more than 64 bits of
    // precision, we can simply cast to an intermediate type to
@@ -1265,7 +1265,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    using limb_pointer = local_limb_type*                         ;
    using const_limb_pointer = const local_limb_type*                   ;
 
-   struct scoped_shared_storage 
+   struct scoped_shared_storage
    {
       BOOST_MP_CXX14_CONSTEXPR      scoped_shared_storage(const cpp_int_base&, std::size_t) {}
       BOOST_MP_CXX14_CONSTEXPR void deallocate(std::size_t) {}
@@ -1392,7 +1392,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
       local_limb_type c = m_data;
       m_data &= limb_mask;
       //
-      // Verification has to come afterwards, otherwise we can leave 
+      // Verification has to come afterwards, otherwise we can leave
       // ourselves in an invalid state:
       //
       detail::verify_limb_mask(true, c, limb_mask, checked_type());
@@ -1628,7 +1628,7 @@ struct cpp_int_backend
    template <class A>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
          boost::multiprecision::detail::is_unsigned<A>::value
-         && trivial_tag::value, cpp_int_backend&>::type 
+         && trivial_tag::value, cpp_int_backend&>::type
       operator=(const A& val)
          noexcept(noexcept(std::declval<cpp_int_backend>().check_in_range(std::declval<A>())))
    {
@@ -1653,9 +1653,9 @@ struct cpp_int_backend
    }
    template <class A>
    BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-         std::is_convertible<A, limb_type>::value 
+         std::is_convertible<A, limb_type>::value
          && !boost::multiprecision::detail::is_integral<A>::value
-         && trivial_tag::value, cpp_int_backend&>::type 
+         && trivial_tag::value, cpp_int_backend&>::type
       operator=(const A& val)
    {
       this->check_in_range(val);
