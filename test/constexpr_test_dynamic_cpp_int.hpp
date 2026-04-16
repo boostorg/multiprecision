@@ -5,7 +5,8 @@
 
 #include <cstdint>
 #include <limits>
-#include "boost/multiprecision/cpp_int.hpp"
+#include <boost/config.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #include "test.hpp"
 
 
@@ -13,8 +14,6 @@
   && !defined(DISABLE_TESTS) \
   && defined(BOOST_MP_HAS_CONSTEXPR_DYNAMIC_ALLOC)
 
-// some operations fail with "Member call on variable whose lifetime has ended"
-// when using boost::multiprecision::et_on
 typedef boost::multiprecision::number<
   boost::multiprecision::cpp_int_backend<0, 32>,
   boost::multiprecision::et_off
@@ -49,6 +48,11 @@ typedef boost::multiprecision::number<
   boost::multiprecision::cpp_int_backend<0, 32>,
   boost::multiprecision::et_on
 > int_backend_32_et;
+
+typedef boost::multiprecision::number<
+  boost::multiprecision::cpp_int_backend<0, 512>,
+  boost::multiprecision::et_on
+> int_backend_512_et;
 
 typedef boost::multiprecision::number<
   boost::multiprecision::cpp_int_backend<>,
@@ -95,6 +99,9 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_256(u32_max) == u32_max);
     static_assert(int_backend_512(u32_max) == u32_max);
     static_assert(int_backend_inf(u32_max) == u32_max);
+    static_assert(int_backend_32_et(u32_max) == u32_max);
+    static_assert(int_backend_512_et(u32_max) == u32_max);
+    static_assert(int_backend_inf_et(u32_max) == u32_max);
 
     static_assert(int_backend_32(i32_min) == i32_min);
     static_assert(int_backend_64(i32_min) == i32_min);
@@ -102,6 +109,9 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_256(i32_min) == i32_min);
     static_assert(int_backend_512(i32_min) == i32_min);
     static_assert(int_backend_inf(i32_min) == i32_min);
+    static_assert(int_backend_32_et(i32_min) == i32_min);
+    static_assert(int_backend_512_et(i32_min) == i32_min);
+    static_assert(int_backend_inf_et(i32_min) == i32_min);
   }
   {
     // construction from floating point
@@ -111,12 +121,19 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_128(12345.12345) == 12345);
     static_assert(int_backend_256(12345.12345) == 12345);
     static_assert(int_backend_512(12345.12345) == 12345);
+    static_assert(int_backend_inf(12345.12345) == 12345);
+    static_assert(int_backend_32_et(12345.12345) == 12345);
+    static_assert(int_backend_512_et(12345.12345) == 12345);
+    static_assert(int_backend_inf_et(12345.12345) == 12345);
 
     static_assert(int_backend_32(-12345.12345) == -12345);
     static_assert(int_backend_64(-12345.12345) == -12345);
     static_assert(int_backend_128(-12345.12345) == -12345);
     static_assert(int_backend_256(-12345.12345) == -12345);
     static_assert(int_backend_512(-12345.12345) == -12345);
+    static_assert(int_backend_32_et(-12345.12345) == -12345);
+    static_assert(int_backend_512_et(-12345.12345) == -12345);
+    static_assert(int_backend_inf_et(-12345.12345) == -12345);
 #   endif
   }
   {
@@ -163,6 +180,20 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_inf("0777") == 511);
     static_assert(int_backend_inf("-0777") == -511);
 
+    static_assert(int_backend_32_et("12345678") == 12345678);
+    static_assert(int_backend_32_et("-12345678") == -12345678);
+    static_assert(int_backend_32_et("0xb0057") == 720983);
+    static_assert(int_backend_32_et("-0xb0057") == -720983);
+    static_assert(int_backend_32_et("0777") == 511);
+    static_assert(int_backend_32_et("-0777") == -511);
+
+    static_assert(int_backend_512_et("12345678") == 12345678);
+    static_assert(int_backend_512_et("-12345678") == -12345678);
+    static_assert(int_backend_512_et("0xb0057") == 720983);
+    static_assert(int_backend_512_et("-0xb0057") == -720983);
+    static_assert(int_backend_512_et("0777") == 511);
+    static_assert(int_backend_512_et("-0777") == -511);
+
     static_assert(int_backend_inf_et("12345678") == 12345678);
     static_assert(int_backend_inf_et("-12345678") == -12345678);
     static_assert(int_backend_inf_et("0xb0057") == 720983);
@@ -178,6 +209,8 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_32(int_backend_256(12345678)) == 12345678);
     static_assert(int_backend_32(int_backend_512(12345678)) == 12345678);
     static_assert(int_backend_32(int_backend_inf(12345678)) == 12345678);
+    static_assert(int_backend_32(int_backend_32_et(12345678)) == 12345678);
+    static_assert(int_backend_32(int_backend_512_et(12345678)) == 12345678);
     static_assert(int_backend_32(int_backend_inf_et(12345678)) == 12345678);
     static_assert(int_backend_32(boost::multiprecision::uint1024_t(12345678)) == 12345678);
     static_assert(int_backend_32(boost::multiprecision::int1024_t(12345678)) == 12345678);
@@ -189,6 +222,8 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_64(int_backend_256(12345678)) == 12345678);
     static_assert(int_backend_64(int_backend_512(12345678)) == 12345678);
     static_assert(int_backend_64(int_backend_inf(12345678)) == 12345678);
+    static_assert(int_backend_64(int_backend_32_et(12345678)) == 12345678);
+    static_assert(int_backend_64(int_backend_512_et(12345678)) == 12345678);
     static_assert(int_backend_64(int_backend_inf_et(12345678)) == 12345678);
     static_assert(int_backend_64(boost::multiprecision::uint1024_t(12345678)) == 12345678);
     static_assert(int_backend_64(boost::multiprecision::int1024_t(12345678)) == 12345678);
@@ -200,6 +235,8 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_128(int_backend_256(12345678)) == 12345678);
     static_assert(int_backend_128(int_backend_512(12345678)) == 12345678);
     static_assert(int_backend_128(int_backend_inf(12345678)) == 12345678);
+    static_assert(int_backend_128(int_backend_32_et(12345678)) == 12345678);
+    static_assert(int_backend_128(int_backend_512_et(12345678)) == 12345678);
     static_assert(int_backend_128(int_backend_inf_et(12345678)) == 12345678);
     static_assert(int_backend_128(boost::multiprecision::uint1024_t(12345678)) == 12345678);
     static_assert(int_backend_128(boost::multiprecision::int1024_t(12345678)) == 12345678);
@@ -211,6 +248,8 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_256(int_backend_256(12345678)) == 12345678);
     static_assert(int_backend_256(int_backend_512(12345678)) == 12345678);
     static_assert(int_backend_256(int_backend_inf(12345678)) == 12345678);
+    static_assert(int_backend_256(int_backend_32_et(12345678)) == 12345678);
+    static_assert(int_backend_256(int_backend_512_et(12345678)) == 12345678);
     static_assert(int_backend_256(int_backend_inf_et(12345678)) == 12345678);
     static_assert(int_backend_256(boost::multiprecision::uint1024_t(12345678)) == 12345678);
     static_assert(int_backend_256(boost::multiprecision::int1024_t(12345678)) == 12345678);
@@ -222,6 +261,8 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_512(int_backend_256(12345678)) == 12345678);
     static_assert(int_backend_512(int_backend_512(12345678)) == 12345678);
     static_assert(int_backend_512(int_backend_inf(12345678)) == 12345678);
+    static_assert(int_backend_512(int_backend_32_et(12345678)) == 12345678);
+    static_assert(int_backend_512(int_backend_512_et(12345678)) == 12345678);
     static_assert(int_backend_512(int_backend_inf_et(12345678)) == 12345678);
     static_assert(int_backend_512(boost::multiprecision::uint1024_t(12345678)) == 12345678);
     static_assert(int_backend_512(boost::multiprecision::int1024_t(12345678)) == 12345678);
@@ -233,10 +274,38 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_inf(int_backend_256(12345678)) == 12345678);
     static_assert(int_backend_inf(int_backend_512(12345678)) == 12345678);
     static_assert(int_backend_inf(int_backend_inf(12345678)) == 12345678);
+    static_assert(int_backend_inf(int_backend_32_et(12345678)) == 12345678);
+    static_assert(int_backend_inf(int_backend_512_et(12345678)) == 12345678);
     static_assert(int_backend_inf(int_backend_inf_et(12345678)) == 12345678);
     static_assert(int_backend_inf(boost::multiprecision::uint1024_t(12345678)) == 12345678);
     static_assert(int_backend_inf(boost::multiprecision::int1024_t(12345678)) == 12345678);
     static_assert(int_backend_inf(boost::multiprecision::int1024_t(-12345678)) == -12345678);
+
+    static_assert(int_backend_32_et(int_backend_32(12345678)) == 12345678);
+    static_assert(int_backend_32_et(int_backend_64(12345678)) == 12345678);
+    static_assert(int_backend_32_et(int_backend_128(12345678)) == 12345678);
+    static_assert(int_backend_32_et(int_backend_256(12345678)) == 12345678);
+    static_assert(int_backend_32_et(int_backend_512(12345678)) == 12345678);
+    static_assert(int_backend_32_et(int_backend_inf(12345678)) == 12345678);
+    static_assert(int_backend_32_et(int_backend_32_et(12345678)) == 12345678);
+    static_assert(int_backend_32_et(int_backend_512_et(12345678)) == 12345678);
+    static_assert(int_backend_32_et(int_backend_inf_et(12345678)) == 12345678);
+    static_assert(int_backend_32_et(boost::multiprecision::uint1024_t(12345678)) == 12345678);
+    static_assert(int_backend_32_et(boost::multiprecision::int1024_t(12345678)) == 12345678);
+    static_assert(int_backend_32_et(boost::multiprecision::int1024_t(-12345678)) == -12345678);
+
+    static_assert(int_backend_512_et(int_backend_32(12345678)) == 12345678);
+    static_assert(int_backend_512_et(int_backend_64(12345678)) == 12345678);
+    static_assert(int_backend_512_et(int_backend_128(12345678)) == 12345678);
+    static_assert(int_backend_512_et(int_backend_256(12345678)) == 12345678);
+    static_assert(int_backend_512_et(int_backend_512(12345678)) == 12345678);
+    static_assert(int_backend_512_et(int_backend_inf(12345678)) == 12345678);
+    static_assert(int_backend_512_et(int_backend_32_et(12345678)) == 12345678);
+    static_assert(int_backend_512_et(int_backend_512_et(12345678)) == 12345678);
+    static_assert(int_backend_512_et(int_backend_inf_et(12345678)) == 12345678);
+    static_assert(int_backend_512_et(boost::multiprecision::uint1024_t(12345678)) == 12345678);
+    static_assert(int_backend_512_et(boost::multiprecision::int1024_t(12345678)) == 12345678);
+    static_assert(int_backend_512_et(boost::multiprecision::int1024_t(-12345678)) == -12345678);
 
     static_assert(int_backend_inf_et(int_backend_32(12345678)) == 12345678);
     static_assert(int_backend_inf_et(int_backend_64(12345678)) == 12345678);
@@ -244,6 +313,8 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(int_backend_inf_et(int_backend_256(12345678)) == 12345678);
     static_assert(int_backend_inf_et(int_backend_512(12345678)) == 12345678);
     static_assert(int_backend_inf_et(int_backend_inf(12345678)) == 12345678);
+    static_assert(int_backend_inf_et(int_backend_32_et(12345678)) == 12345678);
+    static_assert(int_backend_inf_et(int_backend_512_et(12345678)) == 12345678);
     static_assert(int_backend_inf_et(int_backend_inf_et(12345678)) == 12345678);
     static_assert(int_backend_inf_et(boost::multiprecision::uint1024_t(12345678)) == 12345678);
     static_assert(int_backend_inf_et(boost::multiprecision::int1024_t(12345678)) == 12345678);
@@ -257,6 +328,8 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(static_cast<std::uint32_t>(int_backend_256(12345678)) == 12345678U);
     static_assert(static_cast<std::uint32_t>(int_backend_512(12345678)) == 12345678U);
     static_assert(static_cast<std::uint32_t>(int_backend_inf(12345678)) == 12345678U);
+    static_assert(static_cast<std::uint32_t>(int_backend_32_et(12345678)) == 12345678U);
+    static_assert(static_cast<std::uint32_t>(int_backend_512_et(12345678)) == 12345678U);
     static_assert(static_cast<std::uint32_t>(int_backend_inf_et(12345678)) == 12345678U);
 
     static_assert(static_cast<std::int32_t>(int_backend_32(12345678)) == 12345678);
@@ -265,6 +338,8 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(static_cast<std::int32_t>(int_backend_256(12345678)) == 12345678);
     static_assert(static_cast<std::int32_t>(int_backend_512(12345678)) == 12345678);
     static_assert(static_cast<std::int32_t>(int_backend_inf(12345678)) == 12345678);
+    static_assert(static_cast<std::int32_t>(int_backend_32_et(12345678)) == 12345678);
+    static_assert(static_cast<std::int32_t>(int_backend_512_et(12345678)) == 12345678);
     static_assert(static_cast<std::int32_t>(int_backend_inf_et(12345678)) == 12345678);
 
     static_assert(static_cast<std::int32_t>(int_backend_32(-12345678)) == -12345678);
@@ -273,6 +348,8 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(static_cast<std::int32_t>(int_backend_256(-12345678)) == -12345678);
     static_assert(static_cast<std::int32_t>(int_backend_512(-12345678)) == -12345678);
     static_assert(static_cast<std::int32_t>(int_backend_inf(-12345678)) == -12345678);
+    static_assert(static_cast<std::int32_t>(int_backend_32_et(-12345678)) == -12345678);
+    static_assert(static_cast<std::int32_t>(int_backend_512_et(-12345678)) == -12345678);
     static_assert(static_cast<std::int32_t>(int_backend_inf_et(-12345678)) == -12345678);
   }
   {
@@ -284,6 +361,9 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(static_cast<double>(int_backend_256(12345678)) == 12345678.0);
     static_assert(static_cast<double>(int_backend_512(12345678)) == 12345678.0);
     static_assert(static_cast<double>(int_backend_inf(12345678)) == 12345678.0);
+    static_assert(static_cast<double>(int_backend_32_et(12345678)) == 12345678.0);
+    static_assert(static_cast<double>(int_backend_512_et(12345678)) == 12345678.0);
+    static_assert(static_cast<double>(int_backend_inf_et(12345678)) == 12345678.0);
 
     static_assert(static_cast<double>(int_backend_32(-12345678)) == -12345678.0);
     static_assert(static_cast<double>(int_backend_64(-12345678)) == -12345678.0);
@@ -291,106 +371,138 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(static_cast<double>(int_backend_256(-12345678)) == -12345678.0);
     static_assert(static_cast<double>(int_backend_512(-12345678)) == -12345678.0);
     static_assert(static_cast<double>(int_backend_inf(-12345678)) == -12345678.0);
+    static_assert(static_cast<double>(int_backend_32_et(-12345678)) == -12345678.0);
+    static_assert(static_cast<double>(int_backend_512_et(-12345678)) == -12345678.0);
+    static_assert(static_cast<double>(int_backend_inf_et(-12345678)) == -12345678.0);
 
     static_assert(static_cast<double>(int_backend_128("295147905179352825856")) == 295147905179352825856.0);
     static_assert(static_cast<double>(int_backend_256("295147905179352825856")) == 295147905179352825856.0);
     static_assert(static_cast<double>(int_backend_512("295147905179352825856")) == 295147905179352825856.0);
     static_assert(static_cast<double>(int_backend_inf("295147905179352825856")) == 295147905179352825856.0);
+    static_assert(static_cast<double>(int_backend_512_et("295147905179352825856")) == 295147905179352825856.0);
+    static_assert(static_cast<double>(int_backend_inf_et("295147905179352825856")) == 295147905179352825856.0);
 #   endif
   }
   {
     // bit functions
-    static_assert(boost::multiprecision::msb(int_backend_inf(1) << 500) == 500);
-    static_assert(boost::multiprecision::lsb(int_backend_inf(1) << 500) == 500);
-    static_assert(boost::multiprecision::bit_test(int_backend_inf(1) << 500, 500));
+    auto const test_bit_functions = [] <typename T> (T&&) constexpr noexcept {
+      static_assert(boost::multiprecision::msb(T(1) << 500) == 500);
+      static_assert(boost::multiprecision::lsb(T(1) << 500) == 500);
+      static_assert(boost::multiprecision::bit_test(T(1) << 500, 500));
 
-    static_assert(boost::multiprecision::msb(int_backend_inf_et(1) << 500) == 500);
-    static_assert(boost::multiprecision::lsb(int_backend_inf_et(1) << 500) == 500);
-    static_assert(boost::multiprecision::bit_test(int_backend_inf_et(1) << 500, 500));
+      static_assert(boost::multiprecision::msb(int_backend_inf_et(1) << 500) == 500);
+      static_assert(boost::multiprecision::lsb(int_backend_inf_et(1) << 500) == 500);
+      static_assert(boost::multiprecision::bit_test(int_backend_inf_et(1) << 500, 500));
 
-    static_assert([] () constexpr noexcept -> int_backend_inf {
-      int_backend_inf a = 0;
-      return boost::multiprecision::bit_set(a, 500);
-    }() == (int_backend_inf(1) << 500));
+      static_assert([] () constexpr noexcept -> T {
+        T a = 0;
+        return boost::multiprecision::bit_set(a, 500);
+      }() == (T(1) << 500));
 
-    static_assert([] () constexpr noexcept -> int_backend_inf {
-      int_backend_inf a = int_backend_inf(1) << 500;
-      return boost::multiprecision::bit_set(a, 500);
-    }() == (int_backend_inf(1) << 500));
+      static_assert([] () constexpr noexcept -> T {
+        T a = T(1) << 500;
+        return boost::multiprecision::bit_set(a, 500);
+      }() == (T(1) << 500));
 
-    static_assert([] () constexpr noexcept -> int_backend_inf {
-      int_backend_inf a = 0;
-      return boost::multiprecision::bit_unset(a, 500);
-    }() == 0);
+      static_assert([] () constexpr noexcept -> T {
+        T a = 0;
+        return boost::multiprecision::bit_unset(a, 500);
+      }() == 0);
 
-    static_assert([] () constexpr noexcept -> int_backend_inf {
-      int_backend_inf a = int_backend_inf(1) << 500;
-      return boost::multiprecision::bit_unset(a, 500);
-    }() == 0);
+      static_assert([] () constexpr noexcept -> T {
+        T a = T(1) << 500;
+        return boost::multiprecision::bit_unset(a, 500);
+      }() == 0);
 
-    static_assert([] () constexpr noexcept -> int_backend_inf {
-      int_backend_inf a = 0;
-      return boost::multiprecision::bit_flip(a, 500);
-    }() == (int_backend_inf(1) << 500));
+      static_assert([] () constexpr noexcept -> T {
+        T a = 0;
+        return boost::multiprecision::bit_flip(a, 500);
+      }() == (T(1) << 500));
 
-    static_assert([] () constexpr noexcept -> int_backend_inf {
-      int_backend_inf a = int_backend_inf(1) << 500;
-      return boost::multiprecision::bit_flip(a, 500);
-    }() == 0);
+      static_assert([] () constexpr noexcept -> T {
+        T a = T(1) << 500;
+        return boost::multiprecision::bit_flip(a, 500);
+      }() == 0);
+
+      return true;
+    };
+
+    static_assert(test_bit_functions(int_backend_512{}));
+    static_assert(test_bit_functions(int_backend_inf{}));
+    static_assert(test_bit_functions(int_backend_512_et{}));
+    static_assert(test_bit_functions(int_backend_inf_et{}));
   }
   {
     // math operations
-    static_assert([] () constexpr noexcept {
-      int_backend_inf const a((std::numeric_limits<std::uint32_t>::max)());
-      int_backend_inf const b = -(a * a * a * a * a * a * a * a * a) + (a * a) - (a * a * a);
-      int_backend_inf q;
-      int_backend_inf r;
+    auto const test_math_operations = [] <typename T> (T&&) constexpr noexcept {
+      static_assert([] () constexpr noexcept -> T {
+        T const a((std::numeric_limits<std::uint32_t>::max)());
+        T const b = -(a * a * a * a * a * a * a * a * a) + (a * a) - (a * a * a);
+        T q;
+        T r;
 
-      boost::multiprecision::divide_qr(b, int_backend_inf(5), q, r);
-      return ((q + r) + 1) * -3;
-    }() == int_backend_inf(
-      "298393941220594703994056741294897077225167327209541862571731534281447031079324380613832"
-    ));
+        boost::multiprecision::divide_qr(b, T(5), q, r);
+        return ((q + r) + 1) * -3;
+      }() == T(
+        "298393941220594703994056741294897077225167327209541862571731534281447031079324380613832"
+      ));
+
+      return true;
+    };
+
+    static_assert(test_math_operations(int_backend_512{}));
+    static_assert(test_math_operations(int_backend_512_et{}));
+    static_assert(test_math_operations(int_backend_inf{}));
+    static_assert(test_math_operations(int_backend_inf_et{}));
   }
   {
     // boost integral functions
-    static_assert(
-      boost::multiprecision::powm(
-        int_backend_inf(123), 95, int_backend_inf("347524627690950719232228793293134097314")
-      ) == int_backend_inf("139046631754840920912974963240540036501")
-    );
-    
-    static_assert(
-      boost::multiprecision::gcd(
-        int_backend_inf("19045691428043967582979989657743215704243597051686049733150514095808"),
-        int_backend_inf("13707112918842075981093200133901249713363763549144813434262669433146")
-      ) == 2
-    );
-    
-    static_assert(
-      boost::multiprecision::sqrt(
-        int_backend_inf("19045691428043967582979989657743215704243597051686049733150514095808")
-      ) == int_backend_inf("4364136962567051192681890285117644")
-    );
-    
-    static_assert(
-      boost::multiprecision::abs(
-        int_backend_inf("19045691428043967582979989657743215704243597051686049733150514095808")
-      ) == int_backend_inf("19045691428043967582979989657743215704243597051686049733150514095808")
-    );
+    auto const test_boost_integral_functions = [] <typename T> (T&&) constexpr noexcept {
+      static_assert(
+        boost::multiprecision::gcd(
+          T("19045691428043967582979989657743215704243597051686049733150514095808"),
+          T("13707112918842075981093200133901249713363763549144813434262669433146")
+        ) == 2
+      );
 
-    static_assert(
-      boost::multiprecision::abs(
-        int_backend_inf("-19045691428043967582979989657743215704243597051686049733150514095808")
-      ) == int_backend_inf("19045691428043967582979989657743215704243597051686049733150514095808")
-    );
-    
-    static_assert(
-      boost::multiprecision::integer_modulus(
-        int_backend_inf("19045691428043967582979989657743215704243597051686049733150514095808"),
-        u32_max
-      ) == 2377187843
-    );
+      static_assert(
+        boost::multiprecision::sqrt(
+          T("19045691428043967582979989657743215704243597051686049733150514095808")
+        ) == T("4364136962567051192681890285117644")
+      );
+
+      static_assert(
+        boost::multiprecision::integer_modulus(
+          T("19045691428043967582979989657743215704243597051686049733150514095808"),
+          u32_max
+        ) == 2377187843
+      );
+
+      static_assert(
+        boost::multiprecision::abs(
+          T("19045691428043967582979989657743215704243597051686049733150514095808")
+        ) == T("19045691428043967582979989657743215704243597051686049733150514095808")
+      );
+
+      static_assert(
+        boost::multiprecision::abs(
+          T("-19045691428043967582979989657743215704243597051686049733150514095808")
+        ) == T("19045691428043967582979989657743215704243597051686049733150514095808")
+      );
+
+      static_assert(
+        boost::multiprecision::powm(
+          T(123), 95, T("347524627690950719232228793293134097314")
+        ) == T("139046631754840920912974963240540036501")
+      );
+
+      return true;
+    };
+
+    static_assert(test_boost_integral_functions(int_backend_512{}));
+    static_assert(test_boost_integral_functions(int_backend_inf{}));
+    static_assert(test_boost_integral_functions(int_backend_512_et{}));
+    static_assert(test_boost_integral_functions(int_backend_inf_et{}));
   }
   {
     // handwritten functions
@@ -402,6 +514,11 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(
       factorial(int_backend_inf(50))
       == int_backend_inf("30414093201713378043612608166064768844377641568960512000000000000")
+    );
+
+    static_assert(
+      factorial(int_backend_512_et(50))
+      == int_backend_512_et("30414093201713378043612608166064768844377641568960512000000000000")
     );
 
     static_assert(
@@ -420,6 +537,11 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(
       fibonacci(int_backend_inf(200))
       == int_backend_inf("280571172992510140037611932413038677189525")
+    );
+
+    static_assert(
+      fibonacci(int_backend_512_et(200))
+      == int_backend_512_et("280571172992510140037611932413038677189525")
     );
 
     static_assert(
@@ -442,32 +564,8 @@ inline int run_constexpr_cpp_int_tests()
     static_assert(
       (std::numeric_limits<int_backend_512>::min)()
       == int_backend_512(
-        "-13407807929942597099574024998205846127479365820592393377723561443721764030073546"
-        "976801874298166903427690031858186486050853753882811946569946433649006084095"
-      )
-    );
-
-    static_assert(
-      (std::numeric_limits<int_backend_512>::min)()
-      == int_backend_512(
         "-0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
         "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-      )
-    );
-
-    static_assert(
-      (std::numeric_limits<int_backend_512>::min)()
-      == int_backend_512(
-        "-03777777777777777777777777777777777777777777777777777777777777777777777777777777777777"
-        "77777777777777777777777777777777777777777777777777777777777777777777777777777777777777"
-      )
-    );
-
-    static_assert(
-      (std::numeric_limits<int_backend_512>::max)()
-      == int_backend_512(
-        "13407807929942597099574024998205846127479365820592393377723561443721764030073546"
-        "976801874298166903427690031858186486050853753882811946569946433649006084095"
       )
     );
 
@@ -480,10 +578,18 @@ inline int run_constexpr_cpp_int_tests()
     );
 
     static_assert(
-      (std::numeric_limits<int_backend_512>::max)()
-      == int_backend_512(
-        "03777777777777777777777777777777777777777777777777777777777777777777777777777777777777"
-        "77777777777777777777777777777777777777777777777777777777777777777777777777777777777777"
+      (std::numeric_limits<int_backend_512_et>::min)()
+      == int_backend_512_et(
+        "-0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      )
+    );
+
+    static_assert(
+      (std::numeric_limits<int_backend_512_et>::max)()
+      == int_backend_512_et(
+        "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
       )
     );
   }
@@ -491,5 +597,7 @@ inline int run_constexpr_cpp_int_tests()
   return boost::report_errors();
 }
 #else
-inline int run_constexpr_cpp_int_tests(){}
+inline int run_constexpr_cpp_int_tests(){
+  return 0;
+}
 #endif
