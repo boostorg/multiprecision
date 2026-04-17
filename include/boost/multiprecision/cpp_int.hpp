@@ -1906,12 +1906,11 @@ public:
                ++s;
             std::size_t bitcount = 4 * detail::constexpr_strlen(s);
             limb_type   val = 0;
-            std::size_t limb = 0, shift = 0;
             if (bitcount > 4)
                bitcount -= 4;
             else
                bitcount = 0;
-            std::size_t newsize = bitcount / (sizeof(limb_type) * CHAR_BIT) + 1;
+            const std::size_t newsize = bitcount / (sizeof(limb_type) * CHAR_BIT) + 1;
             result.resize(static_cast<unsigned>(newsize), static_cast<unsigned>(newsize)); // will throw if this is a checked integer that cannot be resized
             detail::constexpr_zero_trivial(result.limbs(), result.size());
             while (*s)
@@ -1930,8 +1929,8 @@ public:
 
                   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
                }
-               limb  = bitcount / (sizeof(limb_type) * CHAR_BIT);
-               shift = bitcount % (sizeof(limb_type) * CHAR_BIT);
+               const std::size_t limb  = bitcount / (sizeof(limb_type) * CHAR_BIT);
+               const std::size_t shift = bitcount % (sizeof(limb_type) * CHAR_BIT);
                val <<= shift;
                if (result.size() > limb)
                {
@@ -1948,12 +1947,11 @@ public:
                ++s;
             std::size_t bitcount = 3 * detail::constexpr_strlen(s);
             limb_type   val = 0;
-            std::size_t limb = 0, shift = 0;
             if (bitcount > 3)
                bitcount -= 3;
             else
                bitcount = 0;
-            std::size_t newsize = bitcount / (sizeof(limb_type) * CHAR_BIT) + 1;
+            const std::size_t newsize = bitcount / (sizeof(limb_type) * CHAR_BIT) + 1;
             result.resize(static_cast<unsigned>(newsize), static_cast<unsigned>(newsize)); // will throw if this is a checked integer that cannot be resized
             detail::constexpr_zero_trivial(result.limbs(), result.size());
             while (*s)
@@ -1968,8 +1966,8 @@ public:
 
                   BOOST_MP_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
                }
-               limb  = bitcount / (sizeof(limb_type) * CHAR_BIT);
-               shift = bitcount % (sizeof(limb_type) * CHAR_BIT);
+               const std::size_t limb  = bitcount / (sizeof(limb_type) * CHAR_BIT);
+               const std::size_t shift = bitcount % (sizeof(limb_type) * CHAR_BIT);
                if (result.size() > limb)
                {
                   result.limbs()[limb] |= (val << shift);
