@@ -340,8 +340,10 @@ private:
       {}
 #if BOOST_MP_ENDIAN_LITTLE_BYTE
 # ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+      // LCOV_EXCL_START
       constexpr data_type(limb_type i, limb_type j) : la{i, j} 
       {}
+      // LCOV_EXCL_STOP
 # endif
       constexpr data_type(double_limb_type i) noexcept 
          : double_first(i)
@@ -708,8 +710,10 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
           : m_data{i}
       {}
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+      // LCOV_EXCL_START
       constexpr data_type(limb_type i, limb_type j) : m_data{i, j}
       {}
+      // LCOV_EXCL_STOP
 #endif
       constexpr data_type(double_limb_type i) : m_double_first_limb(i)
       {
@@ -894,8 +898,10 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
           : m_data{i}
       {}
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+      // LCOV_EXCL_START
       constexpr data_type(limb_type i, limb_type j) : m_data{i, j}
       {}
+      // LCOV_EXCL_STOP
 #endif
       constexpr data_type(double_limb_type i) : m_double_first_limb(i)
       {
