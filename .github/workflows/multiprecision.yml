@@ -1,7 +1,7 @@
 # Copyright 2020 Evan Miller
 # Copyright 2020 Matt Borland
 # Copyright 2021 John Maddock
-# Copyright 2021 Christopher Kormanyos
+# Copyright 2021, 2026 Christopher Kormanyos
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -31,7 +31,7 @@ jobs:
         compiler: [ g++-14 ]
         suite: [ specfun_mpfr, specfun_gmp, specfun_cpp_dec_float, specfun_cpp_bin_float, specfun_float128, specfun_cpp_double_double ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -93,7 +93,7 @@ jobs:
         standard: [ c++14, c++17 ]
         suite: [ github_ci_block_1, github_ci_block_2 ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -155,7 +155,7 @@ jobs:
         standard: [ c++17, c++20 ]
         suite: [ specfun_mpfr, specfun_gmp, specfun_cpp_dec_float, specfun_float128, specfun_cpp_double_double ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -217,7 +217,7 @@ jobs:
         standard: [ c++14, c++17, c++20, c++23 ]
         suite: [ standalone ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -279,7 +279,7 @@ jobs:
         standard: [ c++20 ]
         suite: [ arithmetic_tests, functions_and_limits, conversions, cpp_int_tests, misc ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -341,7 +341,7 @@ jobs:
         standard: [ c++20 ]
         suite: [ arithmetic_tests, functions_and_limits, misc ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: '0'
       - name: Set TOOLSET
@@ -405,7 +405,7 @@ jobs:
         standard: [ 14, 17 ]
         suite: [ github_ci_block_1, github_ci_block_2 ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: '0'
       - name: Checkout main boost
@@ -448,7 +448,7 @@ jobs:
         standard: [ 14, 17, 20 ]
         suite: [ github_ci_block_1, github_ci_block_2 ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: '0'
       - name: Checkout main boost
@@ -486,7 +486,7 @@ jobs:
         standard: [ 14, 17, 2a ]
         suite: [ github_ci_block_1, github_ci_block_2 ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: '0'
       - name: Checkout main boost
