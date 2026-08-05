@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Tutorial</title>
 <link rel="stylesheet" href="../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="prev" href="intro.html" title="Introduction">
@@ -46,6 +46,7 @@
 <dt><span class="section"><a href="tut/floats/gmp_float.html">gmp_float</a></span></dt>
 <dt><span class="section"><a href="tut/floats/mpfr_float.html">mpfr_float</a></span></dt>
 <dt><span class="section"><a href="tut/floats/float128.html">float128</a></span></dt>
+<dt><span class="section"><a href="tut/floats/cpp_double_fp_backend.html">cpp_double_fp_backend</a></span></dt>
 <dt><span class="section"><a href="tut/floats/fp_eg.html">Examples</a></span></dt>
 <dd><dl>
 <dt><span class="section"><a href="tut/floats/fp_eg/floatbuiltinctor.html">Construction
@@ -55,7 +56,7 @@
 <dt><span class="section"><a href="tut/floats/fp_eg/caveats.html">Drop-in
           Caveats</a></span></dt>
 <dt><span class="section"><a href="tut/floats/fp_eg/jel.html">Defining
-          a Special Function.</a></span></dt>
+          a Special Function</a></span></dt>
 <dt><span class="section"><a href="tut/floats/fp_eg/nd.html">Calculating
           a Derivative</a></span></dt>
 <dt><span class="section"><a href="tut/floats/fp_eg/gi.html">Calculating
@@ -82,15 +83,12 @@
 <dt><span class="section"><a href="tut/rational/cpp_rational.html">cpp_rational</a></span></dt>
 <dt><span class="section"><a href="tut/rational/gmp_rational.html">gmp_rational</a></span></dt>
 <dt><span class="section"><a href="tut/rational/tommath_rational.html">tommath_rational</a></span></dt>
-<dt><span class="section"><a href="tut/rational/tommath_rational0.html">tommath_rational</a></span></dt>
 <dt><span class="section"><a href="tut/rational/rational_adaptor.html">rational_adaptor</a></span></dt>
 </dl></dd>
 <dt><span class="section"><a href="tut/misc.html">Miscellaneous Number Types.</a></span></dt>
 <dd><dl>
 <dt><span class="section"><a href="tut/misc/logged_adaptor.html">logged_adaptor</a></span></dt>
 <dt><span class="section"><a href="tut/misc/debug_adaptor.html">debug_adaptor</a></span></dt>
-<dt><span class="section"><a href="tut/misc/visualizers.html">Visual C++
-        Debugger Visualizers</a></span></dt>
 </dl></dd>
 <dt><span class="section"><a href="tut/fwd.html">Forward Declarations</a></span></dt>
 <dt><span class="section"><a href="tut/conversions.html">Constructing and
@@ -132,16 +130,21 @@
           What kind of number do I want (<a class="link" href="tut/ints.html" title="Integer Types">integer</a>,
           <a class="link" href="tut/floats.html" title="Floating-point Types">floating-point</a>,
           <a class="link" href="tut/rational.html" title="Rational Number Types">rational</a>, or
-          <a class="link" href="tut/complex.html" title="Complex Number Types">complex</a>).
+          <a class="link" href="tut/complex.html" title="Complex Number Types">complex</a>)?
         </li>
 <li class="listitem">
           Which back-end do I want to perform the actual arithmetic (Boost-supplied,
-          GMP, MPFR, MPC, Tommath etc)?
+          GMP, MPFR, MPC, Tommath etc.)?
         </li>
 </ul></div>
+<p>
+      A practical, comprehensive, instructive, clear and very helpful video regarding
+      the use of Multiprecision can be found <a href="https://www.youtube.com/watch?v=mK4WjpvLj4c" target="_top">here</a>.
+    </p>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

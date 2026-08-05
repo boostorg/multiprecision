@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>gmp_int</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../ints.html" title="Integer Types">
 <link rel="prev" href="cpp_int.html" title="cpp_int">
@@ -82,8 +82,8 @@
               Formatted IO for this type does not support octal or hexadecimal notation
               for negative values, as a result performing formatted output on this
               type when the argument is negative and either of the flags <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">oct</span></code> or <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">hex</span></code>
-              are set, will result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
-              will be thrown.
+              are set will result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              being thrown.
             </li>
 <li class="listitem">
               Conversion from a string results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
@@ -95,9 +95,9 @@
             </li>
 <li class="listitem">
               Although this type is a wrapper around <a href="http://gmplib.org" target="_top">GMP</a>
-              it will work equally well with <a href="http://mpir.org/" target="_top">MPIR</a>.
-              Indeed use of <a href="http://mpir.org/" target="_top">MPIR</a> is recommended
-              on Win32.
+              it will work equally well with <a href="https://github.com/wbhart/mpir/" target="_top">MPIR</a>.
+              Indeed use of <a href="https://github.com/wbhart/mpir/" target="_top">MPIR</a>
+              is recommended on Win32.
             </li>
 <li class="listitem">
               This backend supports rvalue-references and is move-aware, making instantiations
@@ -133,8 +133,9 @@
 <span class="special">}</span>
 </pre>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

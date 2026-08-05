@@ -14,6 +14,7 @@ boost_multiprecision/tut/floats/cpp_dec_float.html
 boost_multiprecision/tut/floats/gmp_float.html
 boost_multiprecision/tut/floats/mpfr_float.html
 boost_multiprecision/tut/floats/float128.html
+boost_multiprecision/tut/floats/cpp_double_fp_backend.html
 boost_multiprecision/tut/floats/fp_eg.html
 boost_multiprecision/tut/floats/fp_eg/floatbuiltinctor.html
 boost_multiprecision/tut/floats/fp_eg/aos.html
@@ -35,12 +36,10 @@ boost_multiprecision/tut/rational.html
 boost_multiprecision/tut/rational/cpp_rational.html
 boost_multiprecision/tut/rational/gmp_rational.html
 boost_multiprecision/tut/rational/tommath_rational.html
-boost_multiprecision/tut/rational/tommath_rational0.html
 boost_multiprecision/tut/rational/rational_adaptor.html
 boost_multiprecision/tut/misc.html
 boost_multiprecision/tut/misc/logged_adaptor.html
 boost_multiprecision/tut/misc/debug_adaptor.html
-boost_multiprecision/tut/misc/visualizers.html
 boost_multiprecision/tut/fwd.html
 boost_multiprecision/tut/conversions.html
 boost_multiprecision/tut/random.html
@@ -70,6 +69,7 @@ boost_multiprecision/ref/mpf_ref.html
 boost_multiprecision/ref/mpfr_ref.html
 boost_multiprecision/ref/cpp_bin_float_ref.html
 boost_multiprecision/ref/cpp_dec_ref.html
+boost_multiprecision/ref/cpp_double_fp_ref.html
 boost_multiprecision/ref/internals.html
 boost_multiprecision/ref/backendconc.html
 boost_multiprecision/ref/headers.html

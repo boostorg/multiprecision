@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Introduction</title>
 <link rel="stylesheet" href="../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="prev" href="../index.html" title="Chapter 1. Boost.Multiprecision">
@@ -90,7 +90,7 @@
       bigger and more precise reals as simply and portably as possible, close to
       'drop-in' replacements for the <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
       (built-in) type</a> analogs, then use a fully Boost-licensed number type,
-      and skip to one of more of :
+      and skip to one or more of:
     </p>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
@@ -193,8 +193,8 @@
       However conversions that are inherently lossy are either declared explicit
       or else forbidden altogether:
     </p>
-<pre class="programlisting"><span class="identifier">d</span> <span class="special">=</span> <span class="number">3.14</span><span class="special">;</span>  <span class="comment">// Error implicit conversion from double not allowed.</span>
-<span class="identifier">d</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">int512_t</span><span class="special">&gt;(</span><span class="number">3.14</span><span class="special">);</span>  <span class="comment">// OK explicit construction is allowed</span>
+<pre class="programlisting"><span class="identifier">d</span> <span class="special">=</span> <span class="number">3.14</span><span class="special">;</span>  <span class="comment">// Error, implicit conversion from double not allowed.</span>
+<span class="identifier">d</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">int512_t</span><span class="special">&gt;(</span><span class="number">3.14</span><span class="special">);</span>  <span class="comment">// OK, explicit construction is allowed</span>
 </pre>
 <p>
       Mixed arithmetic will fail if the conversion is either ambiguous or explicit:
@@ -278,10 +278,10 @@
     </p>
 <p>
       The great advantage of this method is the <span class="emphasis"><em>elimination of temporaries</em></span>:
-      for example, the "naive" implementation of <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code> above, requires one temporary for computing
+      for example, the "naive" implementation of <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code> above requires one temporary for computing
       the result, and at least another one to return it. It's true that sometimes
       this overhead can be reduced by using move-semantics, but it can't be eliminated
-      completely. For example, lets suppose we're evaluating a polynomial via Horner's
+      completely. For example, let's suppose we're evaluating a polynomial via Horner's
       method, something like this:
     </p>
 <pre class="programlisting"><span class="identifier">T</span> <span class="identifier">a</span><span class="special">[</span><span class="number">7</span><span class="special">]</span> <span class="special">=</span> <span class="special">{</span> <span class="comment">/* some values */</span> <span class="special">};</span>
@@ -297,12 +297,12 @@
       use expression templates to reduce the number of temporaries somewhat). Had
       we used an even simpler wrapper around <a href="http://www.mpfr.org" target="_top">MPFR</a>
       like <a href="http://www.holoborodko.com/pavel/mpfr/" target="_top">mpreal</a> things
-      would have been even worse and no less that 24 temporaries are created for
+      would have been even worse and no less than 24 temporaries are created for
       this simple expression (note - we actually measure the number of memory allocations
       performed rather than the number of temporaries directly, note also that the
       <a href="http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats" target="_top">mpf_class</a>
-      wrapper that will be supplied with GMP-5.1 reduces the number of temporaries
-      to pretty much zero). Note that if we compile with expression templates disabled
+      wrapper supplied with GMP-5.1 or later reduces the number of temporaries to
+      pretty much zero). Note that if we compile with expression templates disabled
       and rvalue-reference support on, then actually still have no wasted memory
       allocations as even though temporaries are created, their contents are moved
       rather than copied. <a href="#ftn.boost_multiprecision.intro.f0" class="footnote" name="boost_multiprecision.intro.f0"><sup class="footnote">[1]</sup></a>
@@ -362,7 +362,7 @@
 <p>
       Given the comments above, you might be forgiven for thinking that expression-templates
       are some kind of universal-panacea: sadly though, all tricks like this have
-      their downsides. For one thing, expression template libraries like this one,
+      their downsides. For one thing, expression template libraries like this one
       tend to be slower to compile than their simpler cousins, they're also harder
       to debug (should you actually want to step through our code!), and rely on
       compiler optimizations being turned on to give really good performance. Also,
@@ -375,12 +375,12 @@
 <span class="keyword">void</span> <span class="identifier">my_proc</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;);</span>
 </pre>
 <p>
-      Then calling:
+      Then calling
     </p>
 <pre class="programlisting"><span class="identifier">my_proc</span><span class="special">(</span><span class="identifier">a</span><span class="special">+</span><span class="identifier">b</span><span class="special">);</span>
 </pre>
 <p>
-      Will very likely result in obscure error messages inside the body of <code class="computeroutput"><span class="identifier">my_proc</span></code> - since we've passed it an expression
+      will very likely result in obscure error messages inside the body of <code class="computeroutput"><span class="identifier">my_proc</span></code> - since we've passed it an expression
       template type, and not a number type. Instead we probably need:
     </p>
 <pre class="programlisting"><span class="identifier">my_proc</span><span class="special">(</span><span class="identifier">my_number_type</span><span class="special">(</span><span class="identifier">a</span><span class="special">+</span><span class="identifier">b</span><span class="special">));</span>
@@ -389,13 +389,13 @@
       Having said that, these situations don't occur that often - or indeed not at
       all for non-template functions. In addition, all the functions in the Boost.Math
       library will automatically convert expression-template arguments to the underlying
-      number type without you having to do anything, so:
+      number type without you having to do anything, so
     </p>
 <pre class="programlisting"><span class="identifier">mpfr_float_100</span> <span class="identifier">a</span><span class="special">(</span><span class="number">20</span><span class="special">),</span> <span class="identifier">delta</span><span class="special">(</span><span class="number">0.125</span><span class="special">);</span>
 <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">gamma_p</span><span class="special">(</span><span class="identifier">a</span><span class="special">,</span> <span class="identifier">a</span> <span class="special">+</span> <span class="identifier">delta</span><span class="special">);</span>
 </pre>
 <p>
-      Will work just fine, with the <code class="computeroutput"><span class="identifier">a</span> <span class="special">+</span> <span class="identifier">delta</span></code> expression
+      will work just fine, with the <code class="computeroutput"><span class="identifier">a</span> <span class="special">+</span> <span class="identifier">delta</span></code> expression
       template argument getting converted to an <code class="computeroutput"><span class="identifier">mpfr_float_100</span></code>
       internally by the Boost.Math library.
     </p>
@@ -469,7 +469,7 @@
             </th>
 <th>
               <p>
-                Relative number of memory allocations
+                Relative Number of Memory Allocations
               </p>
             </th>
 </tr></thead>
@@ -541,8 +541,8 @@
           The cost of an in-place multiplication (using <code class="computeroutput"><span class="keyword">operator</span><span class="special">*=</span></code>) tends to be more than an out-of-place
           <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code>
           (typically <code class="computeroutput"><span class="keyword">operator</span> <span class="special">*=</span></code>
-          has to create a temporary workspace to carry out the multiplication, where
-          as <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code>
+          has to create a temporary workspace to carry out the multiplication, whereas
+          <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code>
           can use the target variable as workspace). Since the expression templates
           carry out their magic by converting out-of-place operators to in-place
           ones, we necessarily take this hit. Even so the transformation is more
@@ -552,7 +552,7 @@
 </ul></div>
 <p>
       Finally, note that <code class="computeroutput"><span class="identifier">number</span></code> takes
-      a second template argument, which, when set to <code class="computeroutput"><span class="identifier">et_off</span></code>
+      a second template argument, which, when set to <code class="computeroutput"><span class="identifier">et_off</span></code>,
       disables all the expression template machinery. The result is much faster to
       compile, but slower at runtime.
     </p>
@@ -771,8 +771,9 @@
       </p></div>
 </div>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

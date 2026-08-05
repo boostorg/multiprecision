@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>mpfi_float</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../interval.html" title="Interval Number Types">
 <link rel="prev" href="../interval.html" title="Interval Number Types">
@@ -47,7 +47,7 @@
           The <code class="computeroutput"><span class="identifier">mpfi_float_backend</span></code>
           type is used in conjunction with <code class="computeroutput"><span class="identifier">number</span></code>:
           It acts as a thin wrapper around the <a href="http://perso.ens-lyon.fr/nathalie.revol/software.html" target="_top">MPFI</a>
-          <code class="computeroutput"><span class="identifier">mpfi_t</span></code> to provide an real-number
+          <code class="computeroutput"><span class="identifier">mpfi_t</span></code> to provide a real-number
           type that is a drop-in replacement for the native C++ floating-point types,
           but with much greater precision and implementing interval arithmetic.
         </p>
@@ -59,7 +59,7 @@
           <code class="computeroutput"><span class="identifier">mpfi_float_500</span></code>, <code class="computeroutput"><span class="identifier">mpfi_float_1000</span></code> provide arithmetic types
           at 50, 100, 500 and 1000 decimal digits precision respectively. The <code class="computeroutput"><span class="keyword">typedef</span> <span class="identifier">mpfi_float</span></code>
           provides a variable precision type whose precision can be controlled via
-          theF <code class="computeroutput"><span class="identifier">number</span></code>s member functions.
+          the <code class="computeroutput"><span class="identifier">number</span></code>s member functions.
         </p>
 <div class="note"><table border="0" summary="Note">
 <tr>
@@ -114,7 +114,7 @@
               or <a href="http://gmplib.org" target="_top">GMP</a> code.
             </li>
 <li class="listitem">
-              The code can equally use <a href="http://mpir.org/" target="_top">MPIR</a>
+              The code can equally use <a href="https://github.com/wbhart/mpir/" target="_top">MPIR</a>
               in place of <a href="http://gmplib.org" target="_top">GMP</a> - indeed that
               is the preferred option on Win32.
             </li>
@@ -273,8 +273,9 @@
 <span class="special">}</span>
 </pre>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
