@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Backend Requirements</title>
 <link rel="stylesheet" href="../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../ref.html" title="Reference">
 <link rel="prev" href="internals.html" title="Internal Support Code">
@@ -46,7 +46,7 @@
         In the following tables, type B is the <code class="computeroutput"><span class="identifier">Backend</span></code>
         template argument to <code class="computeroutput"><span class="identifier">number</span></code>,
         <code class="computeroutput"><span class="identifier">b</span></code> and <code class="computeroutput"><span class="identifier">b2</span></code>
-        are a variables of type B, <code class="computeroutput"><span class="identifier">pb</span></code>
+        are variables of type B, <code class="computeroutput"><span class="identifier">pb</span></code>
         is a variable of type B*, <code class="computeroutput"><span class="identifier">cb</span></code>,
         <code class="computeroutput"><span class="identifier">cb2</span></code> and <code class="computeroutput"><span class="identifier">cb3</span></code>
         are constant variables of type <code class="computeroutput"><span class="keyword">const</span>
@@ -271,7 +271,7 @@
 <td>
                 <p>
                   Assignment from an Arithmetic type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>.
                 </p>
               </td>
@@ -344,9 +344,9 @@
                   Returns the string representation of <code class="computeroutput"><span class="identifier">b</span></code>
                   with <code class="computeroutput"><span class="identifier">ss</span></code> digits
                   and formatted according to the flags set in <code class="computeroutput"><span class="identifier">ff</span></code>.
-                  If <code class="computeroutput"><span class="identifier">ss</span></code> is zero,
-                  then returns as many digits as are required to reconstruct the
-                  original value.
+                  If <code class="computeroutput"><span class="identifier">ss</span></code> is zero and
+                  <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">fixed</span></code> is not set in <code class="computeroutput"><span class="identifier">ff</span></code>, then returns as many digits
+                  as are required to reconstruct the original value.
                 </p>
               </td>
 <td>
@@ -426,7 +426,7 @@
                   <span class="special">&gt;</span> <span class="identifier">a</span></code>
                   and zero if <code class="computeroutput"><span class="identifier">cb</span> <span class="special">==</span> <span class="identifier">a</span></code>.
                   The type of <code class="computeroutput"><span class="identifier">a</span></code> shall
-                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>.
                 </p>
               </td>
@@ -724,7 +724,7 @@
                 <p>
                   Converts <code class="computeroutput"><span class="identifier">cb</span></code> to
                   the type of <code class="computeroutput"><span class="special">*</span><span class="identifier">pa</span></code>
-                  and store the result in <code class="computeroutput"><span class="special">*</span><span class="identifier">pa</span></code>. Type <code class="computeroutput"><span class="identifier">B</span></code>
+                  and stores the result in <code class="computeroutput"><span class="special">*</span><span class="identifier">pa</span></code>. Type <code class="computeroutput"><span class="identifier">B</span></code>
                   shall support conversion to at least types <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">intmax_t</span></code>,
                   <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">uintmax_t</span></code> and <code class="computeroutput"><span class="keyword">long</span>
                   <span class="keyword">long</span></code>. Conversion to other
@@ -938,8 +938,8 @@
               </td>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">N</span></code> is one of the
-                  values <code class="computeroutput"><span class="identifier">number_kind_integer</span></code>,
+                  <code class="computeroutput"><span class="identifier">N</span></code> is the value
+                  <code class="computeroutput"><span class="identifier">number_kind_integer</span></code>,
                   <code class="computeroutput"><span class="identifier">number_kind_floating_point</span></code>,
                   <code class="computeroutput"><span class="identifier">number_kind_complex</span></code>,
                   <code class="computeroutput"><span class="identifier">number_kind_rational</span></code>
@@ -1210,8 +1210,7 @@
               </td>
 <td>
                 <p>
-                  Direct construction from an arithmetic type. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in one of the
-                  type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  Direct construction from an arithmetic type. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
                   or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   this operation is simulated using default-construction followed
                   by assignment.
@@ -1373,7 +1372,7 @@
                 <p>
                   Returns <code class="computeroutput"><span class="keyword">true</span></code> if <code class="computeroutput"><span class="identifier">cb</span></code> and <code class="computeroutput"><span class="identifier">a</span></code>
                   are equal in value. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   return the equivalent of <code class="computeroutput"><span class="identifier">eval_eq</span><span class="special">(</span><span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -1400,7 +1399,7 @@
                 <p>
                   Returns <code class="computeroutput"><span class="keyword">true</span></code> if <code class="computeroutput"><span class="identifier">cb</span></code> and <code class="computeroutput"><span class="identifier">a</span></code>
                   are equal in value. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default version returns <code class="computeroutput"><span class="identifier">eval_eq</span><span class="special">(</span><span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
@@ -1450,8 +1449,7 @@
               </td>
 <td>
                 <p>
-                  Returns <code class="computeroutput"><span class="keyword">true</span></code> if <code class="computeroutput"><span class="identifier">cb</span></code> is less than <code class="computeroutput"><span class="identifier">a</span></code> in value. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in one of the
-                  type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  Returns <code class="computeroutput"><span class="keyword">true</span></code> if <code class="computeroutput"><span class="identifier">cb</span></code> is less than <code class="computeroutput"><span class="identifier">a</span></code> in value. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
                   or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default implementation returns <code class="computeroutput"><span class="identifier">eval_lt</span><span class="special">(</span><span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -1476,8 +1474,7 @@
               </td>
 <td>
                 <p>
-                  Returns <code class="computeroutput"><span class="keyword">true</span></code> if <code class="computeroutput"><span class="identifier">a</span></code> is less than <code class="computeroutput"><span class="identifier">cb</span></code> in value. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in one of the
-                  type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  Returns <code class="computeroutput"><span class="keyword">true</span></code> if <code class="computeroutput"><span class="identifier">a</span></code> is less than <code class="computeroutput"><span class="identifier">cb</span></code> in value. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
                   or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default implementation returns <code class="computeroutput"><span class="identifier">eval_gt</span><span class="special">(</span><span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
@@ -1527,8 +1524,7 @@
               </td>
 <td>
                 <p>
-                  Returns <code class="computeroutput"><span class="keyword">true</span></code> if <code class="computeroutput"><span class="identifier">cb</span></code> is greater than <code class="computeroutput"><span class="identifier">a</span></code> in value. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in one of the
-                  type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  Returns <code class="computeroutput"><span class="keyword">true</span></code> if <code class="computeroutput"><span class="identifier">cb</span></code> is greater than <code class="computeroutput"><span class="identifier">a</span></code> in value. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
                   or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default implementation returns <code class="computeroutput"><span class="identifier">eval_gt</span><span class="special">(</span><span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -1553,8 +1549,7 @@
               </td>
 <td>
                 <p>
-                  Returns <code class="computeroutput"><span class="keyword">true</span></code> if <code class="computeroutput"><span class="identifier">a</span></code> is greater than <code class="computeroutput"><span class="identifier">cb</span></code> in value. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in one of the
-                  type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  Returns <code class="computeroutput"><span class="keyword">true</span></code> if <code class="computeroutput"><span class="identifier">a</span></code> is greater than <code class="computeroutput"><span class="identifier">cb</span></code> in value. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
                   or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default implementation returns <code class="computeroutput"><span class="identifier">eval_lt</span><span class="special">(</span><span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
@@ -1643,8 +1638,7 @@
               </td>
 <td>
                 <p>
-                  Adds <code class="computeroutput"><span class="identifier">a</span></code> to <code class="computeroutput"><span class="identifier">b</span></code>. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in one of the
-                  type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  Adds <code class="computeroutput"><span class="identifier">a</span></code> to <code class="computeroutput"><span class="identifier">b</span></code>. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
                   or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default version calls <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>
                 </p>
@@ -1670,7 +1664,7 @@
               </td>
 <td>
                 <p>
-                  Add <code class="computeroutput"><span class="identifier">cb</span></code> to <code class="computeroutput"><span class="identifier">cb2</span></code> and stores the result in
+                  Adds <code class="computeroutput"><span class="identifier">cb</span></code> to <code class="computeroutput"><span class="identifier">cb2</span></code> and stores the result in
                   <code class="computeroutput"><span class="identifier">b</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">b</span>
                   <span class="special">=</span> <span class="identifier">cb</span><span class="special">;</span> <span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">)</span></code>.
@@ -1697,8 +1691,7 @@
               </td>
 <td>
                 <p>
-                  Add <code class="computeroutput"><span class="identifier">cb</span></code> to <code class="computeroutput"><span class="identifier">a</span></code> and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in one of the
-                  type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  Adds <code class="computeroutput"><span class="identifier">cb</span></code> to <code class="computeroutput"><span class="identifier">a</span></code> and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
                   or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -1724,11 +1717,11 @@
               </td>
 <td>
                 <p>
-                  Add <code class="computeroutput"><span class="identifier">a</span></code> to <code class="computeroutput"><span class="identifier">cb</span></code> and stores the result in
+                  Adds <code class="computeroutput"><span class="identifier">a</span></code> to <code class="computeroutput"><span class="identifier">cb</span></code> and stores the result in
                   <code class="computeroutput"><span class="identifier">b</span></code>. The type of
                   <code class="computeroutput"><span class="identifier">a</span></code> shall be listed
-                  in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
-                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
+                  in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
               </td>
@@ -1755,8 +1748,8 @@
                   Subtracts <code class="computeroutput"><span class="identifier">a</span></code> from
                   <code class="computeroutput"><span class="identifier">b</span></code>. The type of
                   <code class="computeroutput"><span class="identifier">a</span></code> shall be listed
-                  in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
-                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
+                  in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default version calls <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>
                 </p>
               </td>
@@ -1813,7 +1806,7 @@
                   <code class="computeroutput"><span class="identifier">cb</span></code> and stores the
                   result in <code class="computeroutput"><span class="identifier">b</span></code>. The
                   type of <code class="computeroutput"><span class="identifier">a</span></code> shall
-                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -1843,7 +1836,7 @@
                   <code class="computeroutput"><span class="identifier">a</span></code> and stores the
                   result in <code class="computeroutput"><span class="identifier">b</span></code>. The
                   type of <code class="computeroutput"><span class="identifier">a</span></code> shall
-                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">);</span> <span class="identifier">b</span><span class="special">.</span><span class="identifier">negate</span><span class="special">();</span></code>.
                 </p>
@@ -1871,8 +1864,8 @@
                   Multiplies <code class="computeroutput"><span class="identifier">b</span></code> by
                   <code class="computeroutput"><span class="identifier">a</span></code>. The type of
                   <code class="computeroutput"><span class="identifier">a</span></code> shall be listed
-                  in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
-                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
+                  in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default version calls <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>
                 </p>
               </td>
@@ -1929,7 +1922,7 @@
                   <code class="computeroutput"><span class="identifier">a</span></code> and stores the
                   result in <code class="computeroutput"><span class="identifier">b</span></code>. The
                   type of <code class="computeroutput"><span class="identifier">a</span></code> shall
-                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -1959,7 +1952,7 @@
                   <code class="computeroutput"><span class="identifier">cb</span></code> and stores the
                   result in <code class="computeroutput"><span class="identifier">b</span></code>. The
                   type of <code class="computeroutput"><span class="identifier">a</span></code> shall
-                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
@@ -2013,7 +2006,7 @@
                   <code class="computeroutput"><span class="identifier">cb</span></code> and adds the
                   result to <code class="computeroutput"><span class="identifier">b</span></code>. The
                   type of <code class="computeroutput"><span class="identifier">a</span></code> shall
-                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided
                   does the equivalent of creating a temporary <code class="computeroutput"><span class="identifier">B</span>
                   <span class="identifier">t</span></code> and <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">t</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code> followed by <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">t</span><span class="special">)</span></code>.
@@ -2042,7 +2035,7 @@
                   <code class="computeroutput"><span class="identifier">cb</span></code> and adds the
                   result to <code class="computeroutput"><span class="identifier">b</span></code>. The
                   type of <code class="computeroutput"><span class="identifier">a</span></code> shall
-                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_multiply_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
@@ -2097,7 +2090,7 @@
                   <code class="computeroutput"><span class="identifier">cb</span></code> and subtracts
                   the result from <code class="computeroutput"><span class="identifier">b</span></code>.
                   The type of <code class="computeroutput"><span class="identifier">a</span></code> shall
-                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided
                   does the equivalent of creating a temporary <code class="computeroutput"><span class="identifier">B</span>
                   <span class="identifier">t</span></code> and <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">t</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code> followed by <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">t</span><span class="special">)</span></code>.
@@ -2126,7 +2119,7 @@
                   <code class="computeroutput"><span class="identifier">cb</span></code> and subtracts
                   the result from <code class="computeroutput"><span class="identifier">b</span></code>.
                   The type of <code class="computeroutput"><span class="identifier">a</span></code> shall
-                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_multiply_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
@@ -2158,7 +2151,7 @@
                   all arguments of type <code class="computeroutput"><span class="identifier">B</span></code>
                   is shown here, but you can replace up to any 2 of <code class="computeroutput"><span class="identifier">cb</span></code>, <code class="computeroutput"><span class="identifier">cb2</span></code>
                   and <code class="computeroutput"><span class="identifier">cb3</span></code> with any
-                  type listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  type listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>.
                 </p>
               </td>
@@ -2189,7 +2182,7 @@
                   all arguments of type <code class="computeroutput"><span class="identifier">B</span></code>
                   is shown here, but you can replace up to any 2 of <code class="computeroutput"><span class="identifier">cb</span></code>, <code class="computeroutput"><span class="identifier">cb2</span></code>
                   and <code class="computeroutput"><span class="identifier">cb3</span></code> with any
-                  type listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  type listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>.
                 </p>
               </td>
@@ -2213,8 +2206,7 @@
               </td>
 <td>
                 <p>
-                  Divides <code class="computeroutput"><span class="identifier">b</span></code> by <code class="computeroutput"><span class="identifier">a</span></code>. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in one of the
-                  type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  Divides <code class="computeroutput"><span class="identifier">b</span></code> by <code class="computeroutput"><span class="identifier">a</span></code>. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
                   or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default version calls <code class="computeroutput"><span class="identifier">eval_divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>
                 </p>
@@ -2277,7 +2269,7 @@
                   <code class="computeroutput"><span class="identifier">a</span></code> and stores the
                   result in <code class="computeroutput"><span class="identifier">b</span></code>. The
                   type of <code class="computeroutput"><span class="identifier">a</span></code> shall
-                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -2308,8 +2300,8 @@
                   Divides <code class="computeroutput"><span class="identifier">a</span></code> by <code class="computeroutput"><span class="identifier">cb</span></code> and stores the result in
                   <code class="computeroutput"><span class="identifier">b</span></code>. The type of
                   <code class="computeroutput"><span class="identifier">a</span></code> shall be listed
-                  in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
-                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
+                  in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">),</span> <span class="identifier">cb</span><span class="special">)</span></code>.
                 </p>
               </td>
@@ -2402,7 +2394,7 @@
                   <span class="identifier">cb</span></code>, only required when
                   <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default version calls <code class="computeroutput"><span class="identifier">eval_modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>
                 </p>
@@ -2462,7 +2454,7 @@
                   in <code class="computeroutput"><span class="identifier">b</span></code>, only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -2493,7 +2485,7 @@
                   in <code class="computeroutput"><span class="identifier">b</span></code>, only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">),</span> <span class="identifier">cb</span><span class="special">)</span></code>.
                 </p>
@@ -2521,7 +2513,7 @@
                   <span class="identifier">cb</span></code>, only required when
                   <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default version calls <code class="computeroutput"><span class="identifier">eval_bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>
                 </p>
@@ -2577,7 +2569,7 @@
                   in <code class="computeroutput"><span class="identifier">b</span></code>, only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -2606,7 +2598,7 @@
                   in <code class="computeroutput"><span class="identifier">b</span></code>, only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
@@ -2634,7 +2626,7 @@
                   <span class="identifier">cb</span></code>, only required when
                   <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default version calls <code class="computeroutput"><span class="identifier">eval_bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>
                 </p>
@@ -2690,7 +2682,7 @@
                   in <code class="computeroutput"><span class="identifier">b</span></code>, only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -2719,7 +2711,7 @@
                   in <code class="computeroutput"><span class="identifier">b</span></code>, only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
@@ -2747,7 +2739,7 @@
                   <span class="identifier">cb</span></code>, only required when
                   <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   the default version calls <code class="computeroutput"><span class="identifier">eval_bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>
                 </p>
@@ -2803,7 +2795,7 @@
                   in <code class="computeroutput"><span class="identifier">b</span></code>, only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -2832,7 +2824,7 @@
                   in <code class="computeroutput"><span class="identifier">b</span></code>, only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided,
                   does the equivalent of <code class="computeroutput"><span class="identifier">eval_bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
@@ -3189,7 +3181,7 @@
                   and <code class="computeroutput"><span class="identifier">cb2</span></code>. Only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. The default version
                   of this function calls <code class="computeroutput"><span class="identifier">eval_gcd</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -3220,7 +3212,7 @@
                   and <code class="computeroutput"><span class="identifier">cb2</span></code>. Only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. The default version
                   of this function calls <code class="computeroutput"><span class="identifier">eval_lcm</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">B</span><span class="special">(</span><span class="identifier">a</span><span class="special">))</span></code>.
                 </p>
@@ -3251,7 +3243,7 @@
                   and <code class="computeroutput"><span class="identifier">a</span></code>. Only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. The default version
                   of this function calls <code class="computeroutput"><span class="identifier">eval_gcd</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
@@ -3282,7 +3274,7 @@
                   and <code class="computeroutput"><span class="identifier">a</span></code>. Only required
                   when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
                   type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
                   <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. The default version
                   of this function calls <code class="computeroutput"><span class="identifier">eval_lcm</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
                 </p>
@@ -3338,8 +3330,8 @@
                 <p>
                   Sets <code class="computeroutput"><span class="identifier">b</span></code> to the result
                   of <span class="emphasis"><em>(cb^cb2)%a</em></span>. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
-                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>. The default version
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>
+                  or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>. The default version
                   of this function is synthesised from other operations above.
                 </p>
               </td>
@@ -3367,8 +3359,8 @@
                 <p>
                   Sets <code class="computeroutput"><span class="identifier">b</span></code> to the result
                   of <span class="emphasis"><em>(cb^a)%cb2</em></span>. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
-                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>. The default version
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>
+                  or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>. The default version
                   of this function is synthesised from other operations above.
                 </p>
               </td>
@@ -3396,8 +3388,8 @@
                 <p>
                   Sets <code class="computeroutput"><span class="identifier">b</span></code> to the result
                   of <span class="emphasis"><em>(cb^a)%a2</em></span>. The type of <code class="computeroutput"><span class="identifier">a</span></code>
-                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
-                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>. The default version
+                  shall be listed in <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>
+                  or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>. The default version
                   of this function is synthesised from other operations above.
                 </p>
               </td>
@@ -3423,7 +3415,7 @@
                   Sets <code class="computeroutput"><span class="identifier">b</span></code> to the largest
                   integer which when squared is less than <code class="computeroutput"><span class="identifier">cb</span></code>,
                   also sets <code class="computeroutput"><span class="identifier">b2</span></code> to
-                  the remainder, ie to <span class="emphasis"><em>cb - b<sup>2</sup></em></span>. The default
+                  the remainder, i.e. to <span class="emphasis"><em>cb - b<sup>2</sup></em></span>. The default
                   version of this function is synthesised from other operations above.
                 </p>
               </td>
@@ -3524,7 +3516,7 @@
                 <p>
                   Returns one of the same values returned by <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">fpclassify</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   will only test for zero <code class="computeroutput"><span class="identifier">cb</span></code>.
                 </p>
               </td>
@@ -3552,7 +3544,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3580,7 +3572,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3608,7 +3600,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3636,7 +3628,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is implemented in terms of <code class="computeroutput"><span class="identifier">eval_pow</span></code>.
                 </p>
               </td>
@@ -3664,7 +3656,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3692,7 +3684,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3720,7 +3712,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3748,7 +3740,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3776,7 +3768,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3804,7 +3796,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3832,7 +3824,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3860,7 +3852,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3888,7 +3880,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3916,7 +3908,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3944,7 +3936,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -3974,7 +3966,7 @@
                   and <code class="computeroutput"><span class="identifier">cb2</span></code>, and store
                   the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating-point type. The default version of this function
+                  is a floating-point type. The default version of this function
                   is synthesised from other operations above.
                 </p>
               </td>
@@ -4662,8 +4654,9 @@
 <span class="emphasis"><em>number</em></span>        <span class="identifier">nexttoward</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 </pre>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

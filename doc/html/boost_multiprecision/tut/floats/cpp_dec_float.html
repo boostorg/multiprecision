@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>cpp_dec_float</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../floats.html" title="Floating-point Types">
 <link rel="prev" href="cpp_bin_float.html" title="cpp_bin_float">
@@ -30,7 +30,7 @@
 <p>
           <code class="computeroutput"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">cpp_dec_float</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
         </p>
-<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span> <span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span> <span class="special">{</span>
 
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">Digits10</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">ExponentType</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">int32_t</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Allocator</span> <span class="special">=</span> <span class="keyword">void</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">cpp_dec_float</span><span class="special">;</span>
@@ -38,7 +38,7 @@
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">cpp_dec_float_50</span><span class="special">;</span>
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">100</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">cpp_dec_float_100</span><span class="special">;</span>
 
-<span class="special">}}</span> <span class="comment">// namespaces</span>
+<span class="special">}</span> <span class="special">}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
           The <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code> back-end
@@ -108,7 +108,7 @@
             </li>
 <li class="listitem">
               Any <code class="computeroutput"><span class="identifier">number</span></code> instantiated
-              on this type, is convertible to any other <code class="computeroutput"><span class="identifier">number</span></code>
+              on this type is convertible to any other <code class="computeroutput"><span class="identifier">number</span></code>
               instantiated on this type - for example you can convert from <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span></code> to <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="identifier">SomeOtherValue</span><span class="special">&gt;</span> <span class="special">&gt;</span></code>.
               Narrowing conversions are truncating and <code class="computeroutput"><span class="keyword">explicit</span></code>.
             </li>
@@ -162,8 +162,9 @@
 <span class="special">}</span>
 </pre>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

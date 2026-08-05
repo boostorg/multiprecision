@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Variable Precision Arithmetic</title>
 <link rel="stylesheet" href="../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../tut.html" title="Tutorial">
 <link rel="prev" href="mixed.html" title="Mixed Precision Arithmetic">
@@ -282,7 +282,7 @@
                   of the target variable upon assignment. The precision of other
                   types (including related or component types - see preserve_component_precision/preserve_related_precision)
                   contained within the expression are ignored. This option has the
-                  unfortunate side effect, that moves may become full deep copies.
+                  unfortunate side effect that moves may become full deep copies.
                 </p>
               </td>
 </tr>
@@ -298,7 +298,7 @@
                   variable within the expression, and that precision is preserved
                   upon assignment. The precision of other types (including related
                   or component types - see preserve_component_precision/preserve_related_precision)
-                  contained within the expression are ignored. Moves, are true moves
+                  contained within the expression are ignored. Moves are true moves,
                   not copies.
                 </p>
               </td>
@@ -318,7 +318,7 @@
                   expression. Component types are the types which make up the two
                   components of the number when dealing with interval or complex
                   numbers. They are the same type as <code class="computeroutput"><span class="identifier">Num</span><span class="special">::</span><span class="identifier">value_type</span></code>.
-                  Moves, are true moves not copies.
+                  Moves are true moves, not copies.
                 </p>
               </td>
 </tr>
@@ -342,7 +342,7 @@
                   and all expressions containing an <code class="computeroutput"><span class="identifier">mpfr_float_100</span></code>
                   variable would have at least 100 decimal digits of precision when
                   evaluated as an <code class="computeroutput"><span class="identifier">mpfr_float</span></code>
-                  expression. Moves, are true moves not copies.
+                  expression. Moves are true moves, not copies.
                 </p>
               </td>
 </tr>
@@ -362,7 +362,7 @@
                   then the precision of the expression will be sufficient to store
                   all of the digits in the integer unchanged. This option should
                   generally be used with extreme caution, as it can easily cause
-                  unintentional precision inflation. Moves, are true moves not copies.
+                  unintentional precision inflation. Moves are true moves, not copies.
                 </p>
               </td>
 </tr>
@@ -416,7 +416,7 @@
               </td>
 <td>
                 <p>
-                  Also considers component types, ie <code class="computeroutput"><span class="identifier">Num</span><span class="special">::</span><span class="identifier">value_type</span></code>.
+                  Also considers component types, i.e. <code class="computeroutput"><span class="identifier">Num</span><span class="special">::</span><span class="identifier">value_type</span></code>.
                 </p>
               </td>
 </tr>
@@ -570,7 +570,7 @@
 </pre>
 <p>
         Our first example will investigate calculating the Bessel J function via
-        it's well known series representation:
+        its well known series representation:
       </p>
 <p>
         <span class="inlinemediaobject"><object type="image/svg+xml" data="../../../bessel2.svg"></object></span>
@@ -578,7 +578,7 @@
 <p>
         This simple series suffers from catastrophic cancellation error near the
         roots of the function, so we'll investigate slowly increasing the precision
-        of the calculation until we get the result to N-decimal places. We'll begin
+        of the calculation until we get the result to N decimal places. We'll begin
         by defining a function to calculate the series for Bessel J, the details
         of which we'll leave in the source code:
       </p>
@@ -680,11 +680,11 @@
    <span class="special">}</span>
    <span class="comment">//</span>
    <span class="comment">// We now have an accurate result, but it may have too many digits,</span>
-   <span class="comment">// so lets round the result to the requested precision now:</span>
+   <span class="comment">// so let's round the result to the requested precision now:</span>
    <span class="comment">//</span>
    <span class="identifier">result</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">saved_digits10</span><span class="special">);</span>
    <span class="comment">//</span>
-   <span class="comment">// To maintain uniform precision during function return, lets</span>
+   <span class="comment">// To maintain uniform precision during function return, let's</span>
    <span class="comment">// reset the default precision now:</span>
    <span class="comment">//</span>
    <span class="identifier">scoped</span><span class="special">.</span><span class="identifier">reset</span><span class="special">(</span><span class="identifier">saved_digits10</span><span class="special">);</span>
@@ -696,7 +696,7 @@
         the unwary here, when the function returns the variable may be copied/moved
         either once or twice depending on whether the compiler implements the named-return-value
         optimisation. And since this all happens outside the scope of this function,
-        the precision of the returned value may get unexpected changed - and potentially
+        the precision of the returned value may get unexpectedly changed - and potentially
         with different behaviour once optimisations are turned on!
       </p>
 <p>
@@ -846,7 +846,7 @@
    <span class="identifier">scope_2</span><span class="special">.</span><span class="identifier">reset</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">variable_precision_options</span><span class="special">::</span><span class="identifier">preserve_target_precision</span><span class="special">);</span>
    <span class="identifier">mp_t</span> <span class="identifier">result</span> <span class="special">=</span> <span class="identifier">reduced</span><span class="special">;</span>
    <span class="comment">//</span>
-   <span class="comment">// As with previous examples, returning the result may create temporaries, so lets</span>
+   <span class="comment">// As with previous examples, returning the result may create temporaries, so let's</span>
    <span class="comment">// make sure that we preserve the precision of result.  Note that this isn't strictly</span>
    <span class="comment">// required if the calling context is always of uniform precision, but we can't be sure </span>
    <span class="comment">// of our calling context:</span>
@@ -900,8 +900,9 @@
         precision to store <span class="emphasis"><em>i</em></span> unchanged.
       </p>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

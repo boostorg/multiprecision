@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Constructing and Interconverting Between Number Types</title>
 <link rel="stylesheet" href="../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../tut.html" title="Tutorial">
 <link rel="prev" href="fwd.html" title="Forward Declarations">
@@ -39,8 +39,8 @@
             (built-in)</a> arithmetic type, as long as the conversion isn't lossy
             (for example float to int conversion):
           </p>
-<pre class="programlisting"><span class="identifier">cpp_dec_float_50</span> <span class="identifier">df</span><span class="special">(</span><span class="number">0.5</span><span class="special">);</span>   <span class="comment">// OK construction from double</span>
-<span class="identifier">cpp_int</span>          <span class="identifier">i</span><span class="special">(</span><span class="number">450</span><span class="special">);</span>    <span class="comment">// OK constructs from signed int</span>
+<pre class="programlisting"><span class="identifier">cpp_dec_float_50</span> <span class="identifier">df</span><span class="special">(</span><span class="number">0.5</span><span class="special">);</span>   <span class="comment">// OK, construction from double</span>
+<span class="identifier">cpp_int</span>          <span class="identifier">i</span><span class="special">(</span><span class="number">450</span><span class="special">);</span>    <span class="comment">// OK, constructs from signed int</span>
 <span class="identifier">cpp_int</span>          <span class="identifier">j</span> <span class="special">=</span> <span class="number">3.14</span><span class="special">;</span>  <span class="comment">// Error, lossy conversion.</span>
 </pre>
 </li>
@@ -49,8 +49,8 @@
             A number can be explicitly constructed from an arithmetic type, even
             when the conversion is lossy:
           </p>
-<pre class="programlisting"><span class="identifier">cpp_int</span>          <span class="identifier">i</span><span class="special">(</span><span class="number">3.14</span><span class="special">);</span>       <span class="comment">// OK explicit conversion</span>
-<span class="identifier">i</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">cpp_int</span><span class="special">&gt;(</span><span class="number">3.14</span><span class="special">)</span>  <span class="comment">// OK explicit conversion</span>
+<pre class="programlisting"><span class="identifier">cpp_int</span>          <span class="identifier">i</span><span class="special">(</span><span class="number">3.14</span><span class="special">);</span>       <span class="comment">// OK, explicit conversion</span>
+<span class="identifier">i</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">cpp_int</span><span class="special">&gt;(</span><span class="number">3.14</span><span class="special">)</span>  <span class="comment">// OK, explicit conversion</span>
 <span class="identifier">i</span><span class="special">.</span><span class="identifier">assign</span><span class="special">(</span><span class="number">3.14</span><span class="special">);</span>                 <span class="comment">// OK, explicit assign and avoid a temporary from the cast above</span>
 <span class="identifier">i</span> <span class="special">=</span> <span class="number">3.14</span><span class="special">;</span>                       <span class="comment">// Error, no implicit assignment operator for lossy conversion.</span>
 <span class="identifier">cpp_int</span>          <span class="identifier">j</span> <span class="special">=</span> <span class="number">3.14</span><span class="special">;</span>      <span class="comment">// Error, no implicit constructor for lossy conversion.</span>
@@ -100,7 +100,7 @@
           </p>
 <pre class="programlisting"><span class="identifier">mpz_int</span> <span class="identifier">z</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
 <span class="keyword">int</span> <span class="identifier">i</span> <span class="special">=</span> <span class="identifier">z</span><span class="special">;</span>                     <span class="comment">// Error, implicit conversion not allowed.</span>
-<span class="keyword">int</span> <span class="identifier">j</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;(</span><span class="identifier">z</span><span class="special">);</span>   <span class="comment">// OK explicit conversion.</span>
+<span class="keyword">int</span> <span class="identifier">j</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;(</span><span class="identifier">z</span><span class="special">);</span>   <span class="comment">// OK, explicit conversion.</span>
 </pre>
 </li>
 <li class="listitem">
@@ -159,7 +159,7 @@
             explicit if it is:
           </p>
 <pre class="programlisting"><span class="identifier">int128_t</span>     <span class="identifier">i128</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
-<span class="identifier">int266_t</span>     <span class="identifier">i256</span> <span class="special">=</span> <span class="identifier">i128</span><span class="special">;</span>  <span class="comment">// OK implicit widening conversion</span>
+<span class="identifier">int266_t</span>     <span class="identifier">i256</span> <span class="special">=</span> <span class="identifier">i128</span><span class="special">;</span>  <span class="comment">// OK, implicit widening conversion</span>
 <span class="identifier">i128_t</span>            <span class="special">=</span> <span class="identifier">i256</span><span class="special">;</span>  <span class="comment">// Error, no assignment operator found, narrowing conversion is explicit.</span>
 <span class="identifier">i128_t</span>            <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">int128_t</span><span class="special">&gt;(</span><span class="identifier">i256</span><span class="special">);</span> <span class="comment">// OK, explicit narrowing conversion.</span>
 
@@ -204,11 +204,12 @@
         More information on what additional types a backend supports conversions
         from are given in the tutorial for each backend. The converting constructor
         will be implicit if the backend's converting constructor is also implicit,
-        and explicit if the backends converting constructor is also explicit.
+        and explicit if the backend's converting constructor is also explicit.
       </p>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

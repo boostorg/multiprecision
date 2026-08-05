@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>std::numeric_limits&lt;&gt; constants</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../limits.html" title="Numeric Limits">
 <link rel="prev" href="../limits.html" title="Numeric Limits">
@@ -157,7 +157,7 @@
           as an integer result.
         </p>
 <p>
-          There are number of proposals to <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3407.html" target="_top">add
+          There are various proposals to <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3407.html" target="_top">add
           Decimal floating-point Support to C++</a>.
         </p>
 <p>
@@ -222,8 +222,8 @@
         </p>
 <p>
           Boost.Multiprecision integer type <code class="computeroutput"><span class="identifier">cpp_int</span></code>
-          is not modulo because as an __arbitrary_precision types, it expands to
-          hold any value that the machine resources permit.
+          is not modulo because as an __arbitrary_precision type, it expands to hold
+          any value that the machine resources permit.
         </p>
 <p>
           However fixed precision <a class="link" href="../ints/cpp_int.html" title="cpp_int">cpp_int</a>'s
@@ -254,7 +254,7 @@
         </h5>
 <p>
           The number of <code class="computeroutput"><span class="identifier">radix</span></code> digits
-          that be represented without change:
+          that can be represented without change:
         </p>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
@@ -267,9 +267,9 @@
             </li>
 </ul></div>
 <p>
-          The values include any implicit bit, so for example, for the ubiquious
+          The values include any implicit bit, so for example, for the ubiquitous
           <code class="computeroutput"><span class="keyword">double</span></code> using 64 bits (<a href="http://en.wikipedia.org/wiki/Double_precision_floating-point_format" target="_top">IEEE
-          binary64 </a>), <code class="computeroutput"><span class="identifier">digits</span></code>
+          binary64</a>), <code class="computeroutput"><span class="identifier">digits</span></code>
           == 53, even though there are only 52 actual bits of the significand stored
           in the representation. The value of <code class="computeroutput"><span class="identifier">digits</span></code>
           reflects the fact that there is one implicit bit which is always set to
@@ -427,7 +427,7 @@
 <pre class="programlisting"><span class="keyword">double</span> <span class="identifier">write</span> <span class="special">=</span> <span class="number">2.</span><span class="special">/</span><span class="number">3</span><span class="special">;</span> <span class="comment">// Any arbitrary value that cannot be represented exactly.</span>
 <span class="keyword">double</span> <span class="identifier">read</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">stringstream</span> <span class="identifier">s</span><span class="special">;</span>
-<span class="identifier">s</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;::</span><span class="identifier">digits10</span><span class="special">);</span> <span class="comment">// or `float64_t` for 64-bit IEE754 double.</span>
+<span class="identifier">s</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;::</span><span class="identifier">digits10</span><span class="special">);</span> <span class="comment">// or `float64_t` for 64-bit IEEE 754 double.</span>
 <span class="identifier">s</span> <span class="special">&lt;&lt;</span> <span class="identifier">write</span><span class="special">;</span>
 <span class="identifier">s</span> <span class="special">&gt;&gt;</span> <span class="identifier">read</span><span class="special">;</span>
 <span class="keyword">if</span><span class="special">(</span><span class="identifier">read</span> <span class="special">!=</span> <span class="identifier">write</span><span class="special">)</span>
@@ -452,7 +452,7 @@
           will display π to the maximum possible precision using a <code class="computeroutput"><span class="keyword">double</span></code>.
         </p>
 <p>
-          and similarly for a much higher precision type:
+          And similarly for a much higher precision type:
         </p>
 <pre class="programlisting"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>
 
@@ -522,9 +522,9 @@
             and Writing of Floating-Point Numbers, Aubrey Jaffer (August 2018)</a>.
           </p>
 <p>
-            Microsoft VS2017 and other recent compilers, now use the <a href="https://doi.org/10.1145/3192366.3192369" target="_top">Ryu
+            Microsoft VS2017 and other recent compilers now use the <a href="https://doi.org/10.1145/3192366.3192369" target="_top">Ryu
             fast float-to-string conversion by Ulf Adams</a> algorithm, claimed
-            to be both exact and fast for 32 and 64-bit floating-point numbers.
+            to be both exact and fast for 32- and 64-bit floating-point numbers.
           </p>
 </td></tr>
 </table></div>
@@ -613,7 +613,7 @@
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
               <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">denorm_absent</span></code>, if it does not allow
-              denormalized values. (Always used for all integer and exact types).
+              denormalized values. (Always used for all integer and exact types.)
             </li>
 <li class="listitem">
               <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">denorm_present</span></code>, if the floating-point
@@ -634,12 +634,13 @@
         </p>
 <p>
           <code class="computeroutput"><span class="keyword">true</span></code> if a type can determine
-          that a value is too small to be represent as a normalized value before
+          that a value is too small to be represented as a normalized value before
           rounding it.
         </p>
 <p>
           Generally true for <code class="computeroutput"><span class="identifier">is_iec559</span></code>
-          floating-point __fundamantal types, but false for integer types.
+          floating-point <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+          (built-in)</a> types, but false for integer types.
         </p>
 <p>
           Standard-compliant IEEE 754 floating-point implementations may detect the
@@ -663,8 +664,9 @@
             </li>
 </ol></div>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
