@@ -1299,28 +1299,28 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_fmod(T& result, const T& a, const T& b
       eval_floor(n, result);
    eval_multiply(n, b);
    eval_subtract(result, a, n);
-   if (eval_get_sign(result) != 0)
+
+   int c = eval_get_sign(result);
+   if (c != 0)
    {
       //
       // Sanity check, that due to rounding errors in division, 
       // we haven't accidently calculated the wrong value:
       // See https://github.com/boostorg/multiprecision/issues/604 for an example.
       //
-      if (eval_get_sign(result) == eval_get_sign(b))
-      {
-         if (result.compare(b) >= 0)
-         {
-            eval_subtract(result, b);
-         }
-      }
-      else
-      {
-         n = b;
+      // The check is by magnitude, so the comparison reverses when the remainder
+      // is negative: see https://github.com/boostorg/multiprecision/issues/764
+      //
+
+      n = b;
+      if (c != eval_get_sign(b))
          n.negate();
-         if (result.compare(n) >= 0)
-         {
-            eval_subtract(result, n);
-         }
+      int cmp = result.compare(n);                                                                                                                            
+      if (c < 0)
+         cmp = -cmp;
+      if (cmp >= 0)
+      {
+         eval_subtract(result, n);
       }
    }
 }
