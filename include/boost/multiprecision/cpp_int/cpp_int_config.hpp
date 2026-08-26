@@ -129,7 +129,7 @@ using signed_double_limb_type = detail::largest_signed_type<64>::type  ;
 constexpr limb_type                       max_block_10        = 1000000000;
 constexpr limb_type                       digits_per_block_10 = 9;
 
-inline limb_type block_multiplier(std::size_t count)
+inline BOOST_MP_CXX14_CONSTEXPR limb_type block_multiplier(std::size_t count)
 {
    constexpr limb_type values[digits_per_block_10] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
    BOOST_MP_ASSERT(count < digits_per_block_10);
