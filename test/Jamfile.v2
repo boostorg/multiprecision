@@ -512,6 +512,7 @@ test-suite functions_and_limits :
       [ run test_cos_near_half_pi.cpp mpfr gmp quadmath : : : <define>TEST_FLOAT128 release [ check-target-builds ../config//has_mpfr : : <build>no ] [ check-target-builds ../config//has_float128 : : <build>no ] : test_cos_near_half_pi_float128 ]
 
       [ run test_cpp_bin_float_tgamma.cpp ]
+      [ run test_cpp_bin_float_fma.cpp ]
       [ run test_cpp_dec_float_tgamma.cpp ]
       [ run test_cpp_double_float_tgamma.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
       [ run test_cpp_double_float_bessel_versus_bin_and_dec.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
