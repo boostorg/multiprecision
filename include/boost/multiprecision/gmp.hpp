@@ -4068,6 +4068,11 @@ namespace Eigen
       {
          return Real::thread_default_precision();
       }
+      static int max_digits10()
+      {
+         // Match numeric_limits for fixed precision, including GMP's extra limb.
+         return digits10() + 3 + ((GMP_LIMB_BITS * 301L) / 1000L);
+      }
       static Real epsilon()
       {
          return ldexp(Real(1), 1 - digits());
