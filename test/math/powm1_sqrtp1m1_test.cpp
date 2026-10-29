@@ -16,7 +16,7 @@
 
 #include "table_type.hpp"
 
-#include "powm1_sqrtp1m1_test.hpp"
+#include "test_powm1_sqrtp1m1.hpp"
 
 //
 // DESCRIPTION:
