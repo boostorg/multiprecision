@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Input Output</title>
 <link rel="stylesheet" href="../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../tut.html" title="Tutorial">
 <link rel="prev" href="limits/how_to_tell.html" title="How to Determine the Kind of a Number From std::numeric_limits">
@@ -76,9 +76,9 @@
 <p>
         The test at <a href="http://www.boost.org/doc/libs/release/libs/multiprecision/doc/html/../../test/test_cpp_bin_float_io.cpp" target="_top">test_cpp_bin_float_io.cpp</a>
         allows any floating-point type to be <span class="emphasis"><em>round_tripped</em></span> using
-        a wide range of fairly random values. It also includes tests compared a collection
-        of <a href="http://www.boost.org/doc/libs/release/libs/multiprecision/doc/html/../../test/string_data.ipp" target="_top">stringdata</a> test cases
-        in a file.
+        a wide range of fairly random values. It also includes tests comparing a
+        collection of <a href="http://www.boost.org/doc/libs/release/libs/multiprecision/doc/html/../../test/string_data.ipp" target="_top">stringdata</a>
+        test cases in a file.
       </p>
 <h5>
 <a name="boost_multiprecision.tut.input_output.h1"></a>
@@ -154,7 +154,7 @@
         Confusingly, Microsoft (and MinGW) do not conform to this standard and provide
         <span class="bold"><strong>at least three digits</strong></span>, for example <code class="computeroutput"><span class="number">1e+001</span></code>. So if you want the output to match
         that from <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
-        (built-in)</a> floating-point types on compilers that use Microsofts
+        (built-in)</a> floating-point types on compilers that use Microsoft's
         runtime then use:
       </p>
 <pre class="programlisting"><span class="preprocessor">#define</span> <span class="identifier">BOOST_MP_MIN_EXPONENT_DIGITS</span> <span class="number">3</span>
@@ -173,8 +173,9 @@
         columns line up.
       </p>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

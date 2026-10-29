@@ -17,8 +17,8 @@ Language adherence:
   - It is compatible with C++14, 17, 20, 23 and beyond.
 
 The big number types in `Boost.Multiprecision` can be used with a wide selection of basic
-mathematical operations, elementary transcendental functions as well as the functions in
-[`Boost.Math`](https://github.com/boostorg/math).
+mathematical operations, elementary transcendental functions as well as many of the functions
+in [`Boost.Math`](https://github.com/boostorg/math).
 The Multiprecision types also interoperate with built-in types in C++.
 The big number types adhere to clearly defined conversion rules. This allows `Boost.Multiprecision` to be
 used for all kinds of mathematical calculations involving integer, rational and floating-point types
@@ -117,12 +117,14 @@ gamma_half: 1.772453850905516027298167483341145182797549456122387128213807789852
 ## Standalone
 
 Defining `BOOST_MP_STANDALONE` allows `Boost.Multiprecision`
-to be used with the only dependency being [Boost.Config](https://github.com/boostorg/config).
+to be used in standalone mode. When using standalone-Multiprecision,
+the only dependency `Boost.Multiprecision` has is
+[Boost.Config](https://github.com/boostorg/config).
 Our [package on this page](https://github.com/boostorg/multiprecision/releases)
 already includes a copy of [Boost.Config](https://github.com/boostorg/config).
 So no other downloads are required.
 
-Some functionality is reduced in this mode.
+Some functionality is reduced in standalone mode.
 A `static_assert` message will alert you if a particular feature has been disabled by standalone mode.
 [`Boost.Math`](https://github.com/boostorg/math) standalone mode is compatiable,
 and recommended if special functions are required for the floating point types.

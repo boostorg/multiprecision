@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Gauss-Laguerre quadrature</title>
 <link rel="stylesheet" href="../../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../fp_eg.html" title="Examples">
 <link rel="prev" href="variable_precision.html" title="Variable-Precision Newton Evaluation">
@@ -80,10 +80,10 @@
             <span class="number">1</span></code>.
           </p>
 <p>
-            Empirical data were used with <a href="http://www.wolframalpha.com/" target="_top">Wolfram
-            Alpha</a> :
+            Empirical data were used with <a href="https://www.wolframalpha.com/input?i=Fit%5B%7B%7B21.0%2C+3.5%7D%2C+%7B51.0%2C+11.1%7D%2C+%7B101.0%2C+22.5%7D%2C+%7B201.0%2C+46.8%7D%7D%2C+%7B1%2C+d%2C+d%5E2%7D%2C+d%5D+FullSimplify%5B%25%5D" target="_top">Wolfram
+            Alpha Gauss-Laguerre coefficients</a> :
           </p>
-<pre class="programlisting"><span class="identifier">Fit</span><span class="special">[{{</span><span class="number">21.0</span><span class="special">,</span> <span class="number">3.5</span><span class="special">},</span> <span class="special">{</span><span class="number">51.0</span><span class="special">,</span> <span class="number">11.1</span><span class="special">},</span> <span class="special">{</span><span class="number">101.0</span><span class="special">,</span> <span class="number">22.5</span><span class="special">},</span> <span class="special">{</span><span class="number">201.0</span><span class="special">,</span> <span class="number">46.8</span><span class="special">}},</span> <span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="identifier">d</span><span class="special">,</span> <span class="identifier">d</span><span class="special">^</span><span class="number">2</span><span class="special">},</span> <span class="identifier">d</span><span class="special">]</span><span class="identifier">FullSimplify</span><span class="special">[%]</span>
+<pre class="programlisting"><span class="identifier">Fit</span><span class="special">[{{</span><span class="number">21.0</span><span class="special">,</span> <span class="number">3.5</span><span class="special">},</span> <span class="special">{</span><span class="number">51.0</span><span class="special">,</span> <span class="number">11.1</span><span class="special">},</span> <span class="special">{</span><span class="number">101.0</span><span class="special">,</span> <span class="number">22.5</span><span class="special">},</span> <span class="special">{</span><span class="number">201.0</span><span class="special">,</span> <span class="number">46.8</span><span class="special">}},</span> <span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="identifier">d</span><span class="special">,</span> <span class="identifier">d</span><span class="special">^</span><span class="number">2</span><span class="special">},</span> <span class="identifier">d</span><span class="special">]</span> <span class="identifier">FullSimplify</span><span class="special">[%]</span>
   <span class="number">0.0000178915</span> <span class="identifier">d</span><span class="special">^</span><span class="number">2</span> <span class="special">+</span> <span class="number">0.235487</span> <span class="identifier">d</span> <span class="special">-</span> <span class="number">1.28301</span>
   <span class="keyword">or</span>
   <span class="special">-</span><span class="number">1.28301</span> <span class="special">+</span> <span class="special">(</span><span class="number">0.235487</span> <span class="special">+</span> <span class="number">0.0000178915</span> <span class="identifier">d</span><span class="special">)</span> <span class="identifier">d</span>
@@ -120,8 +120,8 @@
 <p>
             Finally the result using Gauss-Laguerre quadrature is compared with a
             calculation using <code class="computeroutput"><span class="identifier">cyl_bessel_k</span></code>,
-            and both are listed, finally confirming that none differ more than a
-            small tolerance.
+            and both are listed, conclusively confirming that none differ by more
+            than a small tolerance.
           </p>
 <pre class="programlisting"><span class="identifier">airy_ai_value</span>  <span class="special">:</span> <span class="number">0.13529241631288141552414742351546630617494414298833070600910205475763353480226572366348710990874867334</span>
 <span class="identifier">airy_ai_control</span><span class="special">:</span> <span class="number">0.13529241631288141552414742351546630617494414298833070600910205475763353480226572366348710990874868323</span>
@@ -138,8 +138,9 @@
             <a href="http://www.boost.org/doc/libs/release/libs/multiprecision/doc/html/../../example/gauss_laguerre_quadrature.cpp" target="_top">gauss_laguerre_quadrature.cpp</a>.
           </p>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

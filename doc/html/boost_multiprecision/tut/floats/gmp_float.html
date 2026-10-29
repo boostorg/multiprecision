@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>gmp_float</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../floats.html" title="Floating-point Types">
 <link rel="prev" href="cpp_dec_float.html" title="cpp_dec_float">
@@ -45,9 +45,9 @@
 </pre>
 <p>
           The <code class="computeroutput"><span class="identifier">gmp_float</span></code> back-end
-          is used in conjunction with <code class="computeroutput"><span class="identifier">number</span></code>
-          : it acts as a thin wrapper around the <a href="http://gmplib.org" target="_top">GMP</a>
-          <code class="computeroutput"><span class="identifier">mpf_t</span></code> to provide an real-number
+          is used in conjunction with <code class="computeroutput"><span class="identifier">number</span></code>:
+          it acts as a thin wrapper around the <a href="http://gmplib.org" target="_top">GMP</a>
+          <code class="computeroutput"><span class="identifier">mpf_t</span></code> to provide a real-number
           type that is a drop-in replacement for the native C++ floating-point types,
           but with much greater precision.
         </p>
@@ -110,7 +110,7 @@
 <li class="listitem">
               This backend supports rvalue-references and is move-aware, making instantiations
               of <code class="computeroutput"><span class="identifier">number</span></code> on this backend
-              move aware.
+              move-aware.
             </li>
 <li class="listitem">
               It is not possible to round-trip objects of this type to and from a
@@ -128,7 +128,7 @@
               to segfault).
             </li>
 <li class="listitem">
-              This type can equally be used with <a href="http://mpir.org/" target="_top">MPIR</a>
+              This type can equally be used with <a href="https://github.com/wbhart/mpir/" target="_top">MPIR</a>
               as the underlying implementation - indeed that is the recommended option
               on Win32.
             </li>
@@ -179,8 +179,9 @@
 <span class="special">}</span>
 </pre>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

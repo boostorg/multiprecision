@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Mixed Precision Arithmetic</title>
 <link rel="stylesheet" href="../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../tut.html" title="Tutorial">
 <link rel="prev" href="rounding.html" title="Rounding Rules for Conversions">
@@ -197,7 +197,7 @@
 <p>
         In addition, while this feature can be used with expression templates turned
         off, this feature minimises temporaries and hence memory allocations when
-        expression template are turned on.
+        expression templates are turned on.
       </p>
 <p>
         By way of an example, consider the dot product of two vectors of <a class="link" href="ints/cpp_int.html" title="cpp_int">cpp_int</a>'s,
@@ -442,7 +442,7 @@
 <tbody class="footnotes"><tr><td colspan="4">
 <div id="ftn.boost_multiprecision.tut.mixed.f0" class="footnote"><p><a href="#boost_multiprecision.tut.mixed.f0" class="para"><sup class="para">[1] </sup></a>
                     Here everything fits within <a class="link" href="ints/cpp_int.html" title="cpp_int">cpp_int</a>'s
-                    default internal cache, so no allocation are required.
+                    default internal cache, so no allocation is required.
                   </p></div>
 <div id="ftn.boost_multiprecision.tut.mixed.f1" class="footnote"><p><a href="#boost_multiprecision.tut.mixed.f1" class="para"><sup class="para">[2] </sup></a>
                     A single allocation for the return value.
@@ -627,7 +627,7 @@
 <p>
         As you can see, there is a sweet spot for middling-sized integers where we
         gain: if the values are small, then <a class="link" href="ints/cpp_int.html" title="cpp_int">cpp_int</a>'s
-        own internal cache is large enough anyway, and no allocation occur. Conversely,
+        own internal cache is large enough anyway, and no allocation occurs. Conversely,
         if the values are sufficiently large, then the cost of the actual arithmetic
         dwarfs the memory allocation time. In this particular case, carefully writing
         the code (version 3) is clearly at least as good as using a separate type
@@ -636,7 +636,7 @@
         case.
       </p>
 <p>
-        A typical example where we can't rewrite our code to avoid unnecessary allocations,
+        A typical example where we can't rewrite our code to avoid unnecessary allocations
         occurs when we're calling an external routine. For example the arc length
         of an ellipse with radii <span class="emphasis"><em>a</em></span> and <span class="emphasis"><em>b</em></span>
         is given by:
@@ -824,7 +824,7 @@
         The following backends have at least some direct support for mixed-precision
         arithmetic, and therefore avoid creating unnecessary temporaries when using
         the interfaces above. Therefore when using these types it's more efficient
-        to use mixed-precision arithmetic, than it is to explicitly cast the operands
+        to use mixed-precision arithmetic than it is to explicitly cast the operands
         to the result type:
       </p>
 <p>
@@ -833,8 +833,9 @@
         <a class="link" href="ints/cpp_int.html" title="cpp_int">cpp_int</a>.
       </p>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

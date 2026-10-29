@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>std::numeric_limits&lt;&gt; functions</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../limits.html" title="Numeric Limits">
 <link rel="prev" href="constants.html" title="std::numeric_limits&lt;&gt; constants">
@@ -345,7 +345,7 @@
 </pre>
 <p>
           (There is also a version BOOST_CHECK_CLOSE using tolerance as a <span class="bold"><strong>percentage</strong></span> rather than a fraction; usually the fraction
-          version is simpler to use).
+          version is simpler to use.)
         </p>
 <pre class="programlisting"><span class="keyword">using</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">number</span><span class="special">;</span>
 <span class="keyword">using</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">cpp_dec_float</span><span class="special">;</span>
@@ -390,8 +390,8 @@
           floating-point types.
         </p>
 <p>
-          Confusingly, the string resulting from outputting this representation,
-          is also implementation-defined. And the string that can be input to generate
+          Confusingly, the string resulting from outputting this representation is
+          also implementation-defined. And the string that can be input to generate
           the representation is also implementation-defined.
         </p>
 <p>
@@ -406,7 +406,7 @@
           work hard to provide a sensible representation for <span class="bold"><strong>all</strong></span>
           floating-point types, not just the <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
           (built-in) types</a>, which with the use of suitable facets to define
-          the input and output strings, makes it possible to use these useful features
+          the input and output strings makes it possible to use these useful features
           portably and including <a href="https://www.boost.org/doc/libs/release/libs/serialization/doc/index.html" target="_top">Boost.Serialization</a>.
         </p>
 <h5>
@@ -430,12 +430,12 @@
           A typical example is <code class="computeroutput"><span class="number">0</span><span class="special">/</span><span class="number">0</span></code> but there are many others.
         </p>
 <p>
-          NaNs may also be used, to represent missing values: for example, these
-          could, by convention, be ignored in calculations of statistics like means.
+          NaNs may also be used to represent missing values: for example, these could,
+          by convention, be ignored in calculations of statistics like means.
         </p>
 <p>
           Many of the problems with a representation for <a href="http://en.wikipedia.org/wiki/NaN" target="_top">Not-A-Number</a>
-          has hampered portable use, similar to those with infinity.
+          have hampered portable use, similar to those with infinity.
         </p>
 <p>
           NaN can be used with binary multiprecision types like <code class="computeroutput"><span class="identifier">cpp_bin_float_quad</span></code>:
@@ -449,7 +449,7 @@
 
   <span class="identifier">cpp_bin_float_quad</span> <span class="identifier">expected</span> <span class="special">=</span> <span class="identifier">NaN</span><span class="special">;</span>
   <span class="identifier">cpp_bin_float_quad</span> <span class="identifier">calculated</span> <span class="special">=</span> <span class="number">2</span> <span class="special">*</span> <span class="identifier">NaN</span><span class="special">;</span>
-  <span class="comment">// Comparisons of NaN's always fail:</span>
+  <span class="comment">// Comparisons of NaNs always fail:</span>
   <span class="keyword">bool</span> <span class="identifier">b</span> <span class="special">=</span> <span class="identifier">expected</span> <span class="special">==</span> <span class="identifier">calculated</span><span class="special">;</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">b</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
   <span class="identifier">BOOST_CHECK_NE</span><span class="special">(</span><span class="identifier">expected</span><span class="special">,</span> <span class="identifier">expected</span><span class="special">);</span>
@@ -500,7 +500,7 @@
 </pre>
 <p>
           Similarly we can do the same with NaN (except that we cannot use <code class="computeroutput"><span class="identifier">assert</span></code> (because any comparisons with
-          NaN always return false).
+          NaN always return false)).
         </p>
 <pre class="programlisting"><span class="special">{</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">locale</span> <span class="identifier">old_locale</span><span class="special">;</span>
@@ -536,8 +536,9 @@
           and not only by using the value returned.
         </p>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Variable-Precision Newton Evaluation</title>
 <link rel="stylesheet" href="../../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../fp_eg.html" title="Examples">
 <link rel="prev" href="poly_eg.html" title="Polynomial Evaluation">
@@ -37,15 +37,15 @@
             for which <span class="emphasis"><em>I<sub>x</sub>(a, b) = 0.5</em></span>.
           </p>
 <p>
-            Ultimately we'll use Newtons method and set the precision of mpfr_float
+            Ultimately we'll use Newton's method and set the precision of mpfr_float
             to have just enough digits at each iteration.
           </p>
 <p>
-            The full source of the this program is in <a href="http://www.boost.org/doc/libs/release/libs/multiprecision/doc/html/../../example/mpfr_precision.cpp" target="_top">../../example/mpfr_precision.cpp</a>
+            The full source of this program is in <a href="http://www.boost.org/doc/libs/release/libs/multiprecision/doc/html/../../example/mpfr_precision.cpp" target="_top">../../example/mpfr_precision.cpp</a>.
           </p>
 <p>
-            We'll skip over the #includes and using declations, and go straight to
-            some support code, first off a simple stopwatch for performance measurement:
+            We'll skip over the #includes and using declarations, and go straight
+            to some support code, first off a simple stopwatch for performance measurement:
           </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">clock_type</span><span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">stopwatch</span> <span class="special">{</span> <span class="comment">/*details \*/</span> <span class="special">};</span>
@@ -84,7 +84,7 @@
                 distribution, and
               </li>
 <li class="listitem">
-                The number of decimal digits precision to achieve in the result.
+                the number of decimal digits precision to achieve in the result.
               </li>
 </ul></div>
 <p>
@@ -93,7 +93,7 @@
             and <code class="computeroutput"><span class="identifier">b</span></code> have been or what
             precision they have, we make a copy of them - note that since copying
             also copies the precision as well as the value, we have to set the precision
-            expicitly with a second argument to the copy. Then we can simply return
+            explicitly with a second argument to the copy. Then we can simply return
             the result of <code class="computeroutput"><span class="identifier">ibeta_inv</span></code>:
           </p>
 <pre class="programlisting"><span class="identifier">mpfr_float</span> <span class="identifier">beta_distribution_median_method_1</span><span class="special">(</span><span class="identifier">mpfr_float</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">a_</span><span class="special">,</span> <span class="identifier">mpfr_float</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">b_</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">digits10</span><span class="special">)</span>
@@ -104,7 +104,7 @@
 <span class="special">}</span>
 </pre>
 <p>
-            You be wondering why we needed to change the precision of our variables
+            You may be wondering why we needed to change the precision of our variables
             <code class="computeroutput"><span class="identifier">a</span></code> and <code class="computeroutput"><span class="identifier">b</span></code>
             as well as setting the default - there are in fact two ways in which
             this can go wrong if we don't do that:
@@ -253,8 +253,9 @@ Relative error: 4.03898e-1501
 <span class="special">}</span>
 </pre>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

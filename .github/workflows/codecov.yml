@@ -3,6 +3,7 @@
 # Copyright 2021 Alexander Grund
 # Copyright 2022 James E. King III
 # Copyright 2023 Matt Borland
+# Copyright 2026 Christopher Kormanyos
 #
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
@@ -93,7 +94,7 @@ jobs:
           fi
           git config --global pack.threads 0
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           # For coverage builds fetch the whole history, else only 1 commit using a 'fake ternary'
           fetch-depth: ${{ matrix.coverage && '0' || '1' }}
@@ -107,7 +108,7 @@ jobs:
           restore-keys: ${{matrix.os}}-${{matrix.container}}-${{matrix.compiler}}-
 
       - name: Fetch Boost.CI
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: boostorg/boost-ci
           ref: master

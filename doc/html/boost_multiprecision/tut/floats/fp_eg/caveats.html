@@ -3,11 +3,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Drop-in Caveats</title>
 <link rel="stylesheet" href="../../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../fp_eg.html" title="Examples">
 <link rel="prev" href="aos.html" title="Area of Circle">
-<link rel="next" href="jel.html" title="Defining a Special Function.">
+<link rel="next" href="jel.html" title="Defining a Special Function">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -90,7 +90,7 @@
 <pre class="programlisting"><span class="number">0.14285714285714285714285714285714285714285714285714</span>
 </pre>
 <p>
-            We can also use Boost.Math <a href="https://www.boost.org/doc/libs/release/libs/math/doc/html/math_toolkit/constants.html" target="_top">Boost.Math
+            We can also use <a href="https://www.boost.org/doc/libs/release/libs/math/doc/html/math_toolkit/constants.html" target="_top">Boost.Math
             constants</a> like π, guaranteed to be initialized with the very last
             bit of precision for the floating-point type.
           </p>
@@ -163,11 +163,11 @@
             For some purposes, this difference in precision may be insignificant,
             but if one is implementing a formula involving a fraction from integers,
             including decimal fractions like 1/10, 1/100, then comparison with other
-            computations like <a href="http://www.wolframalpha.com/" target="_top">Wolfram Alpha</a>
-            will reveal differences whose cause may be perplexing.
+            computations like __WolframAlpha will reveal differences whose cause
+            may be perplexing.
           </p>
 <p>
-            To get as precise-as-possible decimal fractions like 1.234, we can write
+            To get as-precise-as-possible decimal fractions like 1.234, we can write
           </p>
 <pre class="programlisting"><span class="keyword">const</span> <span class="identifier">cpp_bin_float_50</span> <span class="identifier">f1</span><span class="special">(</span><span class="identifier">cpp_bin_float_50</span><span class="special">(</span><span class="number">1234</span><span class="special">)</span> <span class="special">/</span> <span class="number">1000</span><span class="special">);</span>  <span class="comment">// Construct from a fraction.</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cpp_bin_float_50 f1(cpp_bin_float_50(1234) / 1000) = "</span> <span class="special">&lt;&lt;</span> <span class="identifier">f1</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// cpp_bin_float_50 f1(cpp_bin_float_50(1234) / 1000) = 1.2340000000000000000000000000000000000000000000000</span>
@@ -200,8 +200,9 @@
 <span class="identifier">cpp_bin_float_50</span> <span class="identifier">f3</span><span class="special">(</span><span class="identifier">cpp_bin_float_50</span><span class="special">(</span><span class="number">1.234</span><span class="special">))</span> <span class="special">=</span> <span class="number">1.2339999999999999857891452847979962825775146484375</span>
 </pre>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

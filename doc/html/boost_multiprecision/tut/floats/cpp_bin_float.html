@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>cpp_bin_float</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../floats.html" title="Floating-point Types">
 <link rel="prev" href="../floats.html" title="Floating-point Types">
@@ -77,12 +77,11 @@
           provide software analogues of the IEEE single, double, quad and octuple
           float data types, plus the Intel-extended-double type respectively. Note
           that while these types are functionally equivalent to the native IEEE types,
-          but they do not have the same size or bit-layout as true IEEE compatible
-          types.
+          they do not have the same size or bit-layout as true IEEE compatible types.
         </p>
 <p>
           Normally <code class="computeroutput"><span class="identifier">cpp_bin_float</span></code>
-          allocates no memory: all of the space required for its digits are allocated
+          allocates no memory: all of the space required for its digits is allocated
           directly within the class. As a result care should be taken not to use
           the class with too high a digit count as stack space requirements can grow
           out of control. If that represents a problem then providing an allocator
@@ -137,7 +136,7 @@
             </li>
 <li class="listitem">
               Any <code class="computeroutput"><span class="identifier">number</span></code> instantiated
-              on this type, is convertible to any other <code class="computeroutput"><span class="identifier">number</span></code>
+              on this type is convertible to any other <code class="computeroutput"><span class="identifier">number</span></code>
               instantiated on this type - for example you can convert from <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_bin_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span></code> to <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_bin_float</span><span class="special">&lt;</span><span class="identifier">SomeOtherValue</span><span class="special">&gt;</span> <span class="special">&gt;</span></code>.
               Narrowing conversions round to nearest and are <code class="computeroutput"><span class="keyword">explicit</span></code>.
             </li>
@@ -150,7 +149,7 @@
               All arithmetic operations are correctly rounded to nearest. String
               conversions and the <code class="computeroutput"><span class="identifier">sqrt</span></code>
               function are also correctly rounded, but transcendental functions (sin,
-              cos, pow, exp etc) are not.
+              cos, pow, exp etc.) are not.
             </li>
 </ul></div>
 <h6>
@@ -188,8 +187,9 @@
 <span class="special">}</span>
 </pre>
 </div>
-<div class="copyright-footer">Copyright © 2002-2020 John
-      Maddock and Christopher Kormanyos<p>
+<div class="copyright-footer">Copyright © 2002-2025 Matthew
+      Borland, Paul A. Bristow, Christopher Kormanyos, Janek Kozicki, John Maddock
+      and Fahad Syed<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

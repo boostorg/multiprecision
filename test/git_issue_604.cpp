@@ -65,6 +65,56 @@ void test()
       T       r = boost::multiprecision::fmod(val1, val2);
       BOOST_CHECK_EQUAL(r, T(0));
    }
+   // Non-zero remainders with a negative dividend, see issue 764: both conventions
+   // agree at zero, so the cases above cannot tell them apart.
+   {
+      const T val1{-8.5};
+      const T val2{2.5};
+      T        r = boost::multiprecision::fmod(val1, val2);
+      BOOST_CHECK_EQUAL(r, T(-1));
+   }
+   {
+      const T val1{-8.5};
+      const T val2{-2.5};
+      T        r = boost::multiprecision::fmod(val1, val2);
+      BOOST_CHECK_EQUAL(r, T(-1));
+   }
+   {
+      const T val1{8.5};
+      const T val2{2.5};
+      T        r = boost::multiprecision::fmod(val1, val2);
+      BOOST_CHECK_EQUAL(r, T(1));
+   }
+   {
+      const T val1{8.5};
+      const T val2{-2.5};
+      T        r = boost::multiprecision::fmod(val1, val2);
+      BOOST_CHECK_EQUAL(r, T(1));
+   }
+   {
+      const T val1{0.5};
+      const T val2{-1};
+      T        r = boost::multiprecision::fmod(val1, val2);
+      BOOST_CHECK_EQUAL(r, T(0.5));
+   }
+   {
+      const T val1{-0.5};
+      const T val2{1};
+      T        r = boost::multiprecision::fmod(val1, val2);
+      BOOST_CHECK_EQUAL(r, T(-0.5));
+   }
+   {
+      const T val1{-0.5};
+      const T val2{-1};
+      T        r = boost::multiprecision::fmod(val1, val2);
+      BOOST_CHECK_EQUAL(r, T(-0.5));
+   }
+   {
+      const T val1{0.5};
+      const T val2{1};
+      T        r = boost::multiprecision::fmod(val1, val2);
+      BOOST_CHECK_EQUAL(r, T(0.5));
+   }
 }
 
 
