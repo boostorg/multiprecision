@@ -1169,6 +1169,135 @@ inline typename std::enable_if<boost::multiprecision::detail::is_signed<S>::valu
    eval_multiply(res, res, b);
 }
 
+//
+// Fused multiply-add, computes a * b + c (or a * b - c if negate_c is true) with a single rounding.
+// The product of two p-bit significands is exact in 2p bits, so the only difficulty is adding c without
+// rounding twice.  We treat three cases, with e(x) the exponent of the leading bit of x and
+// lowP the weight of the least significant bit of the exact product:
+//
+// * c is so large that the product is far below half an ulp of c: the result is c.
+// * c is so small that it can only act as a "sticky" bit below the product (|c| < 2^(lowP-1)):
+//   replace c by a power of two with the same sign that is below the product's last bit.  Every rounding
+//   boundary is a multiple of 2^lowP (this needs p >= 3), so this can not change the rounding decision.
+// * Otherwise the exact sum has at most 3p + 3 significant bits and is computed exactly in a type with 3p + 8 bits.
+//
+// The result is then rounded exactly once, when it is converted back to the precision of the arguments.
+//
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
+inline void eval_multiply_add_impl(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& b,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& c,
+   bool negate_c)
+{
+   using default_ops::eval_add;
+   using default_ops::eval_multiply;
+   using default_ops::eval_subtract;
+
+   using bf_type = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>;
+   constexpr std::ptrdiff_t bc = static_cast<std::ptrdiff_t>(bf_type::bit_count);
+   static_assert(bc >= 3, "fma requires at least 3 bits of precision");
+   // Intermediate values use a wide exponent so that the exponent of the product can not overflow:
+   using wide_exponent_type = typename std::conditional<(sizeof(Exponent) > sizeof(std::int64_t)), Exponent, std::int64_t>::type;
+   using product_type = cpp_bin_float<static_cast<unsigned>(2 * bc), digit_base_2, Allocator, wide_exponent_type, 0, 0>;
+   using wide_type    = cpp_bin_float<static_cast<unsigned>(3 * bc + 8), digit_base_2, Allocator, wide_exponent_type, 0, 0>;
+
+   if ((a.exponent() > bf_type::max_exponent) || (b.exponent() > bf_type::max_exponent) || (c.exponent() > bf_type::max_exponent))
+   {
+      // Zeros, infinities and NaNs: the product is exact (or not a number), so there is only one rounding anyway.
+      bf_type t;
+      eval_multiply(t, a, b);
+      if (negate_c)
+         eval_subtract(res, t, c);
+      else
+         eval_add(res, t, c);
+      return;
+   }
+
+   const std::ptrdiff_t ec   = static_cast<std::ptrdiff_t>(c.exponent());
+   const std::ptrdiff_t eP   = static_cast<std::ptrdiff_t>(a.exponent()) + static_cast<std::ptrdiff_t>(b.exponent()); // leading bit of the product is eP or eP + 1
+   const std::ptrdiff_t lowP = eP - 2 * (bc - 1);
+
+   if (eP + 3 <= ec - bc)
+   {
+      // The product is less than 2^(eP+2) <= 2^(ec-bc-1), which is half the spacing of the numbers just below c,
+      // so c is the correctly rounded result:
+      bool s = c.sign() != negate_c;
+      res    = c;
+      res.sign() = s;
+      return;
+   }
+
+   product_type pa, pb, pp;
+   pa = a;
+   pb = b;
+   eval_multiply(pp, pa, pb); // Exact.
+   wide_type wp, wc;
+   wp = pp;
+   if (ec < lowP - 1)
+   {
+      wc = static_cast<unsigned>(1u);
+      wc.exponent() = static_cast<wide_exponent_type>(lowP - 2);
+   }
+   else
+      wc = c;
+   wc.sign() = c.sign() != negate_c;
+   eval_add(wp, wc); // Exact.
+   // Exponents outside the range of the result type can not be narrowed safely, and rounding
+   // can not bring them back into range:
+   if ((wp.exponent() != wide_type::exponent_zero) && (wp.exponent() > static_cast<wide_exponent_type>(bf_type::max_exponent)))
+   {
+      res.exponent() = bf_type::exponent_infinity;
+      res.sign()     = wp.sign();
+      res.bits()     = static_cast<limb_type>(0u);
+   }
+   else if ((wp.exponent() != wide_type::exponent_zero) && (wp.exponent() < static_cast<wide_exponent_type>(bf_type::min_exponent) - 1))
+   {
+      res.exponent() = bf_type::exponent_zero;
+      res.sign()     = wp.sign();
+      res.bits()     = static_cast<limb_type>(0u);
+   }
+   else
+      res = wp; // The only rounding.
+}
+
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
+inline void eval_multiply_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& b,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& c)
+{
+   eval_multiply_add_impl(res, a, b, c, false);
+}
+
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
+inline void eval_multiply_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& b,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& c)
+{
+   eval_multiply_add_impl(res, a, b, c, true);
+}
+
+// t += a * b and t -= a * b:
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
+inline void eval_multiply_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& t,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& b)
+{
+   eval_multiply_add_impl(t, a, b, t, false);
+}
+
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
+inline void eval_multiply_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& t,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a,
+   const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& b)
+{
+   cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> na(a);
+   na.negate();
+   eval_multiply_add_impl(t, na, b, t, false);
+}
+
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
    class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2,
    class Allocator3, class Exponent3, Exponent MinE3, Exponent MaxE3>
