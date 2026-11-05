@@ -3333,6 +3333,10 @@ namespace Eigen
       {
          return Real::thread_default_precision();
       }
+      static int max_digits10()
+      {
+         return static_cast<int>(boost::multiprecision::detail::calc_max_digits10<0>::max_digits_10(static_cast<unsigned>(digits())));
+      }
       static int digits()
       {
          return boost::math::tools::digits<Real>();

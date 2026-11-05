@@ -68,6 +68,11 @@ struct NumTraitsImp<B1, B1>
    {
       return digits10_imp(std::integral_constant < bool, std::numeric_limits<Real>::digits10 && (std::numeric_limits<Real>::digits10 != INT_MAX) ? true : false > ());
    }
+   static int max_digits10()
+   {
+      static_assert(std::numeric_limits<Real>::is_specialized, "Eigen's NumTraits instantiated on a type with no numeric_limits support.  Are you using a variable precision type?");
+      return std::numeric_limits<Real>::max_digits10;
+   }
    static int digits()
    {
       // return the number of digits in the component type in case Real is complex
@@ -138,6 +143,10 @@ struct NumTraitsImp : public NumTraitsImp<B2, B2>
    static int digits10()
    {
       return NumTraitsImp<B2, B2>::digits10();
+   }
+   static int max_digits10()
+   {
+      return NumTraitsImp<B2, B2>::max_digits10();
    }
    static int digits()
    {

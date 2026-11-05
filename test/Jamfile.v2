@@ -1307,6 +1307,10 @@ test-suite misc :
       #
       # Eigen interoperability:
       #
+      [ run test_eigen_numtraits.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
+      [ run test_eigen_numtraits.cpp gmp : : : release <define>TEST_GMP [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_gmp : : <build>no ] : test_eigen_numtraits_gmp ]
+      [ run test_eigen_numtraits.cpp mpfr gmp : : : release <define>TEST_MPFR [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpfr : : <build>no ] : test_eigen_numtraits_mpfr ]
+      [ run test_eigen_numtraits.cpp mpc mpfr gmp : : : release <define>TEST_MPC [ check-target-builds ../config//has_eigen : : <build>no ] [ check-target-builds ../config//has_mpc : : <build>no ] : test_eigen_numtraits_mpc ]
       [ run test_eigen_interop_cpp_int.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
       [ run test_eigen_interop_cpp_dec_float.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
       [ run test_eigen_interop_cpp_dec_float_2.cpp : : : release [ check-target-builds ../config//has_eigen : : <build>no ] ]
@@ -1329,6 +1333,7 @@ test-suite misc :
 ;
 
 alias eigen_tests :
+    test_eigen_numtraits test_eigen_numtraits_gmp test_eigen_numtraits_mpfr test_eigen_numtraits_mpc test_eigen_interop_cpp_complex
     test_eigen_interop_cpp_int test_eigen_interop_cpp_dec_float test_eigen_interop_cpp_dec_float_2 test_eigen_interop_cpp_dec_float_3
     test_eigen_interop_cpp_bin_float_1 test_eigen_interop_cpp_bin_float_2 test_eigen_interop_cpp_bin_float_3 test_eigen_interop_mpfr_1
     test_eigen_interop_mpfr_2 test_eigen_interop_mpfr_3 test_eigen_interop_mpfr_4 test_eigen_interop_mpfr_5 test_eigen_interop_mpfr_6
