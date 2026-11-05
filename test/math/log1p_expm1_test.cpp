@@ -18,7 +18,7 @@
 
 #include "table_type.hpp"
 
-#include "log1p_expm1_test.hpp"
+#include "test_log1p_expm1.hpp"
 
 //
 // DESCRIPTION:
