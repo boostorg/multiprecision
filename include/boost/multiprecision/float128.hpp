@@ -755,7 +755,7 @@ inline void eval_remainder(float128_backend& result, const float128_backend& a, 
 {
    result.value() = remainderq(a.value(), b.value());
 }
-inline void eval_remainder(float128_backend& result, const float128_backend& a, const float128_backend& b, int* pi)
+inline void eval_remquo(float128_backend& result, const float128_backend& a, const float128_backend& b, int* pi)
 {
    result.value() = remquoq(a.value(), b.value(), pi);
 }
